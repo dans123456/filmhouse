@@ -458,6 +458,7 @@ img {
         border-color: var(--primary-color);
         box-shadow: 0 0 15px rgba(245, 197, 24, 0.25);
         z-index: 1001;
+        margin-left: 0; /* Reset margin on expansion */
     }
     
     .search-bar-wrapper.expanded .search-icon {
