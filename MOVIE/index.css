@@ -422,6 +422,7 @@ img {
         cursor: pointer;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
+        margin-left: auto; /* Pushes the search button to the right next to the trophy and profile */
     }
     
     .search-bar-wrapper .search-icon {
