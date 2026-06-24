@@ -127,7 +127,7 @@ async function initializeDatabase() {
     }
 
     // 2. Load from localStorage cache
-    const cachedData = localStorage.getItem("filmhouse_enriched_db_v4");
+    const cachedData = localStorage.getItem("filmhouse_enriched_db_v5");
     if (cachedData) {
         try {
             const parsed = JSON.parse(cachedData);
@@ -143,7 +143,7 @@ async function initializeDatabase() {
             state.movies = parsed;
             statusEl.textContent = "Loading cached database...";
         } catch (e) {
-            localStorage.removeItem("filmhouse_enriched_db_v4");
+            localStorage.removeItem("filmhouse_enriched_db_v5");
         }
     }
     
@@ -411,7 +411,7 @@ async function initializeDatabase() {
 
     state.movies = enrichedList;
     shuffleArray(state.movies);
-    localStorage.setItem("filmhouse_enriched_db_v4", JSON.stringify(enrichedList));
+    localStorage.setItem("filmhouse_enriched_db_v5", JSON.stringify(enrichedList));
     statusEl.textContent = "Complete!";
 }
 
