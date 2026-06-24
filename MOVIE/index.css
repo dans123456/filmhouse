@@ -1101,7 +1101,6 @@ img {
     transform: scale(1.05);
 }
 
-/* Rating badge on card */
 .movie-card-rating {
     position: absolute;
     top: 8px;
@@ -1114,15 +1113,21 @@ img {
     font-weight: 700;
     padding: 3px 6px;
     border-radius: 4px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 3px;
+    justify-content: center;
+    gap: 4px;
     border: 1px solid rgba(255, 188, 0, 0.2);
 }
 
 .movie-card-rating svg {
     width: 10px;
     height: 10px;
+    display: block;
+}
+.movie-card-rating svg use {
+    width: 100%;
+    height: 100%;
 }
 
 .movie-card-type-badge {
@@ -1344,13 +1349,18 @@ img {
 .detail-meta-list .rating {
     color: var(--primary-color);
     font-weight: 700;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
 }
 .detail-meta-list .rating svg {
     width: 12px;
     height: 12px;
+    display: block;
+}
+.detail-meta-list .rating svg use {
+    width: 100%;
+    height: 100%;
 }
 
 .meta-divider {
@@ -1402,6 +1412,11 @@ img {
     fill: currentColor;
     flex-shrink: 0;
     margin: 0;
+}
+.detail-actions-row .btn svg use,
+.detail-actions-row .btn .icon use {
+    width: 100%;
+    height: 100%;
 }
 
 .detail-actions-row .btn.btn-request-premium {
