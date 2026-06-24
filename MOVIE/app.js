@@ -120,7 +120,6 @@ async function initializeDatabase() {
             if (data && data.length > 0) {
                 state.movies = data;
                 statusEl.textContent = "Starting Film House...";
-                return;
             }
         }
     } catch (e) {
@@ -143,10 +142,22 @@ async function initializeDatabase() {
             });
             state.movies = parsed;
             statusEl.textContent = "Loading cached database...";
-            return;
         } catch (e) {
             localStorage.removeItem("filmhouse_enriched_db_v4");
         }
+    }
+    
+    // Helper to shuffle array in-place
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    if (state.movies && state.movies.length > 0) {
+        shuffleArray(state.movies);
+        return;
     }
 
     // 3. Fallback: Parse CSV and enrich dynamically
@@ -399,6 +410,7 @@ async function initializeDatabase() {
     }
 
     state.movies = enrichedList;
+    shuffleArray(state.movies);
     localStorage.setItem("filmhouse_enriched_db_v4", JSON.stringify(enrichedList));
     statusEl.textContent = "Complete!";
 }
@@ -2136,7 +2148,7 @@ function openDetailModal(movie) {
     watchlistBtn.appendChild(wText);
     
     watchlistBtn.addEventListener("click", () => {
-        toggleWatchlist(movie.csv_id);
+        toggleWatchlist(movie);
         const active = state.watchlist.includes(movie.csv_id);
         watchlistBtn.className = `btn ${active ? 'btn-secondary' : 'btn-primary'}`;
         
@@ -2174,7 +2186,7 @@ function openDetailModal(movie) {
             watchedText.textContent = "Mark Watched";
         } else {
             // Add to history
-            addWatchHistory(movie.csv_id);
+            addWatchHistory(movie);
             
             // Award points (+5)
             awardPoints(5, "watched");
@@ -2409,10 +2421,15 @@ function createMetaDivider() {
 }
 
 // Watchlist local Storage helper
-function toggleWatchlist(movieId) {
+function toggleWatchlist(movie) {
+    const movieId = typeof movie === 'object' ? movie.csv_id : movie;
     const index = state.watchlist.indexOf(movieId);
     if (index === -1) {
         state.watchlist.push(movieId);
+        // Persist external movie metadata if it's not a local database movie
+        if (typeof movie === 'object' && movie.links && movie.links.length === 0) {
+            saveExternalMovieLocally(movie);
+        }
         showToast("Added to your watchlist!", "success", {
             text: "View",
             callback: () => {
@@ -2435,7 +2452,37 @@ function toggleWatchlist(movieId) {
     renderRecommendations();
 }
 
+function saveExternalMovieLocally(movie) {
+    try {
+        const saved = localStorage.getItem("filmhouse_external_movies");
+        let list = saved ? JSON.parse(saved) : [];
+        if (!list.some(m => m.csv_id === movie.csv_id)) {
+            list.push(movie);
+            localStorage.setItem("filmhouse_external_movies", JSON.stringify(list));
+        }
+    } catch (e) {
+        console.error("Error saving external movie", e);
+    }
+}
+
+function loadExternalMovies() {
+    try {
+        const saved = localStorage.getItem("filmhouse_external_movies");
+        if (saved) {
+            const list = JSON.parse(saved);
+            list.forEach(extMovie => {
+                if (!state.movies.some(m => m.csv_id === extMovie.csv_id)) {
+                    state.movies.push(extMovie);
+                }
+            });
+        }
+    } catch (e) {
+        console.error("Error loading external movies", e);
+    }
+}
+
 function loadWatchlist() {
+    loadExternalMovies();
     const saved = localStorage.getItem("filmhouse_watchlist");
     if (saved) {
         try {
@@ -2450,10 +2497,14 @@ function loadWatchlist() {
 }
 
 // Watch History persistence helper
-function addWatchHistory(movieId) {
+function addWatchHistory(movie) {
+    const movieId = typeof movie === 'object' ? movie.csv_id : movie;
     if (!state.history.includes(movieId)) {
         state.history.unshift(movieId);
         if (state.history.length > 20) state.history.pop();
+        if (typeof movie === 'object' && movie.links && movie.links.length === 0) {
+            saveExternalMovieLocally(movie);
+        }
         localStorage.setItem("filmhouse_history", JSON.stringify(state.history));
     }
     const countLabel = document.getElementById("stat-history-count");
@@ -2464,6 +2515,7 @@ function addWatchHistory(movieId) {
 }
 
 function loadWatchHistory() {
+    loadExternalMovies();
     const saved = localStorage.getItem("filmhouse_history");
     if (saved) {
         try {
@@ -3122,9 +3174,13 @@ function bindEvents() {
     const searchIcon = document.querySelector(".search-icon");
     let searchDebounceTimer = null;
     if (searchInput) {
+        const clearBtn = document.getElementById("search-clear-btn");
         searchInput.addEventListener("input", (e) => {
             const query = e.target.value;
             state.searchQuery = query;
+            if (clearBtn) {
+                clearBtn.style.display = query ? "flex" : "none";
+            }
             if (query.trim().length < 3) {
                 state.externalSearchResults = [];
                 renderFeaturedGrid();
@@ -3136,6 +3192,16 @@ function bindEvents() {
                 }, 400);
             }
         });
+        if (clearBtn) {
+            clearBtn.addEventListener("click", () => {
+                searchInput.value = "";
+                state.searchQuery = "";
+                state.externalSearchResults = [];
+                clearBtn.style.display = "none";
+                renderFeaturedGrid();
+                searchInput.focus();
+            });
+        }
     }
     if (searchWrapper && searchInput && searchIcon) {
         searchIcon.addEventListener("click", (e) => {
