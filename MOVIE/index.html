@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Film House</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- PapaParse for local client-side CSV parsing fallback -->
+    <script src="./PapaParse-5.0.2/papaparse.min.js"></script>
+    
+    <!-- Adsgram library integration -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+    <!-- SVG Definitions for Reusable Icons -->
+    <svg style="display: none;">
+        <defs>
+            <g id="icon-search">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/>
+            </g>
+            <g id="icon-bookmark">
+                <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" fill="currentColor"/>
+            </g>
+            <g id="icon-bookmark-fill">
+                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" fill="currentColor"/>
+            </g>
+            <g id="icon-play">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+            </g>
+            <g id="icon-download">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z" fill="currentColor"/>
+            </g>
+            <g id="icon-share">
+                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" fill="currentColor"/>
+            </g>
+            <g id="icon-star">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="currentColor"/>
+            </g>
+            <g id="icon-close">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/>
+            </g>
+            <g id="icon-profile">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="currentColor"/>
+            </g>
+            <g id="icon-history">
+                <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" fill="currentColor"/>
+            </g>
+            <g id="icon-info">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/>
+            </g>
+            <g id="icon-feedback">
+                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z" fill="currentColor"/>
+            </g>
+            <g id="icon-chevron-right">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+            </g>
+            <g id="icon-bell">
+                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 4.36 6 6.92 6 10v5l-2 2v1h16v-1l-2-2z" fill="currentColor"/>
+            </g>
+            <g id="icon-trophy">
+                <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v3c0 2.44 1.72 4.48 4 4.9V19H5v2h14v-2h-2v-4.1c2.28-.42 4-2.46 4-4.9V7c0-1.1-.9-2-2-2zM5 10V7h2v3H5zm14 0h-2V7h2v3z" fill="currentColor"/>
+            </g>
+            <g id="icon-check">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/>
+            </g>
+            <g id="icon-star">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="currentColor"/>
+            </g>
+        </defs>
+    </svg>
+
+    <!-- Preloading Splash Page -->
+    <div id="preloader" class="preloader">
+        <div class="preloader-content">
+            <div class="logo-pulse">
+                <img src="img/FilmHouse3_nobg.png" alt="Film House Logo" class="preloader-logo" id="preloader-logo-img">
+            </div>
+            <div class="user-custom-loader">
+                <div class="loader-line-top"></div>
+                <div class="loader-text">LOADING</div>
+                <div class="loader-line-bottom"></div>
+            </div>
+            <p id="preloader-status" class="preloader-status">Initializing cinema database...</p>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-area" id="logo-home-trigger">
+                <img src="m.png" alt="Film House Logo Icon" class="logo-icon" id="logo-icon-img">
+                <span class="brand-title">FILM HOUSE</span>
+            </div>
+            
+            <div class="search-bar-wrapper">
+                <svg class="search-icon"><use href="#icon-search"></use></svg>
+                <input type="text" id="global-search-input" placeholder="Search movies, series..." aria-label="Search movies">
+                <button id="search-filter-toggle" class="filter-btn" aria-label="Search Filters">
+                    <span class="filter-dot"></span>
+                    <span class="filter-dot"></span>
+                    <span class="filter-dot"></span>
+                </button>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button id="btn-header-leaderboard" class="header-trophy-btn" style="background: none; border: none; padding: 4px; cursor: pointer; color: #f5c518; display: flex; align-items: center; transition: transform 0.2s;" title="View Global Leaderboard">
+                    <svg style="width: 22px; height: 22px; fill: currentColor;"><use href="#icon-trophy"></use></svg>
+                </button>
+                <div class="header-profile-btn" id="profile-drawer-trigger">
+                    <img src="img/FilmHouse3_nobg.png" alt="User Avatar" class="header-avatar" id="header-user-avatar">
+                    <span class="header-username" id="header-user-name">Guest</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search Filters Panel (Slide Down) -->
+        <div class="search-filters-panel" id="search-filters-panel">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="filter-genre">Genre 1</label>
+                    <select id="filter-genre">
+                        <option value="All">All Genres</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-genre-2">Genre 2</label>
+                    <select id="filter-genre-2">
+                        <option value="All">All Genres</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-rating">Min Rating</label>
+                    <select id="filter-rating">
+                        <option value="0">Any Rating</option>
+                        <option value="8">8.0+ Exceptional</option>
+                        <option value="7">7.0+ Good</option>
+                        <option value="6">6.0+ Average</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-year">Release Year</label>
+                    <select id="filter-year">
+                        <option value="All">All Years</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-action-row">
+                <button class="btn btn-secondary btn-sm" id="btn-reset-filters">Reset</button>
+                <button class="btn btn-primary btn-sm" id="btn-apply-filters">Apply Filters</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Bottom Navigation Bar (Mobile Optimization) -->
+    <nav class="bottom-nav">
+        <button class="bottom-nav-item active" data-target="home">
+            <svg class="nav-icon"><use href="#icon-play"></use></svg>
+            <span>Home</span>
+        </button>
+        <button class="bottom-nav-item" data-target="watchlist">
+            <svg class="nav-icon"><use href="#icon-bookmark"></use></svg>
+            <span>Watchlist</span>
+        </button>
+        <button class="bottom-nav-item" data-target="profile">
+            <svg class="nav-icon"><use href="#icon-profile"></use></svg>
+            <span>Profile</span>
+        </button>
+        <button class="bottom-nav-item" data-target="feedback">
+            <svg class="nav-icon"><use href="#icon-feedback"></use></svg>
+            <span>Feedback</span>
+        </button>
+        <button class="bottom-nav-item" data-target="help">
+            <svg class="nav-icon"><use href="#icon-info"></use></svg>
+            <span>Help</span>
+        </button>
+    </nav>
+
+    <!-- Main Screens Container -->
+    <main class="app-content-container">
+        
+        <!-- HOME / DASHBOARD SCREEN -->
+        <section id="screen-home" class="app-screen active">
+            <!-- Hero Carousel -->
+            <div class="hero-carousel-container" id="hero-carousel">
+                <!-- Will be dynamically populated -->
+                <div class="carousel-slide-placeholder"></div>
+            </div>
+
+            <!-- Categories Horizontal Bar -->
+            <div class="categories-container-outer">
+                <h3 class="section-title">Explore Categories</h3>
+                <div class="categories-wrapper-inner" style="position: relative; width: 100%;">
+                    <button class="categories-scroll-indicator scroll-left" id="categories-scroll-left" aria-label="Scroll left" style="display: none;">
+                        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>
+                    </button>
+                    <div class="categories-bar" id="categories-bar-slider">
+                        <!-- Dynamic Buttons -->
+                    </div>
+                    <button class="categories-scroll-indicator scroll-right" id="categories-scroll-right" aria-label="Scroll right">
+                        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recommendations Section -->
+            <div class="movie-listing-section recommendations-section" id="recommendations-section-wrapper" style="display: none;">
+                <h3 class="section-title">Recommended For You</h3>
+                <div class="movies-grid" id="recommendations-grid-container">
+                    <!-- Dynamic Recommendation Cards -->
+                </div>
+            </div>
+
+            <!-- Movie Listing Area -->
+            <div class="movie-listing-section">
+                <h3 class="section-title" id="grid-title">Featured Movies</h3>
+                <div class="movies-grid" id="movies-grid-container">
+                    <!-- Dynamic Movie Cards -->
+                </div>
+            </div>
+        </section>
+
+        <!-- WATCHLIST SCREEN -->
+        <section id="screen-watchlist" class="app-screen">
+            <h2 class="screen-title" style="text-align: center;">My Lists</h2>
+            
+            <!-- Segmented Control Toggle -->
+            <div class="watchlist-segmented-control" style="display: flex; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 4px; margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto; position: relative;">
+                <button id="btn-toggle-watchlist" class="segment-btn active" style="flex: 1; background: none; border: none; padding: 8px 16px; font-size: 13px; font-weight: 600; color: var(--text-primary); cursor: pointer; border-radius: 4px; transition: background 0.2s, color 0.2s;" data-tab="watchlist">Saved Watchlist</button>
+                <button id="btn-toggle-watched" class="segment-btn" style="flex: 1; background: none; border: none; padding: 8px 16px; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-radius: 4px; transition: background 0.2s, color 0.2s;" data-tab="watched">Watched List</button>
+            </div>
+            
+            <div class="movies-grid" id="watchlist-grid-container">
+                <!-- Dynamic Watchlist Items -->
+            </div>
+            <div class="empty-state" id="watchlist-empty-state">
+                <svg class="empty-icon"><use href="#icon-bookmark"></use></svg>
+                <h3>Your Watchlist is Empty</h3>
+                <p>Bookmark movies while exploring to save them here for later!</p>
+                <button class="btn btn-primary" id="btn-watchlist-explore">Explore Movies</button>
+            </div>
+        </section>
+
+        <!-- PROFILE SCREEN -->
+        <section id="screen-profile" class="app-screen">
+            <div class="profile-card-container" style="max-width: 480px; margin: 0 auto; padding: 20px 10px;">
+                <div class="profile-page-card" style="background-color: var(--bg-dark-card); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 24px; backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);">
+                    <h2 class="screen-title" style="margin-bottom: 24px; text-align: center; font-family: var(--font-heading);">My Profile</h2>
+                    
+                    <!-- Loyalty Points & Global Ranking Quick Card -->
+                    <div id="profile-loyalty-ranking-card" class="profile-ranking-card" style="background: linear-gradient(135deg, rgba(245, 197, 24, 0.15) 0%, rgba(245, 197, 24, 0.03) 100%); border: 1px solid rgba(245, 197, 24, 0.3); border-radius: var(--border-radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.2s;" onclick="navigateToScreen('leaderboard')">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="background: rgba(245, 197, 24, 0.2); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: #f5c518;">
+                                <svg style="width: 20px; height: 20px; fill: currentColor;"><use href="#icon-trophy"></use></svg>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 13px; font-weight: 700; margin: 0; color: #f5c518;">Loyalty Rewards</h4>
+                                <span id="profile-loyalty-rank-label" style="font-size: 11px; color: var(--text-secondary);">Calculating Rank...</span>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span id="profile-loyalty-points" style="font-size: 16px; font-weight: 800; color: var(--text-primary); display: block; line-height: 1;">0</span>
+                            <span style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Points</span>
+                        </div>
+                    </div>
+
+                    <!-- Loyalty Points Breakdown Card -->
+                    <div id="profile-points-breakdown-card" style="background-color: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px 16px; margin-bottom: 24px;">
+                        <h4 style="font-size: 11px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+                            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #f5c518;"><use href="#icon-star"></use></svg>
+                            Points Breakdown
+                        </h4>
+                        <div id="profile-points-breakdown-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: var(--text-secondary);">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Downloads (+10 pts each):</span>
+                                <span id="breakdown-downloads" style="font-weight: 600; color: var(--text-primary);">0 pts (0 downloads)</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Daily Visits (+5/10 pts):</span>
+                                <span id="breakdown-visits" style="font-weight: 600; color: var(--text-primary);">0 pts (0 visits)</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Shares (+2 pts each):</span>
+                                <span id="breakdown-shares" style="font-weight: 600; color: var(--text-primary);">0 pts (0 shares)</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Watched List Toggles (+5 pts each):</span>
+                                <span id="breakdown-watched" style="font-weight: 600; color: var(--text-primary);">0 pts (0 watched)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-avatar-upload-section" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; text-align: center;">
+                        <div class="avatar-upload-wrapper" id="profile-image-upload-wrapper" title="Click to upload profile picture" style="position: relative; width: 100px; height: 100px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid var(--primary-color); box-shadow: 0 0 15px var(--primary-glow);">
+                            <img src="img/FilmHouse3_nobg.png" alt="User Avatar" class="profile-avatar-large" id="profile-page-avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div class="avatar-upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 10px; padding: 4px 0; text-align: center; opacity: 0; transition: opacity 0.2s;">
+                                <span>Change</span>
+                            </div>
+                        </div>
+                        <input type="file" id="profile-pic-input" accept="image/*" style="display: none;">
+                        <p style="font-size: 11px; color: var(--text-secondary); margin-top: 8px;">Tap avatar to upload new picture</p>
+                    </div>
+
+                    <form id="profile-page-form" class="profile-page-form" onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label for="profile-page-name" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Full Name</label>
+                            <input type="text" id="profile-page-name" placeholder="Enter Full Name" required style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-primary); width: 100%;">
+                        </div>
+                        
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label for="profile-page-telegram-tag" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Telegram Username</label>
+                            <input type="text" id="profile-page-telegram-tag" value="@demouser" disabled style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-secondary); width: 100%; opacity: 0.6; cursor: not-allowed;">
+                        </div>
+
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label for="profile-page-telegram-id" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Telegram User ID</label>
+                            <input type="text" id="profile-page-telegram-id" value="000000000" disabled style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-secondary); width: 100%; opacity: 0.6; cursor: not-allowed;">
+                        </div>
+
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label for="profile-page-contact-pref" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Contact Preference</label>
+                            <select id="profile-page-contact-pref" style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-primary); width: 100%; outline: none; cursor: pointer;">
+                                <option value="telegram">Telegram DM</option>
+                                <option value="email">Email</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 2px;">Favorite Categories</label>
+                            <div class="edit-genres-checklist" id="profile-genres-checklist" style="display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto; background-color: rgba(0,0,0,0.15); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-block" id="btn-save-profile-page" style="margin-top: 10px;">Save Profile</button>
+                    </form>
+                </div>
+                
+                <!-- Watchlist Summary Section -->
+                <div class="profile-movies-section" style="background-color: var(--bg-dark-card); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 20px; margin-top: 20px; backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 style="font-family: var(--font-heading); font-size: 14px; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: var(--primary-color);"><use href="#icon-bookmark"></use></svg>
+                            My Watchlist (<span id="profile-watchlist-count-label">0</span>)
+                        </h3>
+                        <a href="#" style="font-size: 11px; color: var(--primary-color); text-decoration: none; font-weight: 600;" onclick="event.preventDefault(); navigateToScreen('watchlist')">View All</a>
+                    </div>
+                    <div class="profile-movies-scroll" id="profile-watchlist-scroll-container" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scroll-behavior: smooth;">
+                        <!-- Dynamic list of small posters -->
+                    </div>
+                </div>
+
+                <!-- Watched Movies Summary Section -->
+                <div class="profile-movies-section" style="background-color: var(--bg-dark-card); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 20px; margin-top: 20px; backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 style="font-family: var(--font-heading); font-size: 14px; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: var(--primary-color);"><use href="#icon-check"></use></svg>
+                            Watched List (<span id="profile-watched-count-label">0</span>)
+                        </h3>
+                        <a href="#" style="font-size: 11px; color: var(--primary-color); text-decoration: none; font-weight: 600;" onclick="event.preventDefault(); const tabWatched = document.getElementById('btn-toggle-watched'); if (tabWatched) tabWatched.click(); navigateToScreen('watchlist');">View All</a>
+                    </div>
+                    <div class="profile-movies-scroll" id="profile-watched-scroll-container" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scroll-behavior: smooth;">
+                        <!-- Dynamic list of small posters -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEADERBOARD SCREEN -->
+        <section id="screen-leaderboard" class="app-screen">
+            <div class="leaderboard-container" style="max-width: 480px; margin: 0 auto; padding: 20px 10px;">
+                <div class="leaderboard-header-card" style="background: linear-gradient(135deg, rgba(245, 197, 24, 0.15) 0%, rgba(245, 197, 24, 0.02) 100%); border: 1px solid rgba(245, 197, 24, 0.3); border-radius: var(--border-radius-md); padding: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 0 15px rgba(245, 197, 24, 0.1); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: radial-gradient(circle, rgba(245, 197, 24, 0.2) 0%, transparent 70%); border-radius: 50%;"></div>
+                    <svg style="width: 40px; height: 40px; fill: #f5c518; margin-bottom: 8px;"><use href="#icon-trophy"></use></svg>
+                    <h2 style="font-family: var(--font-heading); font-size: 18px; font-weight: 700; color: #f5c518; margin-bottom: 4px;">Global Leaderboard</h2>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin: 0;">Compete with other movie buffs and earn loyalty rewards!</p>
+                </div>
+                
+                <!-- Current User Rank Stats -->
+                <div id="leaderboard-user-rank-card" style="background-color: var(--bg-dark-card); border: 2px solid rgba(245, 197, 24, 0.4); border-radius: var(--border-radius-md); padding: 14px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 10px rgba(245,197,24,0.05);">
+                    <!-- Dynamically rendered -->
+                </div>
+                
+                <!-- Ranking List -->
+                <div class="leaderboard-list-card" style="background-color: var(--bg-dark-card); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 16px;">
+                    <h3 style="font-size: 13px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; display: flex; justify-content: space-between;">
+                        <span>Rankings</span>
+                        <span style="font-size: 11px; color: var(--text-secondary); font-weight: normal;">Updated Live</span>
+                    </h3>
+                    <div id="leaderboard-rows-container" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Dynamically rendered rows -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEEDBACK SCREEN -->
+        <section id="screen-feedback" class="app-screen">
+            <div class="feedback-card">
+                <h2 class="screen-title">User Feedback</h2>
+                <p class="subtitle">Tell us what you think! Report issues, suggest features, or share your thoughts.</p>
+                
+                <form id="feedback-form" class="feedback-form">
+                    <div class="form-group">
+                        <label for="feedback-type">Category</label>
+                        <select id="feedback-type" required>
+                            <option value="bug">Report a Bug / Issue</option>
+                            <option value="suggestion">Feature Suggestion</option>
+                            <option value="content">Request Movie / Show</option>
+                            <option value="other">General Feedback</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedback-subject">Subject</label>
+                        <input type="text" id="feedback-subject" placeholder="Summarize your feedback" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedback-message">Message</label>
+                        <textarea id="feedback-message" rows="6" placeholder="Describe details..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Submit Feedback</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- HELP / SUPPORT SCREEN -->
+        <section id="screen-help" class="app-screen">
+            <div class="help-card">
+                <h2 class="screen-title">Help & Support</h2>
+                
+                <!-- FAQs Accordion -->
+                <div class="help-section">
+                    <h3>Frequently Asked Questions</h3>
+                    <div class="accordion" id="faq-accordion">
+                        <!-- Dynamic FAQs -->
+                    </div>
+                </div>
+
+                <!-- Contact Support Form -->
+                <div class="help-section contact-support-section">
+                    <h3>Contact Support</h3>
+                    <p class="subtitle">Can't find what you need? Send a direct message to our support staff.</p>
+                    <form id="support-contact-form">
+                        <div class="form-group">
+                            <label for="contact-email">Email Address</label>
+                            <input type="email" id="contact-email" placeholder="name@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-message">How can we help?</label>
+                            <textarea id="contact-message" rows="4" placeholder="Detail your question..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MOVIE DETAIL OVERLAY MODAL -->
+    <div class="modal-overlay" id="detail-modal">
+        <div class="modal-container detail-modal-container">
+            <button class="modal-close-btn" id="btn-close-detail" aria-label="Close details">
+                <svg><use href="#icon-close"></use></svg>
+            </button>
+            <div class="modal-scroll-body" id="detail-modal-body">
+                <!-- Dynamically Populated detail contents -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TRAILER MODAL -->
+    <div class="modal-overlay" id="trailer-modal">
+        <div class="modal-container trailer-modal-container">
+            <button class="modal-close-btn" id="btn-close-trailer" aria-label="Close trailer">
+                <svg><use href="#icon-close"></use></svg>
+            </button>
+            <div class="trailer-iframe-wrapper" id="trailer-iframe-container">
+                <!-- Dynamic Iframe inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE DRAWER (SLIDE IN SIDEBAR) -->
+    <div class="profile-drawer-overlay" id="profile-drawer">
+        <div class="profile-drawer-container">
+            <div class="drawer-header">
+                <h3>User Profile</h3>
+                <button class="drawer-close-btn" id="btn-close-profile" aria-label="Close profile">
+                    <svg><use href="#icon-close"></use></svg>
+                </button>
+            </div>
+            <div class="drawer-body">
+                <!-- User card -->
+                <div class="user-profile-card">
+                    <div class="avatar-large-wrapper">
+                        <img src="img/FilmHouse3_nobg.png" alt="User Avatar" class="profile-avatar-large" id="profile-avatar-img">
+                    </div>
+                    <h4 id="profile-full-name">Demo User</h4>
+                    <p class="profile-meta" id="profile-telegram-tag">@demouser</p>
+                    <p class="profile-meta-id" id="profile-telegram-id">ID: 000000000</p>
+                </div>
+
+                <!-- Watch History / Statistics -->
+                <div class="profile-stats-section">
+                    <div class="stat-box">
+                        <span class="stat-value" id="stat-watchlist-count">0</span>
+                        <span class="stat-label">Watchlist</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value" id="stat-history-count">0</span>
+                        <span class="stat-label">Viewed</span>
+                    </div>
+                    <div class="stat-box" id="stat-points-box" style="cursor: pointer;" onclick="navigateToScreen('leaderboard'); document.getElementById('profile-drawer').classList.remove('active');">
+                        <span class="stat-value" id="stat-profile-points-drawer" style="color: #f5c518;">0</span>
+                        <span class="stat-label">Points 🏆</span>
+                    </div>
+                </div>
+
+                <!-- Options/Settings List -->
+                <div class="drawer-menu-list">
+                    <!-- Edit Profile Form -->
+                    <div class="menu-item-toggle" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                        <button class="menu-item-btn" id="btn-toggle-edit-profile" style="background: none; border: none; padding: 0; display: flex; width: 100%; justify-content: space-between; align-items: center;">
+                            <div class="menu-item-label-group">
+                                <svg class="menu-icon"><use href="#icon-profile"></use></svg>
+                                <span>Edit Profile & Prefs</span>
+                            </div>
+                            <svg class="chevron-icon" id="edit-profile-chevron"><use href="#icon-chevron-right"></use></svg>
+                        </button>
+                        
+                        <div id="profile-edit-section" style="display: none; flex-direction: column; gap: 10px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color);">
+                            <div class="form-group" style="gap: 4px;">
+                                <label for="edit-profile-name" style="font-size: 11px; color: var(--text-secondary);">Full Name</label>
+                                <input type="text" id="edit-profile-name" placeholder="Enter Full Name" style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 8px 10px; font-size: 12px; width: 100%;">
+                            </div>
+                            
+                            <div class="form-group" style="gap: 4px;">
+                                <label style="font-size: 11px; color: var(--text-secondary); margin-bottom: 2px;">Favorite Categories</label>
+                                <div class="edit-genres-checklist" id="edit-genres-checklist" style="display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; background-color: rgba(0,0,0,0.15); padding: 8px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                                    <!-- Dynamically loaded category checkboxes -->
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-primary btn-sm btn-block" id="btn-save-profile-changes">Save Profile</button>
+                        </div>
+                    </div>
+
+                    <!-- TMDB API Key Input Setting -->
+                    <div class="menu-item-toggle" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                        <div class="menu-item-label-group">
+                            <svg class="menu-icon"><use href="#icon-info"></use></svg>
+                            <span>TMDB API Key (v3)</span>
+                        </div>
+                        <input type="password" id="settings-tmdb-key" placeholder="Enter TMDB API Key" style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 8px 10px; font-size: 12px; width: 100%;">
+                        <button class="btn btn-primary btn-sm" id="btn-save-tmdb-key" style="align-self: flex-end;">Save Key</button>
+                    </div>
+
+                    <!-- Notifications Toggles -->
+                    <div class="menu-item-toggle" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div class="menu-item-label-group">
+                                <svg class="menu-icon"><use href="#icon-bell"></use></svg>
+                                <span>Enable Notifications</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="settings-notifications-toggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div id="notification-sub-options" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px; padding-left: 26px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); cursor: pointer;">
+                                <input type="checkbox" id="sub-opt-anime" checked style="cursor: pointer;"> Anime Updates
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); cursor: pointer;">
+                                <input type="checkbox" id="sub-opt-hollywood" checked style="cursor: pointer;"> Hollywood Releases
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); cursor: pointer;">
+                                <input type="checkbox" id="sub-opt-recs" checked style="cursor: pointer;"> Recommendations
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Center Button -->
+                    <button class="menu-item-btn" id="btn-view-notifications">
+                        <div class="menu-item-label-group" style="position: relative; display: flex; align-items: center; gap: 10px;">
+                            <svg class="menu-icon"><use href="#icon-bell"></use></svg>
+                            <span>Notifications Alerts</span>
+                            <span id="notifications-count-badge" class="notifications-badge" style="display: none; background-color: var(--accent-red); color: white; border-radius: 50%; font-size: 9px; font-weight: 700; width: 16px; height: 16px; align-items: center; justify-content: center; line-height: 1;">0</span>
+                        </div>
+                        <svg class="chevron-icon"><use href="#icon-chevron-right"></use></svg>
+                    </button>
+
+                    <!-- Watch History Link -->
+                    <button class="menu-item-btn" id="btn-view-watch-history">
+                        <div class="menu-item-label-group">
+                            <svg class="menu-icon"><use href="#icon-history"></use></svg>
+                            <span>Watch History</span>
+                        </div>
+                        <svg class="chevron-icon"><use href="#icon-chevron-right"></use></svg>
+                    </button>
+
+                    <!-- Account actions -->
+                    <button class="menu-item-btn btn-danger-action" id="btn-account-logout">
+                        <span>Disconnect Account</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOWNLOAD & COMPLIANCE MODAL -->
+    <div class="modal-overlay" id="download-modal">
+        <div class="modal-container download-modal-container">
+            <button class="modal-close-btn" id="btn-close-download" aria-label="Close downloads">
+                <svg><use href="#icon-close"></use></svg>
+            </button>
+            <div class="download-modal-content">
+                <div class="download-header-icon-wrapper">
+                    <svg class="download-header-icon"><use href="#icon-download"></use></svg>
+                </div>
+                <h2>Download Movie</h2>
+                <p class="download-movie-title" id="download-modal-movie-title">Movie Title</p>
+
+                <!-- Disclaimer Box -->
+                <div class="compliance-disclaimer-box">
+                    <div class="disclaimer-title-row">
+                        <svg class="alert-icon"><use href="#icon-info"></use></svg>
+                        <h4>Copyright Compliance Warning</h4>
+                    </div>
+                    <p>By downloading media, you acknowledge that you are using this content for personal, non-commercial evaluation only. Please support the creators by purchasing official copies or streaming on authorized platforms.</p>
+                </div>
+
+                <!-- Download Options Grid -->
+                <div class="download-options-section">
+                    <h3>Available Downloads (Telegram Channels)</h3>
+                    <div class="download-links-grid" id="download-links-grid">
+                        <!-- Links generated dynamically -->
+                    </div>
+                </div>
+                
+                <button class="btn btn-secondary btn-block" id="btn-download-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WATCH HISTORY MODAL -->
+    <div class="modal-overlay" id="history-modal">
+        <div class="modal-container" style="max-width: 480px; width: 90%;">
+            <button class="modal-close-btn" id="btn-close-history" aria-label="Close history">
+                <svg><use href="#icon-close"></use></svg>
+            </button>
+            <div class="drawer-header" style="height: 50px; border-bottom: 1px solid var(--border-color); padding: 0 16px;">
+                <h3 style="font-size: 14px; font-weight: 700; font-family: var(--font-heading);">Watch History</h3>
+            </div>
+            <div class="modal-scroll-body" style="padding: 16px; max-height: 60vh;">
+                <div class="movies-grid" id="history-grid-container" style="grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                    <!-- Dynamic History Cards -->
+                </div>
+                <div class="empty-state" id="history-empty-state" style="display: flex; padding: 20px 0;">
+                    <svg class="empty-icon"><use href="#icon-history"></use></svg>
+                    <h3>No History Found</h3>
+                    <p style="font-size: 11px;">Movies and series you watch will appear here.</p>
+                </div>
+                <button class="btn btn-secondary btn-block btn-danger-action" id="btn-clear-history" style="margin-top: 16px; display: none;">Clear History</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATIONS MODAL -->
+    <div class="modal-overlay" id="notifications-modal">
+        <div class="modal-container" style="max-width: 480px; width: 90%;">
+            <button class="modal-close-btn" id="btn-close-notifications" aria-label="Close notifications">
+                <svg><use href="#icon-close"></use></svg>
+            </button>
+            <div class="drawer-header" style="height: 50px; border-bottom: 1px solid var(--border-color); padding: 0 16px;">
+                <h3 style="font-size: 14px; font-weight: 700; font-family: var(--font-heading);">Notifications</h3>
+            </div>
+            <div class="modal-scroll-body" style="padding: 16px; max-height: 60vh;">
+                <div id="notifications-list" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Dynamic Notification Alerts -->
+                </div>
+                <div class="empty-state" id="notifications-empty-state" style="display: flex; padding: 20px 0;">
+                    <svg class="empty-icon"><use href="#icon-bell"></use></svg>
+                    <h3>All Caught Up!</h3>
+                    <p style="font-size: 11px;">New updates and recommendations will appear here.</p>
+                </div>
+                <button class="btn btn-secondary btn-block btn-sm" id="btn-clear-notifications" style="margin-top: 16px; display: none;">Mark All Read</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELEGRAM LOGIN OVERLAY MODAL -->
+    <div class="modal-overlay" id="telegram-login-modal">
+        <div class="modal-container login-modal-container" style="max-width: 400px; width: 90%; text-align: center; padding: 24px; background-color: var(--bg-dark-card); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);">
+            <!-- Step 1: Login Buttons -->
+            <div id="login-step-choice">
+                <div class="logo-area" style="justify-content: center; margin-bottom: 16px; margin-top: 10px; display: flex; align-items: center; gap: 8px;">
+                    <img src="m.png" alt="Film House Logo Icon" class="logo-icon" style="width: 48px; height: 48px;">
+                    <span class="brand-title" style="font-size: 24px; font-family: var(--font-heading); font-weight: 700;">FILM HOUSE</span>
+                </div>
+                <h2 style="font-size: 18px; margin-bottom: 10px; font-family: var(--font-heading); color: var(--text-primary);">Connect Your Account</h2>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;">To personalize your watchlist, preferences, and notifications, connect your Telegram account.</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                    <button class="btn btn-primary btn-block" id="btn-telegram-login-oauth" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-1-.65-.35-1 .22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.93 1.22-5.46 3.61-.52.36-.99.53-1.4.52-.46-.01-1.34-.26-1.99-.47-.8-.26-1.43-.4-1.38-.85.03-.24.36-.48.99-.74 3.89-1.69 6.48-2.8 7.78-3.33 3.69-1.5 4.46-1.76 4.96-1.77.11 0 .36.03.52.16.14.11.18.27.2.43-.01.07 0 .16-.01.21z"/>
+                        </svg>
+                        Log in with Telegram
+                    </button>
+                    <button class="btn btn-secondary btn-block" id="btn-telegram-login-guest">
+                        Continue as Guest
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Simulated OAuth Form -->
+            <div id="login-step-form" style="display: none; text-align: left;">
+                <h2 style="font-size: 18px; margin-bottom: 6px; font-family: var(--font-heading); text-align: center; color: var(--text-primary);">Telegram Auth</h2>
+                <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px; text-align: center;">Simulating secure authentication widget callback...</p>
+                
+                <form id="oauth-simulation-form" onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 4px;">
+                        <label for="oauth-fullname" style="font-size: 12px; color: var(--text-secondary);">Full Name</label>
+                        <input type="text" id="oauth-fullname" placeholder="John Doe" required style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-primary); width: 100%;">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 4px;">
+                        <label for="oauth-username" style="font-size: 12px; color: var(--text-secondary);">Telegram Username</label>
+                        <input type="text" id="oauth-username" placeholder="username" required style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-primary); width: 100%;">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btn-submit-oauth" style="margin-top: 8px;">Authenticate</button>
+                    <button type="button" class="btn btn-secondary btn-block" id="btn-cancel-oauth">Back</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
