@@ -887,13 +887,9 @@ img {
    CATEGORIES SLIDER
    ========================================================================== */
 .categories-container-outer {
-    margin-bottom: 24px;
-    width: 100%;
-}
-
-.categories-container-outer {
     position: relative;
     width: 100%;
+    margin-bottom: 24px;
 }
 
 .categories-bar {
@@ -1917,6 +1913,7 @@ img {
     opacity: 1;
 }
 
+/* Badge (season number or quality icon) */
 .download-link-badge {
     min-width: 38px;
     height: 38px;
@@ -1939,6 +1936,7 @@ img {
     font-size: 18px;
 }
 
+/* Label wrap for title + sublabel */
 .download-link-label-wrap {
     flex: 1;
     display: flex;
@@ -1959,6 +1957,7 @@ img {
     letter-spacing: 0.5px;
 }
 
+/* Action button */
 .download-link-action-label {
     font-size: 11px;
     color: var(--primary-color);

@@ -28,7 +28,7 @@ const state = {
         id: "000000000",
         username: "demouser",
         fullName: "Demo User",
-        avatar: "MOVIE/img/FilmHouse3_nobg.png",
+        avatar: "img/FilmHouse3_nobg.png",
         points: 0
     },
     isTelegram: false,
@@ -251,8 +251,8 @@ async function initializeDatabase() {
         // Extract metadata fields
         let title = row_title;
         let overview = "No synopsis available.";
-        let poster = "MOVIE/img/FilmHouse3_nobg.png";
-        let backdrop = "MOVIE/img/FilmHouse.png";
+        let poster = "img/FilmHouse3_nobg.png";
+        let backdrop = "img/FilmHouse.png";
         let rating = 0.0;
         let releaseDate = "";
         let lang = "en";
@@ -467,7 +467,7 @@ function handleTelegramAuth() {
     if (profileTelegramTag) profileTelegramTag.textContent = `@${state.user.username}`;
     if (profileTelegramId) profileTelegramId.textContent = `ID: ${state.user.id}`;
 }
-
+// User Profile Management & Loaders
 function loadUserProfile() {
     const defaultProfile = {
         fullName: state.user.fullName,
@@ -1078,6 +1078,7 @@ function generateNotificationAlerts() {
     updateNotificationsBadge();
 }
 
+// Stats badge updater
 function updateNotificationsBadge() {
     const badge = document.getElementById("notifications-count-badge");
     if (!badge) return;
@@ -1856,7 +1857,6 @@ function renderWatchlistGrid() {
 }
 
 // Carousel Banner Slider populate
-// Carousel Banner Slider populate
 function renderCarouselBanner() {
     const container = document.getElementById("hero-carousel");
     if (!container) return;
@@ -2493,7 +2493,6 @@ function loadExternalMovies() {
     }
 }
 
-// Load Watchlist state on init
 function loadWatchlist() {
     loadExternalMovies();
     const saved = localStorage.getItem("filmhouse_watchlist");
@@ -2938,8 +2937,8 @@ async function performGlobalTmdbDiscover() {
                 categories: [],
                 genres: [],
                 overview: item.overview || "No synopsis available.",
-                poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "MOVIE/img/FilmHouse3_nobg.png",
-                backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "MOVIE/img/FilmHouse.png",
+                poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
+                backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
                 rating: Math.round((item.vote_average || 0) * 10) / 10,
                 release_date: item.release_date || "",
                 language: item.original_language || "en",
@@ -2962,8 +2961,8 @@ async function performGlobalTmdbDiscover() {
                 categories: [],
                 genres: [],
                 overview: item.overview || "No synopsis available.",
-                poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "MOVIE/img/FilmHouse3_nobg.png",
-                backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "MOVIE/img/FilmHouse.png",
+                poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
+                backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
                 rating: Math.round((item.vote_average || 0) * 10) / 10,
                 release_date: item.first_air_date || "",
                 language: item.original_language || "en",
@@ -3032,8 +3031,8 @@ async function performGlobalTmdbSearch(query) {
                     categories: [],
                     genres: [],
                     overview: item.overview || "No synopsis available.",
-                    poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "MOVIE/img/FilmHouse3_nobg.png",
-                    backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "MOVIE/img/FilmHouse.png",
+                    poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
+                    backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
                     rating: Math.round((item.vote_average || 0) * 10) / 10,
                     release_date: releaseDate,
                     language: item.original_language || "en",
@@ -3642,7 +3641,7 @@ function bindEvents() {
                 state.user.fullName = fullNameInput.value.trim();
                 state.user.username = usernameInput.value.trim().replace(/^@/, "");
                 state.user.id = String(Math.floor(100000000 + Math.random() * 900000000));
-                state.user.avatar = "MOVIE/img/FilmHouse3_nobg.png";
+                state.user.avatar = "img/FilmHouse3_nobg.png";
 
                 const profileObj = {
                     fullName: state.user.fullName,
