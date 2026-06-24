@@ -1610,9 +1610,21 @@ function renderRecommendations() {
 
     // If no specific recommendations or watchlist is empty, fallback to highly rated movies
     if (recommended.length === 0) {
-        recommended = state.movies
-            .filter(m => !preferredMovieIds.includes(m.csv_id) && m.rating >= 7.5)
-            .sort((a, b) => b.rating - a.rating);
+        // Exclude first 6 movies (which usually show up in featured home view at start)
+        const featuredIds = state.movies.slice(0, 6).map(m => m.csv_id);
+        const candidates = state.movies.filter(m => 
+            !preferredMovieIds.includes(m.csv_id) && 
+            !featuredIds.includes(m.csv_id) && 
+            m.rating >= 7.0
+        );
+        
+        // Shuffle the candidates to ensure recommendations are varied
+        for (let i = candidates.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+        }
+        
+        recommended = candidates;
     }
 
     // Limit to top 6 recommendations
