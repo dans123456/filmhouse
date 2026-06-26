@@ -433,8 +433,9 @@ function generateCSVContent() {
         ];
         
         // Output up to 40 links columns
+        const linksList = movie.links || [];
         for (let i = 0; i < 40; i++) {
-            row.push(escapeCSV(movie.links[i] || ''));
+            row.push(escapeCSV(linksList[i] || ''));
         }
         
         return row.join(',');
