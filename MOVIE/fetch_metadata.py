@@ -6,11 +6,11 @@ import time
 import os
 
 API_KEY = "a3a9df05cdacd9f23c885f2756466395"
-CSV_PATH = r"c:\Users\SWAGAAA\Desktop\fimlhouse\MOVIE\Data\movies.csv"
+CSV_PATH = r"c:\Users\SWAGAAA\Desktop\fimlhouse\MOVIE\Data\datafile.csv"
 OUTPUT_PATH = r"c:\Users\SWAGAAA\Desktop\fimlhouse\MOVIE\Data\movies_metadata.json"
 
 def fetch_json(url):
-    time.sleep(0.1) # Sleep to avoid rate limiting
+    time.sleep(0.35) # Sleep to avoid rate limiting
     try:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=10) as response:
@@ -196,8 +196,8 @@ def main():
         for idx, row in enumerate(reader):
             if not row:
                 continue
-            movie_id_str = row[0].strip()
-            row_title = row[1].strip()
+            row_title = row[0].strip()
+            movie_id_str = row[1].strip()
             row_type = row[2].strip()
             links = [link.strip() for link in row[3:] if link.strip()]
             
@@ -205,9 +205,12 @@ def main():
             
             details = None
             
+            # Extract numeric TMDB ID from slug format like "243875-georgie-mandy-s-first-marriage"
+            movie_id_numeric = movie_id_str.split("-")[0] if "-" in movie_id_str else movie_id_str
+            
             # Try to fetch using ID if present
-            if movie_id_str and movie_id_str.isdigit():
-                tmdb_id = int(movie_id_str)
+            if movie_id_numeric and movie_id_numeric.isdigit():
+                tmdb_id = int(movie_id_numeric)
                 # Try TV first if classified as Series
                 if 'series' in row_type.lower() or 'cartoon' in row_type.lower():
                     details = get_tv_details(tmdb_id)
