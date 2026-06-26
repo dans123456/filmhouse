@@ -2701,38 +2701,34 @@ function openDownloadModal(movie) {
 function shareMovie(movie) {
     const shareText = `Check out "${movie.title}" on Film House! Rating: ${movie.rating}/10. Play now: https://t.me/filmhousenew`;
     const shareUrl = "https://t.me/filmhousenew";
+    const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
     
     // Award points (+2)
     awardPoints(2, "share");
     
     const tg = window.Telegram?.WebApp;
-    if (tg && tg.shareToBot) {
+    if (tg && tg.openTelegramLink) {
         try {
-            tg.shareToBot({
-                text: shareText
-            });
+            tg.openTelegramLink(telegramShareUrl);
+            return;
         } catch (e) {
-            // Fallback native sharing if shareToBot throws
-            triggerNativeSharing(shareText, shareUrl);
+            console.error("tg.openTelegramLink failed, using fallback:", e);
         }
-    } else {
-        triggerNativeSharing(shareText, shareUrl);
     }
-}
-
-function triggerNativeSharing(text, url) {
+    
+    // Fallback if not inside Telegram or failed
     if (navigator.share) {
         navigator.share({
             title: 'Film House',
-            text: text,
-            url: url
+            text: shareText,
+            url: shareUrl
         }).then(() => {
             showToast("Shared successfully!");
         }).catch(err => {
-            copyToClipboard(text);
+            window.open(telegramShareUrl, '_blank');
         });
     } else {
-        copyToClipboard(text);
+        window.open(telegramShareUrl, '_blank');
     }
 }
 
