@@ -604,13 +604,6 @@ function loadUserProfile() {
     // Sync profile movie summary sections
     renderProfileMovieSummaries();
 
-    // Check if user is Admin and display Admin Dashboard trigger button
-    const adminBtn = document.getElementById("btn-admin-dashboard");
-    if (adminBtn) {
-        const isAdmin = ADMIN_TELEGRAM_IDS.includes(state.user.id) || state.user.id === "000000000" || state.user.id === "123456789";
-        adminBtn.style.display = isAdmin ? "flex" : "none";
-    }
-
     // Sync profile data to Firestore database
     syncUserToFirestore();
 }
@@ -3164,17 +3157,7 @@ function bindEvents() {
     setupModalClose("detail-modal", "btn-close-detail");
     setupModalClose("trailer-modal", "btn-close-trailer");
     setupModalClose("download-modal", "btn-close-download");
-    setupModalClose("admin-modal", "btn-close-admin");
-    
-    const adminBtn = document.getElementById("btn-admin-dashboard");
-    if (adminBtn) {
-        adminBtn.addEventListener("click", () => {
-            // Close the profile drawer first so the modal overlays nicely
-            const profileDrawer = document.getElementById("profile-drawer");
-            if (profileDrawer) profileDrawer.classList.remove("active");
-            showAdminDashboard();
-        });
-    }
+
 
     const btnDwnCancel = document.getElementById("btn-download-cancel");
     if (btnDwnCancel) {
@@ -3772,109 +3755,7 @@ function logMovieRequestToFirestore(movie) {
     });
 }
 
-function showAdminDashboard() {
-    const modal = document.getElementById("admin-modal");
-    if (!modal) return;
-    
-    modal.classList.add("active");
-    
-    // Fetch stats from Firestore
-    if (typeof firebase === "undefined" || !db) {
-        showToast("Firebase database not connected.", "error");
-        return;
-    }
-    
-    // 1. Fetch Users
-    db.collection("users").orderBy("lastSeen", "desc").limit(50).get().then(querySnapshot => {
-        const totalUsersEl = document.getElementById("admin-stat-total-users");
-        if (totalUsersEl) totalUsersEl.textContent = querySnapshot.size;
-        
-        const usersListEl = document.getElementById("admin-users-list");
-        if (usersListEl) {
-            usersListEl.replaceChildren();
-            if (querySnapshot.empty) {
-                usersListEl.innerHTML = `<div style="padding: 12px; text-align: center; font-size: 12px; color: var(--text-secondary);">No registered users.</div>`;
-            } else {
-                querySnapshot.forEach(doc => {
-                    const u = doc.data();
-                    const item = document.createElement("div");
-                    item.style.display = "flex";
-                    item.style.alignItems = "center";
-                    item.style.justifyContent = "space-between";
-                    item.style.padding = "8px 12px";
-                    item.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
-                    
-                    const joined = u.joinedDate ? new Date(u.joinedDate.seconds * 1000).toLocaleDateString() : "Unknown";
-                    
-                    item.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <img src="${u.avatar || 'img/FilmHouse3_nobg.png'}" style="width: 24px; height: 24px; border-radius: 50%;">
-                            <div>
-                                <div style="font-size: 12px; font-weight: 600; color: var(--text-primary);">${u.fullName}</div>
-                                <div style="font-size: 10px; color: var(--text-secondary);">@${u.username} | ID: ${u.id}</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 11px; font-weight: 700; color: var(--accent-gold);">${u.points} pts</div>
-                            <div style="font-size: 9px; color: var(--text-secondary);">Joined: ${joined}</div>
-                        </div>
-                    `;
-                    usersListEl.appendChild(item);
-                });
-            }
-        }
-    }).catch(err => {
-        console.error("Error fetching users for admin panel:", err);
-    });
-    
-    // 2. Fetch movie requests
-    db.collection("requests").orderBy("requestedAt", "desc").limit(100).get().then(querySnapshot => {
-        const totalRequestsEl = document.getElementById("admin-stat-total-requests");
-        if (totalRequestsEl) totalRequestsEl.textContent = querySnapshot.size;
-        
-        const requestsListEl = document.getElementById("admin-requests-list");
-        if (requestsListEl) {
-            requestsListEl.replaceChildren();
-            if (querySnapshot.empty) {
-                requestsListEl.innerHTML = `<div style="padding: 12px; text-align: center; font-size: 12px; color: var(--text-secondary);">No movie requests.</div>`;
-            } else {
-                // Aggregate requests by title/type
-                const counts = {};
-                querySnapshot.forEach(doc => {
-                    const req = doc.data();
-                    const key = req.title;
-                    if (!counts[key]) {
-                        counts[key] = { title: req.title, type: req.type, count: 0 };
-                    }
-                    counts[key].count++;
-                });
-                
-                const sortedRequests = Object.values(counts).sort((a, b) => b.count - a.count);
-                sortedRequests.forEach(req => {
-                    const item = document.createElement("div");
-                    item.style.display = "flex";
-                    item.style.alignItems = "center";
-                    item.style.justifyContent = "space-between";
-                    item.style.padding = "8px 12px";
-                    item.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
-                    
-                    item.innerHTML = `
-                        <div>
-                            <div style="font-size: 12px; font-weight: 600; color: var(--text-primary);">${req.title}</div>
-                            <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase;">${req.type}</div>
-                        </div>
-                        <div style="background: rgba(245, 197, 24, 0.1); border: 1px solid var(--accent-gold); color: var(--accent-gold); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px;">
-                            ${req.count} ${req.count === 1 ? 'request' : 'requests'}
-                        </div>
-                    `;
-                    requestsListEl.appendChild(item);
-                });
-            }
-        }
-    }).catch(err => {
-        console.error("Error fetching requests for admin panel:", err);
-    });
-}
+
 
 // App Kickoff Initializer
 document.addEventListener("DOMContentLoaded", async () => {

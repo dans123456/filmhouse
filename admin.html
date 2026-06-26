@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Film House - Admin Control Panel</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <link rel="stylesheet" href="index.css?v=6">
+    <style>
+        body {
+            background-color: var(--bg-dark-pure);
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            padding: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+        .admin-title {
+            font-family: var(--font-heading);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: var(--bg-dark-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: var(--glass-blur);
+        }
+        .stat-num {
+            font-size: 36px;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+        .stat-lbl {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .panel-section {
+            background: var(--bg-dark-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: var(--glass-blur);
+        }
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
+            border-left: 3px solid var(--primary-color);
+            padding-left: 10px;
+        }
+        .table-container {
+            max-height: 350px;
+            overflow-y: auto;
+            border-radius: var(--border-radius-sm);
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+        }
+        .list-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+        .list-row:last-child {
+            border-bottom: none;
+        }
+        .list-row:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+        }
+        .user-details h5 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .user-details p {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .user-stats {
+            text-align: right;
+        }
+        .points-badge {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2px;
+        }
+        .date-label {
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+        .req-count {
+            background: rgba(255, 188, 0, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="admin-header">
+        <div class="admin-title">
+            <span style="font-size: 28px;">👑</span>
+            <span>FILM HOUSE ADMIN</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);" id="status-connection">
+            Connecting Firestore...
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-num" id="stat-users">0</div>
+            <div class="stat-lbl">Registered Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" id="stat-requests">0</div>
+            <div class="stat-lbl">Total Movie Requests</div>
+        </div>
+    </div>
+
+    <section class="panel-section">
+        <h4 class="section-title">Top Requested Movies & Series</h4>
+        <div class="table-container" id="requests-list">
+            <div style="padding: 24px; text-align: center; color: var(--text-secondary);">Loading requests list...</div>
+        </div>
+    </section>
+
+    <section class="panel-section">
+        <h4 class="section-title">Registered App Users</h4>
+        <div class="table-container" id="users-list">
+            <div style="padding: 24px; text-align: center; color: var(--text-secondary);">Loading registered users...</div>
+        </div>
+    </section>
+
+    <script src="admin.js"></script>
+</body>
+</html>
