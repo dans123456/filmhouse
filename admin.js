@@ -202,30 +202,46 @@ if (requestSearchInput) {
 let allCatalogMovies = [];
 let originalCatalogCount = 0;
 let catalogChangesMade = false;
+let githubToken = ""; // Global cache for token
 
-// Load GitHub token on startup
-document.addEventListener("DOMContentLoaded", () => {
-    const savedToken = localStorage.getItem("github_pat");
-    const tokenInput = document.getElementById("github-token");
-    if (savedToken && tokenInput) {
-        tokenInput.value = savedToken;
-    }
+// Load GitHub token on startup from Firestore
+document.addEventListener("DOMContentLoaded", async () => {
     loadCatalog();
+    
+    // Fetch token from Firestore
+    if (db) {
+        try {
+            const doc = await db.collection("settings").doc("github").get();
+            if (doc.exists) {
+                githubToken = doc.data().token || "";
+                const tokenInput = document.getElementById("github-token");
+                if (tokenInput) {
+                    tokenInput.value = githubToken;
+                }
+            }
+        } catch (e) {
+            console.error("Error loading GitHub token from Firestore:", e);
+        }
+    }
 });
 
-// Save GitHub token
+// Save GitHub token to Firestore
 const saveTokenBtn = document.getElementById("btn-save-github-token");
 if (saveTokenBtn) {
-    saveTokenBtn.addEventListener("click", () => {
+    saveTokenBtn.addEventListener("click", async () => {
         const tokenInput = document.getElementById("github-token");
-        if (tokenInput) {
+        if (tokenInput && db) {
             const token = tokenInput.value.trim();
-            if (token) {
-                localStorage.setItem("github_pat", token);
-                alert("GitHub Personal Access Token saved locally!");
-            } else {
-                localStorage.removeItem("github_pat");
-                alert("GitHub Personal Access Token cleared.");
+            try {
+                await db.collection("settings").doc("github").set({
+                    token: token,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                githubToken = token;
+                alert("GitHub Personal Access Token saved securely in your Firebase database!");
+            } catch (e) {
+                console.error("Error saving token to Firestore:", e);
+                alert("Failed to save token to database. Make sure your database rules permit this write.");
             }
         }
     });
@@ -431,7 +447,7 @@ function generateCSVContent() {
 const publishBtn = document.getElementById("btn-publish-catalog");
 if (publishBtn) {
     publishBtn.addEventListener("click", async () => {
-        const token = localStorage.getItem("github_pat");
+        const token = (document.getElementById("github-token")?.value.trim()) || githubToken;
         if (!token) {
             alert("Error: Please set your GitHub Personal Access Token (PAT) first in the Settings panel.");
             return;
