@@ -1069,25 +1069,34 @@
   },
   {
     "csv_id": "341174-fifty-shades-darker",
-    "tmdb_id": null,
-    "title": "Fifty Shades Darker (2017)",
+    "tmdb_id": 341174,
+    "title": "Fifty Shades Darker",
     "type": "Movie",
     "categories": [
       "Main",
       "Erotic Movies",
       "Hollywood/British Movies"
     ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "img/FilmHouse3_nobg.png",
-    "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
-    "release_date": "",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "overview": "When a wounded Christian Grey tries to entice a cautious Ana Steele back into his life, she demands a new arrangement before she will give him another chance. As the two begin to build trust and find stability, shadowy figures from Christian’s past start to circle the couple, determined to destroy their hopes for a future together.",
+    "poster": "https://image.tmdb.org/t/p/w500/w3qa274gvca9t8pkUoG8nfQgTU3.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/16aJtXO6lObbBUr11IvkjB1QD1f.jpg",
+    "rating": 6.5,
+    "release_date": "2017-02-08",
     "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
+    "cast": [
+      "Dakota Johnson",
+      "Jamie Dornan",
+      "Eric Johnson",
+      "Eloise Mumford",
+      "Bella Heathcote"
+    ],
+    "director": "James Foley",
+    "trailer": "vnLqJLeTMVU",
+    "runtime": "118 min",
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADWw4AAoywoEYOlFzIwvvS4hYE"
     ]
@@ -1978,24 +1987,33 @@
   },
   {
     "csv_id": "393345-cult-of-chucky",
-    "tmdb_id": null,
-    "title": "Cult of Chucky (2017)",
+    "tmdb_id": 393345,
+    "title": "Cult of Chucky",
     "type": "Movie",
     "categories": [
       "Main",
       "Hollywood/British Movies"
     ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "img/FilmHouse3_nobg.png",
-    "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
-    "release_date": "",
+    "genres": [
+      "Horror",
+      "Thriller"
+    ],
+    "overview": "Confined to an asylum for the criminally insane for the past four years, Nica is wrongly convinced that she, not Chucky, murdered her entire family... until a string of grisly deaths occur after her psychiatrist introduces a new group therapy tool -- a \"Good Guy\" doll.",
+    "poster": "https://image.tmdb.org/t/p/w500/r5JUiMYfatwYeDkxkLWYUx5GIjY.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/af7uKmGnrOn4P1zyfFXPQZOCCEp.jpg",
+    "rating": 5.8,
+    "release_date": "2017-10-12",
     "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
+    "cast": [
+      "Fiona Dourif",
+      "Brad Dourif",
+      "Alex Vincent",
+      "Jennifer Tilly",
+      "Michael Therriault"
+    ],
+    "director": "Don Mancini",
+    "trailer": "ksTv0_dGiX4",
+    "runtime": "91 min",
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADsQUAAkmBwEShB4wKt8B5TBYE"
     ]
@@ -3879,36 +3897,35 @@
   {
     "csv_id": "1877-phineas-and-ferb",
     "tmdb_id": 1877,
-    "title": "Doctor Mordrid",
-    "type": "Movie",
+    "title": "Phineas and Ferb",
+    "type": "Series",
     "categories": [
       "Main",
-      "Classic Movies",
-      "Hollywood/British Movies"
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Hollywood/British Series"
     ],
     "genres": [
-      "Fantasy",
-      "Action",
-      "Horror",
-      "Science Fiction",
-      "Thriller"
+      "Animation",
+      "Comedy",
+      "Family",
+      "Sci-Fi & Fantasy"
     ],
-    "overview": "Bound by hate and a mystical amulet that holds the powers of life and death, two immortal wizards meet for the last time in an ancient struggle of good versus evil.",
-    "poster": "https://image.tmdb.org/t/p/w500/zH9TkMZHSVRokg6vyyeLdu5SJxf.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/Ak4qIGjRY2CYrTTB1VsM9i9nF13.jpg",
-    "rating": 5.2,
-    "release_date": "1992-11-02",
+    "overview": "Each day, two kindhearted suburban stepbrothers on summer vacation embark on some grand new project, which annoys their controlling sister, Candace, who tries to bust them. Meanwhile, their pet platypus plots against evil Dr. Doofenshmirtz.",
+    "poster": "https://image.tmdb.org/t/p/w500/g6TidT7be954rrzPPBTIXkSmfXj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/5MWFjQ3NuNtNeOE9FdrVLeNMNPs.jpg",
+    "rating": 7.9,
+    "release_date": "2007-08-17",
     "language": "en",
     "cast": [
-      "Jeffrey Combs",
-      "Yvette Nipar",
-      "Jay Acovone",
-      "Keith Coulouris",
-      "Ritch Brinkley"
+      "Vincent Martella",
+      "David Errigo Jr.",
+      "Ashley French",
+      "Caroline Rhea",
+      "Dee Bradley Baker"
     ],
-    "director": "Charles Band",
-    "trailer": "M-BjMiezgxs",
-    "runtime": "74 min",
+    "director": "Dan Povenmire",
+    "trailer": "th9hxCGH_ms",
+    "runtime": "",
     "links": [
       "https://t.me/+cJUgTGPMeXoyM2Nk",
       "https://t.me/+cJUgTGPMeXoyM2Nk",
@@ -4029,36 +4046,25 @@
   },
   {
     "csv_id": "1146147-a-really-haunted-loud-house",
-    "tmdb_id": 1146147,
-    "title": "A Really Haunted Loud House",
+    "tmdb_id": null,
+    "title": "A Really Haunted Loud House (2023)",
     "type": "Movie",
     "categories": [
       "Main",
       "Kids Shows and Movies (Nickelodeon and Disney)",
       "Hollywood/British Movies"
     ],
-    "genres": [
-      "TV Movie",
-      "Comedy",
-      "Family",
-      "Horror"
-    ],
-    "overview": "Lincoln and his best friend, Clyde, struggle to decide whether to participate in the Loud family Spooktacular, attend their friend, Xander's, party, or go trick-or-treating on Halloween.",
-    "poster": "https://image.tmdb.org/t/p/w500/3TT1na5ox9EfWrRiWfmjIysIN81.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/iOYZbQA4wiMHoVSECQfZSvny6Nw.jpg",
-    "rating": 6.5,
-    "release_date": "2023-09-28",
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0.0,
+    "release_date": "",
     "language": "en",
-    "cast": [
-      "Wolfgang Schaeffer",
-      "Jahzir Bruno",
-      "Brian Stepanek",
-      "Jolie Jenkins",
-      "Lexi DiBenedetto"
-    ],
-    "director": "Jonathan Judge",
-    "trailer": "cDmGHalUdZU",
-    "runtime": "72 min",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADcQQAAgiQMEQbC244G-adJBYE"
     ]
@@ -4134,24 +4140,33 @@
   },
   {
     "csv_id": "45666-sam-cat",
-    "tmdb_id": null,
-    "title": "Sam & Cat (2013)",
-    "type": "Movie",
+    "tmdb_id": 45666,
+    "title": "Sam & Cat",
+    "type": "Series",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Hollywood/British Series"
     ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "img/FilmHouse3_nobg.png",
-    "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
-    "release_date": "",
+    "genres": [
+      "Comedy",
+      "Kids",
+      "Family"
+    ],
+    "overview": "Sam Puckett is loud, independent, and tough as nails, while Cat Valentine is sweet as pie and super flighty. But that doesn't stop this unlikely pair from becoming best buds and roomies!\n\nTogether, they're a power duo with a love for fun and adventure -- it's just too bad that it doesn't come cheap. Burgers at their favorite robot restaurant Bots don't grow on trees, after all. A booming out-of-home babysitting business quickly becomes the answer to their empty-pocket problems, but also an extra reason for countless wacky adventures to come!",
+    "poster": "https://image.tmdb.org/t/p/w500/8zL3NVH0owqVDxKvlnG3Df5aWuT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dilTZGypINQKfXB5ZFs2nSfcN94.jpg",
+    "rating": 7.6,
+    "release_date": "2013-06-08",
     "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
+    "cast": [
+      "Jennette McCurdy",
+      "Ariana Grande",
+      "Cameron Ocasio"
+    ],
+    "director": "Dan Schneider",
+    "trailer": "d7cZLsJrRAM",
+    "runtime": "23 min",
     "links": [
       "https://t.me/+cJUgTGPMeXoyM2Nk"
     ]

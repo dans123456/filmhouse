@@ -20,6 +20,10 @@
     <!-- Adsgram library integration -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
+    <!-- Firebase SDK Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
     <link rel="stylesheet" href="index.css?v=6">
 </head>
 <body>
@@ -614,6 +618,15 @@
                         <svg class="chevron-icon"><use href="#icon-chevron-right"></use></svg>
                     </button>
 
+                    <!-- Admin Panel (Only visible to admin users) -->
+                    <button class="menu-item-btn" id="btn-admin-dashboard" style="display: none; border: 1px solid var(--accent-gold); background-color: rgba(245, 197, 24, 0.05);">
+                        <div class="menu-item-label-group">
+                            <svg class="menu-icon" style="color: var(--accent-gold);"><use href="#icon-trophy"></use></svg>
+                            <span style="color: var(--accent-gold); font-weight: 600;">Admin Dashboard</span>
+                        </div>
+                        <svg class="chevron-icon" style="color: var(--accent-gold);"><use href="#icon-chevron-right"></use></svg>
+                    </button>
+
                     <!-- Account actions -->
                     <button class="menu-item-btn btn-danger-action" id="btn-account-logout">
                         <span>Disconnect Account</span>
@@ -700,6 +713,47 @@
                     <p style="font-size: 11px;">New updates and recommendations will appear here.</p>
                 </div>
                 <button class="btn btn-secondary btn-block btn-sm" id="btn-clear-notifications" style="margin-top: 16px; display: none;">Mark All Read</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD MODAL -->
+    <div class="modal-overlay" id="admin-modal">
+        <div class="modal-container" style="max-width: 550px; width: 92%;">
+            <button class="modal-close-btn" id="btn-close-admin" aria-label="Close admin panel">
+                <svg><use href="#icon-close"></use></svg>
+            </button>
+            <div class="drawer-header" style="height: 50px; border-bottom: 1px solid var(--border-color); padding: 0 16px;">
+                <h3 style="font-size: 14px; font-weight: 700; font-family: var(--font-heading); color: var(--accent-gold);">👑 Admin Control Panel</h3>
+            </div>
+            <div class="modal-scroll-body" style="padding: 16px; max-height: 75vh;">
+                <!-- Stats Overview Row -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--border-radius-sm); text-align: center;">
+                        <span id="admin-stat-total-users" style="font-size: 24px; font-weight: 800; font-family: var(--font-heading); color: var(--text-primary);">0</span>
+                        <span style="display: block; font-size: 10px; color: var(--text-secondary); text-transform: uppercase; margin-top: 4px;">Total Users</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--border-radius-sm); text-align: center;">
+                        <span id="admin-stat-total-requests" style="font-size: 24px; font-weight: 800; font-family: var(--font-heading); color: var(--text-primary);">0</span>
+                        <span style="display: block; font-size: 10px; color: var(--text-secondary); text-transform: uppercase; margin-top: 4px;">Total Requests</span>
+                    </div>
+                </div>
+
+                <!-- Section: Requested Movies -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 12px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; font-family: var(--font-heading); letter-spacing: 0.5px;">Top Movie Requests</h4>
+                    <div style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); max-height: 180px; overflow-y: auto; padding: 4px;" id="admin-requests-list">
+                        <div style="padding: 12px; text-align: center; font-size: 12px; color: var(--text-secondary);">No movie requests recorded yet.</div>
+                    </div>
+                </div>
+
+                <!-- Section: Registered Users -->
+                <div>
+                    <h4 style="font-size: 12px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; font-family: var(--font-heading); letter-spacing: 0.5px;">Registered Users</h4>
+                    <div style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); max-height: 180px; overflow-y: auto; padding: 4px;" id="admin-users-list">
+                        <div style="padding: 12px; text-align: center; font-size: 12px; color: var(--text-secondary);">No users registered yet.</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

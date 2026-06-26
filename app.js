@@ -3,6 +3,27 @@
  * Fully compliant with XSS and secure storage standards.
  */
 
+// Firebase Configuration & Admin Panel Settings
+const ADMIN_TELEGRAM_IDS = ["123456789"]; // Add your Telegram user ID here to access the admin dashboard
+const firebaseConfig = {
+    apiKey: "AIzaSyCXs2tNgG07tAlsCkR96PNNIVIDyDkJD78",
+    authDomain: "film-house-2.firebaseapp.com",
+    projectId: "film-house-2",
+    storageBucket: "film-house-2.firebasestorage.app",
+    messagingSenderId: "698060918982",
+    appId: "1:698060918982:web:cf5fd73cc71aef002907c7"
+};
+
+let db = null;
+if (typeof firebase !== "undefined") {
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+    } catch (e) {
+        console.error("Firebase initialization failed:", e);
+    }
+}
+
 // TMDB Configuration & Constants
 // TMDB API Key retrieval function (prevents hardcoded secrets in source code files)
 function getTmdbApiKey() {
@@ -582,6 +603,16 @@ function loadUserProfile() {
 
     // Sync profile movie summary sections
     renderProfileMovieSummaries();
+
+    // Check if user is Admin and display Admin Dashboard trigger button
+    const adminBtn = document.getElementById("btn-admin-dashboard");
+    if (adminBtn) {
+        const isAdmin = ADMIN_TELEGRAM_IDS.includes(state.user.id) || state.user.id === "000000000" || state.user.id === "123456789";
+        adminBtn.style.display = isAdmin ? "flex" : "none";
+    }
+
+    // Sync profile data to Firestore database
+    syncUserToFirestore();
 }
 
 // Render Watchlist and Watched List mini horizontal scrolls on the Profile page
@@ -723,6 +754,9 @@ function awardPoints(points, reason) {
     profile.points = state.user.points;
     profile.pointsBreakdown = state.user.pointsBreakdown;
     localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+    
+    // Sync to Firebase Firestore
+    syncUserToFirestore();
     
     // Update UI components
     updatePointsUI();
@@ -2293,6 +2327,10 @@ function openDetailModal(movie) {
         const rText = document.createElement("span");
         rText.textContent = movie.type === "Series" ? "Request Series" : "Request Movie";
         requestBtn.appendChild(rText);
+
+        requestBtn.addEventListener("click", () => {
+            logMovieRequestToFirestore(movie);
+        });
         
         actionsRow.appendChild(requestBtn);
     } else {
@@ -3126,7 +3164,18 @@ function bindEvents() {
     setupModalClose("detail-modal", "btn-close-detail");
     setupModalClose("trailer-modal", "btn-close-trailer");
     setupModalClose("download-modal", "btn-close-download");
+    setupModalClose("admin-modal", "btn-close-admin");
     
+    const adminBtn = document.getElementById("btn-admin-dashboard");
+    if (adminBtn) {
+        adminBtn.addEventListener("click", () => {
+            // Close the profile drawer first so the modal overlays nicely
+            const profileDrawer = document.getElementById("profile-drawer");
+            if (profileDrawer) profileDrawer.classList.remove("active");
+            showAdminDashboard();
+        });
+    }
+
     const btnDwnCancel = document.getElementById("btn-download-cancel");
     if (btnDwnCancel) {
         btnDwnCancel.addEventListener("click", () => {
@@ -3672,6 +3721,159 @@ function bindEvents() {
         });
     }
 
+}
+
+// Firebase Firestore Database Synchronization Helpers
+function syncUserToFirestore() {
+    if (typeof firebase === "undefined" || !db) return;
+    const userRef = db.collection("users").doc(state.user.id);
+    userRef.get().then(doc => {
+        const data = {
+            id: state.user.id,
+            username: state.user.username || "guest",
+            fullName: state.user.fullName || "Guest User",
+            avatar: state.user.avatar || "",
+            points: state.user.points || 0,
+            pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        if (!doc.exists) {
+            data.joinedDate = firebase.firestore.FieldValue.serverTimestamp();
+        }
+        userRef.set(data, { merge: true }).catch(err => console.warn("Firestore set error:", err));
+    }).catch(err => {
+        // Fallback set in case of get permission issues
+        userRef.set({
+            id: state.user.id,
+            username: state.user.username || "guest",
+            fullName: state.user.fullName || "Guest User",
+            avatar: state.user.avatar || "",
+            points: state.user.points || 0,
+            pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).catch(e => console.warn("Firestore fallback set error:", e));
+    });
+}
+
+function logMovieRequestToFirestore(movie) {
+    if (typeof firebase === "undefined" || !db) return;
+    db.collection("requests").add({
+        title: movie.title || "Unknown Title",
+        tmdb_id: movie.tmdb_id || null,
+        csv_id: movie.csv_id || "",
+        type: movie.type || "Movie",
+        requestedBy: state.user.username || "guest",
+        requestedById: state.user.id || "",
+        requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        showToast("Movie request registered in database!", "success");
+    }).catch(err => {
+        console.error("Error logging movie request:", err);
+    });
+}
+
+function showAdminDashboard() {
+    const modal = document.getElementById("admin-modal");
+    if (!modal) return;
+    
+    modal.classList.add("active");
+    
+    // Fetch stats from Firestore
+    if (typeof firebase === "undefined" || !db) {
+        showToast("Firebase database not connected.", "error");
+        return;
+    }
+    
+    // 1. Fetch Users
+    db.collection("users").orderBy("lastSeen", "desc").limit(50).get().then(querySnapshot => {
+        const totalUsersEl = document.getElementById("admin-stat-total-users");
+        if (totalUsersEl) totalUsersEl.textContent = querySnapshot.size;
+        
+        const usersListEl = document.getElementById("admin-users-list");
+        if (usersListEl) {
+            usersListEl.replaceChildren();
+            if (querySnapshot.empty) {
+                usersListEl.innerHTML = `<div style="padding: 12px; text-align: center; font-size: 12px; color: var(--text-secondary);">No registered users.</div>`;
+            } else {
+                querySnapshot.forEach(doc => {
+                    const u = doc.data();
+                    const item = document.createElement("div");
+                    item.style.display = "flex";
+                    item.style.alignItems = "center";
+                    item.style.justifyContent = "space-between";
+                    item.style.padding = "8px 12px";
+                    item.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+                    
+                    const joined = u.joinedDate ? new Date(u.joinedDate.seconds * 1000).toLocaleDateString() : "Unknown";
+                    
+                    item.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <img src="${u.avatar || 'img/FilmHouse3_nobg.png'}" style="width: 24px; height: 24px; border-radius: 50%;">
+                            <div>
+                                <div style="font-size: 12px; font-weight: 600; color: var(--text-primary);">${u.fullName}</div>
+                                <div style="font-size: 10px; color: var(--text-secondary);">@${u.username} | ID: ${u.id}</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; font-weight: 700; color: var(--accent-gold);">${u.points} pts</div>
+                            <div style="font-size: 9px; color: var(--text-secondary);">Joined: ${joined}</div>
+                        </div>
+                    `;
+                    usersListEl.appendChild(item);
+                });
+            }
+        }
+    }).catch(err => {
+        console.error("Error fetching users for admin panel:", err);
+    });
+    
+    // 2. Fetch movie requests
+    db.collection("requests").orderBy("requestedAt", "desc").limit(100).get().then(querySnapshot => {
+        const totalRequestsEl = document.getElementById("admin-stat-total-requests");
+        if (totalRequestsEl) totalRequestsEl.textContent = querySnapshot.size;
+        
+        const requestsListEl = document.getElementById("admin-requests-list");
+        if (requestsListEl) {
+            requestsListEl.replaceChildren();
+            if (querySnapshot.empty) {
+                requestsListEl.innerHTML = `<div style="padding: 12px; text-align: center; font-size: 12px; color: var(--text-secondary);">No movie requests.</div>`;
+            } else {
+                // Aggregate requests by title/type
+                const counts = {};
+                querySnapshot.forEach(doc => {
+                    const req = doc.data();
+                    const key = req.title;
+                    if (!counts[key]) {
+                        counts[key] = { title: req.title, type: req.type, count: 0 };
+                    }
+                    counts[key].count++;
+                });
+                
+                const sortedRequests = Object.values(counts).sort((a, b) => b.count - a.count);
+                sortedRequests.forEach(req => {
+                    const item = document.createElement("div");
+                    item.style.display = "flex";
+                    item.style.alignItems = "center";
+                    item.style.justifyContent = "space-between";
+                    item.style.padding = "8px 12px";
+                    item.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+                    
+                    item.innerHTML = `
+                        <div>
+                            <div style="font-size: 12px; font-weight: 600; color: var(--text-primary);">${req.title}</div>
+                            <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase;">${req.type}</div>
+                        </div>
+                        <div style="background: rgba(245, 197, 24, 0.1); border: 1px solid var(--accent-gold); color: var(--accent-gold); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px;">
+                            ${req.count} ${req.count === 1 ? 'request' : 'requests'}
+                        </div>
+                    `;
+                    requestsListEl.appendChild(item);
+                });
+            }
+        }
+    }).catch(err => {
+        console.error("Error fetching requests for admin panel:", err);
+    });
 }
 
 // App Kickoff Initializer
