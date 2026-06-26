@@ -195,3 +195,307 @@ const requestSearchInput = document.getElementById("request-search-input");
 if (requestSearchInput) {
     requestSearchInput.addEventListener("input", renderRequestsList);
 }
+
+// --- CATALOG MANAGER LOGIC ---
+
+// Catalog state
+let allCatalogMovies = [];
+let originalCatalogCount = 0;
+let catalogChangesMade = false;
+
+// Load GitHub token on startup
+document.addEventListener("DOMContentLoaded", () => {
+    const savedToken = localStorage.getItem("github_pat");
+    const tokenInput = document.getElementById("github-token");
+    if (savedToken && tokenInput) {
+        tokenInput.value = savedToken;
+    }
+    loadCatalog();
+});
+
+// Save GitHub token
+const saveTokenBtn = document.getElementById("btn-save-github-token");
+if (saveTokenBtn) {
+    saveTokenBtn.addEventListener("click", () => {
+        const tokenInput = document.getElementById("github-token");
+        if (tokenInput) {
+            const token = tokenInput.value.trim();
+            if (token) {
+                localStorage.setItem("github_pat", token);
+                alert("GitHub Personal Access Token saved locally!");
+            } else {
+                localStorage.removeItem("github_pat");
+                alert("GitHub Personal Access Token cleared.");
+            }
+        }
+    });
+}
+
+// Load Catalog
+async function loadCatalog() {
+    const listContainer = document.getElementById("catalog-list");
+    try {
+        const response = await fetch("./MOVIE/Data/movies_metadata.json");
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        allCatalogMovies = await response.json();
+        originalCatalogCount = allCatalogMovies.length;
+        renderCatalogList();
+    } catch (e) {
+        console.error("Failed to load catalog:", e);
+        if (listContainer) {
+            listContainer.innerHTML = `<div style="padding: 24px; text-align: center; color: #ff3b30;">Failed to load catalog data.</div>`;
+        }
+    }
+}
+
+// Render Catalog List
+function renderCatalogList() {
+    const listContainer = document.getElementById("catalog-list");
+    if (!listContainer) return;
+
+    listContainer.replaceChildren();
+
+    const searchQuery = (document.getElementById("catalog-search-input")?.value || "").toLowerCase().trim();
+    const filtered = allCatalogMovies.filter(m => {
+        const title = (m.title || "").toLowerCase();
+        const id = (m.csv_id || "").toLowerCase();
+        const type = (m.type || "").toLowerCase();
+        return title.includes(searchQuery) || id.includes(searchQuery) || type.includes(searchQuery);
+    });
+
+    if (filtered.length === 0) {
+        listContainer.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-secondary);">No matching movies in catalog.</div>`;
+        return;
+    }
+
+    filtered.forEach(m => {
+        const row = document.createElement("div");
+        row.className = "list-row";
+        
+        const posterUrl = m.poster || "MOVIE/img/FilmHouse3_nobg.png";
+        const badgeColor = (m.type || "").toLowerCase() === 'series' || (m.type || "").toLowerCase() === 'tv' ? 'var(--primary-color)' : '#00bcd4';
+        
+        row.innerHTML = `
+            <div class="user-info">
+                <img src="${posterUrl}" alt="Poster" class="user-avatar" style="border-radius: 4px; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                <div class="user-details">
+                    <h5>${m.title}</h5>
+                    <p>ID: ${m.csv_id} | Type: <span style="text-transform: uppercase; font-weight: 600; color: ${badgeColor};">${m.type}</span></p>
+                    <div class="breakdown-group">
+                        <span class="breakdown-tag">🔗 Links: ${m.links ? m.links.length : 0}</span>
+                        ${m.rating ? `<span class="breakdown-tag">⭐ ${m.rating}</span>` : ''}
+                        ${m.release_date ? `<span class="breakdown-tag">📅 ${m.release_date}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+            <div class="user-stats">
+                <button class="btn btn-secondary btn-sm btn-delete-movie" data-csv-id="${m.csv_id}" style="border-color: rgba(255, 59, 48, 0.3); color: #ff3b30; background: rgba(255, 59, 48, 0.05); padding: 6px 12px; font-size: 11px; cursor: pointer;">
+                    Delete
+                </button>
+            </div>
+        `;
+        listContainer.appendChild(row);
+    });
+
+    // Bind delete buttons
+    listContainer.querySelectorAll(".btn-delete-movie").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const csvId = e.currentTarget.getAttribute("data-csv-id");
+            const movieItem = allCatalogMovies.find(m => m.csv_id === csvId);
+            const title = movieItem ? movieItem.title : csvId;
+            if (confirm(`Are you sure you want to remove "${title}" from the catalog?`)) {
+                deleteMovie(csvId);
+            }
+        });
+    });
+}
+
+function deleteMovie(csvId) {
+    allCatalogMovies = allCatalogMovies.filter(m => m.csv_id !== csvId);
+    catalogChangesMade = true;
+    updatePublishButtonState();
+    renderCatalogList();
+}
+
+function updatePublishButtonState() {
+    const publishBtn = document.getElementById("btn-publish-catalog");
+    if (publishBtn) {
+        if (catalogChangesMade) {
+            publishBtn.style.display = "inline-flex";
+        } else {
+            publishBtn.style.display = "none";
+        }
+    }
+}
+
+// Search Catalog Input
+const catalogSearchInput = document.getElementById("catalog-search-input");
+if (catalogSearchInput) {
+    catalogSearchInput.addEventListener("input", renderCatalogList);
+}
+
+// Modal Toggle Logic
+const addMovieModal = document.getElementById("add-movie-modal");
+const openModalBtn = document.getElementById("btn-add-movie-modal");
+const closeModalBtn = document.getElementById("btn-close-movie-modal");
+
+if (openModalBtn && addMovieModal) {
+    openModalBtn.addEventListener("click", () => {
+        addMovieModal.classList.add("active");
+    });
+}
+
+if (closeModalBtn && addMovieModal) {
+    closeModalBtn.addEventListener("click", () => {
+        addMovieModal.classList.remove("active");
+    });
+}
+
+// Add Movie Form Submit
+const addMovieForm = document.getElementById("add-movie-form");
+if (addMovieForm) {
+    addMovieForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        const title = document.getElementById("movie-title").value.trim();
+        const id = document.getElementById("movie-id").value.trim();
+        const type = document.getElementById("movie-type").value;
+        const linksVal = document.getElementById("movie-links").value.trim();
+        
+        const linksList = linksVal.split(",").map(l => l.trim()).filter(l => l);
+        
+        // Add to local state
+        const newMovie = {
+            csv_id: id,
+            title: title,
+            type: type === 'tv' ? 'Series' : 'Movie',
+            links: linksList,
+            poster: '',
+            rating: 0,
+            release_date: ''
+        };
+        
+        // Prevent duplicate IDs locally
+        if (allCatalogMovies.some(m => m.csv_id === id)) {
+            alert("A title with this ID already exists in the catalog!");
+            return;
+        }
+        
+        allCatalogMovies.unshift(newMovie); // Add to beginning of catalog list
+        catalogChangesMade = true;
+        
+        updatePublishButtonState();
+        renderCatalogList();
+        
+        // Reset and close modal
+        addMovieForm.reset();
+        addMovieModal.classList.remove("active");
+    });
+}
+
+// CSV Conversion Helper
+function escapeCSV(field) {
+    if (field === null || field === undefined) return '';
+    const stringField = String(field).trim();
+    if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n') || stringField.includes('\r')) {
+        return `"${stringField.replace(/"/g, '""')}"`;
+    }
+    return stringField;
+}
+
+function generateCSVContent() {
+    const headers = "Title,ID,Type,Link 1 ,Link 2,Link 3 ,Link 4,Link 5,Link 6,Link 7,Link 8,Link 9,Link 10,Link 11,Link 12,Link 13,Link 14,Link 15,Link 16,Link 17,Link 18,Link 19,Link 20,Link 21,Link 22,Link 23,Link 24,Link 25,Link 26,Link 27,Link 28,Link 29,Link 30,Link 31,Link 32,Link 33,Link 34,Link 35,Link 36,Link 37,Link 38,Link 39,Link 40";
+    
+    // Convert back to original order: reverse unshift sequence if necessary, but we can just write as is
+    const rows = allCatalogMovies.map(movie => {
+        const row = [
+            escapeCSV(movie.title),
+            escapeCSV(movie.csv_id),
+            escapeCSV(movie.type.toLowerCase() === 'series' || movie.type.toLowerCase() === 'tv' ? 'tv' : 'movie')
+        ];
+        
+        // Output up to 40 links columns
+        for (let i = 0; i < 40; i++) {
+            row.push(escapeCSV(movie.links[i] || ''));
+        }
+        
+        return row.join(',');
+    });
+    
+    return [headers, ...rows].join('\n');
+}
+
+// Publish Changes to GitHub
+const publishBtn = document.getElementById("btn-publish-catalog");
+if (publishBtn) {
+    publishBtn.addEventListener("click", async () => {
+        const token = localStorage.getItem("github_pat");
+        if (!token) {
+            alert("Error: Please set your GitHub Personal Access Token (PAT) first in the Settings panel.");
+            return;
+        }
+        
+        publishBtn.disabled = true;
+        publishBtn.textContent = "Publishing... ⏳";
+        
+        const owner = "dans123456";
+        const repo = "filmhouse";
+        const path = "MOVIE/Data/datafile.csv";
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        
+        try {
+            // 1. Fetch current file to get SHA hash
+            const getResponse = await fetch(apiUrl, {
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Accept": "application/vnd.github.v3+json"
+                }
+            });
+            
+            if (!getResponse.ok) {
+                throw new Error(`Failed to fetch datafile.csv details from GitHub API: ${getResponse.statusText}`);
+            }
+            
+            const fileData = await getResponse.json();
+            const sha = fileData.sha;
+            
+            // 2. Generate CSV contents
+            const csvContent = generateCSVContent();
+            
+            // 3. Base64 encode using Unicode safe logic
+            const base64Content = btoa(unescape(encodeURIComponent(csvContent)));
+            
+            // 4. Commit file to GitHub
+            const putResponse = await fetch(apiUrl, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json",
+                    "Accept": "application/vnd.github.v3+json"
+                },
+                body: JSON.stringify({
+                    message: "Update catalog (datafile.csv) from Film House Admin Panel",
+                    content: base64Content,
+                    sha: sha
+                })
+            });
+            
+            if (!putResponse.ok) {
+                const errData = await putResponse.json();
+                throw new Error(errData.message || `Failed to update file on GitHub: ${putResponse.statusText}`);
+            }
+            
+            alert("Catalog successfully updated! GitHub Actions is now rebuilding the metadata. Wait 1-2 minutes for changes to reflect on the website.");
+            catalogChangesMade = false;
+            updatePublishButtonState();
+        } catch (error) {
+            console.error("Publishing error:", error);
+            alert(`Failed to publish changes: ${error.message}`);
+        } finally {
+            publishBtn.disabled = false;
+            publishBtn.textContent = "Publish Changes 🚀";
+        }
+    });
+}

@@ -1,0 +1,31 @@
+name: Auto-Enrich Movie Metadata
+
+on:
+  push:
+    paths:
+      - 'MOVIE/Data/datafile.csv'
+
+permissions:
+  contents: write
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Run Scraper Script
+        run: python MOVIE/fetch_metadata.py
+
+      - name: Commit and Push Enriched JSON
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add MOVIE/Data/movies_metadata.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-enrich movie catalog [skip ci]" && git push)

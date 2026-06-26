@@ -6,8 +6,9 @@ import time
 import os
 
 API_KEY = "a3a9df05cdacd9f23c885f2756466395"
-CSV_PATH = r"c:\Users\SWAGAAA\Desktop\fimlhouse\MOVIE\Data\datafile.csv"
-OUTPUT_PATH = r"c:\Users\SWAGAAA\Desktop\fimlhouse\MOVIE\Data\movies_metadata.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_PATH = os.path.join(BASE_DIR, "Data", "datafile.csv")
+OUTPUT_PATH = os.path.join(BASE_DIR, "Data", "movies_metadata.json")
 
 def fetch_json(url):
     time.sleep(0.35) # Sleep to avoid rate limiting

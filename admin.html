@@ -214,6 +214,144 @@
             color: var(--text-secondary);
             border: 1px solid rgba(255,255,255,0.02);
         }
+
+        /* Forms in Admin Panel */
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .form-group input, .form-group select {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #ffffff;
+            outline: none;
+            width: 100%;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Buttons styling */
+        .btn-flex {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Floating action modal for adding movies */
+        .admin-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .admin-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .admin-modal-container {
+            background: var(--bg-dark-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-shadow: var(--shadow-premium);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 {
+            font-family: var(--font-heading);
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .close-modal-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        /* User Info styling */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 188, 0, 0.25);
+            background-color: #0b0c10;
+            object-fit: cover;
+        }
+        .user-details h5 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0 0 4px 0;
+        }
+        .user-details p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        .user-stats {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+        .points-badge {
+            background: linear-gradient(135deg, rgba(255, 188, 0, 0.15) 0%, rgba(255, 188, 0, 0.05) 100%);
+            border: 1px solid rgba(255, 188, 0, 0.3);
+            color: var(--primary-color);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .date-label {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
@@ -229,6 +367,25 @@
         </div>
     </header>
 
+    <!-- GITHUB CONFIGURATION SECTION -->
+    <div class="glass-panel" style="border: 1px solid rgba(255, 188, 0, 0.15);">
+        <div class="section-header">
+            <h4 class="section-title" style="color: var(--primary-color);">⚙️ GitHub Settings (For Publishing Updates)</h4>
+        </div>
+        <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+                <label for="github-token">Personal Access Token (PAT)</label>
+                <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxx">
+            </div>
+            <div class="form-group" style="flex: 1; justify-content: flex-end;">
+                <button class="btn btn-primary" id="btn-save-github-token" style="height: 42px; margin-top: auto;">Save Token</button>
+            </div>
+        </div>
+        <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+            * The token is stored safely only in your local browser's storage and never sent to any external server (except directly to GitHub API).
+        </p>
+    </div>
+
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-num" id="stat-users">0</div>
@@ -241,6 +398,29 @@
         <div class="stat-card">
             <div class="stat-num" id="stat-active-today">0</div>
             <div class="stat-lbl">Active in last 24h</div>
+        </div>
+    </div>
+
+    <!-- CATALOG MANAGER SECTION -->
+    <div class="glass-panel">
+        <div class="section-header">
+            <h4 class="section-title">🎬 Movie Catalog Manager</h4>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm btn-flex" id="btn-add-movie-modal">
+                    <span>+ Add Movie</span>
+                </button>
+                <button class="btn btn-primary btn-sm btn-flex" id="btn-publish-catalog" style="display: none; box-shadow: 0 0 15px var(--primary-glow);">
+                    <span>Publish Changes 🚀</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" id="catalog-search-input" placeholder="Search catalog by title, type, or ID...">
+        </div>
+        
+        <div class="table-container" id="catalog-list">
+            <div style="padding: 32px; text-align: center; color: var(--text-secondary);">Loading catalog items...</div>
         </div>
     </div>
 
@@ -273,6 +453,49 @@
             <div style="padding: 32px; text-align: center; color: var(--text-secondary);">Listening for user logins...</div>
         </div>
     </div>
+
+    <!-- ADD MOVIE MODAL POPUP -->
+    <div class="admin-modal-overlay" id="add-movie-modal">
+        <div class="admin-modal-container">
+            <div class="modal-header">
+                <h3>Add New Title to Catalog</h3>
+                <button class="close-modal-btn" id="btn-close-movie-modal">
+                    <svg style="width:18px;height:18px;fill:currentColor;"><use href="#icon-close"></use></svg>
+                </button>
+            </div>
+            <form id="add-movie-form" onsubmit="event.preventDefault();">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="movie-title">Title</label>
+                    <input type="text" id="movie-title" placeholder="e.g. Inception 2010" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="movie-id">TMDB ID / Slug</label>
+                        <input type="text" id="movie-id" placeholder="e.g. 27205-inception" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="movie-type">Type</label>
+                        <select id="movie-type">
+                            <option value="movie">Movie</option>
+                            <option value="tv">Series (TV)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="movie-links">Telegram Download Links (Comma separated)</label>
+                    <input type="text" id="movie-links" placeholder="e.g. https://t.me/..., https://t.me/..." required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Add to Local List</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SVG Definitions (Simple Close helper fallback) -->
+    <svg style="display:none;">
+        <g id="icon-close">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        </g>
+    </svg>
 
     <script src="admin.js"></script>
 </body>
