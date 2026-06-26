@@ -1384,11 +1384,11 @@ function renderFeaturedGrid(fromDiscover = false) {
 
     const filtersActive = state.filters.genre !== "All" || state.filters.genre2 !== "All" || state.filters.rating > 0 || state.filters.year !== "All";
 
-    // Toggle Carousel and Recommendations visibility based on search activity or filter activity
+    // Toggle Carousel and Recommendations visibility based on search activity, filter activity, or active category
     const carousel = document.getElementById("hero-carousel");
-    if (state.searchQuery || (filtersActive && state.activeCategory === "Main")) {
+    const recs = document.getElementById("recommendations-section-wrapper");
+    if (state.searchQuery || state.activeCategory !== "Main" || filtersActive) {
         if (carousel) carousel.style.display = "none";
-        const recs = document.getElementById("recommendations-section-wrapper");
         if (recs) recs.style.display = "none";
     } else {
         if (carousel) carousel.style.display = "";
@@ -1582,6 +1582,13 @@ function renderRecommendations() {
     const wrapper = document.getElementById("recommendations-section-wrapper");
     const grid = document.getElementById("recommendations-grid-container");
     if (!wrapper || !grid) return;
+
+    const filtersActive = state.filters.genre !== "All" || state.filters.genre2 !== "All" || state.filters.rating > 0 || state.filters.year !== "All";
+    const shouldShow = !state.searchQuery && state.activeCategory === "Main" && !filtersActive;
+    if (!shouldShow) {
+        wrapper.style.display = "none";
+        return;
+    }
 
     // Determine user preference genres / categories from watchlist and history
     const userGenres = new Set();

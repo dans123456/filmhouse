@@ -1069,34 +1069,25 @@
   },
   {
     "csv_id": "341174-fifty-shades-darker",
-    "tmdb_id": 341174,
-    "title": "Fifty Shades Darker",
+    "tmdb_id": null,
+    "title": "Fifty Shades Darker (2017)",
     "type": "Movie",
     "categories": [
       "Main",
       "Erotic Movies",
       "Hollywood/British Movies"
     ],
-    "genres": [
-      "Drama",
-      "Romance"
-    ],
-    "overview": "When a wounded Christian Grey tries to entice a cautious Ana Steele back into his life, she demands a new arrangement before she will give him another chance. As the two begin to build trust and find stability, shadowy figures from Christian’s past start to circle the couple, determined to destroy their hopes for a future together.",
-    "poster": "https://image.tmdb.org/t/p/w500/w3qa274gvca9t8pkUoG8nfQgTU3.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/16aJtXO6lObbBUr11IvkjB1QD1f.jpg",
-    "rating": 6.5,
-    "release_date": "2017-02-08",
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0.0,
+    "release_date": "",
     "language": "en",
-    "cast": [
-      "Dakota Johnson",
-      "Jamie Dornan",
-      "Eric Johnson",
-      "Eloise Mumford",
-      "Bella Heathcote"
-    ],
-    "director": "James Foley",
-    "trailer": "vnLqJLeTMVU",
-    "runtime": "118 min",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADWw4AAoywoEYOlFzIwvvS4hYE"
     ]
@@ -1477,23 +1468,31 @@
   },
   {
     "csv_id": "196454-queen-charlotte-a-bridgerton-story",
-    "tmdb_id": null,
-    "title": "Queen Charlotte: A Bridgerton Story (2023)",
-    "type": "Movie",
+    "tmdb_id": 196454,
+    "title": "Queen Charlotte: A Bridgerton Story",
+    "type": "Series",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Series"
     ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "img/FilmHouse3_nobg.png",
-    "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
-    "release_date": "",
+    "genres": [
+      "Drama"
+    ],
+    "overview": "Young Queen Charlotte's marriage to King George of England sparks an epic love story and transforms high society in this \"Bridgerton\" universe prequel.",
+    "poster": "https://image.tmdb.org/t/p/w500/kFSaVIlBRycGNfrLzJZX7dgSQ1o.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dkKEpUCjGEFH5q3GcAGaWG3o2N2.jpg",
+    "rating": 8.0,
+    "release_date": "2023-05-04",
     "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
+    "cast": [
+      "India Ria Amarteifio",
+      "Corey Mylchreest",
+      "Golda Rosheuvel",
+      "Arsema Thomas",
+      "Adjoa Andoh"
+    ],
+    "director": "Shonda Rhimes",
+    "trailer": "oLtnNw0KT78",
     "runtime": "",
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADxAoAApMnOEb6IcFyjGyPQBYE"
@@ -1979,33 +1978,24 @@
   },
   {
     "csv_id": "393345-cult-of-chucky",
-    "tmdb_id": 393345,
-    "title": "Cult of Chucky",
+    "tmdb_id": null,
+    "title": "Cult of Chucky (2017)",
     "type": "Movie",
     "categories": [
       "Main",
       "Hollywood/British Movies"
     ],
-    "genres": [
-      "Horror",
-      "Thriller"
-    ],
-    "overview": "Confined to an asylum for the criminally insane for the past four years, Nica is wrongly convinced that she, not Chucky, murdered her entire family... until a string of grisly deaths occur after her psychiatrist introduces a new group therapy tool -- a \"Good Guy\" doll.",
-    "poster": "https://image.tmdb.org/t/p/w500/r5JUiMYfatwYeDkxkLWYUx5GIjY.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/af7uKmGnrOn4P1zyfFXPQZOCCEp.jpg",
-    "rating": 5.8,
-    "release_date": "2017-10-12",
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0.0,
+    "release_date": "",
     "language": "en",
-    "cast": [
-      "Fiona Dourif",
-      "Brad Dourif",
-      "Alex Vincent",
-      "Jennifer Tilly",
-      "Michael Therriault"
-    ],
-    "director": "Don Mancini",
-    "trailer": "ksTv0_dGiX4",
-    "runtime": "91 min",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADsQUAAkmBwEShB4wKt8B5TBYE"
     ]
@@ -2609,24 +2599,33 @@
   },
   {
     "csv_id": "677179-creed-iii",
-    "tmdb_id": null,
-    "title": "Creed III (2023)",
+    "tmdb_id": 677179,
+    "title": "Creed III",
     "type": "Movie",
     "categories": [
       "Main",
       "Hollywood/British Movies"
     ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "img/FilmHouse3_nobg.png",
-    "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
-    "release_date": "",
+    "genres": [
+      "Drama",
+      "Action"
+    ],
+    "overview": "After dominating the boxing world, Adonis Creed has thrived in his career and family life. When a childhood friend and former boxing prodigy, Damian Anderson, resurfaces after serving a long sentence in prison, he is eager to prove that he deserves his shot in the ring. The face-off between former friends is more than just a fight. To settle the score, Adonis must put his future on the line to battle Damian — a fighter with nothing to lose.",
+    "poster": "https://image.tmdb.org/t/p/w500/cvsXj3I9Q2iyyIo95AecSd1tad7.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gOIztYywR291pC4k3IpDq7Vj3Kj.jpg",
+    "rating": 7.1,
+    "release_date": "2023-03-01",
     "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
+    "cast": [
+      "Michael B. Jordan",
+      "Tessa Thompson",
+      "Jonathan Majors",
+      "Phylicia Rashād",
+      "Mila Davis-Kent"
+    ],
+    "director": "Michael B. Jordan",
+    "trailer": "xTaIZo8OJYE",
+    "runtime": "116 min",
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADYxgAAkKtqEXT48Jh_pCVvBYE"
     ]
@@ -4135,33 +4134,24 @@
   },
   {
     "csv_id": "45666-sam-cat",
-    "tmdb_id": 45666,
-    "title": "Sam & Cat",
-    "type": "Series",
+    "tmdb_id": null,
+    "title": "Sam & Cat (2013)",
+    "type": "Movie",
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Movies"
     ],
-    "genres": [
-      "Comedy",
-      "Kids",
-      "Family"
-    ],
-    "overview": "Sam Puckett is loud, independent, and tough as nails, while Cat Valentine is sweet as pie and super flighty. But that doesn't stop this unlikely pair from becoming best buds and roomies!\n\nTogether, they're a power duo with a love for fun and adventure -- it's just too bad that it doesn't come cheap. Burgers at their favorite robot restaurant Bots don't grow on trees, after all. A booming out-of-home babysitting business quickly becomes the answer to their empty-pocket problems, but also an extra reason for countless wacky adventures to come!",
-    "poster": "https://image.tmdb.org/t/p/w500/8zL3NVH0owqVDxKvlnG3Df5aWuT.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/dilTZGypINQKfXB5ZFs2nSfcN94.jpg",
-    "rating": 7.6,
-    "release_date": "2013-06-08",
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0.0,
+    "release_date": "",
     "language": "en",
-    "cast": [
-      "Jennette McCurdy",
-      "Ariana Grande",
-      "Cameron Ocasio"
-    ],
-    "director": "Dan Schneider",
-    "trailer": "d7cZLsJrRAM",
-    "runtime": "23 min",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
     "links": [
       "https://t.me/+cJUgTGPMeXoyM2Nk"
     ]
