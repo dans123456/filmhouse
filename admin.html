@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Film House - Admin Control Panel</title>
+    <title>Film House - Premium Command Center</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK Compat -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -16,138 +16,203 @@
     <link rel="stylesheet" href="index.css?v=6">
     <style>
         body {
-            background-color: var(--bg-dark-pure);
+            background-color: #040508;
             color: var(--text-primary);
             font-family: var(--font-primary);
-            padding: 24px;
-            max-width: 900px;
+            padding: 24px 16px;
+            max-width: 1000px;
             margin: 0 auto;
+            min-height: 100vh;
         }
+        
+        /* Premium Glowing Effects */
+        .glass-panel {
+            background: rgba(22, 24, 35, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--border-radius-lg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .glass-panel:hover {
+            border-color: rgba(255, 188, 0, 0.25);
+            box-shadow: 0 8px 40px 0 rgba(255, 188, 0, 0.05);
+        }
+        
         .admin-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 16px;
-            margin-bottom: 24px;
+            padding: 16px 24px;
+            margin-bottom: 32px;
+            background: linear-gradient(135deg, rgba(255, 188, 0, 0.05) 0%, rgba(22, 24, 35, 0.3) 100%);
+            border: 1px solid rgba(255, 188, 0, 0.15);
+            border-radius: var(--border-radius-md);
         }
+        
         .admin-title {
             font-family: var(--font-heading);
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
-            color: var(--primary-color);
+            background: linear-gradient(135deg, #ffffff 0%, var(--primary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            letter-spacing: -0.5px;
         }
+        
+        /* Blinking live sync indicator */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(76, 217, 100, 0.1);
+            border: 1px solid rgba(76, 217, 100, 0.3);
+            color: #4cd964;
+            padding: 6px 12px;
+            border-radius: var(--border-radius-lg);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #4cd964;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 10px #4cd964; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+        
+        /* Metric Stats Layout */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
             margin-bottom: 32px;
         }
         .stat-card {
-            background: var(--bg-dark-card);
+            background: rgba(22, 24, 35, 0.4);
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius-md);
             padding: 20px;
-            text-align: center;
-            box-shadow: var(--shadow-premium);
-            backdrop-filter: var(--glass-blur);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-gradient);
         }
         .stat-num {
-            font-size: 36px;
+            font-size: 38px;
             font-weight: 800;
             font-family: var(--font-heading);
             color: #ffffff;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            line-height: 1.1;
         }
         .stat-lbl {
             font-size: 11px;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 500;
         }
-        .panel-section {
-            background: var(--bg-dark-card);
+        
+        /* Search Box Design */
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-md);
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-premium);
-            backdrop-filter: var(--glass-blur);
+            border-radius: var(--border-radius-sm);
+            padding: 6px 12px;
+            margin-bottom: 16px;
+        }
+        .search-container input {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-family: var(--font-primary);
+            font-size: 13px;
+            width: 100%;
+            outline: none;
+        }
+        .search-container input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
         .section-title {
             font-family: var(--font-heading);
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 16px;
             color: #ffffff;
-            border-left: 3px solid var(--primary-color);
-            padding-left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        
+        /* Scrollable listings */
         .table-container {
-            max-height: 350px;
+            max-height: 380px;
             overflow-y: auto;
             border-radius: var(--border-radius-sm);
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.25);
             border: 1px solid var(--border-color);
         }
         .list-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
+            padding: 14px 20px;
             border-bottom: 1px solid var(--border-color);
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.2s;
         }
         .list-row:last-child {
             border-bottom: none;
         }
         .list-row:hover {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.015);
+            transform: translateX(3px);
         }
-        .user-info {
+        
+        /* Breakdown point stats label */
+        .breakdown-group {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            gap: 8px;
+            margin-top: 4px;
+            flex-wrap: wrap;
         }
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 1px solid var(--border-color);
-        }
-        .user-details h5 {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-        .user-details p {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-        .user-stats {
-            text-align: right;
-        }
-        .points-badge {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 2px;
-        }
-        .date-label {
+        .breakdown-tag {
             font-size: 9px;
-            color: var(--text-muted);
-        }
-        .req-count {
-            background: rgba(255, 188, 0, 0.1);
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.02);
         }
     </style>
 </head>
@@ -155,38 +220,59 @@
 
     <header class="admin-header">
         <div class="admin-title">
-            <span style="font-size: 28px;">👑</span>
-            <span>FILM HOUSE ADMIN</span>
+            <span>✨</span>
+            <span>COMMAND CENTER</span>
         </div>
-        <div style="font-size: 12px; color: var(--text-secondary);" id="status-connection">
-            Connecting Firestore...
+        <div class="live-indicator">
+            <span class="live-dot"></span>
+            <span id="status-text">LIVE SYNC ACTIVE</span>
         </div>
     </header>
 
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-num" id="stat-users">0</div>
-            <div class="stat-lbl">Registered Users</div>
+            <div class="stat-lbl">Total Registered Users</div>
         </div>
         <div class="stat-card">
             <div class="stat-num" id="stat-requests">0</div>
             <div class="stat-lbl">Total Movie Requests</div>
         </div>
+        <div class="stat-card">
+            <div class="stat-num" id="stat-active-today">0</div>
+            <div class="stat-lbl">Active in last 24h</div>
+        </div>
     </div>
 
-    <section class="panel-section">
-        <h4 class="section-title">Top Requested Movies & Series</h4>
+    <div class="glass-panel">
+        <div class="section-header">
+            <h4 class="section-title">🔥 Top Requests Queue</h4>
+            <span style="font-size: 11px; color: var(--primary-color); font-weight: 700; text-transform: uppercase;" id="requests-count-badge">0 Titles</span>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" id="request-search-input" placeholder="Search requested movie or series titles...">
+        </div>
+        
         <div class="table-container" id="requests-list">
-            <div style="padding: 24px; text-align: center; color: var(--text-secondary);">Loading requests list...</div>
+            <div style="padding: 32px; text-align: center; color: var(--text-secondary);">Listening for database requests...</div>
         </div>
-    </section>
+    </div>
 
-    <section class="panel-section">
-        <h4 class="section-title">Registered App Users</h4>
-        <div class="table-container" id="users-list">
-            <div style="padding: 24px; text-align: center; color: var(--text-secondary);">Loading registered users...</div>
+    <div class="glass-panel">
+        <div class="section-header">
+            <h4 class="section-title">👥 App User Profiles</h4>
+            <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;" id="users-count-badge">0 Registered</span>
         </div>
-    </section>
+        
+        <div class="search-container">
+            <input type="text" id="user-search-input" placeholder="Search users by name, telegram tag, or ID...">
+        </div>
+        
+        <div class="table-container" id="users-list">
+            <div style="padding: 32px; text-align: center; color: var(--text-secondary);">Listening for user logins...</div>
+        </div>
+    </div>
 
     <script src="admin.js"></script>
 </body>
