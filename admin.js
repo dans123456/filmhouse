@@ -267,6 +267,93 @@ async function loadCatalog() {
 }
 
 // Render Catalog List
+// Details Modal references
+const movieDetailsModal = document.getElementById("movie-details-modal");
+const closeDetailsModalBtn = document.getElementById("btn-close-details-modal");
+
+if (closeDetailsModalBtn && movieDetailsModal) {
+    closeDetailsModalBtn.addEventListener("click", () => {
+        movieDetailsModal.classList.remove("active");
+    });
+}
+
+function showMovieDetails(movie) {
+    const detailsBody = document.getElementById("details-modal-body");
+    if (!detailsBody || !movieDetailsModal) return;
+    
+    const badgeColor = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv' ? 'var(--primary-color)' : '#00bcd4';
+    const posterUrl = movie.poster || "MOVIE/img/FilmHouse3_nobg.png";
+    const linksList = movie.links || [];
+    
+    detailsBody.innerHTML = `
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+            <img src="${posterUrl}" style="width: 130px; height: 180px; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+            <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; justify-content: center;">
+                <h4 style="margin: 0 0 10px 0; font-size: 18px; font-family: var(--font-heading); color: #fff; line-height: 1.3;">${movie.title}</h4>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>ID:</strong> ${movie.csv_id}</p>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Type:</strong> <span style="text-transform: uppercase; font-weight: 600; color: ${badgeColor};">${movie.type}</span></p>
+                ${movie.release_date ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Release Date:</strong> ${movie.release_date}</p>` : ''}
+                ${movie.rating ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Rating:</strong> ⭐ ${movie.rating}/10</p>` : ''}
+                ${movie.director ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Director:</strong> ${movie.director}</p>` : ''}
+                ${movie.cast && movie.cast.length ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"><strong>Cast:</strong> ${movie.cast.join(', ')}</p>` : ''}
+            </div>
+        </div>
+
+        ${movie.overview ? `
+        <div style="margin-bottom: 20px;">
+            <h5 style="margin: 0 0 6px 0; color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Synopsis</h5>
+            <p style="margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">${movie.overview}</p>
+        </div>
+        ` : ''}
+
+        <div style="margin-bottom: 24px;">
+            <h5 style="margin: 0 0 8px 0; color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Telegram Download Links (${linksList.length})</h5>
+            <div style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.25); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
+                ${linksList.length ? linksList.map((link, idx) => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <span style="font-size: 12px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 82%;" title="${link}">Link ${idx + 1}: ${link}</span>
+                        <a href="${link}" target="_blank" style="font-size: 12px; color: var(--primary-color); text-decoration: none; font-weight: 600; padding: 2px 8px; background: rgba(255, 188, 0, 0.05); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 4px;">Test ↗</a>
+                    </div>
+                `).join('') : '<p style="margin: 0; font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px;">No links added</p>'}
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 10px;">
+            <button class="btn btn-secondary btn-block" id="btn-details-delete-movie" data-csv-id="${movie.csv_id}" style="border-color: rgba(255, 59, 48, 0.4); color: #ff3b30; background: rgba(255, 59, 48, 0.05); cursor: pointer; padding: 12px; font-weight: 600; transition: all 0.3s;">
+                Delete Title 🗑️
+            </button>
+        </div>
+    `;
+    
+    // Bind Delete inside details modal (Confirm Delete state)
+    const deleteBtn = document.getElementById("btn-details-delete-movie");
+    if (deleteBtn) {
+        let deleteTimeout = null;
+        deleteBtn.addEventListener("click", () => {
+            const csvId = deleteBtn.getAttribute("data-csv-id");
+            if (deleteBtn.classList.contains("confirming")) {
+                if (deleteTimeout) clearTimeout(deleteTimeout);
+                movieDetailsModal.classList.remove("active");
+                deleteMovie(csvId);
+            } else {
+                deleteBtn.classList.add("confirming");
+                deleteBtn.textContent = "Confirm Delete? ⚠️";
+                deleteBtn.style.backgroundColor = "#ff3b30";
+                deleteBtn.style.color = "#ffffff";
+                
+                deleteTimeout = setTimeout(() => {
+                    deleteBtn.classList.remove("confirming");
+                    deleteBtn.textContent = "Delete Title 🗑️";
+                    deleteBtn.style.backgroundColor = "rgba(255, 59, 48, 0.05)";
+                    deleteBtn.style.color = "#ff3b30";
+                }, 3000);
+            }
+        });
+    }
+    
+    movieDetailsModal.classList.add("active");
+}
+
 function renderCatalogList() {
     const listContainer = document.getElementById("catalog-list");
     if (!listContainer) return;
@@ -289,12 +376,13 @@ function renderCatalogList() {
     filtered.forEach(m => {
         const row = document.createElement("div");
         row.className = "list-row";
+        row.style.cursor = "pointer";
         
         const posterUrl = m.poster || "MOVIE/img/FilmHouse3_nobg.png";
         const badgeColor = (m.type || "").toLowerCase() === 'series' || (m.type || "").toLowerCase() === 'tv' ? 'var(--primary-color)' : '#00bcd4';
         
         row.innerHTML = `
-            <div class="user-info">
+            <div class="user-info" style="pointer-events: none;">
                 <img src="${posterUrl}" alt="Poster" class="user-avatar" style="border-radius: 4px; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
                 <div class="user-details">
                     <h5>${m.title}</h5>
@@ -306,50 +394,16 @@ function renderCatalogList() {
                     </div>
                 </div>
             </div>
-            <div class="user-stats">
-                <button class="btn btn-secondary btn-sm btn-delete-movie" data-csv-id="${m.csv_id}" style="border-color: rgba(255, 59, 48, 0.3); color: #ff3b30; background: rgba(255, 59, 48, 0.05); padding: 6px 12px; font-size: 11px; cursor: pointer;">
-                    Delete
-                </button>
+            <div class="user-stats" style="pointer-events: none;">
+                <span style="font-size: 11px; color: var(--text-secondary);">View Details ➔</span>
             </div>
         `;
-        listContainer.appendChild(row);
-    });
-
-    // Bind delete buttons with confirmation delay to prevent accidental clicks on mobile
-    listContainer.querySelectorAll(".btn-delete-movie").forEach(btn => {
-        let resetTimeout = null;
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const button = e.currentTarget;
-            const csvId = button.getAttribute("data-csv-id");
-            
-            if (button.classList.contains("confirming")) {
-                if (resetTimeout) clearTimeout(resetTimeout);
-                deleteMovie(csvId);
-            } else {
-                // Reset any other active confirming delete buttons
-                listContainer.querySelectorAll(".btn-delete-movie.confirming").forEach(otherBtn => {
-                    otherBtn.classList.remove("confirming");
-                    otherBtn.textContent = "Delete";
-                    otherBtn.style.backgroundColor = "rgba(255, 59, 48, 0.05)";
-                    otherBtn.style.color = "#ff3b30";
-                });
-                
-                // Transition this button to confirming state
-                button.classList.add("confirming");
-                button.textContent = "Confirm?";
-                button.style.backgroundColor = "#ff3b30";
-                button.style.color = "#ffffff";
-                
-                // Auto revert back to normal state after 3 seconds of inactivity
-                resetTimeout = setTimeout(() => {
-                    button.classList.remove("confirming");
-                    button.textContent = "Delete";
-                    button.style.backgroundColor = "rgba(255, 59, 48, 0.05)";
-                    button.style.color = "#ff3b30";
-                }, 3000);
-            }
+        
+        row.addEventListener("click", () => {
+            showMovieDetails(m);
         });
+        
+        listContainer.appendChild(row);
     });
 }
 
