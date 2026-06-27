@@ -786,8 +786,22 @@ function updatePointsUI() {
     // 3. Profile screen rank label
     const profileRankLabel = document.getElementById("profile-loyalty-rank-label");
     if (profileRankLabel) {
-        const rank = calculateUserRank();
-        profileRankLabel.textContent = `Global Ranking: #${rank} of ${LEADERBOARD_COMPETITORS.length + 1}`;
+        if (typeof firebase !== "undefined" && db) {
+            db.collection("users").where("points", ">", state.user.points || 0).get().then(snap => {
+                const rank = snap.size + 1;
+                db.collection("users").get().then(totalSnap => {
+                    profileRankLabel.textContent = `Global Ranking: #${rank} of ${totalSnap.size}`;
+                }).catch(() => {
+                    profileRankLabel.textContent = `Global Ranking: #${rank}`;
+                });
+            }).catch(err => {
+                const rank = calculateUserRank();
+                profileRankLabel.textContent = `Global Ranking: #${rank} of ${LEADERBOARD_COMPETITORS.length + 1}`;
+            });
+        } else {
+            const rank = calculateUserRank();
+            profileRankLabel.textContent = `Global Ranking: #${rank} of ${LEADERBOARD_COMPETITORS.length + 1}`;
+        }
     }
 
     // 4. Points Breakdown list updates
@@ -823,69 +837,112 @@ function renderLeaderboard() {
     const rowsContainer = document.getElementById("leaderboard-rows-container");
     if (!userRankCard || !rowsContainer) return;
     
-    const list = getDynamicLeaderboard();
-    const userRank = calculateUserRank();
+    // Clear containers and show loading state
+    userRankCard.innerHTML = `<div style="padding: 10px; text-align: center; color: var(--text-secondary); width: 100%;">Loading ranking...</div>`;
+    rowsContainer.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--text-secondary);">Loading global leaderboard...</div>`;
     
-    // Clear containers
-    userRankCard.replaceChildren();
-    rowsContainer.replaceChildren();
-    
-    // Render current user rank card
     const badgePrefix = window.location.pathname.includes("/MOVIE/") ? "" : "MOVIE/";
-    const userAvatarPath = state.user.avatar || (badgePrefix + "img/FilmHouse3_nobg.png");
     
-    const userCardHTML = `
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="${userAvatarPath}" alt="Your Avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #f5c518;">
-            <div>
-                <h4 style="font-size: 13px; font-weight: 700; margin: 0; color: var(--text-primary);">You (${state.user.fullName})</h4>
-                <span class="leaderboard-badge">${getAchievementBadge(state.user.points || 0)}</span>
-            </div>
-        </div>
-        <div style="text-align: right;">
-            <span style="font-size: 16px; font-weight: 800; color: #f5c518; display: block; line-height: 1;">#${userRank}</span>
-            <span style="font-size: 10px; color: var(--text-secondary); font-weight: 500;">Rank | ${state.user.points || 0} pts</span>
-        </div>
-    `;
-    userRankCard.innerHTML = userCardHTML;
+    // If Firebase is available, load live leaderboard
+    if (typeof firebase !== "undefined" && db) {
+        db.collection("users").orderBy("points", "desc").limit(25).get().then(async (snapshot) => {
+            const list = [];
+            
+            snapshot.forEach(doc => {
+                const u = doc.data();
+                const isMe = u.id === state.user.id;
+                
+                list.push({
+                    username: u.username || "guest",
+                    fullName: u.fullName || "Guest Collector",
+                    points: u.points || 0,
+                    avatar: u.avatar || (badgePrefix + "img/FilmHouse3_nobg.png"),
+                    badge: getAchievementBadge(u.points || 0),
+                    isCurrentUser: isMe
+                });
+            });
+            
+            // If current user is not in top 25, get their rank
+            let userRank = 1;
+            try {
+                const rankSnapshot = await db.collection("users").where("points", ">", state.user.points || 0).get();
+                userRank = rankSnapshot.size + 1;
+            } catch (e) {
+                console.error("Error fetching user rank:", e);
+                const index = list.findIndex(item => item.isCurrentUser);
+                userRank = index !== -1 ? index + 1 : list.length + 1;
+            }
+            
+            displayLeaderboardData(list, userRank);
+        }).catch(err => {
+            console.warn("Failed to load live leaderboard, falling back to demo data:", err);
+            renderStaticLeaderboard();
+        });
+    } else {
+        renderStaticLeaderboard();
+    }
     
-    // Render ranking rows
-    list.forEach((item, index) => {
-        const rank = index + 1;
+    function renderStaticLeaderboard() {
+        const list = getDynamicLeaderboard();
+        const userRank = calculateUserRank();
+        displayLeaderboardData(list, userRank);
+    }
+    
+    function displayLeaderboardData(list, userRank) {
+        userRankCard.replaceChildren();
+        rowsContainer.replaceChildren();
         
-        const row = document.createElement("div");
-        row.className = `leaderboard-row ${item.isCurrentUser ? "current-user" : ""}`;
-        
-        // Rank Badge
-        let rankBadgeClass = "leaderboard-rank-default";
-        let rankBadgeContent = rank;
-        if (rank === 1) {
-            rankBadgeClass = "leaderboard-rank-1";
-            rankBadgeContent = "🥇";
-        } else if (rank === 2) {
-            rankBadgeClass = "leaderboard-rank-2";
-            rankBadgeContent = "🥈";
-        } else if (rank === 3) {
-            rankBadgeClass = "leaderboard-rank-3";
-            rankBadgeContent = "🥉";
-        }
-        
-        row.innerHTML = `
+        const userAvatarPath = state.user.avatar || (badgePrefix + "img/FilmHouse3_nobg.png");
+        const userCardHTML = `
             <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="leaderboard-rank-badge ${rankBadgeClass}">${rankBadgeContent}</div>
-                <img src="${item.avatar}" alt="${item.fullName}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color);">
+                <img src="${userAvatarPath}" alt="Your Avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #f5c518;" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
                 <div>
-                    <h4 style="font-size: 12px; font-weight: 600; margin: 0; color: ${item.isCurrentUser ? "#f5c518" : "var(--text-primary)"};">${item.fullName}</h4>
-                    <span class="leaderboard-badge" style="font-size: 8px; padding: 1px 4px;">${item.badge}</span>
+                    <h4 style="font-size: 13px; font-weight: 700; margin: 0; color: var(--text-primary);">You (${state.user.fullName})</h4>
+                    <span class="leaderboard-badge">${getAchievementBadge(state.user.points || 0)}</span>
                 </div>
             </div>
             <div style="text-align: right;">
-                <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">${item.points}</span>
-                <span style="font-size: 9px; color: var(--text-secondary); display: block;">pts</span>
+                <span style="font-size: 16px; font-weight: 800; color: #f5c518; display: block; line-height: 1;">#${userRank}</span>
+                <span style="font-size: 10px; color: var(--text-secondary); font-weight: 500;">Rank | ${state.user.points || 0} pts</span>
             </div>
         `;
-        rowsContainer.appendChild(row);
-    });
+        userRankCard.innerHTML = userCardHTML;
+        
+        list.forEach((item, index) => {
+            const rank = index + 1;
+            const row = document.createElement("div");
+            row.className = `leaderboard-row ${item.isCurrentUser ? "current-user" : ""}`;
+            
+            let rankBadgeClass = "leaderboard-rank-default";
+            let rankBadgeContent = rank;
+            if (rank === 1) {
+                rankBadgeClass = "leaderboard-rank-1";
+                rankBadgeContent = "🥇";
+            } else if (rank === 2) {
+                rankBadgeClass = "leaderboard-rank-2";
+                rankBadgeContent = "🥈";
+            } else if (rank === 3) {
+                rankBadgeClass = "leaderboard-rank-3";
+                rankBadgeContent = "🥉";
+            }
+            
+            row.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="leaderboard-rank-badge ${rankBadgeClass}">${rankBadgeContent}</div>
+                    <img src="${item.avatar}" alt="${item.fullName}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color);" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
+                    <div>
+                        <h4 style="font-size: 12px; font-weight: 600; margin: 0; color: ${item.isCurrentUser ? "#f5c518" : "var(--text-primary)"};">${item.fullName}</h4>
+                        <span class="leaderboard-badge" style="font-size: 8px; padding: 1px 4px;">${item.badge}</span>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">${item.points}</span>
+                    <span style="font-size: 9px; color: var(--text-secondary); display: block;">pts</span>
+                </div>
+            `;
+            rowsContainer.appendChild(row);
+        });
+    }
 }
 
 function renderFavoriteCategoriesChecklist() {
