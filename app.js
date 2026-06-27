@@ -2378,8 +2378,12 @@ function openDetailModal(movie) {
         rText.textContent = movie.type === "Series" ? "Request Series" : "Request Movie";
         requestBtn.appendChild(rText);
 
-        requestBtn.addEventListener("click", () => {
-            logMovieRequestToFirestore(movie);
+        requestBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            showAdRewardFlow(() => {
+                logMovieRequestToFirestore(movie);
+                window.open("https://t.me/+09ahNmGdB1U2MzFk", "_blank");
+            });
         });
         
         actionsRow.appendChild(requestBtn);
@@ -2699,6 +2703,15 @@ function openDownloadModal(movie) {
             anchor.target = "_blank";
             anchor.rel = "noopener noreferrer";
 
+            anchor.addEventListener("click", (e) => {
+                e.preventDefault();
+                showAdRewardFlow(() => {
+                    awardPoints(10, "download");
+                    syncUserToFirestore();
+                    window.open(link, '_blank');
+                });
+            });
+
             if (isTVShow) {
                 // --- TV SERIES: Season layout ---
                 const seasonNum = idx + 1;
@@ -2797,43 +2810,40 @@ function copyToClipboard(text) {
     });
 }
 
-// Adsgram integration helper
-function initializeAdsgram() {
-    const blockId = "your-block-id"; // User replacement block ID
-    
-    // Check if the blockId is a placeholder or invalid before initializing
-    // Adsgram block ID must be all digits or starts with 'int-' followed by digits.
-    const isValidBlockId = /^(?:\d+|int-\d+)$/.test(blockId);
-    if (!isValidBlockId) {
-        console.warn("Adsgram: invalid or placeholder blockId ('" + blockId + "') detected. Adsgram will not be initialized, bypassing ads.");
-        return;
-    }
-
-    if (window.Adsgram) {
+// Sonar ad integration helper
+function showAdRewardFlow(onSuccess) {
+    if (window.Sonar && typeof window.Sonar.show === "function") {
+        let completed = false;
+        
+        const handleSuccess = () => {
+            if (!completed) {
+                completed = true;
+                onSuccess();
+            }
+        };
+        
+        // Safety timeout to ensure user doesn't get stuck if ad crashes or doesn't trigger callbacks
+        const safetyTimeout = setTimeout(handleSuccess, 10000); // 10 seconds safety net
+        
         try {
-            state.adsgramController = window.Adsgram.init({ 
-                blockId,
-                debug: true, // debug mode enabled for local environments
-                debugBannerType: 'FullscreenMedia'
+            window.Sonar.show({
+                adUnit: "filmhouseapp",
+                onReward: () => {
+                    clearTimeout(safetyTimeout);
+                    handleSuccess();
+                },
+                onClose: () => {
+                    clearTimeout(safetyTimeout);
+                    handleSuccess();
+                }
             });
         } catch (e) {
-            console.error("Adsgram script failed to initialize", e);
+            console.error("Sonar execution issue:", e);
+            clearTimeout(safetyTimeout);
+            handleSuccess();
         }
-    }
-}
-
-function showAdRewardFlow(onSuccess) {
-    if (state.adsgramController) {
-        state.adsgramController.show().then(() => {
-            // Reward verified, execute download action
-            onSuccess();
-        }).catch((err) => {
-            // Handle error quietly and fall back to allowing download so user is not blocked
-            console.warn("Adsgram execution issues:", err);
-            onSuccess();
-        });
     } else {
-        // Adsgram script not present, bypass to success
+        // Sonar script not loaded, bypass directly to success
         onSuccess();
     }
 }
@@ -3873,8 +3883,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 8. Load FAQs panel answers
     renderFAQAccordion();
 
-    // 9. Load Adsgram script
-    initializeAdsgram();
+    // 9. Sonar requires no JS-init call, it uses static script tag loading
+    // initializeAdsgram();
 
     // 10. Bind triggers & event click listeners
     bindEvents();
