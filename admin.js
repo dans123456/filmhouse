@@ -223,7 +223,94 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error("Error loading GitHub token from Firestore:", e);
         }
     }
+
+    // Verify Admin Access
+    verifyAdminAccess();
 });
+
+// Admin Access Control Verification
+async function verifyAdminAccess() {
+    const defaultAdmins = ["1329840839", "1175336733"];
+    let authorizedIds = [...defaultAdmins];
+
+    if (db) {
+        try {
+            const adminDoc = await db.collection("settings").doc("admins").get();
+            if (adminDoc.exists) {
+                const storedIds = adminDoc.data().ids || [];
+                authorizedIds = Array.from(new Set([...defaultAdmins, ...storedIds.map(id => String(id).trim())]));
+            } else {
+                // Seed initial admins doc in Firestore if missing
+                await db.collection("settings").doc("admins").set({
+                    ids: defaultAdmins,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+        } catch (e) {
+            console.error("Failed to fetch admin list from Firestore, falling back to defaults:", e);
+        }
+    }
+
+    const adminInput = document.getElementById("admin-tg-ids");
+    if (adminInput) {
+        adminInput.value = authorizedIds.join(", ");
+    }
+
+    // Context & Bypass checks
+    const isLocal = window.location.hostname === "localhost" || 
+                    window.location.hostname === "127.0.0.1" || 
+                    window.location.protocol === "file:";
+
+    const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
+    const currentTgId = tgUser ? String(tgUser.id) : null;
+
+    const idBox = document.getElementById("your-tg-id-box");
+    if (idBox) {
+        idBox.textContent = currentTgId ? `Your Telegram User ID: ${currentTgId}` : "Not running inside Telegram WebApp";
+    }
+
+    // In production, block access if not authorized
+    if (!isLocal) {
+        if (!currentTgId || !authorizedIds.includes(currentTgId)) {
+            const overlay = document.getElementById("unauthorized-overlay");
+            if (overlay) {
+                overlay.style.display = "flex";
+            }
+        }
+    }
+}
+
+// Save Admin IDs to Firestore
+const saveAdminsBtn = document.getElementById("btn-save-admins");
+if (saveAdminsBtn) {
+    saveAdminsBtn.addEventListener("click", async () => {
+        const adminInput = document.getElementById("admin-tg-ids");
+        if (adminInput && db) {
+            const rawInput = adminInput.value.trim();
+            const defaultAdmins = ["1329840839", "1175336733"];
+            
+            // Map input and filter empty
+            let inputIds = rawInput.split(",")
+                .map(id => id.trim())
+                .filter(id => id && /^\d+$/.test(id)); // Allow only numeric IDs
+
+            // Merge with master default admins
+            const finalIds = Array.from(new Set([...defaultAdmins, ...inputIds]));
+
+            try {
+                await db.collection("settings").doc("admins").set({
+                    ids: finalIds,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                adminInput.value = finalIds.join(", ");
+                alert("Authorized Admin IDs updated successfully in your Firebase database!");
+            } catch (e) {
+                console.error("Error saving admin list to Firestore:", e);
+                alert("Failed to update Admin IDs. Make sure your database rules permit this write.");
+            }
+        }
+    });
+}
 
 // Save GitHub token to Firestore
 const saveTokenBtn = document.getElementById("btn-save-github-token");

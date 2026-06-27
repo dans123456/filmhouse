@@ -12,6 +12,8 @@
     <!-- Firebase SDK Compat -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- Telegram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <link rel="stylesheet" href="index.css?v=6">
     <style>
@@ -370,6 +372,14 @@
 </head>
 <body>
 
+    <!-- UNAUTHORIZED OVERLAY -->
+    <div id="unauthorized-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #040508; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; padding: 24px; text-align: center;">
+        <span style="font-size: 64px; margin-bottom: 24px;">🚫</span>
+        <h2 style="font-family: 'Space Grotesk', sans-serif; color: #ffffff; font-size: 24px; margin: 0 0 12px 0; font-weight: 700;">Access Restricted</h2>
+        <p style="color: var(--text-secondary); font-size: 14px; max-width: 320px; line-height: 1.6; margin: 0 0 24px 0;">This admin command center is restricted to authorized Telegram accounts only.</p>
+        <div id="your-tg-id-box" style="font-size: 12px; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border-color); font-family: monospace;"></div>
+    </div>
+
     <header class="admin-header">
         <div class="admin-title">
             <span>✨</span>
@@ -397,6 +407,25 @@
         </div>
         <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
             * The token is stored safely only in your local browser's storage and never sent to any external server (except directly to GitHub API).
+        </p>
+    </div>
+
+    <!-- ADMIN ACCESS CONTROL SECTION -->
+    <div class="glass-panel" style="border: 1px solid rgba(0, 188, 212, 0.15);">
+        <div class="section-header">
+            <h4 class="section-title" style="color: #00bcd4;">🛡️ Admin Access Management</h4>
+        </div>
+        <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+                <label for="admin-tg-ids">Authorized Telegram User IDs (Comma-separated)</label>
+                <input type="text" id="admin-tg-ids" placeholder="e.g. 1329840839, 1175336733">
+            </div>
+            <div class="form-group" style="flex: 1; justify-content: flex-end;">
+                <button class="btn btn-secondary" id="btn-save-admins" style="height: 42px; margin-top: auto; border-color: rgba(0, 188, 212, 0.3); color: #00bcd4;">Update Admins</button>
+            </div>
+        </div>
+        <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 8px;">
+            Authorized IDs have full access to this admin dashboard. Master admin IDs: <strong>1329840839</strong>, <strong>1175336733</strong> (cannot be removed).
         </p>
     </div>
 
