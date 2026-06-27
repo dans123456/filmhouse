@@ -595,3 +595,98 @@ if (publishBtn) {
         }
     });
 }
+
+// Bind Import/Export buttons
+const importBtn = document.getElementById("btn-import-csv");
+const exportBtn = document.getElementById("btn-export-csv");
+const csvFileInput = document.getElementById("input-import-csv");
+
+if (importBtn && csvFileInput) {
+    importBtn.addEventListener("click", () => {
+        csvFileInput.click();
+    });
+
+    csvFileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                if (!results.data || results.data.length === 0) {
+                    alert("The CSV file appears to be empty or formatted incorrectly.");
+                    return;
+                }
+
+                // Map row data
+                const importedMovies = results.data.map(row => {
+                    const keys = Object.keys(row);
+                    const titleKey = keys.find(k => k.trim().toLowerCase() === 'title') || 'Title';
+                    const idKey = keys.find(k => k.trim().toLowerCase() === 'id') || 'ID';
+                    const typeKey = keys.find(k => k.trim().toLowerCase() === 'type') || 'Type';
+
+                    const title = (row[titleKey] || '').trim();
+                    const csv_id = (row[idKey] || '').trim();
+                    const rawType = (row[typeKey] || '').trim().toLowerCase();
+                    const type = (rawType === 'series' || rawType === 'tv') ? 'Series' : 'Movie';
+
+                    // Parse up to 40 links columns
+                    const links = [];
+                    keys.forEach(k => {
+                        const cleanKey = k.trim().toLowerCase();
+                        if (cleanKey.startsWith('link') && row[k]) {
+                            const linkVal = row[k].trim();
+                            if (linkVal) links.push(linkVal);
+                        }
+                    });
+
+                    return {
+                        title,
+                        csv_id,
+                        type,
+                        links,
+                        poster: '',
+                        rating: 0,
+                        release_date: ''
+                    };
+                }).filter(m => m.title && m.csv_id);
+
+                if (importedMovies.length > 0) {
+                    allCatalogMovies = importedMovies;
+                    catalogChangesMade = true;
+                    updatePublishButtonState();
+                    renderCatalogList();
+                    alert(`Successfully imported ${importedMovies.length} catalog items from CSV! Click "Publish Changes 🚀" to save them to your app.`);
+                } else {
+                    alert("Failed to find any movies with valid Title and ID in the CSV.");
+                }
+                csvFileInput.value = ""; // Reset file selector
+            },
+            error: function(err) {
+                alert("Error parsing CSV: " + err.message);
+                csvFileInput.value = "";
+            }
+        });
+    });
+}
+
+if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+        if (allCatalogMovies.length === 0) {
+            alert("No movies available in the catalog to export!");
+            return;
+        }
+
+        const csvContent = generateCSVContent();
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "datafile.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+}

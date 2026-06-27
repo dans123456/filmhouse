@@ -419,7 +419,14 @@
     <div class="glass-panel">
         <div class="section-header">
             <h4 class="section-title">🎬 Movie Catalog Manager</h4>
-            <div style="display: flex; gap: 8px;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <input type="file" id="input-import-csv" accept=".csv" style="display: none;">
+                <button class="btn btn-secondary btn-sm btn-flex" id="btn-import-csv">
+                    <span>📥 Import CSV</span>
+                </button>
+                <button class="btn btn-secondary btn-sm btn-flex" id="btn-export-csv">
+                    <span>📤 Export CSV</span>
+                </button>
                 <button class="btn btn-secondary btn-sm btn-flex" id="btn-add-movie-modal">
                     <span>+ Add Movie</span>
                 </button>
@@ -524,6 +531,7 @@
         </g>
     </svg>
 
+    <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>
