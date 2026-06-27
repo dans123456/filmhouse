@@ -315,14 +315,39 @@ function renderCatalogList() {
         listContainer.appendChild(row);
     });
 
-    // Bind delete buttons
+    // Bind delete buttons with confirmation delay to prevent accidental clicks on mobile
     listContainer.querySelectorAll(".btn-delete-movie").forEach(btn => {
+        let resetTimeout = null;
         btn.addEventListener("click", (e) => {
-            const csvId = e.currentTarget.getAttribute("data-csv-id");
-            const movieItem = allCatalogMovies.find(m => m.csv_id === csvId);
-            const title = movieItem ? movieItem.title : csvId;
-            if (confirm(`Are you sure you want to remove "${title}" from the catalog?`)) {
+            e.stopPropagation();
+            const button = e.currentTarget;
+            const csvId = button.getAttribute("data-csv-id");
+            
+            if (button.classList.contains("confirming")) {
+                if (resetTimeout) clearTimeout(resetTimeout);
                 deleteMovie(csvId);
+            } else {
+                // Reset any other active confirming delete buttons
+                listContainer.querySelectorAll(".btn-delete-movie.confirming").forEach(otherBtn => {
+                    otherBtn.classList.remove("confirming");
+                    otherBtn.textContent = "Delete";
+                    otherBtn.style.backgroundColor = "rgba(255, 59, 48, 0.05)";
+                    otherBtn.style.color = "#ff3b30";
+                });
+                
+                // Transition this button to confirming state
+                button.classList.add("confirming");
+                button.textContent = "Confirm?";
+                button.style.backgroundColor = "#ff3b30";
+                button.style.color = "#ffffff";
+                
+                // Auto revert back to normal state after 3 seconds of inactivity
+                resetTimeout = setTimeout(() => {
+                    button.classList.remove("confirming");
+                    button.textContent = "Delete";
+                    button.style.backgroundColor = "rgba(255, 59, 48, 0.05)";
+                    button.style.color = "#ff3b30";
+                }, 3000);
             }
         });
     });
