@@ -1908,7 +1908,6 @@ function renderWatchlistGrid() {
             addWatchHistory(movie.csv_id);
             showAdRewardFlow(() => {
                 openDownloadModal(movie);
-                awardPoints(10, "download");
             });
         });
         actionRow.appendChild(downloadBtn);
@@ -2402,7 +2401,6 @@ function openDetailModal(movie) {
             // Show Adsgram ad before download links reveal
             showAdRewardFlow(() => {
                 openDownloadModal(movie);
-                awardPoints(10, "download");
             });
         });
         actionsRow.appendChild(downloadBtn);
@@ -2706,7 +2704,6 @@ function openDownloadModal(movie) {
             anchor.addEventListener("click", (e) => {
                 e.preventDefault();
                 showAdRewardFlow(() => {
-                    awardPoints(10, "download");
                     syncUserToFirestore();
                     window.open(link, '_blank');
                 });
