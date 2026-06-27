@@ -213,7 +213,7 @@ def main():
             if movie_id_numeric and movie_id_numeric.isdigit():
                 tmdb_id = int(movie_id_numeric)
                 # Try TV first if classified as Series
-                if 'series' in row_type.lower() or 'cartoon' in row_type.lower():
+                if any(x in row_type.lower() for x in ['series', 'tv', 'show', 'cartoon']):
                     details = get_tv_details(tmdb_id)
                     if not details:
                         details = get_movie_details(tmdb_id)
@@ -273,7 +273,7 @@ def main():
                     runtime = f"{details['episode_run_time'][0]} min"
             else:
                 # Fallback empty properties
-                media_type = 'tv' if 'series' in row_type.lower() else 'movie'
+                media_type = 'tv' if any(x in row_type.lower() for x in ['series', 'tv', 'show', 'cartoon']) else 'movie'
                 
             categories = classify_categories(details, row_title, row_type)
             
