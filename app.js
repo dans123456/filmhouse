@@ -1906,9 +1906,7 @@ function renderWatchlistGrid() {
         downloadBtn.addEventListener("click", (e) => {
             e.stopPropagation();
             addWatchHistory(movie.csv_id);
-            showAdRewardFlow(() => {
-                openDownloadModal(movie);
-            });
+            openDownloadModal(movie);
         });
         actionRow.appendChild(downloadBtn);
 
@@ -2398,10 +2396,8 @@ function openDetailModal(movie) {
         downloadBtn.addEventListener("click", () => {
             // Record watch history
             addWatchHistory(movie.csv_id);
-            // Show Adsgram ad before download links reveal
-            showAdRewardFlow(() => {
-                openDownloadModal(movie);
-            });
+            // Open download options instantly
+            openDownloadModal(movie);
         });
         actionsRow.appendChild(downloadBtn);
     }
@@ -2724,7 +2720,7 @@ function openDownloadModal(movie) {
                 label.textContent = `Season ${seasonNum}`;
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
-                sublabel.textContent = "Full season pack";
+                sublabel.textContent = "Unlock & Stream Season • Ad";
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
                 anchor.appendChild(labelWrap);
@@ -2745,7 +2741,8 @@ function openDownloadModal(movie) {
                 label.textContent = qLabel;
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
-                sublabel.textContent = idx === 0 ? "Standard quality" : idx === 1 ? "High quality" : "Premium quality";
+                const qualityText = idx === 0 ? "Standard Quality" : idx === 1 ? "High Quality" : "Ultra HD Quality";
+                sublabel.textContent = `${qualityText} • Watch Ad to Get Link`;
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
                 anchor.appendChild(labelWrap);
@@ -2753,7 +2750,7 @@ function openDownloadModal(movie) {
 
             const actionLabel = document.createElement("span");
             actionLabel.className = "download-link-action-label";
-            actionLabel.textContent = isTVShow ? "Stream" : "Get";
+            actionLabel.textContent = isTVShow ? "Stream 🍿" : "Get Link ⬇️";
             actionLabel.appendChild(createSvgIcon("icon-download"));
             anchor.appendChild(actionLabel);
 
