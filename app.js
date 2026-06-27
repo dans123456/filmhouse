@@ -2311,7 +2311,7 @@ function openDetailModal(movie) {
 
     // Trailer Button (IMDb Video Gallery / YouTube)
     if (movie.imdb_id || movie.trailer) {
-        const trailerBtn = document.createElement("a");
+        const trailerBtn = document.createElement("button");
         trailerBtn.className = "btn btn-secondary";
         trailerBtn.appendChild(createSvgIcon("icon-play"));
         
@@ -2319,12 +2319,13 @@ function openDetailModal(movie) {
         tText.textContent = "Trailer";
         trailerBtn.appendChild(tText);
 
-        trailerBtn.href = movie.imdb_id 
-            ? `https://www.imdb.com/title/${movie.imdb_id}/videogallery` 
-            : `https://www.youtube.com/watch?v=${movie.trailer}`;
-        trailerBtn.target = "_blank";
-        trailerBtn.rel = "noopener noreferrer";
-        trailerBtn.style.textDecoration = "none";
+        trailerBtn.addEventListener("click", () => {
+            if (movie.trailer) {
+                openTrailerModal(movie.trailer);
+            } else if (movie.imdb_id) {
+                window.open(`https://www.imdb.com/title/${movie.imdb_id}/videogallery`, '_blank');
+            }
+        });
         
         actionsRow.appendChild(trailerBtn);
     }
