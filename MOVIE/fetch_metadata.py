@@ -201,8 +201,8 @@ def main():
             movie_id_str = row[1].strip()
             row_type = row[2].strip()
             links = [link.strip() for link in row[3:] if link.strip()]
-            
-            print(f"[{idx+1}] Processing: ID={movie_id_str}, Title={row_title}")
+            safe_title = row_title.encode('ascii', 'ignore').decode('ascii')
+            print(f"[{idx+1}] Processing: ID={movie_id_str}, Title={safe_title}")
             
             details = None
             

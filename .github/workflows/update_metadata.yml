@@ -3,7 +3,7 @@ name: Auto-Enrich Movie Metadata
 on:
   push:
     paths:
-      - 'MOVIE/Data/datafile.csv'
+      - 'MOVIE/Data/manual_trigger_only.txt'
 
 permissions:
   contents: write

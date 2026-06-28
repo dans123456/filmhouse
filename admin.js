@@ -636,33 +636,45 @@ if (publishBtn) {
         
         const owner = "dans123456";
         const repo = "filmhouse";
-        const path = "MOVIE/Data/datafile.csv";
-        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        const pathCSV = "MOVIE/Data/datafile.csv";
+        const pathJSON = "MOVIE/Data/movies_metadata.json";
+        const apiCSVUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${pathCSV}`;
+        const apiJSONUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${pathJSON}`;
         
         try {
-            // 1. Fetch current file to get SHA hash
-            const getResponse = await fetch(apiUrl, {
+            // 1. Fetch datafile.csv SHA details
+            const getCSVResponse = await fetch(apiCSVUrl, {
                 headers: {
                     "Authorization": `token ${token}`,
                     "Accept": "application/vnd.github.v3+json"
                 }
             });
-            
-            if (!getResponse.ok) {
-                throw new Error(`Failed to fetch datafile.csv details from GitHub API: ${getResponse.statusText}`);
+            if (!getCSVResponse.ok) {
+                throw new Error(`Failed to fetch datafile.csv details from GitHub: ${getCSVResponse.statusText}`);
             }
+            const csvData = await getCSVResponse.json();
+            const shaCSV = csvData.sha;
+
+            // 2. Fetch movies_metadata.json SHA details
+            const getJSONResponse = await fetch(apiJSONUrl, {
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Accept": "application/vnd.github.v3+json"
+                }
+            });
+            if (!getJSONResponse.ok) {
+                throw new Error(`Failed to fetch movies_metadata.json details from GitHub: ${getJSONResponse.statusText}`);
+            }
+            const jsonData = await getJSONResponse.json();
+            const shaJSON = jsonData.sha;
             
-            const fileData = await getResponse.json();
-            const sha = fileData.sha;
-            
-            // 2. Generate CSV contents
+            // 3. Generate contents
             const csvContent = generateCSVContent();
+            const jsonContent = JSON.stringify(allCatalogMovies, null, 2);
             
-            // 3. Base64 encode using Unicode safe logic
-            const base64Content = btoa(unescape(encodeURIComponent(csvContent)));
-            
-            // 4. Commit file to GitHub
-            const putResponse = await fetch(apiUrl, {
+            // 4. Commit CSV content
+            const base64CSV = btoa(unescape(encodeURIComponent(csvContent)));
+            const putCSVResponse = await fetch(apiCSVUrl, {
                 method: "PUT",
                 headers: {
                     "Authorization": `token ${token}`,
@@ -671,19 +683,41 @@ if (publishBtn) {
                 },
                 body: JSON.stringify({
                     message: "Update catalog (datafile.csv) from Film House Admin Panel",
-                    content: base64Content,
-                    sha: sha
+                    content: base64CSV,
+                    sha: shaCSV
                 })
             });
-            
-            if (!putResponse.ok) {
-                const errData = await putResponse.json();
-                throw new Error(errData.message || `Failed to update file on GitHub: ${putResponse.statusText}`);
+            if (!putCSVResponse.ok) {
+                const errData = await putCSVResponse.json();
+                throw new Error(`CSV update failed: ${errData.message || putCSVResponse.statusText}`);
+            }
+
+            // 5. Commit JSON content
+            const base64JSON = btoa(unescape(encodeURIComponent(jsonContent)));
+            const putJSONResponse = await fetch(apiJSONUrl, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json",
+                    "Accept": "application/vnd.github.v3+json"
+                },
+                body: JSON.stringify({
+                    message: "Update catalog metadata (movies_metadata.json) from Film House Admin Panel",
+                    content: base64JSON,
+                    sha: shaJSON
+                })
+            });
+            if (!putJSONResponse.ok) {
+                const errData = await putJSONResponse.json();
+                throw new Error(`JSON update failed: ${errData.message || putJSONResponse.statusText}`);
             }
             
-            alert("Catalog successfully updated! GitHub Actions is now rebuilding the metadata. Wait 1-2 minutes for changes to reflect on the website.");
+            alert("Catalog CSV and enriched JSON database successfully published directly to GitHub! Updates are live instantly.");
             catalogChangesMade = false;
+            newlyAddedIds = [];
+            newlyUpdatedIds = [];
             updatePublishButtonState();
+            renderCatalogList();
         } catch (error) {
             console.error("Publishing error:", error);
             alert(`Failed to publish changes: ${error.message}`);
