@@ -27,7 +27,7 @@ try {
     if (statusTextEl) {
         statusTextEl.textContent = "CONNECTION OFFLINE";
         statusTextEl.parentElement.style.background = "rgba(255, 59, 48, 0.1)";
-        statusTextTextEl.parentElement.style.borderColor = "rgba(255, 59, 48, 0.3)";
+        statusTextEl.parentElement.style.borderColor = "rgba(255, 59, 48, 0.3)";
         statusTextEl.style.color = "#ff3b30";
     }
 }
