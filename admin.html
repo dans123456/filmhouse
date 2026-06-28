@@ -554,6 +554,24 @@
             </div>
         </div>
     </div>
+    <!-- CSV REVIEW MODAL -->
+    <div class="admin-modal-overlay" id="csv-review-modal">
+        <div class="admin-modal-container" style="max-width: 620px; width: 95%;">
+            <div class="modal-header">
+                <h3>CSV Catalog Import Summary</h3>
+                <button class="close-modal-btn" id="btn-close-review-modal">
+                    <svg style="width:18px;height:18px;fill:currentColor;"><use href="#icon-close"></use></svg>
+                </button>
+            </div>
+            <div id="csv-review-body" style="max-height: 400px; overflow-y: auto; color: #ffffff; padding-right: 4px; font-size: 13px;">
+                <!-- Dynamically filled review summary -->
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <button class="btn btn-secondary btn-block" id="btn-cancel-csv-import">Cancel</button>
+                <button class="btn btn-primary btn-block" id="btn-confirm-csv-import">Apply Changes</button>
+            </div>
+        </div>
+    </div>
     <svg style="display:none;">
         <g id="icon-close">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>

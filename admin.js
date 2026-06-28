@@ -203,6 +203,10 @@ let allCatalogMovies = [];
 let originalCatalogCount = 0;
 let catalogChangesMade = false;
 let githubToken = ""; // Global cache for token
+const TMDB_API_KEY = "a3a9df05cdacd9f23c885f2756466395";
+let pendingImportChanges = null;
+let newlyAddedIds = [];
+let newlyUpdatedIds = [];
 
 // Load GitHub token on startup from Firestore
 document.addEventListener("DOMContentLoaded", async () => {
@@ -468,11 +472,18 @@ function renderCatalogList() {
         const posterUrl = m.poster || "MOVIE/img/FilmHouse3_nobg.png";
         const badgeColor = (m.type || "").toLowerCase() === 'series' || (m.type || "").toLowerCase() === 'tv' ? 'var(--primary-color)' : '#00bcd4';
         
+        let diffBadge = "";
+        if (newlyAddedIds.includes(m.csv_id)) {
+            diffBadge = `<span style="font-size: 9px; background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 700;">NEW Addition</span>`;
+        } else if (newlyUpdatedIds.includes(m.csv_id)) {
+            diffBadge = `<span style="font-size: 9px; background: rgba(33, 150, 243, 0.15); border: 1px solid rgba(33, 150, 243, 0.3); color: #2196f3; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 700;">UPDATED Links</span>`;
+        }
+
         row.innerHTML = `
             <div class="user-info" style="pointer-events: none;">
                 <img src="${posterUrl}" alt="Poster" class="user-avatar" style="border-radius: 4px; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
                 <div class="user-details">
-                    <h5>${m.title}</h5>
+                    <h5>${m.title} ${diffBadge}</h5>
                     <p>ID: ${m.csv_id} | Type: <span style="text-transform: uppercase; font-weight: 600; color: ${badgeColor};">${m.type}</span></p>
                     <div class="breakdown-group">
                         <span class="breakdown-tag">🔗 Links: ${m.links ? m.links.length : 0}</span>
@@ -740,11 +751,7 @@ if (importBtn && csvFileInput) {
                 }).filter(m => m.title && m.csv_id);
 
                 if (importedMovies.length > 0) {
-                    allCatalogMovies = importedMovies;
-                    catalogChangesMade = true;
-                    updatePublishButtonState();
-                    renderCatalogList();
-                    alert(`Successfully imported ${importedMovies.length} catalog items from CSV! Click "Publish Changes 🚀" to save them to your app.`);
+                    showCSVReviewModal(importedMovies);
                 } else {
                     alert("Failed to find any movies with valid Title and ID in the CSV.");
                 }
@@ -775,5 +782,186 @@ if (exportBtn) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    });
+}
+
+// In-Browser TMDB Preview Scraper
+async function fetchTMDBPreview(csvId, type) {
+    const numericId = csvId.split("-")[0];
+    if (!numericId || !/^\d+$/.test(numericId)) return null;
+    
+    const mediaType = (type.toLowerCase() === 'series' || type.toLowerCase() === 'tv') ? 'tv' : 'movie';
+    const url = `https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${TMDB_API_KEY}`;
+    
+    try {
+        const res = await fetch(url);
+        if (res.ok) {
+            const data = await res.json();
+            return {
+                title: data.title || data.name || "",
+                poster: data.poster_path ? `https://image.tmdb.org/t/p/w200${data.poster_path}` : "",
+                overview: data.overview || "",
+                rating: data.vote_average || 0
+            };
+        }
+    } catch (e) {
+        console.error("Error fetching TMDB preview:", e);
+    }
+    return null;
+}
+
+// Render HTML inside Review Modal & Scrape TMDB Previews
+function showCSVReviewModal(importedMovies) {
+    const modal = document.getElementById("csv-review-modal");
+    const reviewBody = document.getElementById("csv-review-body");
+    if (!modal || !reviewBody) return;
+
+    // Calculate diffs
+    const existingMap = new Map(allCatalogMovies.map(m => [m.csv_id, m]));
+    const importedMap = new Map(importedMovies.map(m => [m.csv_id, m]));
+
+    const added = [];
+    const updated = [];
+    const removed = [];
+
+    importedMovies.forEach(m => {
+        if (!existingMap.has(m.csv_id)) {
+            added.push(m);
+        } else {
+            const existing = existingMap.get(m.csv_id);
+            const isTitleDiff = existing.title !== m.title;
+            const isTypeDiff = existing.type !== m.type;
+            const isLinksDiff = JSON.stringify(existing.links) !== JSON.stringify(m.links);
+            if (isTitleDiff || isTypeDiff || isLinksDiff) {
+                updated.push({ newMovie: m, oldMovie: existing });
+            }
+        }
+    });
+
+    allCatalogMovies.forEach(m => {
+        if (!importedMap.has(m.csv_id)) {
+            removed.push(m);
+        }
+    });
+
+    pendingImportChanges = {
+        importedList: importedMovies,
+        added,
+        updated,
+        removed
+    };
+
+    // Render HTML inside Review Modal
+    reviewBody.innerHTML = `
+        <div style="margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <span style="background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 4px 10px; border-radius: 6px; font-weight: 700;">🟢 Added: ${added.length}</span>
+            <span style="background: rgba(33, 150, 243, 0.15); border: 1px solid rgba(33, 150, 243, 0.3); color: #2196f3; padding: 4px 10px; border-radius: 6px; font-weight: 700;">🔵 Updated: ${updated.length}</span>
+            <span style="background: rgba(244, 67, 54, 0.15); border: 1px solid rgba(244, 67, 54, 0.3); color: #f44336; padding: 4px 10px; border-radius: 6px; font-weight: 700;">🔴 Removed: ${removed.length}</span>
+        </div>
+        
+        <div id="review-list-container" style="display: flex; flex-direction: column; gap: 12px;">
+            ${added.length > 0 ? `
+                <div>
+                    <h4 style="margin: 0 0 8px 0; color: #4caf50; font-size: 14px;">Pending Additions (${added.length})</h4>
+                    <div id="added-preview-list" style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(76, 175, 80, 0.1);">
+                        ${added.map(m => `
+                            <div id="preview-row-${m.csv_id}" style="display: flex; gap: 10px; align-items: center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div class="preview-spinner" style="width: 32px; height: 42px; background: rgba(255,255,255,0.05); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px;">⏳</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; color: #fff;">${m.title}</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">ID: ${m.csv_id} | Type: ${m.type}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+
+            ${updated.length > 0 ? `
+                <div>
+                    <h4 style="margin: 12px 0 8px 0; color: #2196f3; font-size: 14px;">Modified Titles (${updated.length})</h4>
+                    <div style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(33, 150, 243, 0.1);">
+                        ${updated.map(u => `
+                            <div style="padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-weight: 600; color: #fff;">${u.newMovie.title}</div>
+                                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                                    ${u.oldMovie.title !== u.newMovie.title ? `<span style="color: #ff9800; text-decoration: line-through;">${u.oldMovie.title}</span> ➔ <span style="color: #4caf50;">${u.newMovie.title}</span><br>` : ''}
+                                    ${u.oldMovie.links.length !== u.newMovie.links.length ? `Links: ${u.oldMovie.links.length} ➔ ${u.newMovie.links.length}` : 'Links content updated'}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+
+            ${removed.length > 0 ? `
+                <div>
+                    <h4 style="margin: 12px 0 8px 0; color: #f44336; font-size: 14px;">Titles to Remove (${removed.length})</h4>
+                    <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(244, 67, 54, 0.1);">
+                        ${removed.map(m => `
+                            <div style="color: #e57373; text-decoration: line-through; padding: 4px 6px;">${m.title}</div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    modal.classList.add("active");
+
+    // Fetch TMDB rich previews in-browser for newly added titles in parallel
+    added.forEach(async m => {
+        const preview = await fetchTMDBPreview(m.csv_id, m.type);
+        const row = document.getElementById(`preview-row-${m.csv_id}`);
+        if (row && preview) {
+            row.innerHTML = `
+                <img src="${preview.poster || 'MOVIE/img/FilmHouse3_nobg.png'}" style="width: 32px; height: 46px; border-radius: 4px; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+                        <span>${preview.title || m.title}</span>
+                        <span style="font-size: 10px; color: #ffbc00;">⭐ ${preview.rating ? preview.rating.toFixed(1) : '0.0'}</span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 340px;" title="${preview.overview}">${preview.overview || 'No synopsis loaded.'}</div>
+                </div>
+            `;
+            m.poster = preview.poster;
+            m.rating = preview.rating;
+        }
+    });
+}
+
+// Bind review modal close/confirm handlers
+const closeReviewModalBtn = document.getElementById("btn-close-review-modal");
+const cancelCSVImportBtn = document.getElementById("btn-cancel-csv-import");
+const confirmCSVImportBtn = document.getElementById("btn-confirm-csv-import");
+const csvReviewModal = document.getElementById("csv-review-modal");
+
+if (closeReviewModalBtn && csvReviewModal) {
+    closeReviewModalBtn.addEventListener("click", () => {
+        csvReviewModal.classList.remove("active");
+    });
+}
+
+if (cancelCSVImportBtn && csvReviewModal) {
+    cancelCSVImportBtn.addEventListener("click", () => {
+        csvReviewModal.classList.remove("active");
+        pendingImportChanges = null;
+    });
+}
+
+if (confirmCSVImportBtn && csvReviewModal) {
+    confirmCSVImportBtn.addEventListener("click", () => {
+        if (pendingImportChanges) {
+            allCatalogMovies = pendingImportChanges.importedList;
+            newlyAddedIds = pendingImportChanges.added.map(m => m.csv_id);
+            newlyUpdatedIds = pendingImportChanges.updated.map(u => u.newMovie.csv_id);
+            
+            catalogChangesMade = true;
+            updatePublishButtonState();
+            renderCatalogList();
+            
+            csvReviewModal.classList.remove("active");
+            alert(`Changes applied! You have ${newlyAddedIds.length} new additions and ${newlyUpdatedIds.length} updates. Click "Publish Changes 🚀" to save them to your app.`);
+        }
     });
 }

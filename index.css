@@ -1150,6 +1150,39 @@ img {
     border: 1px solid var(--border-color);
 }
 
+.movie-card-new-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+    color: #ffffff;
+    font-size: 8px;
+    font-weight: 800;
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    animation: pulse-new-badge 2s infinite;
+    z-index: 2;
+}
+
+@keyframes pulse-new-badge {
+    0% {
+        box-shadow: 0 0 4px rgba(76, 175, 80, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(76, 175, 80, 0.8);
+        transform: scale(1.03);
+    }
+    100% {
+        box-shadow: 0 0 4px rgba(76, 175, 80, 0.4);
+        transform: scale(1);
+    }
+}
+
 .movie-card-info {
     padding: 10px;
     display: flex;

@@ -141,6 +141,7 @@ async function initializeDatabase() {
             const data = await response.json();
             if (data && data.length > 0) {
                 state.movies = data;
+                state.newMovieIds = data.slice(0, 10).map(m => m.csv_id);
                 statusEl.textContent = "Starting Film House...";
             }
         }
@@ -163,6 +164,7 @@ async function initializeDatabase() {
                 }
             });
             state.movies = parsed;
+            state.newMovieIds = parsed.slice(0, 10).map(m => m.csv_id);
             statusEl.textContent = "Loading cached database...";
         } catch (e) {
             localStorage.removeItem("filmhouse_enriched_db_v5");
@@ -432,6 +434,7 @@ async function initializeDatabase() {
     }
 
     state.movies = enrichedList;
+    state.newMovieIds = enrichedList.slice(0, 10).map(m => m.csv_id);
     shuffleArray(state.movies);
     localStorage.setItem("filmhouse_enriched_db_v5", JSON.stringify(enrichedList));
     statusEl.textContent = "Complete!";
@@ -1599,6 +1602,14 @@ function renderFeaturedGrid(fromDiscover = false) {
         img.alt = movie.title;
         img.loading = "lazy";
         imgWrapper.appendChild(img);
+
+        // Dynamic NEW Badge Overlay for top additions
+        if (state.newMovieIds && state.newMovieIds.includes(movie.csv_id)) {
+            const newBadge = document.createElement("div");
+            newBadge.className = "movie-card-new-badge";
+            newBadge.textContent = "NEW";
+            imgWrapper.appendChild(newBadge);
+        }
 
         // Rating Badge
         if (movie.rating > 0) {
