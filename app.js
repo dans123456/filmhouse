@@ -3928,6 +3928,9 @@ function showConnectionDrawer(targetLink) {
         }
     });
 
+    drawer.style.display = "flex";
+    // Force reflow
+    drawer.offsetHeight;
     drawer.classList.add("active");
 
     const runStep = (idx) => {
@@ -3935,6 +3938,9 @@ function showConnectionDrawer(targetLink) {
             // Completed all steps! Wait a brief moment then trigger ad flow
             setTimeout(() => {
                 drawer.classList.remove("active");
+                setTimeout(() => {
+                    drawer.style.display = "none";
+                }, 300); // Hide after slide animation finishes
                 showAdRewardFlow(() => {
                     syncUserToFirestore();
                     window.open(targetLink, '_blank');
