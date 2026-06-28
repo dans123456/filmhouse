@@ -2711,10 +2711,7 @@ function openDownloadModal(movie) {
 
             anchor.addEventListener("click", (e) => {
                 e.preventDefault();
-                showAdRewardFlow(() => {
-                    syncUserToFirestore();
-                    window.open(link, '_blank');
-                });
+                showConnectionDrawer(link);
             });
 
             if (isTVShow) {
@@ -3903,3 +3900,68 @@ document.addEventListener("DOMContentLoaded", async () => {
         }, 2500);
     }
 });
+
+// Premium Connection Drawer Loader Transition
+function showConnectionDrawer(targetLink) {
+    const drawer = document.getElementById("connection-drawer");
+    if (!drawer) {
+        // Fallback if elements are missing
+        showAdRewardFlow(() => {
+            syncUserToFirestore();
+            window.open(targetLink, '_blank');
+        });
+        return;
+    }
+
+    const steps = [
+        document.getElementById("step-1"),
+        document.getElementById("step-2"),
+        document.getElementById("step-3")
+    ];
+
+    // Reset steps
+    steps.forEach(step => {
+        if (step) {
+            step.className = "step-item";
+            const statusSpan = step.querySelector(".step-status");
+            if (statusSpan) statusSpan.textContent = "⏳";
+        }
+    });
+
+    drawer.classList.add("active");
+
+    const runStep = (idx) => {
+        if (idx >= steps.length) {
+            // Completed all steps! Wait a brief moment then trigger ad flow
+            setTimeout(() => {
+                drawer.classList.remove("active");
+                showAdRewardFlow(() => {
+                    syncUserToFirestore();
+                    window.open(targetLink, '_blank');
+                });
+            }, 600);
+            return;
+        }
+
+        const currentStep = steps[idx];
+        if (currentStep) {
+            currentStep.classList.add("active");
+            
+            setTimeout(() => {
+                currentStep.classList.remove("active");
+                currentStep.classList.add("completed");
+                const statusSpan = currentStep.querySelector(".step-status");
+                if (statusSpan) statusSpan.textContent = "✅";
+                
+                runStep(idx + 1);
+            }, 800); // 800ms duration per step
+        } else {
+            runStep(idx + 1);
+        }
+    };
+
+    // Start with the first step after a short delay
+    setTimeout(() => {
+        runStep(0);
+    }, 400);
+}
