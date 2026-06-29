@@ -2415,10 +2415,8 @@ function openDetailModal(movie) {
 
         requestBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            showAdRewardFlow().then(() => {
-                logMovieRequestToFirestore(movie);
-                window.open("https://t.me/+09ahNmGdB1U2MzFk", "_blank");
-            });
+            logMovieRequestToFirestore(movie);
+            showConnectionDrawer("https://t.me/+09ahNmGdB1U2MzFk");
         });
         
         actionsRow.appendChild(requestBtn);
