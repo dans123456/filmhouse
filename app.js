@@ -859,17 +859,22 @@ function renderLeaderboard() {
             const list = [];
             const seenIds = new Set();
             const seenUsernames = new Set();
+            const seenFullNames = new Set();
             
             snapshot.forEach(doc => {
                 const u = doc.data();
                 
                 // Skip if duplicate ID
                 if (u.id && seenIds.has(u.id)) return;
-                // Skip if duplicate username (unless it is "guest")
-                if (u.username && u.username !== "guest" && seenUsernames.has(u.username)) return;
+                // Skip if duplicate username (unless it is "guest" or empty)
+                if (u.username && u.username !== "guest" && u.username !== "" && seenUsernames.has(u.username)) return;
+                // Skip if duplicate display name (unless it is a generic guest/demo name)
+                const isGuestName = !u.fullName || u.fullName.includes("Guest") || u.fullName.includes("Demo User");
+                if (u.fullName && !isGuestName && u.fullName !== "" && seenFullNames.has(u.fullName)) return;
                 
                 if (u.id) seenIds.add(u.id);
-                if (u.username && u.username !== "guest") seenUsernames.add(u.username);
+                if (u.username && u.username !== "guest" && u.username !== "") seenUsernames.add(u.username);
+                if (u.fullName && !isGuestName && u.fullName !== "") seenFullNames.add(u.fullName);
                 
                 const isMe = u.id === state.user.id;
                 
