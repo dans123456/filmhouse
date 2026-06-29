@@ -108,33 +108,81 @@ function renderUsersList() {
     filtered.forEach(u => {
         const row = document.createElement("div");
         row.className = "list-row";
+        row.style.flexDirection = "column";
+        row.style.alignItems = "stretch";
+        row.style.padding = "12px 16px";
 
         const joinedDateStr = u.joinedDate ? new Date(u.joinedDate.seconds * 1000).toLocaleDateString() : "Unknown";
-        
-        // Compile points breakdown layout
         const bd = u.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
         
         row.innerHTML = `
-            <div class="user-info">
-                <img src="${u.avatar || 'MOVIE/img/FilmHouse3_nobg.png'}" alt="Avatar" class="user-avatar" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
-                <div class="user-details">
-                    <h5>${u.fullName || 'Guest User'}</h5>
-                    <p>@${u.username || 'guest'} | ID: ${u.id}</p>
-                    <div class="breakdown-group">
-                        <span class="breakdown-tag">📥 Downloads: ${bd.downloads || 0}</span>
-                        <span class="breakdown-tag">🗓 Visits: ${bd.visits || 0}</span>
-                        <span class="breakdown-tag">🔗 Shares: ${bd.shares || 0}</span>
-                        <span class="breakdown-tag">👁 Watched: ${bd.watched || 0}</span>
-                    </div>
+            <div class="user-summary" style="display: flex; align-items: center; justify-content: space-between; width: 100%; cursor: pointer; user-select: none;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="${u.avatar || 'MOVIE/img/FilmHouse3_nobg.png'}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                    <h5 style="margin: 0; font-size: 14px; font-weight: 600; color: #fff;">${u.fullName || 'Guest User'}</h5>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="points-badge" style="margin: 0;">${u.points || 0} pts</div>
+                    <svg class="chevron-icon" style="width: 14px; height: 14px; transition: transform 0.25s ease; fill: var(--text-secondary);" viewBox="0 0 24 24">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                    </svg>
                 </div>
             </div>
-            <div class="user-stats">
-                <div class="points-badge">${u.points || 0} pts</div>
-                <div class="date-label">Joined: ${joinedDateStr}</div>
+            <div class="user-expanded-details" style="display: none; padding-top: 12px; margin-top: 10px; border-top: 1px dashed var(--border-color); width: 100%;">
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Telegram Username:</strong> @${u.username || 'guest'}</p>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>User ID:</strong> ${u.id}</p>
+                <p style="margin: 0 0 12px 0; font-size: 13px; color: var(--text-secondary);"><strong>Joined Date:</strong> ${joinedDateStr}</p>
+                
+                <h6 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Points Breakdown</h6>
+                <div class="breakdown-group" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
+                    <span class="breakdown-tag" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 4px; font-size: 11px; color: var(--text-secondary);">📥 Downloads: ${bd.downloads || 0}</span>
+                    <span class="breakdown-tag" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 4px; font-size: 11px; color: var(--text-secondary);">🚪 Visits: ${bd.visits || 0}</span>
+                    <span class="breakdown-tag" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 4px; font-size: 11px; color: var(--text-secondary);">🔗 Shares: ${bd.shares || 0}</span>
+                    <span class="breakdown-tag" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 4px; font-size: 11px; color: var(--text-secondary);">🎬 Watched: ${bd.watched || 0}</span>
+                </div>
+                
+                <button class="btn btn-secondary btn-sm delete-user-btn" style="color: #ff3b30; border-color: rgba(255, 59, 48, 0.25); background: rgba(255, 59, 48, 0.05); padding: 6px 12px; font-size: 12px; border-radius: 6px; width: 100%; cursor: pointer;">Delete User Profile</button>
             </div>
         `;
+
+        const summary = row.querySelector(".user-summary");
+        const details = row.querySelector(".user-expanded-details");
+        const chevron = row.querySelector(".chevron-icon");
+        const deleteBtn = row.querySelector(".delete-user-btn");
+
+        summary.addEventListener("click", () => {
+            const isVisible = details.style.display === "block";
+            details.style.display = isVisible ? "none" : "block";
+            chevron.style.transform = isVisible ? "rotate(0deg)" : "rotate(90deg)";
+        });
+
+        if (deleteBtn) {
+            deleteBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (confirm(`Are you sure you want to delete user "${u.fullName || 'Guest User'}" (ID: ${u.id})?\nThis action cannot be undone.`)) {
+                    deleteUserFromFirestore(u.id);
+                }
+            });
+        }
+
         listContainer.appendChild(row);
     });
+}
+
+// Delete User from Firestore Database
+function deleteUserFromFirestore(userId) {
+    if (typeof firebase === "undefined" || !db) {
+        alert("Firebase is not loaded!");
+        return;
+    }
+    db.collection("users").doc(userId).delete()
+        .then(() => {
+            alert("User deleted successfully!");
+        })
+        .catch(err => {
+            console.error("Firestore user delete error:", err);
+            alert("Error deleting user: " + err.message);
+        });
 }
 
 // Render Requests List with Aggregation and Filter Capability
