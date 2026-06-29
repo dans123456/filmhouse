@@ -1948,6 +1948,7 @@ img {
     transition: all 0.25s ease;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 .download-link-item::before {
     content: '';

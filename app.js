@@ -2729,14 +2729,10 @@ function openDownloadModal(movie) {
         grid.appendChild(fallbackMsg);
     } else {
         movie.links.forEach((link, idx) => {
-            const anchor = document.createElement("a");
-            anchor.href = link;
+            const anchor = document.createElement("div");
             anchor.className = "download-link-item";
-            anchor.target = "_blank";
-            anchor.rel = "noopener noreferrer";
 
-            anchor.addEventListener("click", (e) => {
-                e.preventDefault();
+            anchor.addEventListener("click", () => {
                 showConnectionDrawer(link);
             });
 
