@@ -2835,56 +2835,39 @@ function copyToClipboard(text) {
     });
 }
 
-// Sonar ad integration helper – returns a Promise
+// Initialize Adsgram controller
+function initializeAdsgram() {
+    if (window.Adsgram) {
+        state.adsgramController = window.Adsgram.init({ blockId: "36631" });
+    } else {
+        console.warn("Adsgram SDK not loaded yet.");
+    }
+}
+
+// Adsgram ad integration helper – returns a Promise
 function showAdRewardFlow(onStatusUpdate) {
     const status = (msg) => { if (typeof onStatusUpdate === "function") onStatusUpdate(msg); };
 
+    // Initialize on-demand if not already done
+    if (!state.adsgramController && window.Adsgram) {
+        initializeAdsgram();
+    }
+
     return new Promise((resolve) => {
-        if (window.Sonar && typeof window.Sonar.show === "function") {
-            let completed = false;
-            const finish = () => { if (!completed) { completed = true; resolve(); } };
-
-            // Reduced safety timeout – 5 seconds max wait
-            const safetyTimeout = setTimeout(() => {
-                console.warn("Sonar ad timed out after 5 s – bypassing.");
-                status("Bypassing…");
-                finish();
-            }, 5000);
-
+        if (state.adsgramController) {
             status("Loading ad…");
-
-            try {
-                const result = window.Sonar.show({
-                    adUnit: "filmhouseapp",
-                    onReward: () => {
-                        clearTimeout(safetyTimeout);
-                        status("Reward received ✓");
-                        finish();
-                    },
-                    onClose: () => {
-                        clearTimeout(safetyTimeout);
-                        status("Ad closed");
-                        finish();
-                    }
+            state.adsgramController.show()
+                .then((result) => {
+                    status("Reward received ✓");
+                    resolve();
+                })
+                .catch((result) => {
+                    console.warn("Adsgram ad skipped or error:", result);
+                    status("No ad available – continuing");
+                    resolve();
                 });
-
-                // Sonar.show() returns a Promise-like – catch load / network errors
-                if (result && typeof result.catch === "function") {
-                    result.catch((err) => {
-                        console.warn("Sonar ad rejected:", err);
-                        clearTimeout(safetyTimeout);
-                        status("No ad available – continuing");
-                        finish();
-                    });
-                }
-            } catch (e) {
-                console.error("Sonar execution issue:", e);
-                clearTimeout(safetyTimeout);
-                status("Ad error – continuing");
-                finish();
-            }
         } else {
-            // Sonar script not loaded, bypass directly
+            // Adsgram script not loaded or failed, bypass directly
             status("Connecting…");
             resolve();
         }
@@ -3926,8 +3909,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 8. Load FAQs panel answers
     renderFAQAccordion();
 
-    // 9. Sonar requires no JS-init call, it uses static script tag loading
-    // initializeAdsgram();
+    // 9. Initialize Adsgram SDK
+    initializeAdsgram();
 
     // 10. Bind triggers & event click listeners
     bindEvents();
