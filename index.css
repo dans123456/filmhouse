@@ -1846,11 +1846,18 @@ img {
 .download-modal-container {
     max-width: 480px;
     width: 90%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .download-modal-content {
     padding: 24px;
     text-align: center;
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 188, 0, 0.3) transparent;
 }
 
 .download-header-icon-wrapper {
@@ -1922,11 +1929,9 @@ img {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-height: 240px;
-    overflow-y: auto;
-    padding-right: 4px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 188, 0, 0.3) transparent;
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
 }
 .download-links-grid::-webkit-scrollbar { width: 4px; }
 .download-links-grid::-webkit-scrollbar-track { background: transparent; }
