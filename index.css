@@ -2676,21 +2676,21 @@ img {
 }
 
 .leaderboard-rank-1 {
-    background: #ffd700;
-    color: #000000;
-    box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    background: transparent;
+    box-shadow: none;
+    font-size: 20px;
 }
 
 .leaderboard-rank-2 {
-    background: #c0c0c0;
-    color: #000000;
-    box-shadow: 0 0 8px rgba(192, 192, 192, 0.3);
+    background: transparent;
+    box-shadow: none;
+    font-size: 20px;
 }
 
 .leaderboard-rank-3 {
-    background: #cd7f32;
-    color: #000000;
-    box-shadow: 0 0 8px rgba(205, 127, 50, 0.3);
+    background: transparent;
+    box-shadow: none;
+    font-size: 20px;
 }
 
 .leaderboard-rank-default {
