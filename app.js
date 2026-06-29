@@ -1656,7 +1656,7 @@ function renderFeaturedGrid(fromDiscover = false) {
 
         const countLabel = document.createElement("span");
         if (movie.links) {
-            countLabel.textContent = movie.type === "Series" ? `${movie.links.length} Ep` : "Direct";
+            countLabel.textContent = movie.type === "Series" ? `${movie.links.length} ${movie.links.length === 1 ? 'Season' : 'Seasons'}` : "Direct";
         }
         metaRow.appendChild(countLabel);
 
@@ -2389,7 +2389,7 @@ function openDetailModal(movie) {
 
         requestBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            showAdRewardFlow(() => {
+            showAdRewardFlow().then(() => {
                 logMovieRequestToFirestore(movie);
                 window.open("https://t.me/+09ahNmGdB1U2MzFk", "_blank");
             });
@@ -2681,7 +2681,7 @@ function openDownloadModal(movie) {
 
     // Update modal heading and section heading based on type
     if (modalHeading) {
-        modalHeading.textContent = isTVShow ? "Stream Series" : "Download Movie";
+        modalHeading.textContent = isTVShow ? "Download Series" : "Download Movie";
     }
     if (sectionHeading) {
         sectionHeading.textContent = isTVShow ? "Available Seasons" : "Available Quality";
@@ -2729,7 +2729,7 @@ function openDownloadModal(movie) {
                 label.textContent = `Season ${seasonNum}`;
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
-                sublabel.textContent = "Unlock & Stream Season • Ad";
+                sublabel.textContent = "Unlock & Download Season • Ad";
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
                 anchor.appendChild(labelWrap);
@@ -2759,7 +2759,7 @@ function openDownloadModal(movie) {
 
             const actionLabel = document.createElement("span");
             actionLabel.className = "download-link-action-label";
-            actionLabel.textContent = isTVShow ? "Stream 🍿" : "Get Link ⬇️";
+            actionLabel.textContent = isTVShow ? "Download 📥" : "Download 📥";
             actionLabel.appendChild(createSvgIcon("icon-download"));
             anchor.appendChild(actionLabel);
 
@@ -2813,42 +2813,60 @@ function copyToClipboard(text) {
     });
 }
 
-// Sonar ad integration helper
-function showAdRewardFlow(onSuccess) {
-    if (window.Sonar && typeof window.Sonar.show === "function") {
-        let completed = false;
-        
-        const handleSuccess = () => {
-            if (!completed) {
-                completed = true;
-                onSuccess();
-            }
-        };
-        
-        // Safety timeout to ensure user doesn't get stuck if ad crashes or doesn't trigger callbacks
-        const safetyTimeout = setTimeout(handleSuccess, 10000); // 10 seconds safety net
-        
-        try {
-            window.Sonar.show({
-                adUnit: "filmhouseapp",
-                onReward: () => {
-                    clearTimeout(safetyTimeout);
-                    handleSuccess();
-                },
-                onClose: () => {
-                    clearTimeout(safetyTimeout);
-                    handleSuccess();
+// Sonar ad integration helper – returns a Promise
+function showAdRewardFlow(onStatusUpdate) {
+    const status = (msg) => { if (typeof onStatusUpdate === "function") onStatusUpdate(msg); };
+
+    return new Promise((resolve) => {
+        if (window.Sonar && typeof window.Sonar.show === "function") {
+            let completed = false;
+            const finish = () => { if (!completed) { completed = true; resolve(); } };
+
+            // Reduced safety timeout – 5 seconds max wait
+            const safetyTimeout = setTimeout(() => {
+                console.warn("Sonar ad timed out after 5 s – bypassing.");
+                status("Bypassing…");
+                finish();
+            }, 5000);
+
+            status("Loading ad…");
+
+            try {
+                const result = window.Sonar.show({
+                    adUnit: "filmhouseapp",
+                    onReward: () => {
+                        clearTimeout(safetyTimeout);
+                        status("Reward received ✓");
+                        finish();
+                    },
+                    onClose: () => {
+                        clearTimeout(safetyTimeout);
+                        status("Ad closed");
+                        finish();
+                    }
+                });
+
+                // Sonar.show() returns a Promise-like – catch load / network errors
+                if (result && typeof result.catch === "function") {
+                    result.catch((err) => {
+                        console.warn("Sonar ad rejected:", err);
+                        clearTimeout(safetyTimeout);
+                        status("No ad available – continuing");
+                        finish();
+                    });
                 }
-            });
-        } catch (e) {
-            console.error("Sonar execution issue:", e);
-            clearTimeout(safetyTimeout);
-            handleSuccess();
+            } catch (e) {
+                console.error("Sonar execution issue:", e);
+                clearTimeout(safetyTimeout);
+                status("Ad error – continuing");
+                finish();
+            }
+        } else {
+            // Sonar script not loaded, bypass directly
+            status("Connecting…");
+            resolve();
         }
-    } else {
-        // Sonar script not loaded, bypass directly to success
-        onSuccess();
-    }
+    });
 }
 
 // Initialize FAQ accordion details
@@ -3904,30 +3922,50 @@ document.addEventListener("DOMContentLoaded", async () => {
 // Premium Connection Drawer Loader Transition
 function showConnectionDrawer(targetLink) {
     const drawer = document.getElementById("connection-drawer");
+    const statusEl = document.getElementById("connection-status-text");
+    const titleEl = drawer ? drawer.querySelector(".connection-title") : null;
+
+    const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg; };
+    const closeDrawer = () => {
+        if (drawer) {
+            drawer.classList.remove("active");
+            setTimeout(() => { drawer.style.display = "none"; }, 300);
+        }
+    };
+
+    const openLink = () => {
+        syncUserToFirestore();
+        window.open(targetLink, '_blank');
+    };
+
     if (!drawer) {
-        // Fallback if elements are missing
-        showAdRewardFlow(() => {
-            syncUserToFirestore();
-            window.open(targetLink, '_blank');
-        });
+        // Fallback if drawer elements are missing
+        showAdRewardFlow().then(openLink);
         return;
     }
 
+    // Reset state
+    if (titleEl) titleEl.textContent = "Securing Premium Connection…";
+    setStatus("Initializing…");
+
     drawer.style.display = "flex";
-    // Force reflow
-    drawer.offsetHeight;
+    drawer.offsetHeight; // force reflow
     drawer.classList.add("active");
 
-    // Run the loading spinner for 2.0 seconds (premium feel), then trigger ad flow
-    setTimeout(() => {
-        drawer.classList.remove("active");
+    // Brief premium animation (800 ms), then start ad flow while drawer is still visible
+    setTimeout(async () => {
+        setStatus("Preparing ad…");
+
+        await showAdRewardFlow((msg) => setStatus(msg));
+
+        // Ad flow finished – close drawer and open the link
+        if (titleEl) titleEl.textContent = "Connection Secured ✓";
+        setStatus("Redirecting…");
+
+        // Small visual confirmation delay (400 ms) so user sees the success state
         setTimeout(() => {
-            drawer.style.display = "none";
-        }, 300); // Hide after slide animation finishes
-        
-        showAdRewardFlow(() => {
-            syncUserToFirestore();
-            window.open(targetLink, '_blank');
-        });
-    }, 2000);
+            closeDrawer();
+            openLink();
+        }, 400);
+    }, 800);
 }

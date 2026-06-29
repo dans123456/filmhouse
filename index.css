@@ -2846,6 +2846,17 @@ img {
     letter-spacing: 0.3px;
 }
 
+.connection-status {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 0 0 20px 0;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
 .connection-steps {
     width: 100%;
     display: flex;
