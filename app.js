@@ -132,6 +132,7 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 // Dynamic Enrichment & Database Loader
 async function initializeDatabase() {
     const statusEl = document.getElementById("preloader-status");
+    let loadedFromServer = false;
     
     // 1. Try to load pre-enriched JSON
     try {
@@ -143,31 +144,37 @@ async function initializeDatabase() {
                 state.movies = data;
                 state.newMovieIds = data.slice(0, 10).map(m => m.csv_id);
                 statusEl.textContent = "Starting Film House...";
+                loadedFromServer = true;
+                
+                // Clear old client-side cache so it doesn't build up or conflict
+                localStorage.removeItem("filmhouse_enriched_db_v5");
             }
         }
     } catch (e) {
         console.warn("Could not load local JSON metadata, falling back to client-side CSV load: ", e);
     }
 
-    // 2. Load from localStorage cache
-    const cachedData = localStorage.getItem("filmhouse_enriched_db_v5");
-    if (cachedData) {
-        try {
-            const parsed = JSON.parse(cachedData);
-            // If the cache was generated in the subfolder, prepend MOVIE/ to local assets
-            parsed.forEach(m => {
-                if (m.poster && m.poster.startsWith("img/")) {
-                    m.poster = "MOVIE/" + m.poster;
-                }
-                if (m.backdrop && m.backdrop.startsWith("img/")) {
-                    m.backdrop = "MOVIE/" + m.backdrop;
-                }
-            });
-            state.movies = parsed;
-            state.newMovieIds = parsed.slice(0, 10).map(m => m.csv_id);
-            statusEl.textContent = "Loading cached database...";
-        } catch (e) {
-            localStorage.removeItem("filmhouse_enriched_db_v5");
+    // 2. Load from localStorage cache ONLY if server fetch failed
+    if (!loadedFromServer) {
+        const cachedData = localStorage.getItem("filmhouse_enriched_db_v5");
+        if (cachedData) {
+            try {
+                const parsed = JSON.parse(cachedData);
+                // If the cache was generated in the subfolder, prepend MOVIE/ to local assets
+                parsed.forEach(m => {
+                    if (m.poster && m.poster.startsWith("img/")) {
+                        m.poster = "MOVIE/" + m.poster;
+                    }
+                    if (m.backdrop && m.backdrop.startsWith("img/")) {
+                        m.backdrop = "MOVIE/" + m.backdrop;
+                    }
+                });
+                state.movies = parsed;
+                state.newMovieIds = parsed.slice(0, 10).map(m => m.csv_id);
+                statusEl.textContent = "Loading cached database...";
+            } catch (e) {
+                localStorage.removeItem("filmhouse_enriched_db_v5");
+            }
         }
     }
     
