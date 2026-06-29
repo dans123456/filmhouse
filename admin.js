@@ -446,14 +446,30 @@ function showMovieDetails(movie) {
         ` : ''}
 
         <div style="margin-bottom: 24px;">
-            <h5 style="margin: 0 0 8px 0; color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Telegram Download Links (${linksList.length})</h5>
-            <div style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.25); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h5 style="margin: 0; color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Telegram Download Links</h5>
+                <button class="btn btn-secondary btn-sm" id="btn-edit-links-toggle" style="font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Edit Links</button>
+            </div>
+            
+            <!-- Read-Only View -->
+            <div id="links-view-container" style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.25); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
                 ${linksList.length ? linksList.map((link, idx) => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                         <span style="font-size: 12px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 82%;" title="${link}">Link ${idx + 1}: ${link}</span>
-                        <a href="${link}" target="_blank" style="font-size: 12px; color: var(--primary-color); text-decoration: none; font-weight: 600; padding: 2px 8px; background: rgba(255, 188, 0, 0.05); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 4px;">Test ↗</a>
+                        <a href="${link}" target="_blank" style="font-size: 12px; color: var(--primary-color); text-decoration: none; font-weight: 600; padding: 2px 8px; background: rgba(255, 188, 0, 0.05); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 4px;">Test 🔗</a>
                     </div>
                 `).join('') : '<p style="margin: 0; font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px;">No links added</p>'}
+            </div>
+
+            <!-- Editor View (Hidden by default) -->
+            <div id="links-edit-container" style="display: none; background: rgba(0,0,0,0.25); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
+                <div id="links-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
+                    <!-- Editable inputs dynamically rendered -->
+                </div>
+                <div style="display: flex; justify-content: space-between; gap: 10px;">
+                    <button class="btn btn-secondary btn-sm" id="btn-add-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">+ Add Link</button>
+                    <button class="btn btn-primary btn-sm" id="btn-save-links-changes" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Save Links</button>
+                </div>
             </div>
         </div>
 
@@ -464,6 +480,104 @@ function showMovieDetails(movie) {
         </div>
     `;
     
+    // Links Editor logic binding
+    const editToggle = document.getElementById("btn-edit-links-toggle");
+    const viewContainer = document.getElementById("links-view-container");
+    const editContainer = document.getElementById("links-edit-container");
+    const inputsWrapper = document.getElementById("links-inputs-wrapper");
+    const addLinkBtn = document.getElementById("btn-add-link-input");
+    const saveLinksBtn = document.getElementById("btn-save-links-changes");
+    
+    let currentLinks = [...linksList];
+
+    function renderLinkInputs() {
+        inputsWrapper.innerHTML = "";
+        currentLinks.forEach((link, idx) => {
+            const wrapper = document.createElement("div");
+            wrapper.style.display = "flex";
+            wrapper.style.gap = "8px";
+            wrapper.style.alignItems = "center";
+            
+            const input = document.createElement("input");
+            input.type = "text";
+            input.className = "form-control";
+            input.style.fontSize = "12px";
+            input.style.padding = "6px 8px";
+            input.style.flex = "1";
+            input.style.background = "var(--input-bg)";
+            input.style.border = "1px solid var(--border-color)";
+            input.style.color = "#fff";
+            input.style.borderRadius = "4px";
+            input.value = link;
+            input.placeholder = `Telegram Link ${idx + 1}...`;
+            input.addEventListener("input", (e) => {
+                currentLinks[idx] = e.target.value.trim();
+            });
+            
+            const removeBtn = document.createElement("button");
+            removeBtn.className = "btn btn-secondary";
+            removeBtn.style.padding = "6px 10px";
+            removeBtn.style.color = "#ff3b30";
+            removeBtn.style.borderColor = "rgba(255, 59, 48, 0.25)";
+            removeBtn.style.background = "rgba(255, 59, 48, 0.05)";
+            removeBtn.style.cursor = "pointer";
+            removeBtn.textContent = "✖";
+            removeBtn.addEventListener("click", () => {
+                currentLinks.splice(idx, 1);
+                renderLinkInputs();
+            });
+            
+            wrapper.appendChild(input);
+            wrapper.appendChild(removeBtn);
+            inputsWrapper.appendChild(wrapper);
+        });
+    }
+
+    if (editToggle && viewContainer && editContainer) {
+        editToggle.addEventListener("click", () => {
+            if (editContainer.style.display === "none") {
+                editContainer.style.display = "block";
+                viewContainer.style.display = "none";
+                editToggle.textContent = "Cancel";
+                renderLinkInputs();
+            } else {
+                editContainer.style.display = "none";
+                viewContainer.style.display = "block";
+                editToggle.textContent = "Edit Links";
+            }
+        });
+    }
+
+    if (addLinkBtn) {
+        addLinkBtn.addEventListener("click", () => {
+            currentLinks.push("");
+            renderLinkInputs();
+        });
+    }
+
+    if (saveLinksBtn) {
+        saveLinksBtn.addEventListener("click", () => {
+            const finalLinks = currentLinks.filter(l => l !== "");
+            const movieIndex = allCatalogMovies.findIndex(m => m.csv_id === movie.csv_id);
+            if (movieIndex !== -1) {
+                allCatalogMovies[movieIndex].links = finalLinks;
+                
+                catalogChangesMade = true;
+                if (!newlyUpdatedIds.includes(movie.csv_id)) {
+                    newlyUpdatedIds.push(movie.csv_id);
+                }
+                
+                renderCatalogList();
+                updatePublishButtonState();
+                
+                alert("Links updated locally! Make sure to click 'Publish Changes' in the header to save them to GitHub.");
+                movieDetailsModal.classList.remove("active");
+            } else {
+                alert("Error: Title not found in catalog.");
+            }
+        });
+    }
+
     // Bind Delete inside details modal (Confirm Delete state)
     const deleteBtn = document.getElementById("btn-details-delete-movie");
     if (deleteBtn) {
