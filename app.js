@@ -2854,22 +2854,42 @@ function showAdRewardFlow(onStatusUpdate) {
     }
 
     return new Promise((resolve) => {
+        let resolved = false;
+        const safeResolve = () => {
+            if (!resolved) { resolved = true; resolve(); }
+        };
+
+        // Safety timeout: auto-resolve after 60s so user is never stuck
+        setTimeout(() => {
+            if (!resolved) {
+                console.warn("Adsgram ad flow timed out after 60s, bypassing.");
+                status("Timed out – continuing");
+                safeResolve();
+            }
+        }, 60000);
+
         if (state.adsgramController) {
             status("Loading ad…");
-            state.adsgramController.show()
-                .then((result) => {
-                    status("Reward received ✓");
-                    resolve();
-                })
-                .catch((result) => {
-                    console.warn("Adsgram ad skipped or error:", result);
-                    status("No ad available – continuing");
-                    resolve();
-                });
+            try {
+                state.adsgramController.show()
+                    .then((result) => {
+                        status("Reward received ✓");
+                        safeResolve();
+                    })
+                    .catch((result) => {
+                        console.warn("Adsgram ad skipped or error:", result);
+                        status("No ad available – continuing");
+                        safeResolve();
+                    });
+            } catch (err) {
+                console.error("Adsgram .show() threw an error:", err);
+                status("Ad error – continuing");
+                safeResolve();
+            }
         } else {
             // Adsgram script not loaded or failed, bypass directly
             status("Connecting…");
-            resolve();
+            safeResolve();
         }
     });
 }
@@ -3941,6 +3961,7 @@ function showConnectionDrawer(targetLink) {
 
     const openLink = () => {
         syncUserToFirestore();
+        awardPoints(10, "download");
         // Close the download modal so the user isn't stuck on it
         if (downloadModal) downloadModal.classList.remove("active");
 
@@ -3951,7 +3972,7 @@ function showConnectionDrawer(targetLink) {
                 tg.openTelegramLink(targetLink);
                 return;
             } catch (e) {
-                console.warn("tg.openTelegramLink failed, falling back to window.open:", e);
+                console.warn("tg.openTelegramLink failed:", e);
             }
         }
         // Fallback for non-Telegram links or if openTelegramLink fails
@@ -3960,10 +3981,15 @@ function showConnectionDrawer(targetLink) {
                 tg.openLink(targetLink);
                 return;
             } catch (e) {
-                console.warn("tg.openLink failed, falling back to window.open:", e);
+                console.warn("tg.openLink failed:", e);
             }
         }
-        window.open(targetLink, '_blank');
+        // Try window.open
+        const win = window.open(targetLink, '_blank');
+        if (!win) {
+            // If popup blocked, redirect directly
+            window.location.href = targetLink;
+        }
     };
 
     if (!drawer) {
