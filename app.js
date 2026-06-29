@@ -3929,6 +3929,7 @@ function showConnectionDrawer(targetLink) {
     const drawer = document.getElementById("connection-drawer");
     const statusEl = document.getElementById("connection-status-text");
     const titleEl = drawer ? drawer.querySelector(".connection-title") : null;
+    const downloadModal = document.getElementById("download-modal");
 
     const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg; };
     const closeDrawer = () => {
@@ -3940,6 +3941,28 @@ function showConnectionDrawer(targetLink) {
 
     const openLink = () => {
         syncUserToFirestore();
+        // Close the download modal so the user isn't stuck on it
+        if (downloadModal) downloadModal.classList.remove("active");
+
+        // Use Telegram's native link opener for t.me links (avoids popup blocking)
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.openTelegramLink && targetLink.includes("t.me")) {
+            try {
+                tg.openTelegramLink(targetLink);
+                return;
+            } catch (e) {
+                console.warn("tg.openTelegramLink failed, falling back to window.open:", e);
+            }
+        }
+        // Fallback for non-Telegram links or if openTelegramLink fails
+        if (tg && tg.openLink) {
+            try {
+                tg.openLink(targetLink);
+                return;
+            } catch (e) {
+                console.warn("tg.openLink failed, falling back to window.open:", e);
+            }
+        }
         window.open(targetLink, '_blank');
     };
 
