@@ -136,7 +136,7 @@ async function initializeDatabase() {
     // 1. Try to load pre-enriched JSON
     try {
         statusEl.textContent = "Loading catalog metadata...";
-        const response = await fetch(JSON_FILE_PATH);
+        const response = await fetch(`${JSON_FILE_PATH}?t=${Date.now()}`);
         if (response.ok) {
             const data = await response.json();
             if (data && data.length > 0) {
@@ -188,7 +188,7 @@ async function initializeDatabase() {
     statusEl.textContent = "Fetching movie list...";
     let csvData = [];
     try {
-        const response = await fetch(CSV_FILE_PATH);
+        const response = await fetch(`${CSV_FILE_PATH}?t=${Date.now()}`);
         const text = await response.text();
         
         // Use PapaParse if loaded

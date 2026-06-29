@@ -342,7 +342,7 @@ if (saveTokenBtn) {
 async function loadCatalog() {
     const listContainer = document.getElementById("catalog-list");
     try {
-        const response = await fetch("./MOVIE/Data/movies_metadata.json");
+        const response = await fetch("./MOVIE/Data/movies_metadata.json?t=" + Date.now());
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
