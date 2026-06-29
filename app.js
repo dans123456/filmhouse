@@ -855,12 +855,26 @@ function renderLeaderboard() {
     
     // If Firebase is available, load live leaderboard
     if (typeof firebase !== "undefined" && db) {
-        db.collection("users").orderBy("points", "desc").limit(25).get().then(async (snapshot) => {
+        db.collection("users").orderBy("points", "desc").limit(40).get().then(async (snapshot) => {
             const list = [];
+            const seenIds = new Set();
+            const seenUsernames = new Set();
             
             snapshot.forEach(doc => {
                 const u = doc.data();
+                
+                // Skip if duplicate ID
+                if (u.id && seenIds.has(u.id)) return;
+                // Skip if duplicate username (unless it is "guest")
+                if (u.username && u.username !== "guest" && seenUsernames.has(u.username)) return;
+                
+                if (u.id) seenIds.add(u.id);
+                if (u.username && u.username !== "guest") seenUsernames.add(u.username);
+                
                 const isMe = u.id === state.user.id;
+                
+                // Limit output to top 25 unique users
+                if (list.length >= 25) return;
                 
                 list.push({
                     username: u.username || "guest",
