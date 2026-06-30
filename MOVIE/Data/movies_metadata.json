@@ -1,36 +1,61 @@
 [
   {
-    "csv_id": "86031-dr-stone",
-    "tmdb_id": 86031,
+    "csv_id": "138502-x-men-97",
+    "tmdb_id": 138502,
     "imdb_id": "",
-    "title": "Dr. STONE (2019)",
+    "title": "X-Men '97 (2024)",
     "type": "Series",
     "categories": [
       "Main",
       "Hollywood/British Series",
-      "Animated Movies",
-      "Anime"
+      "Animated Movies"
     ],
     "genres": [
       "Animation",
       "Action & Adventure",
-      "Comedy",
       "Sci-Fi & Fantasy"
     ],
-    "overview": "One fateful day, all of humanity was petrified by a blinding flash of light. After several millennia, high schooler Taiju awakens and finds himself lost in a world of statues. However, he’s not alone! His science-loving friend Senku’s been up and running for a few months and he's got a grand plan in mind—to kickstart civilization with the power of science!",
-    "poster": "https://image.tmdb.org/t/p/w500/xbZQ3fDl0y5mt0ARwfeyrgQ4JTw.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/lN13BPAEnc5iXmoxxBQHOZ1ScfZ.jpg",
+    "overview": "The X-Men, a band of mutants who use their uncanny gifts to protect a world that hates and fears them, are challenged like never before, forced to face a dangerous and unexpected new future.",
+    "poster": "https://image.tmdb.org/t/p/w500/9Ycz7yYRf9V4jk3YXwcZhFtbNcF.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/iDnTAeR2WNA62XQG0ivtteDSjd5.jpg",
     "rating": 8.5,
-    "release_date": "2019-07-05",
-    "language": "ja",
+    "release_date": "2024-03-20",
+    "language": "en",
     "cast": [],
     "director": "",
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD_hIAArFaIUam_GtftEEHrhYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADBxMAArFaIUYSB9Wel8RDORYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADDhMAArFaIUbNjELgSb9qkBYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQADAhMAArFaIUYsrsdPbDy26RYE"
+    ]
+  },
+  {
+    "csv_id": "986056-thunderbolts",
+    "tmdb_id": 986056,
+    "imdb_id": "",
+    "title": "Thunderbolts* (2025)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Science Fiction",
+      "Adventure"
+    ],
+    "overview": "After finding themselves ensnared in a death trap, seven disillusioned castoffs must embark on a dangerous mission that will force them to confront the darkest corners of their pasts.",
+    "poster": "https://image.tmdb.org/t/p/w500/hqcexYHbiTBfDIdDWxrxPtVndBX.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rthMuZfFv4fqEU4JVbgSW9wQ8rs.jpg",
+    "rating": 7.3,
+    "release_date": "2025-04-30",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD0xEAArFaIUapSuu2vCliSxYE"
     ]
   },
   {
@@ -570,7 +595,7 @@
     "trailer": "N3J2JRQg040",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADqQwAAmVQIUSBODkTLM7xgRYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQADGBIAArFaIUYq2asLr5d_ZRYE"
     ]
   },
   {
@@ -803,7 +828,8 @@
     "trailer": "5PSzFLV-EyQ",
     "runtime": "119 min",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADygYAAtr8kUbA1ER-9gLS6BYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD7BEAArFaIUanXyQqiBVfUhYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD7hEAArFaIUbHFI4DLoJYCRYE"
     ]
   },
   {
