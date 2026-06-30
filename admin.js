@@ -1063,7 +1063,7 @@ function generateCSVContent() {
 const publishBtn = document.getElementById("btn-publish-catalog");
 if (publishBtn) {
     publishBtn.addEventListener("click", async () => {
-        const token = (document.getElementById("github-token")?.value.trim()) || githubToken;
+        const token = (document.getElementById("github-token")?.value.trim()) || (githubToken ? githubToken.trim() : "");
         if (!token) {
             alert("Error: Please set your GitHub Personal Access Token (PAT) first in the Settings panel.");
             return;
@@ -1086,16 +1086,14 @@ if (publishBtn) {
                     headers: {
                         "Authorization": `token ${token}`,
                         "Accept": "application/vnd.github.v3+json",
-                        "Cache-Control": "no-cache",
-                        "Pragma": "no-cache"
+                        "Cache-Control": "no-cache"
                     }
                 }),
                 fetch(`${apiJSONUrl}?t=${Date.now()}`, {
                     headers: {
                         "Authorization": `token ${token}`,
                         "Accept": "application/vnd.github.v3+json",
-                        "Cache-Control": "no-cache",
-                        "Pragma": "no-cache"
+                        "Cache-Control": "no-cache"
                     }
                 })
             ]);
@@ -1174,7 +1172,11 @@ if (publishBtn) {
             renderCatalogList();
         } catch (error) {
             console.error("Publishing error:", error);
-            alert(`Failed to publish changes: ${error.message}`);
+            if (error.message && (error.message.includes("Failed to fetch") || error.message.includes("fetch failed"))) {
+                alert("Network Connection Error: Could not reach GitHub. Please check your mobile signal/internet connection and try again.");
+            } else {
+                alert(`Failed to publish changes: ${error.message}`);
+            }
         } finally {
             publishBtn.disabled = false;
             publishBtn.textContent = "Publish Changes 🚀";
