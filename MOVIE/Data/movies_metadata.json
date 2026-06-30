@@ -1,5 +1,151 @@
 [
   {
+    "csv_id": "202555-daredevil-born-again",
+    "tmdb_id": 202555,
+    "imdb_id": "",
+    "title": "Daredevil: Born Again (2025)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama",
+      "Action & Adventure",
+      "Crime"
+    ],
+    "overview": "Matt Murdock, a blind lawyer with heightened abilities, is fighting for justice through his bustling law firm, while former mob boss Wilson Fisk pursues his own political endeavors in New York. When their past identities begin to emerge, both men find themselves on an inevitable collision course.",
+    "poster": "https://image.tmdb.org/t/p/w500/xDUoAsU8lQHOOoRkFiBuarmACDN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/v2cTiLNlviotwugnDKqY21xGmSv.jpg",
+    "rating": 8.2,
+    "release_date": "2025-03-04",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD1REAArFaIUbA46HUyapdbxYE"
+    ]
+  },
+  {
+    "csv_id": "617126-the-fantastic-4-first-steps",
+    "tmdb_id": 617126,
+    "imdb_id": "",
+    "title": "The Fantastic 4: First Steps (2025)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Science Fiction",
+      "Adventure",
+      "Action"
+    ],
+    "overview": "Against the vibrant backdrop of a 1960s-inspired, retro-futuristic world, Marvel's First Family is forced to balance their roles as heroes with the strength of their family bond, while defending Earth from a ravenous space god called Galactus and his enigmatic Herald, Silver Surfer.",
+    "poster": "https://image.tmdb.org/t/p/w500/nf5qaSEvyYSNeFH0YhSs5EsBLX9.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/s94NjfKkcSczZ1FembwmQZwsuwY.jpg",
+    "rating": 7,
+    "release_date": "2025-07-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADwBEAArFaIUYoxNBxVeObnhYE"
+    ]
+  },
+  {
+    "csv_id": "114471-ironheart",
+    "tmdb_id": 114471,
+    "imdb_id": "",
+    "title": "Ironheart (2025)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Crime",
+      "Action & Adventure"
+    ],
+    "overview": "After the events of Black Panther: Wakanda Forever, technology is pitted against magic when Riri Williams, a young, genius inventor determined to make her mark on the world, returns to her hometown of Chicago. Her unique take on building iron suits is brilliant, but in pursuit of her ambitions, she finds herself wrapped up with the mysterious yet charming Parker Robbins aka \"The Hood.\"",
+    "poster": "https://image.tmdb.org/t/p/w500/dOh6MJpdlQhYpLBhzhNQeYGKTZ5.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kiOEVg5BkzLE0pWoPKecXd7wZ2Q.jpg",
+    "rating": 5.3,
+    "release_date": "2025-06-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADvREAArFaIUY915KK0AmfrhYE"
+    ]
+  },
+  {
+    "csv_id": "138505-marvel-zombies",
+    "tmdb_id": 138505,
+    "imdb_id": "",
+    "title": "Marvel Zombies (2025)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies"
+    ],
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Animation",
+      "Action & Adventure"
+    ],
+    "overview": "After the Avengers are overtaken by a zombie plague, a desperate group of survivors discover the key to bringing an end to the super-powered undead, racing across a dystopian landscape and risking life and limb to save their world.",
+    "poster": "https://image.tmdb.org/t/p/w500/mwKj9ERGFXsWot0nXgQ5yMQf9I7.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lxQMxqao3vs2ehxESrkQU6acU86.jpg",
+    "rating": 7.3,
+    "release_date": "2025-09-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADrBEAArFaIUZFQDiQcGhXmhYE"
+    ]
+  },
+  {
+    "csv_id": "88329-hawkeye",
+    "tmdb_id": 88329,
+    "imdb_id": "",
+    "title": "Hawkeye (2021)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama",
+      "Comedy",
+      "Action & Adventure"
+    ],
+    "overview": "Former Avenger Clint Barton has a seemingly simple mission: get back to his family for Christmas. Possible? Maybe with the help of Kate Bishop, a 22-year-old archer with dreams of becoming a superhero. The two are forced to work together when a presence from Barton’s past threatens to derail far more than the festive spirit.",
+    "poster": "https://image.tmdb.org/t/p/w500/ct5pNE5dDHryHLDnxyZPYcqO1sz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/1R68vl3d5s86JsS2NPjl8UoMqIS.jpg",
+    "rating": 7.8,
+    "release_date": "2021-11-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADchEAArFaIUbIEt7H9gdNKBYE"
+    ]
+  },
+  {
     "csv_id": "198178-wonder-man",
     "tmdb_id": 198178,
     "imdb_id": "",
