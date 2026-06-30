@@ -1187,43 +1187,45 @@ if (publishBtn) {
             const csvContent = generateCSVContent();
             const jsonContent = JSON.stringify(allCatalogMovies, null, 2);
             
-            // 3. Commit CSV and JSON content in parallel
+            // 3. Commit CSV and JSON content sequentially to prevent mobile network socket timeouts/aborts
             const base64CSV = btoa(unescape(encodeURIComponent(csvContent)));
             const base64JSON = btoa(unescape(encodeURIComponent(jsonContent)));
             
-            const [putCSVResponse, putJSONResponse] = await Promise.all([
-                fetch(apiCSVUrl, {
-                    method: "PUT",
-                    headers: {
-                        "Authorization": `token ${token}`,
-                        "Content-Type": "application/json",
-                        "Accept": "application/vnd.github.v3+json"
-                    },
-                    body: JSON.stringify({
-                        message: "Update catalog (datafile.csv) from Film House Admin Panel",
-                        content: base64CSV,
-                        sha: shaCSV
-                    })
-                }),
-                fetch(apiJSONUrl, {
-                    method: "PUT",
-                    headers: {
-                        "Authorization": `token ${token}`,
-                        "Content-Type": "application/json",
-                        "Accept": "application/vnd.github.v3+json"
-                    },
-                    body: JSON.stringify({
-                        message: "Update catalog metadata (movies_metadata.json) from Film House Admin Panel",
-                        content: base64JSON,
-                        sha: shaJSON
-                    })
+            // Upload datafile.csv first
+            const putCSVResponse = await fetch(apiCSVUrl, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json",
+                    "Accept": "application/vnd.github.v3+json"
+                },
+                body: JSON.stringify({
+                    message: "Update catalog (datafile.csv) from Film House Admin Panel",
+                    content: base64CSV,
+                    sha: shaCSV
                 })
-            ]);
+            });
 
             if (!putCSVResponse.ok) {
                 const errData = await putCSVResponse.json();
                 throw new Error(`CSV update failed: ${errData.message || putCSVResponse.statusText}`);
             }
+
+            // Upload movies_metadata.json second
+            const putJSONResponse = await fetch(apiJSONUrl, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json",
+                    "Accept": "application/vnd.github.v3+json"
+                },
+                body: JSON.stringify({
+                    message: "Update catalog metadata (movies_metadata.json) from Film House Admin Panel",
+                    content: base64JSON,
+                    sha: shaJSON
+                })
+            });
+
             if (!putJSONResponse.ok) {
                 const errData = await putJSONResponse.json();
                 throw new Error(`JSON update failed: ${errData.message || putJSONResponse.statusText}`);
