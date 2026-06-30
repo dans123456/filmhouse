@@ -1080,18 +1080,22 @@ if (publishBtn) {
         const apiJSONUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${pathJSON}`;
         
         try {
-            // 1. Fetch CSV and JSON SHA details in parallel
+            // 1. Fetch CSV and JSON SHA details in parallel (adding cache-buster parameters/headers to bypass browser cache)
             const [getCSVResponse, getJSONResponse] = await Promise.all([
-                fetch(apiCSVUrl, {
+                fetch(`${apiCSVUrl}?t=${Date.now()}`, {
                     headers: {
                         "Authorization": `token ${token}`,
-                        "Accept": "application/vnd.github.v3+json"
+                        "Accept": "application/vnd.github.v3+json",
+                        "Cache-Control": "no-cache",
+                        "Pragma": "no-cache"
                     }
                 }),
-                fetch(apiJSONUrl, {
+                fetch(`${apiJSONUrl}?t=${Date.now()}`, {
                     headers: {
                         "Authorization": `token ${token}`,
-                        "Accept": "application/vnd.github.v3+json"
+                        "Accept": "application/vnd.github.v3+json",
+                        "Cache-Control": "no-cache",
+                        "Pragma": "no-cache"
                     }
                 })
             ]);
@@ -1470,10 +1474,12 @@ async function checkCatalogForUpdates() {
     const apiJSONUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${pathJSON}`;
 
     try {
-        const res = await fetch(apiJSONUrl, {
+        const res = await fetch(`${apiJSONUrl}?t=${Date.now()}`, {
             headers: {
                 "Authorization": `token ${token}`,
-                "Accept": "application/vnd.github.v3+json"
+                "Accept": "application/vnd.github.v3+json",
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache"
             }
         });
         if (res.ok) {
