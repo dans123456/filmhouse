@@ -354,10 +354,14 @@ const TMDB_API_KEY = localStorage.getItem("filmhouse_tmdb_key") || "a3a9df05cdac
 let pendingImportChanges = null;
 let newlyAddedIds = [];
 let newlyUpdatedIds = [];
+let lastKnownJsonSha = null;
 
 // Load GitHub token on startup from Firestore
 document.addEventListener("DOMContentLoaded", async () => {
     loadCatalog();
+    
+    // Periodically check for updates published by other administrators (every 25 seconds)
+    setInterval(checkCatalogForUpdates, 25000);
     
     // Fetch token from Firestore
     if (db) {
@@ -369,6 +373,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (tokenInput) {
                     tokenInput.value = githubToken;
                 }
+                // Check once immediately after token is fetched
+                checkCatalogForUpdates();
             }
         } catch (e) {
             console.error("Error loading GitHub token from Firestore:", e);
@@ -1038,74 +1044,86 @@ if (publishBtn) {
         const apiJSONUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${pathJSON}`;
         
         try {
-            // 1. Fetch datafile.csv SHA details
-            const getCSVResponse = await fetch(apiCSVUrl, {
-                headers: {
-                    "Authorization": `token ${token}`,
-                    "Accept": "application/vnd.github.v3+json"
-                }
-            });
+            // 1. Fetch CSV and JSON SHA details in parallel
+            const [getCSVResponse, getJSONResponse] = await Promise.all([
+                fetch(apiCSVUrl, {
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Accept": "application/vnd.github.v3+json"
+                    }
+                }),
+                fetch(apiJSONUrl, {
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Accept": "application/vnd.github.v3+json"
+                    }
+                })
+            ]);
+
             if (!getCSVResponse.ok) {
                 throw new Error(`Failed to fetch datafile.csv details from GitHub: ${getCSVResponse.statusText}`);
             }
-            const csvData = await getCSVResponse.json();
-            const shaCSV = csvData.sha;
-
-            // 2. Fetch movies_metadata.json SHA details
-            const getJSONResponse = await fetch(apiJSONUrl, {
-                headers: {
-                    "Authorization": `token ${token}`,
-                    "Accept": "application/vnd.github.v3+json"
-                }
-            });
             if (!getJSONResponse.ok) {
                 throw new Error(`Failed to fetch movies_metadata.json details from GitHub: ${getJSONResponse.statusText}`);
             }
-            const jsonData = await getJSONResponse.json();
+
+            const [csvData, jsonData] = await Promise.all([
+                getCSVResponse.json(),
+                getJSONResponse.json()
+            ]);
+            const shaCSV = csvData.sha;
             const shaJSON = jsonData.sha;
             
-            // 3. Generate contents
+            // 2. Generate contents
             const csvContent = generateCSVContent();
             const jsonContent = JSON.stringify(allCatalogMovies, null, 2);
             
-            // 4. Commit CSV content
+            // 3. Commit CSV and JSON content in parallel
             const base64CSV = btoa(unescape(encodeURIComponent(csvContent)));
-            const putCSVResponse = await fetch(apiCSVUrl, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `token ${token}`,
-                    "Content-Type": "application/json",
-                    "Accept": "application/vnd.github.v3+json"
-                },
-                body: JSON.stringify({
-                    message: "Update catalog (datafile.csv) from Film House Admin Panel",
-                    content: base64CSV,
-                    sha: shaCSV
+            const base64JSON = btoa(unescape(encodeURIComponent(jsonContent)));
+            
+            const [putCSVResponse, putJSONResponse] = await Promise.all([
+                fetch(apiCSVUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Content-Type": "application/json",
+                        "Accept": "application/vnd.github.v3+json"
+                    },
+                    body: JSON.stringify({
+                        message: "Update catalog (datafile.csv) from Film House Admin Panel",
+                        content: base64CSV,
+                        sha: shaCSV
+                    })
+                }),
+                fetch(apiJSONUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Content-Type": "application/json",
+                        "Accept": "application/vnd.github.v3+json"
+                    },
+                    body: JSON.stringify({
+                        message: "Update catalog metadata (movies_metadata.json) from Film House Admin Panel",
+                        content: base64JSON,
+                        sha: shaJSON
+                    })
                 })
-            });
+            ]);
+
             if (!putCSVResponse.ok) {
                 const errData = await putCSVResponse.json();
                 throw new Error(`CSV update failed: ${errData.message || putCSVResponse.statusText}`);
             }
-
-            // 5. Commit JSON content
-            const base64JSON = btoa(unescape(encodeURIComponent(jsonContent)));
-            const putJSONResponse = await fetch(apiJSONUrl, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `token ${token}`,
-                    "Content-Type": "application/json",
-                    "Accept": "application/vnd.github.v3+json"
-                },
-                body: JSON.stringify({
-                    message: "Update catalog metadata (movies_metadata.json) from Film House Admin Panel",
-                    content: base64JSON,
-                    sha: shaJSON
-                })
-            });
             if (!putJSONResponse.ok) {
                 const errData = await putJSONResponse.json();
                 throw new Error(`JSON update failed: ${errData.message || putJSONResponse.statusText}`);
+            }
+            
+            // Update local check SHA from JSON commit response to avoid self-triggering updates dialog
+            const jsonResData = await putJSONResponse.json();
+            if (jsonResData && jsonResData.content) {
+                lastKnownJsonSha = jsonResData.content.sha;
             }
             
             alert("Catalog CSV and enriched JSON database successfully published directly to GitHub! Updates are live instantly.");
@@ -1404,3 +1422,100 @@ window.addEventListener("beforeunload", (e) => {
         return e.returnValue;
     }
 });
+
+// Check if GitHub catalog has been updated by another administrator
+async function checkCatalogForUpdates() {
+    const token = (document.getElementById("github-token")?.value.trim()) || githubToken;
+    if (!token) return;
+
+    const owner = "dans123456";
+    const repo = "filmhouse";
+    const pathJSON = "MOVIE/Data/movies_metadata.json";
+    const apiJSONUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${pathJSON}`;
+
+    try {
+        const res = await fetch(apiJSONUrl, {
+            headers: {
+                "Authorization": `token ${token}`,
+                "Accept": "application/vnd.github.v3+json"
+            }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const currentSha = data.sha;
+            if (lastKnownJsonSha && lastKnownJsonSha !== currentSha) {
+                showReloadBanner();
+            } else if (!lastKnownJsonSha) {
+                lastKnownJsonSha = currentSha; // Initialize SHA
+            }
+        }
+    } catch (err) {
+        console.warn("Background update check failed:", err);
+    }
+}
+
+// Show a floating banner warning the admin of changes and offering to reload
+function showReloadBanner() {
+    if (document.getElementById("catalog-reload-banner")) return;
+
+    const banner = document.createElement("div");
+    banner.id = "catalog-reload-banner";
+    banner.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary-gradient);
+        color: #000;
+        padding: 12px 24px;
+        border-radius: 30px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-weight: bold;
+        font-size: 13px;
+        animation: slideDown 0.4s ease;
+    `;
+    
+    if (!document.getElementById("banner-animation-style")) {
+        const style = document.createElement("style");
+        style.id = "banner-animation-style";
+        style.textContent = `
+            @keyframes slideDown {
+                from { transform: translate(-50%, -50px); opacity: 0; }
+                to { transform: translate(-50%, 0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    banner.innerHTML = `
+        <span>⚠️ Another admin has published updates on GitHub!</span>
+        <button id="btn-reload-catalog-banner" style="
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+        ">Sync Catalog 📥</button>
+    `;
+
+    document.body.appendChild(banner);
+
+    const reloadBtn = document.getElementById("btn-reload-catalog-banner");
+    if (reloadBtn) {
+        reloadBtn.addEventListener("click", () => {
+            banner.remove();
+            loadCatalog(); // Reload latest JSON from GitHub
+            lastKnownJsonSha = null; // Reset to let next poll retrieve the fresh SHA
+            alert("Catalog successfully synchronized with the latest remote updates!");
+        });
+    }
+}
+
