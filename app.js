@@ -547,6 +547,7 @@ function loadUserProfile() {
     // Merge into state
     state.user.fullName = profile.fullName || state.user.fullName;
     state.user.points = profile.points || 0;
+    state.user.badge = profile.badge || null;
     state.user.pointsBreakdown = profile.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
     
     if (profile.avatar) {
@@ -636,6 +637,9 @@ function loadUserProfile() {
 
     // Sync profile data to Firestore database
     syncUserToFirestore();
+
+    // Start real-time listener for user's movie requests
+    startUserRequestsListener();
 }
 
 // Render Watchlist and Watched List mini horizontal scrolls on the Profile page
@@ -723,7 +727,7 @@ function getDynamicLeaderboard() {
         fullName: state.user.fullName || "Guest Collector",
         points: state.user.points || 0,
         avatar: state.user.avatar || (prefix + "img/FilmHouse3_nobg.png"),
-        badge: getAchievementBadge(state.user.points || 0),
+        badge: getAchievementBadge(state.user.points || 0, state.user.badge),
         isCurrentUser: true
     });
     
@@ -732,7 +736,8 @@ function getDynamicLeaderboard() {
     return list;
 }
 
-function getAchievementBadge(points) {
+function getAchievementBadge(points, userBadge) {
+    if (userBadge) return userBadge;
     if (points >= 500) return "Cinema King";
     if (points >= 300) return "Movie Buff";
     if (points >= 150) return "Super Fan";
@@ -808,6 +813,10 @@ function updatePointsUI() {
     // 1. Drawer stat point counts
     const drawerPoints = document.getElementById("stat-profile-points-drawer");
     if (drawerPoints) drawerPoints.textContent = state.user.points || 0;
+
+    // 1b. Rewards Drawer points display
+    const rewardsPoints = document.getElementById("rewards-points-display");
+    if (rewardsPoints) rewardsPoints.textContent = state.user.points || 0;
     
     // 2. Profile screen points counts
     const profilePoints = document.getElementById("profile-loyalty-points");
@@ -906,7 +915,7 @@ function renderLeaderboard() {
                     fullName: u.fullName || "Guest Collector",
                     points: u.points || 0,
                     avatar: u.avatar || (badgePrefix + "img/FilmHouse3_nobg.png"),
-                    badge: getAchievementBadge(u.points || 0),
+                    badge: getAchievementBadge(u.points || 0, u.badge),
                     isCurrentUser: isMe
                 });
             });
@@ -947,7 +956,7 @@ function renderLeaderboard() {
                 <img src="${userAvatarPath}" alt="Your Avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #f5c518;" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
                 <div>
                     <h4 style="font-size: 13px; font-weight: 700; margin: 0; color: var(--text-primary);">You (${escapeHTML(state.user.fullName)})</h4>
-                    <span class="leaderboard-badge">${escapeHTML(getAchievementBadge(state.user.points || 0))}</span>
+                    <span class="leaderboard-badge">${escapeHTML(getAchievementBadge(state.user.points || 0, state.user.badge))}</span>
                 </div>
             </div>
             <div style="text-align: right;">
@@ -1507,6 +1516,43 @@ function renderCategoriesBar() {
 
     // Trigger scroll event to update arrow visibility indicators
     bar.dispatchEvent(new Event("scroll"));
+}
+
+// Render horizontal Genre filter chips
+function renderGenreChips() {
+    const wrapper = document.getElementById("genre-chips-wrapper");
+    if (!wrapper) return;
+    wrapper.replaceChildren();
+
+    const genres = ["All", "Action", "Adventure", "Comedy", "Drama", "Sci-Fi", "Horror", "Thriller", "Romance", "Mystery", "Animation", "Family"];
+    
+    genres.forEach(genre => {
+        const chip = document.createElement("div");
+        chip.className = `genre-chip ${state.filters.genre === genre ? "active" : ""}`;
+        chip.textContent = genre;
+        
+        chip.addEventListener("click", () => {
+            state.filters.genre = genre;
+            // Sync with filter select element if present
+            const genreSelect = document.getElementById("filter-genre");
+            if (genreSelect) {
+                genreSelect.value = genre;
+            }
+            
+            // Re-render chips to update active styling
+            document.querySelectorAll(".genre-chip").forEach(c => {
+                if (c.textContent === genre) {
+                    c.classList.add("active");
+                } else {
+                    c.classList.remove("active");
+                }
+            });
+            
+            renderFeaturedGrid();
+        });
+        
+        wrapper.appendChild(chip);
+    });
 }
 
 // Render Movie Grid
@@ -2875,6 +2921,13 @@ function initializeAdsgram(blockId) {
 function showAdRewardFlow(onStatusUpdate, blockId) {
     const status = (msg) => { if (typeof onStatusUpdate === "function") onStatusUpdate(msg); };
 
+    // Check VIP Ad-Free Status
+    const adFreeUntil = parseInt(localStorage.getItem("ad_free_until") || "0");
+    if (adFreeUntil > Date.now()) {
+        status("VIP Ad-Free Active! 🎫 Bypassing ads...");
+        return Promise.resolve();
+    }
+
     const id = blockId || ADSGRAM_DOWNLOAD_BLOCK_ID;
 
     // Detect if we are running inside a real Telegram environment with initData
@@ -3370,12 +3423,67 @@ function bindEvents() {
     let searchDebounceTimer = null;
     if (searchInput) {
         const clearBtn = document.getElementById("search-clear-btn");
+        const dropdown = document.getElementById("search-autocomplete-dropdown");
+        
+        const renderAutocomplete = (query) => {
+            if (!dropdown) return;
+            const q = (query || "").toLowerCase().trim();
+            
+            if (q.length < 2) {
+                dropdown.style.display = "none";
+                dropdown.innerHTML = "";
+                return;
+            }
+            
+            // Filter local library movies
+            const matches = state.movies.filter(m => 
+                (m.title || "").toLowerCase().includes(q)
+            ).slice(0, 5);
+            
+            if (matches.length === 0) {
+                dropdown.style.display = "none";
+                dropdown.innerHTML = "";
+                return;
+            }
+            
+            dropdown.innerHTML = "";
+            matches.forEach(m => {
+                const item = document.createElement("div");
+                item.className = "autocomplete-item";
+                
+                const posterUrl = m.poster || (badgePrefix + "img/FilmHouse3_nobg.png");
+                const genreStr = Array.isArray(m.genres) ? m.genres.join(", ") : (m.genre || "Media");
+                const ratingStr = m.rating ? `⭐ ${m.rating}` : "N/A";
+                
+                item.innerHTML = `
+                    <img src="${escapeHTML(posterUrl)}" alt="Poster" class="autocomplete-poster" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
+                    <div class="autocomplete-details">
+                        <div class="autocomplete-title">${escapeHTML(m.title)}</div>
+                        <div class="autocomplete-meta">${escapeHTML(genreStr)} | ${ratingStr}</div>
+                    </div>
+                `;
+                
+                item.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    openDetailModal(m);
+                    dropdown.style.display = "none";
+                    dropdown.innerHTML = "";
+                });
+                
+                dropdown.appendChild(item);
+            });
+            dropdown.style.display = "flex";
+        };
+
         searchInput.addEventListener("input", (e) => {
             const query = e.target.value;
             state.searchQuery = query;
             if (clearBtn) {
                 clearBtn.style.display = query ? "flex" : "none";
             }
+            
+            renderAutocomplete(query);
+
             if (query.trim().length < 3) {
                 state.externalSearchResults = [];
                 renderFeaturedGrid();
@@ -3387,16 +3495,27 @@ function bindEvents() {
                 }, 400);
             }
         });
+
         if (clearBtn) {
             clearBtn.addEventListener("click", () => {
                 searchInput.value = "";
                 state.searchQuery = "";
                 state.externalSearchResults = [];
                 clearBtn.style.display = "none";
+                if (dropdown) {
+                    dropdown.style.display = "none";
+                    dropdown.innerHTML = "";
+                }
                 renderFeaturedGrid();
                 searchInput.focus();
             });
         }
+
+        document.addEventListener("click", (e) => {
+            if (dropdown && !dropdown.contains(e.target) && e.target !== searchInput) {
+                dropdown.style.display = "none";
+            }
+        });
     }
     if (searchWrapper && searchInput && searchIcon) {
         searchIcon.addEventListener("click", (e) => {
@@ -3483,6 +3602,7 @@ function bindEvents() {
             state.filters.year = yearVal;
 
             renderFeaturedGrid();
+            renderGenreChips();
             
             // Close filters panel
             if (filterToggle && filterPanel) {
@@ -3508,6 +3628,7 @@ function bindEvents() {
             state.externalSearchResults = [];
 
             renderFeaturedGrid();
+            renderGenreChips();
         });
     }
 
@@ -3860,6 +3981,7 @@ function syncUserToFirestore() {
             fullName: state.user.fullName || "Guest User",
             avatar: state.user.avatar || "",
             points: state.user.points || 0,
+            badge: state.user.badge || "",
             pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -3875,10 +3997,263 @@ function syncUserToFirestore() {
             fullName: state.user.fullName || "Guest User",
             avatar: state.user.avatar || "",
             points: state.user.points || 0,
+            badge: state.user.badge || "",
             pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true }).catch(e => console.warn("Firestore fallback set error:", e));
     });
+}
+
+// Apply Theme Accent custom properties
+function applyThemeAccent(themeName) {
+    const root = document.documentElement;
+    const themes = {
+        gold: {
+            color: '#ffbc00',
+            glow: 'rgba(255, 188, 0, 0.4)',
+            gradient: 'linear-gradient(135deg, #ffbc00 0%, #ff7b00 100%)',
+            glowBorder: 'rgba(255, 188, 0, 0.3)'
+        },
+        crimson: {
+            color: '#e50914',
+            glow: 'rgba(229, 9, 20, 0.4)',
+            gradient: 'linear-gradient(135deg, #e50914 0%, #b81d24 100%)',
+            glowBorder: 'rgba(229, 9, 20, 0.3)'
+        },
+        azure: {
+            color: '#1a9cff',
+            glow: 'rgba(26, 156, 255, 0.4)',
+            gradient: 'linear-gradient(135deg, #1a9cff 0%, #0056b3 100%)',
+            glowBorder: 'rgba(26, 156, 255, 0.3)'
+        },
+        amethyst: {
+            color: '#a855f7',
+            glow: 'rgba(168, 85, 247, 0.4)',
+            gradient: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)',
+            glowBorder: 'rgba(168, 85, 247, 0.3)'
+        }
+    };
+    const active = themes[themeName] || themes.gold;
+    root.style.setProperty('--primary-color', active.color);
+    root.style.setProperty('--primary-glow', active.glow);
+    root.style.setProperty('--primary-gradient', active.gradient);
+    root.style.setProperty('--border-color-glow', active.glowBorder);
+    
+    // Update active state in UI dots
+    const dots = document.querySelectorAll(".accent-option-dot");
+    dots.forEach(dot => {
+        if (dot.getAttribute("data-theme") === themeName) {
+            dot.classList.add("active");
+        } else {
+            dot.classList.remove("active");
+        }
+    });
+
+    localStorage.setItem("filmhouse_theme_accent", themeName);
+}
+
+// Loyalty Reward Center & Requests Tracker Logic
+let userRequestsUnsubscribe = null;
+
+function startUserRequestsListener() {
+    if (typeof firebase === "undefined" || !db || !state.user.id) return;
+    
+    if (userRequestsUnsubscribe) {
+        userRequestsUnsubscribe();
+    }
+    
+    userRequestsUnsubscribe = db.collection("requests")
+        .where("requestedById", "==", state.user.id)
+        .orderBy("requestedAt", "desc")
+        .onSnapshot(snapshot => {
+            const requests = [];
+            snapshot.forEach(doc => {
+                const req = doc.data();
+                req.docId = doc.id;
+                requests.push(req);
+            });
+            renderUserRequests(requests);
+        }, err => {
+            console.error("User requests sync issue:", err);
+        });
+}
+
+function renderUserRequests(requests) {
+    const list = document.getElementById("user-requests-list");
+    const countBadge = document.getElementById("user-requests-count-badge");
+    const headerNotificationDot = document.getElementById("rewards-notification-dot");
+    
+    if (countBadge) countBadge.textContent = requests.length;
+    if (!list) return;
+    
+    if (requests.length === 0) {
+        list.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; background: rgba(255,255,255,0.01); border-radius: var(--border-radius-sm); border: 1px dashed var(--border-color);">
+                No requests yet. Try requesting a movie that is not in the library!
+            </div>
+        `;
+        return;
+    }
+    
+    list.innerHTML = "";
+    let hasNewFulfillment = false;
+    const acknowledgedFulfillments = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
+
+    requests.forEach(r => {
+        const item = document.createElement("div");
+        item.className = "user-request-item";
+        item.style.cssText = "background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px;";
+        
+        let statusBadge = "";
+        let actionBtn = "";
+        
+        // Dynamic search in catalog to match title or ID
+        const matchingMovie = state.movies.find(m => 
+            (m.title && m.title.toLowerCase() === r.title.toLowerCase()) || 
+            (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
+        );
+        
+        const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
+        const isExplicit = r.status === "fulfilled" && r.downloadLink;
+        
+        if (isMatched || isExplicit) {
+            statusBadge = `<span style="font-size: 10px; background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🟢 Ready</span>`;
+            
+            const dlLink = isExplicit ? r.downloadLink : matchingMovie.links[0];
+            actionBtn = `
+                <button class="btn btn-primary btn-sm user-request-dl-btn" data-link="${escapeHTML(dlLink)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">
+                    Download 📥
+                </button>
+            `;
+            
+            if (!acknowledgedFulfillments.includes(r.docId)) {
+                hasNewFulfillment = true;
+            }
+        } else if (r.status === "priority") {
+            statusBadge = `<span style="font-size: 10px; background: rgba(255, 59, 48, 0.15); border: 1px solid rgba(255, 59, 48, 0.3); color: #ff3b30; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🔥 High Priority</span>`;
+            actionBtn = `<span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Expedited</span>`;
+        } else {
+            statusBadge = `<span style="font-size: 10px; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🟠 Pending</span>`;
+            actionBtn = `
+                <button class="btn btn-secondary btn-sm user-request-boost-btn" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 600; flex-shrink: 0; border-color: rgba(255, 188, 0, 0.3); color: #ffbc00;">
+                    Boost (100 pts)
+                </button>
+            `;
+        }
+        
+        item.innerHTML = `
+            <div style="flex: 1;">
+                <h5 style="margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: #fff;">${escapeHTML(r.title)}</h5>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">${escapeHTML(r.type)}</span>
+                    ${statusBadge}
+                </div>
+            </div>
+            <div style="display: flex; align-items: center;">
+                ${actionBtn}
+            </div>
+        `;
+        
+        // Event listeners
+        const boostBtn = item.querySelector(".user-request-boost-btn");
+        if (boostBtn) {
+            boostBtn.addEventListener("click", () => {
+                boostRequestToPriority(r.docId);
+            });
+        }
+        
+        const dlBtn = item.querySelector(".user-request-dl-btn");
+        if (dlBtn) {
+            dlBtn.addEventListener("click", () => {
+                const ack = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
+                if (!ack.includes(r.docId)) {
+                    ack.push(r.docId);
+                    localStorage.setItem("acknowledged_fulfillments", JSON.stringify(ack));
+                }
+                updateHeaderNotificationDot();
+                showConnectionDrawer(dlBtn.getAttribute("data-link"), ADSGRAM_DOWNLOAD_BLOCK_ID);
+            });
+        }
+        
+        list.appendChild(item);
+    });
+    
+    if (headerNotificationDot) {
+        headerNotificationDot.style.display = hasNewFulfillment ? "block" : "none";
+    }
+}
+
+function boostRequestToPriority(docId) {
+    if (typeof firebase === "undefined" || !db) return;
+    
+    if (state.user.points < 100) {
+        showToast("Not enough points! You need 100 points to boost requests.", "error");
+        return;
+    }
+    
+    db.collection("requests").doc(docId).update({
+        status: "priority"
+    }).then(() => {
+        deductPoints(100);
+        showToast("Request boosted to High Priority! 🚀", "success");
+    }).catch(err => {
+        console.error("Error boosting request:", err);
+        showToast("Failed to boost request.", "error");
+    });
+}
+
+function deductPoints(points) {
+    state.user.points = Math.max(0, (state.user.points || 0) - points);
+    
+    const saved = localStorage.getItem("filmhouse_user_profile");
+    let profile = {};
+    if (saved) {
+        try {
+            profile = JSON.parse(saved);
+        } catch (e) {}
+    }
+    profile.points = state.user.points;
+    localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+    
+    syncUserToFirestore();
+    updatePointsUI();
+    
+    const leaderboardScreen = document.getElementById("screen-leaderboard");
+    if (leaderboardScreen && leaderboardScreen.classList.contains("active")) {
+        renderLeaderboard();
+    }
+}
+
+function updateHeaderNotificationDot() {
+    if (typeof firebase === "undefined" || !db || !state.user.id) return;
+    
+    db.collection("requests")
+        .where("requestedById", "==", state.user.id)
+        .get()
+        .then(snapshot => {
+            const acknowledgedFulfillments = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
+            let hasNew = false;
+            
+            snapshot.forEach(doc => {
+                const r = doc.data();
+                const docId = doc.id;
+                
+                const matchingMovie = state.movies.find(m => 
+                    (m.title && m.title.toLowerCase() === r.title.toLowerCase()) || 
+                    (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
+                );
+                
+                const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
+                const isExplicit = r.status === "fulfilled" && r.downloadLink;
+                
+                if ((isMatched || isExplicit) && !acknowledgedFulfillments.includes(docId)) {
+                    hasNew = true;
+                }
+            });
+            
+            const dot = document.getElementById("rewards-notification-dot");
+            if (dot) dot.style.display = hasNew ? "block" : "none";
+        }).catch(err => console.warn("Error checking header notifications:", err));
 }
 
 function logMovieRequestToFirestore(movie) {
@@ -3902,6 +4277,20 @@ function logMovieRequestToFirestore(movie) {
 
 // App Kickoff Initializer
 document.addEventListener("DOMContentLoaded", async () => {
+    // 0. Load Theme Accent configuration immediately
+    const savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
+    applyThemeAccent(savedTheme);
+
+    // Bind Theme dots listeners
+    const themeDots = document.querySelectorAll(".accent-option-dot");
+    themeDots.forEach(dot => {
+        dot.addEventListener("click", () => {
+            const selectedTheme = dot.getAttribute("data-theme");
+            applyThemeAccent(selectedTheme);
+            showToast("Theme accent updated! 🎨", "success");
+        });
+    });
+
     // 1. Initial login credentials grab
     handleTelegramAuth();
     const profileExists = !!localStorage.getItem("filmhouse_user_profile");
@@ -3924,6 +4313,77 @@ document.addEventListener("DOMContentLoaded", async () => {
             showToast("Welcome to Film House! Your Telegram account has been connected.", "success");
         }, 1000);
     }
+
+    // Reward Center Drawer triggers & listeners
+    const btnRewards = document.getElementById("btn-header-rewards");
+    const rewardsDrawer = document.getElementById("rewards-drawer");
+    const rewardsClose = document.getElementById("rewards-drawer-close");
+    
+    if (btnRewards && rewardsDrawer) {
+        btnRewards.addEventListener("click", () => {
+            rewardsDrawer.style.display = "flex";
+            updatePointsUI();
+            updateHeaderNotificationDot();
+        });
+    }
+    if (rewardsClose && rewardsDrawer) {
+        rewardsClose.addEventListener("click", () => {
+            rewardsDrawer.style.display = "none";
+        });
+        rewardsDrawer.addEventListener("click", (e) => {
+            if (e.target === rewardsDrawer) {
+                rewardsDrawer.style.display = "none";
+            }
+        });
+    }
+    
+    // Reward redemption actions
+    const redeemButtons = document.querySelectorAll("#rewards-drawer .redeem-btn");
+    redeemButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const rewardId = btn.getAttribute("data-reward-id");
+            if (rewardId === "ad-free") {
+                if (state.user.points < 150) {
+                    showToast("Not enough points! You need 150 points for Ad-Free pass.", "error");
+                    return;
+                }
+                deductPoints(150);
+                localStorage.setItem("ad_free_until", Date.now() + 24 * 60 * 60 * 1000);
+                showToast("24h Ad-Free VIP Pass activated! 🎫 Enjoy ad-free downloads.", "success");
+            } else if (rewardId === "vip-badge") {
+                if (state.user.points < 250) {
+                    showToast("Not enough points! You need 250 points for VIP Badge.", "error");
+                    return;
+                }
+                
+                const customBadge = prompt("Enter your custom VIP Badge text (max 15 characters):");
+                if (customBadge === null) return;
+                
+                const cleanBadge = customBadge.trim().substring(0, 15);
+                if (!cleanBadge) {
+                    showToast("Badge text cannot be empty!", "error");
+                    return;
+                }
+                
+                deductPoints(250);
+                
+                state.user.badge = cleanBadge;
+                
+                const saved = localStorage.getItem("filmhouse_user_profile");
+                let profile = {};
+                if (saved) {
+                    try {
+                        profile = JSON.parse(saved);
+                    } catch (e) {}
+                }
+                profile.badge = cleanBadge;
+                localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+                
+                syncUserToFirestore();
+                showToast(`VIP Badge unlocked: "${cleanBadge}"! Check leaderboard.`, "success");
+            }
+        });
+    });
 
     loadUserProfile();
     checkDailyVisitPoints();
@@ -3953,6 +4413,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 6. Draw Category Filters
     renderCategoriesBar();
+    renderGenreChips();
 
     // 7. Load grid results list
     renderFeaturedGrid();

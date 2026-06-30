@@ -66,7 +66,9 @@ if (db) {
     db.collection("requests").orderBy("requestedAt", "desc").onSnapshot(snapshot => {
         allRequests = [];
         snapshot.forEach(doc => {
-            allRequests.push(doc.data());
+            const req = doc.data();
+            req.docId = doc.id;
+            allRequests.push(req);
         });
         updateStatsCounters();
         renderRequestsList();
@@ -210,14 +212,29 @@ function renderRequestsList() {
 
     const searchQuery = (document.getElementById("request-search-input")?.value || "").toLowerCase().trim();
     
-    // Aggregate request counts
+    // Aggregate request counts and status
     const counts = {};
     allRequests.forEach(r => {
-        const key = r.title;
+        const key = r.title.toLowerCase().trim();
         if (!counts[key]) {
-            counts[key] = { title: r.title, type: r.type, count: 0 };
+            counts[key] = { 
+                title: r.title, 
+                type: r.type, 
+                count: 0, 
+                isPriority: false, 
+                isFulfilled: true,
+                docIds: [] 
+            };
         }
         counts[key].count++;
+        counts[key].docIds.push(r.docId);
+        
+        if (r.status === "priority") {
+            counts[key].isPriority = true;
+        }
+        if (r.status !== "fulfilled") {
+            counts[key].isFulfilled = false;
+        }
     });
 
     const sortedRequests = Object.values(counts)
@@ -235,17 +252,83 @@ function renderRequestsList() {
     sortedRequests.forEach(req => {
         const row = document.createElement("div");
         row.className = "list-row";
+        row.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border-color);";
+
+        let badgeMarkup = "";
+        if (req.isPriority) {
+            badgeMarkup = `<span style="font-size: 10px; background: rgba(255, 59, 48, 0.15); border: 1px solid rgba(255, 59, 48, 0.3); color: #ff3b30; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🔥 High Priority</span>`;
+        } else if (req.isFulfilled) {
+            badgeMarkup = `<span style="font-size: 10px; background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🟢 Fulfilled</span>`;
+        } else {
+            badgeMarkup = `<span style="font-size: 10px; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🟠 Pending</span>`;
+        }
+
+        let fulfillBtnMarkup = "";
+        if (!req.isFulfilled) {
+            fulfillBtnMarkup = `
+                <button class="btn-fulfill-request" data-title="${escapeHTML(req.title)}" style="background: var(--primary-gradient); border: none; border-radius: 4px; padding: 6px 12px; color: #000; font-weight: 700; font-size: 11px; cursor: pointer; transition: opacity 0.2s;">
+                    Fulfill 📥
+                </button>
+            `;
+        } else {
+            fulfillBtnMarkup = `
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Resolved</span>
+            `;
+        }
 
         row.innerHTML = `
-            <div class="user-details">
-                <h5>${escapeHTML(req.title)}</h5>
-                <p style="text-transform: uppercase;">${escapeHTML(req.type)}</p>
+            <div class="user-details" style="flex: 1;">
+                <h5 style="margin: 0; display: flex; align-items: center;">
+                    ${escapeHTML(req.title)}
+                    ${badgeMarkup}
+                </h5>
+                <p style="text-transform: uppercase; margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary);">${escapeHTML(req.type)}</p>
             </div>
-            <div class="req-count">
-                ${req.count} ${req.count === 1 ? 'request' : 'requests'}
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="req-count" style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">
+                    ${req.count} ${req.count === 1 ? 'request' : 'requests'}
+                </div>
+                ${fulfillBtnMarkup}
             </div>
         `;
+
+        const fulfillBtn = row.querySelector(".btn-fulfill-request");
+        if (fulfillBtn) {
+            fulfillBtn.addEventListener("click", () => {
+                fulfillMovieTitleRequests(req.title, req.docIds);
+            });
+        }
+
         listContainer.appendChild(row);
+    });
+}
+
+function fulfillMovieTitleRequests(title, docIds) {
+    if (typeof firebase === "undefined" || !db) return;
+    
+    const downloadLink = prompt(`Enter the direct download link for "${title}":`);
+    if (downloadLink === null) return;
+    
+    const cleanLink = downloadLink.trim();
+    if (!cleanLink) {
+        alert("Download link cannot be empty!");
+        return;
+    }
+    
+    const batch = db.batch();
+    docIds.forEach(id => {
+        const ref = db.collection("requests").doc(id);
+        batch.update(ref, {
+            status: "fulfilled",
+            downloadLink: cleanLink
+        });
+    });
+    
+    batch.commit().then(() => {
+        alert(`Successfully fulfilled all requests for "${title}"!`);
+    }).catch(err => {
+        console.error("Error fulfilling requests:", err);
+        alert("Failed to fulfill requests: " + err.message);
     });
 }
 

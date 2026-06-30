@@ -82,6 +82,9 @@
             <g id="icon-star">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="currentColor"/>
             </g>
+            <g id="icon-coin">
+                <path d="M12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zm0 18c4.41 0 8-3.59 8-8s-3.59-8-8-8-8 3.59-8 8 3.59 8 8 8zm.3-13h-1v1.05c-1.17.25-2 1.14-2 2.33 0 1.34 1.05 2.1 2.37 2.45 1.12.3 1.58.55 1.58 1.17 0 .57-.46.96-1.25.96-.86 0-1.4-.41-1.57-1.12l-.93.18c.24 1.05 1.07 1.83 2.17 1.98v1.05h1v-1.05c1.17-.25 2-1.15 2-2.33 0-1.33-1.04-2.09-2.37-2.45-1.12-.3-1.58-.55-1.58-1.17 0-.58.46-.96 1.25-.96.86 0 1.36.43 1.52 1.1l.93-.18c-.24-1.06-1.06-1.84-2.15-1.99V7z" fill="currentColor"/>
+            </g>
         </defs>
     </svg>
 
@@ -132,9 +135,14 @@
                     <span class="filter-dot"></span>
                     <span class="filter-dot"></span>
                 </button>
+                <div id="search-autocomplete-dropdown" class="search-autocomplete-dropdown" style="display:none;"></div>
             </div>
 
             <div style="display: flex; align-items: center; gap: 12px;">
+                <button id="btn-header-rewards" class="header-coin-btn" style="background: none; border: none; padding: 4px; cursor: pointer; color: #ffbc00; display: flex; align-items: center; transition: transform 0.2s; position: relative;" title="View Reward Center">
+                    <svg style="width: 22px; height: 22px; fill: currentColor;"><use href="#icon-coin"></use></svg>
+                    <span id="rewards-notification-dot" style="position: absolute; top: 2px; right: 2px; width: 6px; height: 6px; background-color: #ff3b30; border-radius: 50%; display: none;"></span>
+                </button>
                 <button id="btn-header-leaderboard" class="header-trophy-btn" style="background: none; border: none; padding: 4px; cursor: pointer; color: #f5c518; display: flex; align-items: center; transition: transform 0.2s;" title="View Global Leaderboard">
                     <svg style="width: 22px; height: 22px; fill: currentColor;"><use href="#icon-trophy"></use></svg>
                 </button>
@@ -231,6 +239,13 @@
                     <button class="categories-scroll-indicator scroll-right" id="categories-scroll-right" aria-label="Scroll right">
                         <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>
                     </button>
+                </div>
+            </div>
+
+            <!-- Genre Chips Filter Carousel -->
+            <div class="genre-chips-container" id="genre-chips-container">
+                <div class="genre-chips-wrapper" id="genre-chips-wrapper">
+                    <!-- Dynamic Genre Chips -->
                 </div>
             </div>
 
@@ -355,6 +370,16 @@
                                 <option value="email">Email</option>
                                 <option value="none">None</option>
                             </select>
+                        </div>
+
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">UI Theme Accent</label>
+                            <div style="display: flex; gap: 12px; align-items: center; background-color: rgba(0,0,0,0.15); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                                <div class="accent-option-dot theme-gold-dot active" data-theme="gold" title="IMDb Gold"></div>
+                                <div class="accent-option-dot theme-crimson-dot" data-theme="crimson" title="Netflix Crimson"></div>
+                                <div class="accent-option-dot theme-azure-dot" data-theme="azure" title="Prime Azure"></div>
+                                <div class="accent-option-dot theme-amethyst-dot" data-theme="amethyst" title="Amethyst Purple"></div>
+                            </div>
                         </div>
 
                         <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
@@ -765,6 +790,64 @@
                     <button type="submit" class="btn btn-primary btn-block" id="btn-submit-oauth" style="margin-top: 8px;">Authenticate</button>
                     <button type="button" class="btn btn-secondary btn-block" id="btn-cancel-oauth">Back</button>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREMIUM REWARD CENTER DRAWER -->
+    <div class="connection-drawer-overlay" id="rewards-drawer" style="display: none; z-index: 2500;">
+        <div class="connection-drawer-container" style="max-height: 85vh; display: flex; flex-direction: column;">
+            <div class="connection-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 class="connection-title" style="display: flex; align-items: center; gap: 8px; color: #ffbc00;">
+                    <svg style="width: 24px; height: 24px; fill: currentColor;"><use href="#icon-coin"></use></svg>
+                    Reward Center
+                </h3>
+                <button class="drawer-close-btn" id="rewards-drawer-close" aria-label="Close rewards drawer" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px;">
+                    <svg style="width: 20px; height: 20px; fill: currentColor;"><use href="#icon-close"></use></svg>
+                </button>
+            </div>
+            
+            <div class="rewards-scrollable-content" style="flex: 1; overflow-y: auto; padding-right: 4px;">
+                <!-- Points Card -->
+                <div class="rewards-points-card" style="background: var(--primary-gradient); padding: 20px; border-radius: var(--border-radius-md); text-align: center; color: #000; font-family: var(--font-heading); margin-bottom: 20px; box-shadow: 0 4px 20px var(--primary-glow);">
+                    <span style="font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; opacity: 0.8; display: block;">Your Balance</span>
+                    <span id="rewards-points-display" style="font-size: 32px; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; margin: 4px 0;">
+                        0
+                    </span>
+                    <span style="font-size: 12px; font-weight: 600; display: block; opacity: 0.8;">Loyalty Points 🪙</span>
+                </div>
+                
+                <!-- Rewards List Section -->
+                <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; color: var(--text-primary); font-family: var(--font-heading);">Redeem Rewards</h4>
+                <div class="rewards-items-grid" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+                    <!-- Reward Item 1: Ad-Free -->
+                    <div class="reward-item-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                        <div style="flex: 1;">
+                            <h5 style="margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #fff;">24h Ad-Free VIP Pass 🎫</h5>
+                            <p style="margin: 0; font-size: 11px; color: var(--text-secondary);">Disable Adsgram ads when opening movies for 24 hours.</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm redeem-btn" data-reward-id="ad-free" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">150 pts</button>
+                    </div>
+                    <!-- Reward Item 2: Custom Badges -->
+                    <div class="reward-item-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                        <div style="flex: 1;">
+                            <h5 style="margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #fff;">V.I.P. Leaderboard Badge 👑</h5>
+                            <p style="margin: 0; font-size: 11px; color: var(--text-secondary);">Stand out on the leaderboard with a gold VIP tag.</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm redeem-btn" data-reward-id="vip-badge" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">250 pts</button>
+                    </div>
+                </div>
+                
+                <!-- My Requests Section -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; color: var(--text-primary); font-family: var(--font-heading);">My Movie Requests</h4>
+                    <span id="user-requests-count-badge" class="badge-count" style="font-size: 11px; background: var(--border-color); padding: 2px 8px; border-radius: 20px; font-weight: 700; color: var(--text-secondary);">0</span>
+                </div>
+                <div id="user-requests-list" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; background: rgba(255,255,255,0.01); border-radius: var(--border-radius-sm); border: 1px dashed var(--border-color);">
+                        No requests yet. Try requesting a movie that is not in the library!
+                    </div>
+                </div>
             </div>
         </div>
     </div>
