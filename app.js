@@ -26,6 +26,42 @@ if (window.Telegram && window.Telegram.WebApp) {
     }
 })();
 
+// Safe localStorage wrapper to prevent crashes when third-party cookies/storage are blocked inside webview sandboxes
+const safeStorage = (() => {
+    let available = false;
+    try {
+        const test = "__store_test__";
+        window.localStorage.setItem(test, test);
+        window.localStorage.removeItem(test);
+        available = true;
+    } catch (e) {
+        available = false;
+        console.warn("localStorage is blocked or unavailable. Falling back to temporary in-memory storage.");
+    }
+    const inMemoryStorage = {};
+    return {
+        getItem(key) {
+            if (available) {
+                try { return window.localStorage.getItem(key); } catch (e) {}
+            }
+            return inMemoryStorage.hasOwnProperty(key) ? inMemoryStorage[key] : null;
+        },
+        setItem(key, value) {
+            if (available) {
+                try { window.localStorage.setItem(key, value); return; } catch (e) {}
+            }
+            inMemoryStorage[key] = String(value);
+        },
+        removeItem(key) {
+            if (available) {
+                try { window.localStorage.removeItem(key); return; } catch (e) {}
+            }
+            delete inMemoryStorage[key];
+        }
+    };
+})();
+const localStorage = safeStorage;
+
 // Firebase Configuration & Admin Panel Settings
 const ADMIN_TELEGRAM_IDS = ["123456789"]; // Add your Telegram user ID here to access the admin dashboard
 const firebaseConfig = {
