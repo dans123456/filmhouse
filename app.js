@@ -1,7 +1,12 @@
-/**
- * FILM HOUSE - CORE APPLICATION LOGIC (VANILLA JS)
- * Fully compliant with XSS and secure storage standards.
- */
+// Early Telegram WebApp initialization to prevent loading splash hang
+if (window.Telegram && window.Telegram.WebApp) {
+    try {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+    } catch (e) {
+        console.warn("Early Telegram WebApp initialization warning:", e);
+    }
+}
 
 // Firebase Configuration & Admin Panel Settings
 const ADMIN_TELEGRAM_IDS = ["123456789"]; // Add your Telegram user ID here to access the admin dashboard
