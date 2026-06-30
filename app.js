@@ -4065,13 +4065,18 @@ function startUserRequestsListener() {
     
     userRequestsUnsubscribe = db.collection("requests")
         .where("requestedById", "==", state.user.id)
-        .orderBy("requestedAt", "desc")
         .onSnapshot(snapshot => {
             const requests = [];
             snapshot.forEach(doc => {
                 const req = doc.data();
                 req.docId = doc.id;
                 requests.push(req);
+            });
+            // Sort client-side by requestedAt descending
+            requests.sort((a, b) => {
+                const tA = a.requestedAt ? (a.requestedAt.seconds || 0) : 0;
+                const tB = b.requestedAt ? (b.requestedAt.seconds || 0) : 0;
+                return tB - tA;
             });
             renderUserRequests(requests);
         }, err => {

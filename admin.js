@@ -810,7 +810,7 @@ if (closeModalBtn && addMovieModal) {
 // Add Movie Form Submit
 const addMovieForm = document.getElementById("add-movie-form");
 if (addMovieForm) {
-    addMovieForm.addEventListener("submit", (e) => {
+    addMovieForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         
         const title = document.getElementById("movie-title").value.trim();
@@ -820,32 +820,105 @@ if (addMovieForm) {
         
         const linksList = linksVal.split(",").map(l => l.trim()).filter(l => l);
         
-        // Add to local state
-        const newMovie = {
-            csv_id: id,
-            title: title,
-            type: type === 'tv' ? 'Series' : 'Movie',
-            links: linksList,
-            poster: '',
-            rating: 0,
-            release_date: ''
-        };
-        
         // Prevent duplicate IDs locally
         if (allCatalogMovies.some(m => m.csv_id === id)) {
             alert("A title with this ID already exists in the catalog!");
             return;
         }
+
+        const submitBtn = addMovieForm.querySelector("button[type='submit']");
+        const originalBtnText = submitBtn ? submitBtn.textContent : "Add to Local List";
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Fetching TMDB info... ⏳";
+        }
+
+        // Fetch TMDB rich metadata on the fly
+        const numericId = id.split("-")[0];
+        let poster = "";
+        let rating = 0;
+        let releaseDate = "";
+        let genres = [];
+        let categories = ["Main"]; // Default to Main category
+        let overview = "No synopsis available.";
+        let backdrop = "";
+        let original_language = "en";
         
-        allCatalogMovies.unshift(newMovie); // Add to beginning of catalog list
+        if (numericId && /^\d+$/.test(numericId)) {
+            const mediaType = (type.toLowerCase() === 'tv') ? 'tv' : 'movie';
+            const url = `https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${TMDB_API_KEY}`;
+            try {
+                const res = await fetch(url);
+                if (res.ok) {
+                    const data = await res.json();
+                    poster = data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : "";
+                    backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}` : "";
+                    rating = Math.round((data.vote_average || 0) * 10) / 10;
+                    releaseDate = data.release_date || data.first_air_date || "";
+                    genres = data.genres ? data.genres.map(g => g.name) : [];
+                    overview = data.overview || "No synopsis available.";
+                    original_language = data.original_language || "en";
+                    
+                    // Categorize title
+                    if (type === 'tv') {
+                        categories.push("Hollywood/British Series");
+                        if (original_language === 'ko') {
+                            categories.push("Korean Drama");
+                        }
+                    } else {
+                        categories.push("Hollywood/British Movies");
+                        if (original_language === 'ko') {
+                            categories.push("Korean Drama");
+                        }
+                    }
+                    if (data.genres && data.genres.some(g => g.name.toLowerCase() === "animation")) {
+                        categories.push("Animated Movies");
+                        if (original_language === 'ja') {
+                            categories.push("Anime");
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("Could not enrich movie metadata on form submit:", err);
+            }
+        }
+
+        // Add to local state
+        const newMovie = {
+            csv_id: id,
+            tmdb_id: parseInt(numericId) || null,
+            imdb_id: "",
+            title: title,
+            type: type === 'tv' ? 'Series' : 'Movie',
+            categories: categories,
+            genres: genres,
+            overview: overview,
+            poster: poster || "img/FilmHouse3_nobg.png",
+            backdrop: backdrop || "img/FilmHouse.png",
+            rating: rating,
+            release_date: releaseDate,
+            language: original_language,
+            cast: [],
+            director: "",
+            trailer: "",
+            runtime: "",
+            links: linksList
+        };
+        
+        allCatalogMovies.unshift(newMovie);
+        newlyAddedIds.push(id); // Show new addition badge!
         catalogChangesMade = true;
         
         updatePublishButtonState();
         renderCatalogList();
         
-        // Reset and close modal
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+        }
         addMovieForm.reset();
         addMovieModal.classList.remove("active");
+        alert(`"${title}" added locally with rich TMDB details! Click "Publish Changes 🚀" inside the header to make it live.`);
     });
 }
 
@@ -1260,3 +1333,12 @@ if (confirmCSVImportBtn && csvReviewModal) {
         }
     });
 }
+
+// Warn administrator before leaving page with unpublished changes
+window.addEventListener("beforeunload", (e) => {
+    if (catalogChangesMade) {
+        e.preventDefault();
+        e.returnValue = "You have unpublished changes. If you refresh, they will be lost!";
+        return e.returnValue;
+    }
+});
