@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "569094-spider-man-across-the-spider-verse",
+    "tmdb_id": 569094,
+    "imdb_id": "",
+    "title": "Spider-Man: Across the Spider-Verse (2023)",
+    "type": "Movie",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADjRUAArFaIUZGiouhtPqz0hYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADjhUAArFaIUbi5nXi8C0EWxYE"
+    ]
+  },
+  {
     "csv_id": "114472-secret-invasion",
     "tmdb_id": 114472,
     "imdb_id": "",
