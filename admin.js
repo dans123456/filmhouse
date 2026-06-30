@@ -8,6 +8,22 @@ const firebaseConfig = {
     appId: "1:698060918982:web:cf5fd73cc71aef002907c7"
 };
 
+// HTML Escaper helper to prevent XSS injection in dynamic HTML content
+function escapeHTML(str) {
+    if (str === null || str === undefined) return "";
+    if (typeof str !== "string") str = String(str);
+    return str.replace(/[&<>"']/g, function(match) {
+        const escapeMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;'
+        };
+        return escapeMap[match];
+    });
+}
+
 // Global Datasets for local search filter matching (saves Firestore quota reads)
 let allUsers = [];
 let allRequests = [];
@@ -118,8 +134,8 @@ function renderUsersList() {
         row.innerHTML = `
             <div class="user-summary" style="display: flex; align-items: center; justify-content: space-between; width: 100%; cursor: pointer; user-select: none;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <img src="${u.avatar || 'MOVIE/img/FilmHouse3_nobg.png'}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
-                    <h5 style="margin: 0; font-size: 14px; font-weight: 600; color: #fff;">${u.fullName || 'Guest User'}</h5>
+                    <img src="${escapeHTML(u.avatar) || 'MOVIE/img/FilmHouse3_nobg.png'}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                    <h5 style="margin: 0; font-size: 14px; font-weight: 600; color: #fff;">${escapeHTML(u.fullName) || 'Guest User'}</h5>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div class="points-badge" style="margin: 0;">${u.points || 0} pts</div>
@@ -129,8 +145,8 @@ function renderUsersList() {
                 </div>
             </div>
             <div class="user-expanded-details" style="display: none; padding-top: 12px; margin-top: 10px; border-top: 1px dashed var(--border-color); width: 100%;">
-                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Telegram Username:</strong> @${u.username || 'guest'}</p>
-                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>User ID:</strong> ${u.id}</p>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Telegram Username:</strong> @${escapeHTML(u.username) || 'guest'}</p>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>User ID:</strong> ${escapeHTML(u.id)}</p>
                 <p style="margin: 0 0 12px 0; font-size: 13px; color: var(--text-secondary);"><strong>Joined Date:</strong> ${joinedDateStr}</p>
                 
                 <h6 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Points Breakdown</h6>
@@ -222,8 +238,8 @@ function renderRequestsList() {
 
         row.innerHTML = `
             <div class="user-details">
-                <h5>${req.title}</h5>
-                <p style="text-transform: uppercase;">${req.type}</p>
+                <h5>${escapeHTML(req.title)}</h5>
+                <p style="text-transform: uppercase;">${escapeHTML(req.type)}</p>
             </div>
             <div class="req-count">
                 ${req.count} ${req.count === 1 ? 'request' : 'requests'}
@@ -643,14 +659,14 @@ function renderCatalogList() {
 
         row.innerHTML = `
             <div class="user-info" style="pointer-events: none;">
-                <img src="${posterUrl}" alt="Poster" class="user-avatar" style="border-radius: 4px; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                <img src="${escapeHTML(posterUrl)}" alt="Poster" class="user-avatar" style="border-radius: 4px; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
                 <div class="user-details">
-                    <h5>${m.title} ${diffBadge}</h5>
-                    <p>ID: ${m.csv_id} | Type: <span style="text-transform: uppercase; font-weight: 600; color: ${badgeColor};">${m.type}</span></p>
+                    <h5>${escapeHTML(m.title)} ${diffBadge}</h5>
+                    <p>ID: ${escapeHTML(m.csv_id)} | Type: <span style="text-transform: uppercase; font-weight: 600; color: ${badgeColor};">${escapeHTML(m.type)}</span></p>
                     <div class="breakdown-group">
                         <span class="breakdown-tag">🔗 Links: ${m.links ? m.links.length : 0}</span>
-                        ${m.rating ? `<span class="breakdown-tag">⭐ ${m.rating}</span>` : ''}
-                        ${m.release_date ? `<span class="breakdown-tag">📅 ${m.release_date}</span>` : ''}
+                        ${m.rating ? `<span class="breakdown-tag">⭐ ${escapeHTML(m.rating)}</span>` : ''}
+                        ${m.release_date ? `<span class="breakdown-tag">📅 ${escapeHTML(m.release_date)}</span>` : ''}
                     </div>
                 </div>
             </div>

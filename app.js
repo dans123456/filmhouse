@@ -71,6 +71,22 @@ const state = {
     lastDiscoverQuery: null
 };
 
+// HTML Escaper helper to prevent XSS injection in dynamic HTML content
+function escapeHTML(str) {
+    if (str === null || str === undefined) return "";
+    if (typeof str !== "string") str = String(str);
+    return str.replace(/[&<>"']/g, function(match) {
+        const escapeMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;'
+        };
+        return escapeMap[match];
+    });
+}
+
 // SVG Icon Helper
 function createSvgIcon(iconId, className = "icon") {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -930,8 +946,8 @@ function renderLeaderboard() {
             <div style="display: flex; align-items: center; gap: 12px;">
                 <img src="${userAvatarPath}" alt="Your Avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #f5c518;" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
                 <div>
-                    <h4 style="font-size: 13px; font-weight: 700; margin: 0; color: var(--text-primary);">You (${state.user.fullName})</h4>
-                    <span class="leaderboard-badge">${getAchievementBadge(state.user.points || 0)}</span>
+                    <h4 style="font-size: 13px; font-weight: 700; margin: 0; color: var(--text-primary);">You (${escapeHTML(state.user.fullName)})</h4>
+                    <span class="leaderboard-badge">${escapeHTML(getAchievementBadge(state.user.points || 0))}</span>
                 </div>
             </div>
             <div style="text-align: right;">
@@ -962,10 +978,10 @@ function renderLeaderboard() {
             row.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div class="leaderboard-rank-badge ${rankBadgeClass}">${rankBadgeContent}</div>
-                    <img src="${item.avatar}" alt="${item.fullName}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color);" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
+                    <img src="${escapeHTML(item.avatar)}" alt="${escapeHTML(item.fullName)}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color);" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
                     <div>
-                        <h4 style="font-size: 12px; font-weight: 600; margin: 0; color: ${item.isCurrentUser ? "#f5c518" : "var(--text-primary)"};">${item.fullName}</h4>
-                        <span class="leaderboard-badge" style="font-size: 8px; padding: 1px 4px;">${item.badge}</span>
+                        <h4 style="font-size: 12px; font-weight: 600; margin: 0; color: ${item.isCurrentUser ? "#f5c518" : "var(--text-primary)"};">${escapeHTML(item.fullName)}</h4>
+                        <span class="leaderboard-badge" style="font-size: 8px; padding: 1px 4px;">${escapeHTML(item.badge)}</span>
                     </div>
                 </div>
                 <div style="text-align: right;">
