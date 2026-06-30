@@ -8,6 +8,24 @@ if (window.Telegram && window.Telegram.WebApp) {
     }
 }
 
+// Load Eruda In-App Mobile Console if ?debug=true is passed in URL
+(function() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('debug') === 'true') {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/eruda';
+            script.onload = function() {
+                eruda.init();
+                console.log("Eruda Mobile Debugger successfully initialized!");
+            };
+            document.head.appendChild(script);
+        }
+    } catch (e) {
+        console.warn("Could not load Eruda debugger:", e);
+    }
+})();
+
 // Firebase Configuration & Admin Panel Settings
 const ADMIN_TELEGRAM_IDS = ["123456789"]; // Add your Telegram user ID here to access the admin dashboard
 const firebaseConfig = {
