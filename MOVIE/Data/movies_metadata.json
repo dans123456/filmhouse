@@ -1,19 +1,326 @@
 [
   {
+    "csv_id": "127635-spidey-and-his-amazing-friends",
+    "tmdb_id": 127635,
+    "imdb_id": "",
+    "title": "Spidey and His Amazing Friends (2021)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Kids",
+      "Sci-Fi & Fantasy",
+      "Action & Adventure"
+    ],
+    "overview": "Follow Peter Parker, Gwen Stacy and Miles Morales and their adventures as the young heroes team up with Hulk, Ms. Marvel and Black Panther to defeat foes like Rhino, Doc Ock and Green Goblin and learn that teamwork is the best way to save the day.",
+    "poster": "https://image.tmdb.org/t/p/w500/etO5jDS5WgR4Y1lTyXhQcilJ6u2.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7CvmnHAVxhDbYE7jPp0PbKunqqs.jpg",
+    "rating": 7.1,
+    "release_date": "2021-08-06",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADvBYAArFaIUYJQ5EjvKKUihYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADvxYAArFaIUbhKIQBdgX3qxYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADwhYAArFaIUabvS-WfI55NxYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADxRYAArFaIUYNaT2k2FK42RYE"
+    ]
+  },
+  {
+    "csv_id": "92749-moon-knight",
+    "tmdb_id": 92749,
+    "imdb_id": "",
+    "title": "Moon Knight (2022)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Mystery",
+      "Action & Adventure"
+    ],
+    "overview": "When Steven Grant, a mild-mannered gift-shop employee, becomes plagued with blackouts and memories of another life, he discovers he has dissociative identity disorder and shares a body with mercenary Marc Spector. As Steven/Marc’s enemies converge upon them, they must navigate their complex identities while thrust into a deadly mystery among the powerful gods of Egypt.",
+    "poster": "https://image.tmdb.org/t/p/w500/x6FsYvt33846IQnDSFxla9j0RX8.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/iux1vKPT7Vw1AzetZb4Jz6wfYsm.jpg",
+    "rating": 7.6,
+    "release_date": "2022-03-30",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADiRYAArFaIUYeBE8fPZwG1hYE"
+    ]
+  },
+  {
+    "csv_id": "453395-doctor-strange-in-the-multiverse-of-madness",
+    "tmdb_id": 453395,
+    "imdb_id": "",
+    "title": "Doctor Strange in the Multiverse of Madness (2022)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Fantasy",
+      "Action",
+      "Adventure"
+    ],
+    "overview": "Doctor Strange, with the help of mystical allies both old and new, traverses the mind-bending and dangerous alternate realities of the Multiverse to confront a mysterious new adversary.",
+    "poster": "https://image.tmdb.org/t/p/w500/ddJcSKbcp4rKZTmuyWaMhuwcfMz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lv3TXqhpaIxkclIHbhN2MRMOemQ.jpg",
+    "rating": 7.2,
+    "release_date": "2022-05-04",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADfRYAArFaIUbjTGbHrsxa0RYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADgBYAArFaIUZPjHV7M5a7vBYE"
+    ]
+  },
+  {
+    "csv_id": "92782-ms-marvel",
+    "tmdb_id": 92782,
+    "imdb_id": "",
+    "title": "Ms. Marvel (2022)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Action & Adventure",
+      "Comedy"
+    ],
+    "overview": "A great student, avid gamer, and voracious fan-fic scribe, Kamala Khan has a special affinity for superheroes, particularly Captain Marvel. However, she struggles to fit in at home and at school — that is, until she gets superpowers like the heroes she’s always looked up to. Life is easier with superpowers, right?",
+    "poster": "https://image.tmdb.org/t/p/w500/3HWWh92kZbD7odwJX7nKmXNZsYo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mfcLUWASJghU8MTNK38eYktfE83.jpg",
+    "rating": 6.3,
+    "release_date": "2022-06-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADbhYAArFaIUbnws6aiwH5KRYE"
+    ]
+  },
+  {
+    "csv_id": "616037-thor-love-and-thunder",
+    "tmdb_id": 616037,
+    "imdb_id": "",
+    "title": "Thor: Love and Thunder (2022)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Fantasy",
+      "Action",
+      "Comedy"
+    ],
+    "overview": "After his retirement is interrupted by Gorr the God Butcher, a galactic killer who seeks the extinction of the gods, Thor Odinson enlists the help of King Valkyrie, Korg, and ex-girlfriend Jane Foster, who now wields Mjolnir as the Mighty Thor. Together they embark upon a harrowing cosmic adventure to uncover the mystery of the God Butcher’s vengeance and stop him before it’s too late.",
+    "poster": "https://image.tmdb.org/t/p/w500/pIkRyD18kl4FhoCNQuWxWu5cBLM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jsoz1HlxczSuTx0mDl2h0lxy36l.jpg",
+    "rating": 6.4,
+    "release_date": "2022-07-06",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADPRYAArFaIUaBrnVKRsFwrBYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADPxYAArFaIUatMhG1HYD0zxYE"
+    ]
+  },
+  {
+    "csv_id": "232125-i-am-groot",
+    "tmdb_id": 232125,
+    "imdb_id": "",
+    "title": "I Am Groot (2022)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Comedy",
+      "Family",
+      "Sci-Fi & Fantasy",
+      "Kids"
+    ],
+    "overview": "There's no guarding the galaxy from this mischievous toddler! Get ready as Baby Groot takes center stage in his very own collection of shorts, exploring his glory days growing up and getting into trouble among the stars.",
+    "poster": "https://image.tmdb.org/t/p/w500/3QfQYECgu6DX5UUWCBvv1Fl0BAJ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bAnHzJ6AMhOhnV3C0kTxkpCqpgM.jpg",
+    "rating": 7,
+    "release_date": "2022-08-10",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADJxYAArFaIUal73-O0DX7fBYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADKRYAArFaIUYJ4MY250iB1BYE"
+    ]
+  },
+  {
+    "csv_id": "92783-she-hulk-attorney-at-law",
+    "tmdb_id": 92783,
+    "imdb_id": "",
+    "title": "She-Hulk: Attorney at Law (2022)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Comedy",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Jennifer Walters navigates the complicated life of a single, 30-something attorney who also happens to be a green 6-foot-7-inch superpowered hulk.",
+    "poster": "https://image.tmdb.org/t/p/w500/5xz2orV8f0usyrfGNshcoXHmiaV.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/eljErfkQUcFUgQkI4I1soZcH8MW.jpg",
+    "rating": 6.1,
+    "release_date": "2022-08-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADIBYAArFaIUam_L4mKuCYVxYE"
+    ]
+  },
+  {
+    "csv_id": "894205-werewolf-by-night",
+    "tmdb_id": 894205,
+    "imdb_id": "",
+    "title": "Werewolf by Night (2022)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Fantasy",
+      "Horror"
+    ],
+    "overview": "On a dark and somber night, a secret cabal of monster hunters emerge from the shadows and gather at the foreboding Bloodstone Temple following the death of their leader. In a strange and macabre memorial to the leader’s life, the attendees are thrust into a mysterious and deadly competition for a powerful relic—a hunt that will ultimately bring them face to face with a dangerous monster.",
+    "poster": "https://image.tmdb.org/t/p/w500/mvIvNKRIJPPS7WSFarFhOAGIVnU.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/pfAZP7JvTTxqgq7n6A1OYgkAdEW.jpg",
+    "rating": 7,
+    "release_date": "2022-09-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADFBYAArFaIUbTdXHd96NyIxYE"
+    ]
+  },
+  {
+    "csv_id": "505642-black-panther-wakanda-forever",
+    "tmdb_id": 505642,
+    "imdb_id": "",
+    "title": "Black Panther: Wakanda Forever (2022)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Science Fiction"
+    ],
+    "overview": "Queen Ramonda, Shuri, M’Baku, Okoye and the Dora Milaje fight to protect their nation from intervening world powers in the wake of King T’Challa’s death.  As the Wakandans strive to embrace their next chapter, the heroes must band together with the help of War Dog Nakia and Everett Ross and forge a new path for the kingdom of Wakanda.",
+    "poster": "https://image.tmdb.org/t/p/w500/sv1xJUazXeYqALzczSZ3O6nkH75.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/83H0C66AcvkwpG2738VCTHMY9uv.jpg",
+    "rating": 7,
+    "release_date": "2022-11-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD6xUAArFaIUbtpJsMdIv8SBYE"
+    ]
+  },
+  {
+    "csv_id": "774752-the-guardians-of-the-galaxy-holiday-special",
+    "tmdb_id": 774752,
+    "imdb_id": "",
+    "title": "The Guardians of the Galaxy Holiday Special (2022)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Science Fiction",
+      "Adventure"
+    ],
+    "overview": "On a mission to make Christmas unforgettable for Quill, the Guardians head to Earth in search of the perfect present.",
+    "poster": "https://image.tmdb.org/t/p/w500/8dqXyslZ2hv49Oiob9UjlGSHSTR.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rfnmMYuZ6EKOBvQLp2wqP21v7sI.jpg",
+    "rating": 7.1,
+    "release_date": "2022-11-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD5BUAArFaIUYjsV8ToG_hpBYE"
+    ]
+  },
+  {
     "csv_id": "569094-spider-man-across-the-spider-verse",
     "tmdb_id": 569094,
     "imdb_id": "",
     "title": "Spider-Man: Across the Spider-Verse (2023)",
     "type": "Movie",
     "categories": [
-      "Main"
+      "Main",
+      "Hollywood/British Movies",
+      "Animated Movies"
     ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "img/FilmHouse3_nobg.png",
-    "backdrop": "img/FilmHouse.png",
-    "rating": 0,
-    "release_date": "",
+    "genres": [
+      "Animation",
+      "Action",
+      "Adventure",
+      "Science Fiction"
+    ],
+    "overview": "After reuniting with Gwen Stacy, Brooklyn’s full-time, friendly neighborhood Spider-Man is catapulted across the Multiverse, where he encounters the Spider Society, a team of Spider-People charged with protecting the Multiverse's very existence. But when the heroes clash on how to handle a new threat, Miles finds himself pitted against the other Spiders and must set out on his own to save those he loves most.",
+    "poster": "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/9xfDWXAUbFXQK585JvByT5pEAhe.jpg",
+    "rating": 8.3,
+    "release_date": "2023-05-31",
     "language": "en",
     "cast": [],
     "director": "",
