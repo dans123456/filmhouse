@@ -2353,6 +2353,7 @@ function openDetailModal(movie) {
     metaList.appendChild(createMetaDivider());
 
     const yearLabel = document.createElement("span");
+    yearLabel.className = "detail-year-label";
     yearLabel.textContent = movie.release_date ? movie.release_date.substring(0, 4) : "N/A";
     metaList.appendChild(yearLabel);
     metaList.appendChild(createMetaDivider());
@@ -2577,6 +2578,7 @@ function openDetailModal(movie) {
     synTitle.textContent = "Synopsis";
     synopsisBox.appendChild(synTitle);
     const synDesc = document.createElement("p");
+    synDesc.className = "detail-synopsis-desc";
     synDesc.textContent = movie.overview;
     synopsisBox.appendChild(synDesc);
     overviewSec.appendChild(synopsisBox);
@@ -2663,6 +2665,50 @@ function openDetailModal(movie) {
 
     // Open Modal
     modal.classList.add("active");
+
+    // Dynamic Self-Healing: Fetch missing TMDB details in background if missing
+    const numericId = movie.tmdb_id || (movie.csv_id && movie.csv_id.split("-")[0]);
+    if (numericId && /^\d+$/.test(numericId) && (!movie.overview || movie.overview === "No synopsis available." || !movie.release_date || !movie.poster || movie.poster.includes("FilmHouse3_nobg.png"))) {
+        const mediaType = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv' ? 'tv' : 'movie';
+        const apiKey = getTmdbApiKey();
+        fetch(`https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${apiKey}`)
+            .then(res => { if (res.ok) return res.json(); })
+            .then(data => {
+                if (data) {
+                    movie.overview = data.overview || movie.overview;
+                    movie.release_date = data.release_date || data.first_air_date || movie.release_date;
+                    movie.rating = data.vote_average ? Math.round(data.vote_average * 10) / 10 : movie.rating;
+                    if (data.poster_path && (!movie.poster || movie.poster.includes("FilmHouse3_nobg.png"))) {
+                        movie.poster = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
+                    }
+                    if (data.backdrop_path && (!movie.backdrop || movie.backdrop.includes("FilmHouse.png"))) {
+                        movie.backdrop = `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`;
+                    }
+                    
+                    // Update DOM elements on the fly if user is still viewing this card
+                    const openModal = document.getElementById("detail-modal");
+                    if (openModal && openModal.classList.contains("active")) {
+                        const currentTitle = document.querySelector(".detail-title");
+                        if (currentTitle && currentTitle.textContent === movie.title) {
+                            const backdropEl = document.querySelector(".detail-backdrop");
+                            if (backdropEl && movie.backdrop) backdropEl.src = movie.backdrop;
+                            
+                            const posterEl = document.querySelector(".detail-poster-card img");
+                            if (posterEl && movie.poster) posterEl.src = movie.poster;
+                            
+                            const synopsisEl = document.querySelector(".detail-synopsis-desc");
+                            if (synopsisEl && movie.overview) synopsisEl.textContent = movie.overview;
+                            
+                            const yearLabelEl = document.querySelector(".detail-year-label");
+                            if (yearLabelEl && movie.release_date) {
+                                yearLabelEl.textContent = movie.release_date.substring(0, 4);
+                            }
+                        }
+                    }
+                }
+            })
+            .catch(err => console.warn("Self-healing TMDB details fetch failed:", err));
+    }
 }
 
 function createMetaDivider() {
