@@ -1,5 +1,91 @@
 [
   {
+    "csv_id": "138501-agatha-all-along",
+    "tmdb_id": 138501,
+    "imdb_id": "",
+    "title": "Agatha All Along (2024)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Mystery"
+    ],
+    "overview": "Agatha Harkness gathers a coven of witches and sets off down, down, down The Witches' Road.",
+    "poster": "https://image.tmdb.org/t/p/w500/mGsxKwXUjojitRv2E9qMTbxbBRd.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tYLXJW1sZQU09VWY1BhSVPKGIwc.jpg",
+    "rating": 7.5,
+    "release_date": "2024-09-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADLhIAArFaIUZaGOzND-kr5BYE"
+    ]
+  },
+  {
+    "csv_id": "912649-venom-the-last-dance",
+    "tmdb_id": 912649,
+    "imdb_id": "",
+    "title": "Venom: The Last Dance (2024)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Science Fiction",
+      "Action",
+      "Adventure"
+    ],
+    "overview": "Eddie and Venom are on the run. Hunted by both of their worlds and with the net closing in, the duo are forced into a devastating decision that will bring the curtains down on Venom and Eddie's last dance.",
+    "poster": "https://image.tmdb.org/t/p/w500/vGXptEdgZIhPg3cGlc7e8sNPC2e.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3V4kLQg0kSqPLctI5ziYWabAZYF.jpg",
+    "rating": 6.7,
+    "release_date": "2024-10-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADKBIAArFaIUYP_eIecs3thxYE"
+    ]
+  },
+  {
+    "csv_id": "539972-kraven-the-hunter",
+    "tmdb_id": 539972,
+    "imdb_id": "",
+    "title": "Kraven the Hunter (2024)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Thriller"
+    ],
+    "overview": "Kraven Kravinoff's complex relationship with his ruthless gangster father, Nikolai, starts him down a path of vengeance with brutal consequences, motivating him to become not only the greatest hunter in the world, but also one of its most feared.",
+    "poster": "https://image.tmdb.org/t/p/w500/1GvBhRxY6MELDfxFrete6BNhBB5.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bGGjyPqtNc8hhGkPo8W8D8t90bW.jpg",
+    "rating": 6.4,
+    "release_date": "2024-12-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADHRIAArFaIUbqtF48vq6ZqRYE"
+    ]
+  },
+  {
     "csv_id": "202555-daredevil-born-again",
     "tmdb_id": 202555,
     "imdb_id": "",
