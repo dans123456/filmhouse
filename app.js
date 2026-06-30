@@ -161,6 +161,21 @@ async function initializeDatabase() {
         if (response.ok) {
             const data = await response.json();
             if (data && data.length > 0) {
+                // Auto-migration for manually added/imported entries missing categories or assets
+                data.forEach(m => {
+                    if (!m.categories || !Array.isArray(m.categories) || m.categories.length === 0) {
+                        m.categories = ["Main"];
+                        const isTV = (m.type || "").toLowerCase() === "series" || (m.type || "").toLowerCase() === "tv";
+                        if (isTV) {
+                            m.categories.push("Hollywood/British Series");
+                        } else {
+                            m.categories.push("Hollywood/British Movies");
+                        }
+                    }
+                    if (!m.poster) {
+                        m.poster = "img/FilmHouse3_nobg.png";
+                    }
+                });
                 state.movies = data;
                 state.newMovieIds = data.slice(0, 10).map(m => m.csv_id);
                 statusEl.textContent = "Starting Film House...";
