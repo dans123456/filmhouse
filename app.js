@@ -186,6 +186,14 @@ async function initializeDatabase() {
             if (data && data.length > 0) {
                 // Auto-migration for manually added/imported entries missing categories or assets
                 data.forEach(m => {
+                    // Prepend MOVIE/ to local assets relative paths to resolve 404s
+                    if (m.poster && m.poster.startsWith("img/")) {
+                        m.poster = "MOVIE/" + m.poster;
+                    }
+                    if (m.backdrop && m.backdrop.startsWith("img/")) {
+                        m.backdrop = "MOVIE/" + m.backdrop;
+                    }
+                    
                     if (!m.categories || !Array.isArray(m.categories) || m.categories.length === 0) {
                         m.categories = ["Main"];
                         const isTV = (m.type || "").toLowerCase() === "series" || (m.type || "").toLowerCase() === "tv";
@@ -196,7 +204,7 @@ async function initializeDatabase() {
                         }
                     }
                     if (!m.poster) {
-                        m.poster = "img/FilmHouse3_nobg.png";
+                        m.poster = "MOVIE/img/FilmHouse3_nobg.png";
                     }
                 });
                 state.movies = data;
@@ -245,7 +253,6 @@ async function initializeDatabase() {
     }
 
     if (state.movies && state.movies.length > 0) {
-        shuffleArray(state.movies);
         return;
     }
 
@@ -500,7 +507,6 @@ async function initializeDatabase() {
 
     state.movies = enrichedList;
     state.newMovieIds = enrichedList.slice(0, 10).map(m => m.csv_id);
-    shuffleArray(state.movies);
     localStorage.setItem("filmhouse_enriched_db_v5", JSON.stringify(enrichedList));
     statusEl.textContent = "Complete!";
 }
