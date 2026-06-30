@@ -1165,15 +1165,13 @@ if (publishBtn) {
                 fetch(`${apiCSVUrl}?t=${Date.now()}`, {
                     headers: {
                         "Authorization": `token ${token}`,
-                        "Accept": "application/vnd.github.v3+json",
-                        "Cache-Control": "no-cache"
+                        "Accept": "application/vnd.github.v3+json"
                     }
                 }),
                 fetch(`${apiJSONUrl}?t=${Date.now()}`, {
                     headers: {
                         "Authorization": `token ${token}`,
-                        "Accept": "application/vnd.github.v3+json",
-                        "Cache-Control": "no-cache"
+                        "Accept": "application/vnd.github.v3+json"
                     }
                 })
             ]);
@@ -1561,9 +1559,7 @@ async function checkCatalogForUpdates() {
         const res = await fetch(`${apiJSONUrl}?t=${Date.now()}`, {
             headers: {
                 "Authorization": `token ${token}`,
-                "Accept": "application/vnd.github.v3+json",
-                "Cache-Control": "no-cache",
-                "Pragma": "no-cache"
+                "Accept": "application/vnd.github.v3+json"
             }
         });
         if (res.ok) {
