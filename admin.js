@@ -527,6 +527,77 @@ if (saveTokenBtn) {
     });
 }
 
+// Test Connection to GitHub API and validate token permissions
+const testConnBtn = document.getElementById("btn-test-github-conn");
+if (testConnBtn) {
+    testConnBtn.addEventListener("click", async () => {
+        const tokenInput = document.getElementById("github-token");
+        const token = tokenInput ? tokenInput.value.trim() : "";
+        
+        testConnBtn.disabled = true;
+        testConnBtn.textContent = "Testing... ⏳";
+        
+        let logMsg = "--- GitHub API Diagnostics ---\n";
+        
+        try {
+            // Stage 1: Public Connection & DNS test
+            logMsg += "Stage 1: Testing public DNS & API routing... ";
+            const start1 = Date.now();
+            const publicRes = await fetch("https://api.github.com/zen?t=" + Date.now(), {
+                headers: { "Accept": "application/vnd.github.v3+json" }
+            });
+            const latency1 = Date.now() - start1;
+            
+            if (publicRes.ok) {
+                logMsg += `SUCCESS (Latency: ${latency1}ms)\n`;
+            } else {
+                logMsg += `FAILED (HTTP Status: ${publicRes.status} ${publicRes.statusText})\n`;
+            }
+            
+            // Stage 2: Token verification & repository write permissions
+            if (token) {
+                logMsg += "Stage 2: Testing Token Authorization... ";
+                const start2 = Date.now();
+                const authRes = await fetch("https://api.github.com/repos/dans123456/filmhouse?t=" + Date.now(), {
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Accept": "application/vnd.github.v3+json"
+                    }
+                });
+                const latency2 = Date.now() - start2;
+                
+                if (authRes.ok) {
+                    const repoData = await authRes.json();
+                    const pushAccess = repoData.permissions ? repoData.permissions.push : false;
+                    logMsg += `SUCCESS (Latency: ${latency2}ms)\n`;
+                    logMsg += `Push/Write Permission Status: ${pushAccess ? "✅ AUTHORIZED (You can write changes)" : "❌ DENIED (Read-only token!)"}\n`;
+                } else {
+                    logMsg += `FAILED (HTTP Status: ${authRes.status} ${authRes.statusText})\n`;
+                    if (authRes.status === 401) {
+                        logMsg += "Reason: Your token is invalid, expired, or has been revoked by GitHub.\n";
+                    } else if (authRes.status === 404) {
+                        logMsg += "Reason: Repository not found or token lacks scopes to view private repos.\n";
+                    }
+                }
+            } else {
+                logMsg += "Stage 2: SKIPPED (No token entered to test)\n";
+            }
+            
+            alert(logMsg);
+        } catch (e) {
+            logMsg += `FAILED\nError Details: ${e.message}\n\n`;
+            logMsg += "Troubleshooting tips:\n";
+            logMsg += "- Verify your device has a stable internet connection.\n";
+            logMsg += "- If you are on mobile data, try switching to Wi-Fi (or vice versa).\n";
+            logMsg += "- Ensure that you do not have any parental controls or VPN/Firewall blocking api.github.com.";
+            alert(logMsg);
+        } finally {
+            testConnBtn.disabled = false;
+            testConnBtn.textContent = "Test Connection";
+        }
+    });
+}
+
 // Load Catalog
 async function loadCatalog() {
     const listContainer = document.getElementById("catalog-list");
