@@ -1,5 +1,16 @@
 [
   {
+    "csv_id": "1723634-olivia",
+    "title": "Olivia 2023",
+    "type": "Movie",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD3A8AArFaIUaMxECV2Q4jRxYE"
+    ],
+    "poster": "",
+    "rating": 0,
+    "release_date": ""
+  },
+  {
     "csv_id": "243875-georgie-mandy-s-first-marriage",
     "tmdb_id": 243875,
     "title": "Georgie & Mandy's First Marriage",
@@ -46,7 +57,7 @@
     "overview": "Tarela, a young lady who works at a local bar where she is constantly owed salary, struggles to make ends meet as the survival of her mother, Ebiere and her younger sister, Kome, rests squarely on her shoulders.",
     "poster": "https://image.tmdb.org/t/p/w500/8KpDtd36U8HPcmyIPl8lGnMLr04.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/s9pqRHWCahjNLzcO7lU5rS2MZ2K.jpg",
-    "rating": 4.0,
+    "rating": 4,
     "release_date": "2023-01-20",
     "language": "en",
     "cast": [
@@ -248,7 +259,7 @@
     "overview": "Taking inspiration from the comic books of the same name, each episode of this animated anthology series questions, revisits and twists classic Marvel Cinematic moments.",
     "poster": "https://image.tmdb.org/t/p/w500/lztz5XBMG1x6Y5ubz7CxfPFsAcW.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/jnzoh5qoxRLFRIQAxnl6D3RStPC.jpg",
-    "rating": 8.0,
+    "rating": 8,
     "release_date": "2021-08-11",
     "language": "en",
     "cast": [
@@ -447,7 +458,7 @@
     "overview": "After meeting with newly elected U.S. President Thaddeus Ross, Sam finds himself in the middle of an international incident. He must discover the reason behind a nefarious global plot before the true mastermind has the entire world seeing red.",
     "poster": "https://image.tmdb.org/t/p/w500/pzIddUEMWhWzfvLI3TwxUG2wGoi.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/8eifdha9GQeZAkexgtD45546XKx.jpg",
-    "rating": 6.0,
+    "rating": 6,
     "release_date": "2025-02-12",
     "language": "en",
     "cast": [
@@ -1217,7 +1228,7 @@
     "overview": "Just as Tessa's life begins to become unglued, nothing is what she thought it would be. Not her friends nor her family. The only person that she should be able to rely on is Hardin, who is furious when he discovers the massive secret that she's been keeping. Before Tessa makes the biggest decision of her life, everything changes because of revelations about her family.",
     "poster": "https://image.tmdb.org/t/p/w500/dU4HfnTEJDf9KvxGS9hgO7BVeju.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/mxdiaM2tsx8M6W3zLgiPwAkhQfq.jpg",
-    "rating": 7.0,
+    "rating": 7,
     "release_date": "2021-09-01",
     "language": "en",
     "cast": [
@@ -1486,7 +1497,7 @@
     "overview": "Young Queen Charlotte's marriage to King George of England sparks an epic love story and transforms high society in this \"Bridgerton\" universe prequel.",
     "poster": "https://image.tmdb.org/t/p/w500/kFSaVIlBRycGNfrLzJZX7dgSQ1o.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/dkKEpUCjGEFH5q3GcAGaWG3o2N2.jpg",
-    "rating": 8.0,
+    "rating": 8,
     "release_date": "2023-05-04",
     "language": "en",
     "cast": [
@@ -1963,7 +1974,7 @@
     "overview": "After her mother's mysterious death, Nica begins to suspect that the talking, red-haired doll her visiting niece has been playing with may be the key to the mounting bloodshed and chaos.",
     "poster": "https://image.tmdb.org/t/p/w500/x9DzkDWp8O82Wzxk6otuD9bce9a.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/nNBhmIKYuojQxfQRFEFF0yCXonF.jpg",
-    "rating": 6.0,
+    "rating": 6,
     "release_date": "2013-10-08",
     "language": "en",
     "cast": [
@@ -2029,7 +2040,7 @@
     "overview": "Karen, a single mother, gifts her son Andy a Buddi doll for his birthday, unaware of its more sinister nature. A contemporary re-imagining of the 1988 horror classic.",
     "poster": "https://image.tmdb.org/t/p/w500/rpS7ROczWulqfaXG2klYapULXKm.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/aP0sxYhFZwnDTR6TSkG1bIidb2n.jpg",
-    "rating": 6.0,
+    "rating": 6,
     "release_date": "2019-06-19",
     "language": "en",
     "cast": [
@@ -2614,7 +2625,7 @@
     "overview": "Between personal obligations and training for his next big fight against an opponent with ties to his family's past, Adonis Creed is up against the challenge of his life.",
     "poster": "https://image.tmdb.org/t/p/w500/v3QyboWRoA4O9RbcsqH8tJMe8EB.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/9il7qNbeYnPMYlutsVYDsj4hRyb.jpg",
-    "rating": 7.0,
+    "rating": 7,
     "release_date": "2018-11-21",
     "language": "en",
     "cast": [
@@ -2680,7 +2691,7 @@
     "overview": "Yolo (You only live once) is a Ghanaian teenage TV series. The series is a sequel of the Ghanaian TV Series Things We Do for Love. It advises and directs the youth concerning the challenges they face in their sexuality. A television series produced and directed by Ivan Quashigah",
     "poster": "https://image.tmdb.org/t/p/w500/uIWPZ61l198CR8FcMThFPhyudX7.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/9BztFLYygOjB5XvgAyd53R7hLjj.jpg",
-    "rating": 9.0,
+    "rating": 9,
     "release_date": "2013-01-03",
     "language": "en",
     "cast": [
@@ -2720,7 +2731,7 @@
     "overview": "A dangerously charming, obsessive man goes to extreme measures to insert himself into the lives of women who fascinate him.",
     "poster": "https://image.tmdb.org/t/p/w500/oANi0vEE92nuijiZQgPZ88FSxqQ.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/gzOIymABxmetAECXtazEYCpMmfb.jpg",
-    "rating": 8.0,
+    "rating": 8,
     "release_date": "2018-09-09",
     "language": "en",
     "cast": [
@@ -3296,7 +3307,7 @@
     "overview": "Watch Carly, Sam, and Freddie, as they try to balance their everyday 8th grade lives with their newfound fame managing and starring in the most awesome show on the web.",
     "poster": "https://image.tmdb.org/t/p/w500/zswxst53aM8g2LysdVbtQNJAiKM.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/u3rph1KVUOKbOtrPIgCb27H08Fy.jpg",
-    "rating": 8.0,
+    "rating": 8,
     "release_date": "2007-09-08",
     "language": "en",
     "cast": [
@@ -3368,7 +3379,7 @@
     "overview": "An idealistic teen from rural Texas embarks on the adventure of a lifetime when she decides to leave behind starry nights for big city lights. Thrilled to be on her own and determined not to be intimidated by New York City, she accepts a job as nanny for a high-profile couple with four kids. Helping to keep her moral compass in check are Bertram, the family's butler, and Tony, the building's 20-year-old doorman.",
     "poster": "https://image.tmdb.org/t/p/w500/tspQe0FuiaUj0U1R1norNbiYTe4.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/jDEvpKn1Ry8U7KM4kgC2Iw6ZCJ1.jpg",
-    "rating": 8.0,
+    "rating": 8,
     "release_date": "2011-09-30",
     "language": "en",
     "cast": [
@@ -3838,7 +3849,7 @@
     "overview": "The story of a 10-year-old girl Dawn Haley whose sibling rivalry with her three brothers is heightened by the fact that they are quadruplets.",
     "poster": "https://image.tmdb.org/t/p/w500/nBkA2uXAaySBmlrinn5KroFZn94.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/rewalTto9U3qOysTv54HAwpcSIv.jpg",
-    "rating": 7.0,
+    "rating": 7,
     "release_date": "2014-09-13",
     "language": "en",
     "cast": [
@@ -4337,7 +4348,7 @@
     "overview": "Meet The Thundermans, a typical suburban family that happens to have astounding superpowers. At the center of the action are the 14-year-old Thunderman twins, who share the same bathroom, the same school, and the same annoying little siblings. Their only difference? The sister is a super student with a super sunny disposition who super looks forward to being a superhero someday, and her twin brother is a super villain.",
     "poster": "https://image.tmdb.org/t/p/w500/1tIYEyjK1LLcX0jYK3ZouT7601o.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/7Z4mwfQGoARtNxxQEPp5hKNclJi.jpg",
-    "rating": 8.0,
+    "rating": 8,
     "release_date": "2013-10-14",
     "language": "en",
     "cast": [
@@ -4507,7 +4518,7 @@
     "overview": "The early life of child genius Sheldon Cooper, later seen in The Big Bang Theory.",
     "poster": "https://image.tmdb.org/t/p/w500/kidkbZRBGbsEIrX7pODRSKi9ipl.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/nlDBlCtorM7nx130wYnfR5ZmyLX.jpg",
-    "rating": 8.0,
+    "rating": 8,
     "release_date": "2017-09-25",
     "language": "en",
     "cast": [
@@ -4546,7 +4557,7 @@
     "overview": "Two friends suddenly become rich in unexpected ways. It seems too good to be true — until they get entangled in a deadly money laundering scheme.",
     "poster": "https://image.tmdb.org/t/p/w500/nITszxZ1CDwu2Ml1xFvnDF81sbV.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/6yuWs5ZM7aVMLh9bstcwPcPBKM3.jpg",
-    "rating": 8.0,
+    "rating": 8,
     "release_date": "2023-11-24",
     "language": "en",
     "cast": [
@@ -4579,7 +4590,7 @@
     "overview": "After years of fighting to survive on the streets of Lagos, two brothers fall on opposite sides of the law. The bonds of brotherhood are put to the ultimate test as one joins a Taskforce that hunts down the other and his gang.",
     "poster": "https://image.tmdb.org/t/p/w500/t1tRYdnDvv8wWB9gsFUV8pRqRFf.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/wUPjB5hqnnlBDTkpKxCChyKrFsA.jpg",
-    "rating": 5.0,
+    "rating": 5,
     "release_date": "2022-09-23",
     "language": "en",
     "cast": [
@@ -4640,7 +4651,7 @@
     "overview": "Set in present day Ibadan, against the backdrop of a crippling university strike and an undercurrent of political unrest, three out of school teenagers- Abiola, Lamidi and Sade- grapple with varied existential crises on what's next with their lives. Lamidi's impulsive desire to plan a house party to lighten the mood force the three together. Sade goes missing after the party and the involvement of Sade' father, a local party chieftain, and the aggressive police force reveals a dark side to Lamidi and tests the friendship and trust the boys share.",
     "poster": "https://image.tmdb.org/t/p/w500/ewH0paKBGDdbLygVMLcRKTSpaJ3.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/qHCCifgQ0hs7KoJghbq2DUVdIbe.jpg",
-    "rating": 4.0,
+    "rating": 4,
     "release_date": "2021-05-08",
     "language": "en",
     "cast": [
@@ -4673,7 +4684,7 @@
     "overview": "With the help of their mother, the Judah boys plan to rob a small mall. But when they arrive, they're met by real armed robbers.",
     "poster": "https://image.tmdb.org/t/p/w500/9aMG2ftIFqFAN69FdjovKJY0hsd.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/jX7Mb37fa7JhB9c3acL1evERNwW.jpg",
-    "rating": 9.0,
+    "rating": 9,
     "release_date": "2023-12-15",
     "language": "en",
     "cast": [
@@ -4770,7 +4781,7 @@
     "overview": "While preparing for the most romantic day of the year, four hairdressers at a Lagos salon face wild dramas in their love lives and their families.",
     "poster": "https://image.tmdb.org/t/p/w500/tcdR3O5neQBfzXqC5c5NbxhpLvo.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/7LmA7ZgD7LXWnuqBiKTJ8PeSFMN.jpg",
-    "rating": 2.0,
+    "rating": 2,
     "release_date": "2022-02-22",
     "language": "en",
     "cast": [],
@@ -4828,7 +4839,7 @@
     "overview": "A legendary musician's life and family are turned upside down when a scandal is revealed on the eve of his 60th birthday.",
     "poster": "https://image.tmdb.org/t/p/w500/xyVFV4v3r1ASsMNAOfrYmE3dW6y.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/yrRV9ZZEBvIFrCZ3ItmyAJfO4hI.jpg",
-    "rating": 6.0,
+    "rating": 6,
     "release_date": "2022-12-09",
     "language": "en",
     "cast": [
@@ -4927,7 +4938,7 @@
     "overview": "Two children befriend a magical creature and must help it to return to its forest home.",
     "poster": "https://image.tmdb.org/t/p/w500/G9CEyyOsKycvCK1GCzrR0Gi54U.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/4UInAVm4BQ0gPnzwP4vfWyrJAPf.jpg",
-    "rating": 7.0,
+    "rating": 7,
     "release_date": "2023-08-18",
     "language": "en",
     "cast": [
@@ -5058,7 +5069,7 @@
     "overview": "When Boma tries to win back her ex by telling him that she has cancer, her simple lie soon spirals out of control.",
     "poster": "https://image.tmdb.org/t/p/w500/bVbfNRhZfZRLJTc1hFuCe5qiB2w.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/wT6RXMGv7cfcYHrqcCAV5ycCJez.jpg",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "2022-07-07",
     "language": "en",
     "cast": [
@@ -5123,7 +5134,7 @@
     "overview": "Busola has forever been unlucky with love. Pressured by society and her parents to tie the knot as a means to lift her family out of poverty, she finally meets Tunji – the perfect man. At first, Busola struggles to understand why a billionaire would choose to marry her, but after she accepts his proposal of marriage, a series of increasingly disturbing discoveries lead her to a truth she could never have imagined.",
     "poster": "https://image.tmdb.org/t/p/w500/aK7wpIsDAi9R6Vn518wb7JMEFVs.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/y434EiubaxeeOlpYx8FHnhW3RcS.jpg",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "2022-06-24",
     "language": "en",
     "cast": [
@@ -5156,7 +5167,7 @@
     "overview": "Three members of the same family search for love and acceptance in entirely different scenarios.",
     "poster": "https://image.tmdb.org/t/p/w500/cPjyuVaI1oDSDp8trR5lRLymff7.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/7ZQVVcfdCNj0aMQUiVbeW1IFw4p.jpg",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "",
     "language": "en",
     "cast": [
@@ -5219,7 +5230,7 @@
     "overview": "No synopsis available.",
     "poster": "https://image.tmdb.org/t/p/w500/hQpZZplgrP8WawlQUhQQsPs2zoy.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/hpVaweOd2wZCHTxvwB9i6fCdfbv.jpg",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "",
     "language": "yo",
     "cast": [
@@ -5252,7 +5263,7 @@
     "overview": "A Ghanaian chemist, who in a bid to vindicate his company in a lawsuit stumbles on something even more dangerous in the process - a hidden chemical formula altered for testing and profit gains by a pharmaceutical giant.",
     "poster": "https://image.tmdb.org/t/p/w500/u2SFoo3ZCxbu5GHMsmg79PSYwn6.jpg",
     "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "2022-11-17",
     "language": "en",
     "cast": [
@@ -5284,7 +5295,7 @@
     "overview": "A brilliant engineer teams up with a young recruit to solve a software problem for an IT company. However things take a turn for the worse when he's accused of using the software to steal from the company.",
     "poster": "https://image.tmdb.org/t/p/w500/mHxjSKcOP4gQfr1ItYBELgxk1HR.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/7Lqoq6oZfJv3VYrJs5xpkYPpejp.jpg",
-    "rating": 4.0,
+    "rating": 4,
     "release_date": "2022-04-29",
     "language": "en",
     "cast": [
@@ -5317,7 +5328,7 @@
     "overview": "Life for Ovie (25) has always been a hustle, he has finished school but he is struggling to get a job, but he continues to thrive with a smile on his face and a natural ability to make people laugh, He is also good-hearted and always willing to help but still filled with that strength, resilience and indomitable Warri spirit to survive against all odds, One morning, his father passes away in his sleep.",
     "poster": "https://image.tmdb.org/t/p/w500/fzUXTNAjX2x5PXjRw11dWmjfOkB.jpg",
     "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "2022-10-14",
     "language": "en",
     "cast": [
@@ -5382,7 +5393,7 @@
     "overview": "An heiress and her husband -- who's also her father's most trusted aide -- have a romantic weekend getaway disrupted when things take a nightmarish turn.",
     "poster": "https://image.tmdb.org/t/p/w500/5L1afYTJlw8AoHlVuNCQByotFqQ.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/5LlJgQpQS8UAFLb02XBkqUCp7TH.jpg",
-    "rating": 10.0,
+    "rating": 10,
     "release_date": "2023-06-06",
     "language": "en",
     "cast": [
@@ -5415,7 +5426,7 @@
     "overview": "After her estranged father’s death, Oluchi , an upcoming musician is forced to confront her true self and past mistakes. She reconnects with her daughter through their love for music. However, the echoes from the past spring from every corner, threatening to bring them down.",
     "poster": "https://image.tmdb.org/t/p/w500/ruRAZoVcSBTgXnvCYRi4ygBBY1c.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/gvxtr8pwYmggA85rcVXjGmRgdQz.jpg",
-    "rating": 8.0,
+    "rating": 8,
     "release_date": "2022-08-26",
     "language": "en",
     "cast": [
@@ -5479,7 +5490,7 @@
     "overview": "When a wealthy and flamboyant pastor discovers that his new favorite stripper is his church’s worship leader, he begins an affair with her that opens a Pandora’s Box of crisis beyond what he imagined.",
     "poster": "https://image.tmdb.org/t/p/w500/91UZxu28BBEamhADXty0O6pK7kq.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/1ac0WRl9pS9Hok0q2xFkfKPtt0B.jpg",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "2022-12-23",
     "language": "en",
     "cast": [
@@ -5545,7 +5556,7 @@
     "overview": "A sheltered woman's past comes back to haunt her when she's thrown in jail for being an accomplice to her spy lover, and 20 years later, a group rescue her from jail and sets up a semblance of her old house to make her remember a secret number her spy lover hid with her.",
     "poster": "https://image.tmdb.org/t/p/w500/8DsO5VfFl2X1cXo4oE0jH6U6cU9.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/hRYE3wF6Chrekqjf5LAiHDcY34v.jpg",
-    "rating": 4.0,
+    "rating": 4,
     "release_date": "2023-06-30",
     "language": "en",
     "cast": [
@@ -5577,7 +5588,7 @@
     "overview": "Four friends leave Atlanta to Ghana and along the way, they find laughter, tears, joy, pain, jealousy, and a whole lot of drama. They discover things about themselves and confront deep-seeded feelings and experiences that have molded the women they have become. Most importantly, they discover the power of friendship and love.",
     "poster": "https://image.tmdb.org/t/p/w500/qd1z41wKL95vBlg9cwrwjfC9grm.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/gPmqUh1VtJrWvtajRmMOdIoCnyB.jpg",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "2022-09-09",
     "language": "en",
     "cast": [
@@ -5610,7 +5621,7 @@
     "overview": "It's South Africa 1990. Two major events are about to happen: The release of Nelson Mandela and, more importantly, it's Spud Milton's first year at an elite boys only private boarding school. Spud is a boy from an ordinary background who wins a scholarship to a private school in Kwazulu-Natal, South Africa. Surrounded by boys with nicknames like Gecko, Rambo, Rain Man and Mad Dog, Spud has his hands full trying to adapt to his new home.",
     "poster": "https://image.tmdb.org/t/p/w500/eZptpTY1VMMcyGdj3Hp5SY3M1IN.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/7HvbATFNRLM63QMiCqb51RogIjH.jpg",
-    "rating": 7.0,
+    "rating": 7,
     "release_date": "2010-12-03",
     "language": "en",
     "cast": [
@@ -5675,7 +5686,7 @@
     "overview": "As Spud Milton continues his awkward stagger through adolescence, he learns one of life's most important lessons: When dealing with women and cretins, nothing is ever quite as it seems. \"I'm practically a man in most areas,\" writes Spud confidently on his sixteenth birthday. The year is 1992 and, in South Africa, radical change is in the air. The country may be on the bumpy road to an uncertain future, but Spud Milton is hoping for a smooth ride as he returns to boarding school as a senior. Instead, he discovers that his vindictive arch enemy is back to taunt him and that a garrulous Malawian has taken residence in his dormitory, along with the regular inmates and misfits he calls friends. Spud's world has never seemed less certain; he attempts to master Shakespeare, wrestles constantly with his God, and the power of negative thinking, and develops an aversion to fried fish after a shocking discovery about his grandmother, Wombat.",
     "poster": "https://image.tmdb.org/t/p/w500/fUweNM8bDoY5MpMRQCQMGDPYb7Q.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/s0WLxz6dCWogHOvwfj0rmp48bjw.jpg",
-    "rating": 6.0,
+    "rating": 6,
     "release_date": "2014-12-16",
     "language": "en",
     "cast": [
@@ -5709,7 +5720,7 @@
     "overview": "A beloved housekeeper brings joy until the wife returns, stirring tension and rivalry for affection within the family.",
     "poster": "https://image.tmdb.org/t/p/w500/kVBEhjHWMaiGPEM3d12Ykq7JqEk.jpg",
     "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "2024-05-10",
     "language": "en",
     "cast": [
@@ -5741,7 +5752,7 @@
     "overview": "Aisha makes an emotional return to her hometown in Nigeria, after spending 10 years in the US becoming a successful entrepreneur. She is met by the tensions and challenges which come after spending time away from her family and friends.",
     "poster": "https://image.tmdb.org/t/p/w500/yk2Rkq6hM0J586RvOybWvxpfGk0.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/w0Vnm8BXu7EjgQaO7Bjrapdf34.jpg",
-    "rating": 10.0,
+    "rating": 10,
     "release_date": "2024-05-10",
     "language": "en",
     "cast": [
@@ -5773,7 +5784,7 @@
     "overview": "When two past lovers run into each other, they realize they've been living in the same estate for years and their children attend the same school.",
     "poster": "https://image.tmdb.org/t/p/w500/xWZVp5OJsfhM3006fGkiDTN27yi.jpg",
     "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "2021-11-09",
     "language": "en",
     "cast": [],
@@ -5799,7 +5810,7 @@
     "overview": "A cabman tries to help a drug addict get clean but falls in love with her in the process.",
     "poster": "https://image.tmdb.org/t/p/w500/lrDx4pd8eJ0sksyXgB7CuHmqufG.jpg",
     "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "2020-12-05",
     "language": "en",
     "cast": [],
@@ -5825,7 +5836,7 @@
     "overview": "A young university student falls head over heels with his lecturer and vows to make her his wife.",
     "poster": "img/FilmHouse3_nobg.png",
     "backdrop": "img/FilmHouse.png",
-    "rating": 0.0,
+    "rating": 0,
     "release_date": "2023-07-13",
     "language": "en",
     "cast": [],
