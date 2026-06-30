@@ -37,6 +37,10 @@ const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const CSV_FILE_PATH = "./MOVIE/Data/datafile.csv";
 const JSON_FILE_PATH = "./MOVIE/Data/movies_metadata.json";
 
+// Adsgram Ad Placement Configuration
+const ADSGRAM_DOWNLOAD_BLOCK_ID = "36631";
+const ADSGRAM_REQUEST_BLOCK_ID = "36680"; // Updated to request placement block ID
+
 // State Management Object
 const state = {
     movies: [],            // Complete list of enriched movies
@@ -61,7 +65,7 @@ const state = {
     },
     carouselIndex: 0,
     carouselInterval: null,
-    adsgramController: null,
+    adsgramControllers: {},
     activeWatchlistTab: "watchlist",
     externalSearchResults: [],
     lastDiscoverQuery: null
@@ -2416,7 +2420,7 @@ function openDetailModal(movie) {
         requestBtn.addEventListener("click", (e) => {
             e.preventDefault();
             logMovieRequestToFirestore(movie);
-            showConnectionDrawer("https://t.me/+09ahNmGdB1U2MzFk");
+            showConnectionDrawer("https://t.me/+09ahNmGdB1U2MzFk", ADSGRAM_REQUEST_BLOCK_ID);
         });
         
         actionsRow.appendChild(requestBtn);
@@ -2731,7 +2735,7 @@ function openDownloadModal(movie) {
             anchor.className = "download-link-item";
 
             anchor.addEventListener("click", () => {
-                showConnectionDrawer(link);
+                showConnectionDrawer(link, ADSGRAM_DOWNLOAD_BLOCK_ID);
             });
 
             if (isTVShow) {
@@ -2833,22 +2837,36 @@ function copyToClipboard(text) {
     });
 }
 
-// Initialize Adsgram controller
-function initializeAdsgram() {
-    if (window.Adsgram) {
-        state.adsgramController = window.Adsgram.init({ blockId: "36631" });
-    } else {
+// Initialize Adsgram controller dynamically for a specific block ID
+function initializeAdsgram(blockId) {
+    if (!window.Adsgram) {
         console.warn("Adsgram SDK not loaded yet.");
+        return null;
     }
+    
+    const id = blockId || ADSGRAM_DOWNLOAD_BLOCK_ID;
+    if (!state.adsgramControllers) {
+        state.adsgramControllers = {};
+    }
+    
+    if (!state.adsgramControllers[id]) {
+        state.adsgramControllers[id] = window.Adsgram.init({ blockId: id });
+    }
+    return state.adsgramControllers[id];
 }
 
 // Adsgram ad integration helper – returns a Promise
-function showAdRewardFlow(onStatusUpdate) {
+function showAdRewardFlow(onStatusUpdate, blockId) {
     const status = (msg) => { if (typeof onStatusUpdate === "function") onStatusUpdate(msg); };
 
+    const id = blockId || ADSGRAM_DOWNLOAD_BLOCK_ID;
+
+    // Detect if we are running inside a real Telegram environment with initData
+    const isTelegramEnv = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== "";
+
     // Initialize on-demand if not already done
-    if (!state.adsgramController && window.Adsgram) {
-        initializeAdsgram();
+    if (isTelegramEnv && window.Adsgram) {
+        initializeAdsgram(id);
     }
 
     return new Promise((resolve) => {
@@ -2866,10 +2884,12 @@ function showAdRewardFlow(onStatusUpdate) {
             }
         }, 60000);
 
-        if (state.adsgramController) {
+        const controller = state.adsgramControllers ? state.adsgramControllers[id] : null;
+
+        if (isTelegramEnv && controller) {
             status("Loading ad…");
             try {
-                state.adsgramController.show()
+                controller.show()
                     .then((result) => {
                         status("Reward received ✓");
                         safeResolve();
@@ -2885,7 +2905,7 @@ function showAdRewardFlow(onStatusUpdate) {
                 safeResolve();
             }
         } else {
-            // Adsgram script not loaded or failed, bypass directly
+            // Adsgram script not loaded, failed, or not in Telegram environment, bypass directly
             status("Connecting…");
             safeResolve();
         }
@@ -3942,8 +3962,65 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
+// Helper to convert standard t.me links into native tg:// schemes for external redirection
+function convertToTelegramScheme(url) {
+    if (!url || typeof url !== "string") return url;
+    
+    // Check if it's a telegram link
+    if (url.includes("t.me/")) {
+        try {
+            // Extract the part after t.me/
+            const parts = url.split("t.me/");
+            if (parts.length > 1) {
+                const path = parts[1];
+                
+                // Case 1: Private invite link e.g., t.me/+09ahNmGdB1U2MzFk or t.me/joinchat/09ahNmGdB1U2MzFk
+                if (path.startsWith("+")) {
+                    const code = path.substring(1);
+                    return `tg://join?invite=${code}`;
+                }
+                if (path.startsWith("joinchat/")) {
+                    const code = path.substring(9);
+                    return `tg://join?invite=${code}`;
+                }
+                
+                // Case 2: Channel post link, e.g., t.me/filmhousedirect/280
+                if (path.includes("/")) {
+                    const subParts = path.split("/");
+                    const domain = subParts[0];
+                    const postId = subParts[1];
+                    if (postId && !isNaN(postId)) {
+                        return `tg://resolve?domain=${domain}&post=${postId}`;
+                    }
+                }
+                
+                // Case 3: Bot link with start parameters, e.g., t.me/FilmHouseFilebot?start=xxx or startapp=xxx
+                if (path.includes("?")) {
+                    const subParts = path.split("?");
+                    const domain = subParts[0];
+                    const query = subParts[1];
+                    const params = new URLSearchParams(query);
+                    const startParam = params.get("start") || params.get("startapp");
+                    if (startParam) {
+                        return `tg://resolve?domain=${domain}&start=${startParam}`;
+                    }
+                }
+                
+                // Case 4: Standard user/bot/channel domain name, e.g., t.me/FilmHouseFilebot
+                return `tg://resolve?domain=${path}`;
+            }
+        } catch (e) {
+            console.error("Error converting telegram link to scheme:", e);
+        }
+    }
+    return url;
+}
+
 // Premium Connection Drawer Loader Transition
-function showConnectionDrawer(targetLink) {
+function showConnectionDrawer(targetLink, blockId) {
+    if (!targetLink || typeof targetLink !== "string") return;
+    targetLink = targetLink.trim();
+
     const drawer = document.getElementById("connection-drawer");
     const statusEl = document.getElementById("connection-status-text");
     const titleEl = drawer ? drawer.querySelector(".connection-title") : null;
@@ -3953,19 +4030,34 @@ function showConnectionDrawer(targetLink) {
     const closeDrawer = () => {
         if (drawer) {
             drawer.classList.remove("active");
-            setTimeout(() => { drawer.style.display = "none"; }, 300);
+            setTimeout(() => { 
+                drawer.style.display = "none"; 
+                // Restore spinner and remove dynamic buttons for next requests
+                const spinnerWrapper = drawer.querySelector(".connection-spinner-wrapper");
+                if (spinnerWrapper) spinnerWrapper.style.display = "flex";
+                const actionBtn = drawer.querySelector(".connection-action-btn");
+                if (actionBtn) actionBtn.remove();
+            }, 300);
         }
     };
 
     const openLink = () => {
         syncUserToFirestore();
         awardPoints(10, "download");
+
+        // Guidance toast reminding them to click "Start" in the bot
+        if (targetLink.includes("start=")) {
+            showToast("Important: Tap 'START' at the bottom of the bot chat to get your movie!", "info");
+        }
+
         // Close the download modal so the user isn't stuck on it
         if (downloadModal) downloadModal.classList.remove("active");
 
-        // Use Telegram's native link opener for t.me links (avoids popup blocking)
+        // Use Telegram's native link opener for t.me links (avoids popup blocking inside webapp view)
         const tg = window.Telegram?.WebApp;
-        if (tg && tg.openTelegramLink && targetLink.includes("t.me")) {
+        const isMobile = tg && (tg.platform === "android" || tg.platform === "ios");
+        
+        if (tg && tg.openTelegramLink && targetLink.includes("t.me") && isMobile) {
             try {
                 tg.openTelegramLink(targetLink);
                 return;
@@ -3973,7 +4065,7 @@ function showConnectionDrawer(targetLink) {
                 console.warn("tg.openTelegramLink failed:", e);
             }
         }
-        // Fallback for non-Telegram links or if openTelegramLink fails
+        // Fallback for non-Telegram links or if openTelegramLink fails/is skipped inside Telegram WebApp
         if (tg && tg.openLink) {
             try {
                 tg.openLink(targetLink);
@@ -3982,23 +4074,31 @@ function showConnectionDrawer(targetLink) {
                 console.warn("tg.openLink failed:", e);
             }
         }
+
+        // Convert link to native deep link scheme for external browsers to bypass web preview info page
+        const nativeLink = convertToTelegramScheme(targetLink);
+
         // Try window.open
-        const win = window.open(targetLink, '_blank');
+        const win = window.open(nativeLink, '_blank');
         if (!win) {
             // If popup blocked, redirect directly
-            window.location.href = targetLink;
+            window.location.href = nativeLink;
         }
     };
 
     if (!drawer) {
         // Fallback if drawer elements are missing
-        showAdRewardFlow().then(openLink);
+        showAdRewardFlow(null, blockId).then(openLink);
         return;
     }
 
-    // Reset state
+    // Reset state & ensure spinner is showing and any old action button is removed
     if (titleEl) titleEl.textContent = "Securing Premium Connection…";
     setStatus("Initializing…");
+    const spinnerWrapper = drawer.querySelector(".connection-spinner-wrapper");
+    if (spinnerWrapper) spinnerWrapper.style.display = "flex";
+    const existingBtn = drawer.querySelector(".connection-action-btn");
+    if (existingBtn) existingBtn.remove();
 
     drawer.style.display = "flex";
     drawer.offsetHeight; // force reflow
@@ -4008,16 +4108,43 @@ function showConnectionDrawer(targetLink) {
     setTimeout(async () => {
         setStatus("Preparing ad…");
 
-        await showAdRewardFlow((msg) => setStatus(msg));
+        await showAdRewardFlow((msg) => setStatus(msg), blockId);
 
-        // Ad flow finished – close drawer and open the link
+        // Ad flow finished
         if (titleEl) titleEl.textContent = "Connection Secured ✓";
-        setStatus("Redirecting…");
+        
+        // Show helpful message instructing user what to do in the bot chat
+        if (targetLink.includes("start=")) {
+            setStatus("Ready! Tap the button below to open Telegram. Make sure to tap 'START' at the bottom of the bot chat to receive your movie!");
+        } else {
+            setStatus("Your connection is secured. Tap below to proceed!");
+        }
 
-        // Small visual confirmation delay (400 ms) so user sees the success state
-        setTimeout(() => {
-            closeDrawer();
+        // Hide spinner to transition UI to confirmation button
+        if (spinnerWrapper) spinnerWrapper.style.display = "none";
+
+        // Create a direct redirect button inside the drawer container
+        const container = drawer.querySelector(".connection-drawer-container");
+        const actionBtn = document.createElement("button");
+        actionBtn.className = "btn btn-primary btn-block connection-action-btn";
+        actionBtn.style.marginTop = "16px";
+        
+        if (targetLink.includes("start=")) {
+            actionBtn.textContent = "Start Bot & Get Movie 📥";
+        } else if (targetLink.includes("joinchat") || targetLink.includes("/+")) {
+            actionBtn.textContent = "Join Telegram Channel 📢";
+        } else {
+            actionBtn.textContent = "Open Telegram 📥";
+        }
+
+        actionBtn.addEventListener("click", () => {
             openLink();
-        }, 400);
+            closeDrawer();
+        });
+
+        container.appendChild(actionBtn);
+
+        // Attempt automatic redirect as a convenience fallback (may be blocked by browser popup settings)
+        openLink();
     }, 800);
 }
