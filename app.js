@@ -4321,18 +4321,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     if (btnRewards && rewardsDrawer) {
         btnRewards.addEventListener("click", () => {
-            rewardsDrawer.style.display = "flex";
+            rewardsDrawer.classList.add("active");
             updatePointsUI();
             updateHeaderNotificationDot();
         });
     }
     if (rewardsClose && rewardsDrawer) {
         rewardsClose.addEventListener("click", () => {
-            rewardsDrawer.style.display = "none";
+            rewardsDrawer.classList.remove("active");
         });
         rewardsDrawer.addEventListener("click", (e) => {
             if (e.target === rewardsDrawer) {
-                rewardsDrawer.style.display = "none";
+                rewardsDrawer.classList.remove("active");
             }
         });
     }
