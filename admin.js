@@ -454,8 +454,11 @@ async function verifyAdminAccess() {
                     window.location.hostname === "127.0.0.1" || 
                     window.location.protocol === "file:";
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryTgId = urlParams.get("tg_id") || urlParams.get("admin_id");
+
     const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-    const currentTgId = tgUser ? String(tgUser.id) : null;
+    const currentTgId = tgUser ? String(tgUser.id) : (queryTgId ? String(queryTgId).trim() : null);
 
     const idBox = document.getElementById("your-tg-id-box");
     if (idBox) {
@@ -468,6 +471,12 @@ async function verifyAdminAccess() {
             const overlay = document.getElementById("unauthorized-overlay");
             if (overlay) {
                 overlay.style.display = "flex";
+            }
+        } else {
+            // Hide unauthorized overlay if previously shown or bypassed via query parameter
+            const overlay = document.getElementById("unauthorized-overlay");
+            if (overlay) {
+                overlay.style.display = "none";
             }
         }
     }
