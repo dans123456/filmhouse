@@ -524,7 +524,8 @@ function showMovieDetails(movie) {
     const linksList = movie.links || [];
     
     detailsBody.innerHTML = `
-        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+        <!-- Read-Only Title Info View -->
+        <div id="details-title-info-view" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
             <img src="${posterUrl}" style="width: 130px; height: 180px; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
             <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; justify-content: center;">
                 <h4 style="margin: 0 0 10px 0; font-size: 18px; font-family: var(--font-heading); color: #fff; line-height: 1.3;">${movie.title}</h4>
@@ -534,6 +535,27 @@ function showMovieDetails(movie) {
                 ${movie.rating ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Rating:</strong> ⭐ ${movie.rating}/10</p>` : ''}
                 ${movie.director ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Director:</strong> ${movie.director}</p>` : ''}
                 ${movie.cast && movie.cast.length ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"><strong>Cast:</strong> ${movie.cast.join(', ')}</p>` : ''}
+            </div>
+        </div>
+
+        <!-- Editable Title Info View (Hidden by default) -->
+        <div id="details-title-info-edit" style="display: none; gap: 15px; flex-direction: column; margin-bottom: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Title</label>
+                <input type="text" id="edit-movie-title" value="${escapeHTML(movie.title)}" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
+                    <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">TMDB ID / Slug</label>
+                    <input type="text" id="edit-movie-id" value="${escapeHTML(movie.csv_id)}" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
+                    <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Type</label>
+                    <select id="edit-movie-type" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
+                        <option value="Movie" ${(movie.type || "").toLowerCase() === 'movie' ? 'selected' : ''}>Movie</option>
+                        <option value="Series" ${(movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv' ? 'selected' : ''}>Series (TV)</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -547,7 +569,7 @@ function showMovieDetails(movie) {
         <div style="margin-bottom: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <h5 style="margin: 0; color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Telegram Download Links</h5>
-                <button class="btn btn-secondary btn-sm" id="btn-edit-links-toggle" style="font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Edit Links</button>
+                <button class="btn btn-secondary btn-sm" id="btn-edit-links-toggle" style="font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Edit Details</button>
             </div>
             
             <!-- Read-Only View -->
@@ -567,7 +589,7 @@ function showMovieDetails(movie) {
                 </div>
                 <div style="display: flex; justify-content: space-between; gap: 10px;">
                     <button class="btn btn-secondary btn-sm" id="btn-add-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">+ Add Link</button>
-                    <button class="btn btn-primary btn-sm" id="btn-save-links-changes" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Save Links</button>
+                    <button class="btn btn-primary btn-sm" id="btn-save-links-changes" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -634,15 +656,21 @@ function showMovieDetails(movie) {
 
     if (editToggle && viewContainer && editContainer) {
         editToggle.addEventListener("click", () => {
+            const editInfoContainer = document.getElementById("details-title-info-edit");
+            const viewInfoContainer = document.getElementById("details-title-info-view");
             if (editContainer.style.display === "none") {
                 editContainer.style.display = "block";
                 viewContainer.style.display = "none";
+                if (editInfoContainer) editInfoContainer.style.display = "flex";
+                if (viewInfoContainer) viewInfoContainer.style.display = "none";
                 editToggle.textContent = "Cancel";
                 renderLinkInputs();
             } else {
                 editContainer.style.display = "none";
                 viewContainer.style.display = "block";
-                editToggle.textContent = "Edit Links";
+                if (editInfoContainer) editInfoContainer.style.display = "none";
+                if (viewInfoContainer) viewInfoContainer.style.display = "flex";
+                editToggle.textContent = "Edit Details";
             }
         });
     }
@@ -657,19 +685,53 @@ function showMovieDetails(movie) {
     if (saveLinksBtn) {
         saveLinksBtn.addEventListener("click", () => {
             const finalLinks = currentLinks.filter(l => l !== "");
+            
+            const newTitle = document.getElementById("edit-movie-title")?.value.trim();
+            const newId = document.getElementById("edit-movie-id")?.value.trim();
+            const newType = document.getElementById("edit-movie-type")?.value;
+            
+            if (!newTitle || !newId) {
+                alert("Error: Title and TMDB ID / Slug cannot be empty!");
+                return;
+            }
+            
             const movieIndex = allCatalogMovies.findIndex(m => m.csv_id === movie.csv_id);
             if (movieIndex !== -1) {
+                const prevId = allCatalogMovies[movieIndex].csv_id;
+                
+                allCatalogMovies[movieIndex].title = newTitle;
+                allCatalogMovies[movieIndex].csv_id = newId;
+                allCatalogMovies[movieIndex].type = newType === 'Series' ? 'Series' : 'Movie';
                 allCatalogMovies[movieIndex].links = finalLinks;
                 
-                catalogChangesMade = true;
-                if (!newlyUpdatedIds.includes(movie.csv_id)) {
-                    newlyUpdatedIds.push(movie.csv_id);
+                // Update dynamic TMDB numeric ID mapping if ID changed
+                const numericId = newId.split("-")[0];
+                if (numericId && /^\d+$/.test(numericId)) {
+                    allCatalogMovies[movieIndex].tmdb_id = parseInt(numericId);
                 }
                 
+                if (prevId !== newId) {
+                    if (newlyAddedIds.includes(prevId)) {
+                        newlyAddedIds = newlyAddedIds.filter(id => id !== prevId);
+                        newlyAddedIds.push(newId);
+                    }
+                    if (newlyUpdatedIds.includes(prevId)) {
+                        newlyUpdatedIds = newlyUpdatedIds.filter(id => id !== prevId);
+                        newlyUpdatedIds.push(newId);
+                    } else if (!newlyUpdatedIds.includes(newId)) {
+                        newlyUpdatedIds.push(newId);
+                    }
+                } else {
+                    if (!newlyUpdatedIds.includes(newId) && !newlyAddedIds.includes(newId)) {
+                        newlyUpdatedIds.push(newId);
+                    }
+                }
+                
+                catalogChangesMade = true;
                 renderCatalogList();
                 updatePublishButtonState();
                 
-                alert("Links updated locally! Make sure to click 'Publish Changes' in the header to save them to GitHub.");
+                alert("Title details updated locally! Click 'Publish Changes 🚀' in the header to save them to GitHub.");
                 movieDetailsModal.classList.remove("active");
             } else {
                 alert("Error: Title not found in catalog.");
