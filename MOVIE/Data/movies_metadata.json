@@ -1,5 +1,124 @@
 [
   {
+    "csv_id": "114472-secret-invasion",
+    "tmdb_id": 114472,
+    "imdb_id": "",
+    "title": "Secret Invasion (2023)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama",
+      "Sci-Fi & Fantasy",
+      "Action & Adventure"
+    ],
+    "overview": "Nick Fury and Talos discover a faction of shapeshifting Skrulls who have been infiltrating Earth for years.",
+    "poster": "https://image.tmdb.org/t/p/w500/cF8RJk4wTce9esl9rxdFdUGV3Nb.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6mOK9j99OFlxGc3ird2jWUeUha9.jpg",
+    "rating": 6.5,
+    "release_date": "2023-06-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADdRUAArFaIUYoRWTjq0PD1hYE"
+    ]
+  },
+  {
+    "csv_id": "609681-the-marvels",
+    "tmdb_id": 609681,
+    "imdb_id": "",
+    "title": "The Marvels (2023)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Science Fiction",
+      "Adventure",
+      "Action"
+    ],
+    "overview": "When her duties send her to an anomalous wormhole linked to a Kree revolutionary, Carol's powers become entangled with that of Jersey City super-fan Kamala Khan, aka Ms. Marvel, and Carol's estranged niece, now S.A.B.E.R. astronaut Captain Monica Rambeau. Together, this unlikely trio must team up and learn to work in concert to save the universe.",
+    "poster": "https://image.tmdb.org/t/p/w500/9GBhzXMFjgcZ3FdR9w3bUMMTps5.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/w4pRLYYbhHn3sh9kqRgPZM6GjyS.jpg",
+    "rating": 5.9,
+    "release_date": "2023-11-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADrhMAArFaIUbiBsPisn4IyxYE"
+    ]
+  },
+  {
+    "csv_id": "92788-moon-girl-and-devil-dinosaur",
+    "tmdb_id": 92788,
+    "imdb_id": "",
+    "title": "Marvel's Moon Girl and Devil Dinosaur (2023)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Kids",
+      "Sci-Fi & Fantasy",
+      "Action & Adventure"
+    ],
+    "overview": "After 13-year-old super-genius Lunella accidentally brings ten-ton T-Rex, Devil Dinosaur into present-day New York City via a time vortex, the duo works together to protect the city's Lower East Side from danger.",
+    "poster": "https://image.tmdb.org/t/p/w500/1oFkjiF9fT2asKWjRiJtlbhu3hn.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ieZ9AdB3yJF9jZSVO39zZ9d4D1y.jpg",
+    "rating": 7.5,
+    "release_date": "2023-02-10",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADnRMAArFaIUZ_JqP-_sW3GhYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADqRMAArFaIUb5I5g3iEbDeRYE"
+    ]
+  },
+  {
+    "csv_id": "122226-echo",
+    "tmdb_id": 122226,
+    "imdb_id": "",
+    "title": "Echo (2024)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Action & Adventure",
+      "Crime",
+      "Drama"
+    ],
+    "overview": "Pursued by Wilson Fisk's criminal empire, Maya's journey brings her home and she must confront her own family and legacy.",
+    "poster": "https://image.tmdb.org/t/p/w500/vFyJH630cF68LohVYjQW49074Sy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/u3ySnWqSjM3jedYgJZTR7RWRDDm.jpg",
+    "rating": 6,
+    "release_date": "2024-01-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADeRMAArFaIUZPemqeliV0bRYE"
+    ]
+  },
+  {
     "csv_id": "634492-madame-web",
     "tmdb_id": 634492,
     "imdb_id": "",
