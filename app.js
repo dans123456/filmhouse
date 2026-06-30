@@ -3428,6 +3428,7 @@ function bindEvents() {
         const renderAutocomplete = (query) => {
             if (!dropdown) return;
             const q = (query || "").toLowerCase().trim();
+            const badgePrefix = window.location.pathname.includes("/MOVIE/") ? "" : "MOVIE/";
             
             if (q.length < 2) {
                 dropdown.style.display = "none";
