@@ -1,63 +1,27 @@
 [
   {
-    "csv_id": "111312-marvel-s-m-o-d-o-k",
-    "tmdb_id": 111312,
+    "csv_id": "1724402-freedom-and-justice-2021",
+    "tmdb_id": 1724402,
     "imdb_id": "",
-    "title": "Marvel's M.O.D.O.K. (2021)",
-    "type": "Series",
+    "title": "FREEDOM AND JUSTICE",
+    "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies"
+      "Hollywood/British Movies"
     ],
-    "genres": [
-      "Comedy",
-      "Animation",
-      "Action & Adventure",
-      "Sci-Fi & Fantasy"
-    ],
-    "overview": "The megalomaniacal supervillain M.O.D.O.K. has long pursued his dream of one day conquering the world. But after years of setbacks and failures fighting the Earth’s mightiest heroes, M.O.D.O.K. has run his evil organization A.I.M. into the ground. Ousted as A.I.M.’s leader, while also dealing with his crumbling marriage and family life, the Mental Organism Designed Only for Killing is set to confront his greatest challenge yet: a midlife crisis!",
-    "poster": "https://image.tmdb.org/t/p/w500/2kXRzRjQZs9kAIm3K9MkQgsZR9C.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/zFOn9MgW1oSGyc8HKUAI3bV8NPc.jpg",
-    "rating": 6.6,
-    "release_date": "2021-05-21",
+    "genres": [],
+    "overview": "The movie addresses intense themes like systemic corruption, illegal mining (galamsey), and political injustice in Ghana, tackling controversial issues within the nation's governance.",
+    "poster": "https://postimg.cc/N9hqT8mS",
+    "backdrop": "https://postimg.cc/N9hqT8mS",
+    "rating": 0,
+    "release_date": "",
     "language": "en",
     "cast": [],
     "director": "",
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD3BoAArFaKUaJTfoGI4-kpBYE"
-    ]
-  },
-  {
-    "csv_id": "133903-hit-monkey",
-    "tmdb_id": 133903,
-    "imdb_id": "",
-    "title": "Marvel's Hit-Monkey (2021)",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series",
-      "Animated Movies"
-    ],
-    "genres": [
-      "Animation",
-      "Action & Adventure"
-    ],
-    "overview": "After a high-profile political assassination goes sideways, an injured hitman hides out amongst a tribe of snow monkeys in the mountains of Japan.",
-    "poster": "https://image.tmdb.org/t/p/w500/y3ee57YPBhP8RHadX920UjURAWu.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/8cyWBLWZDJIypCwyW4IszhKIEJE.jpg",
-    "rating": 7.7,
-    "release_date": "2021-11-17",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD1BoAArFaKUY-dupjFvS27hYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD1hoAArFaKUa9WbipCe8rERYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQADUx8AArFaKUZJgKctjqSEmhYE"
     ]
   },
   {
@@ -2125,9 +2089,7 @@
     "trailer": "x9D0uUKJ5KI",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD8RoAArFaKUZ5KHysnEzaSBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD9BoAArFaKUZHgkX3JDpdMhYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD9hoAArFaKUaZQ80xYws9dBYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQADxA4AAgmjcES0aW1m-oSVvRYE"
     ]
   },
   {
