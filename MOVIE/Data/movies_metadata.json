@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "72305",
+    "tmdb_id": 72305,
+    "imdb_id": "",
+    "title": "Kakegurui (2017)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Mystery",
+      "Crime",
+      "Drama"
+    ],
+    "overview": "Run by a corrupt and sadistic school council, the “system” at Hyakkaou is based on gambling, with losers who cannot cover their debts being demeaned by their peers and forced to serve their debtholders. And if that’s not terrifying enough, some games can result in losing an eye, one’s fingernails, or even their life! But the system is shocked when transfer student Yumeko Jabami arrives. Dark, mysterious and attractive, she’s a wildcard who plays for the thrill of it…",
+    "poster": "https://image.tmdb.org/t/p/w500/xsZOMx3ojsER12lRHNe7TcT7YqM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/n35AGT8JMMcbdPMxXLg4KMUuLx.jpg",
+    "rating": 8.1,
+    "release_date": "2017-07-01",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADER4AArFaKUan3oOjo19wSRYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADJx4AArFaKUawlJmwMAYCThYE"
+    ]
+  },
+  {
     "csv_id": "110070",
     "tmdb_id": 110070,
     "imdb_id": "",
