@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "65292-ajin",
+    "tmdb_id": 65292,
+    "imdb_id": "",
+    "title": "Ajin (2016)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Mystery"
+    ],
+    "overview": "17 years ago, immortals first appeared on the battlefields of Africa. Later, rare, unknown new immortal lifeforms began appearing among humans, and they became known as \"Ajin\" (demi-humans). Just before summer vacation, a Japanese high school student is instantly killed in a traffic accident on his way home from school. However, he is revived, and a price is placed on his head. Thus begins a boy's life on the run from all of humankind.",
+    "poster": "https://image.tmdb.org/t/p/w500/fnHBwIKxwrFleSzvHzTqcAzDRM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kOQkt6e18Fe5h9qnkd3PmffX7og.jpg",
+    "rating": 7.9,
+    "release_date": "2016-01-16",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADtxcAArFaKUYanhuwGZFNlxYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADvhcAArFaKUa309-JVLHSDhYE"
+    ]
+  },
+  {
     "csv_id": "240411",
     "tmdb_id": 240411,
     "imdb_id": "",
