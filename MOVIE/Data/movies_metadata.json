@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "61223",
+    "tmdb_id": 61223,
+    "imdb_id": "",
+    "title": "Akame ga Kill! (2014)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Drama",
+      "Action & Adventure"
+    ],
+    "overview": "Young Tatsumi travels to the capital of the Empire in order to earn money for his starving people and encounters a world of unimaginable depravity, dominated by the ruthless Prime Minister who controls the child Emperor. Tatsumi is recruited by Night Raid, a group of assassins dedicated to eliminating corruption by mercilessly killing officials and privileged nobles.",
+    "poster": "https://image.tmdb.org/t/p/w500/rMpvMbSlPbm5QYfFem9fx2Jnttq.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3XAGgklKkJhv5M9m5NkfhBYb7l8.jpg",
+    "rating": 8.3,
+    "release_date": "2014-07-07",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADGRcAArFaKUZZ64oQwXrxThYE"
+    ]
+  },
+  {
     "csv_id": "131366",
     "tmdb_id": 131366,
     "imdb_id": "",
