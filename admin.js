@@ -621,7 +621,9 @@ async function loadCatalog() {
                 const response = await fetch(`${apiJSONUrl}?t=${Date.now()}`, {
                     headers: {
                         "Authorization": `token ${token}`,
-                        "Accept": "application/vnd.github.v3+json"
+                        "Accept": "application/vnd.github.v3+json",
+                        "Cache-Control": "no-cache, no-store, must-revalidate",
+                        "Pragma": "no-cache"
                     }
                 });
                 if (response.ok) {
@@ -636,11 +638,18 @@ async function loadCatalog() {
         }
         
         if (!responseData) {
-            const response = await fetch("./MOVIE/Data/movies_metadata.json?t=" + Date.now());
-            if (!response.ok) {
+            const response = await fetch("./MOVIE/Data/movies_metadata.json?t=" + Date.now(), {
+                headers: {
+                    "Cache-Control": "no-cache, no-store, must-revalidate",
+                    "Pragma": "no-cache",
+                    "Expires": "0"
+                }
+            });
+            if (response.ok) {
+                responseData = await response.json();
+            } else {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            responseData = await response.json();
         }
         
         allCatalogMovies = responseData;
