@@ -60,6 +60,17 @@ function escapeHTML(str) {
     });
 }
 
+function extractYoutubeId(urlOrId) {
+    if (!urlOrId) return "";
+    const cleanStr = urlOrId.trim();
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = cleanStr.match(regExp);
+    if (match && match[2].length === 11) {
+        return match[2];
+    }
+    return cleanStr;
+}
+
 // Global Datasets for local search filter matching (saves Firestore quota reads)
 let allUsers = [];
 let allRequests = [];
@@ -726,6 +737,42 @@ function showMovieDetails(movie) {
                     <input type="text" id="edit-movie-backdrop" value="${escapeHTML(movie.backdrop || '')}" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
                 </div>
             </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
+                    <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">YouTube Trailer (URL or ID)</label>
+                    <input type="text" id="edit-movie-trailer" value="${escapeHTML(movie.trailer || '')}" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
+                    <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Release Date / Year</label>
+                    <input type="text" id="edit-movie-release-date" value="${escapeHTML(movie.release_date || '')}" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Categories</label>
+                <div id="edit-movie-categories-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; max-height: 110px; overflow-y: auto; box-sizing: border-box;">
+                    ${[
+                        { key: "Main", label: "Main (Home)" },
+                        { key: "Hollywood/British Movies", label: "Hollywood Movies" },
+                        { key: "Hollywood/British Series", label: "Hollywood Series" },
+                        { key: "Bollywood", label: "Bollywood" },
+                        { key: "Korean Drama", label: "Korean Drama" },
+                        { key: "African", label: "African" },
+                        { key: "Anime", label: "Anime" },
+                        { key: "Comics and Manga", label: "Comics & Manga" },
+                        { key: "Animated Movies", label: "Animated" },
+                        { key: "Kids Shows and Movies (Nickelodeon and Disney)", label: "Kids" },
+                        { key: "Classic Movies", label: "Classics" },
+                        { key: "Erotic Movies", label: "Erotic" }
+                    ].map(cat => {
+                        const checked = movie.categories && movie.categories.includes(cat.key) ? 'checked' : '';
+                        return `
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="edit-cat-checkbox" value="${cat.key}" ${checked}> ${cat.label}
+                            </label>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
             <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
                 <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Synopsis</label>
                 <textarea id="edit-movie-overview" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%; min-height: 80px; resize: vertical; box-sizing: border-box; font-family: inherit;">${escapeHTML(movie.overview || '')}</textarea>
@@ -865,6 +912,12 @@ function showMovieDetails(movie) {
             const newPoster = document.getElementById("edit-movie-poster")?.value.trim();
             const newBackdrop = document.getElementById("edit-movie-backdrop")?.value.trim();
             const newOverview = document.getElementById("edit-movie-overview")?.value.trim() || "";
+            const newTrailerVal = document.getElementById("edit-movie-trailer")?.value.trim() || "";
+            const newTrailerId = extractYoutubeId(newTrailerVal);
+            const newReleaseDate = document.getElementById("edit-movie-release-date")?.value.trim() || "";
+            
+            // Get selected categories
+            const newCategories = Array.from(document.querySelectorAll(".edit-cat-checkbox:checked")).map(cb => cb.value);
             
             if (!newTitle || !newId) {
                 alert("Error: Title and TMDB ID / Slug cannot be empty!");
@@ -882,6 +935,9 @@ function showMovieDetails(movie) {
                 allCatalogMovies[movieIndex].poster = newPoster || "img/FilmHouse3_nobg.png";
                 allCatalogMovies[movieIndex].backdrop = newBackdrop || "img/FilmHouse.png";
                 allCatalogMovies[movieIndex].overview = newOverview || "No synopsis available.";
+                allCatalogMovies[movieIndex].trailer = newTrailerId;
+                allCatalogMovies[movieIndex].release_date = newReleaseDate;
+                allCatalogMovies[movieIndex].categories = newCategories.length > 0 ? newCategories : ["Main"];
                 
                 // Update dynamic TMDB numeric ID mapping if ID changed
                 const numericId = newId.split("-")[0];
@@ -1107,6 +1163,12 @@ if (addMovieForm) {
         const customPoster = document.getElementById("movie-poster")?.value.trim() || "";
         const customBackdrop = document.getElementById("movie-backdrop")?.value.trim() || "";
         const customOverview = document.getElementById("movie-overview")?.value.trim() || "";
+        const customTrailerVal = document.getElementById("movie-trailer")?.value.trim() || "";
+        const customTrailerId = extractYoutubeId(customTrailerVal);
+        const customReleaseDate = document.getElementById("movie-release-date")?.value.trim() || "";
+        
+        // Get selected categories
+        const checkedCategories = Array.from(document.querySelectorAll(".add-cat-checkbox:checked")).map(cb => cb.value);
         
         const linksList = addMovieLinksState.filter(l => l !== "");
         if (linksList.length === 0) {
@@ -1133,7 +1195,7 @@ if (addMovieForm) {
         let rating = 0;
         let releaseDate = "";
         let genres = [];
-        let categories = ["Main"]; // Default to Main category
+        let categories = checkedCategories.length > 0 ? checkedCategories : ["Main"];
         let overview = customOverview || "No synopsis available.";
         let backdrop = "";
         let original_language = "en";
@@ -1161,19 +1223,19 @@ if (addMovieForm) {
                     
                     // Categorize title
                     if (type === 'tv') {
-                        categories.push("Hollywood/British Series");
-                        if (original_language === 'ko') {
+                        if (!categories.includes("Hollywood/British Series")) categories.push("Hollywood/British Series");
+                        if (original_language === 'ko' && !categories.includes("Korean Drama")) {
                             categories.push("Korean Drama");
                         }
                     } else {
-                        categories.push("Hollywood/British Movies");
-                        if (original_language === 'ko') {
+                        if (!categories.includes("Hollywood/British Movies")) categories.push("Hollywood/British Movies");
+                        if (original_language === 'ko' && !categories.includes("Korean Drama")) {
                             categories.push("Korean Drama");
                         }
                     }
                     if (data.genres && data.genres.some(g => g.name.toLowerCase() === "animation")) {
-                        categories.push("Animated Movies");
-                        if (original_language === 'ja') {
+                        if (!categories.includes("Animated Movies")) categories.push("Animated Movies");
+                        if (original_language === 'ja' && !categories.includes("Anime")) {
                             categories.push("Anime");
                         }
                     }
@@ -1196,11 +1258,11 @@ if (addMovieForm) {
             poster: customPoster || poster || "img/FilmHouse3_nobg.png",
             backdrop: customBackdrop || backdrop || "img/FilmHouse.png",
             rating: rating,
-            release_date: releaseDate,
+            release_date: customReleaseDate || releaseDate,
             language: original_language,
             cast: [],
             director: "",
-            trailer: "",
+            trailer: customTrailerId || "",
             runtime: "",
             links: linksList
         };
