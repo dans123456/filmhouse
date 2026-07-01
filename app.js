@@ -726,6 +726,36 @@ function loadUserProfile() {
 
     // Start real-time listener for user's movie requests
     startUserRequestsListener();
+
+    // Merge locally cached self-healed TMDB details
+    try {
+        const healedCacheStr = localStorage.getItem("filmhouse_healed_movies");
+        if (healedCacheStr) {
+            const healedMap = JSON.parse(healedCacheStr);
+            state.movies.forEach(m => {
+                const healed = healedMap[m.csv_id];
+                if (healed) {
+                    if (healed.poster && (!m.poster || m.poster.includes("FilmHouse3_nobg.png"))) {
+                        m.poster = healed.poster;
+                    }
+                    if (healed.backdrop && (!m.backdrop || m.backdrop.includes("FilmHouse.png"))) {
+                        m.backdrop = healed.backdrop;
+                    }
+                    if (healed.rating > 0 && !m.rating) {
+                        m.rating = healed.rating;
+                    }
+                    if (healed.release_date && !m.release_date) {
+                        m.release_date = healed.release_date;
+                    }
+                    if (healed.overview && (!m.overview || m.overview === "No synopsis available.")) {
+                        m.overview = healed.overview;
+                    }
+                }
+            });
+        }
+    } catch (e) {
+        console.warn("Could not merge healed movie details cache:", e);
+    }
 }
 
 // Render Watchlist and Watched List mini horizontal scrolls on the Profile page
@@ -1412,6 +1442,7 @@ function renderHistoryGrid() {
     historyMovies.forEach(movie => {
         const card = document.createElement("div");
         card.className = "movie-card";
+        card.dataset.id = movie.csv_id;
 
         const imgWrapper = document.createElement("div");
         imgWrapper.className = "movie-card-poster-wrapper";
@@ -1769,6 +1800,7 @@ function renderFeaturedGrid(fromDiscover = false) {
     list.forEach(movie => {
         const card = document.createElement("div");
         card.className = "movie-card";
+        card.dataset.id = movie.csv_id;
 
         // Card image container
         const imgWrapper = document.createElement("div");
@@ -1933,6 +1965,7 @@ function renderRecommendations() {
     recommended.forEach(movie => {
         const card = document.createElement("div");
         card.className = "movie-card";
+        card.dataset.id = movie.csv_id;
 
         const imgWrapper = document.createElement("div");
         imgWrapper.className = "movie-card-poster-wrapper";
@@ -2031,6 +2064,7 @@ function renderWatchlistGrid() {
     list.forEach(movie => {
         const card = document.createElement("div");
         card.className = "watchlist-item-card";
+        card.dataset.id = movie.csv_id;
 
         const imgWrapper = document.createElement("div");
         imgWrapper.className = "watchlist-poster-wrapper";
@@ -2738,6 +2772,25 @@ function openDetailModal(movie) {
                         movie.backdrop = `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`;
                     }
                     
+                    // Save to local self-healing cache
+                    try {
+                        const cacheStr = localStorage.getItem("filmhouse_healed_movies") || "{}";
+                        const cache = JSON.parse(cacheStr);
+                        cache[movie.csv_id] = {
+                            poster: movie.poster,
+                            backdrop: movie.backdrop,
+                            rating: movie.rating,
+                            release_date: movie.release_date,
+                            overview: movie.overview
+                        };
+                        localStorage.setItem("filmhouse_healed_movies", JSON.stringify(cache));
+                    } catch (e) {
+                        console.warn("Could not save healed movie to cache:", e);
+                    }
+
+                    // Update DOM cards on the fly
+                    updateMovieCardDOM(movie);
+                    
                     // Update DOM elements on the fly if user is still viewing this card
                     const openModal = document.getElementById("detail-modal");
                     if (openModal && openModal.classList.contains("active")) {
@@ -2762,6 +2815,76 @@ function openDetailModal(movie) {
             })
             .catch(err => console.warn("Self-healing TMDB details fetch failed:", err));
     }
+}
+
+// Dynamically patch any matching movie card in the UI grids
+function updateMovieCardDOM(movie) {
+    if (!movie || !movie.csv_id) return;
+    
+    // 1. Update standard movie-cards
+    const cards = document.querySelectorAll(`.movie-card[data-id="${movie.csv_id}"]`);
+    cards.forEach(card => {
+        const img = card.querySelector(".movie-card-poster");
+        if (img && movie.poster && !movie.poster.includes("FilmHouse3_nobg.png")) {
+            img.src = movie.poster;
+        }
+        let ratingBadge = card.querySelector(".movie-card-rating");
+        const imgWrapper = card.querySelector(".movie-card-poster-wrapper");
+        if (movie.rating > 0 && imgWrapper) {
+            if (!ratingBadge) {
+                ratingBadge = document.createElement("div");
+                ratingBadge.className = "movie-card-rating";
+                const star = createSvgIcon("icon-star", "star-card-icon");
+                ratingBadge.appendChild(star);
+                const score = document.createElement("span");
+                score.textContent = movie.rating;
+                ratingBadge.appendChild(score);
+                imgWrapper.appendChild(ratingBadge);
+            } else {
+                const score = ratingBadge.querySelector("span");
+                if (score) score.textContent = movie.rating;
+            }
+        }
+        const metaRow = card.querySelector(".movie-card-meta");
+        if (metaRow && movie.release_date && movie.release_date.length >= 4) {
+            const yearLabel = metaRow.querySelector("span:first-child");
+            if (yearLabel) {
+                yearLabel.textContent = movie.release_date.substring(0, 4);
+            }
+        }
+    });
+
+    // 2. Update watchlist-item-cards
+    const wlCards = document.querySelectorAll(`.watchlist-item-card[data-id="${movie.csv_id}"]`);
+    wlCards.forEach(card => {
+        const img = card.querySelector(".watchlist-poster-img");
+        if (img && movie.poster && !movie.poster.includes("FilmHouse3_nobg.png")) {
+            img.src = movie.poster;
+        }
+        let ratingBadge = card.querySelector(".watchlist-rating-badge");
+        const imgWrapper = card.querySelector(".watchlist-poster-wrapper");
+        if (movie.rating > 0 && imgWrapper) {
+            if (!ratingBadge) {
+                ratingBadge = document.createElement("div");
+                ratingBadge.className = "watchlist-rating-badge";
+                ratingBadge.appendChild(createSvgIcon("icon-star", "star-card-icon"));
+                const score = document.createElement("span");
+                score.textContent = movie.rating;
+                ratingBadge.appendChild(score);
+                imgWrapper.appendChild(ratingBadge);
+            } else {
+                const score = ratingBadge.querySelector("span");
+                if (score) score.textContent = movie.rating;
+            }
+        }
+        const metaRow = card.querySelector(".watchlist-meta-row");
+        if (metaRow && movie.release_date && movie.release_date.length >= 4) {
+            const yearLabel = metaRow.querySelector("span:first-child");
+            if (yearLabel) {
+                yearLabel.textContent = movie.release_date.substring(0, 4);
+            }
+        }
+    });
 }
 
 function createMetaDivider() {
