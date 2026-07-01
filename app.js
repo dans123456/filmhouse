@@ -2240,7 +2240,7 @@ function renderCarouselBanner() {
         metaRow.appendChild(yearLabel);
 
         const genreLabel = document.createElement("span");
-        genreLabel.textContent = movie.genres.slice(0, 2).join(", ");
+        genreLabel.textContent = (movie.genres && Array.isArray(movie.genres)) ? movie.genres.slice(0, 2).join(", ") : "";
         metaRow.appendChild(genreLabel);
 
         overlay.appendChild(metaRow);
