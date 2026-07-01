@@ -396,9 +396,6 @@ let lastKnownJsonSha = null;
 document.addEventListener("DOMContentLoaded", async () => {
     loadCatalog();
     
-    // Periodically check for updates published by other administrators (every 25 seconds)
-    setInterval(checkCatalogForUpdates, 25000);
-    
     // Fetch token from Firestore
     if (db) {
         try {
@@ -409,8 +406,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (tokenInput) {
                     tokenInput.value = githubToken;
                 }
-                // Check once immediately after token is fetched
-                checkCatalogForUpdates();
                 // Reload catalog using the newly loaded GitHub Token to fetch from GitHub API directly
                 loadCatalog();
             }
@@ -1594,99 +1589,4 @@ window.addEventListener("beforeunload", (e) => {
     }
 });
 
-// Check if GitHub catalog has been updated by another administrator
-async function checkCatalogForUpdates() {
-    const token = (document.getElementById("github-token")?.value.trim()) || githubToken;
-    if (!token) return;
-
-    const owner = "dans123456";
-    const repo = "filmhouse";
-    const pathJSON = "MOVIE/Data/movies_metadata.json";
-    const apiJSONUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${pathJSON}`;
-
-    try {
-        const res = await fetch(`${apiJSONUrl}?t=${Date.now()}`, {
-            headers: {
-                "Authorization": `token ${token}`,
-                "Accept": "application/vnd.github.v3+json"
-            }
-        });
-        if (res.ok) {
-            const data = await res.json();
-            const currentSha = data.sha;
-            if (lastKnownJsonSha && lastKnownJsonSha !== currentSha) {
-                showReloadBanner();
-            } else if (!lastKnownJsonSha) {
-                lastKnownJsonSha = currentSha; // Initialize SHA
-            }
-        }
-    } catch (err) {
-        console.warn("Background update check failed:", err);
-    }
-}
-
-// Show a floating banner warning the admin of changes and offering to reload
-function showReloadBanner() {
-    if (document.getElementById("catalog-reload-banner")) return;
-
-    const banner = document.createElement("div");
-    banner.id = "catalog-reload-banner";
-    banner.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--primary-gradient);
-        color: #000;
-        padding: 12px 24px;
-        border-radius: 30px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        font-weight: bold;
-        font-size: 13px;
-        animation: slideDown 0.4s ease;
-    `;
-    
-    if (!document.getElementById("banner-animation-style")) {
-        const style = document.createElement("style");
-        style.id = "banner-animation-style";
-        style.textContent = `
-            @keyframes slideDown {
-                from { transform: translate(-50%, -50px); opacity: 0; }
-                to { transform: translate(-50%, 0); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    banner.innerHTML = `
-        <span>⚠️ Another admin has published updates on GitHub!</span>
-        <button id="btn-reload-catalog-banner" style="
-            background: #000;
-            color: #fff;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s;
-        ">Sync Catalog 📥</button>
-    `;
-
-    document.body.appendChild(banner);
-
-    const reloadBtn = document.getElementById("btn-reload-catalog-banner");
-    if (reloadBtn) {
-        reloadBtn.addEventListener("click", () => {
-            banner.remove();
-            loadCatalog(); // Reload latest JSON from GitHub
-            lastKnownJsonSha = null; // Reset to let next poll retrieve the fresh SHA
-            alert("Catalog successfully synchronized with the latest remote updates!");
-        });
-    }
-}
 
