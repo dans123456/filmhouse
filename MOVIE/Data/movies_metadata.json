@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "236144",
+    "tmdb_id": 236144,
+    "imdb_id": "",
+    "title": "My Instant Death Ability Is Overpowered (2024)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Action & Adventure",
+      "Animation",
+      "Comedy",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Yogiri Takatou missed a few things during his nap. When he wakes up, he finds out that he and his entire class are in another word and must now team up with Tomochika and fend off danger with his Instant Death ability. If he can keep his eyes open, that is...",
+    "poster": "https://image.tmdb.org/t/p/w500/rqklWX3bDMrFx5bmV1kuGuMuo27.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zN6kspmbYSwR8nmNeKvD4efNnxj.jpg",
+    "rating": 6.3,
+    "release_date": "2024-01-05",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADDRQAArFaKUb0Zf3svkAS-xYE"
+    ]
+  },
+  {
     "csv_id": "64706-kangoku-gakuen",
     "tmdb_id": 64706,
     "imdb_id": "",
