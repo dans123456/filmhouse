@@ -1,27 +1,67 @@
 [
   {
-    "csv_id": "1724366-badboys-and-bridesmaids-2021",
-    "tmdb_id": 1724366,
+    "csv_id": "110070",
+    "tmdb_id": 110070,
     "imdb_id": "",
-    "title": "Badboys and Bridesmaids",
-    "type": "Movie",
+    "title": "Horimiya (2021)",
+    "type": "Series",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
     ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "img/FilmHouse3_nobg.png",
-    "backdrop": "img/FilmHouse.png",
-    "rating": 0,
-    "release_date": "",
-    "language": "en",
+    "genres": [
+      "Animation",
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "A secret life is the one thing they have in common. At school, Hori is a prim and perfect social butterfly, but the truth is she's a brash homebody. Meanwhile, under a gloomy facade, Miyamura hides a gentle heart, along with piercings and tattoos. In a chance meeting, they both reveal a side they've never shown. Could this blossom into something new?",
+    "poster": "https://image.tmdb.org/t/p/w500/iSOKGl5KIeOCAtigUDCfFZe2cOi.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ldUbhEbyI28M6PiAkL0hZ2o8bOT.jpg",
+    "rating": 8.5,
+    "release_date": "2021-01-10",
+    "language": "ja",
     "cast": [],
     "director": "",
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADlx0AArFaKUbSlLkRoIPjWBYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQADjR0AArFaKUZxmfrbQjW1MhYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADrx0AArFaKUZF6lmmFgwUNhYE"
+    ]
+  },
+  {
+    "csv_id": "88046",
+    "tmdb_id": 88046,
+    "imdb_id": "",
+    "title": "Fire Force (2019)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy",
+      "Comedy"
+    ],
+    "overview": "Year 198 of the Solar Era in Tokyo, special fire brigades are fighting against a phenomenon called spontaneous human combustion where humans beings are turned into living infernos called \"Infernals\". While the Infernals are first generation cases of spontaneous human combustion, later generations possess the ability to manipulate flames while retaining human form. Shinra Kusakabe, a youth who gained the nickname Devil's Footprints for his ability to ignite his feet at will, joins the Special Fire Force Company 8 which composes of other flames users as they work to extinguish any Infernals they encounter. As a faction that is creating Infernals appears, Shira begins to uncover the truth behind a mysterious fire that caused the death of his family twelve years ago.",
+    "poster": "https://image.tmdb.org/t/p/w500/96jrp8XIEPKC7xHhbkpWLD15oYW.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xkNnQ3IGGRQcXnl1zTb5H6Vb3SP.jpg",
+    "rating": 8.3,
+    "release_date": "2019-07-05",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADXxwAArFaKUYYYlEa1OcZUxYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADZhwAArFaKUaujFWUofzW4RYE"
     ]
   },
   {
