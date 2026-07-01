@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "203737",
+    "tmdb_id": 203737,
+    "imdb_id": "",
+    "title": "【OSHI NO KO】 (2023)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Drama"
+    ],
+    "overview": "A small-town doctor gets sucked into the ruthless world of show business when he crosses paths with a popular teen idol who holds a secret.",
+    "poster": "https://image.tmdb.org/t/p/w500/rFp74PFpz14AHrtlVPrLyrSng47.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gArCVC4ML529WMCEqOXbALdQbUq.jpg",
+    "rating": 8.3,
+    "release_date": "2023-04-12",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD5hgAArFaKUahDdAVsm6bAhYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD7RgAArFaKUYM0KQhNbaouBYE"
+    ]
+  },
+  {
     "csv_id": "118956-dota-dragon-s-blood",
     "tmdb_id": 118956,
     "imdb_id": "",
