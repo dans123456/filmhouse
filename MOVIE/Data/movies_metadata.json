@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "280110-illegals",
+    "tmdb_id": 280110,
+    "imdb_id": "",
+    "title": "My Hero Academia: Vigilantes (2025)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Drama",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "After a life-changing incident, timid college student Koichi Haimawari accepts an offer from revered vigilante Knuckleduster to train as his protégé.",
+    "poster": "https://image.tmdb.org/t/p/w500/iv0cXt6uJGlTryWZNQMGyum4Pme.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/baZ0pGbBGjCBhIqsFyOSTpJyUnQ.jpg",
+    "rating": 7.6,
+    "release_date": "2025-04-07",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADChoAArFaKUZb5cqpBSVQyRYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADExoAArFaKUbG7h_3Nu4rxxYE"
+    ]
+  },
+  {
     "csv_id": "65930",
     "tmdb_id": 65930,
     "imdb_id": "",
