@@ -1,5 +1,101 @@
 [
   {
+    "csv_id": "768744-the-movie",
+    "tmdb_id": 768744,
+    "imdb_id": "",
+    "title": "My Hero Academia: World Heroes' Mission (2021)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action",
+      "Adventure",
+      "Science Fiction"
+    ],
+    "overview": "A mysterious group called Humarize strongly believes in the Quirk Singularity Doomsday theory which states that when quirks get mixed further in with future generations, that power will bring forth the end of humanity. In order to save everyone, the Pro-Heroes around the world ask UA Academy heroes-in-training to assist them and form a world-class selected hero team. It’s up to the heroes to save the world and the future of heroes in what is the most dangerous crisis to take place yet in My Hero Academia.",
+    "poster": "https://image.tmdb.org/t/p/w500/jzP5rPwwNqUGERlrUzKKljfyulf.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/g3pIN5kRvmtcdtzjsJomZ1sw2QO.jpg",
+    "rating": 7.6,
+    "release_date": "2021-08-06",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADLxkAArFaKUaXSs1sR1J4GhYE"
+    ]
+  },
+  {
+    "csv_id": "592350-the-movie",
+    "tmdb_id": 592350,
+    "imdb_id": "",
+    "title": "My Hero Academia: Heroes Rising (2019)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action",
+      "Fantasy",
+      "Adventure"
+    ],
+    "overview": "Class 1-A visits Nabu Island where they finally get to do some real hero work. The place is so peaceful that it's more like a vacation... until they're attacked by a villain with an unfathomable Quirk! His power is eerily familiar, and it looks like Shigaraki had a hand in the plan. But with All Might retired and citizens' lives on the line, there's no time for questions. Deku and his friends are the next generation of heroes, and they're the island's only hope.",
+    "poster": "https://image.tmdb.org/t/p/w500/kpWsIkfXrnQ1pmR79qAHHq7DPxc.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/9guoVF7zayiiUq5ulKQpt375VIy.jpg",
+    "rating": 8.1,
+    "release_date": "2019-12-20",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADJxkAArFaKUYUSC5jbU31DBYE"
+    ]
+  },
+  {
+    "csv_id": "505262-the-movie-2",
+    "tmdb_id": 505262,
+    "imdb_id": "",
+    "title": "My Hero Academia: Two Heroes (2018)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "overview": "All Might and Deku accept an invitation to go abroad to a floating and mobile manmade city, called 'I-Island', where they research quirks as well as hero supplemental items at the special 'I-Expo' convention that is currently being held on the island. During that time, suddenly, despite an iron wall of security surrounding the island, the system is breached by a villain, and the only ones able to stop him are the students of Class 1-A.",
+    "poster": "https://image.tmdb.org/t/p/w500/hC4nTxdhXqFWzgqynGvvXVMiMNp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/b9qGMCOrMbxUjD6xDAYPoIPnYcC.jpg",
+    "rating": 7.9,
+    "release_date": "2018-08-03",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADFBkAArFaKUZa_YKYAAGaWMAWBA"
+    ]
+  },
+  {
     "csv_id": "203737",
     "tmdb_id": 203737,
     "imdb_id": "",
