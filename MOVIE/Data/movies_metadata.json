@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "240411",
+    "tmdb_id": 240411,
+    "imdb_id": "",
+    "title": "Dan Da Dan (2024)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Comedy",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "In a bet to prove whether ghosts or aliens exist, two high schoolers face terrifying paranormal threats, gain superpowers and maybe even fall in love?!",
+    "poster": "https://image.tmdb.org/t/p/w500/6qfZAOEUFIrbUH3JvePclx1nXzz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/uNTrRKIOyKYISthoeizghtXPEOK.jpg",
+    "rating": 8.5,
+    "release_date": "2024-10-04",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADUBcAArFaKUZlqiVrjoKr7BYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADfhcAArFaKUblHCBd9-3zBhYE"
+    ]
+  },
+  {
     "csv_id": "61223",
     "tmdb_id": 61223,
     "imdb_id": "",
