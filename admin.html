@@ -551,69 +551,75 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-row" style="margin-bottom: 12px;">
-                    <div class="form-group">
-                        <label for="movie-poster">Custom Poster URL (Optional)</label>
-                        <input type="text" id="movie-poster" placeholder="Leave blank to auto-fetch from TMDB">
-                    </div>
-                    <div class="form-group">
-                        <label for="movie-backdrop">Custom Backdrop URL (Optional)</label>
-                        <input type="text" id="movie-backdrop" placeholder="Leave blank to auto-fetch from TMDB">
-                    </div>
+                <div style="margin-top: 15px; margin-bottom: 12px; border-top: 1px solid var(--border-color); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; font-weight: bold; color: var(--primary-color);">✨ Custom Fields & Overrides (Optional)</span>
+                    <button type="button" id="btn-toggle-custom-fields" style="background: rgba(255, 188, 0, 0.1); border: 1px solid rgba(255, 188, 0, 0.25); color: var(--primary-color); padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; font-family: inherit;">Show Custom Fields ▾</button>
                 </div>
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label for="movie-overview">Custom Synopsis (Optional)</label>
-                    <textarea id="movie-overview" placeholder="Enter custom synopsis (e.g. for Nollywood movies not on TMDb) or leave blank to auto-fetch" style="min-height: 80px; resize: vertical; padding: 10px; font-family: inherit; font-size: 13px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; width: 100%; box-sizing: border-box;"></textarea>
-                </div>
-                <div class="form-row" style="margin-bottom: 12px;">
-                    <div class="form-group">
-                        <label for="movie-trailer">YouTube Trailer URL or Video ID (Optional)</label>
-                        <input type="text" id="movie-trailer" placeholder="e.g. https://www.youtube.com/watch?v=...">
+                <div id="add-movie-custom-fields" style="display: none; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; padding-bottom: 12px;">
+                    <div class="form-row" style="margin-bottom: 12px;">
+                        <div class="form-group">
+                            <label for="movie-poster">Custom Poster URL (Optional)</label>
+                            <input type="text" id="movie-poster" placeholder="Leave blank to auto-fetch from TMDB">
+                        </div>
+                        <div class="form-group">
+                            <label for="movie-backdrop">Custom Backdrop URL (Optional)</label>
+                            <input type="text" id="movie-backdrop" placeholder="Leave blank to auto-fetch from TMDB">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="movie-release-date">Release Date / Year (Optional)</label>
-                        <input type="text" id="movie-release-date" placeholder="e.g. 2023-07-13 or 2023">
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label for="movie-overview">Custom Synopsis (Optional)</label>
+                        <textarea id="movie-overview" placeholder="Enter custom synopsis (e.g. for Nollywood movies not on TMDb) or leave blank to auto-fetch" style="min-height: 80px; resize: vertical; padding: 10px; font-family: inherit; font-size: 13px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; width: 100%; box-sizing: border-box;"></textarea>
                     </div>
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Categories (Select all that apply)</label>
-                    <div id="add-movie-categories-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; max-height: 110px; overflow-y: auto; box-sizing: border-box;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Main" checked> Main (Home)
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Hollywood/British Movies"> Hollywood Movies
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Hollywood/British Series"> Hollywood Series
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Bollywood"> Bollywood
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Korean Drama"> Korean Drama
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="African"> African
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Anime"> Anime
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Comics and Manga"> Comics & Manga
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Animated Movies"> Animated
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Kids Shows and Movies (Nickelodeon and Disney)"> Kids
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Classic Movies"> Classics
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                            <input type="checkbox" class="add-cat-checkbox" value="Erotic Movies"> Erotic
-                        </label>
+                    <div class="form-row" style="margin-bottom: 12px;">
+                        <div class="form-group">
+                            <label for="movie-trailer">YouTube Trailer URL or Video ID (Optional)</label>
+                            <input type="text" id="movie-trailer" placeholder="e.g. https://www.youtube.com/watch?v=...">
+                        </div>
+                        <div class="form-group">
+                            <label for="movie-release-date">Release Date / Year (Optional)</label>
+                            <input type="text" id="movie-release-date" placeholder="e.g. 2023-07-13 or 2023">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Categories (Select all that apply)</label>
+                        <div id="add-movie-categories-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; max-height: 110px; overflow-y: auto; box-sizing: border-box;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Main" checked> Main (Home)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Hollywood/British Movies"> Hollywood Movies
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Hollywood/British Series"> Hollywood Series
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Bollywood"> Bollywood
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Korean Drama"> Korean Drama
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="African"> African
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Anime"> Anime
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Comics and Manga"> Comics & Manga
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Animated Movies"> Animated
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Kids Shows and Movies (Nickelodeon and Disney)"> Kids
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Classic Movies"> Classics
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                                <input type="checkbox" class="add-cat-checkbox" value="Erotic Movies"> Erotic
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom: 20px;">
@@ -669,6 +675,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=55"></script>
+    <script src="admin.js?v=56"></script>
 </body>
 </html>

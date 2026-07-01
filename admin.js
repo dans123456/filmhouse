@@ -1134,12 +1134,46 @@ if (openModalBtn && addMovieModal) {
         addMovieLinksState = [""]; // reset links list
         addMovieModal.classList.add("active");
         renderAddMovieLinks();
+        
+        const customSection = document.getElementById("add-movie-custom-fields");
+        const toggleBtn = document.getElementById("btn-toggle-custom-fields");
+        if (customSection) customSection.style.display = "none";
+        if (toggleBtn) toggleBtn.textContent = "Show Custom Fields ▾";
     });
 }
 
 if (closeModalBtn && addMovieModal) {
     closeModalBtn.addEventListener("click", () => {
         addMovieModal.classList.remove("active");
+    });
+}
+
+const toggleCustomFieldsBtn = document.getElementById("btn-toggle-custom-fields");
+if (toggleCustomFieldsBtn) {
+    toggleCustomFieldsBtn.addEventListener("click", () => {
+        const customSection = document.getElementById("add-movie-custom-fields");
+        if (customSection) {
+            const isHidden = customSection.style.display === "none" || !customSection.style.display;
+            customSection.style.display = isHidden ? "block" : "none";
+            toggleCustomFieldsBtn.textContent = isHidden ? "Hide Custom Fields ▴" : "Show Custom Fields ▾";
+        }
+    });
+}
+
+const addMovieIdInput = document.getElementById("movie-id");
+if (addMovieIdInput) {
+    addMovieIdInput.addEventListener("input", () => {
+        const val = addMovieIdInput.value.trim().split("-")[0];
+        const isTmdb = val && /^\d+$/.test(val);
+        const customSection = document.getElementById("add-movie-custom-fields");
+        const toggleBtn = document.getElementById("btn-toggle-custom-fields");
+        if (customSection && toggleBtn) {
+            if (!isTmdb && val !== "") {
+                // Auto-expand section if they type a custom Nollywood text slug ID
+                customSection.style.display = "block";
+                toggleBtn.textContent = "Hide Custom Fields ▴";
+            }
+        }
     });
 }
 
@@ -1700,7 +1734,38 @@ if (cancelCSVImportBtn && csvReviewModal) {
 if (confirmCSVImportBtn && csvReviewModal) {
     confirmCSVImportBtn.addEventListener("click", () => {
         if (pendingImportChanges) {
-            allCatalogMovies = pendingImportChanges.importedList;
+            // Build the final catalog by merging imported data with existing rich metadata
+            const finalCatalog = pendingImportChanges.importedList.map(imported => {
+                const existing = allCatalogMovies.find(ex => ex.csv_id === imported.csv_id);
+                if (existing) {
+                    // Update only CSV-controlled columns (Title, Type, Links)
+                    // Keep all other rich TMDB/custom metadata fields intact!
+                    return {
+                        ...existing,
+                        title: imported.title,
+                        type: imported.type,
+                        links: imported.links
+                    };
+                } else {
+                    // Set safe default values for new movies if TMDB preview wasn't fetched yet
+                    return {
+                        ...imported,
+                        categories: imported.categories || ["Main"],
+                        genres: imported.genres || [],
+                        overview: imported.overview || "No synopsis available.",
+                        poster: imported.poster || "img/FilmHouse3_nobg.png",
+                        backdrop: imported.backdrop || "img/FilmHouse.png",
+                        rating: imported.rating || 0,
+                        release_date: imported.release_date || "",
+                        language: imported.language || "en",
+                        cast: imported.cast || [],
+                        director: imported.director || "",
+                        trailer: imported.trailer || "",
+                        runtime: imported.runtime || ""
+                    };
+                }
+            });
+            allCatalogMovies = finalCatalog;
             newlyAddedIds = pendingImportChanges.added.map(m => m.csv_id);
             newlyUpdatedIds = pendingImportChanges.updated.map(u => u.newMovie.csv_id);
             
