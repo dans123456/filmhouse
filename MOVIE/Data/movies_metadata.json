@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "1724402-freedom-and-justice-2021",
+    "tmdb_id": 1724402,
+    "imdb_id": "",
+    "title": "FREEDOM AND JUSTICE",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "The movie addresses intense themes like systemic corruption, illegal mining (galamsey), and political injustice in Ghana, tackling controversial issues within the nation's governance.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADUx8AArFaKUZJgKctjqSEmhYE"
+    ]
+  },
+  {
     "csv_id": "72305",
     "tmdb_id": 72305,
     "imdb_id": "",
