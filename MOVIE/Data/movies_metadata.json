@@ -1,35 +1,27 @@
 [
   {
-    "csv_id": "88046",
-    "tmdb_id": 88046,
+    "csv_id": "1724366-badboys-and-bridesmaids-2021",
+    "tmdb_id": 1724366,
     "imdb_id": "",
-    "title": "Fire Force (2019)",
-    "type": "Series",
+    "title": "Badboys and Bridesmaids",
+    "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
-      "Anime"
+      "Hollywood/British Movies"
     ],
-    "genres": [
-      "Animation",
-      "Action & Adventure",
-      "Sci-Fi & Fantasy",
-      "Comedy"
-    ],
-    "overview": "Year 198 of the Solar Era in Tokyo, special fire brigades are fighting against a phenomenon called spontaneous human combustion where humans beings are turned into living infernos called \"Infernals\". While the Infernals are first generation cases of spontaneous human combustion, later generations possess the ability to manipulate flames while retaining human form. Shinra Kusakabe, a youth who gained the nickname Devil's Footprints for his ability to ignite his feet at will, joins the Special Fire Force Company 8 which composes of other flames users as they work to extinguish any Infernals they encounter. As a faction that is creating Infernals appears, Shira begins to uncover the truth behind a mysterious fire that caused the death of his family twelve years ago.",
-    "poster": "https://image.tmdb.org/t/p/w500/96jrp8XIEPKC7xHhbkpWLD15oYW.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/xkNnQ3IGGRQcXnl1zTb5H6Vb3SP.jpg",
-    "rating": 8.3,
-    "release_date": "2019-07-05",
-    "language": "ja",
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
     "cast": [],
     "director": "",
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADXxwAArFaKUYYYlEa1OcZUxYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADZhwAArFaKUaujFWUofzW4RYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQADlx0AArFaKUbSlLkRoIPjWBYE"
     ]
   },
   {
