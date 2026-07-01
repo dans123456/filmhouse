@@ -411,6 +411,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
                 // Check once immediately after token is fetched
                 checkCatalogForUpdates();
+                // Reload catalog using the newly loaded GitHub Token to fetch from GitHub API directly
+                loadCatalog();
             }
         } catch (e) {
             console.error("Error loading GitHub token from Firestore:", e);
@@ -611,11 +613,42 @@ if (testConnBtn) {
 async function loadCatalog() {
     const listContainer = document.getElementById("catalog-list");
     try {
-        const response = await fetch("./MOVIE/Data/movies_metadata.json?t=" + Date.now());
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        const token = (document.getElementById("github-token")?.value.trim()) || githubToken;
+        let responseData = null;
+        
+        if (token) {
+            const owner = "dans123456";
+            const repo = "filmhouse";
+            const pathJSON = "MOVIE/Data/movies_metadata.json";
+            const apiJSONUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${pathJSON}`;
+            
+            try {
+                const response = await fetch(`${apiJSONUrl}?t=${Date.now()}`, {
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Accept": "application/vnd.github.v3+json"
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    lastKnownJsonSha = data.sha; // Set the fresh SHA directly
+                    const jsonText = decodeURIComponent(escape(atob(data.content.replace(/\s/g, ""))));
+                    responseData = JSON.parse(jsonText);
+                }
+            } catch (err) {
+                console.warn("Failed to load catalog from GitHub API, falling back to local file:", err);
+            }
         }
-        allCatalogMovies = await response.json();
+        
+        if (!responseData) {
+            const response = await fetch("./MOVIE/Data/movies_metadata.json?t=" + Date.now());
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            responseData = await response.json();
+        }
+        
+        allCatalogMovies = responseData;
         originalCatalogCount = allCatalogMovies.length;
         renderCatalogList();
     } catch (e) {
