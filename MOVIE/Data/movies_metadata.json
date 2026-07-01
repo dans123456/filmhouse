@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "239287-terminator",
+    "tmdb_id": 239287,
+    "imdb_id": "",
+    "title": "Terminator Zero (2024)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Sci-Fi & Fantasy",
+      "Action & Adventure"
+    ],
+    "overview": "A warrior from a post-apocalyptic future travels to 1997 to protect an AI scientist being hunted by an unfeeling — and indestructible — cyborg.",
+    "poster": "https://image.tmdb.org/t/p/w500/v4sbn6IsJGAIZNHjdB4CprvS7zo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/woH18JkZMYhMSWqtHkPA4F6Gd1z.jpg",
+    "rating": 7,
+    "release_date": "2024-08-29",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADWRoAArFaKUZ48XyMJicM9RYE"
+    ]
+  },
+  {
     "csv_id": "34791-claymore",
     "tmdb_id": 34791,
     "imdb_id": "",
