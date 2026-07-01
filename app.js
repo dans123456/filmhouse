@@ -2372,6 +2372,17 @@ function openDetailModal(movie) {
     const body = document.getElementById("detail-modal-body");
     if (!modal || !body) return;
 
+    // Normalize movie fields to prevent crashes on missing metadata (CSV imports/batch adds)
+    movie.poster = movie.poster || "MOVIE/img/FilmHouse3_nobg.png";
+    movie.backdrop = movie.backdrop || "MOVIE/img/FilmHouse.png";
+    movie.overview = movie.overview || "No synopsis available.";
+    movie.language = movie.language || "en";
+    movie.categories = movie.categories || ["Main"];
+    movie.genres = movie.genres || [];
+    movie.cast = movie.cast || [];
+    movie.rating = movie.rating || 0;
+    movie.release_date = movie.release_date || "";
+
     body.replaceChildren();
 
     // 1. Hero banner area
