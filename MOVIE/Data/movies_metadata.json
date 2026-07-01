@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "91997-pluto",
+    "tmdb_id": 91997,
+    "imdb_id": "",
+    "title": "PLUTO (2023)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Sci-Fi & Fantasy",
+      "Mystery",
+      "Crime"
+    ],
+    "overview": "When the world's seven most advanced robots and their human allies are murdered one by one, Inspector Gesicht soon discovers that he's also in danger.",
+    "poster": "https://image.tmdb.org/t/p/w500/pZHlPmGZWlTcSrS7zvnKZD2QQs1.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/oz3LT9glLNWpSQACnWlIYoSZA5M.jpg",
+    "rating": 7.8,
+    "release_date": "2023-10-26",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD0xcAArFaKUYu022_JaJHtRYE"
+    ]
+  },
+  {
     "csv_id": "65292-ajin",
     "tmdb_id": 65292,
     "imdb_id": "",
