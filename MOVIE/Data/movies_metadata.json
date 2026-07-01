@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "131366",
+    "tmdb_id": 131366,
+    "imdb_id": "",
+    "title": "Ningen Fushin: Adventurers Who Don't Believe in Humanity Will Save the World (2023)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy",
+      "Comedy"
+    ],
+    "overview": "Nick used to be a member of a veteran adventurer party, helping his undisciplined friends with the accounts whenever he could. But what was his reward? Getting accused of embezzlement and kicked out by the leader he respected. Before long, he finds a few other jaded adventurers and kindred spirits, and together, they form their own unstoppable party!",
+    "poster": "https://image.tmdb.org/t/p/w500/3UuScuuCZfHsZvVYY3ySzrMsQfa.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7Y5Jnq89taomGJvDqy4VTbzuE0m.jpg",
+    "rating": 7,
+    "release_date": "2023-01-10",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD_xYAArFaKUYLT96GPO-l4RYE"
+    ]
+  },
+  {
     "csv_id": "117933",
     "tmdb_id": 117933,
     "imdb_id": "",
