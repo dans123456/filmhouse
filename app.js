@@ -208,6 +208,52 @@ function showToast(message, type = "success", action = null) {
 // Delay Helper for batch requests
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+// Helper to shuffle movies but keep brand new uploads pinned to the top on first open
+function shuffleAndPinNewMovies(movies) {
+    if (!movies || movies.length === 0) return [];
+
+    // Get the latest 10 uploads (first 10 items in the original list)
+    const latestUploads = movies.slice(0, 10);
+    const latestUploadIds = latestUploads.map(m => m.csv_id);
+
+    // Retrieve seen movie IDs from localStorage
+    let seenIds = [];
+    try {
+        const storedSeen = localStorage.getItem("filmhouse_seen_movie_ids");
+        if (storedSeen) {
+            seenIds = JSON.parse(storedSeen);
+        }
+    } catch (e) {
+        console.warn("Could not read seen movie IDs from localStorage:", e);
+    }
+
+    // Determine brand new movies that the user hasn't seen yet
+    const brandNewMovies = latestUploads.filter(m => !seenIds.includes(m.csv_id));
+
+    // Remaining movies are those that are not brand new (either seen latest uploads, or older movies)
+    const brandNewIdsSet = new Set(brandNewMovies.map(m => m.csv_id));
+    const remainingMovies = movies.filter(m => !brandNewIdsSet.has(m.csv_id));
+
+    // Shuffle the remaining movies
+    for (let i = remainingMovies.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [remainingMovies[i], remainingMovies[j]] = [remainingMovies[j], remainingMovies[i]];
+    }
+
+    // Save all current latest upload IDs to localStorage so they are marked as seen next time
+    const updatedSeenIds = Array.from(new Set([...seenIds, ...latestUploadIds]));
+    if (updatedSeenIds.length > 200) {
+        updatedSeenIds.splice(0, updatedSeenIds.length - 200);
+    }
+    try {
+        localStorage.setItem("filmhouse_seen_movie_ids", JSON.stringify(updatedSeenIds));
+    } catch (e) {
+        console.warn("Could not write seen movie IDs to localStorage:", e);
+    }
+
+    return [...brandNewMovies, ...remainingMovies];
+}
+
 // Dynamic Enrichment & Database Loader
 async function initializeDatabase() {
     const statusEl = document.getElementById("preloader-status");
@@ -243,8 +289,8 @@ async function initializeDatabase() {
                         m.poster = "MOVIE/img/FilmHouse3_nobg.png";
                     }
                 });
-                state.movies = data;
                 state.newMovieIds = data.slice(0, 10).map(m => m.csv_id);
+                state.movies = shuffleAndPinNewMovies(data);
                 statusEl.textContent = "Starting Film House...";
                 loadedFromServer = true;
                 
@@ -271,8 +317,8 @@ async function initializeDatabase() {
                         m.backdrop = "MOVIE/" + m.backdrop;
                     }
                 });
-                state.movies = parsed;
                 state.newMovieIds = parsed.slice(0, 10).map(m => m.csv_id);
+                state.movies = shuffleAndPinNewMovies(parsed);
                 statusEl.textContent = "Loading cached database...";
             } catch (e) {
                 localStorage.removeItem("filmhouse_enriched_db_v5");
@@ -280,13 +326,7 @@ async function initializeDatabase() {
         }
     }
     
-    // Helper to shuffle array in-place
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    }
+
 
     if (state.movies && state.movies.length > 0) {
         return;
@@ -541,8 +581,8 @@ async function initializeDatabase() {
         await delay(60);
     }
 
-    state.movies = enrichedList;
     state.newMovieIds = enrichedList.slice(0, 10).map(m => m.csv_id);
+    state.movies = shuffleAndPinNewMovies(enrichedList);
     localStorage.setItem("filmhouse_enriched_db_v5", JSON.stringify(enrichedList));
     statusEl.textContent = "Complete!";
 }
