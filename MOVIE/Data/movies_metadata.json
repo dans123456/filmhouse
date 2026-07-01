@@ -1,6 +1,36 @@
 [
   {
-    "csv_id": "1724402-freedom-and-justice-2021",
+    "csv_id": "133903-hit-monkey",
+    "tmdb_id": 133903,
+    "imdb_id": "",
+    "title": "Marvel's Hit-Monkey (2021)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure"
+    ],
+    "overview": "After a high-profile political assassination goes sideways, an injured hitman hides out amongst a tribe of snow monkeys in the mountains of Japan.",
+    "poster": "https://image.tmdb.org/t/p/w500/y3ee57YPBhP8RHadX920UjURAWu.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/8cyWBLWZDJIypCwyW4IszhKIEJE.jpg",
+    "rating": 7.7,
+    "release_date": "2021-11-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD1BoAArFaKUY-dupjFvS27hYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD1hoAArFaKUa9WbipCe8rERYE"
+    ]
+  },
+  {
+    "csv_id": "1724402-freedom-and--2021",
     "tmdb_id": 1724402,
     "imdb_id": "",
     "title": "FREEDOM AND JUSTICE",
