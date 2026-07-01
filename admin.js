@@ -726,6 +726,10 @@ function showMovieDetails(movie) {
                     <input type="text" id="edit-movie-backdrop" value="${escapeHTML(movie.backdrop || '')}" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
                 </div>
             </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Synopsis</label>
+                <textarea id="edit-movie-overview" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%; min-height: 80px; resize: vertical; box-sizing: border-box; font-family: inherit;">${escapeHTML(movie.overview || '')}</textarea>
+            </div>
         </div>
 
         ${movie.overview ? `
@@ -860,6 +864,7 @@ function showMovieDetails(movie) {
             const newType = document.getElementById("edit-movie-type")?.value;
             const newPoster = document.getElementById("edit-movie-poster")?.value.trim();
             const newBackdrop = document.getElementById("edit-movie-backdrop")?.value.trim();
+            const newOverview = document.getElementById("edit-movie-overview")?.value.trim() || "";
             
             if (!newTitle || !newId) {
                 alert("Error: Title and TMDB ID / Slug cannot be empty!");
@@ -876,6 +881,7 @@ function showMovieDetails(movie) {
                 allCatalogMovies[movieIndex].links = finalLinks;
                 allCatalogMovies[movieIndex].poster = newPoster || "img/FilmHouse3_nobg.png";
                 allCatalogMovies[movieIndex].backdrop = newBackdrop || "img/FilmHouse.png";
+                allCatalogMovies[movieIndex].overview = newOverview || "No synopsis available.";
                 
                 // Update dynamic TMDB numeric ID mapping if ID changed
                 const numericId = newId.split("-")[0];
@@ -1025,6 +1031,43 @@ if (catalogSearchInput) {
     catalogSearchInput.addEventListener("input", renderCatalogList);
 }
 
+let addMovieLinksState = [""];
+
+function renderAddMovieLinks() {
+    const wrapper = document.getElementById("add-movie-links-inputs-wrapper");
+    if (!wrapper) return;
+    
+    wrapper.innerHTML = addMovieLinksState.map((link, idx) => {
+        const escaped = escapeHTML(link);
+        return `
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <span style="font-size: 11px; color: var(--text-secondary); font-weight: 700; width: 55px; flex-shrink: 0;">Link ${idx + 1}:</span>
+                <input type="text" class="add-movie-link-input" data-index="${idx}" value="${escaped}" placeholder="Paste Telegram download URL" style="flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px;">
+                <button type="button" class="btn-remove-add-movie-link" data-index="${idx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 6px; display: ${addMovieLinksState.length > 1 ? 'block' : 'none'};">
+                    <svg style="width: 14px; height: 14px; fill: currentColor;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+            </div>
+        `;
+    }).join('');
+    
+    // Bind input updates
+    wrapper.querySelectorAll(".add-movie-link-input").forEach(input => {
+        input.addEventListener("input", (e) => {
+            const idx = parseInt(e.target.dataset.index);
+            addMovieLinksState[idx] = e.target.value.trim();
+        });
+    });
+    
+    // Bind remove button clicks
+    wrapper.querySelectorAll(".btn-remove-add-movie-link").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const idx = parseInt(e.currentTarget.dataset.index);
+            addMovieLinksState.splice(idx, 1);
+            renderAddMovieLinks();
+        });
+    });
+}
+
 // Modal Toggle Logic
 const addMovieModal = document.getElementById("add-movie-modal");
 const openModalBtn = document.getElementById("btn-add-movie-modal");
@@ -1032,13 +1075,23 @@ const closeModalBtn = document.getElementById("btn-close-movie-modal");
 
 if (openModalBtn && addMovieModal) {
     openModalBtn.addEventListener("click", () => {
+        addMovieLinksState = [""]; // reset links list
         addMovieModal.classList.add("active");
+        renderAddMovieLinks();
     });
 }
 
 if (closeModalBtn && addMovieModal) {
     closeModalBtn.addEventListener("click", () => {
         addMovieModal.classList.remove("active");
+    });
+}
+
+const btnAddMovieLinkInput = document.getElementById("btn-add-movie-link-input");
+if (btnAddMovieLinkInput) {
+    btnAddMovieLinkInput.addEventListener("click", () => {
+        addMovieLinksState.push("");
+        renderAddMovieLinks();
     });
 }
 
@@ -1051,11 +1104,15 @@ if (addMovieForm) {
         const title = document.getElementById("movie-title").value.trim();
         const id = document.getElementById("movie-id").value.trim();
         const type = document.getElementById("movie-type").value;
-        const linksVal = document.getElementById("movie-links").value.trim();
         const customPoster = document.getElementById("movie-poster")?.value.trim() || "";
         const customBackdrop = document.getElementById("movie-backdrop")?.value.trim() || "";
+        const customOverview = document.getElementById("movie-overview")?.value.trim() || "";
         
-        const linksList = linksVal.split(",").map(l => l.trim()).filter(l => l);
+        const linksList = addMovieLinksState.filter(l => l !== "");
+        if (linksList.length === 0) {
+            alert("Error: Please add at least one Telegram download link!");
+            return;
+        }
         
         // Prevent duplicate IDs locally
         if (allCatalogMovies.some(m => m.csv_id === id)) {
@@ -1077,7 +1134,7 @@ if (addMovieForm) {
         let releaseDate = "";
         let genres = [];
         let categories = ["Main"]; // Default to Main category
-        let overview = "No synopsis available.";
+        let overview = customOverview || "No synopsis available.";
         let backdrop = "";
         let original_language = "en";
         
@@ -1093,8 +1150,14 @@ if (addMovieForm) {
                     rating = Math.round((data.vote_average || 0) * 10) / 10;
                     releaseDate = data.release_date || data.first_air_date || "";
                     genres = data.genres ? data.genres.map(g => g.name) : [];
-                    overview = data.overview || "No synopsis available.";
                     original_language = data.original_language || "en";
+                    
+                    // Override with custom synopsis if entered, else use TMDB
+                    if (customOverview) {
+                        overview = customOverview;
+                    } else {
+                        overview = data.overview || "No synopsis available.";
+                    }
                     
                     // Categorize title
                     if (type === 'tv') {

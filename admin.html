@@ -542,9 +542,18 @@
                         <input type="text" id="movie-backdrop" placeholder="Leave blank to auto-fetch from TMDB">
                     </div>
                 </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="movie-overview">Custom Synopsis (Optional)</label>
+                    <textarea id="movie-overview" placeholder="Enter custom synopsis (e.g. for Nollywood movies not on TMDb) or leave blank to auto-fetch" style="min-height: 80px; resize: vertical; padding: 10px; font-family: inherit; font-size: 13px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; width: 100%; box-sizing: border-box;"></textarea>
+                </div>
                 <div class="form-group" style="margin-bottom: 20px;">
-                    <label for="movie-links">Telegram Download Links (Comma separated)</label>
-                    <input type="text" id="movie-links" placeholder="e.g. https://t.me/..., https://t.me/..." required>
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500;">Telegram Download Links</label>
+                    <div id="add-movie-links-container" style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
+                        <div id="add-movie-links-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
+                            <!-- Dynamic inputs loaded here -->
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-add-movie-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">+ Add Link</button>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Add to Local List</button>
             </form>
@@ -590,6 +599,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=52"></script>
+    <script src="admin.js?v=53"></script>
 </body>
 </html>
