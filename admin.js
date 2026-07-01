@@ -679,6 +679,16 @@ function showMovieDetails(movie) {
                     </select>
                 </div>
             </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
+                    <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Poster Image URL</label>
+                    <input type="text" id="edit-movie-poster" value="${escapeHTML(movie.poster || '')}" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
+                    <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Backdrop Image URL</label>
+                    <input type="text" id="edit-movie-backdrop" value="${escapeHTML(movie.backdrop || '')}" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
+                </div>
+            </div>
         </div>
 
         ${movie.overview ? `
@@ -811,6 +821,8 @@ function showMovieDetails(movie) {
             const newTitle = document.getElementById("edit-movie-title")?.value.trim();
             const newId = document.getElementById("edit-movie-id")?.value.trim();
             const newType = document.getElementById("edit-movie-type")?.value;
+            const newPoster = document.getElementById("edit-movie-poster")?.value.trim();
+            const newBackdrop = document.getElementById("edit-movie-backdrop")?.value.trim();
             
             if (!newTitle || !newId) {
                 alert("Error: Title and TMDB ID / Slug cannot be empty!");
@@ -825,6 +837,8 @@ function showMovieDetails(movie) {
                 allCatalogMovies[movieIndex].csv_id = newId;
                 allCatalogMovies[movieIndex].type = newType === 'Series' ? 'Series' : 'Movie';
                 allCatalogMovies[movieIndex].links = finalLinks;
+                allCatalogMovies[movieIndex].poster = newPoster || "img/FilmHouse3_nobg.png";
+                allCatalogMovies[movieIndex].backdrop = newBackdrop || "img/FilmHouse.png";
                 
                 // Update dynamic TMDB numeric ID mapping if ID changed
                 const numericId = newId.split("-")[0];
@@ -1001,6 +1015,8 @@ if (addMovieForm) {
         const id = document.getElementById("movie-id").value.trim();
         const type = document.getElementById("movie-type").value;
         const linksVal = document.getElementById("movie-links").value.trim();
+        const customPoster = document.getElementById("movie-poster")?.value.trim() || "";
+        const customBackdrop = document.getElementById("movie-backdrop")?.value.trim() || "";
         
         const linksList = linksVal.split(",").map(l => l.trim()).filter(l => l);
         
@@ -1077,8 +1093,8 @@ if (addMovieForm) {
             categories: categories,
             genres: genres,
             overview: overview,
-            poster: poster || "img/FilmHouse3_nobg.png",
-            backdrop: backdrop || "img/FilmHouse.png",
+            poster: customPoster || poster || "img/FilmHouse3_nobg.png",
+            backdrop: customBackdrop || backdrop || "img/FilmHouse.png",
             rating: rating,
             release_date: releaseDate,
             language: original_language,
