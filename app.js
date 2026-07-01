@@ -1867,6 +1867,12 @@ function renderRecommendations() {
     const userGenres = new Set();
     const userCategories = new Set();
 
+    // Exclude the first 12 movies shown in the main Featured grid to prevent visual duplication at the top of the page
+    const featuredMain = state.movies
+        .filter(m => m.categories && m.categories.includes("Main"))
+        .slice(0, 12);
+    const featuredMainIds = featuredMain.map(m => m.csv_id);
+
     const preferredMovieIds = [...state.watchlist, ...state.history];
     const preferredMovies = state.movies.filter(m => preferredMovieIds.includes(m.csv_id));
 
@@ -1879,23 +1885,28 @@ function renderRecommendations() {
 
     let recommended = [];
     if (preferredMovies.length > 0) {
-        // Filter out movies already in watchlist or history
+        // Filter out movies already in watchlist, history, or currently in the top Featured grid
         recommended = state.movies.filter(m => 
             !preferredMovieIds.includes(m.csv_id) && 
+            !featuredMainIds.includes(m.csv_id) && 
             (
                 (m.genres && m.genres.some(g => userGenres.has(g))) ||
                 (m.categories && m.categories.some(c => userCategories.has(c)))
             )
         );
+        
+        // Shuffle the recommended matches to ensure they are varied on each load
+        for (let i = recommended.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [recommended[i], recommended[j]] = [recommended[j], recommended[i]];
+        }
     }
 
     // If no specific recommendations or watchlist is empty, fallback to highly rated movies
     if (recommended.length === 0) {
-        // Exclude first 6 movies (which usually show up in featured home view at start)
-        const featuredIds = state.movies.slice(0, 6).map(m => m.csv_id);
         const candidates = state.movies.filter(m => 
             !preferredMovieIds.includes(m.csv_id) && 
-            !featuredIds.includes(m.csv_id) && 
+            !featuredMainIds.includes(m.csv_id) && 
             m.rating >= 7.0
         );
         
