@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "65942-re",
+    "tmdb_id": 65942,
+    "imdb_id": "",
+    "title": "Re:ZERO -Starting Life in Another World- (2016)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy",
+      "Drama",
+      "Mystery"
+    ],
+    "overview": "Natsuki Subaru, an ordinary high school  student, is on his way home from the convenience store when he finds  himself transported to another world. As he's lost and confused in a new  world where he doesn't even know left from right, the only person to  reach out to him was a beautiful girl with silver hair. Determined to  repay her somehow for saving him from his own despair, Subaru agrees to  help the girl find something she's looking for.",
+    "poster": "https://image.tmdb.org/t/p/w500/oHqYrPAsIiTD5m4DuxumV4er8BU.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7ZruEnSnHD6Jx5mF0hBt1E306Vt.jpg",
+    "rating": 7.9,
+    "release_date": "2016-04-04",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD5xsAArFaKUYCmM0OjuEHaxYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADARwAArFaKUZYlM8Vy_CyIRYE"
+    ]
+  },
+  {
     "csv_id": "31724-code-geass",
     "tmdb_id": 31724,
     "imdb_id": "",
