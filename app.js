@@ -208,50 +208,16 @@ function showToast(message, type = "success", action = null) {
 // Delay Helper for batch requests
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-// Helper to shuffle movies but keep brand new uploads pinned to the top on first open
+// Helper to shuffle movies randomly
 function shuffleAndPinNewMovies(movies) {
     if (!movies || movies.length === 0) return [];
 
-    // Get the latest 10 uploads (first 10 items in the original list)
-    const latestUploads = movies.slice(0, 10);
-    const latestUploadIds = latestUploads.map(m => m.csv_id);
-
-    // Retrieve seen movie IDs from localStorage
-    let seenIds = [];
-    try {
-        const storedSeen = localStorage.getItem("filmhouse_seen_movie_ids");
-        if (storedSeen) {
-            seenIds = JSON.parse(storedSeen);
-        }
-    } catch (e) {
-        console.warn("Could not read seen movie IDs from localStorage:", e);
-    }
-
-    // Determine brand new movies that the user hasn't seen yet
-    const brandNewMovies = latestUploads.filter(m => !seenIds.includes(m.csv_id));
-
-    // Remaining movies are those that are not brand new (either seen latest uploads, or older movies)
-    const brandNewIdsSet = new Set(brandNewMovies.map(m => m.csv_id));
-    const remainingMovies = movies.filter(m => !brandNewIdsSet.has(m.csv_id));
-
-    // Shuffle the remaining movies
-    for (let i = remainingMovies.length - 1; i > 0; i--) {
+    const shuffled = [...movies];
+    for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [remainingMovies[i], remainingMovies[j]] = [remainingMovies[j], remainingMovies[i]];
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-
-    // Save all current latest upload IDs to localStorage so they are marked as seen next time
-    const updatedSeenIds = Array.from(new Set([...seenIds, ...latestUploadIds]));
-    if (updatedSeenIds.length > 200) {
-        updatedSeenIds.splice(0, updatedSeenIds.length - 200);
-    }
-    try {
-        localStorage.setItem("filmhouse_seen_movie_ids", JSON.stringify(updatedSeenIds));
-    } catch (e) {
-        console.warn("Could not write seen movie IDs to localStorage:", e);
-    }
-
-    return [...brandNewMovies, ...remainingMovies];
+    return shuffled;
 }
 
 // Dynamic Enrichment & Database Loader
