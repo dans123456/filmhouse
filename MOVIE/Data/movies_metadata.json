@@ -1,5 +1,34 @@
 [
   {
+    "csv_id": "206324-30",
+    "tmdb_id": 206324,
+    "imdb_id": "",
+    "title": "Chillin' in My 30s After Getting Fired From the Demon King's Army",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Dariel, a dark soldier in the demon king's army who cannot use magic, has risen to the position of assistant to the Four Generals with his talent and energy, and has been wielding his skill. However, as soon as the Four Generals are replaced, Dariel is fired from the army. Dariel is devastated, but when he arrives in a human village, he finds that his adventuring skills, which are supposed to be useless to demons, have blossomed! \"I was... human?\" Dariel decides to spend his second life in this village, and the requests start pouring in! Trouble! False charge! Duel! With his natural skills and the adjusting power that he developed in his old place, the former dark soldier solves them all!",
+    "poster": "https://image.tmdb.org/t/p/w500/wt3y5uru1yaHRHl8KUZ68HqcaMv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6Z8uMC4Bj30dbYKc3LkQbpXx4eA.jpg",
+    "rating": 7.5,
+    "release_date": "2023-01-07",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADdhMAAghnMUbtRYJmmLu6VRYE"
+    ]
+  },
+  {
     "csv_id": "46184-campione",
     "tmdb_id": 46184,
     "imdb_id": "",
