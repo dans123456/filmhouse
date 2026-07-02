@@ -403,22 +403,36 @@ let newlyAddedIds = [];
 let newlyUpdatedIds = [];
 let lastKnownJsonSha = null;
 
-// Load GitHub token on startup from Firestore
+// Load GitHub token on startup from Firestore and localStorage
 document.addEventListener("DOMContentLoaded", async () => {
+    // 1. Instant load from localStorage
+    const localToken = localStorage.getItem("filmhouse_github_token");
+    if (localToken) {
+        githubToken = localToken;
+        const tokenInput = document.getElementById("github-token");
+        if (tokenInput) {
+            tokenInput.value = githubToken;
+        }
+    }
+
     loadCatalog();
     
-    // Fetch token from Firestore
+    // 2. Fetch token from Firestore to sync/update
     if (db) {
         try {
             const doc = await db.collection("settings").doc("github").get();
             if (doc.exists) {
-                githubToken = doc.data().token || "";
-                const tokenInput = document.getElementById("github-token");
-                if (tokenInput) {
-                    tokenInput.value = githubToken;
+                const dbToken = doc.data().token || "";
+                if (dbToken && dbToken !== githubToken) {
+                    githubToken = dbToken;
+                    localStorage.setItem("filmhouse_github_token", dbToken);
+                    const tokenInput = document.getElementById("github-token");
+                    if (tokenInput) {
+                        tokenInput.value = githubToken;
+                    }
+                    // Reload catalog with the new synced token
+                    loadCatalog();
                 }
-                // Reload catalog using the newly loaded GitHub Token to fetch from GitHub API directly
-                loadCatalog();
             }
         } catch (e) {
             console.error("Error loading GitHub token from Firestore:", e);
@@ -522,23 +536,30 @@ if (saveAdminsBtn) {
     });
 }
 
-// Save GitHub token to Firestore
+// Save GitHub token to Firestore & localStorage
 const saveTokenBtn = document.getElementById("btn-save-github-token");
 if (saveTokenBtn) {
     saveTokenBtn.addEventListener("click", async () => {
         const tokenInput = document.getElementById("github-token");
-        if (tokenInput && db) {
+        if (tokenInput) {
             const token = tokenInput.value.trim();
-            try {
-                await db.collection("settings").doc("github").set({
-                    token: token,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                githubToken = token;
-                alert("GitHub Personal Access Token saved securely in your Firebase database!");
-            } catch (e) {
-                console.error("Error saving token to Firestore:", e);
-                alert("Failed to save token to database. Make sure your database rules permit this write.");
+            // Save locally first for instant access
+            localStorage.setItem("filmhouse_github_token", token);
+            githubToken = token;
+            
+            if (db) {
+                try {
+                    await db.collection("settings").doc("github").set({
+                        token: token,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert("GitHub Personal Access Token saved locally and securely in Firestore!");
+                } catch (e) {
+                    console.error("Error saving token to Firestore:", e);
+                    alert("Token saved locally! (Note: Firestore cloud sync failed - check your database rules).");
+                }
+            } else {
+                alert("GitHub Personal Access Token saved locally!");
             }
         }
     });
