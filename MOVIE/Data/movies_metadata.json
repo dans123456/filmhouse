@@ -1,164 +1,33 @@
 [
   {
-    "csv_id": "1019978-cake",
-    "tmdb_id": 1019978,
+    "csv_id": "72517",
+    "tmdb_id": 72517,
     "imdb_id": "",
-    "title": "Cake",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "African"
-    ],
-    "genres": [
-      "Romance",
-      "Comedy"
-    ],
-    "overview": "A baker becomes infatuated with one of his customers and tries to bake a special cake for her before he can express his feelings.",
-    "poster": "https://image.tmdb.org/t/p/w500/6ssDLMKElRKlfjontpRfAerSySt.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/mzqLc2dv48XfFxaFn5uwfDpHXLO.jpg",
-    "rating": 10,
-    "release_date": "2022-02-25",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "b_BqEc4SiVo",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD6xMAAghnMUZ6iGWl5qR7CBYE"
-    ]
-  },
-  {
-    "csv_id": "1223826-love-and-life",
-    "tmdb_id": 1223826,
-    "imdb_id": "",
-    "title": "Love and Life",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "African"
-    ],
-    "genres": [
-      "Drama"
-    ],
-    "overview": "A heartbroken recent widow, a marriage in trouble, and an uncertain romance... These three women, friends from way back when, may seem to live perfect lives in a perfect world but recently they have all struggled to remember love and to keep love alive. They learn, that when everything else fails, as long as you have your friends you have hope.",
-    "poster": "https://image.tmdb.org/t/p/w500/qJwKnRuZOERCtEY22kHQywCnVvy.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/4njumVIoBGtb2jMPe3HglOVLJze.jpg",
-    "rating": 0,
-    "release_date": "2023-12-29",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "hSwsO3ctQSQ",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADohMAAghnMUaj2kcPiM4-4RYE"
-    ]
-  },
-  {
-    "csv_id": "1065039-christmas-in-miami",
-    "tmdb_id": 1065039,
-    "imdb_id": "",
-    "title": "Christmas in Miami",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "African"
-    ],
-    "genres": [
-      "Comedy"
-    ],
-    "overview": "Akpos jets off with his family to the exotic city of Miami, Florida to represent Nigeria at the Intercontinental Christmas Fiesta, which is a unifying Fiesta that will bring together 6 families from 6 very diverse nations across 5 continents, to spend the week leading up to Christmas together, on an exotic island in Miami, USA. This 'mini' Olympics of Christmas is a multi-ethnic story of unity in diversity. It celebrates how we are all different, but the same, or how we are all 'same difference'. It reminds that Christmas transcends skin colour and racial barriers. It's a rib-tickling comedy that aims to unite borders by helping each of the nations represented to also debunk long-held negative stereotypes and perceptions that the general public always had about them. And of course, somewhere in between all of these, we are treated to endless servings of Akpos' mis-adventures.",
-    "poster": "https://image.tmdb.org/t/p/w500/bpk7OXQvrmlJ5rDZBANPMqcWmlR.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/wUz99i3I4zZ71KM0t1tLKQJJId9.jpg",
-    "rating": 0,
-    "release_date": "2021-12-24",
-    "language": "fr",
-    "cast": [],
-    "director": "",
-    "trailer": "mFFde4XLtcU",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADfxMAAghnMUZKXQkmwrCraRYE"
-    ]
-  },
-  {
-    "csv_id": "1724808-christmas-is-coming",
-    "tmdb_id": 1724808,
-    "imdb_id": "",
-    "title": "Christmas Is Coming",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "African"
-    ],
-    "genres": [],
-    "overview": "Ufuoma McDermott plays Henri Attah, a tomboy whose life spirals out of control when her roommates play a prank on her, giving her a surprise make over.",
-    "poster": "https://i.postimg.cc/gkxPJ5yK/photo-2026-07-02-12-25-03.jpg",
-    "backdrop": "https://i.postimg.cc/gkxPJ5yK/photo-2026-07-02-12-25-03.jpg",
-    "rating": 0,
-    "release_date": "2021",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "WFzKFHPMH0Y",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADjRIAAghnMUZ3aTi81OgLDBYE"
-    ]
-  },
-  {
-    "csv_id": "1724798-superstar",
-    "tmdb_id": 1724798,
-    "imdb_id": "",
-    "title": "Superstar",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "African"
-    ],
-    "genres": [],
-    "overview": "The story of a dream that was larger than life and one woman's journey to achieving that dream.",
-    "poster": "https://i.postimg.cc/XY4srB9W/photo-2026-07-02-11-42-52.jpg",
-    "backdrop": "https://i.postimg.cc/XY4srB9W/photo-2026-07-02-11-42-52.jpg",
-    "rating": 0,
-    "release_date": "2021",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "c1ixjhem48w",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD_REAAghnMUb6oenIFwE9yxYE"
-    ]
-  },
-  {
-    "csv_id": "16830-hellsing",
-    "tmdb_id": 16830,
-    "imdb_id": "",
-    "title": "Hellsing",
+    "title": "Classroom of the Elite",
     "type": "Series",
     "categories": [
       "Main",
       "Anime"
     ],
     "genres": [
-      "Action & Adventure",
       "Animation",
-      "Sci-Fi & Fantasy"
+      "Drama",
+      "Mystery"
     ],
-    "overview": "Vampires exist. It is the duty of Hellsing, an organization sponsored by the British government, to hide that frightening fact and protect the blissfully unaware populace.\n\nLately, vampire activity has been on the rise and the cause is more alarming than anything they could have imagined.",
-    "poster": "https://image.tmdb.org/t/p/w500/p2xedgWeqcVtv7K4MsMjIfsaV2g.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/jy74GLS8QA1O8JRwXj72uCKtV1B.jpg",
-    "rating": 7.9,
-    "release_date": "2001-10-11",
+    "overview": "Kiyotaka Ayanokouji enrolls at the prestigious Tokyo Koudo Ikusei Academy, but is assigned to Class 1-D, where students with behavioral problems are housed. The school awards points equivalent to 100,000 yen per month and allows unusual freedom in classes, masking a more complex system.",
+    "poster": "https://image.tmdb.org/t/p/w500/8BtSk9DGIlS24otIB3qCagVCI6W.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/c2sl2dLlyFFeb18pJtOpBD8cidr.jpg",
+    "rating": 8.4,
+    "release_date": "2017-07-12",
     "language": "ja",
     "cast": [],
     "director": "",
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADvREAAghnMUYIJw5UUtOYBRYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADzxEAAghnMUbgc-Ko1cYTYxYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQADqBMAAghnMUbXp5EHiRzf-RYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADsxMAAghnMUZZlgRhW231YhYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADgRQAAghnMUY83kRDyArLQhYE"
     ]
   },
   {
@@ -194,7 +63,7 @@
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADUx8AArFaKUZJgKctjqSEmhYE"
     ],
-    "poster": "https://postimg.cc/w1xMYcrp",
+    "poster": "https://image.tmdb.org/t/p/w500/e5UevUk9zyhnCWE35Gn0wBIrWEf.jpg",
     "rating": 0,
     "release_date": "",
     "genres": [
@@ -206,9 +75,7 @@
     ],
     "tmdb_id": 1724402,
     "overview": "The movie addresses intense themes like systemic corruption, illegal mining (galamsey), and political injustice in Ghana, tackling controversial issues within the nation's governance.",
-    "language": "en",
-    "backdrop": "https://postimg.cc/w1xMYcrp",
-    "trailer": ""
+    "language": "en"
   },
   {
     "title": "Kakegurui",
