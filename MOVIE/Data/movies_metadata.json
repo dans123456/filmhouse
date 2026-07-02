@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "97617",
+    "tmdb_id": 97617,
+    "imdb_id": "",
+    "title": "The Misfit of Demon King Academy",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Anos Voldigord was a tyrannical Demon King that eradicated humans, spirits, and even the gods, but became bored of eternal warfare and reincarnated with dreams of a peaceful world. However, what awaited him in reincarnation after 2000 years were descendants who became too weak after being accustomed to peace, and all sorts of magic that deteriorated to the extreme. Anos enters Demon King Academy that gathers and educates those who are viewed as the reincarnation of the Demon King, but the academy could not see through his true powers and ends up branding him as a misfit.",
+    "poster": "https://image.tmdb.org/t/p/w500/xBNR7V4s5b0qQfRCiyEvIC5PS6v.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fxISKAY8c2xYXt2CFLjUU2bEx8n.jpg",
+    "rating": 8.4,
+    "release_date": "2020-07-04",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADjhMAAghnMUY3d9J_k-6OPhYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADkRMAAghnMUYRDTnSEdR5DBYE"
+    ]
+  },
+  {
     "csv_id": "206324-30",
     "tmdb_id": 206324,
     "imdb_id": "",
