@@ -482,7 +482,7 @@ async function initializeDatabase() {
             categories.push("Anime");
         }
 
-        if (genres.includes("Animation") && mType === 'movie') {
+        if (genres.includes("Animation") && !categories.includes("Anime")) {
             categories.push("Animated Movies");
         }
 

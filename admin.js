@@ -1292,21 +1292,34 @@ if (addMovieForm) {
                     overview = data.overview || "No synopsis available.";
                     
                     // Categorize title automatically
-                    if (type === 'tv') {
-                        categories.push("Hollywood/British Series");
-                        if (original_language === 'ko') {
-                            categories.push("Korean Drama");
-                        }
+                    const africanCountries = ["NG", "ZA", "GH", "KE", "EG", "TZ", "UG", "MA", "DZ"];
+                    const isAfrican = data.origin_country && data.origin_country.some(c => africanCountries.includes(c));
+                    
+                    if (isAfrican) {
+                        categories.push("African");
                     } else {
-                        categories.push("Hollywood/British Movies");
+                        const isAnimation = data.genres && data.genres.some(g => g.name.toLowerCase() === "animation");
+                        if (isAnimation) {
+                            if (original_language === 'ja') {
+                                categories.push("Anime");
+                            } else {
+                                categories.push("Animated Movies");
+                            }
+                        }
+                        
                         if (original_language === 'ko') {
                             categories.push("Korean Drama");
+                        } else if (original_language === 'hi') {
+                            categories.push("Bollywood");
                         }
-                    }
-                    if (data.genres && data.genres.some(g => g.name.toLowerCase() === "animation")) {
-                        categories.push("Animated Movies");
-                        if (original_language === 'ja') {
-                            categories.push("Anime");
+                        
+                        const isRegional = categories.some(cat => ["Korean Drama", "Bollywood", "African", "Anime"].includes(cat));
+                        if (!isRegional) {
+                            if (type === 'tv') {
+                                categories.push("Hollywood/British Series");
+                            } else {
+                                categories.push("Hollywood/British Movies");
+                            }
                         }
                     }
                 } else {

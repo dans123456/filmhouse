@@ -1,6 +1,6 @@
 [
   {
-    "title": "Marvel's Hit-Monkey (2021)",
+    "title": "Marvel's Hit-Monkey",
     "csv_id": "133903-hit-monkey",
     "type": "Series",
     "links": [
@@ -17,7 +17,6 @@
     "categories": [
       "Main",
       "Animated Movies",
-      "Anime",
       "Hollywood/British Series"
     ],
     "tmdb_id": 133903,
@@ -26,7 +25,7 @@
     "language": "en"
   },
   {
-    "title": "FREEDOM AND JUSTICE",
+    "title": "Freedom.And.Justice.2021",
     "csv_id": "1724402-freedom-and--2021",
     "type": "Movie",
     "links": [
@@ -40,14 +39,14 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1724402,
     "overview": "The movie addresses intense themes like systemic corruption, illegal mining (galamsey), and political injustice in Ghana, tackling controversial issues within the nation's governance.",
     "language": "en"
   },
   {
-    "title": "Kakegurui (2017)",
+    "title": "Kakegurui",
     "csv_id": "72305",
     "type": "Series",
     "links": [
@@ -65,7 +64,7 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Anime"
     ],
     "tmdb_id": 72305,
     "overview": "Run by a corrupt and sadistic school council, the “system” at Hyakkaou is based on gambling, with losers who cannot cover their debts being demeaned by their peers and forced to serve their debtholders. And if that’s not terrifying enough, some games can result in losing an eye, one’s fingernails, or even their life! But the system is shocked when transfer student Yumeko Jabami arrives. Dark, mysterious and attractive, she’s a wildcard who plays for the thrill of it…",
@@ -73,7 +72,7 @@
     "language": "ja"
   },
   {
-    "title": "Horimiya (2021)",
+    "title": "Horimiya",
     "csv_id": "110070",
     "type": "Series",
     "links": [
@@ -90,7 +89,7 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Anime"
     ],
     "tmdb_id": 110070,
     "overview": "A secret life is the one thing they have in common. At school, Hori is a prim and perfect social butterfly, but the truth is she's a brash homebody. Meanwhile, under a gloomy facade, Miyamura hides a gentle heart, along with piercings and tattoos. In a chance meeting, they both reveal a side they've never shown. Could this blossom into something new?",
@@ -98,7 +97,7 @@
     "language": "ja"
   },
   {
-    "title": "Fire Force (2019)",
+    "title": "Fire Force",
     "csv_id": "88046",
     "type": "Series",
     "links": [
@@ -116,7 +115,7 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Anime"
     ],
     "tmdb_id": 88046,
     "overview": "Year 198 of the Solar Era in Tokyo, special fire brigades are fighting against a phenomenon called spontaneous human combustion where humans beings are turned into living infernos called \"Infernals\". While the Infernals are first generation cases of spontaneous human combustion, later generations possess the ability to manipulate flames while retaining human form. Shinra Kusakabe, a youth who gained the nickname Devil's Footprints for his ability to ignite his feet at will, joins the Special Fire Force Company 8 which composes of other flames users as they work to extinguish any Infernals they encounter. As a faction that is creating Infernals appears, Shira begins to uncover the truth behind a mysterious fire that caused the death of his family twelve years ago.",
@@ -124,7 +123,7 @@
     "language": "ja"
   },
   {
-    "title": "Re:ZERO -Starting Life in Another World- (2016)",
+    "title": "Re:ZERO -Starting Life in Another World-",
     "csv_id": "65942-re",
     "type": "Series",
     "links": [
@@ -143,18 +142,16 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 65942,
-    "overview": "Natsuki Subaru, an ordinary high school student, is on his way home from the convenience store when he finds himself transported to another world. As he's lost and confused in a new world where he doesn't even know left from right, the only person to reach out to him was a beautiful girl with silver hair. Determined to repay her somehow for saving him from his own despair, Subaru agrees to help the girl find something she's looking for.",
+    "overview": "Natsuki Subaru, an ordinary high school  student, is on his way home from the convenience store when he finds  himself transported to another world. As he's lost and confused in a new  world where he doesn't even know left from right, the only person to  reach out to him was a beautiful girl with silver hair. Determined to  repay her somehow for saving him from his own despair, Subaru agrees to  help the girl find something she's looking for.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/7ZruEnSnHD6Jx5mF0hBt1E306Vt.jpg",
     "language": "ja",
     "cast": []
   },
   {
-    "title": "Code Geass: Lelouch of the Rebellion (2006)",
+    "title": "Code Geass: Lelouch of the Rebellion",
     "csv_id": "31724-code-geass",
     "type": "Series",
     "links": [
@@ -172,8 +169,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 31724,
@@ -183,7 +178,7 @@
     "cast": []
   },
   {
-    "title": "Terminator Zero (2024)",
+    "title": "Terminator Zero",
     "csv_id": "239287-terminator",
     "type": "Series",
     "links": [
@@ -199,8 +194,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 239287,
@@ -210,7 +203,7 @@
     "cast": []
   },
   {
-    "title": "Claymore (2007)",
+    "title": "Claymore",
     "csv_id": "34791-claymore",
     "type": "Series",
     "links": [
@@ -227,8 +220,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 34791,
@@ -238,7 +229,7 @@
     "cast": []
   },
   {
-    "title": "My Hero Academia: Vigilantes (2025)",
+    "title": "My Hero Academia: Vigilantes",
     "csv_id": "280110-illegals",
     "type": "Series",
     "links": [
@@ -256,8 +247,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 280110,
@@ -267,7 +256,7 @@
     "cast": []
   },
   {
-    "title": "My Hero Academia (2016)",
+    "title": "My Hero Academia",
     "csv_id": "65930",
     "type": "Series",
     "links": [
@@ -289,8 +278,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 65930,
@@ -300,7 +287,7 @@
     "cast": []
   },
   {
-    "title": "My Hero Academia: World Heroes' Mission (2021)",
+    "title": "My Hero Academia: World Heroes' Mission",
     "csv_id": "768744-the-movie",
     "type": "Movie",
     "links": [
@@ -317,8 +304,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 768744,
@@ -328,7 +313,7 @@
     "cast": []
   },
   {
-    "title": "My Hero Academia: Heroes Rising (2019)",
+    "title": "My Hero Academia: Heroes Rising",
     "csv_id": "592350-the-movie",
     "type": "Movie",
     "links": [
@@ -345,8 +330,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 592350,
@@ -356,7 +339,7 @@
     "cast": []
   },
   {
-    "title": "My Hero Academia: Two Heroes (2018)",
+    "title": "My Hero Academia: Two Heroes",
     "csv_id": "505262-the-movie-2",
     "type": "Movie",
     "links": [
@@ -373,8 +356,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 505262,
@@ -384,7 +365,7 @@
     "cast": []
   },
   {
-    "title": "【OSHI NO KO】 (2023)",
+    "title": "【OSHI NO KO】",
     "csv_id": "203737",
     "type": "Series",
     "links": [
@@ -400,8 +381,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 203737,
@@ -411,7 +390,7 @@
     "cast": []
   },
   {
-    "title": "DOTA: Dragon's Blood (2021)",
+    "title": "DOTA: Dragon's Blood",
     "csv_id": "118956-dota-dragon-s-blood",
     "type": "Series",
     "links": [
@@ -429,8 +408,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies"
+      "Animated Movies",
+      "Hollywood/British Series"
     ],
     "tmdb_id": 118956,
     "overview": "After encounters with a dragon and a princess on her own mission, a Dragon Knight becomes embroiled in events larger than he could have ever imagined.",
@@ -439,7 +418,7 @@
     "cast": []
   },
   {
-    "title": "PLUTO (2023)",
+    "title": "PLUTO",
     "csv_id": "91997-pluto",
     "type": "Series",
     "links": [
@@ -456,8 +435,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 91997,
@@ -467,7 +444,7 @@
     "cast": []
   },
   {
-    "title": "Ajin (2016)",
+    "title": "Ajin",
     "csv_id": "65292-ajin",
     "type": "Series",
     "links": [
@@ -484,8 +461,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 65292,
@@ -495,7 +470,7 @@
     "cast": []
   },
   {
-    "title": "Dan Da Dan (2024)",
+    "title": "Dan Da Dan",
     "csv_id": "240411",
     "type": "Series",
     "links": [
@@ -513,8 +488,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 240411,
@@ -524,7 +497,7 @@
     "cast": []
   },
   {
-    "title": "Akame ga Kill! (2014)",
+    "title": "Akame ga Kill!",
     "csv_id": "61223",
     "type": "Series",
     "links": [
@@ -540,8 +513,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 61223,
@@ -551,7 +522,7 @@
     "cast": []
   },
   {
-    "title": "Ningen Fushin: Adventurers Who Don't Believe in Humanity Will Save the World (2023)",
+    "title": "Ningen Fushin: Adventurers Who Don't Believe in Humanity Will Save the World",
     "csv_id": "131366",
     "type": "Series",
     "links": [
@@ -568,8 +539,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 131366,
@@ -579,7 +548,7 @@
     "cast": []
   },
   {
-    "title": "Summer Time Rendering (2022)",
+    "title": "Summer Time Rendering",
     "csv_id": "117933",
     "type": "Series",
     "links": [
@@ -595,8 +564,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 117933,
@@ -606,7 +573,7 @@
     "cast": []
   },
   {
-    "title": "Made in Abyss: Wandering Twilight (2019)",
+    "title": "Made in Abyss: Wandering Twilight",
     "csv_id": "526429",
     "type": "Movie",
     "links": [
@@ -624,8 +591,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 526429,
@@ -635,7 +600,7 @@
     "cast": []
   },
   {
-    "title": "Made in Abyss: Journey's Dawn (2019)",
+    "title": "Made in Abyss: Journey's Dawn",
     "csv_id": "526426",
     "type": "Movie",
     "links": [
@@ -653,8 +618,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 526426,
@@ -664,7 +627,7 @@
     "cast": []
   },
   {
-    "title": "Made in Abyss (2017)",
+    "title": "Made in Abyss",
     "csv_id": "72636-made-in-abyss",
     "type": "Series",
     "links": [
@@ -682,8 +645,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 72636,
@@ -693,7 +654,7 @@
     "cast": []
   },
   {
-    "title": "My Instant Death Ability Is Overpowered (2024)",
+    "title": "My Instant Death Ability Is Overpowered",
     "csv_id": "236144",
     "type": "Series",
     "links": [
@@ -710,8 +671,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 236144,
@@ -721,7 +680,7 @@
     "cast": []
   },
   {
-    "title": "Prison School (2015)",
+    "title": "Prison School",
     "csv_id": "64706-kangoku-gakuen",
     "type": "Series",
     "links": [
@@ -736,8 +695,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 64706,
@@ -747,7 +704,7 @@
     "cast": []
   },
   {
-    "title": "Rascal Does Not Dream of a Dreaming Girl (2019)",
+    "title": "Rascal Does Not Dream of a Dreaming Girl",
     "csv_id": "572154",
     "type": "Movie",
     "links": [
@@ -764,8 +721,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 572154,
@@ -775,7 +730,7 @@
     "cast": []
   },
   {
-    "title": "Lazarus (2025)",
+    "title": "Lazarus",
     "csv_id": "231003-lazarus",
     "type": "Series",
     "links": [
@@ -791,8 +746,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies"
+      "Animated Movies",
+      "Hollywood/British Series"
     ],
     "tmdb_id": 231003,
     "overview": "In 2052, a Nobel Prize-winning neuroscientist develops a drug called Hapna — a cure-all that has the unexpected side-effect of causing death three years later. In response to this threat, a special force of agents—nicknamed \"Lazarus\"— is assembled to take on the malevolent Skinner.",
@@ -801,7 +756,7 @@
     "cast": []
   },
   {
-    "title": "The Rising of the Shield Hero (2019)",
+    "title": "The Rising of the Shield Hero",
     "csv_id": "83095",
     "type": "Series",
     "links": [
@@ -820,8 +775,6 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies",
       "Anime"
     ],
     "tmdb_id": 83095,
@@ -837,22 +790,22 @@
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQAD8hcAArFaIUat2A2IQ4vU0RYE"
     ],
-    "poster": "img/FilmHouse3_nobg.png",
+    "poster": "https://image.tmdb.org/t/p/w500/urk4BPSPhRTggZQ4lHNmu1ugmhi.jpg",
     "rating": 0,
-    "release_date": "",
+    "release_date": "2026-01-26",
     "genres": [],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1723794,
-    "overview": "No synopsis available.",
+    "overview": "Vanessa has beauty and brains but due to her geeky exterior, she can't seem to get noticed by her crush.",
     "backdrop": "img/FilmHouse.png",
     "language": "en",
     "cast": []
   },
   {
-    "title": "Spidey and His Amazing Friends (2021)",
+    "title": "Spidey and His Amazing Friends",
     "csv_id": "127635-spidey-and-his-amazing-friends",
     "type": "Series",
     "links": [
@@ -872,8 +825,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies"
+      "Animated Movies",
+      "Hollywood/British Series"
     ],
     "tmdb_id": 127635,
     "overview": "Follow Peter Parker, Gwen Stacy and Miles Morales and their adventures as the young heroes team up with Hulk, Ms. Marvel and Black Panther to defeat foes like Rhino, Doc Ock and Green Goblin and learn that teamwork is the best way to save the day.",
@@ -882,7 +835,7 @@
     "cast": []
   },
   {
-    "title": "Moon Knight (2022)",
+    "title": "Moon Knight",
     "csv_id": "92749-moon-knight",
     "type": "Series",
     "links": [
@@ -907,7 +860,7 @@
     "cast": []
   },
   {
-    "title": "Doctor Strange in the Multiverse of Madness (2022)",
+    "title": "Doctor Strange in the Multiverse of Madness",
     "csv_id": "453395-doctor-strange-in-the-multiverse-of-madness",
     "type": "Movie",
     "links": [
@@ -933,7 +886,7 @@
     "cast": []
   },
   {
-    "title": "Ms. Marvel (2022)",
+    "title": "Ms. Marvel",
     "csv_id": "92782-ms-marvel",
     "type": "Series",
     "links": [
@@ -958,7 +911,7 @@
     "cast": []
   },
   {
-    "title": "Thor: Love and Thunder (2022)",
+    "title": "Thor: Love and Thunder",
     "csv_id": "616037-thor-love-and-thunder",
     "type": "Movie",
     "links": [
@@ -984,7 +937,7 @@
     "cast": []
   },
   {
-    "title": "I Am Groot (2022)",
+    "title": "I Am Groot",
     "csv_id": "232125-i-am-groot",
     "type": "Series",
     "links": [
@@ -1003,8 +956,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies"
+      "Animated Movies",
+      "Hollywood/British Series"
     ],
     "tmdb_id": 232125,
     "overview": "There's no guarding the galaxy from this mischievous toddler! Get ready as Baby Groot takes center stage in his very own collection of shorts, exploring his glory days growing up and getting into trouble among the stars.",
@@ -1013,7 +966,7 @@
     "cast": []
   },
   {
-    "title": "She-Hulk: Attorney at Law (2022)",
+    "title": "She-Hulk: Attorney at Law",
     "csv_id": "92783-she-hulk-attorney-at-law",
     "type": "Series",
     "links": [
@@ -1037,7 +990,7 @@
     "cast": []
   },
   {
-    "title": "Werewolf by Night (2022)",
+    "title": "Werewolf by Night",
     "csv_id": "894205-werewolf-by-night",
     "type": "Movie",
     "links": [
@@ -1062,7 +1015,7 @@
     "cast": []
   },
   {
-    "title": "Black Panther: Wakanda Forever (2022)",
+    "title": "Black Panther: Wakanda Forever",
     "csv_id": "505642-black-panther-wakanda-forever",
     "type": "Movie",
     "links": [
@@ -1087,7 +1040,7 @@
     "cast": []
   },
   {
-    "title": "The Guardians of the Galaxy Holiday Special (2022)",
+    "title": "The Guardians of the Galaxy Holiday Special",
     "csv_id": "774752-the-guardians-of-the-galaxy-holiday-special",
     "type": "Movie",
     "links": [
@@ -1112,7 +1065,7 @@
     "cast": []
   },
   {
-    "title": "Spider-Man: Across the Spider-Verse (2023)",
+    "title": "Spider-Man: Across the Spider-Verse",
     "csv_id": "569094-spider-man-across-the-spider-verse",
     "type": "Movie",
     "links": [
@@ -1130,8 +1083,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Animated Movies"
+      "Animated Movies",
+      "Hollywood/British Movies"
     ],
     "tmdb_id": 569094,
     "overview": "After reuniting with Gwen Stacy, Brooklyn’s full-time, friendly neighborhood Spider-Man is catapulted across the Multiverse, where he encounters the Spider Society, a team of Spider-People charged with protecting the Multiverse's very existence. But when the heroes clash on how to handle a new threat, Miles finds himself pitted against the other Spiders and must set out on his own to save those he loves most.",
@@ -1140,7 +1093,7 @@
     "cast": []
   },
   {
-    "title": "Secret Invasion (2023)",
+    "title": "Secret Invasion",
     "csv_id": "114472-secret-invasion",
     "type": "Series",
     "links": [
@@ -1165,7 +1118,7 @@
     "cast": []
   },
   {
-    "title": "The Marvels (2023)",
+    "title": "The Marvels",
     "csv_id": "609681-the-marvels",
     "type": "Movie",
     "links": [
@@ -1190,7 +1143,7 @@
     "cast": []
   },
   {
-    "title": "Marvel's Moon Girl and Devil Dinosaur (2023)",
+    "title": "Marvel's Moon Girl and Devil Dinosaur",
     "csv_id": "92788-moon-girl-and-devil-dinosaur",
     "type": "Series",
     "links": [
@@ -1208,8 +1161,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies"
+      "Animated Movies",
+      "Hollywood/British Series"
     ],
     "tmdb_id": 92788,
     "overview": "After 13-year-old super-genius Lunella accidentally brings ten-ton T-Rex, Devil Dinosaur into present-day New York City via a time vortex, the duo works together to protect the city's Lower East Side from danger.",
@@ -1218,7 +1171,7 @@
     "cast": []
   },
   {
-    "title": "Echo (2024)",
+    "title": "Echo",
     "csv_id": "122226-echo",
     "type": "Series",
     "links": [
@@ -1243,7 +1196,7 @@
     "cast": []
   },
   {
-    "title": "Madame Web (2024)",
+    "title": "Madame Web",
     "csv_id": "634492-madame-web",
     "type": "Movie",
     "links": [
@@ -1268,28 +1221,30 @@
     "cast": []
   },
   {
-    "title": "Chasing Lullaby",
+    "title": "Chassing Lullaby",
     "csv_id": "1723743-chassing-lullaby",
     "type": "Movie",
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADMhYAArFaKUbwTbCBtQobMBYE"
     ],
-    "poster": "img/FilmHouse3_nobg.png",
+    "poster": "https://image.tmdb.org/t/p/w500/ycZDjwo0W0atCjuaKhm4HYcIqVe.jpg",
     "rating": 0,
-    "release_date": "",
-    "genres": [],
+    "release_date": "2021-05-09",
+    "genres": [
+      "Comedy"
+    ],
     "categories": [
       "Main",
       "Hollywood/British Movies"
     ],
     "tmdb_id": 1723743,
-    "overview": "No synopsis available.",
+    "overview": "On the eve of Mothers’ Day, 5 women confronting loss, love and life, in a series of connected events, journey towards redemption as they re-build their lives in the wake of a day where motherhood is celebrated and the childless are forgotten.",
     "backdrop": "img/FilmHouse.png",
     "language": "en",
     "cast": []
   },
   {
-    "title": "X-Men '97 (2024)",
+    "title": "X-Men '97",
     "csv_id": "138502-x-men-97",
     "type": "Series",
     "links": [
@@ -1305,8 +1260,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies"
+      "Animated Movies",
+      "Hollywood/British Series"
     ],
     "tmdb_id": 138502,
     "overview": "The X-Men, a band of mutants who use their uncanny gifts to protect a world that hates and fears them, are challenged like never before, forced to face a dangerous and unexpected new future.",
@@ -1315,7 +1270,7 @@
     "cast": []
   },
   {
-    "title": "Thunderbolts* (2025)",
+    "title": "Thunderbolts*",
     "csv_id": "986056-thunderbolts",
     "type": "Movie",
     "links": [
@@ -1340,7 +1295,7 @@
     "cast": []
   },
   {
-    "title": "Agatha All Along (2024)",
+    "title": "Agatha All Along",
     "csv_id": "138501-agatha-all-along",
     "type": "Series",
     "links": [
@@ -1364,7 +1319,7 @@
     "cast": []
   },
   {
-    "title": "Venom: The Last Dance (2024)",
+    "title": "Venom: The Last Dance",
     "csv_id": "912649-venom-the-last-dance",
     "type": "Movie",
     "links": [
@@ -1389,7 +1344,7 @@
     "cast": []
   },
   {
-    "title": "Kraven the Hunter (2024)",
+    "title": "Kraven the Hunter",
     "csv_id": "539972-kraven-the-hunter",
     "type": "Movie",
     "links": [
@@ -1414,7 +1369,7 @@
     "cast": []
   },
   {
-    "title": "Daredevil: Born Again (2025)",
+    "title": "Daredevil: Born Again",
     "csv_id": "202555-daredevil-born-again",
     "type": "Series",
     "links": [
@@ -1440,7 +1395,7 @@
     "cast": []
   },
   {
-    "title": "The Fantastic 4: First Steps (2025)",
+    "title": "The Fantastic 4: First Steps",
     "csv_id": "617126-the-fantastic-4-first-steps",
     "type": "Movie",
     "links": [
@@ -1465,7 +1420,7 @@
     "cast": []
   },
   {
-    "title": "Ironheart (2025)",
+    "title": "Ironheart",
     "csv_id": "114471-ironheart",
     "type": "Series",
     "links": [
@@ -1490,7 +1445,7 @@
     "cast": []
   },
   {
-    "title": "Marvel Zombies (2025)",
+    "title": "Marvel Zombies",
     "csv_id": "138505-marvel-zombies",
     "type": "Series",
     "links": [
@@ -1506,8 +1461,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Animated Movies"
+      "Animated Movies",
+      "Hollywood/British Series"
     ],
     "tmdb_id": 138505,
     "overview": "After the Avengers are overtaken by a zombie plague, a desperate group of survivors discover the key to bringing an end to the super-powered undead, racing across a dystopian landscape and risking life and limb to save their world.",
@@ -1516,7 +1471,7 @@
     "cast": []
   },
   {
-    "title": "Hawkeye (2021)",
+    "title": "Hawkeye",
     "csv_id": "88329-hawkeye",
     "type": "Series",
     "links": [
@@ -1541,7 +1496,7 @@
     "cast": []
   },
   {
-    "title": "Wonder Man (2026)",
+    "title": "Wonder Man",
     "csv_id": "198178-wonder-man",
     "type": "Series",
     "links": [
@@ -1565,7 +1520,7 @@
     "cast": []
   },
   {
-    "title": "RANCOR",
+    "title": "Rancor",
     "csv_id": "1723707-rancor",
     "type": "Movie",
     "links": [
@@ -1577,10 +1532,10 @@
     "genres": [],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1723707,
-    "overview": "No synopsis available.",
+    "overview": "Dasola hates her brother Murewa, a fact that breaks their mother's heart. When Dasola gets into a fight with her boyfriend that leads to a federal crime, the family must come together to make a sacrifice",
     "backdrop": "img/FilmHouse.png",
     "language": "en",
     "cast": []
@@ -1592,34 +1547,40 @@
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADUhsAArFaKUaQvGvn4Hj07xYE"
     ],
-    "poster": "img/FilmHouse3_nobg.png",
+    "poster": "https://image.tmdb.org/t/p/w500/z5HB7lrOQ0YXZBWmQ6Vl5mh4v1b.jpg",
     "rating": 0,
     "release_date": "",
     "genres": [],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1723689,
-    "backdrop": "img/FilmHouse.png"
+    "backdrop": "img/FilmHouse.png",
+    "overview": "A 17-year-old high school student's world is turned upside down when her nudes are leaked by the new school blog, leaving her to battle with the disastrous consequences",
+    "language": "en"
   },
   {
-    "title": "Burden Of Proof 2023",
+    "title": "Burden of Proof",
     "csv_id": "1723646-burden-of-proof",
     "type": "Movie",
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADehQAArFaKUbCFGzJuPh1FBYE"
     ],
-    "poster": "img/FilmHouse3_nobg.png",
+    "poster": "https://image.tmdb.org/t/p/w500/4WGD76Lhu9nIVrPujQibxvYgOK3.jpg",
     "rating": 0,
-    "release_date": "",
-    "genres": [],
+    "release_date": "2023-01-20",
+    "genres": [
+      "Drama"
+    ],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1723646,
-    "backdrop": "img/FilmHouse.png"
+    "backdrop": "img/FilmHouse.png",
+    "overview": "Adaeze's efficiency attracts her boss, but a jealous colleague and a past will become a stumbling block to her happiness.",
+    "language": "en"
   },
   {
     "title": "Georgie & Mandy's First Marriage",
@@ -1803,6 +1764,7 @@
     ],
     "categories": [
       "Main",
+      "Animated Movies",
       "Hollywood/British Series"
     ],
     "tmdb_id": 213249,
@@ -1835,8 +1797,9 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Series"
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
     ],
     "tmdb_id": 138503,
     "overview": "Peter Parker is on his way to becoming a hero, but his path to get there is anything but ordinary.",
@@ -1864,6 +1827,7 @@
     ],
     "categories": [
       "Main",
+      "Animated Movies",
       "Hollywood/British Series"
     ],
     "tmdb_id": 91363,
@@ -1925,7 +1889,7 @@
     ],
     "categories": [
       "Main",
-      "African"
+      "Hollywood/British Series"
     ],
     "tmdb_id": 158141,
     "overview": "When five ordinary South Londoners discover they have extraordinary powers, it's down to just one man to bring them together to save the woman he loves.",
@@ -2024,8 +1988,8 @@
     "categories": [
       "Main",
       "Animated Movies",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 277834,
     "overview": "In Ancient Polynesia, when a terrible curse incurred by Maui reaches an impetuous Chieftain's daughter's island, she answers the Ocean's call to seek out the demigod to set things right.",
@@ -2129,8 +2093,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 926670,
     "overview": "Henry Hart meets a superfan—eager to fight crime with Kid Danger—who comes into possession of a device that can open up alternate realities. Facing a wild ride, Henry will need his best friend Jasper and his new superfan sidekick to find his way out or be stuck in another dimension forever.",
@@ -2196,7 +2160,7 @@
     ],
     "categories": [
       "Main",
-      "Korean Drama"
+      "Hollywood/British Series"
     ],
     "tmdb_id": 204082,
     "overview": "In this reality competition show inspired by \"Squid Game,\" 456 players put their skills to the ultimate test for a life-changing $4.56 million prize.",
@@ -2324,9 +2288,9 @@
     ],
     "categories": [
       "Main",
+      "Hollywood/British Series",
       "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Classic Movies",
-      "Hollywood/British Series"
+      "Classic Movies"
     ],
     "tmdb_id": 1892,
     "overview": "Will, a street-smart teenager, moves from the tough streets of West Philly to posh Bel-Air to live with his Uncle Philip, Aunt Vivian, his cousins — spoiled Hilary, preppy Carlton and young Ashley — and their sophisticated British butler, Geoffrey. Though Will’s antics and upbringing contrast greatly with the upper-class lifestyle of his extended relatives, he soon finds himself right at home as a loved part of the family.",
@@ -2362,6 +2326,7 @@
     ],
     "categories": [
       "Main",
+      "Animated Movies",
       "Hollywood/British Series"
     ],
     "tmdb_id": 246,
@@ -2656,8 +2621,8 @@
     ],
     "categories": [
       "Main",
-      "Erotic Movies",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Erotic Movies"
     ],
     "tmdb_id": 216015,
     "overview": "When college senior Anastasia Steele steps in for her sick roommate to interview prominent businessman Christian Grey for their campus paper, little does she realize the path her life will take. Christian, as enigmatic as he is rich and powerful, finds himself strangely drawn to Ana, and she to him. Though sexually inexperienced, Ana plunges headlong into an affair -- and learns that Christian's true sexual proclivities push the boundaries of pain and pleasure.",
@@ -2690,8 +2655,8 @@
     ],
     "categories": [
       "Main",
-      "Erotic Movies",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Erotic Movies"
     ],
     "tmdb_id": 341174,
     "overview": "When a wounded Christian Grey tries to entice a cautious Ana Steele back into his life, she demands a new arrangement before she will give him another chance. As the two begin to build trust and find stability, shadowy figures from Christian’s past start to circle the couple, determined to destroy their hopes for a future together.",
@@ -2724,8 +2689,8 @@
     ],
     "categories": [
       "Main",
-      "Erotic Movies",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Erotic Movies"
     ],
     "tmdb_id": 337167,
     "overview": "Believing they have left behind shadowy figures from their past, newlyweds Christian and Ana fully embrace an inextricable connection and shared life of luxury. But just as she steps into her role as Mrs. Grey and he relaxes into an unfamiliar stability, new threats could jeopardize their happy ending before it even begins.",
@@ -2991,7 +2956,7 @@
     ],
     "categories": [
       "Main",
-      "African"
+      "Hollywood/British Series"
     ],
     "tmdb_id": 64641,
     "overview": "A young female police detective is fighting cancer while trying to solve the murder of a Vancouver billionaire's drug-addicted son.",
@@ -3050,7 +3015,7 @@
       "https://t.me/+buByzJSLOUA0NWI0"
     ],
     "poster": "https://image.tmdb.org/t/p/w500/7V0Ebks0GgpKvQ7QbLAIdX5dos4.jpg",
-    "rating": 8.3,
+    "rating": 8.4,
     "release_date": "2022-08-21",
     "genres": [
       "Sci-Fi & Fantasy",
@@ -3157,8 +3122,8 @@
     ],
     "categories": [
       "Main",
-      "Classic Movies",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "tmdb_id": 2105,
     "overview": "At a high-school party, four friends find that losing their collective virginity isn't as easy as they had thought. But they still believe that they need to do so before college. To motivate themselves, they enter a pact to all \"score\" by their senior prom.",
@@ -3230,6 +3195,7 @@
     ],
     "categories": [
       "Main",
+      "Animated Movies",
       "Hollywood/British Series"
     ],
     "tmdb_id": 73021,
@@ -3362,8 +3328,9 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 93260,
     "overview": "The Casagrandes tells the story of Ronnie Anne, an independent, adventurous, 11-year-old who explores city life with her big, loving, multi-generational Mexican-American family.",
@@ -3394,8 +3361,8 @@
     ],
     "categories": [
       "Main",
-      "Classic Movies",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "tmdb_id": 10585,
     "overview": "After being shot in a toy store, a serial killer transfers his soul into a Good Guy doll. A mother then gifts it to her 6-year old son Andy, which unleashes terror upon the city.",
@@ -3427,8 +3394,8 @@
     ],
     "categories": [
       "Main",
-      "Classic Movies",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "tmdb_id": 11186,
     "overview": "Chucky is reconstructed by a toy factory to dispel the negative publicity surrounding the doll, and tracks young Andy Barclay to a foster home where the chase begins again.",
@@ -3461,8 +3428,8 @@
     ],
     "categories": [
       "Main",
-      "Classic Movies",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "tmdb_id": 11187,
     "overview": "Eight years after seemingly destroying the killer doll, teen Andy Barclay is placed in a military school, and the spirit of Chucky returns to renew his quest and seek vengeance after being recreated from a mass of melted plastic.",
@@ -3495,8 +3462,8 @@
     ],
     "categories": [
       "Main",
-      "Classic Movies",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "tmdb_id": 11932,
     "overview": "For ten years, the tortured soul of serial killer Charles Lee Ray has been imprisoned inside a child's doll. Chucky is reborn when his old flame, Tiffany, rescues his battered doll parts from a police impound. But Chucky wants his new playmate cut down to size, so he transforms his blushing bride into a stunning little terror. Chucky and Tiffany can't wait to start their own homicidal honeymoon. When this demonic duo hits the road and hooks up with a pair of unsuspecting newlyweds, they leave a trail of murder and mayhem behind them. Chucky's back!",
@@ -3729,11 +3696,11 @@
     ],
     "categories": [
       "Main",
-      "Classic Movies",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "tmdb_id": 31251,
-    "overview": "Six sexy women, and a teenage girl, devastate a right-wing militia before doing battle with ruthless drug pushers.",
+    "overview": "Seven women decide to fight the local drug cartel. When Las Vegas pop singer Michelle's brother is found severely beaten, he's discovered to have been on illegal drugs. Michelle meets with April, her brother's teacher, who reveals that she's secretly been gathering intelligence on the cartel's local processing plant, and Michelle agrees to help April with a plan to destroy the plant. With Michelle's fame opening the door, they recruit four more women with special skills and connections to help them carry out their audacious goal.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/nSG1Ydpdo0cjVrbrxozU1YdPpAk.jpg",
     "language": "en",
     "cast": [
@@ -3764,8 +3731,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 46150,
     "overview": "Carrossel is a children's telenovela created by Abel Santa Cruz and written by Íris Abravanel, originally transmitted on SBT from May 21, 2012 to present. It is a Brazilian remake of the Mexican telenovela Carrusel, which in turn had been inspired by the Argentinean telenovela Jacinta Pichimahuida, la Maestra que no se Olvida.\n\nIn a short time the display was a telenovela phenomenon of hearing canal causing quite successful among the children public yielding several CDs, DVDs, toys and other products in less than a year. including we have made several spin-offs based on it, including a cartoon series and television sitcom.",
@@ -3800,8 +3767,8 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Comic"
     ],
     "tmdb_id": 61889,
     "overview": "Lawyer-by-day Matt Murdock uses his heightened senses from being blinded as a young boy to fight crime at night on the streets of Hell’s Kitchen as Daredevil.",
@@ -3833,8 +3800,8 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Comic"
     ],
     "tmdb_id": 9480,
     "overview": "A man blinded in a childhood accident fights crime using his superhumanly-elevated remaining senses.",
@@ -3963,8 +3930,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 1778,
     "overview": "Zoey 101 is an American television series which originally aired on Nickelodeon from January 9, 2005 until May 2, 2008. It focuses on the lives of teenager Zoey Brooks and her friends as they attend Pacific Coast Academy, a fictional boarding school in Southern California. It was created by Dan Schneider. It was initially filmed at Pepperdine University in Malibu, California, then at stages in Valencia, California beginning in season 3. It was nominated for an \"Outstanding Children's Program\" Emmy in 2005. Zoey 101 was the most expensive production ever for Nickelodeon series, as it was shot completely on location in Malibu. It was also Nickelodeon's best performance for a series premiere in almost eight years. Despite this, many critics have made negative comments about the show, its setting, and its characters.",
@@ -4031,8 +3998,9 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 114466,
     "overview": "Return to the fantastical city of San Fransokyo where the affable, inflatable, inimitable healthcare companion robot, Baymax, sets out to do what he was programmed to do: help others.",
@@ -4101,9 +4069,9 @@
     ],
     "categories": [
       "Main",
+      "Hollywood/British Movies",
       "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Classic Movies",
-      "Hollywood/British Movies"
+      "Classic Movies"
     ],
     "tmdb_id": 15739,
     "overview": "An orphan in a facility run by the mean Miss Hannigan, Annie believes that her parents left her there by mistake. When a rich man named Oliver \"Daddy\" Warbucks decides to let an orphan live at his home to promote his image, Annie is selected. While Annie gets accustomed to living in Warbucks' mansion, she still longs to meet her parents. So Warbucks announces a search for them and a reward, which brings out many frauds.",
@@ -4137,8 +4105,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 196867,
     "overview": "Annie is a young, happy foster kid who's also tough enough to make her way on the streets of New York in 2014. Originally left by her parents as a baby with the promise that they'd be back for her someday, it's been a hard knock life ever since with her mean foster mom Miss Hannigan. But everything's about to change when the hard-nosed tycoon and New York mayoral candidate Will Stacks—advised by his brilliant VP and his shrewd and scheming campaign advisor—makes a thinly-veiled campaign move and takes her in. Stacks believes he's her guardian angel, but Annie's self-assured nature and bright, sun-will-come-out-tomorrow outlook on life just might mean it's the other way around.",
@@ -4348,6 +4316,7 @@
     ],
     "categories": [
       "Main",
+      "Animated Movies",
       "Hollywood/British Series"
     ],
     "tmdb_id": 33880,
@@ -4460,8 +4429,9 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 4630,
     "overview": "The zany, fast-paced adventures of a 10-year-old boy and his fairy godparents, who inadvertently create havoc as they grant wishes for their pint-sized charge.",
@@ -4519,7 +4489,7 @@
       "https://t.me/FilmHouseFilebot?start=BQADAQAD8QsAAgiQKETeucjWw3FwfxYE"
     ],
     "poster": "https://image.tmdb.org/t/p/w500/qV9DjDIMUu7ieCQTQkEe9R83Ooa.jpg",
-    "rating": 6.5,
+    "rating": 6.6,
     "release_date": "2023-07-07",
     "genres": [
       "Crime",
@@ -4528,8 +4498,8 @@
     ],
     "categories": [
       "Main",
-      "Erotic Movies",
-      "African"
+      "African",
+      "Erotic Movies"
     ],
     "tmdb_id": 227975,
     "overview": "A married professor is pulled into a passionate affair with a younger man that uncovers a path of tragedy and betrayal from those closest to her.",
@@ -4619,7 +4589,7 @@
       "https://t.me/+cJUgTGPMeXoyM2Nk"
     ],
     "poster": "https://image.tmdb.org/t/p/w500/7TMp3RMf9DCZaaR9XeAQ1N6tby4.jpg",
-    "rating": 7.4,
+    "rating": 7.3,
     "release_date": "2015-09-12",
     "genres": [
       "Comedy"
@@ -4650,7 +4620,7 @@
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADHAoAAt0TaUYURiKK3i37_hYE"
     ],
-    "poster": "https://image.tmdb.org/t/p/w500/uuot1N5AgZ7xRCKgm4ZCwOhgIJu.jpg",
+    "poster": "https://image.tmdb.org/t/p/w500/tEv842Nd5uMSavURG4aQO1pNtst.jpg",
     "rating": 7.7,
     "release_date": "2023-09-28",
     "genres": [
@@ -4660,8 +4630,8 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Comic"
     ],
     "tmdb_id": 205715,
     "overview": "At America's only college for superheroes, gifted students put their moral boundaries to the test, competing for the university's top ranking, and a chance to join The Seven, Vought International's elite superhero team. When the school's dark secrets come to light, they must decide what kind of heroes they want to become.",
@@ -4699,8 +4669,9 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 40075,
     "overview": "Twin brother and sister Dipper and Mabel Pines are in for an unexpected adventure when they spend the summer helping their great uncle Stan run a tourist trap in the mysterious town of Gravity Falls, Oregon.",
@@ -4767,8 +4738,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 61852,
     "overview": "When 13-year-old Henry Hart lands a job as Danger, the sidekick-in-training to superhero Captain Man, he must learn to navigate a double life balancing the challenges of 8th grade with the crazy adventures of a real-life crime fighter!",
@@ -4876,8 +4847,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 5371,
     "overview": "Watch Carly, Sam, and Freddie, as they try to balance their everyday 8th grade lives with their newfound fame managing and starring in the most awesome show on the web.",
@@ -4911,8 +4882,8 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Comic"
     ],
     "tmdb_id": 62127,
     "overview": "Danny Rand resurfaces 15 years after being presumed dead. Now, with the power of the Iron Fist, he seeks to reclaim his past and fulfill his destiny.",
@@ -4946,8 +4917,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 38974,
     "overview": "An idealistic teen from rural Texas embarks on the adventure of a lifetime when she decides to leave behind starry nights for big city lights. Thrilled to be on her own and determined not to be intimidated by New York City, she accepts a job as nanny for a high-profile couple with four kids. Helping to keep her moral compass in check are Bertram, the family's butler, and Tony, the building's 20-year-old doorman.",
@@ -4985,8 +4956,9 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 129959,
     "overview": "Follow the adventures of Po, who partners up with a no-nonsense English knight named Wandering Blade to find a collection of four powerful weapons before a mysterious pair of weasels do, and save the world from destruction.",
@@ -5049,7 +5021,7 @@
       "https://t.me/FilmHouseFilebot?start=BQADAQADeQoAAt1EmUXfFAq38fjLVRYE"
     ],
     "poster": "https://image.tmdb.org/t/p/w500/zuxGfRKziGHPogipnEXXykdDmyT.jpg",
-    "rating": 7.8,
+    "rating": 7.7,
     "release_date": "2020-02-07",
     "genres": [
       "Sci-Fi & Fantasy",
@@ -5095,8 +5067,9 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 68073,
     "overview": "Welcome to the Loud House, where life can get pretty crazy. One boy, TEN girls?! Lincoln Loud wouldn’t change it for the world!",
@@ -5129,8 +5102,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 674610,
     "overview": "Lincoln Loud gears up for the ultimate Christmas, until he finds out that most of his sisters have plans to be elsewhere for the big day. Determined to remind his family that they all need to be together, Lincoln and his best friend Clyde McBride embark on a mission to preserve the family’s holiday traditions.",
@@ -5167,8 +5140,8 @@
     "categories": [
       "Main",
       "Animated Movies",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 410113,
     "overview": "The Loud family travel to Scotland and discover they are descendants of Scottish royalty as they move into their giant ancestral castle.",
@@ -5233,9 +5206,9 @@
     ],
     "categories": [
       "Main",
+      "Hollywood/British Movies",
       "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Classic Movies",
-      "Hollywood/British Movies"
+      "Classic Movies"
     ],
     "tmdb_id": 10830,
     "overview": "Matilda Wormwood is an brilliant and intelligent little girl. Unfortunately, her parents, Harry and Zinnia, fail to see that fact. As time passes, she finally starts school and has a kind teacher, loyal friends, and a terrifying, sadistic headmistress. As she becomes fed up with the constant cruelty, she discovers she has a special gift that she just might be able to use to outwit the unruly adults around her.",
@@ -5270,8 +5243,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 668482,
     "overview": "An extraordinary young girl discovers her superpower and summons the remarkable courage, against all odds, to help others change their stories, whilst also taking charge of her own destiny. Standing up for what's right, she's met with miraculous results.",
@@ -5333,8 +5306,8 @@
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADIAQAAvTpGUd0FCBLBdd3YRYE"
     ],
-    "poster": "https://image.tmdb.org/t/p/w500/tMslOS7noUUjc8BLvePk2QsV75v.jpg",
-    "rating": 8.1,
+    "poster": "https://image.tmdb.org/t/p/w500/eqCGgjQJRImIZp8dUOx1YUpx1dj.jpg",
+    "rating": 8.2,
     "release_date": "2023-07-07",
     "genres": [
       "Animation",
@@ -5343,8 +5316,9 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Series"
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
     ],
     "tmdb_id": 125928,
     "overview": "Twenty-somethings Clark Kent, the bright and driven Lois Lane, and their best friend Jimmy Olsen begin to discover who they are and everything they can accomplish together as an investigative reporting team at the Daily Planet.",
@@ -5411,8 +5385,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 61854,
     "overview": "The story of a 10-year-old girl Dawn Haley whose sibling rivalry with her three brothers is heightened by the fact that they are quadruplets.",
@@ -5550,8 +5524,9 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 1877,
     "overview": "Each day, two kindhearted suburban stepbrothers on summer vacation embark on some grand new project, which annoys their controlling sister, Candace, who tries to bust them. Meanwhile, their pet platypus plots against evil Dr. Doofenshmirtz.",
@@ -5589,8 +5564,8 @@
     "categories": [
       "Main",
       "Animated Movies",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 71689,
     "overview": "Phineas and Ferb get trapped in an alternate dimension where the evil Doofenshmirtz rules the tri-state area. They must find a way back home with the help of their pet platypus named Perry, who they discover is a secret agent.",
@@ -5626,8 +5601,8 @@
     "categories": [
       "Main",
       "Animated Movies",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 594328,
     "overview": "Phineas and Ferb travel across the galaxy to rescue their older sister Candace, who has been abducted by aliens and taken to a utopia in a far-off planet, free of her pesky little brothers.",
@@ -5662,8 +5637,8 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Comic"
     ],
     "tmdb_id": 67178,
     "overview": "A former Marine out to punish the criminals responsible for his family's murder finds himself ensnared in a military conspiracy.",
@@ -5698,8 +5673,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 1146147,
     "overview": "Lincoln and his best friend, Clyde, struggle to decide whether to participate in the Loud family Spooktacular, attend their friend, Xander's, party, or go trick-or-treating on Halloween.",
@@ -5732,8 +5707,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 211779,
     "overview": "12-year-old Lincoln Loud goes on new adventures in the town of Royal Woods with his best friend Clyde McBride, while also navigating the chaos of living in a family with 10 sisters.",
@@ -5773,6 +5748,7 @@
     ],
     "categories": [
       "Main",
+      "Animated Movies",
       "Hollywood/British Series"
     ],
     "tmdb_id": 60625,
@@ -5806,8 +5782,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 45666,
     "overview": "Sam Puckett is loud, independent, and tough as nails, while Cat Valentine is sweet as pie and super flighty. But that doesn't stop this unlikely pair from becoming best buds and roomies!\n\nTogether, they're a power duo with a love for fun and adventure -- it's just too bad that it doesn't come cheap. Burgers at their favorite robot restaurant Bots don't grow on trees, after all. A booming out-of-home babysitting business quickly becomes the answer to their empty-pocket problems, but also an extra reason for countless wacky adventures to come!",
@@ -5906,8 +5882,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 58981,
     "overview": "Meet The Thundermans, a typical suburban family that happens to have astounding superpowers. At the center of the action are the 14-year-old Thunderman twins, who share the same bathroom, the same school, and the same annoying little siblings. Their only difference? The sister is a super student with a super sunny disposition who super looks forward to being a superhero someday, and her twin brother is a super villain.",
@@ -5940,8 +5916,8 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Comic"
     ],
     "tmdb_id": 466282,
     "overview": "Lara Jean's love life goes from imaginary to out of control when her secret letters to every boy she's ever fallen for are mysteriously mailed out.",
@@ -5974,8 +5950,8 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Comic"
     ],
     "tmdb_id": 565426,
     "overview": "Lara Jean and Peter have just taken their romance from pretend to officially real when another recipient of one of her love letters enters the picture.",
@@ -6009,8 +5985,8 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Comic"
     ],
     "tmdb_id": 614409,
     "overview": "Senior year of high school takes center stage as Lara Jean returns from a family trip to Korea and considers her college plans — with and without Peter.",
@@ -6081,8 +6057,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 71728,
     "overview": "The early life of child genius Sheldon Cooper, later seen in The Big Bang Theory.",
@@ -6272,7 +6248,7 @@
     ],
     "categories": [
       "Main",
-      "African"
+      "Hollywood/British Movies"
     ],
     "tmdb_id": 751182,
     "overview": "A romantic comedy that brings out the intricacies and absurdities of the Nairobi dating scene.",
@@ -6336,7 +6312,7 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1082109,
     "overview": "While preparing for the most romantic day of the year, four hairdressers at a Lagos salon face wild dramas in their love lives and their families.",
@@ -6393,7 +6369,7 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1060526,
     "overview": "A legendary musician's life and family are turned upside down when a scandal is revealed on the eve of his 60th birthday.",
@@ -6489,8 +6465,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "African",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 1166162,
     "overview": "Two children befriend a magical creature and must help it to return to its forest home.",
@@ -6780,7 +6756,7 @@
     "genres": [],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1618414,
     "overview": "No synopsis available.",
@@ -6811,7 +6787,7 @@
     ],
     "categories": [
       "Main",
-      "African"
+      "Hollywood/British Movies"
     ],
     "tmdb_id": 1240212,
     "overview": "A Ghanaian chemist, who in a bid to vindicate his company in a lawsuit stumbles on something even more dangerous in the process - a hidden chemical formula altered for testing and profit gains by a pharmaceutical giant.",
@@ -6969,7 +6945,7 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1018288,
     "overview": "After her estranged father’s death, Oluchi , an upcoming musician is forced to confront her true self and past mistakes. She reconnects with her daughter through their love for music. However, the echoes from the past spring from every corner, threatening to bring them down.",
@@ -7065,7 +7041,7 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1019807,
     "overview": "A rich brat must work together with a “ghetto” tomboy if he wants to recover his stolen passport; or he would miss a flight to a life-changing interview.",
@@ -7257,8 +7233,8 @@
     ],
     "categories": [
       "Main",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 1451853,
     "overview": "A beloved housekeeper brings joy until the wife returns, stirring tension and rivalry for affection within the family.",
@@ -7289,7 +7265,7 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "tmdb_id": 1285427,
     "overview": "Aisha makes an emotional return to her hometown in Nigeria, after spending 10 years in the US becoming a successful entrepreneur. She is met by the tensions and challenges which come after spending time away from her family and friends.",
@@ -7321,7 +7297,7 @@
     ],
     "categories": [
       "Main",
-      "African"
+      "Hollywood/British Movies"
     ],
     "tmdb_id": 1722061,
     "overview": "When two past lovers run into each other, they realize they've been living in the same estate for years and their children attend the same school.",
@@ -7415,7 +7391,7 @@
     "runtime": "24 min"
   },
   {
-    "title": "Marvel's Hit-Monkey (2021)",
+    "title": "Marvel's Hit-Monkey",
     "csv_id": "133903-hit-monkey",
     "type": "Series",
     "links": [
@@ -7432,7 +7408,6 @@
     "categories": [
       "Main",
       "Animated Movies",
-      "Anime",
       "Hollywood/British Series"
     ],
     "tmdb_id": 133903,
@@ -7441,7 +7416,7 @@
     "language": "en"
   },
   {
-    "title": "Marvel's M.O.D.O.K. (2021)",
+    "title": "Marvel's M.O.D.O.K.",
     "csv_id": "111312-marvel-s-m-o-d-o-k",
     "type": "Series",
     "links": [
@@ -7459,7 +7434,6 @@
     "categories": [
       "Main",
       "Animated Movies",
-      "Anime",
       "Hollywood/British Series"
     ],
     "tmdb_id": 111312,
@@ -7468,7 +7442,7 @@
     "language": "en"
   },
   {
-    "title": "Spider-Man: No Way Home (2021)",
+    "title": "Spider-Man: No Way Home",
     "csv_id": "634649-spider-man-no-way-home",
     "type": "Movie",
     "links": [
@@ -7492,7 +7466,7 @@
     "language": "en"
   },
   {
-    "title": "Eternals (2021)",
+    "title": "Eternals",
     "csv_id": "524434-eternals",
     "type": "Movie",
     "links": [
@@ -7516,7 +7490,7 @@
     "language": "en"
   },
   {
-    "title": "Venom: Let There Be Carnage (2021)",
+    "title": "Venom: Let There Be Carnage",
     "csv_id": "580489-venom-let-there-be-carnage",
     "type": "Movie",
     "links": [
@@ -7540,7 +7514,7 @@
     "language": "en"
   },
   {
-    "title": "Venom (2018)",
+    "title": "Venom",
     "csv_id": "335983-venom",
     "type": "Movie",
     "links": [
@@ -7563,7 +7537,7 @@
     "language": "en"
   },
   {
-    "title": "Venom: The Last Dance (2024)",
+    "title": "Venom: The Last Dance",
     "csv_id": "912649-venom-the-last-dance",
     "type": "Movie",
     "links": [
@@ -7588,7 +7562,7 @@
     "cast": []
   },
   {
-    "title": "Shang-Chi and the Legend of the Ten Rings (2021)",
+    "title": "Shang-Chi and the Legend of the Ten Rings",
     "csv_id": "566525-shang-chi-and-the-legend-of-the-ten-rings",
     "type": "Movie",
     "links": [
@@ -7612,7 +7586,7 @@
     "language": "en"
   },
   {
-    "title": "Black Widow (2021)",
+    "title": "Black Widow",
     "csv_id": "497698-black-widow",
     "type": "Movie",
     "links": [
@@ -7636,7 +7610,7 @@
     "language": "en"
   },
   {
-    "title": "The Falcon and the Winter Soldier (2021)",
+    "title": "The Falcon and the Winter Soldier",
     "csv_id": "88396-falcon-winter-soldier",
     "type": "Series",
     "links": [
@@ -7659,7 +7633,7 @@
     "language": "en"
   },
   {
-    "title": "WandaVision (2021)",
+    "title": "WandaVision",
     "csv_id": "85271-wandavision",
     "type": "Series",
     "links": [
@@ -7683,7 +7657,7 @@
     "language": "en"
   },
   {
-    "title": "Helstrom (2020)",
+    "title": "Helstrom",
     "csv_id": "88987-helstrom",
     "type": "Series",
     "links": [
@@ -7707,7 +7681,7 @@
     "language": "en"
   },
   {
-    "title": "The New Mutants (2020)",
+    "title": "The New Mutants",
     "csv_id": "340102-the-new-mutants",
     "type": "Movie",
     "links": [
@@ -7730,7 +7704,7 @@
     "language": "en"
   },
   {
-    "title": "Peter's To-Do List (2019)",
+    "title": "Peter's To-Do List",
     "csv_id": "758025-peter-s-to-do-list",
     "type": "Movie",
     "links": [
@@ -7754,7 +7728,7 @@
     "language": "en"
   },
   {
-    "title": "Spider-Man: Far From Home (2019)",
+    "title": "Spider-Man: Far From Home",
     "csv_id": "429617-spider-man-far-from-home",
     "type": "Movie",
     "links": [
@@ -7779,7 +7753,7 @@
     "language": "en"
   },
   {
-    "title": "Dark Phoenix (2019)",
+    "title": "Dark Phoenix",
     "csv_id": "320288-dark-phoenix",
     "type": "Movie",
     "links": [
@@ -7803,7 +7777,7 @@
     "language": "en"
   },
   {
-    "title": "Avengers: Endgame (2019)",
+    "title": "Avengers: Endgame",
     "csv_id": "299534-avengers-endgame",
     "type": "Movie",
     "links": [
@@ -7828,7 +7802,7 @@
     "language": "en"
   },
   {
-    "title": "Captain Marvel (2019)",
+    "title": "Captain Marvel",
     "csv_id": "299537-captain-marvel",
     "type": "Movie",
     "links": [
@@ -7852,7 +7826,7 @@
     "language": "en"
   },
   {
-    "title": "Team Darryl (2018)",
+    "title": "Team Darryl",
     "csv_id": "505945-team-darryl",
     "type": "Movie",
     "links": [
@@ -7876,7 +7850,7 @@
     "language": "en"
   },
   {
-    "title": "Marvel's Cloak & Dagger (2018)",
+    "title": "Marvel's Cloak & Dagger",
     "csv_id": "66190-marvel-s-cloak-and-dagger",
     "type": "Series",
     "links": [
@@ -7901,7 +7875,7 @@
     "language": "en"
   },
   {
-    "title": "Spider-Man: Into the Spider-Verse (2018)",
+    "title": "Spider-Man: Into the Spider-Verse",
     "csv_id": "324857-spider-man-into-the-spider-verse",
     "type": "Movie",
     "links": [
@@ -7918,6 +7892,7 @@
     ],
     "categories": [
       "Main",
+      "Animated Movies",
       "Hollywood/British Movies"
     ],
     "tmdb_id": 324857,
@@ -7926,7 +7901,7 @@
     "language": "en"
   },
   {
-    "title": "Ant-Man and the Wasp [2018]",
+    "title": "Ant-Man and the Wasp",
     "csv_id": "363088-ant-man-and-the-wasp",
     "type": "Movie",
     "links": [
@@ -7950,7 +7925,7 @@
     "language": "en"
   },
   {
-    "title": "Deadpool 2 (2018)",
+    "title": "Deadpool 2",
     "csv_id": "383498-deadpool-2",
     "type": "Movie",
     "links": [
@@ -7974,7 +7949,7 @@
     "language": "en"
   },
   {
-    "title": "Avengers: Infinity War (2018)",
+    "title": "Avengers: Infinity War",
     "csv_id": "299536-avengers-infinity-war",
     "type": "Movie",
     "links": [
@@ -7999,7 +7974,7 @@
     "language": "en"
   },
   {
-    "title": "Black Panther (2018)",
+    "title": "Black Panther",
     "csv_id": "284054-black-panther",
     "type": "Movie",
     "links": [
@@ -8023,7 +7998,7 @@
     "language": "en"
   },
   {
-    "title": "Team Thor: Part 2 (2017)",
+    "title": "Team Thor: Part 2",
     "csv_id": "441829-team-thor-part-2",
     "type": "Movie",
     "links": [
@@ -8047,7 +8022,7 @@
     "language": "en"
   },
   {
-    "title": "Big Hero 6 The Series (2017)",
+    "title": "Big Hero 6 The Series",
     "csv_id": "68665-big-hero-6",
     "type": "Series",
     "links": [
@@ -8067,6 +8042,7 @@
     ],
     "categories": [
       "Main",
+      "Animated Movies",
       "Hollywood/British Series"
     ],
     "tmdb_id": 68665,
@@ -8075,7 +8051,7 @@
     "language": "en"
   },
   {
-    "title": "Marvel's Spider-Man (2017)",
+    "title": "Marvel's Spider-Man",
     "csv_id": "72705-spider-man",
     "type": "Series",
     "links": [
@@ -8094,6 +8070,7 @@
     ],
     "categories": [
       "Main",
+      "Animated Movies",
       "Hollywood/British Series"
     ],
     "tmdb_id": 72705,
@@ -8102,7 +8079,7 @@
     "language": "en"
   },
   {
-    "title": "Marvel's Future Avengers (2017)",
+    "title": "Marvel's Future Avengers",
     "csv_id": "91278-marvel-future-avengers",
     "type": "Series",
     "links": [
@@ -8119,7 +8096,7 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Anime"
     ],
     "tmdb_id": 91278,
     "overview": "Makoto, Adi, and Chloe attend a special training school where they train to become the heroes of the next generation. Unfortunately for them they are actually science experiments for Hydra. When Adi and Chloe get captured by Hydra for learning the truth, Makoto seeks out the one group he believes could help them- The Avengers. After rescuing the kids The Avengers decide to take them in and train them to be the heroes of the future.",
@@ -8127,7 +8104,7 @@
     "language": "ja"
   },
   {
-    "title": "Marvel's Runaways (2017)",
+    "title": "Marvel's Runaways",
     "csv_id": "67466-marvel-s-runaways",
     "type": "Series",
     "links": [
@@ -8153,7 +8130,7 @@
     "language": "en"
   },
   {
-    "title": "The Gifted (2017)",
+    "title": "The Gifted",
     "csv_id": "69629-the-gifted",
     "type": "Series",
     "links": [
@@ -8178,7 +8155,7 @@
     "language": "en"
   },
   {
-    "title": "Legion (2017)",
+    "title": "Legion",
     "csv_id": "67195-legion",
     "type": "Series",
     "links": [
@@ -8204,7 +8181,7 @@
     "language": "en"
   },
   {
-    "title": "Marvel's Inhumans (2017)",
+    "title": "Marvel's Inhumans",
     "csv_id": "68716-marvel-s-inhumans",
     "type": "Series",
     "links": [
@@ -8228,7 +8205,7 @@
     "language": "en"
   },
   {
-    "title": "Marvel's The Defenders (2017)",
+    "title": "Marvel's The Defenders",
     "csv_id": "62285-marvel-s-the-defenders",
     "type": "Series",
     "links": [
@@ -8269,8 +8246,8 @@
     ],
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Comic"
     ],
     "tmdb_id": 62127,
     "overview": "Danny Rand resurfaces 15 years after being presumed dead. Now, with the power of the Iron Fist, he seeks to reclaim his past and fulfill his destiny.",
@@ -8287,7 +8264,7 @@
     "trailer": "f9OKL5no-S0"
   },
   {
-    "title": "Thor: Ragnarok (2017)",
+    "title": "Thor: Ragnarok",
     "csv_id": "284053-thor-ragnarok",
     "type": "Movie",
     "links": [
@@ -8312,7 +8289,7 @@
     "language": "en"
   },
   {
-    "title": "Spider-Man: Homecoming (2017)",
+    "title": "Spider-Man: Homecoming",
     "csv_id": "315635-spider-man-homecoming",
     "type": "Movie",
     "links": [
@@ -8337,7 +8314,7 @@
     "language": "en"
   },
   {
-    "title": "Guardians of the Galaxy Vol. 2 (2017)",
+    "title": "Guardians of the Galaxy Vol. 2",
     "csv_id": "283995-guardians-of-the-galaxy-vol-2",
     "type": "Movie",
     "links": [
@@ -8361,7 +8338,7 @@
     "language": "en"
   },
   {
-    "title": "Guardians of the Galaxy Vol. 3 (2023)",
+    "title": "Guardians of the Galaxy Vol. 3",
     "csv_id": "447365-guardians-of-the-galaxy-vol-3",
     "type": "Movie",
     "links": [
@@ -8386,7 +8363,7 @@
     "language": "en"
   },
   {
-    "title": "Logan (2017)",
+    "title": "Logan",
     "csv_id": "263115-logan",
     "type": "Movie",
     "links": [
@@ -8411,7 +8388,7 @@
     "language": "en"
   },
   {
-    "title": "Team Thor (2016)",
+    "title": "Team Thor",
     "csv_id": "413279-team-thor",
     "type": "Movie",
     "links": [
@@ -8434,7 +8411,7 @@
     "language": "en"
   },
   {
-    "title": "Marvel's Agents of S.H.I.E.L.D.: Slingshot (2016)",
+    "title": "Marvel's Agents of S.H.I.E.L.D.: Slingshot",
     "csv_id": "69088-agents-of-s-h-i-e-l-d-slingshot",
     "type": "Series",
     "links": [
@@ -8458,7 +8435,7 @@
     "language": "en"
   },
   {
-    "title": "Marvel's Luke Cage (2016)",
+    "title": "Marvel's Luke Cage",
     "csv_id": "62126-marvel-s-luke-cage",
     "type": "Series",
     "links": [
@@ -8483,7 +8460,7 @@
     "language": "en"
   },
   {
-    "title": "Doctor Strange (2016)",
+    "title": "Doctor Strange",
     "csv_id": "284052-doctor-strange",
     "type": "Movie",
     "links": [
@@ -8508,7 +8485,7 @@
     "language": "en"
   },
   {
-    "title": "X-Men: Apocalypse (2016)",
+    "title": "X-Men: Apocalypse",
     "csv_id": "246655-x-men-apocalypse",
     "type": "Movie",
     "links": [
@@ -8532,7 +8509,7 @@
     "language": "en"
   },
   {
-    "title": "Captain America: Civil War (2016)",
+    "title": "Captain America: Civil War",
     "csv_id": "271110-captain-america-civil-war",
     "type": "Movie",
     "links": [
@@ -8556,7 +8533,7 @@
     "language": "en"
   },
   {
-    "title": "Deadpool (2016)",
+    "title": "Deadpool",
     "csv_id": "293660-deadpool",
     "type": "Movie",
     "links": [
