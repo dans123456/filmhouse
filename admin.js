@@ -1865,20 +1865,22 @@ if (confirmCSVImportBtn && csvReviewModal) {
     confirmCSVImportBtn.addEventListener("click", () => {
         if (pendingImportChanges) {
             // Build the final catalog by merging imported data with existing rich metadata
-            const finalCatalog = pendingImportChanges.importedList.map(imported => {
-                const existing = allCatalogMovies.find(ex => ex.csv_id === imported.csv_id);
-                if (existing) {
+            const finalCatalog = [...allCatalogMovies];
+            
+            pendingImportChanges.importedList.forEach(imported => {
+                const existingIdx = finalCatalog.findIndex(ex => ex.csv_id === imported.csv_id);
+                if (existingIdx !== -1) {
                     // Update only CSV-controlled columns (Title, Type, Links)
                     // Keep all other rich TMDB/custom metadata fields intact!
-                    return {
-                        ...existing,
-                        title: (existing.tmdb_id && existing.title) ? existing.title : imported.title,
+                    finalCatalog[existingIdx] = {
+                        ...finalCatalog[existingIdx],
+                        title: (finalCatalog[existingIdx].tmdb_id && finalCatalog[existingIdx].title) ? finalCatalog[existingIdx].title : imported.title,
                         type: imported.type,
                         links: imported.links
                     };
                 } else {
                     // Set safe default values for new movies if TMDB preview wasn't fetched yet
-                    return {
+                    finalCatalog.push({
                         ...imported,
                         categories: imported.categories || ["Main"],
                         genres: imported.genres || [],
@@ -1892,7 +1894,7 @@ if (confirmCSVImportBtn && csvReviewModal) {
                         director: imported.director || "",
                         trailer: imported.trailer || "",
                         runtime: imported.runtime || ""
-                    };
+                    });
                 }
             });
             allCatalogMovies = finalCatalog;
