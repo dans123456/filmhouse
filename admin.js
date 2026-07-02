@@ -1229,7 +1229,7 @@ if (addMovieForm) {
     addMovieForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         
-        const title = document.getElementById("movie-title").value.trim();
+        let title = document.getElementById("movie-title").value.trim();
         const id = document.getElementById("movie-id").value.trim();
         const type = document.getElementById("movie-type").value;
         const customPoster = document.getElementById("movie-poster")?.value.trim() || "";
@@ -1282,6 +1282,7 @@ if (addMovieForm) {
                 const res = await fetch(url);
                 if (res.ok) {
                     const data = await res.json();
+                    title = data.title || data.name || title;
                     poster = data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : "";
                     backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}` : "";
                     rating = Math.round((data.vote_average || 0) * 10) / 10;
@@ -1761,6 +1762,8 @@ function showCSVReviewModal(importedMovies) {
                     <div style="font-size: 11px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 340px;" title="${preview.overview}">${preview.overview || 'No synopsis loaded.'}</div>
                 </div>
             `;
+            m.title = preview.title || m.title;
+            m.overview = preview.overview || m.overview;
             m.poster = preview.poster;
             m.rating = preview.rating;
         }
@@ -1797,7 +1800,7 @@ if (confirmCSVImportBtn && csvReviewModal) {
                     // Keep all other rich TMDB/custom metadata fields intact!
                     return {
                         ...existing,
-                        title: imported.title,
+                        title: (existing.tmdb_id && existing.title) ? existing.title : imported.title,
                         type: imported.type,
                         links: imported.links
                     };
