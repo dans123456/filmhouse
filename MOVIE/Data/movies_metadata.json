@@ -1,60 +1,27 @@
 [
   {
-    "csv_id": "62565",
-    "tmdb_id": 62565,
+    "csv_id": "1724798-superstar",
+    "tmdb_id": 1724798,
     "imdb_id": "",
-    "title": "My Love Story!!",
-    "type": "Series",
+    "title": "Superstar",
+    "type": "Movie",
     "categories": [
       "Main",
-      "Anime"
+      "Hollywood/British Movies"
     ],
-    "genres": [
-      "Animation",
-      "Comedy"
-    ],
-    "overview": "Takeo Goda is a giant guy with a giant heart. Too bad the girls don't want him! (They always go for his good-looking best friend, Makoto Sunakawa.) Used to being on the sidelines, Takeo simply stands tall and accepts his fate. But one day when he saves a girl named Rinko Yamato from a harasser on the train, his (love!) life suddenly takes an incredible turn! Takeo can hardly believe it when he crosses paths with Rinko again, and he finds himself falling in love with her... But with handsome Suna around, does Takeo even stand a chance?",
-    "poster": "https://image.tmdb.org/t/p/w500/oKvrM8WVOGcSSwIKFfsAxIuk6Nx.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/dQruznwYPKGmiHvR7DS8pikwSca.jpg",
-    "rating": 8.4,
-    "release_date": "2015-04-09",
-    "language": "ja",
+    "genres": [],
+    "overview": "The story of a dream that was larger than life and one woman's journey to achieving that dream.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
     "cast": [],
     "director": "",
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADHxIAAghnMUYP17rOX0c7DBYE"
-    ]
-  },
-  {
-    "csv_id": "16830-hellsing",
-    "tmdb_id": 16830,
-    "imdb_id": "",
-    "title": "Hellsing",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Anime"
-    ],
-    "genres": [
-      "Action & Adventure",
-      "Animation",
-      "Sci-Fi & Fantasy"
-    ],
-    "overview": "Vampires exist. It is the duty of Hellsing, an organization sponsored by the British government, to hide that frightening fact and protect the blissfully unaware populace.\n\nLately, vampire activity has been on the rise and the cause is more alarming than anything they could have imagined.",
-    "poster": "https://image.tmdb.org/t/p/w500/p2xedgWeqcVtv7K4MsMjIfsaV2g.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/jy74GLS8QA1O8JRwXj72uCKtV1B.jpg",
-    "rating": 7.9,
-    "release_date": "2001-10-11",
-    "language": "ja",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADvREAAghnMUYIJw5UUtOYBRYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADzxEAAghnMUbgc-Ko1cYTYxYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD_REAAghnMUb6oenIFwE9yxYE"
     ]
   },
   {
@@ -90,7 +57,7 @@
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADUx8AArFaKUZJgKctjqSEmhYE"
     ],
-    "poster": "https://postimg.cc/w1xMYcrp",
+    "poster": "img/FilmHouse3_nobg.png",
     "rating": 0,
     "release_date": "",
     "genres": [
@@ -103,7 +70,7 @@
     "tmdb_id": 1724402,
     "overview": "The movie addresses intense themes like systemic corruption, illegal mining (galamsey), and political injustice in Ghana, tackling controversial issues within the nation's governance.",
     "language": "en",
-    "backdrop": "https://postimg.cc/w1xMYcrp",
+    "backdrop": "img/FilmHouse.png",
     "trailer": ""
   },
   {
