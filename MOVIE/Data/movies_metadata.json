@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "16830-hellsing",
+    "tmdb_id": 16830,
+    "imdb_id": "",
+    "title": "Hellsing",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Action & Adventure",
+      "Animation",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Vampires exist. It is the duty of Hellsing, an organization sponsored by the British government, to hide that frightening fact and protect the blissfully unaware populace.\n\nLately, vampire activity has been on the rise and the cause is more alarming than anything they could have imagined.",
+    "poster": "https://image.tmdb.org/t/p/w500/p2xedgWeqcVtv7K4MsMjIfsaV2g.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jy74GLS8QA1O8JRwXj72uCKtV1B.jpg",
+    "rating": 7.9,
+    "release_date": "2001-10-11",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADvREAAghnMUYIJw5UUtOYBRYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADzxEAAghnMUbgc-Ko1cYTYxYE"
+    ]
+  },
+  {
     "title": "Marvel's Hit-Monkey",
     "csv_id": "133903-hit-monkey",
     "type": "Series",
@@ -32,7 +62,7 @@
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADUx8AArFaKUZJgKctjqSEmhYE"
     ],
-    "poster": "img/FilmHouse3_nobg.png",
+    "poster": "https://postimg.cc/w1xMYcrp",
     "rating": 0,
     "release_date": "",
     "genres": [
@@ -45,7 +75,7 @@
     "tmdb_id": 1724402,
     "overview": "The movie addresses intense themes like systemic corruption, illegal mining (galamsey), and political injustice in Ghana, tackling controversial issues within the nation's governance.",
     "language": "en",
-    "backdrop": "img/FilmHouse.png",
+    "backdrop": "https://postimg.cc/w1xMYcrp",
     "trailer": ""
   },
   {
