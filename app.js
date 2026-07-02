@@ -99,6 +99,7 @@ const JSON_FILE_PATH = "./MOVIE/Data/movies_metadata.json";
 // Adsgram Ad Placement Configuration
 const ADSGRAM_DOWNLOAD_BLOCK_ID = "36631";
 const ADSGRAM_REQUEST_BLOCK_ID = "36680"; // Updated to request placement block ID
+const ADSGRAM_TASK_BLOCK_ID = "36680"; // Set to your Adsgram Task Block ID (CPA format)
 
 // State Management Object
 const state = {
@@ -113,7 +114,20 @@ const state = {
         username: "demouser",
         fullName: "Demo User",
         avatar: "img/FilmHouse3_nobg.png",
-        points: 0
+        points: 0,
+        badge: "",
+        badgeExpiresAt: 0,
+        pointsBreakdown: { downloads: 0, visits: 0, shares: 0, watched: 0 },
+        dailyStats: {
+            date: "",
+            checkInClaimed: false,
+            sharesCount: 0,
+            shareClaimed: false,
+            adWatchesCount: 0,
+            adWatchesClaimed: false,
+            downloadsCount: 0,
+            downloadsClaimed: false
+        }
     },
     isTelegram: false,
     filters: {
@@ -646,6 +660,17 @@ function loadUserProfile() {
     state.user.badge = profile.badge || null;
     state.user.badgeExpiresAt = profile.badgeExpiresAt || 0;
     state.user.pointsBreakdown = profile.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
+    state.user.dailyStats = profile.dailyStats || {
+        date: new Date().toISOString().split("T")[0],
+        checkInClaimed: false,
+        sharesCount: 0,
+        shareClaimed: false,
+        adWatchesCount: 0,
+        adWatchesClaimed: false,
+        downloadsCount: 0,
+        downloadsClaimed: false
+    };
+    checkAndResetDailyMissions();
     
     if (profile.avatar) {
         const isStoredDefault = !profile.avatar.startsWith("data:") && !profile.avatar.startsWith("http");
@@ -889,13 +914,16 @@ function awardPoints(points, reason) {
     }
     if (reason === "download" && points > 0) {
         state.user.pointsBreakdown.downloads = (state.user.pointsBreakdown.downloads || 0) + 1;
+        updateMissionProgress("download", 1);
     } else if (reason === "visit" && points > 0) {
         state.user.pointsBreakdown.visits = (state.user.pointsBreakdown.visits || 0) + 1;
     } else if (reason === "share" && points > 0) {
         state.user.pointsBreakdown.shares = (state.user.pointsBreakdown.shares || 0) + 1;
+        updateMissionProgress("share", 1);
     } else if (reason === "watched") {
         if (points > 0) {
             state.user.pointsBreakdown.watched = (state.user.pointsBreakdown.watched || 0) + 1;
+            updateMissionProgress("ad", 1);
         } else {
             state.user.pointsBreakdown.watched = Math.max(0, (state.user.pointsBreakdown.watched || 0) - 1);
         }
@@ -3271,11 +3299,6 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
     // Detect if we are running inside a real Telegram environment with initData
     const isTelegramEnv = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== "";
 
-    // Initialize on-demand if not already done
-    if (isTelegramEnv && window.Adsgram) {
-        initializeAdsgram(id);
-    }
-
     return new Promise((resolve) => {
         let resolved = false;
         const safeResolve = () => {
@@ -3291,30 +3314,61 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
             }
         }, 60000);
 
-        const controller = state.adsgramControllers ? state.adsgramControllers[id] : null;
-
-        if (isTelegramEnv && controller) {
-            status("Loading ad…");
-            try {
-                controller.show()
-                    .then((result) => {
-                        status("Reward received ✓");
-                        safeResolve();
-                    })
-                    .catch((result) => {
-                        console.warn("Adsgram ad skipped or error:", result);
-                        status("No ad available – continuing");
-                        safeResolve();
-                    });
-            } catch (err) {
-                console.error("Adsgram .show() threw an error:", err);
-                status("Ad error – continuing");
-                safeResolve();
-            }
-        } else {
-            // Adsgram script not loaded, failed, or not in Telegram environment, bypass directly
+        if (!isTelegramEnv || !window.Adsgram) {
             status("Connecting…");
             safeResolve();
+            return;
+        }
+
+        // Initialize controllers if not already done
+        if (!state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID]) {
+            state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID] = window.Adsgram.init({ blockId: ADSGRAM_DOWNLOAD_BLOCK_ID });
+        }
+        if (ADSGRAM_TASK_BLOCK_ID && !state.adsgramControllers[ADSGRAM_TASK_BLOCK_ID]) {
+            state.adsgramControllers[ADSGRAM_TASK_BLOCK_ID] = window.Adsgram.init({ blockId: ADSGRAM_TASK_BLOCK_ID });
+        }
+
+        // Try playing Task first if this is a movie download request
+        if (id === ADSGRAM_DOWNLOAD_BLOCK_ID && ADSGRAM_TASK_BLOCK_ID) {
+            status("Checking for task…");
+            const taskController = state.adsgramControllers[ADSGRAM_TASK_BLOCK_ID];
+            
+            taskController.show().then(() => {
+                status("Task completed! Reward received ✓");
+                // Award task completion bonus points (+10)
+                awardPoints(10, "download");
+                safeResolve();
+            }).catch((err) => {
+                console.log("No Adsgram task available (or already completed), falling back to video ad:", err);
+                status("Loading premium ad buffer…");
+                
+                // Fallback to standard rewarded video ad
+                const videoController = state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID];
+                videoController.show().then(() => {
+                    status("Ad completed! Reward received ✓");
+                    safeResolve();
+                }).catch((videoErr) => {
+                    console.warn("Standard video ad failed as well:", videoErr);
+                    status("No buffer available – continuing");
+                    safeResolve();
+                });
+            });
+        } else {
+            // Non-download ad request (e.g. trailer watch), play standard ad directly
+            status("Loading ad…");
+            const controller = state.adsgramControllers[id];
+            if (controller) {
+                controller.show().then(() => {
+                    status("Reward received ✓");
+                    safeResolve();
+                }).catch((err) => {
+                    console.warn("Adsgram ad skipped or error:", err);
+                    status("No ad available – continuing");
+                    safeResolve();
+                });
+            } else {
+                safeResolve();
+            }
         }
     });
 }
@@ -4323,6 +4377,7 @@ function syncUserToFirestore() {
             badge: state.user.badge || "",
             badgeExpiresAt: state.user.badgeExpiresAt || 0,
             pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
+            dailyStats: state.user.dailyStats || {},
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         };
         if (!doc.exists) {
@@ -4340,6 +4395,7 @@ function syncUserToFirestore() {
             badge: state.user.badge || "",
             badgeExpiresAt: state.user.badgeExpiresAt || 0,
             pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
+            dailyStats: state.user.dailyStats || {},
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true }).catch(e => console.warn("Firestore fallback set error:", e));
     });
@@ -4642,7 +4698,198 @@ function logMovieRequestToFirestore(movie) {
     });
 }
 
+// Daily Missions / Quests System Helpers
+function checkAndResetDailyMissions() {
+    const today = new Date().toISOString().split("T")[0];
+    if (!state.user.dailyStats || state.user.dailyStats.date !== today) {
+        state.user.dailyStats = {
+            date: today,
+            checkInClaimed: false,
+            sharesCount: 0,
+            shareClaimed: false,
+            adWatchesCount: 0,
+            adWatchesClaimed: false,
+            downloadsCount: 0,
+            downloadsClaimed: false
+        };
+        saveDailyStats();
+    }
+}
 
+function saveDailyStats() {
+    const saved = localStorage.getItem("filmhouse_user_profile");
+    let profile = {};
+    if (saved) {
+        try {
+            profile = JSON.parse(saved);
+        } catch (e) {}
+    }
+    profile.dailyStats = state.user.dailyStats;
+    localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+}
+
+function renderDailyMissions() {
+    const list = document.getElementById("daily-missions-list");
+    if (!list) return;
+    
+    checkAndResetDailyMissions();
+    const stats = state.user.dailyStats;
+    
+    const missions = [
+        {
+            id: "login",
+            title: "Daily Login 🗓️",
+            desc: "Log into the app today to check in.",
+            target: 1,
+            current: 1,
+            claimed: stats.checkInClaimed,
+            reward: 5
+        },
+        {
+            id: "share",
+            title: "Social Promoter 🔗",
+            desc: "Share 1 movie link with friends on Telegram.",
+            target: 1,
+            current: Math.min(1, stats.sharesCount || 0),
+            claimed: stats.shareClaimed,
+            reward: 10
+        },
+        {
+            id: "ad",
+            title: "Ad Explorer 📺",
+            desc: "Watch 5 video ads (trailers or downloads).",
+            target: 5,
+            current: Math.min(5, stats.adWatchesCount || 0),
+            claimed: stats.adWatchesClaimed,
+            reward: 25
+        },
+        {
+            id: "download",
+            title: "Movie Collector 📥",
+            desc: "Secure 3 premium connections (downloads).",
+            target: 3,
+            current: Math.min(3, stats.downloadsCount || 0),
+            claimed: stats.downloadsClaimed,
+            reward: 15
+        }
+    ];
+
+    list.innerHTML = "";
+    missions.forEach(m => {
+        const pct = Math.min(100, (m.current / m.target) * 100);
+        let btnHTML = "";
+        
+        if (m.claimed) {
+            btnHTML = `<button class="btn btn-secondary btn-sm" disabled style="padding: 6px 12px; font-size: 11px; border-radius: 6px; opacity: 0.6; pointer-events: none;">Claimed ✓</button>`;
+        } else if (m.current >= m.target) {
+            btnHTML = `<button class="btn btn-success btn-sm claim-mission-btn" data-mission-id="${m.id}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 700; background: #4caf50; border-color: #4caf50; color: #fff;">Claim +${m.reward}</button>`;
+        } else {
+            btnHTML = `<button class="btn btn-secondary btn-sm" disabled style="padding: 6px 12px; font-size: 11px; border-radius: 6px; opacity: 0.7; pointer-events: none;">${m.current}/${m.target}</button>`;
+        }
+
+        const item = document.createElement("div");
+        item.className = "daily-mission-card";
+        item.style.cssText = "background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; display: flex; flex-direction: column; gap: 8px;";
+        item.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <div style="flex: 1;">
+                    <h5 style="margin: 0 0 2px 0; font-size: 12px; font-weight: 700; color: #fff;">${m.title}</h5>
+                    <p style="margin: 0; font-size: 10px; color: var(--text-secondary); line-height: 1.3;">${m.desc}</p>
+                </div>
+                ${btnHTML}
+            </div>
+            ${m.target > 1 ? `
+                <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; margin-top: 4px;">
+                    <div style="width: ${pct}%; height: 100%; background: ${m.current >= m.target ? '#4caf50' : 'var(--accent-color)'}; border-radius: 10px; transition: width 0.3s ease;"></div>
+                </div>
+            ` : ''}
+        `;
+        
+        list.appendChild(item);
+    });
+
+    // Add claim button listeners
+    list.querySelectorAll(".claim-mission-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const id = btn.getAttribute("data-mission-id");
+            claimMissionReward(id);
+        });
+    });
+}
+
+function claimMissionReward(missionId) {
+    const stats = state.user.dailyStats;
+    let pointsToAward = 0;
+    
+    if (missionId === "login" && !stats.checkInClaimed) {
+        stats.checkInClaimed = true;
+        pointsToAward = 5;
+    } else if (missionId === "share" && !stats.shareClaimed && (stats.sharesCount || 0) >= 1) {
+        stats.shareClaimed = true;
+        pointsToAward = 10;
+    } else if (missionId === "ad" && !stats.adWatchesClaimed && (stats.adWatchesCount || 0) >= 5) {
+        stats.adWatchesClaimed = true;
+        pointsToAward = 25;
+    } else if (missionId === "download" && !stats.downloadsClaimed && (stats.downloadsCount || 0) >= 3) {
+        stats.downloadsClaimed = true;
+        pointsToAward = 15;
+    }
+    
+    if (pointsToAward > 0) {
+        // Award points
+        state.user.points = (state.user.points || 0) + pointsToAward;
+        saveDailyStats();
+        
+        // Save overall profile points
+        const saved = localStorage.getItem("filmhouse_user_profile");
+        if (saved) {
+            try {
+                const profile = JSON.parse(saved);
+                profile.points = state.user.points;
+                profile.dailyStats = state.user.dailyStats;
+                localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+            } catch (e) {}
+        }
+        
+        syncUserToFirestore();
+        updatePointsUI();
+        renderDailyMissions();
+        showToast(`Mission completed! +${pointsToAward} points earned! 🪙`, "success");
+    }
+}
+
+function updateMissionProgress(actionType, count = 1) {
+    checkAndResetDailyMissions();
+    const stats = state.user.dailyStats;
+    if (actionType === "share") {
+        stats.sharesCount = (stats.sharesCount || 0) + count;
+    } else if (actionType === "ad") {
+        stats.adWatchesCount = (stats.adWatchesCount || 0) + count;
+    } else if (actionType === "download") {
+        stats.downloadsCount = (stats.downloadsCount || 0) + count;
+    }
+    saveDailyStats();
+    renderDailyMissions();
+}
+
+function startMissionsResetTimer() {
+    const timerEl = document.getElementById("missions-reset-timer");
+    if (!timerEl) return;
+    
+    function updateTimer() {
+        const now = new Date();
+        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        const diffMs = tomorrow - now;
+        
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        
+        timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+    
+    updateTimer();
+    setInterval(updateTimer, 60000); // update every minute
+}
 
 // App Kickoff Initializer
 document.addEventListener("DOMContentLoaded", async () => {
@@ -4700,6 +4947,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         btnRewards.addEventListener("click", () => {
             rewardsDrawer.classList.add("active");
             updatePointsUI();
+            renderDailyMissions();
             updateHeaderNotificationDot();
         });
     }
@@ -4767,6 +5015,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     loadUserProfile();
     checkDailyVisitPoints();
+    renderDailyMissions();
+    startMissionsResetTimer();
 
     // Check if browser visitor needs Telegram login prompt overlay
     if (!state.isTelegram && !profileExists) {
