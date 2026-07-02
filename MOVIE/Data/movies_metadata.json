@@ -32,7 +32,7 @@
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADUx8AArFaKUZJgKctjqSEmhYE"
     ],
-    "poster": "https://image.tmdb.org/t/p/w500/e5UevUk9zyhnCWE35Gn0wBIrWEf.jpg",
+    "poster": "https://postimg.cc/w1xMYcrp",
     "rating": 0,
     "release_date": "",
     "genres": [
@@ -44,7 +44,9 @@
     ],
     "tmdb_id": 1724402,
     "overview": "The movie addresses intense themes like systemic corruption, illegal mining (galamsey), and political injustice in Ghana, tackling controversial issues within the nation's governance.",
-    "language": "en"
+    "language": "en",
+    "backdrop": "img/FilmHouse.png",
+    "trailer": ""
   },
   {
     "title": "Kakegurui",
