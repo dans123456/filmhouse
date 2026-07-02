@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "229926-suicide-squad-isekai",
+    "tmdb_id": 229926,
+    "imdb_id": "",
+    "title": "Suicide Squad Isekai",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "In the crime-ridden city of Gotham, Amanda Waller, the head of A.R.G.U.S., assembles a group of notorious criminals—Harley Quinn, Deadshot, Peacemaker, Clayface and King Shark—for a mission into an otherworldly realm that's connected to this world through a gate. It's a realm of swords and magic where orcs rampage and dragons rule the skies. Can Harley Quinn and her crew conquer this perilous realm?",
+    "poster": "https://image.tmdb.org/t/p/w500/AbVwsBJnLoqJzPJn8dlGFSGfygy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gMk4uyWJnsgauRIjJyE63ECDTNa.jpg",
+    "rating": 7.2,
+    "release_date": "2024-06-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADOhMAAghnMUZMKMfbOvCpmRYE"
+    ]
+  },
+  {
     "csv_id": "610892",
     "tmdb_id": 610892,
     "imdb_id": "",
