@@ -1,59 +1,27 @@
 [
   {
-    "csv_id": "155942",
-    "tmdb_id": 155942,
+    "csv_id": "1724798-superstar",
+    "tmdb_id": 1724798,
     "imdb_id": "",
-    "title": "Handyman Saitou in Another World",
-    "type": "Series",
+    "title": "Superstar",
+    "type": "Movie",
     "categories": [
       "Main",
-      "Anime"
+      "Hollywood/British Movies"
     ],
-    "genres": [
-      "Animation",
-      "Comedy",
-      "Sci-Fi & Fantasy"
-    ],
-    "overview": "Handyman Saito has never been anyone special. All his life, he’s had average grades, ordinary athletic skill, a commonplace job… But his unremarkable path takes a turn when he wakes up in another world. Here, warriors, wizards, and elves accompany him on quests delving deep into dungeons, and Saito realizes for the first time what it’s like to be needed. After all, who other than the handyman could be trusted to open locked treasure chests or repair his allies’ equipment? Beginning with a simple “thank you,” this is the story of an ordinary person’s fulfilling life.",
-    "poster": "https://image.tmdb.org/t/p/w500/xp404PMU2cGsODMTIkkUizbYhcm.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/6c1tMSLoWmy0rPic1j0cihExfmP.jpg",
-    "rating": 7.1,
-    "release_date": "2023-01-08",
-    "language": "ja",
+    "genres": [],
+    "overview": "The story of a dream that was larger than life and one woman's journey to achieving that dream.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
     "cast": [],
     "director": "",
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADOhIAAghnMUYyUVDKey21rhYE"
-    ]
-  },
-  {
-    "csv_id": "62565",
-    "tmdb_id": 62565,
-    "imdb_id": "",
-    "title": "My Love Story!!",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Anime"
-    ],
-    "genres": [
-      "Animation",
-      "Comedy"
-    ],
-    "overview": "Takeo Goda is a giant guy with a giant heart. Too bad the girls don't want him! (They always go for his good-looking best friend, Makoto Sunakawa.) Used to being on the sidelines, Takeo simply stands tall and accepts his fate. But one day when he saves a girl named Rinko Yamato from a harasser on the train, his (love!) life suddenly takes an incredible turn! Takeo can hardly believe it when he crosses paths with Rinko again, and he finds himself falling in love with her... But with handsome Suna around, does Takeo even stand a chance?",
-    "poster": "https://image.tmdb.org/t/p/w500/oKvrM8WVOGcSSwIKFfsAxIuk6Nx.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/dQruznwYPKGmiHvR7DS8pikwSca.jpg",
-    "rating": 8.4,
-    "release_date": "2015-04-09",
-    "language": "ja",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADHxIAAghnMUYP17rOX0c7DBYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD_REAAghnMUb6oenIFwE9yxYE"
     ]
   },
   {
