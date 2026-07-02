@@ -1292,6 +1292,7 @@ if (addMovieForm) {
                     overview = data.overview || "No synopsis available.";
                     
                     // Categorize title automatically
+                    const titleLower = title.toLowerCase();
                     const africanCountries = ["NG", "ZA", "GH", "KE", "EG", "TZ", "UG", "MA", "DZ"];
                     const isAfrican = data.origin_country && data.origin_country.some(c => africanCountries.includes(c));
                     
@@ -1321,6 +1322,37 @@ if (addMovieForm) {
                                 categories.push("Hollywood/British Movies");
                             }
                         }
+                    }
+
+                    // Classics franchise auto-matching
+                    const classicKeywords = [
+                        "chucky", "child's play", "bride of chucky", "seed of chucky", "curse of chucky", 
+                        "cult of chucky", "american pie", "american wedding", "american reunion", 
+                        "naked mile", "beta house", "girls' rules", "band camp", "hole in one"
+                    ];
+                    let releaseYear = 0;
+                    if (releaseDate && releaseDate.length >= 4) {
+                        releaseYear = parseInt(releaseDate.substring(0, 4)) || 0;
+                    }
+                    const isClassicMatch = (releaseYear > 0 && releaseYear < 2000) || classicKeywords.some(keyword => titleLower.includes(keyword));
+                    if (isClassicMatch) {
+                        if (!categories.includes("Classic Movies")) categories.push("Classic Movies");
+                    }
+
+                    // Comics auto-matching
+                    const comicKeywords = [
+                        "marvel", "avengers", "spider-man", "spidey", "iron man", "captain america", "thor", 
+                        "guardians of the galaxy", "loki", "wandavision", "hulk", "deadpool", "wolverine", 
+                        "venom", "shang-chi", "eternals", "black widow", "hawkeye", "ms. marvel", "moon knight", 
+                        "she-hulk", "werewolf by night", "black panther", "echo", "madame web", "x-men", "kraven", 
+                        "daredevil", "born again", "ironheart", "fantastic 4", "wonder man", "gen v", "the boys", 
+                        "invincible", "punisher", "batman", "superman", "shazam", "black adam", "dc comics", 
+                        "blue beetle", "kakegurui", "hit-monkey", "m.o.d.o.k.", "what if...?"
+                    ];
+                    const isToAllTheBoys = titleLower.includes("to all the boys");
+                    const isComicMatch = comicKeywords.some(keyword => titleLower.includes(keyword));
+                    if (isComicMatch && !isToAllTheBoys) {
+                        if (!categories.includes("Comic")) categories.push("Comic");
                     }
                 } else {
                     throw new Error("TMDB fetch returned non-ok status");

@@ -500,16 +500,26 @@ async function initializeDatabase() {
         if (releaseDate && releaseDate.length >= 4) {
             releaseYear = parseInt(releaseDate.substring(0, 4)) || 0;
         }
-        if (releaseYear > 0 && releaseYear < 2000) {
+        const classicKeywords = [
+            "chucky", "child's play", "bride of chucky", "seed of chucky", "curse of chucky", 
+            "cult of chucky", "american pie", "american wedding", "american reunion", 
+            "naked mile", "beta house", "girls' rules", "band camp", "hole in one"
+        ];
+        if ((releaseYear > 0 && releaseYear < 2000) || anyMatch(titleLower, classicKeywords)) {
             categories.push("Classic Movies");
         }
 
         const comicKeywords = [
-            "daredevil", "echo", "iron fist", "invincible", "the boys", 
-            "gen v", "black adam", "shazam", "superman", "avatar the last airbender",
-            "marvel", "dc comics", "punisher", "spider-man", "batman"
+            "marvel", "avengers", "spider-man", "spidey", "iron man", "captain america", "thor", 
+            "guardians of the galaxy", "loki", "wandavision", "hulk", "deadpool", "wolverine", 
+            "venom", "shang-chi", "eternals", "black widow", "hawkeye", "ms. marvel", "moon knight", 
+            "she-hulk", "werewolf by night", "black panther", "echo", "madame web", "x-men", "kraven", 
+            "daredevil", "born again", "ironheart", "fantastic 4", "wonder man", "gen v", "the boys", 
+            "invincible", "punisher", "batman", "superman", "shazam", "black adam", "dc comics", 
+            "blue beetle", "kakegurui", "hit-monkey", "m.o.d.o.k.", "what if...?"
         ];
-        if (anyMatch(titleLower, comicKeywords)) {
+        const isToAllTheBoys = titleLower.includes("to all the boys");
+        if (anyMatch(titleLower, comicKeywords) && !isToAllTheBoys) {
             categories.push("Comic");
         }
 
