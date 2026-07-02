@@ -510,7 +510,7 @@ async function initializeDatabase() {
             "marvel", "dc comics", "punisher", "spider-man", "batman"
         ];
         if (anyMatch(titleLower, comicKeywords)) {
-            categories.push("Comics and Manga");
+            categories.push("Comic");
         }
 
         const isRegional = categories.some(cat => ["Korean Drama", "Bollywood", "African", "Anime"].includes(cat));
@@ -1127,7 +1127,7 @@ function renderFavoriteCategoriesChecklist() {
 
     const categoryList = [
         "Hollywood/British Movies", "Hollywood/British Series", 
-        "Bollywood", "Korean Drama", "African", "Anime", "Comics and Manga", 
+        "Bollywood", "Korean Drama", "African", "Anime", "Comic", 
         "Animated Movies", "Kids Shows and Movies (Nickelodeon and Disney)", 
         "Classic Movies", "Erotic Movies"
     ];
@@ -1139,7 +1139,7 @@ function renderFavoriteCategoriesChecklist() {
         "Korean Drama": "K-Drama",
         "African": "African",
         "Anime": "Anime",
-        "Comics and Manga": "Comics & Manga",
+        "Comic": "Comic",
         "Animated Movies": "Animated",
         "Kids Shows and Movies (Nickelodeon and Disney)": "Kids / Family",
         "Classic Movies": "Classics",
@@ -1565,7 +1565,7 @@ function renderCategoriesBar() {
 
     const categoryList = [
         "Main", "Hollywood/British Movies", "Hollywood/British Series", 
-        "Bollywood", "Korean Drama", "African", "Anime", "Comics and Manga", 
+        "Bollywood", "Korean Drama", "African", "Anime", "Comic", 
         "Animated Movies", "Kids Shows and Movies (Nickelodeon and Disney)", 
         "Classic Movies", "Erotic Movies"
     ];
@@ -1578,7 +1578,7 @@ function renderCategoriesBar() {
         "Korean Drama": "K-Drama",
         "African": "African",
         "Anime": "Anime",
-        "Comics and Manga": "Manga",
+        "Comic": "Comic",
         "Animated Movies": "Animated",
         "Kids Shows and Movies (Nickelodeon and Disney)": "Kids",
         "Classic Movies": "Classics",
@@ -1593,7 +1593,7 @@ function renderCategoriesBar() {
         "Korean Drama": `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/></svg>`, // Heart
         "African": `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="currentColor"/></svg>`, // Globe outline
         "Anime": `<svg viewBox="0 0 24 24"><path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-3.5-6c.83 1.43 2.45 2.5 4.5 2.5s3.67-1.07 4.5-2.5h-9z" fill="currentColor"/></svg>`, // Smiley/Cartoon face
-        "Comics and Manga": `<svg viewBox="0 0 24 24"><path d="M21 5c-1.11-.9-3.13-1.86-5-2-1.92-.14-4 .6-5 1.5C10 3.6 7.92 2.86 6 3c-1.87.14-3.89 1.1-5 2v14c0 1.1.9 2 2 2h4c1.78 0 3.61.85 5 1.5 1.39-.65 3.22-1.5 5-1.5h4c1.1 0 2-.9 2-2V5zm-2 13h-3c-1.38 0-2.61.57-3.5 1.5V6c.9-.9 2.12-1.5 3.5-1.5h3v13.5z" fill="currentColor"/></svg>`, // Book
+        "Comic": `<svg viewBox="0 0 24 24"><path d="M21 5c-1.11-.9-3.13-1.86-5-2-1.92-.14-4 .6-5 1.5C10 3.6 7.92 2.86 6 3c-1.87.14-3.89 1.1-5 2v14c0 1.1.9 2 2 2h4c1.78 0 3.61.85 5 1.5 1.39-.65 3.22-1.5 5-1.5h4c1.1 0 2-.9 2-2V5zm-2 13h-3c-1.38 0-2.61.57-3.5 1.5V6c.9-.9 2.12-1.5 3.5-1.5h3v13.5z" fill="currentColor"/></svg>`, // Book
         "Animated Movies": `<svg viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.5c-1.34 1.9-3.53 3-5 3s-3.66-1.1-5-3h10z" fill="currentColor"/></svg>`, // Winking smiley
         "Kids Shows and Movies (Nickelodeon and Disney)": `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" fill="currentColor"/></svg>`, // Teddy/Toy Plus
         "Classic Movies": `<svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v3c0 2.44 1.72 4.48 4 4.9V19H5v2h14v-2h-2v-4.1c2.28-.42 4-2.46 4-4.9V7c0-1.1-.9-2-2-2zM5 10V7h2v3H5zm14 0h-2V7h2v3z" fill="currentColor"/></svg>`, // Trophy
@@ -1705,7 +1705,7 @@ function renderFeaturedGrid(fromDiscover = false) {
                 "Korean Drama": "K-Drama",
                 "African": "African",
                 "Anime": "Anime",
-                "Comics and Manga": "Manga",
+                "Comic": "Comic",
                 "Animated Movies": "Animated",
                 "Kids Shows and Movies (Nickelodeon and Disney)": "Kids",
                 "Classic Movies": "Classics",
@@ -1715,17 +1715,7 @@ function renderFeaturedGrid(fromDiscover = false) {
         }
     }
 
-    // Trigger Discover request automatically if filters are active, no text search, and on Main category
-    if (filtersActive && !state.searchQuery && state.activeCategory === "Main") {
-        const filterKey = `${state.filters.genre}-${state.filters.genre2}-${state.filters.rating}-${state.filters.year}`;
-        if (state.lastDiscoverQuery !== filterKey && !fromDiscover) {
-            state.lastDiscoverQuery = filterKey;
-            performGlobalTmdbDiscover();
-            return; // performGlobalTmdbDiscover will re-call renderFeaturedGrid(true) when finished
-        }
-    } else {
-        state.lastDiscoverQuery = null;
-    }
+    state.lastDiscoverQuery = null;
 
     // Filter by active category (or search globally if search term is active)
     let list = state.movies;
@@ -4560,6 +4550,14 @@ function logMovieRequestToFirestore(movie) {
 
 // App Kickoff Initializer
 document.addEventListener("DOMContentLoaded", async () => {
+    // Force clear old corrupted database & healed caches once
+    if (localStorage.getItem("filmhouse_reset_v7") !== "true") {
+        localStorage.removeItem("filmhouse_healed_movies");
+        localStorage.removeItem("filmhouse_enriched_db_v5");
+        localStorage.removeItem("filmhouse_enriched_db_v4");
+        localStorage.setItem("filmhouse_reset_v7", "true");
+    }
+
     // 0. Load Theme Accent configuration immediately
     const savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
     applyThemeAccent(savedTheme);
@@ -4851,6 +4849,19 @@ function showConnectionDrawer(targetLink, blockId) {
         showAdRewardFlow(null, blockId).then(openLink);
         return;
     }
+
+    // Set up close actions for connection drawer overlay and close button
+    const closeBtn = document.getElementById("btn-close-connection-drawer");
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            closeDrawer();
+        };
+    }
+    drawer.onclick = (e) => {
+        if (e.target === drawer) {
+            closeDrawer();
+        }
+    };
 
     // Reset state & ensure spinner is showing and any old action button is removed
     if (titleEl) titleEl.textContent = "Securing Premium Connection…";

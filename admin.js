@@ -758,7 +758,7 @@ function showMovieDetails(movie) {
                         { key: "Korean Drama", label: "Korean Drama" },
                         { key: "African", label: "African" },
                         { key: "Anime", label: "Anime" },
-                        { key: "Comics and Manga", label: "Comics & Manga" },
+                        { key: "Comic", label: "Comic" },
                         { key: "Animated Movies", label: "Animated" },
                         { key: "Kids Shows and Movies (Nickelodeon and Disney)", label: "Kids" },
                         { key: "Classic Movies", label: "Classics" },
@@ -1167,11 +1167,28 @@ if (addMovieIdInput) {
         const isTmdb = val && /^\d+$/.test(val);
         const customSection = document.getElementById("add-movie-custom-fields");
         const toggleBtn = document.getElementById("btn-toggle-custom-fields");
-        if (customSection && toggleBtn) {
-            if (!isTmdb && val !== "") {
-                // Auto-expand section if they type a custom Nollywood text slug ID
+        const toggleContainer = toggleBtn ? toggleBtn.parentElement : null;
+        
+        if (customSection) {
+            if (val === "") {
+                if (toggleContainer) toggleContainer.style.display = "flex";
+                if (toggleBtn) {
+                    toggleBtn.style.display = "block";
+                    toggleBtn.textContent = "Show Custom Fields ▾";
+                }
+                customSection.style.display = "none";
+            } else if (isTmdb) {
+                // TMDB ID: Hide custom fields completely (API will handle everything)
+                if (toggleContainer) toggleContainer.style.display = "none";
+                customSection.style.display = "none";
+            } else {
+                // Custom ID: Show custom fields and hide toggle button (they must fill them)
+                if (toggleContainer) {
+                    toggleContainer.style.display = "flex";
+                    // Keep header text but hide the collapse/expand button
+                    if (toggleBtn) toggleBtn.style.display = "none";
+                }
                 customSection.style.display = "block";
-                toggleBtn.textContent = "Hide Custom Fields ▴";
             }
         }
     });
@@ -1223,18 +1240,21 @@ if (addMovieForm) {
             submitBtn.textContent = "Fetching TMDB info... ⏳";
         }
 
-        // Fetch TMDB rich metadata on the fly
+        // Fetch TMDB rich metadata on the fly if ID is numeric, otherwise use manual fields
         const numericId = id.split("-")[0];
+        const isTmdb = numericId && /^\d+$/.test(numericId);
+        
         let poster = "";
         let rating = 0;
         let releaseDate = "";
         let genres = [];
-        let categories = checkedCategories.length > 0 ? checkedCategories : ["Main"];
-        let overview = customOverview || "No synopsis available.";
+        let categories = ["Main"];
+        let overview = "No synopsis available.";
         let backdrop = "";
         let original_language = "en";
+        let trailerId = "";
         
-        if (numericId && /^\d+$/.test(numericId)) {
+        if (isTmdb) {
             const mediaType = (type.toLowerCase() === 'tv') ? 'tv' : 'movie';
             const url = `https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${TMDB_API_KEY}`;
             try {
@@ -1247,56 +1267,70 @@ if (addMovieForm) {
                     releaseDate = data.release_date || data.first_air_date || "";
                     genres = data.genres ? data.genres.map(g => g.name) : [];
                     original_language = data.original_language || "en";
+                    overview = data.overview || "No synopsis available.";
                     
-                    // Override with custom synopsis if entered, else use TMDB
-                    if (customOverview) {
-                        overview = customOverview;
-                    } else {
-                        overview = data.overview || "No synopsis available.";
-                    }
-                    
-                    // Categorize title
+                    // Categorize title automatically
                     if (type === 'tv') {
-                        if (!categories.includes("Hollywood/British Series")) categories.push("Hollywood/British Series");
-                        if (original_language === 'ko' && !categories.includes("Korean Drama")) {
+                        categories.push("Hollywood/British Series");
+                        if (original_language === 'ko') {
                             categories.push("Korean Drama");
                         }
                     } else {
-                        if (!categories.includes("Hollywood/British Movies")) categories.push("Hollywood/British Movies");
-                        if (original_language === 'ko' && !categories.includes("Korean Drama")) {
+                        categories.push("Hollywood/British Movies");
+                        if (original_language === 'ko') {
                             categories.push("Korean Drama");
                         }
                     }
                     if (data.genres && data.genres.some(g => g.name.toLowerCase() === "animation")) {
-                        if (!categories.includes("Animated Movies")) categories.push("Animated Movies");
-                        if (original_language === 'ja' && !categories.includes("Anime")) {
+                        categories.push("Animated Movies");
+                        if (original_language === 'ja') {
                             categories.push("Anime");
                         }
                     }
+                } else {
+                    throw new Error("TMDB fetch returned non-ok status");
                 }
             } catch (err) {
                 console.warn("Could not enrich movie metadata on form submit:", err);
+                alert("Error: Failed to fetch TMDB details. Please check the TMDB ID or your internet connection.");
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                }
+                return;
             }
+        } else {
+            // Manual flow: strictly use user inputs
+            poster = customPoster || "img/FilmHouse3_nobg.png";
+            backdrop = customBackdrop || "img/FilmHouse.png";
+            overview = customOverview || "No synopsis available.";
+            releaseDate = customReleaseDate || "";
+            rating = 0;
+            trailerId = customTrailerId || "";
+            categories = checkedCategories.length > 0 ? checkedCategories : ["Main"];
+            
+            // Map selected categories to genres so local filtering works
+            genres = categories.filter(c => c !== "Main" && c !== "Hollywood/British Movies" && c !== "Hollywood/British Series");
         }
 
         // Add to local state
         const newMovie = {
             csv_id: id,
-            tmdb_id: parseInt(numericId) || null,
+            tmdb_id: isTmdb ? parseInt(numericId) : null,
             imdb_id: "",
             title: title,
             type: type === 'tv' ? 'Series' : 'Movie',
             categories: categories,
             genres: genres,
             overview: overview,
-            poster: customPoster || poster || "img/FilmHouse3_nobg.png",
-            backdrop: customBackdrop || backdrop || "img/FilmHouse.png",
+            poster: poster,
+            backdrop: backdrop,
             rating: rating,
-            release_date: customReleaseDate || releaseDate,
+            release_date: releaseDate,
             language: original_language,
             cast: [],
             director: "",
-            trailer: customTrailerId || "",
+            trailer: trailerId,
             runtime: "",
             links: linksList
         };
