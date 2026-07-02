@@ -1503,6 +1503,33 @@ if (publishBtn) {
             const shaCSV = csvData.sha;
             const shaJSON = jsonData.sha;
             
+            // Auto-Merge check: retrieve latest remote database list to prevent race conditions
+            if (jsonData.content) {
+                try {
+                    const decodedJSON = decodeURIComponent(escape(atob(jsonData.content.replace(/\s/g, ""))));
+                    const remoteMovies = JSON.parse(decodedJSON);
+                    
+                    let mergedCount = 0;
+                    const localCsvIds = new Set(allCatalogMovies.map(m => m.csv_id));
+                    
+                    remoteMovies.forEach(rm => {
+                        if (rm.csv_id && !localCsvIds.has(rm.csv_id)) {
+                            allCatalogMovies.push(rm);
+                            mergedCount++;
+                        }
+                    });
+                    
+                    if (mergedCount > 0) {
+                        console.log(`Auto-merged ${mergedCount} remote movies into local list to prevent overwrite deletion!`);
+                        // Ensure lists are sorted consistently
+                        allCatalogMovies.sort((a, b) => a.title.localeCompare(b.title));
+                        renderMoviesList(allCatalogMovies);
+                    }
+                } catch (err) {
+                    console.warn("Auto-merge remote verification check failed:", err);
+                }
+            }
+            
             // 2. Generate contents
             const csvContent = generateCSVContent();
             const jsonContent = JSON.stringify(allCatalogMovies, null, 2);
