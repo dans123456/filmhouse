@@ -99,7 +99,7 @@ const JSON_FILE_PATH = "./MOVIE/Data/movies_metadata.json";
 // Adsgram Ad Placement Configuration
 const ADSGRAM_DOWNLOAD_BLOCK_ID = "36631";
 const ADSGRAM_REQUEST_BLOCK_ID = "36680"; // Updated to request placement block ID
-const ADSGRAM_TASK_BLOCK_ID = "36680"; // Set to your Adsgram Task Block ID (CPA format)
+const ADSGRAM_TASK_BLOCK_ID = "task-36911"; // Set to your Adsgram Task Block ID (CPA format)
 
 // State Management Object
 const state = {
