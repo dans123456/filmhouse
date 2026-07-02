@@ -644,6 +644,7 @@ function loadUserProfile() {
     state.user.fullName = profile.fullName || state.user.fullName;
     state.user.points = profile.points || 0;
     state.user.badge = profile.badge || null;
+    state.user.badgeExpiresAt = profile.badgeExpiresAt || 0;
     state.user.pointsBreakdown = profile.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
     
     if (profile.avatar) {
@@ -724,6 +725,9 @@ function loadUserProfile() {
 
     // Build favorite genres checklist dynamically
     renderFavoriteCategoriesChecklist();
+    
+    // Check if VIP Custom Badge has expired before syncing UI
+    checkVipBadgeExpiry();
     
     // Sync points UI elements
     updatePointsUI();
@@ -981,6 +985,63 @@ function updatePointsUI() {
     if (bkV) bkV.textContent = `${breakdown.visits * 5} pts (${breakdown.visits} visits)`;
     if (bkS) bkS.textContent = `${breakdown.shares * 2} pts (${breakdown.shares} shares)`;
     if (bkW) bkW.textContent = `${breakdown.watched * 5} pts (${breakdown.watched} watched)`;
+
+    // 5. Update VIP Badge active status / expiry info in Reward Center
+    const vipCard = document.querySelector('[data-reward-id="vip-badge"]')?.closest('.reward-item-card');
+    if (vipCard) {
+        const descEl = vipCard.querySelector('p');
+        const btnEl = vipCard.querySelector('button');
+        if (state.user.badge && state.user.badgeExpiresAt > Date.now()) {
+            const timeLeftMs = state.user.badgeExpiresAt - Date.now();
+            const daysLeft = Math.ceil(timeLeftMs / (24 * 60 * 60 * 1000));
+            if (descEl) descEl.innerHTML = `<span style="color: #ffbc00; font-weight: 700;">★ Active Badge: "${escapeHTML(state.user.badge)}"</span><br><span style="color: var(--text-secondary); font-size: 10px;">Expires in ${daysLeft} day(s).</span>`;
+            if (btnEl) {
+                btnEl.textContent = "Active";
+                btnEl.disabled = true;
+                btnEl.style.opacity = "0.6";
+                btnEl.style.background = "var(--border-color)";
+                btnEl.style.borderColor = "var(--border-color)";
+            }
+        } else {
+            if (descEl) descEl.textContent = "Stand out on the leaderboard with a custom VIP tag (lasts 7 days).";
+            if (btnEl) {
+                btnEl.textContent = "2,500 pts";
+                btnEl.disabled = false;
+                btnEl.style.opacity = "";
+                btnEl.style.background = "";
+                btnEl.style.borderColor = "";
+            }
+        }
+    }
+
+    // 6. Update Ad-Free active status / expiry info in Reward Center
+    const adFreeCard = document.querySelector('[data-reward-id="ad-free"]')?.closest('.reward-item-card');
+    if (adFreeCard) {
+        const descEl = adFreeCard.querySelector('p');
+        const btnEl = adFreeCard.querySelector('button');
+        const adFreeUntil = parseInt(localStorage.getItem("ad_free_until") || "0");
+        if (adFreeUntil > Date.now()) {
+            const timeLeftMs = adFreeUntil - Date.now();
+            const hoursLeft = Math.ceil(timeLeftMs / (60 * 60 * 1000));
+            if (descEl) descEl.innerHTML = `<span style="color: #ffbc00; font-weight: 700;">★ Active Ad-Free Pass</span><br><span style="color: var(--text-secondary); font-size: 10px;">Expires in ${hoursLeft} hour(s).</span>`;
+            if (btnEl) {
+                btnEl.textContent = "Active";
+                btnEl.disabled = true;
+                btnEl.style.opacity = "0.6";
+                btnEl.style.background = "var(--border-color)";
+                btnEl.style.borderColor = "var(--border-color)";
+            }
+        } else {
+            if (descEl) descEl.textContent = "Disable Adsgram ads when opening movies for 24 hours.";
+            if (btnEl) {
+                btnEl.textContent = "1,500 pts";
+                btnEl.disabled = false;
+                btnEl.style.opacity = "";
+                btnEl.style.background = "";
+                btnEl.style.borderColor = "";
+            }
+        }
+    }
 }
 
 function checkDailyVisitPoints() {
@@ -4260,6 +4321,7 @@ function syncUserToFirestore() {
             avatar: state.user.avatar || "",
             points: state.user.points || 0,
             badge: state.user.badge || "",
+            badgeExpiresAt: state.user.badgeExpiresAt || 0,
             pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -4276,6 +4338,7 @@ function syncUserToFirestore() {
             avatar: state.user.avatar || "",
             points: state.user.points || 0,
             badge: state.user.badge || "",
+            badgeExpiresAt: state.user.badgeExpiresAt || 0,
             pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true }).catch(e => console.warn("Firestore fallback set error:", e));
@@ -4419,7 +4482,7 @@ function renderUserRequests(requests) {
             statusBadge = `<span style="font-size: 10px; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🟠 Pending</span>`;
             actionBtn = `
                 <button class="btn btn-secondary btn-sm user-request-boost-btn" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 600; flex-shrink: 0; border-color: rgba(255, 188, 0, 0.3); color: #ffbc00;">
-                    Boost (100 pts)
+                    Boost (1,000 pts)
                 </button>
             `;
         }
@@ -4469,20 +4532,43 @@ function renderUserRequests(requests) {
 function boostRequestToPriority(docId) {
     if (typeof firebase === "undefined" || !db) return;
     
-    if (state.user.points < 100) {
-        showToast("Not enough points! You need 100 points to boost requests.", "error");
+    if (state.user.points < 1000) {
+        showToast("Not enough points! You need 1,000 points to boost requests.", "error");
         return;
     }
     
     db.collection("requests").doc(docId).update({
         status: "priority"
     }).then(() => {
-        deductPoints(100);
+        deductPoints(1000);
         showToast("Request boosted to High Priority! 🚀", "success");
     }).catch(err => {
         console.error("Error boosting request:", err);
         showToast("Failed to boost request.", "error");
     });
+}
+
+function checkVipBadgeExpiry() {
+    if (state.user && state.user.badge) {
+        const expiry = parseInt(state.user.badgeExpiresAt || "0");
+        if (expiry > 0 && Date.now() > expiry) {
+            state.user.badge = "";
+            state.user.badgeExpiresAt = 0;
+            
+            const saved = localStorage.getItem("filmhouse_user_profile");
+            if (saved) {
+                try {
+                    const profile = JSON.parse(saved);
+                    profile.badge = "";
+                    profile.badgeExpiresAt = 0;
+                    localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+                } catch (e) {}
+            }
+            
+            syncUserToFirestore();
+            showToast("Your VIP Custom Badge has expired! Earn more points to reclaim it. 🏆", "info");
+        }
+    }
 }
 
 function deductPoints(points) {
@@ -4634,16 +4720,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         btn.addEventListener("click", () => {
             const rewardId = btn.getAttribute("data-reward-id");
             if (rewardId === "ad-free") {
-                if (state.user.points < 150) {
-                    showToast("Not enough points! You need 150 points for Ad-Free pass.", "error");
+                if (state.user.points < 1500) {
+                    showToast("Not enough points! You need 1,500 points for Ad-Free pass.", "error");
                     return;
                 }
-                deductPoints(150);
+                deductPoints(1500);
                 localStorage.setItem("ad_free_until", Date.now() + 24 * 60 * 60 * 1000);
                 showToast("24h Ad-Free VIP Pass activated! 🎫 Enjoy ad-free downloads.", "success");
             } else if (rewardId === "vip-badge") {
-                if (state.user.points < 250) {
-                    showToast("Not enough points! You need 250 points for VIP Badge.", "error");
+                if (state.user.points < 2500) {
+                    showToast("Not enough points! You need 2,500 points for VIP Badge.", "error");
                     return;
                 }
                 
@@ -4656,9 +4742,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     return;
                 }
                 
-                deductPoints(250);
+                deductPoints(2500);
                 
+                const expiryTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days
                 state.user.badge = cleanBadge;
+                state.user.badgeExpiresAt = expiryTime;
                 
                 const saved = localStorage.getItem("filmhouse_user_profile");
                 let profile = {};
@@ -4668,6 +4756,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     } catch (e) {}
                 }
                 profile.badge = cleanBadge;
+                profile.badgeExpiresAt = expiryTime;
                 localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
                 
                 syncUserToFirestore();
