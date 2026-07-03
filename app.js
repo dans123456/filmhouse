@@ -5293,6 +5293,64 @@ document.addEventListener("DOMContentLoaded", async () => {
         }, 1000);
     }
 
+    // Global Leaderboard renderer
+    function fetchAndRenderLeaderboard() {
+        const list = document.getElementById("points-leaderboard-list");
+        if (!list || typeof firebase === "undefined" || !db) return;
+        
+        db.collection("users")
+            .orderBy("points", "desc")
+            .limit(10)
+            .get()
+            .then(snapshot => {
+                list.innerHTML = "";
+                let rank = 1;
+                
+                snapshot.forEach(doc => {
+                    const u = doc.data();
+                    const points = parseInt(u.points || 0);
+                    const name = escapeHTML(u.fullName || u.username || `User ${doc.id.substring(0, 4)}`);
+                    
+                    let badge = "";
+                    let rankStyle = "color: var(--text-secondary); font-weight: 700;";
+                    if (rank === 1) {
+                        badge = "🥇";
+                        rankStyle = "color: #ffbc00; font-size: 14px; font-weight: 900;";
+                    } else if (rank === 2) {
+                        badge = "🥈";
+                        rankStyle = "color: #e0e0e0; font-size: 14px; font-weight: 900;";
+                    } else if (rank === 3) {
+                        badge = "🥉";
+                        rankStyle = "color: #cd7f32; font-size: 14px; font-weight: 900;";
+                    } else {
+                        badge = `#${rank}`;
+                    }
+                    
+                    const isMe = state.user && (String(state.user.id) === String(u.id));
+                    const itemBg = isMe ? "background: rgba(255, 188, 0, 0.06); border-color: rgba(255, 188, 0, 0.25);" : "background: rgba(255,255,255,0.01); border-color: transparent;";
+                    
+                    const item = document.createElement("div");
+                    item.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); margin-bottom: 4px; ${itemBg}`;
+                    item.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 24px; text-align: center; ${rankStyle}">${badge}</span>
+                            <span style="font-size: 12px; font-weight: ${isMe ? '700' : '500'}; color: ${isMe ? 'var(--primary-color)' : '#fff'};">${name} ${isMe ? ' (You)' : ''}</span>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 700; color: #ffbc00;">${points.toLocaleString()} pts</span>
+                    `;
+                    list.appendChild(item);
+                    rank++;
+                });
+                
+                if (list.children.length === 0) {
+                    list.innerHTML = `<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 11px;">Join the game! Claim points to rank here. 🚀</div>`;
+                }
+            }).catch(err => {
+                console.warn("Error rendering leaderboard:", err);
+                list.innerHTML = `<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 11px;">Leaderboard offline.</div>`;
+            });
+    }
+
     // Reward Center Drawer triggers & listeners
     const btnRewards = document.getElementById("btn-header-rewards");
     const rewardsDrawer = document.getElementById("rewards-drawer");
@@ -5304,6 +5362,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             updatePointsUI();
             renderDailyMissions();
             updateHeaderNotificationDot();
+            fetchAndRenderLeaderboard();
         });
     }
     if (rewardsClose && rewardsDrawer) {

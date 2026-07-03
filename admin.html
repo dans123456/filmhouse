@@ -544,6 +544,14 @@
                 <div style="font-size: 20px; font-weight: 800; color: var(--primary-color); margin-top: 4px; font-family: var(--font-heading);" id="stat-catalog-size">0</div>
             </div>
         </div>
+        
+        <!-- Catalog Breakdown Sub-Panel -->
+        <div id="catalog-breakdown-container" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 14px; display: none;">
+            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px;">📚 Catalog Category Distribution</div>
+            <div id="analytics-categories-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
     </div>
 
     <div class="glass-panel">
@@ -735,6 +743,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=61"></script>
+    <script src="admin.js?v=62"></script>
 </body>
 </html>

@@ -158,6 +158,36 @@ function updateStatsCounters() {
     const statCatalogSize = document.getElementById("stat-catalog-size");
     if (statCatalogSize) statCatalogSize.textContent = allCatalogMovies.length;
 
+    // Categories breakdown calculator
+    const breakdownContainer = document.getElementById("catalog-breakdown-container");
+    const categoriesList = document.getElementById("analytics-categories-list");
+    if (breakdownContainer && categoriesList) {
+        if (allCatalogMovies.length > 0) {
+            breakdownContainer.style.display = "block";
+            const categoryCounts = {};
+            allCatalogMovies.forEach(m => {
+                const cats = m.categories || ["Main"];
+                cats.forEach(cat => {
+                    const cleanCat = String(cat).trim() || "Main";
+                    categoryCounts[cleanCat] = (categoryCounts[cleanCat] || 0) + 1;
+                });
+            });
+            
+            categoriesList.innerHTML = "";
+            Object.entries(categoryCounts).forEach(([cat, count]) => {
+                const box = document.createElement("div");
+                box.style.cssText = "background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;";
+                box.innerHTML = `
+                    <span style="color: var(--text-secondary); font-weight: 600;">${escapeHTML(cat)}</span>
+                    <span style="color: var(--primary-color); font-weight: 700;">${count}</span>
+                `;
+                categoriesList.appendChild(box);
+            });
+        } else {
+            breakdownContainer.style.display = "none";
+        }
+    }
+
     // Total requests counter
     const totalRequestsEl = document.getElementById("stat-requests");
     if (totalRequestsEl) totalRequestsEl.textContent = allRequests.length;
