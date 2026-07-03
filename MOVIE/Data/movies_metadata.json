@@ -1,5 +1,34 @@
 [
   {
+    "csv_id": "207468-8",
+    "tmdb_id": 207468,
+    "imdb_id": "",
+    "title": "Kaiju No. 8",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "In a world plagued by creatures known as Kaiju, Kafka Hibino aspired to enlist in The Defense Force. He makes a promise to enlist with his childhood friend, Mina Ashiro. Soon, life takes them in separate ways. While employed cleaning up after Kaiju battles, Kafka meets Reno Ichikawa. Reno's determination to join The Defense Force reawakens Kafka's promise to join Mina and protect humanity.",
+    "poster": "https://image.tmdb.org/t/p/w500/bJxGs0w5RAhaX4fIUQu511rvm0S.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/htGeuCcNhlBe8GTx3izKOsd8frw.jpg",
+    "rating": 8.5,
+    "release_date": "2024-04-13",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADggsAAq-EQEbCsAqUDKoneRYE"
+    ]
+  },
+  {
     "csv_id": "635302",
     "tmdb_id": 635302,
     "imdb_id": "",
