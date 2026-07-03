@@ -1884,17 +1884,35 @@ async function fetchTMDBPreview(csvId, type) {
     if (!numericId || !/^\d+$/.test(numericId)) return null;
     
     const mediaType = (type.toLowerCase() === 'series' || type.toLowerCase() === 'tv') ? 'tv' : 'movie';
-    const url = `https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${TMDB_API_KEY}`;
+    const url = `https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${TMDB_API_KEY}&append_to_response=videos`;
     
     try {
         const res = await fetch(url);
         if (res.ok) {
             const data = await res.json();
+            
+            // Extract YouTube trailer key
+            let trailerId = "";
+            if (data.videos && data.videos.results) {
+                const officialTrailer = data.videos.results.find(v => v.type === "Trailer" && v.site === "YouTube");
+                if (officialTrailer) {
+                    trailerId = officialTrailer.key;
+                } else if (data.videos.results.length > 0) {
+                    trailerId = data.videos.results[0].key;
+                }
+            }
+
             return {
+                tmdb_id: data.id,
                 title: data.title || data.name || "",
                 poster: data.poster_path ? `https://image.tmdb.org/t/p/w200${data.poster_path}` : "",
+                backdrop: data.backdrop_path ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}` : "",
                 overview: data.overview || "",
-                rating: data.vote_average || 0
+                rating: Math.round((data.vote_average || 0) * 10) / 10,
+                release_date: data.release_date || data.first_air_date || "",
+                language: data.original_language || "en",
+                genres: data.genres ? data.genres.map(g => g.name) : [],
+                trailer: trailerId
             };
         }
     } catch (e) {
@@ -2034,10 +2052,16 @@ function showCSVReviewModal(importedMovies) {
                     <div style="font-size: 11px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 340px;" title="${preview.overview}">${preview.overview || 'No synopsis loaded.'}</div>
                 </div>
             `;
+            m.tmdb_id = preview.tmdb_id;
             m.title = preview.title || m.title;
             m.overview = preview.overview || m.overview;
             m.poster = preview.poster;
+            m.backdrop = preview.backdrop;
             m.rating = preview.rating;
+            m.release_date = preview.release_date;
+            m.language = preview.language;
+            m.genres = preview.genres;
+            m.trailer = preview.trailer;
         }
     });
 }
