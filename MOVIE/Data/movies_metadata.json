@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "1119449-good-luck-have-fun-don-t-die",
+    "tmdb_id": 1119449,
+    "imdb_id": "",
+    "title": "Good Luck, Have Fun, Don't Die",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A 'Man from the Future' arrives at an LA diner where he must recruit the precise combination of disgruntled patrons to join him on a one-night quest to save the world from the terminal threat of a rogue artificial intelligence.",
+    "poster": "https://image.tmdb.org/t/p/w500/rWcfOdY7TU6lTdazWj0ebDZnAfO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/drRxbu2OHG0DEENptZ8wI5f0uEU.jpg",
+    "rating": 7,
+    "release_date": "2026-02-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Nm4WbapDzDQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADOxcAAq-EQEZDQdKLjxZbsBYE"
+    ]
+  },
+  {
     "csv_id": "1297842-goat",
     "tmdb_id": 1297842,
     "imdb_id": "",
