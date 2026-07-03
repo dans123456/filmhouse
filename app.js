@@ -956,6 +956,7 @@ function awardPoints(points, reason) {
     // Notify the user via toast
     let reasonText = "";
     if (reason === "download") reasonText = "downloading a movie";
+    else if (reason === "task") reasonText = "completing the task";
     else if (reason === "visit") reasonText = "your daily visit";
     else if (reason === "share") reasonText = "sharing a movie";
     else if (reason === "watched") reasonText = points > 0 ? "marking a movie as watched" : "removing a movie from watched list";
@@ -3415,6 +3416,9 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 btnEl.style.boxSizing = "border-box";
                 btnEl.style.transition = "all 0.2s ease";
                 btnEl.style.boxShadow = "0 3px 10px var(--primary-glow)";
+                btnEl.addEventListener("click", () => {
+                    status("Task started! Return here and tap 'Claim 🎁' after completing the task in Telegram.");
+                });
 
                 const claimEl = document.createElement("div");
                 claimEl.setAttribute("slot", "claim");
@@ -3458,7 +3462,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 const handleReward = () => {
                     cleanupAndRestore();
                     status("Task completed! Reward received ✓");
-                    awardPoints(10, "download");
+                    awardPoints(10, "task");
                     safeResolve();
                 };
                 
@@ -4756,6 +4760,12 @@ function renderUserRequests(requests) {
     
     if (headerNotificationDot) {
         headerNotificationDot.style.display = hasNewFulfillment ? "block" : "none";
+    }
+    
+    // Notify user once per session if a request is ready
+    if (hasNewFulfillment && !state.notifiedOfFulfillment) {
+        state.notifiedOfFulfillment = true;
+        showToast("Good news! One of your movie requests is ready! 🍿 Check the Reward Center.", "success");
     }
 }
 

@@ -668,6 +668,29 @@
             </div>
         </div>
     </div>
+
+    <!-- FULFILL REQUEST MODAL -->
+    <div class="admin-modal-overlay" id="fulfill-request-modal">
+        <div class="admin-modal-container" style="max-width: 480px; width: 95%;">
+            <div class="modal-header">
+                <h3 id="fulfill-modal-title">Fulfill Request</h3>
+                <button class="close-modal-btn" id="btn-close-fulfill-modal">
+                    <svg style="width:18px;height:18px;fill:currentColor;"><use href="#icon-close"></use></svg>
+                </button>
+            </div>
+            <form id="fulfill-request-form" onsubmit="event.preventDefault();">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="fulfill-download-link" style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Telegram Direct Download Link</label>
+                    <input type="text" id="fulfill-download-link" placeholder="e.g. https://t.me/c/..." required style="background-color: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: #ffffff; outline: none; width: 100%; box-sizing: border-box; margin-top: 6px;">
+                </div>
+                <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 20px;">
+                    This link will be sent directly to all users who requested this title.
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px; font-weight: 700; border-radius: var(--border-radius-md);">Submit Fulfillment 📥</button>
+            </form>
+        </div>
+    </div>
+
     <svg style="display:none;">
         <g id="icon-close">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
@@ -675,6 +698,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=56"></script>
+    <script src="admin.js?v=57"></script>
 </body>
 </html>

@@ -353,30 +353,19 @@ function renderRequestsList() {
 function fulfillMovieTitleRequests(title, docIds) {
     if (typeof firebase === "undefined" || !db) return;
     
-    const downloadLink = prompt(`Enter the direct download link for "${title}":`);
-    if (downloadLink === null) return;
+    const modal = document.getElementById("fulfill-request-modal");
+    const titleEl = document.getElementById("fulfill-modal-title");
+    const inputEl = document.getElementById("fulfill-download-link");
     
-    const cleanLink = downloadLink.trim();
-    if (!cleanLink) {
-        alert("Download link cannot be empty!");
-        return;
-    }
+    if (!modal || !titleEl || !inputEl) return;
     
-    const batch = db.batch();
-    docIds.forEach(id => {
-        const ref = db.collection("requests").doc(id);
-        batch.update(ref, {
-            status: "fulfilled",
-            downloadLink: cleanLink
-        });
-    });
+    currentFulfillTitle = title;
+    currentFulfillDocIds = docIds;
     
-    batch.commit().then(() => {
-        alert(`Successfully fulfilled all requests for "${title}"!`);
-    }).catch(err => {
-        console.error("Error fulfilling requests:", err);
-        alert("Failed to fulfill requests: " + err.message);
-    });
+    titleEl.textContent = `Fulfill Request: "${title}"`;
+    inputEl.value = "";
+    
+    modal.classList.add("active");
 }
 
 // Bind search input typing events
@@ -1919,5 +1908,45 @@ window.addEventListener("beforeunload", (e) => {
         return e.returnValue;
     }
 });
+
+// Fulfill Request Modal Event Listeners
+let currentFulfillTitle = "";
+let currentFulfillDocIds = [];
+
+const fulfillRequestModal = document.getElementById("fulfill-request-modal");
+const closeFulfillModalBtn = document.getElementById("btn-close-fulfill-modal");
+const fulfillForm = document.getElementById("fulfill-request-form");
+const fulfillLinkInput = document.getElementById("fulfill-download-link");
+
+if (closeFulfillModalBtn && fulfillRequestModal) {
+    closeFulfillModalBtn.addEventListener("click", () => {
+        fulfillRequestModal.classList.remove("active");
+    });
+}
+
+if (fulfillForm && fulfillRequestModal) {
+    fulfillForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const downloadLink = fulfillLinkInput.value.trim();
+        if (!downloadLink) return;
+        
+        const batch = db.batch();
+        currentFulfillDocIds.forEach(id => {
+            const ref = db.collection("requests").doc(id);
+            batch.update(ref, {
+                status: "fulfilled",
+                downloadLink: downloadLink
+            });
+        });
+        
+        batch.commit().then(() => {
+            fulfillRequestModal.classList.remove("active");
+            alert(`Successfully fulfilled all requests for "${currentFulfillTitle}"!`);
+        }).catch(err => {
+            console.error("Error fulfilling requests:", err);
+            alert("Failed to fulfill requests: " + err.message);
+        });
+    });
+}
 
 
