@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "1382832-hungry",
+    "tmdb_id": 1382832,
+    "imdb_id": "",
+    "title": "Hungry",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A group of holidaymakers must fight for their lives against a rampaging hippo on the loose after becoming lost in the Louisiana swamplands.",
+    "poster": "https://image.tmdb.org/t/p/w500/kHbUXJhXYV7UGiStIgCyplWsYKd.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ikyzq678qnHtRY8ZiQJzK4hiOyW.jpg",
+    "rating": 6.9,
+    "release_date": "2026-06-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "aHZrv6CSTuA",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADLRcAAq-EQEZD9KnolIpP6xYE"
+    ]
+  },
+  {
     "csv_id": "1433570-betray-thirst",
     "tmdb_id": 1433570,
     "imdb_id": "",
