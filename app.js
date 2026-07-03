@@ -3320,39 +3320,145 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
             return;
         }
 
-        // Initialize controllers if not already done
+        // Initialize video controller if not already done
         if (!state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID]) {
             state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID] = window.Adsgram.init({ blockId: ADSGRAM_DOWNLOAD_BLOCK_ID });
-        }
-        if (ADSGRAM_TASK_BLOCK_ID && !state.adsgramControllers[ADSGRAM_TASK_BLOCK_ID]) {
-            state.adsgramControllers[ADSGRAM_TASK_BLOCK_ID] = window.Adsgram.init({ blockId: ADSGRAM_TASK_BLOCK_ID });
         }
 
         // Try playing Task first if this is a movie download request
         if (id === ADSGRAM_DOWNLOAD_BLOCK_ID && ADSGRAM_TASK_BLOCK_ID) {
             status("Checking for task…");
-            const taskController = state.adsgramControllers[ADSGRAM_TASK_BLOCK_ID];
             
-            taskController.show().then(() => {
-                status("Task completed! Reward received ✓");
-                // Award task completion bonus points (+10)
-                awardPoints(10, "download");
-                safeResolve();
-            }).catch((err) => {
-                console.log("No Adsgram task available (or already completed), falling back to video ad:", err);
-                status("Loading premium ad buffer…");
+            const drawer = document.getElementById("connection-drawer");
+            const spinnerWrapper = drawer ? drawer.querySelector(".connection-spinner-wrapper") : null;
+            const container = drawer ? drawer.querySelector(".connection-drawer-container") : null;
+            const titleEl = drawer ? drawer.querySelector(".connection-title") : null;
+            
+            if (drawer && container) {
+                // Hide spinner during task interaction
+                if (spinnerWrapper) spinnerWrapper.style.display = "none";
+                if (titleEl) titleEl.textContent = "Complete Task";
+                status("Complete the task below to unlock download:");
                 
-                // Fallback to standard rewarded video ad
-                const videoController = state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID];
-                videoController.show().then(() => {
-                    status("Ad completed! Reward received ✓");
-                    safeResolve();
-                }).catch((videoErr) => {
-                    console.warn("Standard video ad failed as well:", videoErr);
-                    status("No buffer available – continuing");
+                // Remove any existing task containers
+                const existingTaskContainer = container.querySelector(".adsgram-task-container");
+                if (existingTaskContainer) existingTaskContainer.remove();
+                
+                const taskContainer = document.createElement("div");
+                taskContainer.className = "adsgram-task-container";
+                taskContainer.style.width = "100%";
+                taskContainer.style.marginTop = "20px";
+                taskContainer.style.display = "flex";
+                taskContainer.style.flexDirection = "column";
+                taskContainer.style.alignItems = "center";
+                
+                const taskEl = document.createElement("adsgram-task");
+                taskEl.setAttribute("data-block-id", ADSGRAM_TASK_BLOCK_ID);
+                
+                // Setup slots matching the app theme securely
+                const rewardEl = document.createElement("span");
+                rewardEl.setAttribute("slot", "reward");
+                rewardEl.textContent = "+10 Bonus Points 🪙";
+                rewardEl.style.color = "#ffbc00";
+                rewardEl.style.fontWeight = "600";
+                rewardEl.style.fontSize = "14px";
+                rewardEl.style.marginBottom = "10px";
+                rewardEl.style.display = "block";
+
+                const btnEl = document.createElement("div");
+                btnEl.setAttribute("slot", "button");
+                btnEl.textContent = "Start Task ⚡";
+                btnEl.style.background = "linear-gradient(135deg, #e50914, #b20710)";
+                btnEl.style.color = "#fff";
+                btnEl.style.padding = "12px 24px";
+                btnEl.style.borderRadius = "8px";
+                btnEl.style.fontWeight = "600";
+                btnEl.style.cursor = "pointer";
+                btnEl.style.textAlign = "center";
+                btnEl.style.width = "100%";
+                btnEl.style.boxSizing = "border-box";
+                btnEl.style.transition = "transform 0.2s";
+                btnEl.style.boxShadow = "0 4px 15px rgba(229, 9, 20, 0.4)";
+
+                const claimEl = document.createElement("div");
+                claimEl.setAttribute("slot", "claim");
+                claimEl.textContent = "Claim Reward & Download 🎁";
+                claimEl.style.background = "linear-gradient(135deg, #00c853, #009624)";
+                claimEl.style.color = "#fff";
+                claimEl.style.padding = "12px 24px";
+                claimEl.style.borderRadius = "8px";
+                claimEl.style.fontWeight = "600";
+                claimEl.style.cursor = "pointer";
+                claimEl.style.textAlign = "center";
+                claimEl.style.width = "100%";
+                claimEl.style.boxSizing = "border-box";
+                claimEl.style.transition = "transform 0.2s";
+                claimEl.style.boxShadow = "0 4px 15px rgba(0, 200, 83, 0.4)";
+
+                const doneEl = document.createElement("div");
+                doneEl.setAttribute("slot", "done");
+                doneEl.textContent = "Completed ✓";
+                doneEl.style.background = "#222";
+                doneEl.style.color = "#888";
+                doneEl.style.border = "1px solid #444";
+                doneEl.style.padding = "12px 24px";
+                doneEl.style.borderRadius = "8px";
+                doneEl.style.fontWeight = "600";
+                doneEl.style.textAlign = "center";
+                doneEl.style.width = "100%";
+                doneEl.style.boxSizing = "border-box";
+
+                taskEl.replaceChildren(rewardEl, btnEl, claimEl, doneEl);
+                taskContainer.appendChild(taskEl);
+                container.appendChild(taskContainer);
+                
+                const cleanupAndRestore = () => {
+                    taskContainer.remove();
+                    if (spinnerWrapper) spinnerWrapper.style.display = "flex";
+                };
+                
+                taskEl.addEventListener("reward", () => {
+                    cleanupAndRestore();
+                    status("Task completed! Reward received ✓");
+                    awardPoints(10, "download");
                     safeResolve();
                 });
-            });
+                
+                const handleFallback = (err) => {
+                    console.log("Adsgram task error or not found, falling back to video ad:", err);
+                    cleanupAndRestore();
+                    
+                    status("Loading premium ad buffer…");
+                    const videoController = state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID];
+                    if (videoController) {
+                        videoController.show().then(() => {
+                            status("Ad completed! Reward received ✓");
+                            safeResolve();
+                        }).catch((videoErr) => {
+                            console.warn("Standard video ad failed as well:", videoErr);
+                            status("No buffer available – continuing");
+                            safeResolve();
+                        });
+                    } else {
+                        safeResolve();
+                    }
+                };
+                
+                taskEl.addEventListener("onError", handleFallback);
+                taskEl.addEventListener("onBannerNotFound", handleFallback);
+            } else {
+                // Drawer elements missing, fallback to standard video ad
+                const videoController = state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID];
+                if (videoController) {
+                    videoController.show().then(() => {
+                        safeResolve();
+                    }).catch(() => {
+                        safeResolve();
+                    });
+                } else {
+                    safeResolve();
+                }
+            }
         } else {
             // Non-download ad request (e.g. trailer watch), play standard ad directly
             status("Loading ad…");
@@ -5139,11 +5245,13 @@ function showConnectionDrawer(targetLink, blockId) {
             drawer.classList.remove("active");
             setTimeout(() => { 
                 drawer.style.display = "none"; 
-                // Restore spinner and remove dynamic buttons for next requests
+                // Restore spinner and remove dynamic buttons/tasks for next requests
                 const spinnerWrapper = drawer.querySelector(".connection-spinner-wrapper");
                 if (spinnerWrapper) spinnerWrapper.style.display = "flex";
                 const actionBtn = drawer.querySelector(".connection-action-btn");
                 if (actionBtn) actionBtn.remove();
+                const taskContainer = drawer.querySelector(".adsgram-task-container");
+                if (taskContainer) taskContainer.remove();
             }, 300);
         }
     };
