@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "737396-tazmanian-devil",
+    "tmdb_id": 737396,
+    "imdb_id": "",
+    "title": "Tazmanian Devil",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "After moving to the United States, a young Nigerian immigrant struggles to find a balance between his desire to join a college fraternity and bonding with his estranged father, a strict pastor at a local church.",
+    "poster": "https://image.tmdb.org/t/p/w500/3xNoAsAp2Do8fJ2IHYcOKe5uI07.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/p1nGaB5z38d15ZEy9y66Mlgyhk4.jpg",
+    "rating": 7,
+    "release_date": "2020-08-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADyA8AAghnOUbwMs2ID7ObpRYE"
+    ]
+  },
+  {
     "csv_id": "1329471-carolina-caroline",
     "tmdb_id": 1329471,
     "imdb_id": "",
