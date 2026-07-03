@@ -1,5 +1,120 @@
 [
   {
+    "csv_id": "1279493-the-get-out",
+    "tmdb_id": 1279493,
+    "imdb_id": "",
+    "title": "The Get Out",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Thriller"
+    ],
+    "overview": "A nightclub owner is on the verge of leaving his dangerous past behind for retirement with his girlfriend. When masked gunmen rob him and he finds himself squeezed by ruthless cartels, a mysterious newcomer arrives with an interest in buying the business. With danger closing in from all sides, he must navigate a deadly web of deception, power, and survival  -  where escape may no longer be an option.",
+    "poster": "https://image.tmdb.org/t/p/w500/A56e359GzpasjuYRajkDBhLncEW.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/to9R8DbenkykhllymiHXcOw7QDo.jpg",
+    "rating": 6.8,
+    "release_date": "2026-06-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADPRAAAghnOUbmaZnnOLl4nBYE"
+    ]
+  },
+  {
+    "csv_id": "1284465-the-death-of-robin-hood",
+    "tmdb_id": 1284465,
+    "imdb_id": "",
+    "title": "The Death of Robin Hood",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Adventure",
+      "Drama",
+      "Thriller",
+      "Action"
+    ],
+    "overview": "Grappling with his past after a life of crime and murder, Robin Hood finds himself gravely injured after a battle he thought would be his last. In the hands of a mysterious woman, he is offered a chance at salvation.",
+    "poster": "https://image.tmdb.org/t/p/w500/13MmRwmG5NmaMfU8qNrtgGXisiD.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lh3BDkmWJh998n4fQcHYcVi7dpm.jpg",
+    "rating": 6.7,
+    "release_date": "2026-06-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADGBAAAghnOUbExIdROwPM4xYE"
+    ]
+  },
+  {
+    "csv_id": "1314481-the-devil-wears-prada-2",
+    "tmdb_id": 1314481,
+    "imdb_id": "",
+    "title": "The Devil Wears Prada 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "Andy Sachs returns to Runway as Miranda Priestly navigates a new media landscape and Runway's position within. The duo reconnect with former assistant Emily Charlton, now the head of a luxury brand that possesses funding which could ensure Runway's survival.",
+    "poster": "https://image.tmdb.org/t/p/w500/fCAURTUx3YfsJ8k9I0UamjSILiR.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/Af907x5h9W1wVis8XrSd7ynTWuy.jpg",
+    "rating": 6.9,
+    "release_date": "2026-04-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADGhAAAghnOUZ8IQYZP-BkgRYE"
+    ]
+  },
+  {
+    "csv_id": "1340206-tuner",
+    "tmdb_id": 1340206,
+    "imdb_id": "",
+    "title": "Tuner",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "overview": "A gifted piano tuner's meticulous skills for tuning pianos lead him to discover an unexpected aptitude for cracking safes, turning his life upside down.",
+    "poster": "https://image.tmdb.org/t/p/w500/5OvA3i9wZs5jHu0DCrfmXlzAM67.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sT5Inhc0aaReSZoufWgfJTQUbKp.jpg",
+    "rating": 7.1,
+    "release_date": "2026-05-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADBRAAAghnOUaiikYTdwOpNhYE"
+    ]
+  },
+  {
     "csv_id": "737396-tazmanian-devil",
     "tmdb_id": 737396,
     "imdb_id": "",
