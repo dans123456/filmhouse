@@ -3355,12 +3355,6 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 const taskEl = document.createElement("adsgram-task");
                 taskEl.setAttribute("data-block-id", ADSGRAM_TASK_BLOCK_ID);
                 
-                // CRITICAL FOR TESTING: Set data-debug="true" so that a test task is always returned.
-                // Otherwise, if the blockId task-36911 is new/under-review, it fires "onBannerNotFound"
-                // immediately and bypasses to standard video ads.
-                // TODO: Remove setAttribute("data-debug", "true") before final production release.
-                taskEl.setAttribute("data-debug", "true");
-                
                 // Style taskEl natively as the card to match app design
                 taskEl.style.display = "block";
                 taskEl.style.width = "100%";
