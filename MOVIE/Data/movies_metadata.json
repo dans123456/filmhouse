@@ -1,5 +1,31 @@
 [
   {
+    "csv_id": "1725433-the-chase",
+    "tmdb_id": 1725433,
+    "imdb_id": "",
+    "title": "The Chase",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [],
+    "overview": "The Chase is a Ghanaian comedic drama produced by Earth Dreams Entertainment, starring popular Ghanaian entertainers including comedian Clemento Suarez.",
+    "poster": "https://i.postimg.cc/3wRngQq4/photo-2026-07-03-16-07-17.jpg",
+    "backdrop": "https://i.postimg.cc/3wRngQq4/photo-2026-07-03-16-07-17.jpg",
+    "rating": 0,
+    "release_date": "2024",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADmw4AAq-EQEYC0q1OYfhHaxYE"
+    ]
+  },
+  {
     "csv_id": "1725426-the-angel-i-don-t-know",
     "tmdb_id": 1725426,
     "imdb_id": "",
