@@ -3349,13 +3349,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 taskContainer.style.width = "100%";
                 taskContainer.style.marginTop = "20px";
                 taskContainer.style.display = "flex";
-                taskContainer.style.flexDirection = "column";
-                taskContainer.style.alignItems = "center";
-                taskContainer.style.background = "rgba(255, 255, 255, 0.03)";
-                taskContainer.style.border = "1px solid rgba(255, 255, 255, 0.08)";
-                taskContainer.style.borderRadius = "16px";
-                taskContainer.style.padding = "24px 20px";
-                taskContainer.style.boxSizing = "border-box";
+                taskContainer.style.justifyContent = "center";
                 
                 const taskEl = document.createElement("adsgram-task");
                 taskEl.setAttribute("data-block-id", ADSGRAM_TASK_BLOCK_ID);
@@ -3366,28 +3360,39 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 // TODO: Remove setAttribute("data-debug", "true") before final production release.
                 taskEl.setAttribute("data-debug", "true");
                 
+                // Style taskEl natively as the card to match app design
                 taskEl.style.display = "block";
                 taskEl.style.width = "100%";
+                taskEl.style.background = "rgba(255, 255, 255, 0.03)";
+                taskEl.style.border = "1px solid rgba(255, 255, 255, 0.08)";
+                taskEl.style.borderRadius = "16px";
+                taskEl.style.padding = "16px 14px";
+                taskEl.style.boxSizing = "border-box";
+                
+                // Add native CSS variables for the shadow DOM task layout
+                taskEl.style.setProperty("--adsgram-task-button-width", "95px");
+                taskEl.style.setProperty("--adsgram-task-icon-size", "44px");
+                taskEl.style.setProperty("--adsgram-task-font-size", "14px");
                 
                 // Setup slots matching the app theme securely (Vanilla JS DOM Manipulation)
                 const rewardEl = document.createElement("div");
                 rewardEl.setAttribute("slot", "reward");
                 rewardEl.style.display = "flex";
                 rewardEl.style.flexDirection = "column";
-                rewardEl.style.alignItems = "center";
-                rewardEl.style.gap = "4px";
-                rewardEl.style.marginBottom = "20px";
+                rewardEl.style.alignItems = "flex-start"; // Left align to match task text
+                rewardEl.style.gap = "2px";
+                rewardEl.style.marginTop = "6px";
                 
                 const rewardTitle = document.createElement("span");
                 rewardTitle.textContent = "TASK REWARD";
-                rewardTitle.style.fontSize = "10px";
+                rewardTitle.style.fontSize = "9px";
                 rewardTitle.style.fontWeight = "700";
-                rewardTitle.style.color = "rgba(255, 255, 255, 0.4)";
-                rewardTitle.style.letterSpacing = "1.5px";
+                rewardTitle.style.color = "rgba(255, 255, 255, 0.35)";
+                rewardTitle.style.letterSpacing = "1px";
                 
                 const rewardValue = document.createElement("span");
-                rewardValue.textContent = "+10 Bonus Points 🪙";
-                rewardValue.style.fontSize = "16px";
+                rewardValue.textContent = "+10 Points 🪙";
+                rewardValue.style.fontSize = "13px";
                 rewardValue.style.fontWeight = "700";
                 rewardValue.style.color = "#ffbc00";
                 
@@ -3395,46 +3400,46 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
 
                 const btnEl = document.createElement("div");
                 btnEl.setAttribute("slot", "button");
-                btnEl.textContent = "Start Task ⚡";
+                btnEl.textContent = "Start ⚡";
                 btnEl.style.background = "linear-gradient(135deg, #e50914, #b20710)";
                 btnEl.style.color = "#fff";
-                btnEl.style.padding = "14px 20px";
-                btnEl.style.borderRadius = "12px";
+                btnEl.style.padding = "10px 12px";
+                btnEl.style.borderRadius = "10px";
                 btnEl.style.fontWeight = "600";
-                btnEl.style.fontSize = "14px";
+                btnEl.style.fontSize = "12px";
                 btnEl.style.cursor = "pointer";
                 btnEl.style.textAlign = "center";
                 btnEl.style.width = "100%";
                 btnEl.style.boxSizing = "border-box";
                 btnEl.style.transition = "all 0.2s ease";
-                btnEl.style.boxShadow = "0 4px 15px rgba(229, 9, 20, 0.3)";
+                btnEl.style.boxShadow = "0 3px 10px rgba(229, 9, 20, 0.25)";
 
                 const claimEl = document.createElement("div");
                 claimEl.setAttribute("slot", "claim");
-                claimEl.textContent = "Claim Download Reward 🎁";
+                claimEl.textContent = "Claim 🎁";
                 claimEl.style.background = "linear-gradient(135deg, #00c853, #009624)";
                 claimEl.style.color = "#fff";
-                claimEl.style.padding = "14px 20px";
-                claimEl.style.borderRadius = "12px";
+                claimEl.style.padding = "10px 12px";
+                claimEl.style.borderRadius = "10px";
                 claimEl.style.fontWeight = "600";
-                claimEl.style.fontSize = "14px";
+                claimEl.style.fontSize = "12px";
                 claimEl.style.cursor = "pointer";
                 claimEl.style.textAlign = "center";
                 claimEl.style.width = "100%";
                 claimEl.style.boxSizing = "border-box";
                 claimEl.style.transition = "all 0.2s ease";
-                claimEl.style.boxShadow = "0 4px 15px rgba(0, 200, 83, 0.3)";
+                claimEl.style.boxShadow = "0 3px 10px rgba(0, 200, 83, 0.25)";
 
                 const doneEl = document.createElement("div");
                 doneEl.setAttribute("slot", "done");
-                doneEl.textContent = "Completed ✓";
+                doneEl.textContent = "Done ✓";
                 doneEl.style.background = "rgba(255, 255, 255, 0.05)";
                 doneEl.style.color = "rgba(255, 255, 255, 0.3)";
                 doneEl.style.border = "1px solid rgba(255, 255, 255, 0.08)";
-                doneEl.style.padding = "14px 20px";
-                doneEl.style.borderRadius = "12px";
+                doneEl.style.padding = "10px 12px";
+                doneEl.style.borderRadius = "10px";
                 doneEl.style.fontWeight = "600";
-                doneEl.style.fontSize = "14px";
+                doneEl.style.fontSize = "12px";
                 doneEl.style.textAlign = "center";
                 doneEl.style.width = "100%";
                 doneEl.style.boxSizing = "border-box";
