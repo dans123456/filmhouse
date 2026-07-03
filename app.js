@@ -3456,23 +3456,45 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 };
                 
                 const handleFallback = (err) => {
-                    console.log("Adsgram task error or not found, falling back to video ad:", err);
+                    console.log("Adsgram task error or not found, offering video ad fallback:", err);
                     cleanupAndRestore();
                     
-                    status("Loading premium ad buffer…");
-                    const videoController = state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID];
-                    if (videoController) {
-                        videoController.show().then(() => {
-                            status("Ad completed! Reward received ✓");
+                    status("Task not available or already completed. Watch a quick video ad to secure your connection:");
+                    if (titleEl) titleEl.textContent = "Secure Connection";
+                    
+                    // Show a fallback button for the video ad instead of popping it up automatically
+                    const existingFallbackBtn = container.querySelector(".fallback-video-btn");
+                    if (existingFallbackBtn) existingFallbackBtn.remove();
+                    
+                    const fallbackBtn = document.createElement("button");
+                    fallbackBtn.className = "btn btn-primary btn-block fallback-video-btn";
+                    fallbackBtn.style.marginTop = "16px";
+                    fallbackBtn.textContent = "Watch Video Ad 🎬";
+                    
+                    fallbackBtn.addEventListener("click", () => {
+                        fallbackBtn.disabled = true;
+                        fallbackBtn.textContent = "Loading Ad…";
+                        status("Loading premium ad buffer…");
+                        
+                        const videoController = state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID];
+                        if (videoController) {
+                            videoController.show().then(() => {
+                                status("Ad completed! Reward received ✓");
+                                fallbackBtn.remove();
+                                safeResolve();
+                            }).catch((videoErr) => {
+                                console.warn("Standard video ad failed as well:", videoErr);
+                                status("No buffer available – continuing");
+                                fallbackBtn.remove();
+                                safeResolve();
+                            });
+                        } else {
+                            fallbackBtn.remove();
                             safeResolve();
-                        }).catch((videoErr) => {
-                            console.warn("Standard video ad failed as well:", videoErr);
-                            status("No buffer available – continuing");
-                            safeResolve();
-                        });
-                    } else {
-                        safeResolve();
-                    }
+                        }
+                    });
+                    
+                    container.appendChild(fallbackBtn);
                 };
                 
                 // Bind to all variations of reward, error and not found events to ensure compatibility
@@ -5291,6 +5313,8 @@ function showConnectionDrawer(targetLink, blockId) {
                 if (actionBtn) actionBtn.remove();
                 const taskContainer = drawer.querySelector(".adsgram-task-container");
                 if (taskContainer) taskContainer.remove();
+                const fallbackBtn = drawer.querySelector(".fallback-video-btn");
+                if (fallbackBtn) fallbackBtn.remove();
             }, 300);
         }
     };
