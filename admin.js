@@ -1944,62 +1944,79 @@ function showCSVReviewModal(importedMovies) {
         removed
     };
 
-    // Render HTML inside Review Modal
-    reviewBody.innerHTML = `
-        <div style="margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
-            <span style="background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 4px 10px; border-radius: 6px; font-weight: 700;">🟢 Added: ${added.length}</span>
-            <span style="background: rgba(33, 150, 243, 0.15); border: 1px solid rgba(33, 150, 243, 0.3); color: #2196f3; padding: 4px 10px; border-radius: 6px; font-weight: 700;">🔵 Updated: ${updated.length}</span>
-            <span style="background: rgba(244, 67, 54, 0.15); border: 1px solid rgba(244, 67, 54, 0.3); color: #f44336; padding: 4px 10px; border-radius: 6px; font-weight: 700;">🔴 Removed: ${removed.length}</span>
-        </div>
+    // Render HTML inside Review Modal based on Overwrite checkbox state
+    const overwriteCheckbox = document.getElementById("csv-import-overwrite");
+    if (overwriteCheckbox) {
+        overwriteCheckbox.checked = false; // default to safe merge/append mode
+        overwriteCheckbox.replaceWith(overwriteCheckbox.cloneNode(true)); // clear old listeners
+        const newCheckbox = document.getElementById("csv-import-overwrite");
+        newCheckbox.addEventListener("change", () => {
+            renderReviewUI();
+        });
+    }
+
+    function renderReviewUI() {
+        const checkbox = document.getElementById("csv-import-overwrite");
+        const isOverwrite = checkbox ? checkbox.checked : false;
+        const activeRemoved = isOverwrite ? removed : [];
         
-        <div id="review-list-container" style="display: flex; flex-direction: column; gap: 12px;">
-            ${added.length > 0 ? `
-                <div>
-                    <h4 style="margin: 0 0 8px 0; color: #4caf50; font-size: 14px;">Pending Additions (${added.length})</h4>
-                    <div id="added-preview-list" style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(76, 175, 80, 0.1);">
-                        ${added.map(m => `
-                            <div id="preview-row-${m.csv_id}" style="display: flex; gap: 10px; align-items: center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                <div class="preview-spinner" style="width: 32px; height: 42px; background: rgba(255,255,255,0.05); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px;">⏳</div>
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 600; color: #fff;">${m.title}</div>
-                                    <div style="font-size: 11px; color: var(--text-secondary);">ID: ${m.csv_id} | Type: ${m.type}</div>
+        reviewBody.innerHTML = `
+            <div style="margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+                <span style="background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 4px 10px; border-radius: 6px; font-weight: 700;">🟢 Added: ${added.length}</span>
+                <span style="background: rgba(33, 150, 243, 0.15); border: 1px solid rgba(33, 150, 243, 0.3); color: #2196f3; padding: 4px 10px; border-radius: 6px; font-weight: 700;">🔵 Updated: ${updated.length}</span>
+                <span style="background: ${activeRemoved.length > 0 ? 'rgba(244, 67, 54, 0.15)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${activeRemoved.length > 0 ? 'rgba(244, 67, 54, 0.3)' : 'rgba(255,255,255,0.1)'}; color: ${activeRemoved.length > 0 ? '#f44336' : 'var(--text-secondary)'}; padding: 4px 10px; border-radius: 6px; font-weight: 700;">🔴 Removed: ${activeRemoved.length} ${!isOverwrite ? '(Merge Mode)' : ''}</span>
+            </div>
+            
+            <div id="review-list-container" style="display: flex; flex-direction: column; gap: 12px;">
+                ${added.length > 0 ? `
+                    <div>
+                        <h4 style="margin: 0 0 8px 0; color: #4caf50; font-size: 14px;">Pending Additions (${added.length})</h4>
+                        <div id="added-preview-list" style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(76, 175, 80, 0.1);">
+                            ${added.map(m => `
+                                <div id="preview-row-${m.csv_id}" style="display: flex; gap: 10px; align-items: center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <div class="preview-spinner" style="width: 32px; height: 42px; background: rgba(255,255,255,0.05); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px;">⏳</div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; color: #fff;">${m.title}</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">ID: ${m.csv_id} | Type: ${m.type}</div>
+                                    </div>
                                 </div>
-                            </div>
-                        `).join('')}
+                            `).join('')}
+                        </div>
                     </div>
-                </div>
-            ` : ''}
+                ` : ''}
 
-            ${updated.length > 0 ? `
-                <div>
-                    <h4 style="margin: 12px 0 8px 0; color: #2196f3; font-size: 14px;">Modified Titles (${updated.length})</h4>
-                    <div style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(33, 150, 243, 0.1);">
-                        ${updated.map(u => `
-                            <div style="padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                <div style="font-weight: 600; color: #fff;">${u.newMovie.title}</div>
-                                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-                                    ${u.oldMovie.title !== u.newMovie.title ? `<span style="color: #ff9800; text-decoration: line-through;">${u.oldMovie.title}</span> ➔ <span style="color: #4caf50;">${u.newMovie.title}</span><br>` : ''}
-                                    ${u.oldMovie.links.length !== u.newMovie.links.length ? `Links: ${u.oldMovie.links.length} ➔ ${u.newMovie.links.length}` : 'Links content updated'}
+                ${updated.length > 0 ? `
+                    <div>
+                        <h4 style="margin: 12px 0 8px 0; color: #2196f3; font-size: 14px;">Modified Titles (${updated.length})</h4>
+                        <div style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(33, 150, 243, 0.1);">
+                            ${updated.map(u => `
+                                <div style="padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <div style="font-weight: 600; color: #fff;">${u.newMovie.title}</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                                        ${u.oldMovie.title !== u.newMovie.title ? `<span style="color: #ff9800; text-decoration: line-through;">${u.oldMovie.title}</span> ➔ <span style="color: #4caf50;">${u.newMovie.title}</span><br>` : ''}
+                                        ${u.oldMovie.links.length !== u.newMovie.links.length ? `Links: ${u.oldMovie.links.length} ➔ ${u.newMovie.links.length}` : 'Links content updated'}
+                                    </div>
                                 </div>
-                            </div>
-                        `).join('')}
+                            `).join('')}
+                        </div>
                     </div>
-                </div>
-            ` : ''}
+                ` : ''}
 
-            ${removed.length > 0 ? `
-                <div>
-                    <h4 style="margin: 12px 0 8px 0; color: #f44336; font-size: 14px;">Titles to Remove (${removed.length})</h4>
-                    <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(244, 67, 54, 0.1);">
-                        ${removed.map(m => `
-                            <div style="color: #e57373; text-decoration: line-through; padding: 4px 6px;">${m.title}</div>
-                        `).join('')}
+                ${activeRemoved.length > 0 ? `
+                    <div>
+                        <h4 style="margin: 12px 0 8px 0; color: #f44336; font-size: 14px;">Titles to Remove (${activeRemoved.length})</h4>
+                        <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(244, 67, 54, 0.1);">
+                            ${activeRemoved.map(m => `
+                                <div style="color: #e57373; text-decoration: line-through; padding: 4px 6px;">${m.title}</div>
+                            `).join('')}
+                        </div>
                     </div>
-                </div>
-            ` : ''}
-        </div>
-    `;
+                ` : ''}
+            </div>
+        `;
+    }
 
+    renderReviewUI();
     modal.classList.add("active");
 
     // Fetch TMDB rich previews in-browser for newly added titles in parallel
@@ -2047,8 +2064,17 @@ if (cancelCSVImportBtn && csvReviewModal) {
 if (confirmCSVImportBtn && csvReviewModal) {
     confirmCSVImportBtn.addEventListener("click", () => {
         if (pendingImportChanges) {
+            const overwriteCheckbox = document.getElementById("csv-import-overwrite");
+            const isOverwrite = overwriteCheckbox ? overwriteCheckbox.checked : false;
+
             // Build the final catalog by merging imported data with existing rich metadata
-            const finalCatalog = [...allCatalogMovies];
+            let finalCatalog = [...allCatalogMovies];
+            
+            if (isOverwrite) {
+                // If overwrite mode is checked, remove all movies not in the imported CSV
+                const importedIds = new Set(pendingImportChanges.importedList.map(m => m.csv_id));
+                finalCatalog = finalCatalog.filter(ex => importedIds.has(ex.csv_id));
+            }
             
             pendingImportChanges.importedList.forEach(imported => {
                 const existingIdx = finalCatalog.findIndex(ex => ex.csv_id === imported.csv_id);
@@ -2080,6 +2106,7 @@ if (confirmCSVImportBtn && csvReviewModal) {
                     });
                 }
             });
+            
             allCatalogMovies = finalCatalog;
             newlyAddedIds = pendingImportChanges.added.map(m => m.csv_id);
             newlyUpdatedIds = pendingImportChanges.updated.map(u => u.newMovie.csv_id);

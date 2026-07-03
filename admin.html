@@ -707,7 +707,13 @@
             <div id="csv-review-body" style="max-height: 400px; overflow-y: auto; color: #ffffff; padding-right: 4px; font-size: 13px;">
                 <!-- Dynamically filled review summary -->
             </div>
-            <div style="display: flex; gap: 12px; margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 14px; background: rgba(255,255,255,0.015); border: 1px dashed var(--border-color); padding: 10px; border-radius: var(--border-radius-sm);">
+                <input type="checkbox" id="csv-import-overwrite" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary-color);">
+                <label for="csv-import-overwrite" style="cursor: pointer; font-size: 12px; color: var(--text-secondary); user-select: none; font-weight: 600; margin: 0;">
+                    ⚠️ Overwrite Mode: Delete all existing library movies NOT in this CSV file
+                </label>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px;">
                 <button class="btn btn-secondary btn-block" id="btn-cancel-csv-import">Cancel</button>
                 <button class="btn btn-primary btn-block" id="btn-confirm-csv-import">Apply Changes</button>
             </div>
@@ -743,6 +749,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=62"></script>
+    <script src="admin.js?v=63"></script>
 </body>
 </html>
