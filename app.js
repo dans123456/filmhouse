@@ -3382,6 +3382,8 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 rewardEl.style.alignItems = "flex-start"; // Left align to match task text
                 rewardEl.style.gap = "2px";
                 rewardEl.style.marginTop = "6px";
+                rewardEl.style.width = "100%";
+                rewardEl.style.textAlign = "left";
                 
                 const rewardTitle = document.createElement("span");
                 rewardTitle.textContent = "TASK REWARD";
@@ -3401,18 +3403,18 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 const btnEl = document.createElement("div");
                 btnEl.setAttribute("slot", "button");
                 btnEl.textContent = "Start ⚡";
-                btnEl.style.background = "linear-gradient(135deg, #e50914, #b20710)";
-                btnEl.style.color = "#fff";
+                btnEl.style.background = "var(--primary-gradient)";
+                btnEl.style.color = "#000000";
                 btnEl.style.padding = "10px 12px";
                 btnEl.style.borderRadius = "10px";
-                btnEl.style.fontWeight = "600";
+                btnEl.style.fontWeight = "700";
                 btnEl.style.fontSize = "12px";
                 btnEl.style.cursor = "pointer";
                 btnEl.style.textAlign = "center";
                 btnEl.style.width = "100%";
                 btnEl.style.boxSizing = "border-box";
                 btnEl.style.transition = "all 0.2s ease";
-                btnEl.style.boxShadow = "0 3px 10px rgba(229, 9, 20, 0.25)";
+                btnEl.style.boxShadow = "0 3px 10px var(--primary-glow)";
 
                 const claimEl = document.createElement("div");
                 claimEl.setAttribute("slot", "claim");
@@ -3421,7 +3423,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 claimEl.style.color = "#fff";
                 claimEl.style.padding = "10px 12px";
                 claimEl.style.borderRadius = "10px";
-                claimEl.style.fontWeight = "600";
+                claimEl.style.fontWeight = "700";
                 claimEl.style.fontSize = "12px";
                 claimEl.style.cursor = "pointer";
                 claimEl.style.textAlign = "center";
@@ -3434,11 +3436,11 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 doneEl.setAttribute("slot", "done");
                 doneEl.textContent = "Done ✓";
                 doneEl.style.background = "rgba(255, 255, 255, 0.05)";
-                doneEl.style.color = "rgba(255, 255, 255, 0.3)";
-                doneEl.style.border = "1px solid rgba(255, 255, 255, 0.08)";
+                doneEl.style.color = "var(--text-secondary)";
+                doneEl.style.border = "1px solid var(--border-color)";
                 doneEl.style.padding = "10px 12px";
                 doneEl.style.borderRadius = "10px";
-                doneEl.style.fontWeight = "600";
+                doneEl.style.fontWeight = "700";
                 doneEl.style.fontSize = "12px";
                 doneEl.style.textAlign = "center";
                 doneEl.style.width = "100%";
