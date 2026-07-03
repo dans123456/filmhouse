@@ -4762,6 +4762,40 @@ function renderUserRequests(requests) {
         headerNotificationDot.style.display = hasNewFulfillment ? "block" : "none";
     }
     
+    // Update persistent Home Screen fulfillment reminder banner
+    const banner = document.getElementById("fulfilled-requests-banner");
+    const bannerText = document.getElementById("fulfilled-banner-text");
+    const bannerBtn = document.getElementById("btn-banner-view-requests");
+    
+    const unacknowledgedFulfilled = requests.filter(r => {
+        const matchingMovie = state.movies.find(m => 
+            (m.title && m.title.toLowerCase() === r.title.toLowerCase()) || 
+            (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
+        );
+        const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
+        const isExplicit = r.status === "fulfilled" && r.downloadLink;
+        return (isMatched || isExplicit) && !acknowledgedFulfillments.includes(r.docId);
+    });
+    
+    if (unacknowledgedFulfilled.length > 0) {
+        if (banner) banner.style.display = "flex";
+        if (bannerText) {
+            const titles = unacknowledgedFulfilled.map(r => `"${r.title}"`).join(", ");
+            bannerText.textContent = `${titles} ${unacknowledgedFulfilled.length === 1 ? 'is' : 'are'} ready to download! 🍿`;
+        }
+        if (bannerBtn) {
+            bannerBtn.onclick = () => {
+                const rewardsDrawer = document.getElementById("rewards-drawer");
+                if (rewardsDrawer) rewardsDrawer.classList.add("active");
+                updatePointsUI();
+                renderDailyMissions();
+                updateHeaderNotificationDot();
+            };
+        }
+    } else {
+        if (banner) banner.style.display = "none";
+    }
+    
     // Notify user once per session if a request is ready
     if (hasNewFulfillment && !state.notifiedOfFulfillment) {
         state.notifiedOfFulfillment = true;
