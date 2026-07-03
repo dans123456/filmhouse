@@ -174,11 +174,27 @@ function updateStatsCounters() {
             });
             
             categoriesList.innerHTML = "";
+            const labelMap = {
+                "Main": "Main Featured Library 🌟",
+                "Hollywood/British Series": "Hollywood TV Series 📺",
+                "Hollywood/British Movies": "Hollywood Movies (Stand-alone) 🎬",
+                "Kids Shows and Movies (Nickelodeon and Disney)": "Kids / Disney / Family 🧒",
+                "Classic Movies": "Classic Movies 🎞️",
+                "Animated Movies": "Animated Movies 🎨",
+                "Comic": "Comic & Superhero 🦸",
+                "Erotic Movies": "Erotic Movies 🔞",
+                "Korean Drama": "Korean Drama (K-Drama) 🇰🇷",
+                "African": "African Cinema 🌍",
+                "Anime": "Anime Series & Movies 🎌",
+                "Bollywood": "Bollywood Cinema 🇮🇳"
+            };
+
             Object.entries(categoryCounts).forEach(([cat, count]) => {
+                const displayName = labelMap[cat] || `${cat} 📁`;
                 const box = document.createElement("div");
                 box.style.cssText = "background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;";
                 box.innerHTML = `
-                    <span style="color: var(--text-secondary); font-weight: 600;">${escapeHTML(cat)}</span>
+                    <span style="color: var(--text-secondary); font-weight: 600;">${escapeHTML(displayName)}</span>
                     <span style="color: var(--primary-color); font-weight: 700;">${count}</span>
                 `;
                 categoriesList.appendChild(box);
