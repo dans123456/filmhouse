@@ -1,5 +1,31 @@
 [
   {
+    "csv_id": "1725249-unexpected-places",
+    "tmdb_id": 1725249,
+    "imdb_id": "",
+    "title": "Unexpected Places",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [],
+    "overview": "In Unexpected Places, the film explores Chris’ transformation from irresponsibility and rudeness to a responsible and kind-hearted individual. Love finds him when he least expects it, but sadly, he doesn’t live long enough to enjoy it fully.",
+    "poster": "https://i.postimg.cc/Gptgmt5t/photo-2026-07-03-10-29-06.jpg",
+    "backdrop": "https://i.postimg.cc/Gptgmt5t/photo-2026-07-03-10-29-06.jpg",
+    "rating": 0,
+    "release_date": "2024",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "https://www.youtube.com/shorts/_UWzDv8PfCQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADeRMAAghnOUbrjAnsb9gRjRYE"
+    ]
+  },
+  {
     "csv_id": "1279493-the-get-out",
     "tmdb_id": 1279493,
     "imdb_id": "",
