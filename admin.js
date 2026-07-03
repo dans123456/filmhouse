@@ -2175,17 +2175,132 @@ if (fulfillForm && fulfillRequestModal) {
             });
         });
         
-        batch.commit().then(() => {
-            if (submitBtn) submitBtn.disabled = false;
-            fulfillRequestModal.classList.remove("active");
-            
-            // Re-render local catalog lists and update button state
-            renderCatalogList();
-            updatePublishButtonState();
-            
-            alert(`Successfully fulfilled all requests for "${currentFulfillTitle}" in Firestore!\n\nAdditionally, the movie was auto-added/updated in your local catalog. Click "Publish Changes 🚀" inside the header to make it live.`);
+        batch.commit().then(async () => {
+            // Auto-Publish to GitHub in background if token exists!
+            const token = (document.getElementById("github-token")?.value.trim()) || (githubToken ? githubToken.trim() : "");
+            if (token) {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Publishing to GitHub... ⏳";
+                }
+                
+                const owner = "dans123456";
+                const repo = "filmhouse";
+                const pathCSV = "MOVIE/Data/datafile.csv";
+                const pathJSON = "MOVIE/Data/movies_metadata.json";
+                const apiCSVUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${pathCSV}`;
+                const apiJSONUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${pathJSON}`;
+                
+                try {
+                    // Fetch SHA values with cache busters
+                    const [getCSVResponse, getJSONResponse] = await Promise.all([
+                        fetch(`${apiCSVUrl}?t=${Date.now()}`, {
+                            headers: {
+                                "Authorization": `token ${token}`,
+                                "Accept": "application/vnd.github.v3+json"
+                            }
+                        }),
+                        fetch(`${apiJSONUrl}?t=${Date.now()}`, {
+                            headers: {
+                                "Authorization": `token ${token}`,
+                                "Accept": "application/vnd.github.v3+json"
+                            }
+                        })
+                    ]);
+                    
+                    if (getCSVResponse.ok && getJSONResponse.ok) {
+                        const csvData = await getCSVResponse.json();
+                        const jsonData = await getJSONResponse.json();
+                        const shaCSV = csvData.sha;
+                        const shaJSON = jsonData.sha;
+                        
+                        const csvContent = generateCSVContent();
+                        const jsonContent = JSON.stringify(allCatalogMovies, null, 2);
+                        
+                        const base64CSV = btoa(unescape(encodeURIComponent(csvContent)));
+                        const base64JSON = btoa(unescape(encodeURIComponent(jsonContent)));
+                        
+                        // Push CSV
+                        const putCSVResponse = await fetch(apiCSVUrl, {
+                            method: "PUT",
+                            headers: {
+                                "Authorization": `token ${token}`,
+                                "Content-Type": "application/json",
+                                "Accept": "application/vnd.github.v3+json"
+                            },
+                            body: JSON.stringify({
+                                message: `Auto-update catalog (datafile.csv) on request fulfill: ${currentFulfillTitle}`,
+                                content: base64CSV,
+                                sha: shaCSV
+                            })
+                        });
+                        
+                        // Push JSON
+                        if (putCSVResponse.ok) {
+                            const putJSONResponse = await fetch(apiJSONUrl, {
+                                method: "PUT",
+                                headers: {
+                                    "Authorization": `token ${token}`,
+                                    "Content-Type": "application/json",
+                                    "Accept": "application/vnd.github.v3+json"
+                                },
+                                body: JSON.stringify({
+                                    message: `Auto-update metadata (movies_metadata.json) on request fulfill: ${currentFulfillTitle}`,
+                                    content: base64JSON,
+                                    sha: shaJSON
+                                })
+                            });
+                            
+                            if (putJSONResponse.ok) {
+                                const jsonResData = await putJSONResponse.json();
+                                if (jsonResData && jsonResData.content) {
+                                    lastKnownJsonSha = jsonResData.content.sha;
+                                }
+                                catalogChangesMade = false;
+                                newlyAddedIds = [];
+                                newlyUpdatedIds = [];
+                                localStorage.removeItem("filmhouse_unpublished_catalog");
+                                
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.textContent = "Fulfill Request";
+                                }
+                                
+                                renderCatalogList();
+                                updatePublishButtonState();
+                                fulfillRequestModal.classList.remove("active");
+                                alert(`Successfully fulfilled requests and published "${currentFulfillTitle}" directly live to GitHub! 🚀`);
+                                return;
+                            }
+                        }
+                    }
+                    throw new Error("GitHub API transaction failed");
+                } catch (publishErr) {
+                    console.error("Auto-publishing failed:", publishErr);
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Fulfill Request";
+                    }
+                    renderCatalogList();
+                    updatePublishButtonState();
+                    fulfillRequestModal.classList.remove("active");
+                    alert(`Firestore updated successfully! However, auto-publishing to GitHub failed: ${publishErr.message || 'Network issue'}.\n\nPlease click the 'Publish Changes 🚀' button in the header to retry pushing the catalog changes to your app.`);
+                }
+            } else {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Fulfill Request";
+                }
+                renderCatalogList();
+                updatePublishButtonState();
+                fulfillRequestModal.classList.remove("active");
+                alert(`Successfully fulfilled all requests for "${currentFulfillTitle}" in Firestore!\n\n(Note: No GitHub token was active to auto-publish. Staged locally. Please click 'Publish Changes 🚀' in the header to save to GitHub.)`);
+            }
         }).catch(err => {
-            if (submitBtn) submitBtn.disabled = false;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Fulfill Request";
+            }
             console.error("Error fulfilling requests:", err);
             alert("Failed to fulfill requests: " + err.message);
         });
