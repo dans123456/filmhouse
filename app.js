@@ -5119,6 +5119,7 @@ function startMissionsResetTimer() {
 
 // App Kickoff Initializer
 document.addEventListener("DOMContentLoaded", async () => {
+    try {
     // Force clear old corrupted database & healed caches once
     if (localStorage.getItem("filmhouse_reset_v7") !== "true") {
         localStorage.removeItem("filmhouse_healed_movies");
@@ -5292,6 +5293,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         setTimeout(() => {
             loader.classList.add("fade-out");
         }, 2500);
+    }
+    } catch (err) {
+        console.error("Critical initialization error:", err);
+        const loader = document.getElementById("preloader");
+        if (loader) {
+            loader.classList.add("fade-out");
+        }
+        try {
+            showToast("Initialization warning: some features may be loaded offline.", "info");
+        } catch (e) {}
     }
 });
 
