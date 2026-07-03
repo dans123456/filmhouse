@@ -1,258 +1,5 @@
 [
   {
-    "csv_id": "1381913-at-ease",
-    "tmdb_id": 1381913,
-    "imdb_id": "",
-    "title": "At Ease",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "African"
-    ],
-    "genres": [],
-    "overview": "An exceptional soldier and leader, Major Agbo leads his special forces team on a mission to successfully rescue hostages from insurgents. However, as the only member of his team to survive the operation, he must now fight his way back",
-    "poster": "https://image.tmdb.org/t/p/w500/oqkWR9NyIg5wxZMjgXWUYCd8e0N.jpg",
-    "backdrop": "https://i.postimg.cc/CxGxjdtD/photo-2026-07-03-16-50-38.jpg",
-    "rating": 0,
-    "release_date": "2024-10-16",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD1Q8AAq-EQEZ3OIBDm5cWOBYE"
-    ]
-  },
-  {
-    "csv_id": "1725446-ilebaye",
-    "tmdb_id": 1725446,
-    "imdb_id": "",
-    "title": "Ilebaye",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "African"
-    ],
-    "genres": [],
-    "overview": "Ilebaye is a popular 2024 Nollywood film starring Big Brother Naija winner Ilebaye Odiniya, Mofe Duncan, and Miwa Olorunfemi.. Directed by Kayode Peters, the dramatic storyline follows a fresh graduate whose job interview is sabotaged, only for her to be unexpectedly hired by the company owner who turns out to be her biological father",
-    "poster": "https://i.postimg.cc/KYD3v1fj/photo-2026-07-03-16-22-48.jpg",
-    "backdrop": "https://i.postimg.cc/KYD3v1fj/photo-2026-07-03-16-22-48.jpg",
-    "rating": 0,
-    "release_date": "2024",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADEQ8AAq-EQEYh01azJO2M6BYE"
-    ]
-  },
-  {
-    "csv_id": "1725433-the-chase",
-    "tmdb_id": 1725433,
-    "imdb_id": "",
-    "title": "The Chase",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "African"
-    ],
-    "genres": [],
-    "overview": "The Chase is a Ghanaian comedic drama produced by Earth Dreams Entertainment, starring popular Ghanaian entertainers including comedian Clemento Suarez.",
-    "poster": "https://i.postimg.cc/3wRngQq4/photo-2026-07-03-16-07-17.jpg",
-    "backdrop": "https://i.postimg.cc/3wRngQq4/photo-2026-07-03-16-07-17.jpg",
-    "rating": 0,
-    "release_date": "2024",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADmw4AAq-EQEYC0q1OYfhHaxYE"
-    ]
-  },
-  {
-    "csv_id": "1725426-the-angel-i-don-t-know",
-    "tmdb_id": 1725426,
-    "imdb_id": "",
-    "title": "The Angel I Don't Know",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "African"
-    ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "https://i.postimg.cc/9Q4h1KsV/photo-2026-07-03-16-03-00.jpg",
-    "backdrop": "https://i.postimg.cc/9Q4h1KsV/photo-2026-07-03-16-03-00.jpg",
-    "rating": 0,
-    "release_date": "2020",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADfQ4AAq-EQEY_iuWKdlk5LBYE"
-    ]
-  },
-  {
-    "csv_id": "570465-king-of-boys",
-    "tmdb_id": 570465,
-    "imdb_id": "",
-    "title": "King of Boys",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "African"
-    ],
-    "genres": [
-      "Drama"
-    ],
-    "overview": "The story of Alhaja Eniola Salami, a businesswoman and philanthropist with a checkered past and a promising political future. As her political ambitions see her outgrowing the underworld connections responsible for her considerable wealth, she's drawn into a power struggle that threatens everything she holds dear.",
-    "poster": "https://image.tmdb.org/t/p/w500/3nO3VboeVLVOwIHMkTRIwTrrKQP.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/8lUYBdpIo8ysI9UzVn8Zs1AwB5x.jpg",
-    "rating": 6.4,
-    "release_date": "2018-10-26",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "cF-FQLKaUCk",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD_wkAAq-EQEZh8E9diHmWMBYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADDwoAAq-EQEZlzmsadhebcRYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADEAoAAq-EQEakzYTtR80kZRYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADEQoAAq-EQEYel5_OxvuLhRYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADEgoAAq-EQEbE5JTL-4txhhYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADEwoAAq-EQEagqblNuadk3BYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADFAoAAq-EQEbO9G6rlQ7V7RYE"
-    ]
-  },
-  {
-    "csv_id": "207468-8",
-    "tmdb_id": 207468,
-    "imdb_id": "",
-    "title": "Kaiju No. 8",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Anime"
-    ],
-    "genres": [
-      "Animation",
-      "Action & Adventure",
-      "Sci-Fi & Fantasy"
-    ],
-    "overview": "In a world plagued by creatures known as Kaiju, Kafka Hibino aspired to enlist in The Defense Force. He makes a promise to enlist with his childhood friend, Mina Ashiro. Soon, life takes them in separate ways. While employed cleaning up after Kaiju battles, Kafka meets Reno Ichikawa. Reno's determination to join The Defense Force reawakens Kafka's promise to join Mina and protect humanity.",
-    "poster": "https://image.tmdb.org/t/p/w500/bJxGs0w5RAhaX4fIUQu511rvm0S.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/htGeuCcNhlBe8GTx3izKOsd8frw.jpg",
-    "rating": 8.5,
-    "release_date": "2024-04-13",
-    "language": "ja",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADggsAAq-EQEbCsAqUDKoneRYE"
-    ]
-  },
-  {
-    "csv_id": "635302",
-    "tmdb_id": 635302,
-    "imdb_id": "",
-    "title": "Demon Slayer -Kimetsu no Yaiba- The Movie: Mugen Train",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Anime"
-    ],
-    "genres": [
-      "Animation",
-      "Action",
-      "Fantasy"
-    ],
-    "overview": "Tanjiro Kamado, joined with Inosuke Hashibira, a boy raised by boars who wears a boar's head, and Zenitsu Agatsuma, a scared boy who reveals his true power when he sleeps, boards the Infinity Train on a new mission with the Fire Hashira, Kyojuro Rengoku, to defeat a demon who has been tormenting the people and killing the demon slayers who oppose it!",
-    "poster": "https://image.tmdb.org/t/p/w500/h8Rb9gBr48ODIwYUttZNYeMWeUU.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/xPpXYnCWfjkt3zzE0dpCNME1pXF.jpg",
-    "rating": 8.2,
-    "release_date": "2020-10-16",
-    "language": "ja",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADqgkAAq-EQEbcrSdIPGD3ShYE"
-    ]
-  },
-  {
-    "csv_id": "85937",
-    "tmdb_id": 85937,
-    "imdb_id": "",
-    "title": "Demon Slayer: Kimetsu no Yaiba",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Anime"
-    ],
-    "genres": [
-      "Animation",
-      "Action & Adventure",
-      "Sci-Fi & Fantasy"
-    ],
-    "overview": "After a demon attack leaves his family slain and his sister cursed, Tanjiro embarks upon a perilous journey to find a cure and avenge those he's lost.",
-    "poster": "https://image.tmdb.org/t/p/w500/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/3GQKYh6Trm8pxd2AypovoYQf4Ay.jpg",
-    "rating": 8.6,
-    "release_date": "2019-04-06",
-    "language": "ja",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADuwkAAq-EQEZ_AAHKkzGnyrIWBA",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADzAkAAq-EQEaYWuZjAAGn7-cWBA",
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD1gkAAq-EQEZqIBrt6PpRRBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADCgoAAq-EQEZX-0qBXthbBBYE"
-    ]
-  },
-  {
-    "csv_id": "1725311-entwined",
-    "tmdb_id": 1725311,
-    "imdb_id": "",
-    "title": "Entwined",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "African"
-    ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "https://i.postimg.cc/5tSXt5Xc/photo-2026-07-03-12-47-34.jpg",
-    "backdrop": "https://i.postimg.cc/5tSXt5Xc/photo-2026-07-03-12-47-34.jpg",
-    "rating": 0,
-    "release_date": "",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADrwkAAq-EQEZP-kefUc3JHRYE"
-    ]
-  },
-  {
     "title": "【OSHI NO KO】",
     "csv_id": "203737",
     "type": "Series",
@@ -311,6 +58,28 @@
     ],
     "director": "Brian Yorkey",
     "trailer": "QkT-HIMSrRk"
+  },
+  {
+    "title": "40 Dates and 40 Nights",
+    "csv_id": "1431804-40-dates-and-40-nights",
+    "type": "Movie",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD2Q4AAq-EQEa4QWGK0y6xfxYE"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w200/lWEhjO801M52CY5Gx6OAwZZ6m7o.jpg",
+    "rating": 5,
+    "release_date": "",
+    "overview": "Burned out on dating and ready to quit, Leah accepts her grandma's outrageous challenge: 40 dates in 40 nights for a full year of rent. From awkward dinners to unexpected sparks, she discovers the biggest obstacle to love might just be herself.",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "backdrop": "img/FilmHouse.png",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": ""
   },
   {
     "title": "A Lot Like Love",
@@ -1400,6 +1169,31 @@
     "overview": "Just when his time under house arrest is about to end, Scott Lang once again puts his freedom at risk to help Hope van Dyne and Dr. Hank Pym dive into the quantum realm and try to accomplish, against time and any chance of success, a very dangerous rescue mission.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/iYdgEUE2W2aJkgqfSjf1x3gFfuV.jpg",
     "language": "en"
+  },
+  {
+    "csv_id": "1381913-at-ease",
+    "tmdb_id": 1381913,
+    "imdb_id": "",
+    "title": "At Ease",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [],
+    "overview": "An exceptional soldier and leader, Major Agbo leads his special forces team on a mission to successfully rescue hostages from insurgents. However, as the only member of his team to survive the operation, he must now fight his way back",
+    "poster": "https://image.tmdb.org/t/p/w500/oqkWR9NyIg5wxZMjgXWUYCd8e0N.jpg",
+    "backdrop": "https://i.postimg.cc/CxGxjdtD/photo-2026-07-03-16-50-38.jpg",
+    "rating": 0,
+    "release_date": "2024-10-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD1Q8AAq-EQEZ3OIBDm5cWOBYE"
+    ]
   },
   {
     "title": "Avatar: The Last Airbender",
@@ -2985,6 +2779,67 @@
     "language": "en"
   },
   {
+    "csv_id": "635302",
+    "tmdb_id": 635302,
+    "imdb_id": "",
+    "title": "Demon Slayer -Kimetsu no Yaiba- The Movie: Mugen Train",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action",
+      "Fantasy"
+    ],
+    "overview": "Tanjiro Kamado, joined with Inosuke Hashibira, a boy raised by boars who wears a boar's head, and Zenitsu Agatsuma, a scared boy who reveals his true power when he sleeps, boards the Infinity Train on a new mission with the Fire Hashira, Kyojuro Rengoku, to defeat a demon who has been tormenting the people and killing the demon slayers who oppose it!",
+    "poster": "https://image.tmdb.org/t/p/w500/h8Rb9gBr48ODIwYUttZNYeMWeUU.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xPpXYnCWfjkt3zzE0dpCNME1pXF.jpg",
+    "rating": 8.2,
+    "release_date": "2020-10-16",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADqgkAAq-EQEbcrSdIPGD3ShYE"
+    ]
+  },
+  {
+    "csv_id": "85937",
+    "tmdb_id": 85937,
+    "imdb_id": "",
+    "title": "Demon Slayer: Kimetsu no Yaiba",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "After a demon attack leaves his family slain and his sister cursed, Tanjiro embarks upon a perilous journey to find a cure and avenge those he's lost.",
+    "poster": "https://image.tmdb.org/t/p/w500/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3GQKYh6Trm8pxd2AypovoYQf4Ay.jpg",
+    "rating": 8.6,
+    "release_date": "2019-04-06",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADuwkAAq-EQEZ_AAHKkzGnyrIWBA",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADzAkAAq-EQEaYWuZjAAGn7-cWBA",
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD1gkAAq-EQEZqIBrt6PpRRBYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQADCgoAAq-EQEZX-0qBXthbBBYE"
+    ]
+  },
+  {
     "title": "Disconnect",
     "csv_id": "751182-disconnect",
     "type": "Movie",
@@ -3285,6 +3140,98 @@
     "director": "Danny Strong"
   },
   {
+    "title": "Enola Holmes",
+    "csv_id": "497582-enola-holmes",
+    "type": "Movie",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD7A4AAq-EQEYE8wy7hjaKMBYE"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w200/riYInlsq2kf1AWoGm80JQW5dLKp.jpg",
+    "rating": 7.222,
+    "release_date": "",
+    "overview": "While searching for her missing mother, intrepid teen Enola Holmes uses her sleuthing skills to outsmart big brother Sherlock and help a runaway lord.",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "backdrop": "img/FilmHouse.png",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": ""
+  },
+  {
+    "title": "Enola Holmes 2",
+    "csv_id": "829280-enola-holmes-2",
+    "type": "Movie",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD6w4AAq-EQEa7WFP5G-NXgBYE"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w200/tegBpjM5ODoYoM1NjaiHVLEA0QM.jpg",
+    "rating": 7.404,
+    "release_date": "",
+    "overview": "Enola takes on her first official case as a detective, but to solve the mystery of a missing girl, she'll need help from friends — and brother Sherlock.",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "backdrop": "img/FilmHouse.png",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": ""
+  },
+  {
+    "title": "Enola Holmes 3",
+    "csv_id": "1202033-enola-holmes-3",
+    "type": "Movie",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD5w4AAq-EQEYov5o5XPNARxYE"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w200/7kRYHH9H9PjBFwz1FprbHB2AAjI.jpg",
+    "rating": 7.2,
+    "release_date": "",
+    "overview": "Adventure follows detective Enola Holmes to Malta, where her plans to tie the knot unravel when Sherlock's disappearance plunges her into a perilous case.",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "backdrop": "img/FilmHouse.png",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": ""
+  },
+  {
+    "csv_id": "1725311-entwined",
+    "tmdb_id": 1725311,
+    "imdb_id": "",
+    "title": "Entwined",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/5tSXt5Xc/photo-2026-07-03-12-47-34.jpg",
+    "backdrop": "https://i.postimg.cc/5tSXt5Xc/photo-2026-07-03-12-47-34.jpg",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADrwkAAq-EQEZP-kefUc3JHRYE"
+    ]
+  },
+  {
     "title": "Eternals",
     "csv_id": "524434-eternals",
     "type": "Movie",
@@ -3406,6 +3353,28 @@
     ],
     "director": "Michael Mohan",
     "trailer": "vkaO0Kmoicg"
+  },
+  {
+    "title": "Exit 8",
+    "csv_id": "1408208",
+    "type": "Movie",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD9Q4AAq-EQEYt2G7hImpPWxYE"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w200/nQXYTvm6AY4WmtcPskroqC7Skh.jpg",
+    "rating": 6.877,
+    "release_date": "",
+    "overview": "A man trapped in an endless sterile subway passageway sets out to find Exit 8. The rules of his quest are simple: do not overlook anything out of the ordinary. If you discover an anomaly, turn back immediately. If you don’t, carry on. Then leave from Exit 8. But even a single oversight will send him back to the beginning. Will he ever reach his goal and escape this infinite corridor?",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "backdrop": "img/FilmHouse.png",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": ""
   },
   {
     "title": "Fallout",
@@ -4207,6 +4176,34 @@
     "runtime": "86 min"
   },
   {
+    "csv_id": "1364082-hijack-93",
+    "tmdb_id": 1364082,
+    "imdb_id": "",
+    "title": "Hijack '93",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "Thriller",
+      "Drama"
+    ],
+    "overview": "In an effort to dismantle their military-backed government, four men hijack an airplane, leveraging passengers onboard in the name of social change.",
+    "poster": "https://image.tmdb.org/t/p/w500/nrwTBMlexcgy11MXRVRz8IZrfTI.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/l0YYwVi7tIcuSGc3ssxTL5kfiHi.jpg",
+    "rating": 5.5,
+    "release_date": "2024-10-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "rNJzWqKUlwM",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADxxAAAq-EQEaB4LBgQ4IEyhYE"
+    ]
+  },
+  {
     "title": "Hole in One",
     "csv_id": "45781-hole-in-one",
     "type": "Movie",
@@ -4500,6 +4497,55 @@
     "trailer": "CVsEPwY1-k8"
   },
   {
+    "csv_id": "1725446-ilebaye",
+    "tmdb_id": 1725446,
+    "imdb_id": "",
+    "title": "Ilebaye",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [],
+    "overview": "Ilebaye is a popular 2024 Nollywood film starring Big Brother Naija winner Ilebaye Odiniya, Mofe Duncan, and Miwa Olorunfemi.. Directed by Kayode Peters, the dramatic storyline follows a fresh graduate whose job interview is sabotaged, only for her to be unexpectedly hired by the company owner who turns out to be her biological father",
+    "poster": "https://i.postimg.cc/KYD3v1fj/photo-2026-07-03-16-22-48.jpg",
+    "backdrop": "https://i.postimg.cc/KYD3v1fj/photo-2026-07-03-16-22-48.jpg",
+    "rating": 0,
+    "release_date": "2024",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADEQ8AAq-EQEYh01azJO2M6BYE"
+    ]
+  },
+  {
+    "title": "Ip Man: Kung Fu Legend",
+    "csv_id": "1628071-2",
+    "type": "Movie",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD7w4AAq-EQEbsWCqxhl7KBxYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD8Q4AAq-EQEYn8FCMb4MzrxYE"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w200/m3Low6jJrKXHSYFpXNkmYsG1Q6I.jpg",
+    "rating": 0,
+    "release_date": "",
+    "overview": "In 1950s Hong Kong, British merchants and Chinese triads have joined forces to expand their territory, forcibly demolishing factories without regard for public welfare. This move draws fierce opposition from Ip Man, standing up for the workers, he faces pressure from all sides. Framed for murder, he is sent to prison. Within the prison walls, the triads set multiple deadly traps. Can Ip Man overcome these trials, escape the danger, and clear his name?",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "backdrop": "img/FilmHouse.png",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": ""
+  },
+  {
     "title": "Ironheart",
     "csv_id": "114471-ironheart",
     "type": "Series",
@@ -4562,6 +4608,35 @@
     "runtime": "23 min"
   },
   {
+    "csv_id": "207468-8",
+    "tmdb_id": 207468,
+    "imdb_id": "",
+    "title": "Kaiju No. 8",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "In a world plagued by creatures known as Kaiju, Kafka Hibino aspired to enlist in The Defense Force. He makes a promise to enlist with his childhood friend, Mina Ashiro. Soon, life takes them in separate ways. While employed cleaning up after Kaiju battles, Kafka meets Reno Ichikawa. Reno's determination to join The Defense Force reawakens Kafka's promise to join Mina and protect humanity.",
+    "poster": "https://image.tmdb.org/t/p/w500/bJxGs0w5RAhaX4fIUQu511rvm0S.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/htGeuCcNhlBe8GTx3izKOsd8frw.jpg",
+    "rating": 8.5,
+    "release_date": "2024-04-13",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADggsAAq-EQEbCsAqUDKoneRYE"
+    ]
+  },
+  {
     "title": "Kakegurui",
     "csv_id": "72305",
     "type": "Series",
@@ -4587,6 +4662,40 @@
     "overview": "Run by a corrupt and sadistic school council, the “system” at Hyakkaou is based on gambling, with losers who cannot cover their debts being demeaned by their peers and forced to serve their debtholders. And if that’s not terrifying enough, some games can result in losing an eye, one’s fingernails, or even their life! But the system is shocked when transfer student Yumeko Jabami arrives. Dark, mysterious and attractive, she’s a wildcard who plays for the thrill of it…",
     "backdrop": "https://image.tmdb.org/t/p/w1280/n35AGT8JMMcbdPMxXLg4KMUuLx.jpg",
     "language": "ja"
+  },
+  {
+    "csv_id": "570465-king-of-boys",
+    "tmdb_id": 570465,
+    "imdb_id": "",
+    "title": "King of Boys",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "The story of Alhaja Eniola Salami, a businesswoman and philanthropist with a checkered past and a promising political future. As her political ambitions see her outgrowing the underworld connections responsible for her considerable wealth, she's drawn into a power struggle that threatens everything she holds dear.",
+    "poster": "https://image.tmdb.org/t/p/w500/3nO3VboeVLVOwIHMkTRIwTrrKQP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/8lUYBdpIo8ysI9UzVn8Zs1AwB5x.jpg",
+    "rating": 6.4,
+    "release_date": "2018-10-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "cF-FQLKaUCk",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD_wkAAq-EQEZh8E9diHmWMBYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADDwoAAq-EQEZlzmsadhebcRYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADEAoAAq-EQEakzYTtR80kZRYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADEQoAAq-EQEYel5_OxvuLhRYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADEgoAAq-EQEbE5JTL-4txhhYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADEwoAAq-EQEagqblNuadk3BYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADFAoAAq-EQEbO9G6rlQ7V7RYE"
+    ]
   },
   {
     "title": "Kraven the Hunter",
@@ -6368,6 +6477,28 @@
     "runtime": "48 min"
   },
   {
+    "title": "One Spoon of Chocolate",
+    "csv_id": "1290792-one-spoon-of-chocolate",
+    "type": "Movie",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD9A4AAq-EQEa_Pe9yfD9voRYE"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w200/iiVuwRguusPeO2Mqmg68cpqq9ex.jpg",
+    "rating": 4.813,
+    "release_date": "",
+    "overview": "After serving his country in the Army, Unique is falsely accused of assault and sent to prison. Once released, Unique sets up shop in Ohio to restart his life, linking up with his only surviving relative, Ramsey. There’s something insidious happening in this town, though, as its racist sheriff and his crew of similarly bigoted acolytes all have a knack for violence and share a gruesome secret pertaining to a recent string of missing young Black men. When they set their sights on Unique and turn his life upside down, the former soldier has no choice but to bring the ruckus down on the sheriff and his goons.",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "backdrop": "img/FilmHouse.png",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": ""
+  },
+  {
     "title": "Palava!",
     "csv_id": "1060526-palava",
     "type": "Movie",
@@ -7660,6 +7791,28 @@
     "trailer": "87A_aLJOY4g"
   },
   {
+    "title": "Tavvai",
+    "csv_id": "1722860-tavvai",
+    "type": "Movie",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD4w4AAq-EQEb2A0irLUE8SBYE"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w200/pZAbPoVTMYrxFUSGG9hwaOUsZnW.jpg",
+    "rating": 0,
+    "release_date": "",
+    "overview": "In 1880, A Maharaj through his atrocities invited Tavvai. The village is terrified for generations until a chosen one sets things right.",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "backdrop": "img/FilmHouse.png",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": ""
+  },
+  {
     "csv_id": "737396-tazmanian-devil",
     "tmdb_id": 737396,
     "imdb_id": "",
@@ -7843,6 +7996,32 @@
     "runtime": "83 min"
   },
   {
+    "csv_id": "1725426-the-angel-i-don-t-know",
+    "tmdb_id": 1725426,
+    "imdb_id": "",
+    "title": "The Angel I Don't Know",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/9Q4h1KsV/photo-2026-07-03-16-03-00.jpg",
+    "backdrop": "https://i.postimg.cc/9Q4h1KsV/photo-2026-07-03-16-03-00.jpg",
+    "rating": 0,
+    "release_date": "2020",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADfQ4AAq-EQEY_iuWKdlk5LBYE"
+    ]
+  },
+  {
     "title": "The Casagrandes",
     "csv_id": "93260-the-casagrandes",
     "type": "Series",
@@ -7877,6 +8056,32 @@
     ],
     "director": "Michael Rubiner",
     "runtime": "22 min"
+  },
+  {
+    "csv_id": "1725433-the-chase",
+    "tmdb_id": 1725433,
+    "imdb_id": "",
+    "title": "The Chase",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [],
+    "overview": "The Chase is a Ghanaian comedic drama produced by Earth Dreams Entertainment, starring popular Ghanaian entertainers including comedian Clemento Suarez.",
+    "poster": "https://i.postimg.cc/3wRngQq4/photo-2026-07-03-16-07-17.jpg",
+    "backdrop": "https://i.postimg.cc/3wRngQq4/photo-2026-07-03-16-07-17.jpg",
+    "rating": 0,
+    "release_date": "2024",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADmw4AAq-EQEYC0q1OYfhHaxYE"
+    ]
   },
   {
     "title": "The Day of the Jackal",
@@ -9460,6 +9665,28 @@
     "runtime": "80 min"
   },
   {
+    "title": "We're So Dead",
+    "csv_id": "1525703-we-re-so-dead",
+    "type": "Movie",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD5Q4AAq-EQEYX3ekOISyCOhYE"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w200/yGQTZNcEPbynjZd2uoI8IKgDdLm.jpg",
+    "rating": 0,
+    "release_date": "",
+    "overview": "The restaurant is dead in more ways than one. A huge party has canceled and dashed their hopes of a big holiday tip. Surviving the shift becomes much more than side work and a deep clean, when a Karen, unhappiness with her service, goes on a spree to murder the entire staff.",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "backdrop": "img/FilmHouse.png",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": ""
+  },
+  {
     "title": "Wednesday",
     "csv_id": "119051-wednesday",
     "type": "Series",
@@ -9866,204 +10093,5 @@
     "director": "Dan Schneider",
     "trailer": "RX6YeYT3ed8",
     "runtime": "23 min"
-  },
-  {
-    "title": "40 Dates and 40 Nights",
-    "csv_id": "1431804-40-dates-and-40-nights",
-    "type": "Movie",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD2Q4AAq-EQEa4QWGK0y6xfxYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w200/lWEhjO801M52CY5Gx6OAwZZ6m7o.jpg",
-    "rating": 5,
-    "release_date": "",
-    "overview": "Burned out on dating and ready to quit, Leah accepts her grandma's outrageous challenge: 40 dates in 40 nights for a full year of rent. From awkward dinners to unexpected sparks, she discovers the biggest obstacle to love might just be herself.",
-    "categories": [
-      "Main"
-    ],
-    "genres": [],
-    "backdrop": "img/FilmHouse.png",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": ""
-  },
-  {
-    "title": "Tavvai",
-    "csv_id": "1722860-tavvai",
-    "type": "Movie",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD4w4AAq-EQEb2A0irLUE8SBYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w200/pZAbPoVTMYrxFUSGG9hwaOUsZnW.jpg",
-    "rating": 0,
-    "release_date": "",
-    "overview": "In 1880, A Maharaj through his atrocities invited Tavvai. The village is terrified for generations until a chosen one sets things right.",
-    "categories": [
-      "Main"
-    ],
-    "genres": [],
-    "backdrop": "img/FilmHouse.png",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": ""
-  },
-  {
-    "title": "We're So Dead",
-    "csv_id": "1525703-we-re-so-dead",
-    "type": "Movie",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD5Q4AAq-EQEYX3ekOISyCOhYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w200/yGQTZNcEPbynjZd2uoI8IKgDdLm.jpg",
-    "rating": 0,
-    "release_date": "",
-    "overview": "The restaurant is dead in more ways than one. A huge party has canceled and dashed their hopes of a big holiday tip. Surviving the shift becomes much more than side work and a deep clean, when a Karen, unhappiness with her service, goes on a spree to murder the entire staff.",
-    "categories": [
-      "Main"
-    ],
-    "genres": [],
-    "backdrop": "img/FilmHouse.png",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": ""
-  },
-  {
-    "title": "Enola Holmes 3",
-    "csv_id": "1202033-enola-holmes-3",
-    "type": "Movie",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD5w4AAq-EQEYov5o5XPNARxYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w200/7kRYHH9H9PjBFwz1FprbHB2AAjI.jpg",
-    "rating": 7.2,
-    "release_date": "",
-    "overview": "Adventure follows detective Enola Holmes to Malta, where her plans to tie the knot unravel when Sherlock's disappearance plunges her into a perilous case.",
-    "categories": [
-      "Main"
-    ],
-    "genres": [],
-    "backdrop": "img/FilmHouse.png",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": ""
-  },
-  {
-    "title": "Enola Holmes 2",
-    "csv_id": "829280-enola-holmes-2",
-    "type": "Movie",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD6w4AAq-EQEa7WFP5G-NXgBYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w200/tegBpjM5ODoYoM1NjaiHVLEA0QM.jpg",
-    "rating": 7.404,
-    "release_date": "",
-    "overview": "Enola takes on her first official case as a detective, but to solve the mystery of a missing girl, she'll need help from friends — and brother Sherlock.",
-    "categories": [
-      "Main"
-    ],
-    "genres": [],
-    "backdrop": "img/FilmHouse.png",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": ""
-  },
-  {
-    "title": "Enola Holmes",
-    "csv_id": "497582-enola-holmes",
-    "type": "Movie",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD7A4AAq-EQEYE8wy7hjaKMBYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w200/riYInlsq2kf1AWoGm80JQW5dLKp.jpg",
-    "rating": 7.222,
-    "release_date": "",
-    "overview": "While searching for her missing mother, intrepid teen Enola Holmes uses her sleuthing skills to outsmart big brother Sherlock and help a runaway lord.",
-    "categories": [
-      "Main"
-    ],
-    "genres": [],
-    "backdrop": "img/FilmHouse.png",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": ""
-  },
-  {
-    "title": "Ip Man: Kung Fu Legend",
-    "csv_id": "1628071-2",
-    "type": "Movie",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD7w4AAq-EQEbsWCqxhl7KBxYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD8Q4AAq-EQEYn8FCMb4MzrxYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w200/m3Low6jJrKXHSYFpXNkmYsG1Q6I.jpg",
-    "rating": 0,
-    "release_date": "",
-    "overview": "In 1950s Hong Kong, British merchants and Chinese triads have joined forces to expand their territory, forcibly demolishing factories without regard for public welfare. This move draws fierce opposition from Ip Man, standing up for the workers, he faces pressure from all sides. Framed for murder, he is sent to prison. Within the prison walls, the triads set multiple deadly traps. Can Ip Man overcome these trials, escape the danger, and clear his name?",
-    "categories": [
-      "Main"
-    ],
-    "genres": [],
-    "backdrop": "img/FilmHouse.png",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": ""
-  },
-  {
-    "title": "One Spoon of Chocolate",
-    "csv_id": "1290792-one-spoon-of-chocolate",
-    "type": "Movie",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD9A4AAq-EQEa_Pe9yfD9voRYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w200/iiVuwRguusPeO2Mqmg68cpqq9ex.jpg",
-    "rating": 4.813,
-    "release_date": "",
-    "overview": "After serving his country in the Army, Unique is falsely accused of assault and sent to prison. Once released, Unique sets up shop in Ohio to restart his life, linking up with his only surviving relative, Ramsey. There’s something insidious happening in this town, though, as its racist sheriff and his crew of similarly bigoted acolytes all have a knack for violence and share a gruesome secret pertaining to a recent string of missing young Black men. When they set their sights on Unique and turn his life upside down, the former soldier has no choice but to bring the ruckus down on the sheriff and his goons.",
-    "categories": [
-      "Main"
-    ],
-    "genres": [],
-    "backdrop": "img/FilmHouse.png",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": ""
-  },
-  {
-    "title": "Exit 8",
-    "csv_id": "1408208",
-    "type": "Movie",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD9Q4AAq-EQEYt2G7hImpPWxYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w200/nQXYTvm6AY4WmtcPskroqC7Skh.jpg",
-    "rating": 6.877,
-    "release_date": "",
-    "overview": "A man trapped in an endless sterile subway passageway sets out to find Exit 8. The rules of his quest are simple: do not overlook anything out of the ordinary. If you discover an anomaly, turn back immediately. If you don’t, carry on. Then leave from Exit 8. But even a single oversight will send him back to the beginning. Will he ever reach his goal and escape this infinite corridor?",
-    "categories": [
-      "Main"
-    ],
-    "genres": [],
-    "backdrop": "img/FilmHouse.png",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": ""
   }
 ]
