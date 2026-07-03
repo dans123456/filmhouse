@@ -4748,6 +4748,11 @@ function renderUserRequests(requests) {
                 }
                 updateHeaderNotificationDot();
                 updateHomeFulfillmentBanner();
+                
+                // Close the rewards drawer so the connection drawer can be seen and clicked!
+                const rewardsDrawer = document.getElementById("rewards-drawer");
+                if (rewardsDrawer) rewardsDrawer.classList.remove("active");
+                
                 showConnectionDrawer(dlBtn.getAttribute("data-link"), ADSGRAM_DOWNLOAD_BLOCK_ID);
             });
         }
