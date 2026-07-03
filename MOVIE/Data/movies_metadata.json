@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "1291335-solo-mio",
+    "tmdb_id": 1291335,
+    "imdb_id": "",
+    "title": "Solo Mio",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After Matt's dreams of a picturesque Italian wedding are shattered when his fiancée leaves him at the altar, he embarks on his planned honeymoon across Italy alone, immersing himself in the country's vibrant culture, food, and beauty, meeting Gia along the way.",
+    "poster": "https://image.tmdb.org/t/p/w500/efSsZJaddeq0LOABZqpCXdMxv9P.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/eVXBp5BBskAj0RJ6pDSNPcBs1uI.jpg",
+    "rating": 7.3,
+    "release_date": "2026-02-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "433MYSlERJo",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADYxcAAq-EQEYQ30fhByYq0BYE"
+    ]
+  },
+  {
     "csv_id": "1265609-war-machine",
     "tmdb_id": 1265609,
     "imdb_id": "",
