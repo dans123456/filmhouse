@@ -1375,87 +1375,105 @@ if (addMovieForm) {
         let original_language = "en";
         let trailerId = "";
         
+        let finalType = type;
         if (isTmdb) {
-            const mediaType = (type.toLowerCase() === 'tv') ? 'tv' : 'movie';
+            const mediaType = (type.toLowerCase() === 'tv' || type.toLowerCase() === 'series') ? 'tv' : 'movie';
             const url = `https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${TMDB_API_KEY}`;
             try {
-                const res = await fetch(url);
+                let res = await fetch(url);
+                let data = null;
                 if (res.ok) {
-                    const data = await res.json();
-                    title = data.title || data.name || title;
-                    poster = data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : "";
-                    backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}` : "";
-                    rating = Math.round((data.vote_average || 0) * 10) / 10;
-                    releaseDate = data.release_date || data.first_air_date || "";
-                    genres = data.genres ? data.genres.map(g => g.name) : [];
-                    original_language = data.original_language || "en";
-                    overview = data.overview || "No synopsis available.";
-                    
-                    // Categorize title automatically
-                    const titleLower = title.toLowerCase();
-                    const africanCountries = ["NG", "ZA", "GH", "KE", "EG", "TZ", "UG", "MA", "DZ"];
-                    const isAfrican = data.origin_country && data.origin_country.some(c => africanCountries.includes(c));
-                    
-                    if (isAfrican) {
-                        categories.push("African");
-                    } else {
-                        const isAnimation = data.genres && data.genres.some(g => g.name.toLowerCase() === "animation");
-                        if (isAnimation) {
-                            if (original_language === 'ja') {
-                                categories.push("Anime");
-                            } else {
-                                categories.push("Animated Movies");
-                            }
-                        }
-                        
-                        if (original_language === 'ko') {
-                            categories.push("Korean Drama");
-                        } else if (original_language === 'hi') {
-                            categories.push("Bollywood");
-                        }
-                        
-                        const isRegional = categories.some(cat => ["Korean Drama", "Bollywood", "African", "Anime"].includes(cat));
-                        if (!isRegional) {
-                            if (type === 'tv') {
-                                categories.push("Hollywood/British Series");
-                            } else {
-                                categories.push("Hollywood/British Movies");
-                            }
-                        }
-                    }
-
-                    // Classics franchise auto-matching
-                    const classicKeywords = [
-                        "chucky", "child's play", "bride of chucky", "seed of chucky", "curse of chucky", 
-                        "cult of chucky", "american pie", "american wedding", "american reunion", 
-                        "naked mile", "beta house", "girls' rules", "band camp", "hole in one"
-                    ];
-                    let releaseYear = 0;
-                    if (releaseDate && releaseDate.length >= 4) {
-                        releaseYear = parseInt(releaseDate.substring(0, 4)) || 0;
-                    }
-                    const isClassicMatch = (releaseYear > 0 && releaseYear < 2000) || classicKeywords.some(keyword => titleLower.includes(keyword));
-                    if (isClassicMatch) {
-                        if (!categories.includes("Classic Movies")) categories.push("Classic Movies");
-                    }
-
-                    // Comics auto-matching
-                    const comicKeywords = [
-                        "marvel", "avengers", "spider-man", "spidey", "iron man", "captain america", "thor", 
-                        "guardians of the galaxy", "loki", "wandavision", "hulk", "deadpool", "wolverine", 
-                        "venom", "shang-chi", "eternals", "black widow", "hawkeye", "ms. marvel", "moon knight", 
-                        "she-hulk", "werewolf by night", "black panther", "echo", "madame web", "x-men", "kraven", 
-                        "daredevil", "born again", "ironheart", "fantastic 4", "wonder man", "gen v", "the boys", 
-                        "invincible", "punisher", "batman", "superman", "shazam", "black adam", "dc comics", 
-                        "blue beetle", "kakegurui", "hit-monkey", "m.o.d.o.k.", "what if...?"
-                    ];
-                    const isToAllTheBoys = titleLower.includes("to all the boys");
-                    const isComicMatch = comicKeywords.some(keyword => titleLower.includes(keyword));
-                    if (isComicMatch && !isToAllTheBoys) {
-                        if (!categories.includes("Comic")) categories.push("Comic");
-                    }
+                    data = await res.json();
                 } else {
-                    throw new Error("TMDB fetch returned non-ok status");
+                    // Try fallback to the other media type
+                    const fallbackType = (mediaType === 'tv') ? 'movie' : 'tv';
+                    const fallbackUrl = `https://api.themoviedb.org/3/${fallbackType}/${numericId}?api_key=${TMDB_API_KEY}`;
+                    const fallbackRes = await fetch(fallbackUrl);
+                    if (fallbackRes.ok) {
+                        data = await fallbackRes.json();
+                        finalType = (fallbackType === 'tv') ? 'Series' : 'Movie';
+                        
+                        // Update UI dropdown value to match correct type
+                        const typeSelect = document.getElementById("movie-type");
+                        if (typeSelect) {
+                            typeSelect.value = (fallbackType === 'tv') ? 'Series' : 'Movie';
+                        }
+                    } else {
+                        throw new Error(`Failed to fetch from both movie and tv endpoints for TMDB ID ${numericId}`);
+                    }
+                }
+                
+                title = data.title || data.name || title;
+                poster = data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : "";
+                backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}` : "";
+                rating = Math.round((data.vote_average || 0) * 10) / 10;
+                releaseDate = data.release_date || data.first_air_date || "";
+                genres = data.genres ? data.genres.map(g => g.name) : [];
+                original_language = data.original_language || "en";
+                overview = data.overview || "No synopsis available.";
+                
+                // Categorize title automatically
+                const titleLower = title.toLowerCase();
+                const africanCountries = ["NG", "ZA", "GH", "KE", "EG", "TZ", "UG", "MA", "DZ"];
+                const isAfrican = data.origin_country && data.origin_country.some(c => africanCountries.includes(c));
+                
+                if (isAfrican) {
+                    categories.push("African");
+                } else {
+                    const isAnimation = data.genres && data.genres.some(g => g.name.toLowerCase() === "animation");
+                    if (isAnimation) {
+                        if (original_language === 'ja') {
+                            categories.push("Anime");
+                        } else {
+                            categories.push("Animated Movies");
+                        }
+                    }
+                    
+                    if (original_language === 'ko') {
+                        categories.push("Korean Drama");
+                    } else if (original_language === 'hi') {
+                        categories.push("Bollywood");
+                    }
+                    
+                    const isRegional = categories.some(cat => ["Korean Drama", "Bollywood", "African", "Anime"].includes(cat));
+                    if (!isRegional) {
+                        if (finalType.toLowerCase() === 'series' || finalType.toLowerCase() === 'tv') {
+                            categories.push("Hollywood/British Series");
+                        } else {
+                            categories.push("Hollywood/British Movies");
+                        }
+                    }
+                }
+
+                // Classics franchise auto-matching
+                const classicKeywords = [
+                    "chucky", "child's play", "bride of chucky", "seed of chucky", "curse of chucky", 
+                    "cult of chucky", "american pie", "american wedding", "american reunion", 
+                    "naked mile", "beta house", "girls' rules", "band camp", "hole in one"
+                ];
+                let releaseYear = 0;
+                if (releaseDate && releaseDate.length >= 4) {
+                    releaseYear = parseInt(releaseDate.substring(0, 4)) || 0;
+                }
+                const isClassicMatch = (releaseYear > 0 && releaseYear < 2000) || classicKeywords.some(keyword => titleLower.includes(keyword));
+                if (isClassicMatch) {
+                    if (!categories.includes("Classic Movies")) categories.push("Classic Movies");
+                }
+
+                // Comics auto-matching
+                const comicKeywords = [
+                    "marvel", "avengers", "spider-man", "spidey", "iron man", "captain america", "thor", 
+                    "guardians of the galaxy", "loki", "wandavision", "hulk", "deadpool", "wolverine", 
+                    "venom", "shang-chi", "eternals", "black widow", "hawkeye", "ms. marvel", "moon knight", 
+                    "she-hulk", "werewolf by night", "black panther", "echo", "madame web", "x-men", "kraven", 
+                    "daredevil", "born again", "ironheart", "fantastic 4", "wonder man", "gen v", "the boys", 
+                    "invincible", "punisher", "batman", "superman", "shazam", "black adam", "dc comics", 
+                    "blue beetle", "kakegurui", "hit-monkey", "m.o.d.o.k.", "what if...?"
+                ];
+                const isToAllTheBoys = titleLower.includes("to all the boys");
+                const isComicMatch = comicKeywords.some(keyword => titleLower.includes(keyword));
+                if (isComicMatch && !isToAllTheBoys) {
+                    if (!categories.includes("Comic")) categories.push("Comic");
                 }
             } catch (err) {
                 console.warn("Could not enrich movie metadata on form submit:", err);
@@ -1486,7 +1504,7 @@ if (addMovieForm) {
             tmdb_id: isTmdb ? parseInt(numericId) : null,
             imdb_id: "",
             title: title,
-            type: type === 'tv' ? 'Series' : 'Movie',
+            type: (finalType.toLowerCase() === 'series' || finalType.toLowerCase() === 'tv') ? 'Series' : 'Movie',
             categories: categories,
             genres: genres,
             overview: overview,
