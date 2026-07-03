@@ -134,7 +134,31 @@ function updateStatsCounters() {
     const usersBadgeEl = document.getElementById("users-count-badge");
     if (usersBadgeEl) usersBadgeEl.textContent = `${allUsers.length} Registered`;
 
-    // Total requests
+    const statTotalUsers = document.getElementById("stat-total-users");
+    if (statTotalUsers) statTotalUsers.textContent = allUsers.length;
+
+    // Total points economy circulation
+    let totalPoints = 0;
+    allUsers.forEach(u => {
+        totalPoints += parseInt(u.points || 0);
+    });
+    const statTotalPoints = document.getElementById("stat-total-points");
+    if (statTotalPoints) statTotalPoints.textContent = totalPoints.toLocaleString();
+
+    // Completed requests fulfillment rate
+    const totalReqCount = allRequests.length;
+    const fulfilledReqCount = allRequests.filter(r => r.status === "fulfilled").length;
+    const fulfillmentRate = totalReqCount > 0 ? Math.round((fulfilledReqCount / totalReqCount) * 100) : 100;
+    const statFulfillmentRate = document.getElementById("stat-fulfillment-rate");
+    if (statFulfillmentRate) {
+        statFulfillmentRate.textContent = `${fulfillmentRate}% (${fulfilledReqCount}/${totalReqCount})`;
+    }
+
+    // Catalog Size
+    const statCatalogSize = document.getElementById("stat-catalog-size");
+    if (statCatalogSize) statCatalogSize.textContent = allCatalogMovies.length;
+
+    // Total requests counter
     const totalRequestsEl = document.getElementById("stat-requests");
     if (totalRequestsEl) totalRequestsEl.textContent = allRequests.length;
 
@@ -1378,7 +1402,7 @@ if (addMovieForm) {
         let finalType = type;
         if (isTmdb) {
             const mediaType = (type.toLowerCase() === 'tv' || type.toLowerCase() === 'series') ? 'tv' : 'movie';
-            const url = `https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${TMDB_API_KEY}`;
+            const url = `https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${TMDB_API_KEY}&append_to_response=videos`;
             try {
                 let res = await fetch(url);
                 let data = null;
@@ -1387,7 +1411,7 @@ if (addMovieForm) {
                 } else {
                     // Try fallback to the other media type
                     const fallbackType = (mediaType === 'tv') ? 'movie' : 'tv';
-                    const fallbackUrl = `https://api.themoviedb.org/3/${fallbackType}/${numericId}?api_key=${TMDB_API_KEY}`;
+                    const fallbackUrl = `https://api.themoviedb.org/3/${fallbackType}/${numericId}?api_key=${TMDB_API_KEY}&append_to_response=videos`;
                     const fallbackRes = await fetch(fallbackUrl);
                     if (fallbackRes.ok) {
                         data = await fallbackRes.json();
@@ -1411,6 +1435,16 @@ if (addMovieForm) {
                 genres = data.genres ? data.genres.map(g => g.name) : [];
                 original_language = data.original_language || "en";
                 overview = data.overview || "No synopsis available.";
+                
+                // Extract YouTube trailer key automatically
+                if (data.videos && data.videos.results) {
+                    const officialTrailer = data.videos.results.find(v => v.type === "Trailer" && v.site === "YouTube");
+                    if (officialTrailer) {
+                        trailerId = officialTrailer.key;
+                    } else if (data.videos.results.length > 0) {
+                        trailerId = data.videos.results[0].key;
+                    }
+                }
                 
                 // Categorize title automatically
                 const titleLower = title.toLowerCase();
@@ -2096,7 +2130,7 @@ if (fulfillForm && fulfillRequestModal) {
                     const searchObj = await searchRes.json();
                     if (searchObj.results && searchObj.results.length > 0) {
                         const firstMatch = searchObj.results[0];
-                        const detailsUrl = `https://api.themoviedb.org/3/${firstMatch.media_type || mediaType}/${firstMatch.id}?api_key=${TMDB_API_KEY}`;
+                        const detailsUrl = `https://api.themoviedb.org/3/${firstMatch.media_type || mediaType}/${firstMatch.id}?api_key=${TMDB_API_KEY}&append_to_response=videos`;
                         const detailsRes = await fetch(detailsUrl);
                         if (detailsRes.ok) {
                             tmdbData = await detailsRes.json();
@@ -2111,6 +2145,16 @@ if (fulfillForm && fulfillRequestModal) {
                 const tmdbId = tmdbData.id;
                 const slug = currentFulfillTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
                 const csvId = `${tmdbId}-${slug}`;
+                
+                let trailerId = "";
+                if (tmdbData.videos && tmdbData.videos.results) {
+                    const officialTrailer = tmdbData.videos.results.find(v => v.type === "Trailer" && v.site === "YouTube");
+                    if (officialTrailer) {
+                        trailerId = officialTrailer.key;
+                    } else if (tmdbData.videos.results.length > 0) {
+                        trailerId = tmdbData.videos.results[0].key;
+                    }
+                }
                 
                 const newMovie = {
                     csv_id: csvId,
@@ -2128,7 +2172,7 @@ if (fulfillForm && fulfillRequestModal) {
                     language: tmdbData.original_language || "en",
                     cast: [],
                     director: "",
-                    trailer: "",
+                    trailer: trailerId,
                     runtime: "",
                     links: [downloadLink]
                 };

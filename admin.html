@@ -521,6 +521,31 @@
         </div>
     </div>
 
+    <!-- Platform Analytics Dashboard -->
+    <div class="glass-panel" id="admin-analytics-panel">
+        <div class="section-header">
+            <h4 class="section-title">📊 Platform Analytics Dashboard</h4>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 10px;">
+            <div style="background: rgba(255,255,255,0.015); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; box-shadow: inset 0 0 10px rgba(255,255,255,0.01);">
+                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Active Users</div>
+                <div style="font-size: 20px; font-weight: 800; color: #fff; margin-top: 4px; font-family: var(--font-heading);" id="stat-total-users">0</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.015); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; box-shadow: inset 0 0 10px rgba(255,255,255,0.01);">
+                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Points Economy</div>
+                <div style="font-size: 20px; font-weight: 800; color: #ffbc00; margin-top: 4px; font-family: var(--font-heading);" id="stat-total-points">0</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.015); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; box-shadow: inset 0 0 10px rgba(255,255,255,0.01);">
+                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Fulfillment Rate</div>
+                <div style="font-size: 20px; font-weight: 800; color: #4caf50; margin-top: 4px; font-family: var(--font-heading);" id="stat-fulfillment-rate">0%</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.015); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; box-shadow: inset 0 0 10px rgba(255,255,255,0.01);">
+                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Library Catalog</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--primary-color); margin-top: 4px; font-family: var(--font-heading);" id="stat-catalog-size">0</div>
+            </div>
+        </div>
+    </div>
+
     <div class="glass-panel">
         <div class="section-header">
             <h4 class="section-title">👥 App User Profiles</h4>
@@ -710,6 +735,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=60"></script>
+    <script src="admin.js?v=61"></script>
 </body>
 </html>

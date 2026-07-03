@@ -4728,20 +4728,28 @@ function renderUserRequests(requests) {
     if (activeRequests.length === 0) {
         list.innerHTML = `
             <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; background: rgba(255,255,255,0.01); border-radius: var(--border-radius-sm); border: 1px dashed var(--border-color);">
-                All requests claimed! Check your download history below. 🎬
+                All requests claimed! Check your request history below. 🎬
             </div>
         `;
     } else {
         activeRequests.forEach(r => {
             const item = document.createElement("div");
             item.className = "user-request-item";
-            item.style.cssText = "background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px;";
+            item.style.cssText = "background: rgba(255,255,255,0.025); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; display: flex; flex-direction: column; gap: 12px;";
             
-            let statusBadge = "";
             let actionBtn = "";
+            let step = 1;
+            let progressPct = 0;
+            let reviewingColor = "rgba(255,255,255,0.1)";
+            let readyColor = "rgba(255,255,255,0.1)";
+            let activeLineColor = "var(--primary-color)";
             
             if (r._isMatched || r._isExplicit) {
-                statusBadge = `<span style="font-size: 10px; background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🟢 Ready</span>`;
+                step = 3;
+                progressPct = 100;
+                reviewingColor = "var(--primary-color)";
+                readyColor = "#4caf50";
+                activeLineColor = "#4caf50";
                 const dlLink = r._isExplicit ? r.downloadLink : r._matchingMovie.links[0];
                 actionBtn = `
                     <button class="btn btn-primary btn-sm user-request-dl-btn" data-link="${escapeHTML(dlLink)}" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">
@@ -4749,10 +4757,14 @@ function renderUserRequests(requests) {
                     </button>
                 `;
             } else if (r.status === "priority") {
-                statusBadge = `<span style="font-size: 10px; background: rgba(255, 59, 48, 0.15); border: 1px solid rgba(255, 59, 48, 0.3); color: #ff3b30; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🔥 High Priority</span>`;
-                actionBtn = `<span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Expedited</span>`;
+                step = 2;
+                progressPct = 50;
+                reviewingColor = "#ff3b30";
+                activeLineColor = "#ff3b30";
+                actionBtn = `<span style="font-size: 11px; color: #ff3b30; font-weight: 700; text-shadow: 0 0 6px rgba(255,59,48,0.2);">🔥 Expedited</span>`;
             } else {
-                statusBadge = `<span style="font-size: 10px; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🟠 Pending</span>`;
+                step = 1;
+                progressPct = 0;
                 actionBtn = `
                     <button class="btn btn-secondary btn-sm user-request-boost-btn" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 600; flex-shrink: 0; border-color: rgba(255, 188, 0, 0.3); color: #ffbc00;">
                         Boost (1,000 pts)
@@ -4760,17 +4772,50 @@ function renderUserRequests(requests) {
                 `;
             }
             
-            item.innerHTML = `
-                <div style="flex: 1;">
-                    <h5 style="margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: #fff;">${escapeHTML(r.title)}</h5>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">${escapeHTML(r.type)}</span>
-                        ${statusBadge}
+            const stepperHTML = `
+                <div class="request-stepper" style="display: flex; align-items: center; justify-content: space-between; padding: 4px 14px 0 14px; position: relative; width: 100%; box-sizing: border-box; margin-top: 2px;">
+                    <!-- Line track background -->
+                    <div style="position: absolute; top: 10px; left: 30px; right: 30px; height: 2px; background: rgba(255,255,255,0.06); z-index: 1;"></div>
+                    <!-- Active line progress -->
+                    <div style="position: absolute; top: 10px; left: 30px; width: calc(${progressPct}% - ${progressPct === 100 ? '0px' : '30px'}); height: 2px; background: ${activeLineColor}; z-index: 2; transition: all 0.3s ease;"></div>
+                    
+                    <!-- Step 1: Requested -->
+                    <div style="z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <div style="width: 20px; height: 20px; border-radius: 50%; background: #1a1a1a; border: 2px solid var(--primary-color); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px var(--primary-glow);">
+                            <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--primary-color);"></div>
+                        </div>
+                        <span style="font-size: 9px; font-weight: 700; color: #fff; letter-spacing: 0.3px;">Requested</span>
+                    </div>
+                    
+                    <!-- Step 2: Reviewing -->
+                    <div style="z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <div style="width: 20px; height: 20px; border-radius: 50%; background: #1a1a1a; border: 2px solid ${reviewingColor}; display: flex; align-items: center; justify-content: center; box-shadow: ${step >= 2 ? `0 0 8px ${reviewingColor}` : 'none'}; transition: all 0.3s ease;">
+                            <div style="width: 6px; height: 6px; border-radius: 50%; background: ${step >= 2 ? reviewingColor : 'transparent'}; transition: all 0.3s ease;"></div>
+                        </div>
+                        <span style="font-size: 9px; font-weight: 700; color: ${step >= 2 ? '#fff' : 'var(--text-muted)'}; letter-spacing: 0.3px;">${r.status === 'priority' ? '🔥 Priority Review' : 'Reviewing'}</span>
+                    </div>
+                    
+                    <!-- Step 3: Ready -->
+                    <div style="z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <div style="width: 20px; height: 20px; border-radius: 50%; background: #1a1a1a; border: 2px solid ${readyColor}; display: flex; align-items: center; justify-content: center; box-shadow: ${step >= 3 ? '0 0 10px rgba(76, 175, 80, 0.4)' : 'none'}; transition: all 0.3s ease;">
+                            <div style="width: 6px; height: 6px; border-radius: 50%; background: ${step >= 3 ? '#4caf50' : 'transparent'}; transition: all 0.3s ease;"></div>
+                        </div>
+                        <span style="font-size: 9px; font-weight: 700; color: ${step >= 3 ? '#4caf50' : 'var(--text-muted)'}; letter-spacing: 0.3px;">Ready 🍿</span>
                     </div>
                 </div>
-                <div style="display: flex; align-items: center;">
-                    ${actionBtn}
+            `;
+            
+            item.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px;">
+                    <div>
+                        <h5 style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; font-family: var(--font-heading);">${escapeHTML(r.title)}</h5>
+                        <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">${escapeHTML(r.type)}</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        ${actionBtn}
+                    </div>
                 </div>
+                ${stepperHTML}
             `;
             
             // Event listeners
