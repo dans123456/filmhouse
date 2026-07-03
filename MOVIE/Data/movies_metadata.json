@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "1273221-scary-movie",
+    "tmdb_id": 1273221,
+    "imdb_id": "",
+    "title": "Scary Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Horror"
+    ],
+    "overview": "Twenty-six years after outrunning a suspiciously familiar masked killer, the Core Four are back in the killer's crosshairs and no horror movie IP is safe.",
+    "poster": "https://image.tmdb.org/t/p/w500/reZ8NInXjMkkaOpUHcI3Pn7iaRN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xWBiXclrRmTggQHMRsIn84YHavs.jpg",
+    "rating": 5.4,
+    "release_date": "2026-06-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADUw8AAghnOUYszDtlTY4wZBYE"
+    ]
+  },
+  {
     "title": "【OSHI NO KO】",
     "csv_id": "203737",
     "type": "Series",
