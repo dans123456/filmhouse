@@ -1578,6 +1578,17 @@ if (addMovieForm) {
             genres = categories.filter(c => c !== "Main" && c !== "Hollywood/British Movies" && c !== "Hollywood/British Series");
         }
 
+        // Merge manually checked categories from the checkboxes for the TMDB flow
+        if (isTmdb && checkedCategories.length > 0) {
+            checkedCategories.forEach(cat => {
+                if (!categories.includes(cat)) {
+                    categories.push(cat);
+                }
+            });
+            // Update genres mapping after merge
+            genres = categories.filter(c => c !== "Main" && c !== "Hollywood/British Movies" && c !== "Hollywood/British Series");
+        }
+
         // Add to local state
         const newMovie = {
             csv_id: id,
