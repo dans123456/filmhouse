@@ -3374,7 +3374,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 rewardEl.setAttribute("slot", "reward");
                 rewardEl.style.display = "flex";
                 rewardEl.style.flexDirection = "column";
-                rewardEl.style.alignItems = "flex-start"; // Left align to match task text
+                rewardEl.style.alignItems = "flex-start";
                 rewardEl.style.gap = "2px";
                 rewardEl.style.marginTop = "6px";
                 rewardEl.style.width = "100%";
@@ -3394,6 +3394,16 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 rewardValue.style.color = "#ffbc00";
                 
                 rewardEl.replaceChildren(rewardTitle, rewardValue);
+ 
+                // Safety timeout fallback: if task doesn't load or trigger within 3 seconds, auto-fallback to video ad
+                let fallbackTriggered = false;
+                const safetyTimeout = setTimeout(() => {
+                    if (!fallbackTriggered) {
+                        fallbackTriggered = true;
+                        console.log("Adsgram task load timeout - falling back to video ad");
+                        handleFallback("timeout");
+                    }
+                }, 3000);
 
                 const btnEl = document.createElement("div");
                 btnEl.setAttribute("slot", "button");
@@ -3411,9 +3421,10 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 btnEl.style.transition = "all 0.2s ease";
                 btnEl.style.boxShadow = "0 3px 10px var(--primary-glow)";
                 btnEl.addEventListener("click", () => {
+                    clearTimeout(safetyTimeout);
                     status("Task started! Return here and tap 'Claim 🎁' after completing the task in Telegram.");
                 });
-
+ 
                 const claimEl = document.createElement("div");
                 claimEl.setAttribute("slot", "claim");
                 claimEl.textContent = "Claim 🎁";
@@ -3429,7 +3440,10 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 claimEl.style.boxSizing = "border-box";
                 claimEl.style.transition = "all 0.2s ease";
                 claimEl.style.boxShadow = "0 3px 10px rgba(0, 200, 83, 0.25)";
-
+                claimEl.addEventListener("click", () => {
+                    clearTimeout(safetyTimeout);
+                });
+ 
                 const doneEl = document.createElement("div");
                 doneEl.setAttribute("slot", "done");
                 doneEl.textContent = "Done ✓";
@@ -3443,17 +3457,19 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 doneEl.style.textAlign = "center";
                 doneEl.style.width = "100%";
                 doneEl.style.boxSizing = "border-box";
-
+ 
                 taskEl.replaceChildren(rewardEl, btnEl, claimEl, doneEl);
                 taskContainer.appendChild(taskEl);
                 container.appendChild(taskContainer);
                 
                 const cleanupAndRestore = () => {
+                    clearTimeout(safetyTimeout);
                     taskContainer.remove();
                     if (spinnerWrapper) spinnerWrapper.style.display = "flex";
                 };
                 
                 const handleReward = () => {
+                    fallbackTriggered = true;
                     cleanupAndRestore();
                     status("Task completed! Reward received ✓");
                     awardPoints(10, "task");
@@ -3461,7 +3477,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 };
                 
                 const handleFallback = (err) => {
-                    console.log("Adsgram task error or not found, offering video ad fallback:", err);
+                    fallbackTriggered = true;
                     cleanupAndRestore();
                     
                     status("Task not available or already completed. Watch a quick video ad to secure your connection:");
