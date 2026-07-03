@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "1314481-the-devil-wears-prada-2",
+    "tmdb_id": 1314481,
+    "imdb_id": "",
+    "title": "The Devil Wears Prada 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "Andy Sachs returns to Runway as Miranda Priestly navigates a new media landscape and Runway's position within. The duo reconnect with former assistant Emily Charlton, now the head of a luxury brand that possesses funding which could ensure Runway's survival.",
+    "poster": "https://image.tmdb.org/t/p/w500/fCAURTUx3YfsJ8k9I0UamjSILiR.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/Af907x5h9W1wVis8XrSd7ynTWuy.jpg",
+    "rating": 6.9,
+    "release_date": "2026-04-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADGhAAAghnOUZ8IQYZP-BkgRYE"
+    ]
+  },
+  {
     "csv_id": "1340206-tuner",
     "tmdb_id": 1340206,
     "imdb_id": "",
