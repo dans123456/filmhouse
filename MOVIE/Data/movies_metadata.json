@@ -1,285 +1,5 @@
 [
   {
-    "csv_id": "129",
-    "tmdb_id": 129,
-    "imdb_id": "",
-    "title": "Spirited Away",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Anime"
-    ],
-    "genres": [
-      "Animation",
-      "Family",
-      "Fantasy"
-    ],
-    "overview": "A young girl, Chihiro, becomes trapped in a strange new world of spirits. When her parents undergo a mysterious transformation, she must call upon the courage she never knew she had to free her family.",
-    "poster": "https://image.tmdb.org/t/p/w500/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/dyJvKsNs2KP8qQnAXbRwDjblViy.jpg",
-    "rating": 8.5,
-    "release_date": "2001-07-20",
-    "language": "ja",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADGQkAAq-EQEYF-fVAelcapxYE"
-    ]
-  },
-  {
-    "csv_id": "1725286-safe",
-    "tmdb_id": 1725286,
-    "imdb_id": "",
-    "title": "SAFE",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "African"
-    ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "https://i.postimg.cc/RCtCXQTF/photo-2026-07-03-11-52-46.jpg",
-    "backdrop": "https://i.postimg.cc/RCtCXQTF/photo-2026-07-03-11-52-46.jpg",
-    "rating": 0,
-    "release_date": "2024",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "lOk4mOR6KX8",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADowgAAq-EQEZRVAWyr49NihYE"
-    ]
-  },
-  {
-    "csv_id": "1725249-unexpected-places",
-    "tmdb_id": 1725249,
-    "imdb_id": "",
-    "title": "Unexpected Places",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "African"
-    ],
-    "genres": [],
-    "overview": "In Unexpected Places, the film explores Chris’ transformation from irresponsibility and rudeness to a responsible and kind-hearted individual. Love finds him when he least expects it, but sadly, he doesn’t live long enough to enjoy it fully.",
-    "poster": "https://i.postimg.cc/Gptgmt5t/photo-2026-07-03-10-29-06.jpg",
-    "backdrop": "https://i.postimg.cc/Gptgmt5t/photo-2026-07-03-10-29-06.jpg",
-    "rating": 0,
-    "release_date": "2024",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "https://www.youtube.com/shorts/_UWzDv8PfCQ",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADeRMAAghnOUbrjAnsb9gRjRYE"
-    ]
-  },
-  {
-    "csv_id": "1279493-the-get-out",
-    "tmdb_id": 1279493,
-    "imdb_id": "",
-    "title": "The Get Out",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Action",
-      "Thriller"
-    ],
-    "overview": "A nightclub owner is on the verge of leaving his dangerous past behind for retirement with his girlfriend. When masked gunmen rob him and he finds himself squeezed by ruthless cartels, a mysterious newcomer arrives with an interest in buying the business. With danger closing in from all sides, he must navigate a deadly web of deception, power, and survival  -  where escape may no longer be an option.",
-    "poster": "https://image.tmdb.org/t/p/w500/A56e359GzpasjuYRajkDBhLncEW.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/to9R8DbenkykhllymiHXcOw7QDo.jpg",
-    "rating": 6.8,
-    "release_date": "2026-06-18",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADPRAAAghnOUbmaZnnOLl4nBYE"
-    ]
-  },
-  {
-    "csv_id": "1284465-the-death-of-robin-hood",
-    "tmdb_id": 1284465,
-    "imdb_id": "",
-    "title": "The Death of Robin Hood",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Adventure",
-      "Drama",
-      "Thriller",
-      "Action"
-    ],
-    "overview": "Grappling with his past after a life of crime and murder, Robin Hood finds himself gravely injured after a battle he thought would be his last. In the hands of a mysterious woman, he is offered a chance at salvation.",
-    "poster": "https://image.tmdb.org/t/p/w500/13MmRwmG5NmaMfU8qNrtgGXisiD.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/lh3BDkmWJh998n4fQcHYcVi7dpm.jpg",
-    "rating": 6.7,
-    "release_date": "2026-06-18",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD2RAAAghnOUY8FS75eMgWWRYE"
-    ]
-  },
-  {
-    "csv_id": "1314481-the-devil-wears-prada-2",
-    "tmdb_id": 1314481,
-    "imdb_id": "",
-    "title": "The Devil Wears Prada 2",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Comedy",
-      "Drama"
-    ],
-    "overview": "Andy Sachs returns to Runway as Miranda Priestly navigates a new media landscape and Runway's position within. The duo reconnect with former assistant Emily Charlton, now the head of a luxury brand that possesses funding which could ensure Runway's survival.",
-    "poster": "https://image.tmdb.org/t/p/w500/fCAURTUx3YfsJ8k9I0UamjSILiR.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/Af907x5h9W1wVis8XrSd7ynTWuy.jpg",
-    "rating": 6.9,
-    "release_date": "2026-04-29",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADGhAAAghnOUZ8IQYZP-BkgRYE"
-    ]
-  },
-  {
-    "csv_id": "1340206-tuner",
-    "tmdb_id": 1340206,
-    "imdb_id": "",
-    "title": "Tuner",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Crime",
-      "Drama",
-      "Thriller"
-    ],
-    "overview": "A gifted piano tuner's meticulous skills for tuning pianos lead him to discover an unexpected aptitude for cracking safes, turning his life upside down.",
-    "poster": "https://image.tmdb.org/t/p/w500/5OvA3i9wZs5jHu0DCrfmXlzAM67.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/sT5Inhc0aaReSZoufWgfJTQUbKp.jpg",
-    "rating": 7.1,
-    "release_date": "2026-05-21",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADvBAAAghnOUZYBJvgZYFTgRYE"
-    ]
-  },
-  {
-    "csv_id": "737396-tazmanian-devil",
-    "tmdb_id": 737396,
-    "imdb_id": "",
-    "title": "Tazmanian Devil",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Drama"
-    ],
-    "overview": "After moving to the United States, a young Nigerian immigrant struggles to find a balance between his desire to join a college fraternity and bonding with his estranged father, a strict pastor at a local church.",
-    "poster": "https://image.tmdb.org/t/p/w500/3xNoAsAp2Do8fJ2IHYcOKe5uI07.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/p1nGaB5z38d15ZEy9y66Mlgyhk4.jpg",
-    "rating": 7,
-    "release_date": "2020-08-22",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADlxAAAghnOUavrcFnJxs7kxYE"
-    ]
-  },
-  {
-    "csv_id": "1329471-carolina-caroline",
-    "tmdb_id": 1329471,
-    "imdb_id": "",
-    "title": "Carolina Caroline",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Crime",
-      "Drama",
-      "Romance"
-    ],
-    "overview": "A young woman, desperate to leave her small town, runs away with a charming con man, embarking on a crime and passion-filled journey through the Southeast to find her estranged mother.",
-    "poster": "https://image.tmdb.org/t/p/w500/9waKPyT5JWv9EWTf79j25yT6Bu4.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/5dE3rixgMUTXOQLuO3zya4zSFav.jpg",
-    "rating": 7.1,
-    "release_date": "2026-06-05",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADrw8AAghnOUbAq34iTBseyBYE"
-    ]
-  },
-  {
-    "csv_id": "1273221-scary-movie",
-    "tmdb_id": 1273221,
-    "imdb_id": "",
-    "title": "Scary Movie",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Comedy",
-      "Horror"
-    ],
-    "overview": "Twenty-six years after outrunning a suspiciously familiar masked killer, the Core Four are back in the killer's crosshairs and no horror movie IP is safe.",
-    "poster": "https://image.tmdb.org/t/p/w500/reZ8NInXjMkkaOpUHcI3Pn7iaRN.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/xWBiXclrRmTggQHMRsIn84YHavs.jpg",
-    "rating": 5.4,
-    "release_date": "2026-06-03",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADUw8AAghnOUYszDtlTY4wZBYE"
-    ]
-  },
-  {
     "title": "【OSHI NO KO】",
     "csv_id": "203737",
     "type": "Series",
@@ -2167,6 +1887,35 @@
     "overview": "The story follows Carol Danvers as she becomes one of the universe’s most powerful heroes when Earth is caught in the middle of a galactic war between two alien races. Set in the 1990s, Captain Marvel is an all-new adventure from a previously unseen period in the history of the Marvel Cinematic Universe.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/qAzYK4YPSWDc7aa4R43LcwRIAyb.jpg",
     "language": "en"
+  },
+  {
+    "csv_id": "1329471-carolina-caroline",
+    "tmdb_id": 1329471,
+    "imdb_id": "",
+    "title": "Carolina Caroline",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Crime",
+      "Drama",
+      "Romance"
+    ],
+    "overview": "A young woman, desperate to leave her small town, runs away with a charming con man, embarking on a crime and passion-filled journey through the Southeast to find her estranged mother.",
+    "poster": "https://image.tmdb.org/t/p/w500/9waKPyT5JWv9EWTf79j25yT6Bu4.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/5dE3rixgMUTXOQLuO3zya4zSFav.jpg",
+    "rating": 7.1,
+    "release_date": "2026-06-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADrw8AAghnOUbAq34iTBseyBYE"
+    ]
   },
   {
     "title": "Carrossel",
@@ -6776,6 +6525,32 @@
     "runtime": "117 min"
   },
   {
+    "csv_id": "1725286-safe",
+    "tmdb_id": 1725286,
+    "imdb_id": "",
+    "title": "SAFE",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/RCtCXQTF/photo-2026-07-03-11-52-46.jpg",
+    "backdrop": "https://i.postimg.cc/RCtCXQTF/photo-2026-07-03-11-52-46.jpg",
+    "rating": 0,
+    "release_date": "2024",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "lOk4mOR6KX8",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADowgAAq-EQEZRVAWyr49NihYE"
+    ]
+  },
+  {
     "title": "Sam & Cat",
     "csv_id": "45666-sam-cat",
     "type": "Series",
@@ -6878,6 +6653,34 @@
     ],
     "director": "Evan Goldberg",
     "trailer": "JrmC2uJXsMM"
+  },
+  {
+    "csv_id": "1273221-scary-movie",
+    "tmdb_id": 1273221,
+    "imdb_id": "",
+    "title": "Scary Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Horror"
+    ],
+    "overview": "Twenty-six years after outrunning a suspiciously familiar masked killer, the Core Four are back in the killer's crosshairs and no horror movie IP is safe.",
+    "poster": "https://image.tmdb.org/t/p/w500/reZ8NInXjMkkaOpUHcI3Pn7iaRN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xWBiXclrRmTggQHMRsIn84YHavs.jpg",
+    "rating": 5.4,
+    "release_date": "2026-06-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADUw8AAghnOUYszDtlTY4wZBYE"
+    ]
   },
   {
     "title": "Secret Invasion",
@@ -7248,6 +7051,35 @@
     "cast": []
   },
   {
+    "csv_id": "129",
+    "tmdb_id": 129,
+    "imdb_id": "",
+    "title": "Spirited Away",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Animation",
+      "Family",
+      "Fantasy"
+    ],
+    "overview": "A young girl, Chihiro, becomes trapped in a strange new world of spirits. When her parents undergo a mysterious transformation, she must call upon the courage she never knew she had to free her family.",
+    "poster": "https://image.tmdb.org/t/p/w500/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dyJvKsNs2KP8qQnAXbRwDjblViy.jpg",
+    "rating": 8.5,
+    "release_date": "2001-07-20",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADGQkAAq-EQEYF-fVAelcapxYE"
+    ]
+  },
+  {
     "title": "Spud",
     "csv_id": "61410-spud",
     "type": "Movie",
@@ -7549,6 +7381,33 @@
     "trailer": "87A_aLJOY4g"
   },
   {
+    "csv_id": "737396-tazmanian-devil",
+    "tmdb_id": 737396,
+    "imdb_id": "",
+    "title": "Tazmanian Devil",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "After moving to the United States, a young Nigerian immigrant struggles to find a balance between his desire to join a college fraternity and bonding with his estranged father, a strict pastor at a local church.",
+    "poster": "https://image.tmdb.org/t/p/w500/3xNoAsAp2Do8fJ2IHYcOKe5uI07.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/p1nGaB5z38d15ZEy9y66Mlgyhk4.jpg",
+    "rating": 7,
+    "release_date": "2020-08-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADlxAAAghnOUavrcFnJxs7kxYE"
+    ]
+  },
+  {
     "title": "Team Darryl",
     "csv_id": "505945-team-darryl",
     "type": "Movie",
@@ -7620,6 +7479,32 @@
     "overview": "A continuation of the documentary spoof of what Thor and his roommate Darryl were up to during the events of \"Captain America: Civil War\". While Cap and Iron Man duke it out, Thor tries to pay Darryl his rent in Asgardian coins.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/cz8m8AS8MOD1x4RAjYgYMHf13xB.jpg",
     "language": "en"
+  },
+  {
+    "csv_id": "1725297-tejiri",
+    "tmdb_id": 1725297,
+    "imdb_id": "",
+    "title": "Tejiri",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/90wvFpJL/photo-2026-07-03-12-20-20.jpg",
+    "backdrop": "https://i.postimg.cc/90wvFpJL/photo-2026-07-03-12-20-20.jpg",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADOgkAAq-EQEaO6CqrdqMpkhYE"
+    ]
   },
   {
     "title": "Terminator Zero",
@@ -7746,6 +7631,64 @@
     ],
     "director": "Ronan Bennett",
     "trailer": "EUb_04MdnMI"
+  },
+  {
+    "csv_id": "1284465-the-death-of-robin-hood",
+    "tmdb_id": 1284465,
+    "imdb_id": "",
+    "title": "The Death of Robin Hood",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Adventure",
+      "Drama",
+      "Thriller",
+      "Action"
+    ],
+    "overview": "Grappling with his past after a life of crime and murder, Robin Hood finds himself gravely injured after a battle he thought would be his last. In the hands of a mysterious woman, he is offered a chance at salvation.",
+    "poster": "https://image.tmdb.org/t/p/w500/13MmRwmG5NmaMfU8qNrtgGXisiD.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lh3BDkmWJh998n4fQcHYcVi7dpm.jpg",
+    "rating": 6.7,
+    "release_date": "2026-06-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD2RAAAghnOUY8FS75eMgWWRYE"
+    ]
+  },
+  {
+    "csv_id": "1314481-the-devil-wears-prada-2",
+    "tmdb_id": 1314481,
+    "imdb_id": "",
+    "title": "The Devil Wears Prada 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "Andy Sachs returns to Runway as Miranda Priestly navigates a new media landscape and Runway's position within. The duo reconnect with former assistant Emily Charlton, now the head of a luxury brand that possesses funding which could ensure Runway's survival.",
+    "poster": "https://image.tmdb.org/t/p/w500/fCAURTUx3YfsJ8k9I0UamjSILiR.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/Af907x5h9W1wVis8XrSd7ynTWuy.jpg",
+    "rating": 6.9,
+    "release_date": "2026-04-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADGhAAAghnOUZ8IQYZP-BkgRYE"
+    ]
   },
   {
     "title": "The Fairly OddParents",
@@ -7881,6 +7824,34 @@
     "director": "Andy Borowitz",
     "trailer": "_u6vYpbfCmQ",
     "runtime": "23 min"
+  },
+  {
+    "csv_id": "1279493-the-get-out",
+    "tmdb_id": 1279493,
+    "imdb_id": "",
+    "title": "The Get Out",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Thriller"
+    ],
+    "overview": "A nightclub owner is on the verge of leaving his dangerous past behind for retirement with his girlfriend. When masked gunmen rob him and he finds himself squeezed by ruthless cartels, a mysterious newcomer arrives with an interest in buying the business. With danger closing in from all sides, he must navigate a deadly web of deception, power, and survival  -  where escape may no longer be an option.",
+    "poster": "https://image.tmdb.org/t/p/w500/A56e359GzpasjuYRajkDBhLncEW.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/to9R8DbenkykhllymiHXcOw7QDo.jpg",
+    "rating": 6.8,
+    "release_date": "2026-06-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADPRAAAghnOUbmaZnnOLl4nBYE"
+    ]
   },
   {
     "title": "The Gifted",
@@ -8842,6 +8813,61 @@
     ],
     "director": "Amy Andelson",
     "trailer": "BegK8MyhDf0"
+  },
+  {
+    "csv_id": "1340206-tuner",
+    "tmdb_id": 1340206,
+    "imdb_id": "",
+    "title": "Tuner",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "overview": "A gifted piano tuner's meticulous skills for tuning pianos lead him to discover an unexpected aptitude for cracking safes, turning his life upside down.",
+    "poster": "https://image.tmdb.org/t/p/w500/5OvA3i9wZs5jHu0DCrfmXlzAM67.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sT5Inhc0aaReSZoufWgfJTQUbKp.jpg",
+    "rating": 7.1,
+    "release_date": "2026-05-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADvBAAAghnOUZYBJvgZYFTgRYE"
+    ]
+  },
+  {
+    "csv_id": "1725249-unexpected-places",
+    "tmdb_id": 1725249,
+    "imdb_id": "",
+    "title": "Unexpected Places",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [],
+    "overview": "In Unexpected Places, the film explores Chris’ transformation from irresponsibility and rudeness to a responsible and kind-hearted individual. Love finds him when he least expects it, but sadly, he doesn’t live long enough to enjoy it fully.",
+    "poster": "https://i.postimg.cc/Gptgmt5t/photo-2026-07-03-10-29-06.jpg",
+    "backdrop": "https://i.postimg.cc/Gptgmt5t/photo-2026-07-03-10-29-06.jpg",
+    "rating": 0,
+    "release_date": "2024",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "https://www.youtube.com/shorts/_UWzDv8PfCQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADeRMAAghnOUbrjAnsb9gRjRYE"
+    ]
   },
   {
     "title": "Venom",
