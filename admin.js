@@ -2005,11 +2005,117 @@ if (closeFulfillModalBtn && fulfillRequestModal) {
 }
 
 if (fulfillForm && fulfillRequestModal) {
-    fulfillForm.addEventListener("submit", (e) => {
+    fulfillForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const downloadLink = fulfillLinkInput.value.trim();
         if (!downloadLink) return;
         
+        // Disable form buttons during async operations
+        const submitBtn = fulfillForm.querySelector("button[type='submit']");
+        const cancelBtn = document.getElementById("btn-close-fulfill-modal");
+        if (submitBtn) submitBtn.disabled = true;
+        
+        // 1. Sync to local CSV catalog
+        const matchTitle = currentFulfillTitle.toLowerCase().trim();
+        const existingMovie = allCatalogMovies.find(m => m.title.toLowerCase().trim() === matchTitle);
+        
+        if (existingMovie) {
+            if (!existingMovie.links) existingMovie.links = [];
+            if (!existingMovie.links.includes(downloadLink)) {
+                existingMovie.links.unshift(downloadLink);
+                catalogChangesMade = true;
+                if (!newlyUpdatedIds.includes(existingMovie.csv_id)) {
+                    newlyUpdatedIds.push(existingMovie.csv_id);
+                }
+            }
+        } else {
+            // Create a new catalog entry
+            let isSeries = false;
+            const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === matchTitle);
+            if (matchedReq && (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv')) {
+                isSeries = true;
+            }
+            
+            const mediaType = isSeries ? 'tv' : 'movie';
+            const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(currentFulfillTitle)}`;
+            
+            let tmdbData = null;
+            try {
+                const searchRes = await fetch(searchUrl);
+                if (searchRes.ok) {
+                    const searchObj = await searchRes.json();
+                    if (searchObj.results && searchObj.results.length > 0) {
+                        const firstMatch = searchObj.results[0];
+                        const detailsUrl = `https://api.themoviedb.org/3/${firstMatch.media_type || mediaType}/${firstMatch.id}?api_key=${TMDB_API_KEY}`;
+                        const detailsRes = await fetch(detailsUrl);
+                        if (detailsRes.ok) {
+                            tmdbData = await detailsRes.json();
+                        }
+                    }
+                }
+            } catch (tmdbErr) {
+                console.warn("Failed to lookup TMDB info for new fulfilled request:", tmdbErr);
+            }
+            
+            if (tmdbData) {
+                const tmdbId = tmdbData.id;
+                const slug = currentFulfillTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const csvId = `${tmdbId}-${slug}`;
+                
+                const newMovie = {
+                    csv_id: csvId,
+                    tmdb_id: tmdbId,
+                    imdb_id: "",
+                    title: tmdbData.title || tmdbData.name || currentFulfillTitle,
+                    type: isSeries ? 'Series' : 'Movie',
+                    categories: ["Main"],
+                    genres: tmdbData.genres ? tmdbData.genres.map(g => g.name) : [],
+                    overview: tmdbData.overview || "No synopsis available.",
+                    poster: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : "img/FilmHouse3_nobg.png",
+                    backdrop: tmdbData.backdrop_path ? `https://image.tmdb.org/t/p/w1280${tmdbData.backdrop_path}` : "img/FilmHouse.png",
+                    rating: Math.round((tmdbData.vote_average || 0) * 10) / 10,
+                    release_date: tmdbData.release_date || tmdbData.first_air_date || "",
+                    language: tmdbData.original_language || "en",
+                    cast: [],
+                    director: "",
+                    trailer: "",
+                    runtime: "",
+                    links: [downloadLink]
+                };
+                allCatalogMovies.unshift(newMovie);
+                newlyAddedIds.push(csvId);
+                catalogChangesMade = true;
+            } else {
+                const slug = currentFulfillTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const csvId = `manual-${Date.now()}-${slug}`;
+                
+                const newMovie = {
+                    csv_id: csvId,
+                    tmdb_id: null,
+                    imdb_id: "",
+                    title: currentFulfillTitle,
+                    type: isSeries ? 'Series' : 'Movie',
+                    categories: ["Main"],
+                    genres: [],
+                    overview: "No synopsis available.",
+                    poster: "img/FilmHouse3_nobg.png",
+                    backdrop: "img/FilmHouse.png",
+                    rating: 0,
+                    release_date: "",
+                    language: "en",
+                    cast: [],
+                    director: "",
+                    trailer: "",
+                    runtime: "",
+                    links: [downloadLink]
+                };
+                allCatalogMovies.unshift(newMovie);
+                newlyAddedIds.push(csvId);
+                catalogChangesMade = true;
+            }
+        }
+        
+        // 2. Commit Firestore batch update
         const batch = db.batch();
         currentFulfillDocIds.forEach(id => {
             const ref = db.collection("requests").doc(id);
@@ -2020,9 +2126,16 @@ if (fulfillForm && fulfillRequestModal) {
         });
         
         batch.commit().then(() => {
+            if (submitBtn) submitBtn.disabled = false;
             fulfillRequestModal.classList.remove("active");
-            alert(`Successfully fulfilled all requests for "${currentFulfillTitle}"!`);
+            
+            // Re-render local catalog lists and update button state
+            renderCatalogList();
+            updatePublishButtonState();
+            
+            alert(`Successfully fulfilled all requests for "${currentFulfillTitle}" in Firestore!\n\nAdditionally, the movie was auto-added/updated in your local catalog. Click "Publish Changes 🚀" inside the header to make it live.`);
         }).catch(err => {
+            if (submitBtn) submitBtn.disabled = false;
             console.error("Error fulfilling requests:", err);
             alert("Failed to fulfill requests: " + err.message);
         });
