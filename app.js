@@ -3337,8 +3337,8 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
             if (drawer && container) {
                 // Hide spinner during task interaction
                 if (spinnerWrapper) spinnerWrapper.style.display = "none";
-                if (titleEl) titleEl.textContent = "Complete Task";
-                status("Complete the task below to unlock download:");
+                if (titleEl) titleEl.textContent = "Premium Task";
+                status("Complete the task below to secure connection:");
                 
                 // Remove any existing task containers
                 const existingTaskContainer = container.querySelector(".adsgram-task-container");
@@ -3351,59 +3351,90 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 taskContainer.style.display = "flex";
                 taskContainer.style.flexDirection = "column";
                 taskContainer.style.alignItems = "center";
+                taskContainer.style.background = "rgba(255, 255, 255, 0.03)";
+                taskContainer.style.border = "1px solid rgba(255, 255, 255, 0.08)";
+                taskContainer.style.borderRadius = "16px";
+                taskContainer.style.padding = "24px 20px";
+                taskContainer.style.boxSizing = "border-box";
                 
                 const taskEl = document.createElement("adsgram-task");
                 taskEl.setAttribute("data-block-id", ADSGRAM_TASK_BLOCK_ID);
                 
-                // Setup slots matching the app theme securely
-                const rewardEl = document.createElement("span");
+                // CRITICAL FOR TESTING: Set data-debug="true" so that a test task is always returned.
+                // Otherwise, if the blockId task-36911 is new/under-review, it fires "onBannerNotFound"
+                // immediately and bypasses to standard video ads.
+                // TODO: Remove setAttribute("data-debug", "true") before final production release.
+                taskEl.setAttribute("data-debug", "true");
+                
+                taskEl.style.display = "block";
+                taskEl.style.width = "100%";
+                
+                // Setup slots matching the app theme securely (Vanilla JS DOM Manipulation)
+                const rewardEl = document.createElement("div");
                 rewardEl.setAttribute("slot", "reward");
-                rewardEl.textContent = "+10 Bonus Points 🪙";
-                rewardEl.style.color = "#ffbc00";
-                rewardEl.style.fontWeight = "600";
-                rewardEl.style.fontSize = "14px";
-                rewardEl.style.marginBottom = "10px";
-                rewardEl.style.display = "block";
+                rewardEl.style.display = "flex";
+                rewardEl.style.flexDirection = "column";
+                rewardEl.style.alignItems = "center";
+                rewardEl.style.gap = "4px";
+                rewardEl.style.marginBottom = "20px";
+                
+                const rewardTitle = document.createElement("span");
+                rewardTitle.textContent = "TASK REWARD";
+                rewardTitle.style.fontSize = "10px";
+                rewardTitle.style.fontWeight = "700";
+                rewardTitle.style.color = "rgba(255, 255, 255, 0.4)";
+                rewardTitle.style.letterSpacing = "1.5px";
+                
+                const rewardValue = document.createElement("span");
+                rewardValue.textContent = "+10 Bonus Points 🪙";
+                rewardValue.style.fontSize = "16px";
+                rewardValue.style.fontWeight = "700";
+                rewardValue.style.color = "#ffbc00";
+                
+                rewardEl.replaceChildren(rewardTitle, rewardValue);
 
                 const btnEl = document.createElement("div");
                 btnEl.setAttribute("slot", "button");
                 btnEl.textContent = "Start Task ⚡";
                 btnEl.style.background = "linear-gradient(135deg, #e50914, #b20710)";
                 btnEl.style.color = "#fff";
-                btnEl.style.padding = "12px 24px";
-                btnEl.style.borderRadius = "8px";
+                btnEl.style.padding = "14px 20px";
+                btnEl.style.borderRadius = "12px";
                 btnEl.style.fontWeight = "600";
+                btnEl.style.fontSize = "14px";
                 btnEl.style.cursor = "pointer";
                 btnEl.style.textAlign = "center";
                 btnEl.style.width = "100%";
                 btnEl.style.boxSizing = "border-box";
-                btnEl.style.transition = "transform 0.2s";
-                btnEl.style.boxShadow = "0 4px 15px rgba(229, 9, 20, 0.4)";
+                btnEl.style.transition = "all 0.2s ease";
+                btnEl.style.boxShadow = "0 4px 15px rgba(229, 9, 20, 0.3)";
 
                 const claimEl = document.createElement("div");
                 claimEl.setAttribute("slot", "claim");
-                claimEl.textContent = "Claim Reward & Download 🎁";
+                claimEl.textContent = "Claim Download Reward 🎁";
                 claimEl.style.background = "linear-gradient(135deg, #00c853, #009624)";
                 claimEl.style.color = "#fff";
-                claimEl.style.padding = "12px 24px";
-                claimEl.style.borderRadius = "8px";
+                claimEl.style.padding = "14px 20px";
+                claimEl.style.borderRadius = "12px";
                 claimEl.style.fontWeight = "600";
+                claimEl.style.fontSize = "14px";
                 claimEl.style.cursor = "pointer";
                 claimEl.style.textAlign = "center";
                 claimEl.style.width = "100%";
                 claimEl.style.boxSizing = "border-box";
-                claimEl.style.transition = "transform 0.2s";
-                claimEl.style.boxShadow = "0 4px 15px rgba(0, 200, 83, 0.4)";
+                claimEl.style.transition = "all 0.2s ease";
+                claimEl.style.boxShadow = "0 4px 15px rgba(0, 200, 83, 0.3)";
 
                 const doneEl = document.createElement("div");
                 doneEl.setAttribute("slot", "done");
                 doneEl.textContent = "Completed ✓";
-                doneEl.style.background = "#222";
-                doneEl.style.color = "#888";
-                doneEl.style.border = "1px solid #444";
-                doneEl.style.padding = "12px 24px";
-                doneEl.style.borderRadius = "8px";
+                doneEl.style.background = "rgba(255, 255, 255, 0.05)";
+                doneEl.style.color = "rgba(255, 255, 255, 0.3)";
+                doneEl.style.border = "1px solid rgba(255, 255, 255, 0.08)";
+                doneEl.style.padding = "14px 20px";
+                doneEl.style.borderRadius = "12px";
                 doneEl.style.fontWeight = "600";
+                doneEl.style.fontSize = "14px";
                 doneEl.style.textAlign = "center";
                 doneEl.style.width = "100%";
                 doneEl.style.boxSizing = "border-box";
@@ -3417,12 +3448,12 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                     if (spinnerWrapper) spinnerWrapper.style.display = "flex";
                 };
                 
-                taskEl.addEventListener("reward", () => {
+                const handleReward = () => {
                     cleanupAndRestore();
                     status("Task completed! Reward received ✓");
                     awardPoints(10, "download");
                     safeResolve();
-                });
+                };
                 
                 const handleFallback = (err) => {
                     console.log("Adsgram task error or not found, falling back to video ad:", err);
@@ -3444,8 +3475,16 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                     }
                 };
                 
+                // Bind to all variations of reward, error and not found events to ensure compatibility
+                taskEl.addEventListener("reward", handleReward);
+                taskEl.addEventListener("onReward", handleReward);
+                taskEl.addEventListener("onreward", handleReward);
+                
                 taskEl.addEventListener("onError", handleFallback);
+                taskEl.addEventListener("onerror", handleFallback);
+                
                 taskEl.addEventListener("onBannerNotFound", handleFallback);
+                taskEl.addEventListener("onbannernotfound", handleFallback);
             } else {
                 // Drawer elements missing, fallback to standard video ad
                 const videoController = state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID];
