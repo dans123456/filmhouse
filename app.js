@@ -4810,7 +4810,6 @@ function updateHomeFulfillmentBanner() {
         banner.style.display = "none";
     }
 }
-}
 
 function boostRequestToPriority(docId) {
     if (typeof firebase === "undefined" || !db) return;
