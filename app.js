@@ -4623,6 +4623,7 @@ function applyThemeAccent(themeName) {
 
 // Loyalty Reward Center & Requests Tracker Logic
 let userRequestsUnsubscribe = null;
+let currentUserRequests = [];
 
 function startUserRequestsListener() {
     if (typeof firebase === "undefined" || !db || !state.user.id) return;
@@ -4646,6 +4647,7 @@ function startUserRequestsListener() {
                 const tB = b.requestedAt ? (b.requestedAt.seconds || 0) : 0;
                 return tB - tA;
             });
+            currentUserRequests = requests;
             renderUserRequests(requests);
         }, err => {
             console.error("User requests sync issue:", err);
@@ -4745,6 +4747,7 @@ function renderUserRequests(requests) {
                     localStorage.setItem("acknowledged_fulfillments", JSON.stringify(ack));
                 }
                 updateHeaderNotificationDot();
+                updateHomeFulfillmentBanner();
                 showConnectionDrawer(dlBtn.getAttribute("data-link"), ADSGRAM_DOWNLOAD_BLOCK_ID);
             });
         }
@@ -4756,12 +4759,24 @@ function renderUserRequests(requests) {
         headerNotificationDot.style.display = hasNewFulfillment ? "block" : "none";
     }
     
-    // Update persistent Home Screen fulfillment reminder banner
+    updateHomeFulfillmentBanner();
+    
+    // Notify user once per session if a request is ready
+    if (hasNewFulfillment && !state.notifiedOfFulfillment) {
+        state.notifiedOfFulfillment = true;
+        showToast("Good news! One of your movie requests is ready! 🍿 Check the Reward Center.", "success");
+    }
+}
+
+function updateHomeFulfillmentBanner() {
     const banner = document.getElementById("fulfilled-requests-banner");
     const bannerText = document.getElementById("fulfilled-banner-text");
     const bannerBtn = document.getElementById("btn-banner-view-requests");
+    if (!banner) return;
+
+    const acknowledgedFulfillments = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
     
-    const unacknowledgedFulfilled = requests.filter(r => {
+    const unacknowledgedFulfilled = currentUserRequests.filter(r => {
         const matchingMovie = state.movies.find(m => 
             (m.title && m.title.toLowerCase() === r.title.toLowerCase()) || 
             (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
@@ -4772,7 +4787,7 @@ function renderUserRequests(requests) {
     });
     
     if (unacknowledgedFulfilled.length > 0) {
-        if (banner) banner.style.display = "flex";
+        banner.style.display = "flex";
         if (bannerText) {
             const titles = unacknowledgedFulfilled.map(r => `"${r.title}"`).join(", ");
             bannerText.textContent = `${titles} ${unacknowledgedFulfilled.length === 1 ? 'is' : 'are'} ready to download! 🍿`;
@@ -4787,14 +4802,9 @@ function renderUserRequests(requests) {
             };
         }
     } else {
-        if (banner) banner.style.display = "none";
+        banner.style.display = "none";
     }
-    
-    // Notify user once per session if a request is ready
-    if (hasNewFulfillment && !state.notifiedOfFulfillment) {
-        state.notifiedOfFulfillment = true;
-        showToast("Good news! One of your movie requests is ready! 🍿 Check the Reward Center.", "success");
-    }
+}
 }
 
 function boostRequestToPriority(docId) {
