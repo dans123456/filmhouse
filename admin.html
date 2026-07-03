@@ -497,7 +497,19 @@
     <div class="glass-panel">
         <div class="section-header">
             <h4 class="section-title">🔥 Top Requests Queue</h4>
-            <span style="font-size: 11px; color: var(--primary-color); font-weight: 700; text-transform: uppercase;" id="requests-count-badge">0 Titles</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 11px; color: var(--primary-color); font-weight: 700; text-transform: uppercase;" id="requests-count-badge">0 Titles</span>
+                <button id="btn-clear-fulfilled" onclick="clearFulfilledRequests()" style="background: rgba(255, 59, 48, 0.15); border: 1px solid rgba(255, 59, 48, 0.3); color: #ff3b30; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; display: none;">🗑️ Clear Fulfilled</button>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div id="request-filter-tabs" style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+            <button class="req-filter-tab active" data-filter="actionable" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: var(--primary-gradient); color: #000; cursor: pointer; transition: all 0.2s;">⚡ Actionable</button>
+            <button class="req-filter-tab" data-filter="priority" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">🔥 Priority</button>
+            <button class="req-filter-tab" data-filter="pending" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">🟠 Pending</button>
+            <button class="req-filter-tab" data-filter="fulfilled" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">🟢 Fulfilled</button>
+            <button class="req-filter-tab" data-filter="all" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">All</button>
         </div>
         
         <div class="search-container">
@@ -698,6 +710,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=57"></script>
+    <script src="admin.js?v=58"></script>
 </body>
 </html>

@@ -74,6 +74,7 @@ function extractYoutubeId(urlOrId) {
 // Global Datasets for local search filter matching (saves Firestore quota reads)
 let allUsers = [];
 let allRequests = [];
+let requestFilterTab = "actionable"; // actionable | priority | pending | fulfilled | all
 
 // Initialize Firebase & Firestore
 let db = null;
@@ -250,7 +251,7 @@ function deleteUserFromFirestore(userId) {
         });
 }
 
-// Render Requests List with Aggregation and Filter Capability
+// Render Requests List with Aggregation, Tab Filtering, and Sorting
 function renderRequestsList() {
     const listContainer = document.getElementById("requests-list");
     if (!listContainer) return;
@@ -284,19 +285,51 @@ function renderRequestsList() {
         }
     });
 
-    const sortedRequests = Object.values(counts)
-        .sort((a, b) => b.count - a.count)
+    let filteredRequests = Object.values(counts)
         .filter(r => r.title.toLowerCase().includes(searchQuery));
+    
+    // Apply tab filter
+    const fulfilledCount = filteredRequests.filter(r => r.isFulfilled).length;
+    switch (requestFilterTab) {
+        case "actionable":
+            filteredRequests = filteredRequests.filter(r => !r.isFulfilled);
+            break;
+        case "priority":
+            filteredRequests = filteredRequests.filter(r => r.isPriority);
+            break;
+        case "pending":
+            filteredRequests = filteredRequests.filter(r => !r.isPriority && !r.isFulfilled);
+            break;
+        case "fulfilled":
+            filteredRequests = filteredRequests.filter(r => r.isFulfilled);
+            break;
+        // "all" = no filter
+    }
+    
+    // Sort: Priority first, then by request count descending
+    filteredRequests.sort((a, b) => {
+        if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
+        return b.count - a.count;
+    });
 
     const badgeEl = document.getElementById("requests-count-badge");
-    if (badgeEl) badgeEl.textContent = `${sortedRequests.length} Unique Titles`;
+    if (badgeEl) badgeEl.textContent = `${filteredRequests.length} Titles`;
+    
+    // Show/hide clear fulfilled button
+    const clearBtn = document.getElementById("btn-clear-fulfilled");
+    if (clearBtn) {
+        clearBtn.style.display = fulfilledCount > 0 ? "inline-block" : "none";
+    }
 
-    if (sortedRequests.length === 0) {
-        listContainer.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-secondary);">No matching movie requests found.</div>`;
+    if (filteredRequests.length === 0) {
+        const emptyMsg = requestFilterTab === "actionable" 
+            ? "All requests are fulfilled! Switch to the \"Fulfilled\" or \"All\" tab to view them."
+            : "No matching requests in this filter.";
+        listContainer.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-secondary);">${emptyMsg}</div>`;
         return;
     }
 
-    sortedRequests.forEach(req => {
+    filteredRequests.forEach(req => {
         const row = document.createElement("div");
         row.className = "list-row";
         row.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border-color);";
@@ -377,6 +410,53 @@ if (userSearchInput) {
 const requestSearchInput = document.getElementById("request-search-input");
 if (requestSearchInput) {
     requestSearchInput.addEventListener("input", renderRequestsList);
+}
+
+// Bind filter tab click listeners
+const filterTabContainer = document.getElementById("request-filter-tabs");
+if (filterTabContainer) {
+    filterTabContainer.querySelectorAll(".req-filter-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+            requestFilterTab = tab.getAttribute("data-filter");
+            // Update active tab styling
+            filterTabContainer.querySelectorAll(".req-filter-tab").forEach(t => {
+                t.style.background = "rgba(255,255,255,0.03)";
+                t.style.color = "var(--text-secondary)";
+                t.classList.remove("active");
+            });
+            tab.style.background = "var(--primary-gradient)";
+            tab.style.color = "#000";
+            tab.classList.add("active");
+            renderRequestsList();
+        });
+    });
+}
+
+// Batch-delete all fulfilled requests from Firestore
+function clearFulfilledRequests() {
+    if (typeof firebase === "undefined" || !db) return;
+    
+    const fulfilledDocs = allRequests.filter(r => r.status === "fulfilled");
+    if (fulfilledDocs.length === 0) {
+        showToast("No fulfilled requests to clear.", "info");
+        return;
+    }
+    
+    if (!confirm(`Delete ${fulfilledDocs.length} fulfilled request document(s) from Firestore? This cannot be undone.`)) {
+        return;
+    }
+    
+    const batch = db.batch();
+    fulfilledDocs.forEach(r => {
+        batch.delete(db.collection("requests").doc(r.docId));
+    });
+    
+    batch.commit().then(() => {
+        showToast(`Cleared ${fulfilledDocs.length} fulfilled requests from the database. 🗑️`, "success");
+    }).catch(err => {
+        console.error("Error clearing fulfilled requests:", err);
+        showToast("Failed to clear fulfilled requests.", "error");
+    });
 }
 
 // --- CATALOG MANAGER LOGIC ---

@@ -4658,107 +4658,174 @@ function renderUserRequests(requests) {
     const list = document.getElementById("user-requests-list");
     const countBadge = document.getElementById("user-requests-count-badge");
     const headerNotificationDot = document.getElementById("rewards-notification-dot");
+    const historyWrapper = document.getElementById("user-requests-history-wrapper");
+    const historyList = document.getElementById("user-requests-history");
+    const historyCountBadge = document.getElementById("history-count-badge");
+    const historyToggle = document.getElementById("user-requests-history-toggle");
+    const historyChevron = document.getElementById("history-chevron");
     
-    if (countBadge) countBadge.textContent = requests.length;
     if (!list) return;
     
     if (requests.length === 0) {
+        if (countBadge) countBadge.textContent = "0";
         list.innerHTML = `
             <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; background: rgba(255,255,255,0.01); border-radius: var(--border-radius-sm); border: 1px dashed var(--border-color);">
                 No requests yet. Try requesting a movie that is not in the library!
             </div>
         `;
+        if (historyWrapper) historyWrapper.style.display = "none";
         return;
     }
     
-    list.innerHTML = "";
-    let hasNewFulfillment = false;
     const acknowledgedFulfillments = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
-
+    
+    // Split into active vs history
+    const activeRequests = [];
+    const historyRequests = [];
+    let hasNewFulfillment = false;
+    
     requests.forEach(r => {
-        const item = document.createElement("div");
-        item.className = "user-request-item";
-        item.style.cssText = "background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px;";
-        
-        let statusBadge = "";
-        let actionBtn = "";
-        
-        // Dynamic search in catalog to match title or ID
         const matchingMovie = state.movies.find(m => 
             (m.title && m.title.toLowerCase() === r.title.toLowerCase()) || 
             (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
         );
-        
         const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
         const isExplicit = r.status === "fulfilled" && r.downloadLink;
+        const isFulfilled = isMatched || isExplicit;
+        const isClaimed = isFulfilled && acknowledgedFulfillments.includes(r.docId);
         
-        if (isMatched || isExplicit) {
-            statusBadge = `<span style="font-size: 10px; background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🟢 Ready</span>`;
-            
-            const dlLink = isExplicit ? r.downloadLink : matchingMovie.links[0];
-            actionBtn = `
-                <button class="btn btn-primary btn-sm user-request-dl-btn" data-link="${escapeHTML(dlLink)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">
-                    Download 📥
-                </button>
-            `;
-            
-            if (!acknowledgedFulfillments.includes(r.docId)) {
+        if (isClaimed) {
+            historyRequests.push({ ...r, _matchingMovie: matchingMovie, _isExplicit: isExplicit });
+        } else {
+            activeRequests.push({ ...r, _matchingMovie: matchingMovie, _isMatched: isMatched, _isExplicit: isExplicit });
+            if (isFulfilled && !acknowledgedFulfillments.includes(r.docId)) {
                 hasNewFulfillment = true;
             }
-        } else if (r.status === "priority") {
-            statusBadge = `<span style="font-size: 10px; background: rgba(255, 59, 48, 0.15); border: 1px solid rgba(255, 59, 48, 0.3); color: #ff3b30; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🔥 High Priority</span>`;
-            actionBtn = `<span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Expedited</span>`;
-        } else {
-            statusBadge = `<span style="font-size: 10px; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🟠 Pending</span>`;
-            actionBtn = `
-                <button class="btn btn-secondary btn-sm user-request-boost-btn" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 600; flex-shrink: 0; border-color: rgba(255, 188, 0, 0.3); color: #ffbc00;">
-                    Boost (1,000 pts)
-                </button>
-            `;
         }
-        
-        item.innerHTML = `
-            <div style="flex: 1;">
-                <h5 style="margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: #fff;">${escapeHTML(r.title)}</h5>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">${escapeHTML(r.type)}</span>
-                    ${statusBadge}
-                </div>
-            </div>
-            <div style="display: flex; align-items: center;">
-                ${actionBtn}
+    });
+    
+    // Update badge with active count only
+    if (countBadge) countBadge.textContent = activeRequests.length;
+    
+    // Render active requests
+    list.innerHTML = "";
+    if (activeRequests.length === 0) {
+        list.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; background: rgba(255,255,255,0.01); border-radius: var(--border-radius-sm); border: 1px dashed var(--border-color);">
+                All requests claimed! Check your download history below. 🎬
             </div>
         `;
-        
-        // Event listeners
-        const boostBtn = item.querySelector(".user-request-boost-btn");
-        if (boostBtn) {
-            boostBtn.addEventListener("click", () => {
-                boostRequestToPriority(r.docId);
+    } else {
+        activeRequests.forEach(r => {
+            const item = document.createElement("div");
+            item.className = "user-request-item";
+            item.style.cssText = "background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px;";
+            
+            let statusBadge = "";
+            let actionBtn = "";
+            
+            if (r._isMatched || r._isExplicit) {
+                statusBadge = `<span style="font-size: 10px; background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🟢 Ready</span>`;
+                const dlLink = r._isExplicit ? r.downloadLink : r._matchingMovie.links[0];
+                actionBtn = `
+                    <button class="btn btn-primary btn-sm user-request-dl-btn" data-link="${escapeHTML(dlLink)}" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">
+                        Download 📥
+                    </button>
+                `;
+            } else if (r.status === "priority") {
+                statusBadge = `<span style="font-size: 10px; background: rgba(255, 59, 48, 0.15); border: 1px solid rgba(255, 59, 48, 0.3); color: #ff3b30; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🔥 High Priority</span>`;
+                actionBtn = `<span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Expedited</span>`;
+            } else {
+                statusBadge = `<span style="font-size: 10px; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00; padding: 2px 8px; border-radius: 20px; font-weight: 700;">🟠 Pending</span>`;
+                actionBtn = `
+                    <button class="btn btn-secondary btn-sm user-request-boost-btn" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 600; flex-shrink: 0; border-color: rgba(255, 188, 0, 0.3); color: #ffbc00;">
+                        Boost (1,000 pts)
+                    </button>
+                `;
+            }
+            
+            item.innerHTML = `
+                <div style="flex: 1;">
+                    <h5 style="margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: #fff;">${escapeHTML(r.title)}</h5>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">${escapeHTML(r.type)}</span>
+                        ${statusBadge}
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    ${actionBtn}
+                </div>
+            `;
+            
+            // Event listeners
+            const boostBtn = item.querySelector(".user-request-boost-btn");
+            if (boostBtn) {
+                boostBtn.addEventListener("click", () => {
+                    boostRequestToPriority(r.docId);
+                });
+            }
+            
+            const dlBtn = item.querySelector(".user-request-dl-btn");
+            if (dlBtn) {
+                dlBtn.addEventListener("click", () => {
+                    const ack = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
+                    if (!ack.includes(r.docId)) {
+                        ack.push(r.docId);
+                        localStorage.setItem("acknowledged_fulfillments", JSON.stringify(ack));
+                    }
+                    updateHeaderNotificationDot();
+                    updateHomeFulfillmentBanner();
+                    
+                    // Re-render so claimed request moves to history immediately
+                    renderUserRequests(currentUserRequests);
+                    
+                    // Close the rewards drawer so the connection drawer can be seen and clicked!
+                    const rewardsDrawer = document.getElementById("rewards-drawer");
+                    if (rewardsDrawer) rewardsDrawer.classList.remove("active");
+                    
+                    showConnectionDrawer(dlBtn.getAttribute("data-link"), ADSGRAM_DOWNLOAD_BLOCK_ID);
+                });
+            }
+            
+            list.appendChild(item);
+        });
+    }
+    
+    // Render history section
+    if (historyWrapper && historyList) {
+        if (historyRequests.length > 0) {
+            historyWrapper.style.display = "block";
+            if (historyCountBadge) historyCountBadge.textContent = historyRequests.length;
+            
+            historyList.innerHTML = "";
+            historyRequests.forEach(r => {
+                const item = document.createElement("div");
+                item.style.cssText = "background: rgba(255,255,255,0.015); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px;";
+                item.innerHTML = `
+                    <div style="flex: 1;">
+                        <h5 style="margin: 0 0 2px 0; font-size: 11px; font-weight: 600; color: var(--text-secondary);">${escapeHTML(r.title)}</h5>
+                        <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">${escapeHTML(r.type)}</span>
+                    </div>
+                    <span style="font-size: 10px; background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.2); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700;">✅ Claimed</span>
+                `;
+                historyList.appendChild(item);
             });
+            
+            // Bind toggle (only if not already bound)
+            if (historyToggle && !historyToggle._bound) {
+                historyToggle._bound = true;
+                historyToggle.addEventListener("click", () => {
+                    const isOpen = historyList.style.display === "flex";
+                    historyList.style.display = isOpen ? "none" : "flex";
+                    if (historyChevron) {
+                        historyChevron.style.transform = isOpen ? "rotate(0deg)" : "rotate(180deg)";
+                    }
+                });
+            }
+        } else {
+            historyWrapper.style.display = "none";
         }
-        
-        const dlBtn = item.querySelector(".user-request-dl-btn");
-        if (dlBtn) {
-            dlBtn.addEventListener("click", () => {
-                const ack = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
-                if (!ack.includes(r.docId)) {
-                    ack.push(r.docId);
-                    localStorage.setItem("acknowledged_fulfillments", JSON.stringify(ack));
-                }
-                updateHeaderNotificationDot();
-                updateHomeFulfillmentBanner();
-                
-                // Close the rewards drawer so the connection drawer can be seen and clicked!
-                const rewardsDrawer = document.getElementById("rewards-drawer");
-                if (rewardsDrawer) rewardsDrawer.classList.remove("active");
-                
-                showConnectionDrawer(dlBtn.getAttribute("data-link"), ADSGRAM_DOWNLOAD_BLOCK_ID);
-            });
-        }
-        
-        list.appendChild(item);
-    });
+    }
     
     if (headerNotificationDot) {
         headerNotificationDot.style.display = hasNewFulfillment ? "block" : "none";
