@@ -709,6 +709,30 @@ if (testConnBtn) {
 async function loadCatalog() {
     const listContainer = document.getElementById("catalog-list");
     try {
+        // CHECK FOR LOCAL UNPUBLISHED DRAFT FIRST!
+        const draftStr = localStorage.getItem("filmhouse_unpublished_catalog");
+        if (draftStr) {
+            try {
+                const draft = JSON.parse(draftStr);
+                if (draft && draft.allCatalogMovies && draft.allCatalogMovies.length > 0) {
+                    if (confirm("You have unpublished changes (added/edited/deleted movies) from your last session. Would you like to restore them? Click Cancel to start fresh with the live catalog.")) {
+                        allCatalogMovies = draft.allCatalogMovies;
+                        newlyAddedIds = draft.newlyAddedIds || [];
+                        newlyUpdatedIds = draft.newlyUpdatedIds || [];
+                        catalogChangesMade = true;
+                        originalCatalogCount = allCatalogMovies.length;
+                        updatePublishButtonState();
+                        renderCatalogList();
+                        return;
+                    } else {
+                        localStorage.removeItem("filmhouse_unpublished_catalog");
+                    }
+                }
+            } catch (draftErr) {
+                console.warn("Failed to parse local draft:", draftErr);
+            }
+        }
+
         const token = (document.getElementById("github-token")?.value.trim()) || githubToken;
         let responseData = null;
         
@@ -1165,8 +1189,15 @@ function updatePublishButtonState() {
     if (publishBtn) {
         if (catalogChangesMade) {
             publishBtn.style.display = "inline-flex";
+            // Save draft locally
+            localStorage.setItem("filmhouse_unpublished_catalog", JSON.stringify({
+                allCatalogMovies,
+                newlyAddedIds,
+                newlyUpdatedIds
+            }));
         } else {
             publishBtn.style.display = "none";
+            localStorage.removeItem("filmhouse_unpublished_catalog");
         }
     }
 }
@@ -1657,6 +1688,7 @@ if (publishBtn) {
             catalogChangesMade = false;
             newlyAddedIds = [];
             newlyUpdatedIds = [];
+            localStorage.removeItem("filmhouse_unpublished_catalog"); // Clear draft!
             updatePublishButtonState();
             renderCatalogList();
         } catch (error) {
