@@ -1,5 +1,166 @@
 [
   {
+    "csv_id": "1236470-the-lost-bus",
+    "tmdb_id": 1236470,
+    "imdb_id": "",
+    "title": "The Lost Bus",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A determined father risks everything to rescue a dedicated teacher and her students from a raging wildfire.",
+    "poster": "https://image.tmdb.org/t/p/w500/4IPxzGlE17fJAwUTMul4opMeutA.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wofTDrrNvySkjrv2v34jqpPZAP6.jpg",
+    "rating": 7,
+    "release_date": "2025-09-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "kQFiO88d_gk",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADoh0AAq-ESEZgZwHtNFmEZBYE"
+    ]
+  },
+  {
+    "csv_id": "82690-wreck-it-ralph",
+    "tmdb_id": 82690,
+    "imdb_id": "",
+    "title": "Wreck-It Ralph",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Wreck-It Ralph is the 9-foot-tall, 643-pound villain of an arcade video game named Fix-It Felix Jr., in which the game's titular hero fixes buildings that Ralph destroys. Wanting to prove he can be a good guy and not just a villain, Ralph escapes his game and lands in Hero's Duty, a first-person shooter where he helps the game's hero battle against alien invaders. He later enters Sugar Rush, a kart racing game set on tracks made of candies, cookies and other sweets. There, Ralph meets Vanellope von Schweetz who has learned that her game is faced with a dire threat that could affect the entire arcade, and one that Ralph may have inadvertently started.",
+    "poster": "https://image.tmdb.org/t/p/w500/ihfvxPh5C4rV2WSKWs7k7rzxzzO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3IFRjBDwtk0DlIsDfJ2zEzLjUBi.jpg",
+    "rating": 7.4,
+    "release_date": "2012-11-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "87E6N7ToCxs",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADnh0AAq-ESEY-g_txy1kZqBYE"
+    ]
+  },
+  {
+    "csv_id": "9473-south-park-bigger-longer-uncut",
+    "tmdb_id": 9473,
+    "imdb_id": "",
+    "title": "South Park: Bigger, Longer & Uncut",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Classic Movies"
+    ],
+    "overview": "In this feature film based on the hit animated series, the third graders of South Park sneak into an R-rated film by ultra-vulgar Canadian television personalities Terrance and Phillip, and emerge with expanded vocabularies that leave their parents and teachers scandalized. When outraged Americans try to censor the film, the controversy spirals into a call to wage war on Canada and Terrance and Phillip end up on death row, with the kids their only hope of rescue.",
+    "poster": "https://image.tmdb.org/t/p/w500/tS0PedvA2mFO9VCHYwQpaU1K36U.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2q3B90h2hZ6xJTvna9CIFDNaIr4.jpg",
+    "rating": 7.3,
+    "release_date": "1999-06-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Tq-C9-QJV30",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADnB0AAq-ESEZedi-nc7vOwhYE"
+    ]
+  },
+  {
+    "csv_id": "749170-heads-of-state",
+    "tmdb_id": 749170,
+    "imdb_id": "",
+    "title": "Heads of State",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "The UK Prime Minister and US President have a public rivalry that risks their countries' alliance. But when they become targets of a powerful enemy, they're forced to rely on each other as they go on a wild, multinational run. Allied with Noel, a brilliant MI6 agent, they must find a way to thwart a conspiracy that threatens the free world.",
+    "poster": "https://image.tmdb.org/t/p/w500/lVgE5oLzf7ABmzyASEVcjYyHI41.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vJbEUMeI2AxBUZKjP6ZVeVNNTLh.jpg",
+    "rating": 6.8,
+    "release_date": "2025-06-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "f70LlXPC7VI",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADmB0AAq-ESEaiPhWN7iQy-hYE"
+    ]
+  },
+  {
+    "csv_id": "505904-freaky-friday",
+    "tmdb_id": 505904,
+    "imdb_id": "",
+    "title": "Freaky Friday",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "When an overworked mother and her teenage daughter magically swap bodies, they have just one day to put things right again before mom’s big wedding.",
+    "poster": "https://image.tmdb.org/t/p/w500/aD1GTKtSAyQIumPoUjslk6IzHxA.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/cky3HJ5Z0Hox3C5tU3wDpoLqnqc.jpg",
+    "rating": 5.4,
+    "release_date": "2018-09-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "GhajYz6tH1A",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADlx0AAq-ESEY7S0ucutei0BYE"
+    ]
+  },
+  {
+    "csv_id": "62177-brave",
+    "tmdb_id": 62177,
+    "imdb_id": "",
+    "title": "Brave",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "In the mystical Scottish Highlands, Merida is the princess of a kingdom ruled by King Fergus and Queen Elinor. An unruly daughter and an accomplished archer, Merida one day defies a sacred custom of the land and inadvertently brings turmoil to the kingdom. In an attempt to set things right, Merida seeks out an eccentric old Wise Woman and is granted an ill-fated wish. Also figuring into Merida's quest — and serving as comic relief — are the kingdom's three lords: the enormous Lord MacGuffin, the surly Lord Macintosh, and the disagreeable Lord Dingwall.",
+    "poster": "https://image.tmdb.org/t/p/w500/1XAuDtMWpL0sYSFK0R6EZate2Ux.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qx9ts2hBYJrkIQxhryitxnLlm2u.jpg",
+    "rating": 7,
+    "release_date": "2012-06-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "OKdLpBLp3nM",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADlB0AAq-ESEasbfDrK0Ic0xYE"
+    ]
+  },
+  {
     "csv_id": "1038392-the-conjuring-last-rites",
     "tmdb_id": 1038392,
     "imdb_id": "",
