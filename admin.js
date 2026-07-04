@@ -928,8 +928,8 @@ function showMovieDetails(movie) {
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%;">
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
-                    <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">TMDB ID / Slug</label>
-                    <input type="text" id="edit-movie-id" value="${escapeHTML(movie.csv_id)}" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
+                    <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">TMDB ID / Slug or Link</label>
+                    <input type="text" id="edit-movie-id" value="${escapeHTML(movie.csv_id)}" placeholder="e.g. 27205-inception or paste TMDB URL" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
                 </div>
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
                     <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Type</label>
