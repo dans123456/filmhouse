@@ -71,6 +71,34 @@ function extractYoutubeId(urlOrId) {
     return cleanStr;
 }
 
+function extractTmdbIdAndType(inputVal) {
+    if (!inputVal || typeof inputVal !== "string") return null;
+    if (!inputVal.includes("themoviedb.org")) return null;
+    try {
+        let cleanVal = inputVal.trim();
+        if (!/^https?:\/\//i.test(cleanVal)) {
+            cleanVal = "https://" + cleanVal;
+        }
+        const url = new URL(cleanVal);
+        const pathSegments = url.pathname.split("/").filter(Boolean);
+        const typeIndex = pathSegments.findIndex(segment => segment === "movie" || segment === "tv");
+        if (typeIndex !== -1 && typeIndex < pathSegments.length - 1) {
+            const mediaType = pathSegments[typeIndex];
+            const idAndSlug = pathSegments[typeIndex + 1];
+            const numericId = idAndSlug.split("-")[0];
+            if (/^\d+$/.test(numericId)) {
+                return {
+                    id: idAndSlug,
+                    type: mediaType === "tv" ? "tv" : "movie"
+                };
+            }
+        }
+    } catch (e) {
+        console.error("Error parsing TMDB URL:", e);
+    }
+    return null;
+}
+
 // Global Datasets for local search filter matching (saves Firestore quota reads)
 let allUsers = [];
 let allRequests = [];
@@ -1015,6 +1043,21 @@ function showMovieDetails(movie) {
     
     let currentLinks = [...linksList];
 
+    // Auto-extract TMDB ID and Type on pasting in Edit modal
+    const editMovieIdInput = document.getElementById("edit-movie-id");
+    if (editMovieIdInput) {
+        editMovieIdInput.addEventListener("input", () => {
+            const parsed = extractTmdbIdAndType(editMovieIdInput.value);
+            if (parsed) {
+                editMovieIdInput.value = parsed.id;
+                const editTypeSelect = document.getElementById("edit-movie-type");
+                if (editTypeSelect) {
+                    editTypeSelect.value = parsed.type === "tv" ? "Series" : "Movie";
+                }
+            }
+        });
+    }
+
     function renderLinkInputs() {
         inputsWrapper.innerHTML = "";
         currentLinks.forEach((link, idx) => {
@@ -1354,6 +1397,15 @@ if (toggleCustomFieldsBtn) {
 const addMovieIdInput = document.getElementById("movie-id");
 if (addMovieIdInput) {
     addMovieIdInput.addEventListener("input", () => {
+        const parsed = extractTmdbIdAndType(addMovieIdInput.value);
+        if (parsed) {
+            addMovieIdInput.value = parsed.id;
+            const typeSelect = document.getElementById("movie-type");
+            if (typeSelect) {
+                typeSelect.value = parsed.type;
+            }
+        }
+        
         const val = addMovieIdInput.value.trim().split("-")[0];
         const isTmdb = val && /^\d+$/.test(val);
         const customSection = document.getElementById("add-movie-custom-fields");
