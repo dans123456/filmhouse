@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "1010755-the-strangers-chapter-3",
+    "tmdb_id": 1010755,
+    "imdb_id": "",
+    "title": "The Strangers: Chapter 3",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Tethered by a frightening conclusion, Maya and the Strangers are locked on an unavoidable, unforgiving collision course — a showdown that proves they’re far from strangers now.",
+    "poster": "https://image.tmdb.org/t/p/w500/dWi4D1rUX1Pg4MaafpwwssqJ9lv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fPfDB0IHOqvmKIzFP9CA51OOS1N.jpg",
+    "rating": 5.9,
+    "release_date": "2026-02-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "B2fZEIHamVs",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADcBcAAq-EQEaWumeYFDvIAhYE"
+    ]
+  },
+  {
     "csv_id": "696393-cold-storage",
     "tmdb_id": 696393,
     "imdb_id": "",
