@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "46298-hunter-x-hunter",
+    "tmdb_id": 46298,
+    "imdb_id": "",
+    "title": "Hunter x Hunter",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "Gon, a young boy who lives on Whale Island, dreams of becoming a Hunter like his father, who left when Gon was still young.",
+    "poster": "https://image.tmdb.org/t/p/w500/i2EEr2uBvRlAwJ8d8zTG2Y19mIa.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bFKKyCI89Xq98Gul8cGox8K3sZa.jpg",
+    "rating": 8.7,
+    "release_date": "2011-10-02",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "D-51-3Dpio0",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADHhAAAq-ESEYpmKvMlHB8CBYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADIRAAAq-ESEaB5iuEmSJKKxYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADJRAAAq-ESEZnkK5K-K6GMRYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADKBAAAq-ESEY6UyTMAAHKBTAWBA",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADLRAAAq-ESEY4WoHpQTSCZhYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADLxAAAq-ESEbCuicOA2PkYBYE"
+    ]
+  },
+  {
     "csv_id": "78462",
     "tmdb_id": 78462,
     "imdb_id": "",
