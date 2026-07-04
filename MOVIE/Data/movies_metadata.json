@@ -1,27 +1,29 @@
 [
   {
-    "csv_id": "1010755-the-strangers-chapter-3",
-    "tmdb_id": 1010755,
+    "csv_id": "217460-shanty-town",
+    "tmdb_id": 217460,
     "imdb_id": "",
-    "title": "The Strangers: Chapter 3",
-    "type": "Movie",
+    "title": "Shanty Town",
+    "type": "Series",
     "categories": [
-      "Main",
-      "Hollywood/British Movies"
+      "Main"
     ],
-    "genres": [],
-    "overview": "Tethered by a frightening conclusion, Maya and the Strangers are locked on an unavoidable, unforgiving collision course — a showdown that proves they’re far from strangers now.",
-    "poster": "https://image.tmdb.org/t/p/w500/dWi4D1rUX1Pg4MaafpwwssqJ9lv.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/fPfDB0IHOqvmKIzFP9CA51OOS1N.jpg",
-    "rating": 5.9,
-    "release_date": "2026-02-05",
+    "genres": [
+      "Crime",
+      "Drama"
+    ],
+    "overview": "A group of courtesans attempts to escape the grasp of a notorious kingpin – but political corruption and blood ties make freedom a near-impossible goal.",
+    "poster": "https://image.tmdb.org/t/p/w500/a7jRDMea7ADCtPphb9nOMp2dkgK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6qDujYplO8CFrjtgUdqDesidxV.jpg",
+    "rating": 8.4,
+    "release_date": "2023-01-20",
     "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "B2fZEIHamVs",
+    "trailer": "g3-TbsMEVPw",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADcBcAAq-EQEaWumeYFDvIAhYE"
+      "https://t.me/filmHouseFile1bot?start=BQADAQADcRkAAq-EQEba-ih3oZZpxxYE"
     ]
   },
   {
