@@ -1394,6 +1394,123 @@ if (toggleCustomFieldsBtn) {
     });
 }
 
+// TMDB In-App Search inside Add Movie Form
+const btnSearchTmdb = document.getElementById("btn-search-tmdb");
+const inputSearchTmdb = document.getElementById("movie-search-tmdb");
+const resultsSearchTmdb = document.getElementById("tmdb-search-results");
+
+if (btnSearchTmdb && inputSearchTmdb && resultsSearchTmdb) {
+    const performSearch = async () => {
+        const query = inputSearchTmdb.value.trim();
+        if (!query) return;
+        
+        btnSearchTmdb.disabled = true;
+        btnSearchTmdb.textContent = "Searching...";
+        resultsSearchTmdb.innerHTML = `<div style="padding: 12px; text-align: center; color: var(--text-secondary); font-size: 13px;">Searching TMDB... ⏳</div>`;
+        resultsSearchTmdb.style.display = "block";
+        
+        try {
+            const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`;
+            const response = await fetch(searchUrl);
+            if (!response.ok) throw new Error("Search failed");
+            
+            const data = await response.json();
+            const filteredResults = (data.results || []).filter(item => item.media_type === "movie" || item.media_type === "tv");
+            
+            if (filteredResults.length === 0) {
+                resultsSearchTmdb.innerHTML = `<div style="padding: 12px; text-align: center; color: var(--text-secondary); font-size: 13px;">No movies or series found ✖</div>`;
+                return;
+            }
+            
+            resultsSearchTmdb.innerHTML = "";
+            filteredResults.forEach(item => {
+                const title = item.title || item.name;
+                const releaseDate = item.release_date || item.first_air_date || "";
+                const year = releaseDate ? releaseDate.split("-")[0] : "N/A";
+                const isTv = item.media_type === "tv";
+                const posterPath = item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : "MOVIE/img/FilmHouse3_nobg.png";
+                
+                const itemDiv = document.createElement("div");
+                itemDiv.style.display = "flex";
+                itemDiv.style.alignItems = "center";
+                itemDiv.style.gap = "10px";
+                itemDiv.style.padding = "8px";
+                itemDiv.style.borderBottom = "1px solid rgba(255, 255, 255, 0.05)";
+                itemDiv.style.cursor = "pointer";
+                itemDiv.style.transition = "background 0.2s";
+                
+                // Hover effect styling
+                itemDiv.addEventListener("mouseenter", () => {
+                    itemDiv.style.background = "rgba(255, 188, 0, 0.08)";
+                });
+                itemDiv.addEventListener("mouseleave", () => {
+                    itemDiv.style.background = "transparent";
+                });
+                
+                itemDiv.innerHTML = `
+                    <img src="${posterPath}" style="width: 34px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 13px; font-weight: bold; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${escapeHTML(title)}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                            ${year} &bull; <span style="text-transform: uppercase; font-weight: bold; color: ${isTv ? 'var(--primary-color)' : '#00bcd4'};">${isTv ? 'Series' : 'Movie'}</span>
+                        </div>
+                    </div>
+                `;
+                
+                itemDiv.addEventListener("click", () => {
+                    // Auto-fill form values
+                    const movieTitleInput = document.getElementById("movie-title");
+                    const movieIdInput = document.getElementById("movie-id");
+                    const movieTypeSelect = document.getElementById("movie-type");
+                    
+                    if (movieTitleInput) movieTitleInput.value = title;
+                    
+                    if (movieIdInput) {
+                        const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                        movieIdInput.value = `${item.id}-${slug}`;
+                        // Trigger input event to update custom fields visibility automatically
+                        movieIdInput.dispatchEvent(new Event("input"));
+                    }
+                    
+                    if (movieTypeSelect) {
+                        movieTypeSelect.value = isTv ? "tv" : "movie";
+                    }
+                    
+                    // Clear search input and hide results
+                    inputSearchTmdb.value = "";
+                    resultsSearchTmdb.style.display = "none";
+                });
+                
+                resultsSearchTmdb.appendChild(itemDiv);
+            });
+        } catch (e) {
+            console.error("TMDB Search Error:", e);
+            resultsSearchTmdb.innerHTML = `<div style="padding: 12px; text-align: center; color: #ff3b30; font-size: 13px;">Error fetching search results.</div>`;
+        } finally {
+            btnSearchTmdb.disabled = false;
+            btnSearchTmdb.textContent = "Search";
+        }
+    };
+    
+    btnSearchTmdb.addEventListener("click", performSearch);
+    inputSearchTmdb.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            performSearch();
+        }
+    });
+}
+
+// Click outside to close TMDB search results dropdown
+document.addEventListener("click", (e) => {
+    const resultsContainer = document.getElementById("tmdb-search-results");
+    const searchInput = document.getElementById("movie-search-tmdb");
+    const searchBtn = document.getElementById("btn-search-tmdb");
+    if (resultsContainer && e.target !== searchInput && e.target !== searchBtn && !resultsContainer.contains(e.target)) {
+        resultsContainer.style.display = "none";
+    }
+});
+
 const addMovieIdInput = document.getElementById("movie-id");
 if (addMovieIdInput) {
     addMovieIdInput.addEventListener("input", () => {

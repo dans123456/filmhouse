@@ -579,6 +579,16 @@
                 </button>
             </div>
             <form id="add-movie-form" onsubmit="event.preventDefault();">
+                <div class="form-group" style="margin-bottom: 16px; position: relative;">
+                    <label for="movie-search-tmdb" style="color: var(--primary-color); font-weight: bold; display: flex; align-items: center; gap: 4px;">🔍 Search TMDB to Auto-Fill</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="movie-search-tmdb" placeholder="Enter movie or series title (e.g. Inception)..." style="flex: 1;">
+                        <button type="button" id="btn-search-tmdb" class="btn btn-secondary" style="white-space: nowrap; padding: 0 16px; font-weight: bold; background: rgba(255, 188, 0, 0.1); border: 1px solid rgba(255, 188, 0, 0.25); color: var(--primary-color); border-radius: 4px; cursor: pointer; transition: all 0.2s;">Search</button>
+                    </div>
+                    <div id="tmdb-search-results" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #1a1c29; border: 1px solid var(--border-color); border-radius: 4px; max-height: 250px; overflow-y: auto; z-index: 1000; box-shadow: 0 8px 24px rgba(0,0,0,0.6); margin-top: 4px; padding: 4px; box-sizing: border-box;">
+                        <!-- Results items loaded dynamically -->
+                    </div>
+                </div>
                 <div class="form-group" style="margin-bottom: 12px;">
                     <label for="movie-title">Title</label>
                     <input type="text" id="movie-title" placeholder="e.g. Inception 2010" required>
