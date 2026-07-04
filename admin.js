@@ -73,7 +73,7 @@ function extractYoutubeId(urlOrId) {
 
 function extractTmdbIdAndType(inputVal) {
     if (!inputVal || typeof inputVal !== "string") return null;
-    if (!inputVal.includes("themoviedb.org")) return null;
+    if (!inputVal.toLowerCase().includes("themoviedb.org")) return null;
     try {
         let cleanVal = inputVal.trim();
         if (!/^https?:\/\//i.test(cleanVal)) {
@@ -81,9 +81,9 @@ function extractTmdbIdAndType(inputVal) {
         }
         const url = new URL(cleanVal);
         const pathSegments = url.pathname.split("/").filter(Boolean);
-        const typeIndex = pathSegments.findIndex(segment => segment === "movie" || segment === "tv");
+        const typeIndex = pathSegments.findIndex(segment => segment.toLowerCase() === "movie" || segment.toLowerCase() === "tv");
         if (typeIndex !== -1 && typeIndex < pathSegments.length - 1) {
-            const mediaType = pathSegments[typeIndex];
+            const mediaType = pathSegments[typeIndex].toLowerCase();
             const idAndSlug = pathSegments[typeIndex + 1];
             const numericId = idAndSlug.split("-")[0];
             if (/^\d+$/.test(numericId)) {
