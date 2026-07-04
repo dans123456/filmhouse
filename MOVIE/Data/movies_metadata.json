@@ -1,5 +1,55 @@
 [
   {
+    "csv_id": "1038392-the-conjuring-last-rites",
+    "tmdb_id": 1038392,
+    "imdb_id": "",
+    "title": "The Conjuring: Last Rites",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Paranormal investigators Ed and Lorraine Warren take on one last terrifying case involving mysterious entities they must confront.",
+    "poster": "https://image.tmdb.org/t/p/w500/byWgphT74ClOVa8EOGzYDkl8DVL.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/i8MupUe4xgmYXoRNAQMYvuoexSU.jpg",
+    "rating": 6.9,
+    "release_date": "2025-09-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "p4aWdkM5xF8",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADLh0AAq-ESEY8ebqZRtzxcRYE"
+    ]
+  },
+  {
+    "csv_id": "1263256-happy-gilmore-2",
+    "tmdb_id": 1263256,
+    "imdb_id": "",
+    "title": "Happy Gilmore 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Happy Gilmore isn't done with golf — not by a long shot. Since his retirement after his first Tour Championship win, Gilmore returns to finance his daughter's ballet classes.",
+    "poster": "https://image.tmdb.org/t/p/w500/E3dPHPJigkXwuiE0n1vzz0se8a.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/m7vBHmPQSokvN4hMQDxdJBdqAtJ.jpg",
+    "rating": 6.5,
+    "release_date": "2025-07-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "YKzRPFvky9Y",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADJR0AAq-ESEbg_B5tzFDqiRYE"
+    ]
+  },
+  {
     "csv_id": "1221415-brute-1976",
     "tmdb_id": 1221415,
     "imdb_id": "",
