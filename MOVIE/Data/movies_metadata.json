@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "1061474-superman",
+    "tmdb_id": 1061474,
+    "imdb_id": "",
+    "title": "Superman",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "Superman, a journalist in Metropolis, embarks on a journey to reconcile his Kryptonian heritage with his human upbringing as Clark Kent.",
+    "poster": "https://image.tmdb.org/t/p/w500/ldyfo0BKmz5rWtJJKCvwaNS4cJT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/eGX66zonvc4bXg3rM08RUxdYSDx.jpg",
+    "rating": 7.3,
+    "release_date": "2025-07-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "MikgqM0LXr4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD5h0AAq-ESEZdWMTd2Bn_vBYE"
+    ]
+  },
+  {
     "csv_id": "11852-the-hot-chick",
     "tmdb_id": 11852,
     "imdb_id": "",
