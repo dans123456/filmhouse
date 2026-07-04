@@ -1,5 +1,55 @@
 [
   {
+    "csv_id": "744653-the-thursday-murder-club",
+    "tmdb_id": 744653,
+    "imdb_id": "",
+    "title": "The Thursday Murder Club",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A group of senior sleuths passionate about solving cold cases get plunged into a real-life murder mystery in this comic crime caper.",
+    "poster": "https://image.tmdb.org/t/p/w500/jbnazCHr8S2l2glyvjPTpa4NbEw.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/4KN06gns94rQFoYQWDGunK7Cob4.jpg",
+    "rating": 6.6,
+    "release_date": "2025-08-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "50DYgzRBhFA",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD_xwAAq-ESEZBFf94is80DhYE"
+    ]
+  },
+  {
+    "csv_id": "1078605-weapons",
+    "tmdb_id": 1078605,
+    "imdb_id": "",
+    "title": "Weapons",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "When all but one child from the same class mysteriously vanish on the same night at exactly the same time, a community is left questioning who or what is behind their disappearance.",
+    "poster": "https://image.tmdb.org/t/p/w500/cpf7vsRZ0MYRQcnLWteD5jK9ymT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wJ20rOZ1VgkCqv1jeOQB2Brny9k.jpg",
+    "rating": 7.3,
+    "release_date": "2025-08-04",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "QKHySfXqN0I",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD0hwAAq-ESEbT9TV2DuJj7BYE"
+    ]
+  },
+  {
     "csv_id": "1011477-karate-kid-legends",
     "tmdb_id": 1011477,
     "imdb_id": "",
