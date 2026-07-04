@@ -1499,6 +1499,26 @@ if (btnSearchTmdb && inputSearchTmdb && resultsSearchTmdb) {
             performSearch();
         }
     });
+
+    // Auto-search as the user types (with 500ms debounce)
+    let tmdbSearchTimeout = null;
+    inputSearchTmdb.addEventListener("input", () => {
+        clearTimeout(tmdbSearchTimeout);
+        const query = inputSearchTmdb.value.trim();
+        if (!query) {
+            resultsSearchTmdb.style.display = "none";
+            resultsSearchTmdb.innerHTML = "";
+            return;
+        }
+        
+        // Show loading state under the input
+        resultsSearchTmdb.innerHTML = `<div style="padding: 12px; text-align: center; color: var(--text-secondary); font-size: 13px;">Searching TMDB... ⏳</div>`;
+        resultsSearchTmdb.style.display = "block";
+        
+        tmdbSearchTimeout = setTimeout(() => {
+            performSearch();
+        }, 500);
+    });
 }
 
 // Click outside to close TMDB search results dropdown
