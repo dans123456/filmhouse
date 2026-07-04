@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "1011477-karate-kid-legends",
+    "tmdb_id": 1011477,
+    "imdb_id": "",
+    "title": "Karate Kid: Legends",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After a family tragedy, kung fu prodigy Li Fong is uprooted from his home in Beijing and forced to move to New York City with his mother. When a new friend needs his help, Li enters a karate competition – but his skills alone aren't enough. Li's kung fu teacher Mr. Han enlists original Karate Kid Daniel LaRusso for help, and Li learns a new way to fight, merging their two styles into one for the ultimate martial arts showdown.",
+    "poster": "https://image.tmdb.org/t/p/w500/c90Lt7OQGsOmhv6x4JoFdoHzw5l.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7Q2CmqIVJuDAESPPp76rWIiA0AD.jpg",
+    "rating": 7,
+    "release_date": "2025-05-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "LhRXf-yEQqA",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADrBwAAq-ESEbzcwZI7w1a5RYE"
+    ]
+  },
+  {
     "csv_id": "247767-the-studio",
     "tmdb_id": 247767,
     "imdb_id": "",
