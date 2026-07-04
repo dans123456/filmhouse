@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "152483-the-boys-presents-diabolical",
+    "tmdb_id": 152483,
+    "imdb_id": "",
+    "title": "The Boys Presents: Diabolical",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "From some of the most unhinged and maniacal minds in Hollywood today comes this animated anthology series, a collection of irreverent and emotionally shocking animated short films. Each episode plunges elbow-deep into unseen crevices of The Boys Universe.",
+    "poster": "https://image.tmdb.org/t/p/w500/kZKfZWwFOAicgoKS2IO7oM1GuHZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7bsHAsS1RDtslictkApeb7cedLL.jpg",
+    "rating": 7.1,
+    "release_date": "2022-03-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "LO8mSkbppE4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADbBwAAq-ESEZPvQyl1RQvpxYE"
+    ]
+  },
+  {
     "csv_id": "2808-totally-spies",
     "tmdb_id": 2808,
     "imdb_id": "",
