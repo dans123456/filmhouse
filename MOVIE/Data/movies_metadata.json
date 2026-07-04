@@ -1,5 +1,59 @@
 [
   {
+    "csv_id": "68555-2-l",
+    "tmdb_id": 68555,
+    "imdb_id": "",
+    "title": "Death Note Relight 2: L's Successors",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "L's successor must ponder L's defeat if he hopes to succeed where his famed predecessor failed. At the headquarters of the SPK, he calls upon the Japanese task force to declare war on Light. A recap of Death Note episodes 27–37, with new footage.",
+    "poster": "https://image.tmdb.org/t/p/w500/uyez2cXhVwgEAakW5bHSscoFlF5.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/an8OJ9L1TkNB5pLkzbyf0LNfoXz.jpg",
+    "rating": 7.3,
+    "release_date": "2009-10-07",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADnBAAAq-ESEYXDwl1i6b0ERYE"
+    ]
+  },
+  {
+    "csv_id": "51482-death-note",
+    "tmdb_id": 51482,
+    "imdb_id": "",
+    "title": "Death Note Relight 1: Visions of a God",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "When rogue shinigami Ryuk leaves his Death Note in the human world, he has no idea how far the one who finds it will take his new-found power. With the Death Note in hand, brilliant high school student Light Yagami vows to rid the world of evil. A recap of Death Note episodes 1–26, with alternate footage.",
+    "poster": "https://image.tmdb.org/t/p/w500/qDhbGqjZ7yFwa7FMIzuiQTQMfEQ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lyQCUSslaE8fe4CHHKwXvTeudQf.jpg",
+    "rating": 7.9,
+    "release_date": "2007-08-31",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "Dx39acQ9h3w",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADlxAAAq-ESEZXx81EBx7bGBYE"
+    ]
+  },
+  {
     "csv_id": "13916-death-note",
     "tmdb_id": 13916,
     "imdb_id": "",
