@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "133282-magical-destroyers",
+    "tmdb_id": 133282,
+    "imdb_id": "",
+    "title": "Magical Destroyers",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "Freedom of expression is threatened when a mysterious group, the SSC, destroy Japan’s otaku culture. However, a young revolutionary, Otaku Hero—who loves the culture more than anything—rises up. With the help of three rambunctious magical girls—Anarchy, Blue, and Pink—they’ll team up to create a world free of this oppressive rule. Be part of the rebellion to bring back fandom!",
+    "poster": "https://image.tmdb.org/t/p/w500/bJaYE1fdHCB6BTFugMLSnfqWECP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/cXOnRnlOMmTrYAkQjZJiyBdKT9D.jpg",
+    "rating": 5.5,
+    "release_date": "2023-04-08",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "KdC45CYGhGc",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADAhAAAh-4UEYJ3sfmouubjhYE"
+    ]
+  },
+  {
     "csv_id": "68640-unbreakable-machine-doll",
     "tmdb_id": 68640,
     "imdb_id": "",
