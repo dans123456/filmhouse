@@ -1,231 +1,28 @@
 [
   {
-    "csv_id": "152601-her",
-    "tmdb_id": 152601,
-    "imdb_id": "",
-    "title": "Her",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "In the not so distant future, Theodore, a lonely writer, purchases a newly developed operating system designed to meet the user's every need. To Theodore's surprise, a romantic relationship develops between him and his operating system. This unconventional love story blends science fiction and romance in a sweet tale that explores the nature of love and the ways that technology isolates and connects us all.",
-    "poster": "https://image.tmdb.org/t/p/w500/eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/sPPsR9f4K0movWVQ99u4uMqFzEL.jpg",
-    "rating": 7.8,
-    "release_date": "2013-12-18",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "ne6p6MfLBxc",
-    "runtime": "",
+    "title": "【OSHI NO KO】",
+    "csv_id": "203737",
+    "type": "Series",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADmyAAAh-4UEYxasM30oNFjhYE"
-    ]
-  },
-  {
-    "csv_id": "274855-geostorm",
-    "tmdb_id": 274855,
-    "imdb_id": "",
-    "title": "Geostorm",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD5hgAArFaKUahDdAVsm6bAhYE",
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD7RgAArFaKUYM0KQhNbaouBYE"
     ],
-    "genres": [],
-    "overview": "After an unprecedented series of natural disasters threatened the planet, the world's leaders came together to create an intricate network of satellites to control the global climate and keep everyone safe. But now, something has gone wrong: the system built to protect Earth is attacking it, and it becomes a race against the clock to uncover the real threat before a worldwide geostorm wipes out everything and everyone along with it.",
-    "poster": "https://image.tmdb.org/t/p/w500/nrsx0jEaBgXq4PWo7SooSnYJTv.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/vIEuJiIZN9EclAJDmD49F2zUzuX.jpg",
-    "rating": 6.1,
-    "release_date": "2017-10-12",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "w1QSI0CFEWU",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADmSAAAh-4UEYfVq4xgVEXSRYE"
-    ]
-  },
-  {
-    "csv_id": "264660-ex-machina",
-    "tmdb_id": 264660,
-    "imdb_id": "",
-    "title": "Ex Machina",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Caleb, a coder at the world's largest internet company, wins a competition to spend a week at a private mountain retreat belonging to Nathan, the reclusive CEO of the company. But when Caleb arrives at the remote location he finds that he will have to participate in a strange and fascinating experiment in which he must interact with the world's first true artificial intelligence, housed in the body of a beautiful robot girl.",
-    "poster": "https://image.tmdb.org/t/p/w500/dmJW8IAKHKxFNiUnoDR7JfsK7Rp.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/uqOuJ50EtTj7kkDIXP8LCg7G45D.jpg",
-    "rating": 7.6,
-    "release_date": "2015-01-21",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "sDkEF7Db7Gw",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADlCAAAh-4UEanX1Ld3a1qAxYE"
-    ]
-  },
-  {
-    "csv_id": "743032-conjuring-the-devil",
-    "tmdb_id": 743032,
-    "imdb_id": "",
-    "title": "Conjuring the Devil",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A woman who is struggling with the conflict between her faith and her personal life must defend herself against the spirit of a demonic nun who is bent on destroying her.",
-    "poster": "https://image.tmdb.org/t/p/w500/5OMSt8YlxYiYacTEo129a1T2yG4.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/3KAR4UzdqYmlDA4VBHC3Lp9x30B.jpg",
-    "rating": 5.3,
-    "release_date": "2020-09-15",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "8B9_hZ6qsew",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADkyAAAh-4UEYx4sYTSrvO4xYE"
-    ]
-  },
-  {
-    "csv_id": "1022103-conjuring-the-beyond",
-    "tmdb_id": 1022103,
-    "imdb_id": "",
-    "title": "Conjuring: The Beyond",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A sleep study goes awry when participants start to go missing.",
-    "poster": "https://image.tmdb.org/t/p/w500/dNr0mqVSLfIaPlhcmJNRJVzCQBs.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/lE7EAyNcpjfb2A79PcJ9gQYkYZp.jpg",
-    "rating": 4.3,
-    "release_date": "2022-09-13",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "vIP88aSLGEM",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADkiAAAh-4UEbri51AJociBRYE"
-    ]
-  },
-  {
-    "csv_id": "109451-cloudy-with-a-chance-of-meatballs-2",
-    "tmdb_id": 109451,
-    "imdb_id": "",
-    "title": "Cloudy with a Chance of Meatballs 2",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
+    "poster": "https://image.tmdb.org/t/p/w500/rFp74PFpz14AHrtlVPrLyrSng47.jpg",
+    "rating": 8.3,
+    "release_date": "2023-04-12",
     "genres": [
-      "Animated Movies"
+      "Animation",
+      "Drama"
     ],
-    "overview": "After the disastrous food storm in the first film, Flint and his friends are forced to leave the town. Flint accepts the invitation from his idol Chester V to join The Live Corp Company, which has been tasked to clean the island, and where the best inventors in the world create technologies for the betterment of mankind. When Flint discovers that his machine still operates and now creates mutant food beasts like living pickles, hungry tacodiles, shrimpanzees and apple pie-thons, he and his friends must return to save the world.",
-    "poster": "https://image.tmdb.org/t/p/w500/ss5NcK2NWFg2YcKKYXLrk8q1myS.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/vWriOBVlgW0XWdgbOiijhyLW7B8.jpg",
-    "rating": 6.5,
-    "release_date": "2013-09-26",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "3QCJTbHU60U",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADiiAAAh-4UEa9o47fb7CZQhYE"
-    ]
-  },
-  {
-    "csv_id": "218778-alexander-and-the-terrible-horrible-no-good-very-bad-day",
-    "tmdb_id": 218778,
-    "imdb_id": "",
-    "title": "Alexander and the Terrible, Horrible, No Good, Very Bad Day",
-    "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Anime"
     ],
-    "genres": [],
-    "overview": "Alexander's day begins with gum stuck in his hair, followed by more calamities. Though he finds little sympathy from his family and begins to wonder if bad things only happen to him, his mom, dad, brother, and sister all find themselves living through their own terrible, horrible, no good, very bad day.",
-    "poster": "https://image.tmdb.org/t/p/w500/pxbAepXQjsGFDHaR3dPndFSxDU0.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/aaEpmSJTR9BpPjCg8YqLkJ3AEnp.jpg",
-    "rating": 6.2,
-    "release_date": "2014-10-08",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "bQ4C-RoKDQg",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADiSAAAh-4UEYh3kvKo0dMkhYE"
-    ]
-  },
-  {
-    "csv_id": "509967-6-underground",
-    "tmdb_id": 509967,
-    "imdb_id": "",
-    "title": "6 Underground",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "After faking his death, a tech billionaire recruits a team of international operatives for a bold and bloody mission to take down a brutal dictator.",
-    "poster": "https://image.tmdb.org/t/p/w500/lnWkyG3LLgbbrIEeyl5mK5VRFe4.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/eFw5YSorHidsajLTayo1noueIxI.jpg",
-    "rating": 6.3,
-    "release_date": "2019-12-10",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "XcIuFTrLS6g",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADeSAAAh-4UEY-eYdBy009NxYE"
-    ]
-  },
-  {
-    "csv_id": "1824-50-first-dates",
-    "tmdb_id": 1824,
-    "imdb_id": "",
-    "title": "50 First Dates",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Henry is a player skilled at seducing women. But when this veterinarian meets Lucy, a girl with a quirky problem when it comes to total recall, he realizes it's possible to fall in love all over again…and again, and again. That's because the delightful Lucy has no short-term memory, so Henry must woo her day after day until he finally sweeps her off her feet.",
-    "poster": "https://image.tmdb.org/t/p/w500/lzUI2Cg7OMfcUNv3f7MywYNBjs6.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/v8lPo8UWKyP2tIXD8N64HfNP4Pw.jpg",
-    "rating": 6.9,
-    "release_date": "2004-02-13",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "17KJk3ErIx0",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADdyAAAh-4UEbF22c87SRVlBYE"
-    ]
+    "tmdb_id": 203737,
+    "overview": "A small-town doctor gets sucked into the ruthless world of show business when he crosses paths with a popular teen idol who holds a secret.",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gArCVC4ML529WMCEqOXbALdQbUq.jpg",
+    "language": "ja",
+    "cast": []
   },
   {
     "csv_id": "933398-12-hours",
@@ -251,2083 +48,6 @@
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADdiAAAh-4UEYlxQqZ05iltxYE"
     ]
-  },
-  {
-    "csv_id": "76489-the-three-stooges",
-    "tmdb_id": 76489,
-    "imdb_id": "",
-    "title": "The Three Stooges",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Left on the doorstep of an orphanage run by nuns, three newborn knuckleheads grow up to be finger-poking, nyuk-nyuking janitors named Larry, Curly and Moe. When they learn that financial problems will soon force the only home they've ever known to close, the trio sets out to raise $830,000 in one month. Out in the world for the very first time, the three innocent bumblers become embroiled in a murder plot and find stardom on a TV reality show.",
-    "poster": "https://image.tmdb.org/t/p/w500/b0nNQCL90RGTwjxLEFsFFLQZKNe.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/qiXR2emZXBiqCIXNwq0XRypHTmY.jpg",
-    "rating": 5.8,
-    "release_date": "2012-04-13",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "RQGXqn00hf4",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADYiAAAh-4UEZhpPqxGNSdChYE"
-    ]
-  },
-  {
-    "csv_id": "331482-little-women",
-    "tmdb_id": 331482,
-    "imdb_id": "",
-    "title": "Little Women",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Four sisters come of age in America in the aftermath of the Civil War.",
-    "poster": "https://image.tmdb.org/t/p/w500/yn5ihODtZ7ofn8pDYfxCmxh8AXI.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/lqxxwTRk0l7CubY6JkJdhnwJEkn.jpg",
-    "rating": 7.9,
-    "release_date": "2019-12-25",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "AST2-4db4ic",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADXiAAAh-4UEbNBmUg9oqXphYE"
-    ]
-  },
-  {
-    "csv_id": "204082-homefront",
-    "tmdb_id": 204082,
-    "imdb_id": "",
-    "title": "Homefront",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Phil Broker, a retired DEA agent, leads a quiet life with his daughter Maddy, until a school bullying incident draws them into a conflict with Morgan “Gator” Bodine, a local crime boss.",
-    "poster": "https://image.tmdb.org/t/p/w500/xcFLM44jgl015wLe7lWC1C1bEEM.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/kT8orKwz2bmRdHBLnG44yucYtFy.jpg",
-    "rating": 6.9,
-    "release_date": "2013-11-12",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "BjFTuZH7E2c",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADWCAAAh-4UEaY9fI-iHG98BYE"
-    ]
-  },
-  {
-    "csv_id": "323272-war-room",
-    "tmdb_id": 323272,
-    "imdb_id": "",
-    "title": "War Room",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "The family-friendly movie explores the transformational role prayer plays in the lives of the Jordan family. Tony and Elizabeth Jordan, a middle-class couple who seemingly have it all – great jobs, a beautiful daughter, their dream home. But appearances can be deceiving. In reality, the Jordan’s marriage has become a war zone and their daughter is collateral damage. With the help of Miss Clara, an older, wiser woman, Elizabeth discovers she can start fighting for her family instead of against them. Through a newly energized faith, Elizabeth and Tony’s real enemy doesn’t have a prayer.",
-    "poster": "https://image.tmdb.org/t/p/w500/unxQeVUi5DH01r7ZNvAHwpvX7UK.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/oCCvZEbqCCcALQtah8HJm9Ja4HT.jpg",
-    "rating": 7.8,
-    "release_date": "2015-08-28",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "mIl-XY9t_Lw",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADUSAAAh-4UEZXmv8ePBaTTBYE"
-    ]
-  },
-  {
-    "csv_id": "474335-uncle-drew",
-    "tmdb_id": 474335,
-    "imdb_id": "",
-    "title": "Uncle Drew",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Uncle Drew recruits a squad of older basketball players to return to the court to compete in a tournament.",
-    "poster": "https://image.tmdb.org/t/p/w500/yO2qw2cX0oU1ZrPBKc0PPj1C1NL.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/604nkQ0s7ND7nrQorF0v9rSDpdf.jpg",
-    "rating": 6.7,
-    "release_date": "2018-06-27",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "9H2SSvQ8ihA",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADTyAAAh-4UEaMEzMLFnh14xYE"
-    ]
-  },
-  {
-    "csv_id": "290764-tracers",
-    "tmdb_id": 290764,
-    "imdb_id": "",
-    "title": "Tracers",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Wanted by the mafia, a New York City bike messenger escapes into the world of parkour after meeting a beautiful stranger.",
-    "poster": "https://image.tmdb.org/t/p/w500/2XoazCkD4gRlqkJK7q6TOTUx1ta.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/mQDbtyPuA60dSmXKjlnJntLesRz.jpg",
-    "rating": 6,
-    "release_date": "2015-01-15",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "obHGqI9AnP0",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADSiAAAh-4UEZEs_49lgdUGRYE"
-    ]
-  },
-  {
-    "csv_id": "296271-the-devil-conspiracy",
-    "tmdb_id": 296271,
-    "imdb_id": "",
-    "title": "The Devil Conspiracy",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A powerful biotech company has breakthrough technology allowing them to clone history’s most influential people with just a few fragments of DNA. Behind this company is a cabal of Satanists that steals the shroud of Christ, putting them in possession of Jesus’ DNA. The clone will serve as the ultimate offering to the devil. The Archangel Michael comes to earth and will stop at nothing to end the devil’s conspiracy.",
-    "poster": "https://image.tmdb.org/t/p/w500/gZCWgbIq2IBDRMJmdx5NeYbbigL.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/sp7MPK2K60LLd7A6zjHKsfgjFil.jpg",
-    "rating": 6.4,
-    "release_date": "2023-01-13",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "6im3vt5yZoY",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADRiAAAh-4UEbtcazvdFqGChYE"
-    ]
-  },
-  {
-    "csv_id": "724495-the-woman-king",
-    "tmdb_id": 724495,
-    "imdb_id": "",
-    "title": "The Woman King",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "The story of the Agojie, the all-female unit of warriors who protected the African Kingdom of Dahomey in the 1800s with skills and a fierceness unlike anything the world has ever seen, and General Nanisca as she trains the next generation of recruits and readies them for battle against an enemy determined to destroy their way of life.",
-    "poster": "https://image.tmdb.org/t/p/w500/438QXt1E3WJWb3PqNniK0tAE5c1.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/p5kb4VwnK0bkxsOmME3SBKAcBoe.jpg",
-    "rating": 7.6,
-    "release_date": "2022-09-16",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "3RDaPV_rJ1Y",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADPSAAAh-4UEY-buU2DF5D8hYE"
-    ]
-  },
-  {
-    "csv_id": "436969-the-suicide-squad",
-    "tmdb_id": 436969,
-    "imdb_id": "",
-    "title": "The Suicide Squad",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Supervillains Harley Quinn, Bloodsport, Peacemaker and a collection of nutty cons at Belle Reve prison join the super-secret, super-shady Task Force X as they are dropped off at the remote, enemy-infused island of Corto Maltese.",
-    "poster": "https://image.tmdb.org/t/p/w500/q61qEyssk2ku3okWICKArlAdhBn.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/rAgsOIhqRS6tUthmHoqnqh9PIAE.jpg",
-    "rating": 7.5,
-    "release_date": "2021-07-28",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "eg5ciqQzmK0",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADOyAAAh-4UEao3kgyK_G44BYE"
-    ]
-  },
-  {
-    "csv_id": "758323-the-pope-s-exorcist",
-    "tmdb_id": 758323,
-    "imdb_id": "",
-    "title": "The Pope's Exorcist",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Father Gabriele Amorth, Chief Exorcist of the Vatican, investigates a young boy's terrifying possession and ends up uncovering a centuries-old conspiracy the Vatican has desperately tried to keep hidden.",
-    "poster": "https://image.tmdb.org/t/p/w500/jFC4LS5qTAT3PinzdEzINfu1CV9.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/3oqmk6mNWPatBKcjOOJLp5WW9zN.jpg",
-    "rating": 6.9,
-    "release_date": "2023-04-05",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "YJXqvnT_rsk",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADOCAAAh-4UEa4YosNhB5ByBYE"
-    ]
-  },
-  {
-    "csv_id": "9319-the-last-boy-scout",
-    "tmdb_id": 9319,
-    "imdb_id": "",
-    "title": "The Last Boy Scout",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Classic Movies"
-    ],
-    "genres": [
-      "Classic Movies"
-    ],
-    "overview": "Somewhere in Los Angeles, the city of broken dreams, a stripper is murdered. Now, the private detective she had hired and her ex-footballer boyfriend are going to find her murderer... if they don't kill each other first. But the more they dig, the deeper they become enmeshed in a web of extortion, blackmail and corrupt politics hidden beneath the surface of professional football.",
-    "poster": "https://image.tmdb.org/t/p/w500/glPswihcZYoAQ4YM2uJF4UACy8T.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/8AZ8Hjcr4Jr1eR93OW70g9jjUr9.jpg",
-    "rating": 6.8,
-    "release_date": "1991-12-13",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "6UKLRGyovho",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADKiAAAh-4UEZ9Y0HDndFKthYE"
-    ]
-  },
-  {
-    "csv_id": "205587-the-judge",
-    "tmdb_id": 205587,
-    "imdb_id": "",
-    "title": "The Judge",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A successful lawyer returns to his hometown for his mother's funeral only to discover that his estranged father, the town's judge, is suspected of murder.",
-    "poster": "https://image.tmdb.org/t/p/w500/3K93GWotLXe4FqpErri0xkpLaD5.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/sPantp0oQ9idos7Jdwko2r6ZOIa.jpg",
-    "rating": 7.3,
-    "release_date": "2014-10-08",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "ZBvK6ni97W8",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADJyAAAh-4UEah7cv4lp1WnRYE"
-    ]
-  },
-  {
-    "csv_id": "241251-the-boy-next-door",
-    "tmdb_id": 241251,
-    "imdb_id": "",
-    "title": "The Boy Next Door",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A recently cheated on married woman falls for a younger man who has moved in next door, but their torrid affair soon takes a dangerous turn.",
-    "poster": "https://image.tmdb.org/t/p/w500/gicmSeLG6Uh7BF1r1mxZHUQ8r26.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/96iXwJibeNW9RGEa58zYa0SQV6m.jpg",
-    "rating": 4.9,
-    "release_date": "2015-01-23",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "MgbBwovOOoc",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADGSAAAh-4UEbxlRwv0niOYBYE"
-    ]
-  },
-  {
-    "csv_id": "225565-that-awkward-moment",
-    "tmdb_id": 225565,
-    "imdb_id": "",
-    "title": "That Awkward Moment",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Best pals Jason and Daniel indulge in casual flings and revel in their carefree, unattached lives. After learning that the marriage of their friend Mikey is over, they gladly welcome him back into their circle. The three young men make a pact to have fun and avoid commitment. However, when all three find themselves involved in serious relationships, they must keep their romances secret from one another.",
-    "poster": "https://image.tmdb.org/t/p/w500/tjDAdesZNYFyRNnZvLT0osc7S2t.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/2FfNbWD2ss7BrI1jYVbkWT3CunU.jpg",
-    "rating": 6.1,
-    "release_date": "2014-01-29",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "Mvr-NQrqF6I",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADEyAAAh-4UEZHFNLoZ768phYE"
-    ]
-  },
-  {
-    "csv_id": "297761-suicide-squad",
-    "tmdb_id": 297761,
-    "imdb_id": "",
-    "title": "Suicide Squad",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government, undertaking high-risk black ops missions in exchange for commuted prison sentences.",
-    "poster": "https://image.tmdb.org/t/p/w500/sk3FZgh3sRrmr8vyhaitNobMcfh.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/wAk0yKrhAmvsoMvlKs4QImhvK5X.jpg",
-    "rating": 5.9,
-    "release_date": "2016-08-03",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "m0Xb9BhfVjY",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADDiAAAh-4UEbIXUMPBCCCMRYE"
-    ]
-  },
-  {
-    "csv_id": "257-oliver-twist",
-    "tmdb_id": 257,
-    "imdb_id": "",
-    "title": "Oliver Twist",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "When 9-year-old orphan Oliver Twist dares to ask his cruel taskmaster, Mr. Bumble, for a second serving of gruel, he's hired out as an apprentice. Escaping that dismal fate, young Oliver falls in with the street urchin known as the Artful Dodger and his criminal mentor, Fagin. When kindly Mr. Brownlow takes Oliver in, Fagin's evil henchman Bill Sikes plots to kidnap the boy.",
-    "poster": "https://image.tmdb.org/t/p/w500/zhPdYZ3x2uanhM1SyBj4CuL6hSa.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/2tfwa81Fg8iD4o8iEtIQRI8UY0F.jpg",
-    "rating": 6.8,
-    "release_date": "2005-09-23",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "4aUGLJicck8",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADBSAAAh-4UEYRGsCwSWLoWRYE"
-    ]
-  },
-  {
-    "csv_id": "395992-life",
-    "tmdb_id": 395992,
-    "imdb_id": "",
-    "title": "Life",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "The six-member crew of the International Space Station is tasked with studying a sample from Mars that may be the first proof of extra-terrestrial life, which proves more intelligent than ever expected.",
-    "poster": "https://image.tmdb.org/t/p/w500/wztfli5NgYDgurVgShNflvnyA3Z.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/nNh7vHHISVAaziJEqAq0P9iL52w.jpg",
-    "rating": 6.5,
-    "release_date": "2017-03-22",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "cuA-xqBw4jE",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD8h8AAh-4UEYk4-iwPIWZWRYE"
-    ]
-  },
-  {
-    "csv_id": "18785-the-hangover",
-    "tmdb_id": 18785,
-    "imdb_id": "",
-    "title": "The Hangover",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "When three friends finally come to after a raucous night of bachelor-party revelry, they find a baby in the closet and a tiger in the bathroom. But they can't seem to locate their best friend, Doug – who's supposed to be tying the knot. Launching a frantic search for Doug, the trio perseveres through a nasty hangover to try to make it to the church on time.",
-    "poster": "https://image.tmdb.org/t/p/w500/A0uS9rHR56FeBtpjVki16M5xxSW.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/iuRVt8tFiXDPGgzavhuSa3QHRxD.jpg",
-    "rating": 7.3,
-    "release_date": "2009-06-02",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "tlize92ffnY",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD8R8AAh-4UEYjJNVrAAGNOdEWBA"
-    ]
-  },
-  {
-    "csv_id": "10591-the-girl-next-door",
-    "tmdb_id": 10591,
-    "imdb_id": "",
-    "title": "The Girl Next Door",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Exceptionally ambitious high schooler Matthew has aspirations for a career in politics when he falls in love with his gorgeous 19-year-old neighbor, Danielle. But Matthew's bright future is jeopardized when he finds Danielle was once a porn star. As Danielle's past catches up with her, Matthew's love for her forces him to re-evaluate his goals.",
-    "poster": "https://image.tmdb.org/t/p/w500/5mVyFHSY2rSsNgD4NfEwV82HigU.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/qvcOovScPoRalRxDy50rYSYFree.jpg",
-    "rating": 6.8,
-    "release_date": "2004-04-09",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "0rD3Qkh-238",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD3h8AAh-4UEbOHsQdCbrrrxYE"
-    ]
-  },
-  {
-    "csv_id": "836225-the-exorcism-of-god",
-    "tmdb_id": 836225,
-    "imdb_id": "",
-    "title": "The Exorcism of God",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "An American priest working in Mexico is considered a saint by many local parishioners. However, due to a botched exorcism, he carries a secret that’s eating him alive until he gets an opportunity to face his demon one final time.",
-    "poster": "https://image.tmdb.org/t/p/w500/hangTmbxpSV4gpHG7MgSlCWSSFa.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/mjIuTXM4FhLAT1apxHULetAZAfj.jpg",
-    "rating": 7.1,
-    "release_date": "2022-03-11",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "VdLI8I4jZD0",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD3R8AAh-4UEYAAWUSIXg9umEWBA"
-    ]
-  },
-  {
-    "csv_id": "413644-the-son-of-bigfoot",
-    "tmdb_id": 413644,
-    "imdb_id": "",
-    "title": "The Son of Bigfoot",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "Teenage outsider Adam sets out on an epic and daring quest to uncover the mystery behind his long-lost dad, only to find out that he is none other than the legendary Bigfoot! He has been hiding deep in the forest for years to protect himself and his family from HairCo., a giant corporation eager to run scientific experiments with his special DNA. As father and son start making up for lost time after the boy's initial disbelief, Adam soon discovers that he too is gifted with superpowers beyond his imagination. But little do they know, HairCo. is on their tail as Adam's traces have led them to Bigfoot!",
-    "poster": "https://image.tmdb.org/t/p/w500/5yCQvhFuFPY0pACxoUpLUlYCxop.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/xydu6XhKVFf5FomLi9diWjoWc5d.jpg",
-    "rating": 6.6,
-    "release_date": "2017-07-26",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "hNqBAdBR8_k",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD3B8AAh-4UEYzvPFSSJAhRhYE"
-    ]
-  },
-  {
-    "csv_id": "109439-the-hangover-part-iii",
-    "tmdb_id": 109439,
-    "imdb_id": "",
-    "title": "The Hangover Part III",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "This time, there's no wedding. No bachelor party. What could go wrong, right? But when the Wolfpack hits the road, all bets are off.",
-    "poster": "https://image.tmdb.org/t/p/w500/vtxuPWkdllLNLVyGjKYa267ntuH.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/o8ZS811VjYbBi4pRYwILLdWCVey.jpg",
-    "rating": 6.2,
-    "release_date": "2013-05-23",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "96TelFMZwHc",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADxx8AAh-4UEbw07c153wHihYE"
-    ]
-  },
-  {
-    "csv_id": "523536-checkered-ninja",
-    "tmdb_id": 523536,
-    "imdb_id": "",
-    "title": "Checkered Ninja",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "A possessed Ninja doll teams up with a teenage boy to avenge the murder of a poor child factory worker.",
-    "poster": "https://image.tmdb.org/t/p/w500/dzN5xbp73TI7pjEqZ66ECNxdWJl.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/9s30XbfHZB9gcoQpm1P3i1hcGgH.jpg",
-    "rating": 7.4,
-    "release_date": "2018-12-25",
-    "language": "da",
-    "cast": [],
-    "director": "",
-    "trailer": "3V1CKYQRS40",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADwx8AAh-4UEb0R9nhgoah2RYE"
-    ]
-  },
-  {
-    "csv_id": "9655-she-s-the-man",
-    "tmdb_id": 9655,
-    "imdb_id": "",
-    "title": "She's the Man",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Viola Hastings is in a real jam. Complications threaten her scheme to pose as her twin brother, Sebastian, and take his place at a new boarding school. She falls in love with her handsome roommate, Duke, who loves beautiful Olivia, who has fallen for Sebastian! As if that were not enough, Viola's twin returns from London ahead of schedule but has no idea that his sister has already replaced him on campus.",
-    "poster": "https://image.tmdb.org/t/p/w500/xRElqFcUVuGf0s2rAQSSNAn1IS9.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/9ys3pySjmZiONZWAy8QhOxv5SDH.jpg",
-    "rating": 6.8,
-    "release_date": "2006-03-17",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "D4OhwrMidSU",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADvB8AAh-4UEZrP53lDNpCLRYE"
-    ]
-  },
-  {
-    "csv_id": "417384-scary-stories-to-tell-in-the-dark",
-    "tmdb_id": 417384,
-    "imdb_id": "",
-    "title": "Scary Stories to Tell in the Dark",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Mill Valley, Pennsylvania, Halloween night, 1968. After playing a joke on a school bully, Stella and her friends decide to sneak into a supposedly haunted house that once belonged to the powerful Bellows family, unleashing dark forces that they will be unable to control.",
-    "poster": "https://image.tmdb.org/t/p/w500/uy0dNFbhRhHBLwpOGpcTw9UEwdX.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/snll1zUi2oxIah9qifXOvbfjcrG.jpg",
-    "rating": 6.5,
-    "release_date": "2019-08-08",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "FLsr5nsa8qg",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADsR8AAh-4UEbiHMhFvrMMpBYE"
-    ]
-  },
-  {
-    "csv_id": "110490-rags",
-    "tmdb_id": 110490,
-    "imdb_id": "",
-    "title": "Rags",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Rags follows the story of Charlie Prince, an orphan living with his acerbic and unloving stepfather and spoiled, simple-minded stepbrothers. Charlie's dream is to be a singer, and while he is vocally talented and can write music, he can't seem to catch a break. Kadee Worth, on the other hand, is the daughter of music mogul Reginald Worth and is an international pop phenomenon. While the world knows her as a glamorous superstar, she is secretly frustrated with singing other people's songs and wearing clothes other people choose for her. Kadee wants the world to hear and see her true talent. Despite every obstacle that gets thrown in their way, once Charlie and Kadee find one another, they each finally get what they have been looking for – a voice, a stage, an audience and each other.",
-    "poster": "https://image.tmdb.org/t/p/w500/5CfrXWMeGcMlisL1YRCgpFMWiER.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/rTHODCYE1nth5sUXwdbZtFhny4M.jpg",
-    "rating": 7.3,
-    "release_date": "2012-05-28",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "UlPvT8ywd7I",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADrh8AAh-4UEb10Yt6HND_XRYE"
-    ]
-  },
-  {
-    "csv_id": "845659-perfect-addiction",
-    "tmdb_id": 845659,
-    "imdb_id": "",
-    "title": "Perfect Addiction",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A female boxing trainer discovers that her champion cage-fighter boyfriend has been cheating on her with her sister and decides to seek revenge by training up his arch-rival to challenge him.",
-    "poster": "https://image.tmdb.org/t/p/w500/ucO3NFIvMff71cBRR5EgYXPKWMC.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/sE6uilkTOIdg1zbZ3S8UKJ7Q9Av.jpg",
-    "rating": 6.8,
-    "release_date": "2023-02-16",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "FibtBUxV9hY",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADrB8AAh-4UEaeSqplR_ZlVBYE"
-    ]
-  },
-  {
-    "csv_id": "388399-patriots-day",
-    "tmdb_id": 388399,
-    "imdb_id": "",
-    "title": "Patriots Day",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "In the aftermath of an unspeakable act of terror, Police Sergeant Tommy Saunders joins courageous survivors, first responders and investigators in a race against the clock to hunt down the Boston Marathon bombers before they strike again.",
-    "poster": "https://image.tmdb.org/t/p/w500/mIDxsJTrOC7NhgOo3GziiHyKfsQ.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/lWcNlDMmZ6xJVoCZjhFxqVl0TIa.jpg",
-    "rating": 7.1,
-    "release_date": "2016-12-12",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "ykwSo64RYao",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADoh8AAh-4UEZ8h4KLPVqNlhYE"
-    ]
-  },
-  {
-    "csv_id": "527776-overcomer",
-    "tmdb_id": 527776,
-    "imdb_id": "",
-    "title": "Overcomer",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "After reluctantly agreeing to coach cross-country, high school basketball Coach John Harrison helps the least likely runner attempt the impossible in the biggest race of the year.",
-    "poster": "https://image.tmdb.org/t/p/w500/rVR3uN1yPRqYBBtNFSrEKCpRhaK.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/704pWRU1CihHgIIKRSAZD7juXQy.jpg",
-    "rating": 7.7,
-    "release_date": "2019-08-22",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "w7DWf7ObFNI",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADnB8AAh-4UEbzfiPSKxlpZBYE"
-    ]
-  },
-  {
-    "csv_id": "10867-malena",
-    "tmdb_id": 10867,
-    "imdb_id": "",
-    "title": "Malena",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "12-year-old Renato experiences three significant events on the same day: the beginning of the Second World War, getting a bike, and witnessing the arrival of the gorgeous Malèna. Through his eyes, we see the curse of beauty and loneliness of Malena, whose husband is presumed dead, and, through his soul, we see his love for her.",
-    "poster": "https://image.tmdb.org/t/p/w500/3OyQTl0IGkbnjDxd3MhztfPE34g.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/vadUKKQixxOKWkcuZ1SUEoBQeVG.jpg",
-    "rating": 7.5,
-    "release_date": "2000-10-27",
-    "language": "it",
-    "cast": [],
-    "director": "",
-    "trailer": "73FrJrCgJCI",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADgx8AAh-4UEY4LKqDw1Sx9BYE"
-    ]
-  },
-  {
-    "csv_id": "113145-mad-buddies",
-    "tmdb_id": 113145,
-    "imdb_id": "",
-    "title": "Mad Buddies",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "African"
-    ],
-    "genres": [
-      "African"
-    ],
-    "overview": "Two sworn enemies, Boetie (Leon Schuster) and Beast (Kenneth Nkosi) are forced to do a road trip together on foot, only to discover that they have been conned into being part of a TV reality show.",
-    "poster": "https://image.tmdb.org/t/p/w500/cYLz9eENFrIHLPnJ15mE2omn2eN.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/9auAjvVgdc1FDujjXGikljSLJUr.jpg",
-    "rating": 4.5,
-    "release_date": "2012-06-22",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "Iam7Xq1HbZ8",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADfR8AAh-4UEbINyMV7SgcPBYE"
-    ]
-  },
-  {
-    "csv_id": "13497-drumline",
-    "tmdb_id": 13497,
-    "imdb_id": "",
-    "title": "Drumline",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A talented street drummer from Harlem enrolls in a Southern university, expecting to lead its marching band's drumline to victory. He initially flounders in his new world, before realizing that it takes more than talent to reach the top.",
-    "poster": "https://image.tmdb.org/t/p/w500/zl7gdxYqKdFCioPT3DAkZR5DDUP.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/46scrnII4tNzNQmeULCMCsCmgKA.jpg",
-    "rating": 6.9,
-    "release_date": "2002-12-13",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "PSki9bBcQh4",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADfB8AAh-4UEafKC3AAuyySRYE"
-    ]
-  },
-  {
-    "csv_id": "14836-coraline",
-    "tmdb_id": 14836,
-    "imdb_id": "",
-    "title": "Coraline",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "Wandering her rambling old house in her boring new town, 11-year-old Coraline discovers a hidden door to a strangely idealized version of her life. In order to stay in the fantasy, she must make a frighteningly real sacrifice.",
-    "poster": "https://image.tmdb.org/t/p/w500/4jeFXQYytChdZYE9JYO7Un87IlW.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/hofnlIyF6bePkgQOpcuRWLvzf15.jpg",
-    "rating": 7.9,
-    "release_date": "2009-02-05",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "T6iQnnHNF50",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADeB8AAh-4UEb1-IT2eJUMfBYE"
-    ]
-  },
-  {
-    "csv_id": "702525-bigfoot-family",
-    "tmdb_id": 702525,
-    "imdb_id": "",
-    "title": "Bigfoot Family",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "Bigfoot, Adam's father, wants to use his fame for a good cause. Protecting a large wildlife reserve in Alaska sounds like the perfect opportunity! When Bigfoot mysteriously disappears without a trace, Adam and his animal friends will brave anything to find him again and save the nature reserve.",
-    "poster": "https://image.tmdb.org/t/p/w500/vn7sNO6CD8FBHBEVcOiNv08mjy1.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/u6GALns99aM7nDdcY4Cxf6sACdC.jpg",
-    "rating": 7.1,
-    "release_date": "2020-07-23",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "YewYuPqakzw",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADch8AAh-4UEY-jdbMH2P9BxYE"
-    ]
-  },
-  {
-    "csv_id": "844075-new-gods-yang-jian",
-    "tmdb_id": 844075,
-    "imdb_id": "",
-    "title": "New Gods: Yang Jian",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "Fifteen hundred years after the war of gods, the heaven declined. Yang Jian, the God of Erlang, made a living by working as a catcher. One day, Yang Jian was ordered to hunt down a young man, his own nephew.",
-    "poster": "https://image.tmdb.org/t/p/w500/tW5dFOemV4d7hxTcVI2bu4u0C9z.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/zxIXvhF5PSZwQ9tvlLIzhcwi7IO.jpg",
-    "rating": 7.5,
-    "release_date": "2022-08-19",
-    "language": "zh",
-    "cast": [],
-    "director": "",
-    "trailer": "IaELO-4rPnE",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADcR8AAh-4UEbtFR2FV04OchYE"
-    ]
-  },
-  {
-    "csv_id": "136797-need-for-speed",
-    "tmdb_id": 136797,
-    "imdb_id": "",
-    "title": "Need for Speed",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "The film revolves around a local street-racer who partners with a rich and arrogant business associate, only to find himself framed by his colleague and sent to prison. After he gets out, he joins a New York-to-Los Angeles race to get revenge. But when the ex-partner learns of the scheme, he puts a massive bounty on the racer's head, forcing him to run a cross-country gauntlet of illegal racers in all manner of supercharged vehicles.",
-    "poster": "https://image.tmdb.org/t/p/w500/45D153Bk0bNwonV1w5IBBvqssPV.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/syVAWAnY6fTBDDFntHsM8vFjKex.jpg",
-    "rating": 6.4,
-    "release_date": "2014-03-12",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "e73J71RZRn8",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADXx8AAh-4UEb7fTsF5sSl5hYE"
-    ]
-  },
-  {
-    "csv_id": "253046-jailbait",
-    "tmdb_id": 253046,
-    "imdb_id": "",
-    "title": "Jailbait",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A gritty coming of age thriller about a young girl sent to juvenile prison for the murder of her abusive step father. The film follows Anna Nix's journey into the dark world of an all girls jail where she discovers complex relationships, drugs, mental illness and her eventual search for redemption.",
-    "poster": "https://image.tmdb.org/t/p/w500/bNaKWcYARKnvDBCFEIc0uOQxX2v.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/hdWExtkjIxA3j6r8GdWgRKXuNm9.jpg",
-    "rating": 5.4,
-    "release_date": "2014-02-14",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "WR-ouRYzlm8",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADWx8AAh-4UEb8-8EicpVDwxYE"
-    ]
-  },
-  {
-    "csv_id": "523139-in-the-tall-grass",
-    "tmdb_id": 523139,
-    "imdb_id": "",
-    "title": "In the Tall Grass",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "After hearing a child screaming for help from the green depths of a vast field of tall grass, Becky, a pregnant woman, and Cal, her brother, park their car near a mysterious abandoned church and enter the field, discovering that they are not alone and, for some reason, they are unable to escape a completely inextricable vegetable labyrinth.",
-    "poster": "https://image.tmdb.org/t/p/w500/1RxhzwFkAUqMt215Brb06u8P8pn.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/qk8pKinGFWEDZ02NVKuUsBuWuGx.jpg",
-    "rating": 5.5,
-    "release_date": "2019-09-20",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "7afc9gTbVFI",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADVB8AAh-4UEYtgma-YOdLQxYE"
-    ]
-  },
-  {
-    "csv_id": "409502-i-m-not-ashamed",
-    "tmdb_id": 409502,
-    "imdb_id": "",
-    "title": "I'm Not Ashamed",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Based on the journal entries of Rachel Joy Scott, the first student killed in the Columbine High School shooting in 1999.",
-    "poster": "https://image.tmdb.org/t/p/w500/P4bxuNq5XT0Wc3MYpoLP52e0P6.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/rsdFvneLY76JGXQ1rYovyeUtqyc.jpg",
-    "rating": 7.1,
-    "release_date": "2016-10-21",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "GjgeFACV7oY",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADTR8AAh-4UEYvHCUAAe639ToWBA"
-    ]
-  },
-  {
-    "csv_id": "1005166-hey-you",
-    "tmdb_id": 1005166,
-    "imdb_id": "",
-    "title": "Hey, You!",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "African"
-    ],
-    "genres": [
-      "African"
-    ],
-    "overview": "The life of an awkward 32 years old software engineer is turned upside down when he finds out the girl he wants to be with is the FANSALONE model he obsesses over and she’s his next-door neighbour.",
-    "poster": "https://image.tmdb.org/t/p/w500/2eMnqNemIj8EqSVnav86xzOBg8i.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/ukcadYIDgh5KI90sivC94OnuL3f.jpg",
-    "rating": 7.3,
-    "release_date": "2022-07-29",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADQx8AAh-4UEY-TJilgEuN9hYE"
-    ]
-  },
-  {
-    "csv_id": "522681-escape-room",
-    "tmdb_id": 522681,
-    "imdb_id": "",
-    "title": "Escape Room",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Six strangers find themselves in circumstances beyond their control, and must use their wits to survive.",
-    "poster": "https://image.tmdb.org/t/p/w500/8Ls1tZ6qjGzfGHjBB7ihOnf7f0b.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/mWLljCmpqlcYQh7uh51BBMwCZwN.jpg",
-    "rating": 6.5,
-    "release_date": "2019-01-03",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "6dSKUoV0SNI",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADPR8AAh-4UEaNTw4-nYgwdhYE"
-    ]
-  },
-  {
-    "csv_id": "14442-ella-enchanted",
-    "tmdb_id": 14442,
-    "imdb_id": "",
-    "title": "Ella Enchanted",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Ella lives in a magical world in which each child, at the moment of their birth, is given a virtuous \"gift\" from a fairy godmother. Ella's so-called gift, however, is obedience. This birthright proves itself to be quite the curse once Ella finds herself in the hands of several unscrupulous characters whom she quite literally cannot disobey. Determined to gain control of her life and decisions, Ella sets off on a journey to find her fairy godmother who she hopes will lift the curse. The path, however, isn't easy -- Ella must outwit a slew of unpleasant obstacles including ogres, giants, wicked stepsisters, elves and Prince Charmont's evil uncle, who wants to take over the crown and rule the kingdom.",
-    "poster": "https://image.tmdb.org/t/p/w500/7AyNzwSEpJEG1gBdgwRfXi1cjs8.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/r4Q7GKzTiAzr1MGU1b13s9L12YZ.jpg",
-    "rating": 6.5,
-    "release_date": "2004-04-09",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "OoSUHgs7hCs",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADOR8AAh-4UEZkN5KLGL37TxYE"
-    ]
-  },
-  {
-    "csv_id": "72608-doctor-bull",
-    "tmdb_id": 72608,
-    "imdb_id": "",
-    "title": "Doctor Bull",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Classic Movies"
-    ],
-    "genres": [
-      "Classic Movies"
-    ],
-    "overview": "In this engaging adaptation of James Gould Cozzen's novel The Last Adam, film icon Will Rogers portrays Dr. George Bull, a compassionate, highly regarded small-town physician who often prescribes a healthy dose of common sense! But when Bull begins dating a widow (Vera Allen), the local gossips misconstrue the story. To make matters worse, Bull's plainspoken manner earns him an enemy in the wealthy owner of a nearby construction camp. But once it's learned that the camp has caused illness by polluting the local water supply, the good doctor steps in to try to restore the town's health - and his reputation!",
-    "poster": "https://image.tmdb.org/t/p/w500/mlRBJOBTWViKn7qzHRBBAdIdS1X.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/jMVUhyqhoTaa2COFlZhTTnLELye.jpg",
-    "rating": 6.7,
-    "release_date": "1933-09-22",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADKh8AAh-4UEZMj6AZyJTqYBYE"
-    ]
-  },
-  {
-    "csv_id": "755566-day-shift",
-    "tmdb_id": 755566,
-    "imdb_id": "",
-    "title": "Day Shift",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "An LA vampire hunter has a week to come up with the cash to pay for his kid's tuition and braces. Trying to make a living these days just might kill him.",
-    "poster": "https://image.tmdb.org/t/p/w500/tkl7n5r542S40hnYDI27lGNCACu.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/yjZM4QrgA7PqX18Es6DxvJQH3ba.jpg",
-    "rating": 6.7,
-    "release_date": "2022-08-05",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "GN_IwBptKi4",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADIh8AAh-4UEbsb1AjYdZUNxYE"
-    ]
-  },
-  {
-    "csv_id": "778819-checkered-ninja-2",
-    "tmdb_id": 778819,
-    "imdb_id": "",
-    "title": "Checkered Ninja 2",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "After Phillip Eppermint manages to evade a prison sentence in Thailand, Checkered Ninja comes alive and seeks out Alex. Together, with Alex and his entire family, they now have to go to Thailand to bust Eppermint.",
-    "poster": "https://image.tmdb.org/t/p/w500/fjWiVF2vFwd3mhs1dNoS0SOHxqt.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/7i6F8CiBDHrZ1THxlsjF9EiSkXd.jpg",
-    "rating": 6.7,
-    "release_date": "2021-08-19",
-    "language": "da",
-    "cast": [],
-    "director": "",
-    "trailer": "RubZfeopTKM",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADHR8AAh-4UEboIAdwgjYerBYE"
-    ]
-  },
-  {
-    "csv_id": "640-catch-me-if-you-can",
-    "tmdb_id": 640,
-    "imdb_id": "",
-    "title": "Catch Me If You Can",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A true story about Frank Abagnale Jr. who, before his 19th birthday, successfully conned millions of dollars worth of checks as a Pan Am pilot, doctor, and legal prosecutor. An FBI agent makes it his mission to put him behind bars. But Frank not only eludes capture, he revels in the pursuit.",
-    "poster": "https://image.tmdb.org/t/p/w500/ctjEj2xM32OvBXCq8zAdK3ZrsAj.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/ggC3Brchf4RqPitEh7cROFoeAWn.jpg",
-    "rating": 8,
-    "release_date": "2002-12-16",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "71rDQ7z4eFg",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADHB8AAh-4UEaizcFDwGKHixYE"
-    ]
-  },
-  {
-    "csv_id": "694-the-shining",
-    "tmdb_id": 694,
-    "imdb_id": "",
-    "title": "The Shining",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Classic Movies"
-    ],
-    "genres": [
-      "Classic Movies"
-    ],
-    "overview": "Jack Torrance accepts a caretaker job at the Overlook Hotel, where he, along with his wife Wendy and their son Danny, must live isolated from the rest of the world for the winter. But they aren't prepared for the madness that lurks within.",
-    "poster": "https://image.tmdb.org/t/p/w500/uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/mmd1HnuvAzFc4iuVJcnBrhDNEKr.jpg",
-    "rating": 8.2,
-    "release_date": "1980-05-23",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "jAE7dNurHR4",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADFR8AAh-4UEZmWoZqbE7XexYE"
-    ]
-  },
-  {
-    "csv_id": "514619-nobody-s-fool",
-    "tmdb_id": 514619,
-    "imdb_id": "",
-    "title": "Nobody's Fool",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "After serving five years in prison, wild child Tanya looks to her buttoned-up, by-the-book sister Danica to help her get back on her feet. The feisty ex-con becomes suspicious and concerned when Danica tells her that she's in a long-distance, online relationship with a mysterious man she's never seen. As the polar opposites start to collide, Tanya soon discovers that her sibling's picture-perfect life may not be what it seems.",
-    "poster": "https://image.tmdb.org/t/p/w500/2VTHRTwLlnFDlNUxc8MEeFwCQTm.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/hCK1V5CNXS9wukjkBfKbZ8ghDtL.jpg",
-    "rating": 6.1,
-    "release_date": "2018-10-31",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "MsFbMw9LO5M",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADCx8AAh-4UEZJ6EFDtMaN-RYE"
-    ]
-  },
-  {
-    "csv_id": "530915-1917",
-    "tmdb_id": 530915,
-    "imdb_id": "",
-    "title": "1917",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "At the height of the First World War, two young British soldiers must cross enemy territory and deliver a message that will stop a deadly attack on hundreds of soldiers.",
-    "poster": "https://image.tmdb.org/t/p/w500/iZf0KyrE25z1sage4SYFLCCrMi9.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/2lBOQK06tltt8SQaswgb8d657Mv.jpg",
-    "rating": 8,
-    "release_date": "2019-12-25",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "gZjQROMAh_s",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADAx8AAh-4UEZM2D3oPCDZ9hYE"
-    ]
-  },
-  {
-    "csv_id": "205596-the-imitation-game",
-    "tmdb_id": 205596,
-    "imdb_id": "",
-    "title": "The Imitation Game",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Based on the real life story of legendary cryptanalyst Alan Turing, the film portrays the nail-biting race against time by Turing and his brilliant team of code-breakers at Britain's top-secret Government Code and Cypher School at Bletchley Park, during the darkest days of World War II.",
-    "poster": "https://image.tmdb.org/t/p/w500/zSqJ1qFq8NXFfi7JeIYMlzyR0dx.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/usuRn9DUKQQr4nBWnrQzlOuZ1Q4.jpg",
-    "rating": 8,
-    "release_date": "2014-11-14",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "j2jRs4EAvWM",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADBB8AAh-4UEbumw3dPX9gqhYE"
-    ]
-  },
-  {
-    "csv_id": "845404-tyler-perry-s-a-madea-homecoming",
-    "tmdb_id": 845404,
-    "imdb_id": "",
-    "title": "Tyler Perry's A Madea Homecoming",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Madea's back - hallelujer! And she's not putting up with any nonsense as family drama erupts at her great-grandson's college graduation celebration.",
-    "poster": "https://image.tmdb.org/t/p/w500/fWJXNc0Q0qIXU8O8hcUmH0iCYzu.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/7hzK0D7NGTy1MDJkWL9IQKrTmfq.jpg",
-    "rating": 6.8,
-    "release_date": "2022-02-25",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "afJXk-RgzoQ",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD4R4AAh-4UEar8k8UOlEPdxYE"
-    ]
-  },
-  {
-    "csv_id": "464504-a-madea-family-funeral",
-    "tmdb_id": 464504,
-    "imdb_id": "",
-    "title": "A Madea Family Funeral",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A joyous family reunion becomes a hilarious nightmare as Madea and the crew travel to backwoods Georgia, where they find themselves unexpectedly planning a funeral that might unveil unpleasant family secrets.",
-    "poster": "https://image.tmdb.org/t/p/w500/sFvOTUlZrIxCLdmz1fC16wK0lme.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/byHW1cN59Af7RFhSSbtz9kzMCc4.jpg",
-    "rating": 6,
-    "release_date": "2019-03-01",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "d1Dojp2XkN8",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD3h4AAh-4UEZ3Qf1biigbthYE"
-    ]
-  },
-  {
-    "csv_id": "16781-madea-s-family-reunion",
-    "tmdb_id": 16781,
-    "imdb_id": "",
-    "title": "Madea's Family Reunion",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Southern matriarch Madea has a lot on her plate. Her nieces, Vanessa and Lisa, have relationship troubles - Vanessa moves into Madea's house with her 2 young children and Lisa is engaged to a controlling man that her mother set her up with. In addition, Madea has just been court-ordered to become the guardian of Nikki, a rebellious runaway teenager. Madea must keep the peace and her family together while simultaneously planning her clan's reunion.",
-    "poster": "https://image.tmdb.org/t/p/w500/lAzrDS5bJJSSdPAUxuctCoomXUc.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/vFNooLsEgurZjnTEmwS8FWHurDi.jpg",
-    "rating": 6.4,
-    "release_date": "2006-02-24",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD2h4AAh-4UEYlTSYja_Q9XRYE"
-    ]
-  },
-  {
-    "csv_id": "1246310-madea-s-destination-wedding",
-    "tmdb_id": 1246310,
-    "imdb_id": "",
-    "title": "Madea's Destination Wedding",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Madea packs her best floral dresses and a whole lot of chaos when the Simmons family heads to the Bahamas for her grandniece's whirlwind wedding.",
-    "poster": "https://image.tmdb.org/t/p/w500/jwMwRucnAROgWo9WLLmIqzHmmzi.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/rEX85lgoawCWv9l8bgEPRqWtdPp.jpg",
-    "rating": 6,
-    "release_date": "2025-07-10",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "WdAYvmk4QjA",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD2B4AAh-4UEZvjofo6VaOfRYE"
-    ]
-  },
-  {
-    "csv_id": "51017-madea-s-big-happy-family",
-    "tmdb_id": 51017,
-    "imdb_id": "",
-    "title": "Madea's Big Happy Family",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "When Shirley, Madea's niece, receives distressing news about her health, the only thing she wants is her family gathered around her. However, Shirley's three adult children are too preoccupied with their own troubled lives to pay attention to their mother. It is up to Madea, with the help of rowdy Aunt Bam, to bring the clan together and help Shirley deal with her crisis.",
-    "poster": "https://image.tmdb.org/t/p/w500/6qWcpqRfUEFrbKdDvB7tg7h1oXz.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/fDVFfShvogB52g86V2plsmF3BWF.jpg",
-    "rating": 6.7,
-    "release_date": "2011-04-22",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "bExi5_p28Mo",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD1h4AAh-4UEYTHgX_yCzCOhYE"
-    ]
-  },
-  {
-    "csv_id": "15670-madea-goes-to-jail",
-    "tmdb_id": 15670,
-    "imdb_id": "",
-    "title": "Madea Goes to Jail",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "After a high-speed car chase, Madea winds up behind bars because her quick temper gets the best of her. Meanwhile, Assistant District Attorney Josh Hardaway lands a case that's too personal to handle: that of a young prostitute and former drug addict named Candace, also a childhood friend. When Candace winds up in jail, Madea takes the young woman under her protective wing.",
-    "poster": "https://image.tmdb.org/t/p/w500/qiXNNmSFXsfUdKDkylBF2LfX0DR.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/oLutveZjcSDVjIgfq7afMIarjpL.jpg",
-    "rating": 6.5,
-    "release_date": "2009-02-20",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "61AeW3d3fWo",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD0x4AAh-4UEYL6n1-0NqyOhYE"
-    ]
-  },
-  {
-    "csv_id": "103370-madea-s-witness-protection",
-    "tmdb_id": 103370,
-    "imdb_id": "",
-    "title": "Madea's Witness Protection",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "For years, mild-mannered Wall Street banker George Needleman has meandered through life oblivious to his family's dysfunction and his company's malfeasance, but he's forced to wake up when he learns that he's been framed in a mob-backed Ponzi scheme. Placed under federal protection, George and his family are shipped down South to Madea's house, where the no-nonsense matriarch whips them all into shape using her special brand of tough love.",
-    "poster": "https://image.tmdb.org/t/p/w500/4P6d7kVDB60Ydmk9WAhrPCWrARI.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/lDdTFUonxMymKX2NYbUkJSfJWyj.jpg",
-    "rating": 6.1,
-    "release_date": "2012-06-29",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "zCrCd8Bn0lU",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADzh4AAh-4UEabhoRd0xJx-RYE"
-    ]
-  },
-  {
-    "csv_id": "26367-i-can-do-bad-all-by-myself",
-    "tmdb_id": 26367,
-    "imdb_id": "",
-    "title": "I Can Do Bad All By Myself",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "When Madea catches teenage Jennifer and her two younger brothers looting her home, she decides to take matters into her own hands and delivers the young delinquents to the only relative they have: their aunt April. A heavy-drinking nightclub singer who lives off of her married boyfriend, April wants nothing to do with the kids.",
-    "poster": "https://image.tmdb.org/t/p/w500/kl8RNyG7jokw2pTLJNwkPhsBAL9.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/nJjTb3PwG1s7DxMhFoW5BtrXgnx.jpg",
-    "rating": 6.3,
-    "release_date": "2009-09-11",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "nkUvBCW-tS4",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADxx4AAh-4UEYrZ7G1ENmz7hYE"
-    ]
-  },
-  {
-    "csv_id": "16186-diary-of-a-mad-black-woman",
-    "tmdb_id": 16186,
-    "imdb_id": "",
-    "title": "Diary of a Mad Black Woman",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Charles, an attorney, and Helen, his devoted wife, seem to have everything – money, a beautiful mansion – the American Dream. However, as Helen prepares to celebrate their 18th wedding anniversary, her life takes an unexpected twist when she comes home to find her clothes packed up in a U-Haul van parked in the driveway. Charles is divorcing her and kicks her out. Helen moves in with her grandmother Madea, an old woman who doesn't take any lip from anyone. Madea helps Helen through these tough times by showing her what is really important in life. Helen is forced to rediscover love, life, and religion in her pursuit for happiness.",
-    "poster": "https://image.tmdb.org/t/p/w500/4w36ckDhsWFPD9XaHOOJb1ru7JZ.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/ds88sDzCE13ZmGBtCfPsltd9qC1.jpg",
-    "rating": 6.5,
-    "release_date": "2005-02-25",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "nFi0lV3fMRU",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADxh4AAh-4UEYev89xlDfT9xYE"
-    ]
-  },
-  {
-    "csv_id": "459202-boo-2-a-madea-halloween",
-    "tmdb_id": 459202,
-    "imdb_id": "",
-    "title": "Boo 2! A Madea Halloween",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Madea and the gang encounter monsters, goblins and boogeymen at a haunted campground.",
-    "poster": "https://image.tmdb.org/t/p/w500/5nvP4etJ8ecQv8qZM08dK4BAzdK.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/noK6DNqqRtKyYbF5tIhrb7YNYpb.jpg",
-    "rating": 5.8,
-    "release_date": "2017-10-20",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "feRTw6OK_Ks",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADxB4AAh-4UEaXPMf_HCqmvhYE"
-    ]
-  },
-  {
-    "csv_id": "380124-boo-a-madea-halloween",
-    "tmdb_id": 380124,
-    "imdb_id": "",
-    "title": "Boo! A Madea Halloween",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Madea winds up in the middle of mayhem when she spends a hilarious, haunted Halloween fending off killers, paranormal poltergeists, ghosts, ghouls, and zombies while keeping a watchful eye on a group of misbehaving teens.",
-    "poster": "https://image.tmdb.org/t/p/w500/82TLEZv1rOJNgllfYD22NkivGDH.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/2fC29LRezRnpQwnbjxXSO7dakb.jpg",
-    "rating": 5.8,
-    "release_date": "2016-10-21",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "-sPHseSGr9Q",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADwx4AAh-4UEYDnohUOUCAlxYE"
-    ]
-  },
-  {
-    "csv_id": "175555-a-madea-christmas",
-    "tmdb_id": 175555,
-    "imdb_id": "",
-    "title": "A Madea Christmas",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Madea dispenses her unique form of holiday spirit on rural town when she's coaxed into helping a friend pay her daughter a surprise visit in the country for Christmas.",
-    "poster": "https://image.tmdb.org/t/p/w500/tbwm8GptynNoxbkC5AhjYMYfnn7.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/bBnVwaiLBXBkwq9zSZUzDNWUHW5.jpg",
-    "rating": 6.4,
-    "release_date": "2013-12-13",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "qklsiYiVykQ",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADwR4AAh-4UEYYksCwxjfsoBYE"
-    ]
-  },
-  {
-    "csv_id": "9767-the-break-up",
-    "tmdb_id": 9767,
-    "imdb_id": "",
-    "title": "The Break-Up",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Pushed to the breaking-up point after their latest 'why can't you do this one little thing for me?' argument, Brooke calls it quits with her boyfriend Gary. What follows is a hilarious series of remedies, war tactics, overtures and undermining tricks – all encouraged by the former couple's friends and confidantes …and the occasional total stranger! When neither ex is willing to move out of their shared apartment, the only solution is to continue living as hostile roommates until one of them reaches breaking point.",
-    "poster": "https://image.tmdb.org/t/p/w500/ghCLIPRZNAndBoIZJ8f7lN5Mlly.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/tukmcuDcTgFesqveQQWKhKXKEzg.jpg",
-    "rating": 5.9,
-    "release_date": "2006-06-01",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "SfTaJUh3_J4",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADuR4AAh-4UEaPrQV56oB4fBYE"
-    ]
-  },
-  {
-    "csv_id": "9352-eurotrip",
-    "tmdb_id": 9352,
-    "imdb_id": "",
-    "title": "EuroTrip",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "When Scott learns that his longtime cyber-buddy from Berlin is a gorgeous young woman, he and his friends embark on a trip across Europe.",
-    "poster": "https://image.tmdb.org/t/p/w500/iLdO4PwbZCCQSa9rchZMwuJm9xe.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/fuKb0cuIU9DpUhHrN0ycoFmr63e.jpg",
-    "rating": 6.6,
-    "release_date": "2004-02-20",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "UhaoTcD60q4",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADtx4AAh-4UEZVmbLU_S1HARYE"
-    ]
-  },
-  {
-    "csv_id": "937287-challengers",
-    "tmdb_id": 937287,
-    "imdb_id": "",
-    "title": "Challengers",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Tennis player turned coach Tashi has taken her husband, Art, and transformed him into a world-famous Major champion. To jolt him out of his recent losing streak, she signs him up for a \"Challenger\" event — close to the lowest level of pro tournament — where he finds himself standing across the net from his former best friend and Tashi's former boyfriend.",
-    "poster": "https://image.tmdb.org/t/p/w500/H6vke7zGiuLsz4v4RPeReb9rsv.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/tq8COKsI99Bivjd4CZIYVGoKcIx.jpg",
-    "rating": 6.9,
-    "release_date": "2024-04-18",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "-2N3hmRmwHQ",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADtR4AAh-4UEbyEQZ_DPUDZBYE"
-    ]
-  },
-  {
-    "csv_id": "787-mr-mrs-smith",
-    "tmdb_id": 787,
-    "imdb_id": "",
-    "title": "Mr. & Mrs. Smith",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A husband and wife struggle to keep their marriage alive until they realize they are both secretly working as assassins. Now, their respective assignments require them to kill each other.",
-    "poster": "https://image.tmdb.org/t/p/w500/kjD700RtyhveN3ZbOnSvUSne0Qj.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/iFaWUETEE2umP1WY0LUAmjSpzm7.jpg",
-    "rating": 6.7,
-    "release_date": "2005-06-07",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "TWB_icm5M38",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADsx4AAh-4UEb4Sro4F5ZjThYE"
-    ]
-  },
-  {
-    "csv_id": "748167-uglies",
-    "tmdb_id": 748167,
-    "imdb_id": "",
-    "title": "Uglies",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "In a futuristic dystopia with enforced beauty standards, a teen awaiting mandatory cosmetic surgery embarks on a journey to find her missing friend.",
-    "poster": "https://image.tmdb.org/t/p/w500/jaUu9zHtbcFwrB5Y1DNYE09HMex.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/y4NzXdvpJdwRmsnOT7HdkmHh6Yn.jpg",
-    "rating": 5.7,
-    "release_date": "2024-09-12",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "OhcOHkgTrQQ",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADsh4AAh-4UEZ3cS9gsk6kUBYE"
-    ]
-  },
-  {
-    "csv_id": "257211-the-intern",
-    "tmdb_id": 257211,
-    "imdb_id": "",
-    "title": "The Intern",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "70-year-old widower Ben Whittaker has discovered that retirement isn't all it's cracked up to be. Seizing an opportunity to get back in the game, he becomes a senior intern at an online fashion site, founded and run by Jules Ostin.",
-    "poster": "https://image.tmdb.org/t/p/w500/bTQ46fupPbjBfFBHuzfD3hxxL0Q.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/rFY9V4Dhq7lbIu6LlpzbL9u2K2E.jpg",
-    "rating": 7.2,
-    "release_date": "2015-09-23",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "f6dKhzYgksc",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADsR4AAh-4UEZZVRcq9_gK1xYE"
-    ]
-  },
-  {
-    "csv_id": "939243-sonic-the-hedgehog-3",
-    "tmdb_id": 939243,
-    "imdb_id": "",
-    "title": "Sonic the Hedgehog 3",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Sonic, Knuckles, and Tails reunite against a powerful new adversary, Shadow, a mysterious villain with powers unlike anything they have faced before. With their abilities outmatched in every way, Team Sonic must seek out an unlikely alliance in hopes of stopping Shadow and protecting the planet.",
-    "poster": "https://image.tmdb.org/t/p/w500/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg",
-    "rating": 7.6,
-    "release_date": "2024-12-19",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "LH1J1EbqCaI",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADqh4AAh-4UEbkznfF58lqthYE"
-    ]
-  },
-  {
-    "csv_id": "993710-back-in-action",
-    "tmdb_id": 993710,
-    "imdb_id": "",
-    "title": "Back in Action",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Fifteen years after vanishing from the CIA to start a family, elite spies Matt and Emily jump back into the world of espionage when their cover is blown.",
-    "poster": "https://image.tmdb.org/t/p/w500/3L3l6LsiLGHkTG4RFB2aBA6BttB.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/mkxGpqh4yOYqtENv01IrDcesFRf.jpg",
-    "rating": 6.4,
-    "release_date": "2025-01-15",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "MV2nYw6gL_w",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADqR4AAh-4UEa68IywqiKXKRYE"
-    ]
-  },
-  {
-    "csv_id": "573435-bad-boys-ride-or-die",
-    "tmdb_id": 573435,
-    "imdb_id": "",
-    "title": "Bad Boys: Ride or Die",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "After their late former Captain is framed, Lowrey and Burnett try to clear his name, only to end up on the run themselves.",
-    "poster": "https://image.tmdb.org/t/p/w500/oGythE98MYleE6mZlGs5oBGkux1.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/3q01ACG0MWm0DekhvkPFCXyPZSu.jpg",
-    "rating": 7.3,
-    "release_date": "2024-06-05",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "uWLNl_KQCAU",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADox4AAh-4UEYTffoWndh1xxYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADpB4AAh-4UEaTzIX2PMTgaxYE"
-    ]
-  },
-  {
-    "csv_id": "10681-wall-e",
-    "tmdb_id": 10681,
-    "imdb_id": "",
-    "title": "WALL·E",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "After hundreds of years doing what he was built for, WALL•E— a robot designed to clean up the earth—discovers a new purpose in life when he meets a sleek search robot named EVE. EVE comes to realize that WALL•E has inadvertently stumbled upon the key to the planet's future, and races back to space to report to the humans. Meanwhile, WALL•E chases EVE across the galaxy and sets into motion one of the most imaginative adventures ever brought to the big screen.",
-    "poster": "https://image.tmdb.org/t/p/w500/hbhFnRzzg6ZDmm8YAmxBnQpQIPh.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/nYs4ZwnJBK4AgljhvzwNz7fpr3E.jpg",
-    "rating": 8.1,
-    "release_date": "2008-06-26",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "Tbr_L9Gap_M",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADnh4AAh-4UEbiG9dI5la_zhYE"
-    ]
-  },
-  {
-    "csv_id": "845781-red-one",
-    "tmdb_id": 845781,
-    "imdb_id": "",
-    "title": "Red One",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "After Santa Claus (codename: Red One) is kidnapped, the North Pole's Head of Security must team up with the world's most infamous tracker in a globe-trotting, action-packed mission to save Christmas.",
-    "poster": "https://image.tmdb.org/t/p/w500/cdqLnri3NEGcmfnqwk2TSIYtddg.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/rOmUuQEZfPXglwFs5ELLLUDKodL.jpg",
-    "rating": 7,
-    "release_date": "2024-10-31",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "7l3hfD74X-4",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADmx4AAh-4UEbBolKNOaIHBxYE"
-    ]
-  },
-  {
-    "csv_id": "615453-ne-zha",
-    "tmdb_id": 615453,
-    "imdb_id": "",
-    "title": "Ne Zha",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "A young boy is born as the reincarnation of a demonic power, into a society that hates and fears him. Destined by prophecy to bring destruction to the world, Nezha must choose between good and evil to see if he can change his fate.",
-    "poster": "https://image.tmdb.org/t/p/w500/phM9bb6s9c60LA8qwsdk7U1N2cS.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/k1pJslKr4aDayw9kWwWnlC3MIP3.jpg",
-    "rating": 7.9,
-    "release_date": "2019-07-26",
-    "language": "zh",
-    "cast": [],
-    "director": "",
-    "trailer": "PYSiEFeMbZ0",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADlR4AAh-4UEZWo3FK1PTBURYE"
-    ]
-  },
-  {
-    "csv_id": "980477-ne-zha-2",
-    "tmdb_id": 980477,
-    "imdb_id": "",
-    "title": "Ne Zha 2",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "After a catastrophic event leaves their bodies destroyed, Ne Zha and Ao Bing are granted a fragile second chance at life. As tensions rise between the dragon clans and celestial forces, the two must undergo a series of perilous trials that will test their bond, challenge their identities, and decide the fate of both mortals and immortals.",
-    "poster": "https://image.tmdb.org/t/p/w500/cb5NyNrqiCNNoDkA8FfxHAtypdG.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/zxi6WQPVc0uQAG5TtLsKvxYHApC.jpg",
-    "rating": 8.1,
-    "release_date": "2025-01-29",
-    "language": "zh",
-    "cast": [],
-    "director": "",
-    "trailer": "ETlOSBR92Fs",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADlh4AAh-4UEbTpehfcUuSYhYE"
-    ]
-  },
-  {
-    "csv_id": "283141-lil-kev",
-    "tmdb_id": 283141,
-    "imdb_id": "",
-    "title": "Lil Kev",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Series"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "Set in 1993 North Philadelphia, follow 12-year-old Kevin Hart, whose wild imagination and unshakable optimism constantly collide with his neighborhood's harsh realities. At the same time, his no-nonsense mother Nancy juggles night shifts as an E.R. nurse while waging a one-woman war to keep Kev on track – no easy feat with his mischievous older brother Robert blazing all the wrong trails, his trainwreck father Henry's outrageous attempts to win Nancy back, and his ex-con uncle Richard Jr.'s questionable life advice.",
-    "poster": "https://image.tmdb.org/t/p/w500/rnWr6Xr72Lsqf2JH52BdticR3Dc.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/fMCewQBoRlPQOZcSmGJOf3cWDMO.jpg",
-    "rating": 7.7,
-    "release_date": "2025-03-06",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "XjK8gozeTbg",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADkh4AAh-4UEbGNYNy6QzAWBYE"
-    ]
-  },
-  {
-    "csv_id": "950387-a-minecraft-movie",
-    "tmdb_id": 950387,
-    "imdb_id": "",
-    "title": "A Minecraft Movie",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Four misfits find themselves struggling with ordinary problems when they are suddenly pulled through a mysterious portal into the Overworld: a bizarre, cubic wonderland that thrives on imagination. To get back home, they'll have to master this world while embarking on a magical quest with an unexpected, expert crafter, Steve.",
-    "poster": "https://image.tmdb.org/t/p/w500/yFHHfHcUgGAxziP1C3lLt0q2T4s.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/2Nti3gYAX513wvhp8IiLL6ZDyOm.jpg",
-    "rating": 6.3,
-    "release_date": "2025-03-31",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "aSh_L6bvaCQ",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADRR4AAh-4UEYFSHd-UeP-KxYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADQx4AAh-4UEZQ175adOHQHRYE"
-    ]
-  },
-  {
-    "csv_id": "574475-final-destination-bloodlines",
-    "tmdb_id": 574475,
-    "imdb_id": "",
-    "title": "Final Destination Bloodlines",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Plagued by a violent recurring nightmare, college student Stefanie heads home to track down the one person who might be able to break the cycle and save her family from the grisly demise that inevitably awaits them all.",
-    "poster": "https://image.tmdb.org/t/p/w500/6WxhEvFsauuACfv8HyoVX6mZKFj.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/uIpJPDNFoeX0TVml9smPrs9KUVx.jpg",
-    "rating": 7,
-    "release_date": "2025-05-14",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "xitSoRbHJ50",
-    "runtime": "",
-    "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADRh4AAh-4UEaO1MXklmWEZxYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADRx4AAh-4UEZo3qbnJrGIDxYE"
-    ]
-  },
-  {
-    "csv_id": "9354-honey-i-shrunk-the-kids",
-    "tmdb_id": 9354,
-    "imdb_id": "",
-    "title": "Honey, I Shrunk the Kids",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Classic Movies"
-    ],
-    "genres": [
-      "Classic Movies"
-    ],
-    "overview": "The scientist father of a teenage girl and boy accidentally shrinks his and two other neighborhood teens to the size of insects. Now the teens must fight diminutive dangers as the father searches for them.",
-    "poster": "https://image.tmdb.org/t/p/w500/omQOzahi2NIeiYznNxHFDvNbvo6.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/jQuP23kN9iEBglGpw4AxRagoqBf.jpg",
-    "rating": 6.3,
-    "release_date": "1989-06-23",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "_av5kqcMVm4",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD6x0AAh-4UEZMXwJyEFRq6hYE"
-    ]
-  },
-  {
-    "csv_id": "11158-honey-i-blew-up-the-kid",
-    "tmdb_id": 11158,
-    "imdb_id": "",
-    "title": "Honey, I Blew Up the Kid",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Classic Movies"
-    ],
-    "genres": [
-      "Classic Movies"
-    ],
-    "overview": "Wayne Szalinski is at it again. But instead of shrinking things, he tries to make a machine that can make things grow. As in the first one, his machine isn't quite accurate. But when he brings Nick & his toddler son Adam to see his invention, the machine unexpectedly starts working. And when Adam comes right up to the machine, he gets zapped along with his stuffed bunny.",
-    "poster": "https://image.tmdb.org/t/p/w500/4EGqDo2pP2ZL0TCcYDGnwsU8liQ.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/r4Vx7kne6dovybAJR4LsR4eQCxP.jpg",
-    "rating": 5.3,
-    "release_date": "1992-07-16",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "-agq5R3b43U",
-    "runtime": "",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD7B0AAh-4UEa2doqAcj4InRYE"
-    ]
-  },
-  {
-    "title": "【OSHI NO KO】",
-    "csv_id": "203737",
-    "type": "Series",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD5hgAArFaKUahDdAVsm6bAhYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD7RgAArFaKUYM0KQhNbaouBYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w500/rFp74PFpz14AHrtlVPrLyrSng47.jpg",
-    "rating": 8.3,
-    "release_date": "2023-04-12",
-    "genres": [
-      "Animation",
-      "Drama"
-    ],
-    "categories": [
-      "Main",
-      "Anime"
-    ],
-    "tmdb_id": 203737,
-    "overview": "A small-town doctor gets sucked into the ruthless world of show business when he crosses paths with a popular teen idol who holds a secret.",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/gArCVC4ML529WMCEqOXbALdQbUq.jpg",
-    "language": "ja",
-    "cast": []
   },
   {
     "title": "13 Reasons Why",
@@ -2363,6 +83,31 @@
     ],
     "director": "Brian Yorkey",
     "trailer": "QkT-HIMSrRk"
+  },
+  {
+    "csv_id": "530915-1917",
+    "tmdb_id": 530915,
+    "imdb_id": "",
+    "title": "1917",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "At the height of the First World War, two young British soldiers must cross enemy territory and deliver a message that will stop a deadly attack on hundreds of soldiers.",
+    "poster": "https://image.tmdb.org/t/p/w500/iZf0KyrE25z1sage4SYFLCCrMi9.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2lBOQK06tltt8SQaswgb8d657Mv.jpg",
+    "rating": 8,
+    "release_date": "2019-12-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "gZjQROMAh_s",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADAx8AAh-4UEZM2D3oPCDZ9hYE"
+    ]
   },
   {
     "csv_id": "584-2-fast-2-furious",
@@ -2410,6 +155,56 @@
     "director": "",
     "trailer": "",
     "runtime": ""
+  },
+  {
+    "csv_id": "1824-50-first-dates",
+    "tmdb_id": 1824,
+    "imdb_id": "",
+    "title": "50 First Dates",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Henry is a player skilled at seducing women. But when this veterinarian meets Lucy, a girl with a quirky problem when it comes to total recall, he realizes it's possible to fall in love all over again…and again, and again. That's because the delightful Lucy has no short-term memory, so Henry must woo her day after day until he finally sweeps her off her feet.",
+    "poster": "https://image.tmdb.org/t/p/w500/lzUI2Cg7OMfcUNv3f7MywYNBjs6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/v8lPo8UWKyP2tIXD8N64HfNP4Pw.jpg",
+    "rating": 6.9,
+    "release_date": "2004-02-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "17KJk3ErIx0",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADdyAAAh-4UEbF22c87SRVlBYE"
+    ]
+  },
+  {
+    "csv_id": "509967-6-underground",
+    "tmdb_id": 509967,
+    "imdb_id": "",
+    "title": "6 Underground",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After faking his death, a tech billionaire recruits a team of international operatives for a bold and bloody mission to take down a brutal dictator.",
+    "poster": "https://image.tmdb.org/t/p/w500/lnWkyG3LLgbbrIEeyl5mK5VRFe4.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/eFw5YSorHidsajLTayo1noueIxI.jpg",
+    "rating": 6.3,
+    "release_date": "2019-12-10",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "XcIuFTrLS6g",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADeSAAAh-4UEY-eYdBy009NxYE"
+    ]
   },
   {
     "title": "A Lot Like Love",
@@ -2476,6 +271,82 @@
     "director": "Jonathan Judge",
     "trailer": "LVgpSzcW_04",
     "runtime": "64 min"
+  },
+  {
+    "csv_id": "175555-a-madea-christmas",
+    "tmdb_id": 175555,
+    "imdb_id": "",
+    "title": "A Madea Christmas",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Madea dispenses her unique form of holiday spirit on rural town when she's coaxed into helping a friend pay her daughter a surprise visit in the country for Christmas.",
+    "poster": "https://image.tmdb.org/t/p/w500/tbwm8GptynNoxbkC5AhjYMYfnn7.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bBnVwaiLBXBkwq9zSZUzDNWUHW5.jpg",
+    "rating": 6.4,
+    "release_date": "2013-12-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "qklsiYiVykQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADwR4AAh-4UEYYksCwxjfsoBYE"
+    ]
+  },
+  {
+    "csv_id": "464504-a-madea-family-funeral",
+    "tmdb_id": 464504,
+    "imdb_id": "",
+    "title": "A Madea Family Funeral",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A joyous family reunion becomes a hilarious nightmare as Madea and the crew travel to backwoods Georgia, where they find themselves unexpectedly planning a funeral that might unveil unpleasant family secrets.",
+    "poster": "https://image.tmdb.org/t/p/w500/sFvOTUlZrIxCLdmz1fC16wK0lme.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/byHW1cN59Af7RFhSSbtz9kzMCc4.jpg",
+    "rating": 6,
+    "release_date": "2019-03-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "d1Dojp2XkN8",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD3h4AAh-4UEZ3Qf1biigbthYE"
+    ]
+  },
+  {
+    "csv_id": "950387-a-minecraft-movie",
+    "tmdb_id": 950387,
+    "imdb_id": "",
+    "title": "A Minecraft Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Four misfits find themselves struggling with ordinary problems when they are suddenly pulled through a mysterious portal into the Overworld: a bizarre, cubic wonderland that thrives on imagination. To get back home, they'll have to master this world while embarking on a magical quest with an unexpected, expert crafter, Steve.",
+    "poster": "https://image.tmdb.org/t/p/w500/yFHHfHcUgGAxziP1C3lLt0q2T4s.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2Nti3gYAX513wvhp8IiLL6ZDyOm.jpg",
+    "rating": 6.3,
+    "release_date": "2025-03-31",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "aSh_L6bvaCQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADRR4AAh-4UEYFSHd-UeP-KxYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADQx4AAh-4UEZQ175adOHQHRYE"
+    ]
   },
   {
     "title": "A Really Haunted Loud House",
@@ -2942,6 +813,31 @@
     "backdrop": "https://image.tmdb.org/t/p/w1280/3XAGgklKkJhv5M9m5NkfhBYb7l8.jpg",
     "language": "ja",
     "cast": []
+  },
+  {
+    "csv_id": "218778-alexander-and-the-terrible-horrible-no-good-very-bad-day",
+    "tmdb_id": 218778,
+    "imdb_id": "",
+    "title": "Alexander and the Terrible, Horrible, No Good, Very Bad Day",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Alexander's day begins with gum stuck in his hair, followed by more calamities. Though he finds little sympathy from his family and begins to wonder if bad things only happen to him, his mom, dad, brother, and sister all find themselves living through their own terrible, horrible, no good, very bad day.",
+    "poster": "https://image.tmdb.org/t/p/w500/pxbAepXQjsGFDHaR3dPndFSxDU0.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/aaEpmSJTR9BpPjCg8YqLkJ3AEnp.jpg",
+    "rating": 6.2,
+    "release_date": "2014-10-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "bQ4C-RoKDQg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADiSAAAh-4UEYh3kvKo0dMkhYE"
+    ]
   },
   {
     "title": "All American",
@@ -3715,6 +1611,57 @@
     "language": "en"
   },
   {
+    "csv_id": "993710-back-in-action",
+    "tmdb_id": 993710,
+    "imdb_id": "",
+    "title": "Back in Action",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Fifteen years after vanishing from the CIA to start a family, elite spies Matt and Emily jump back into the world of espionage when their cover is blown.",
+    "poster": "https://image.tmdb.org/t/p/w500/3L3l6LsiLGHkTG4RFB2aBA6BttB.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mkxGpqh4yOYqtENv01IrDcesFRf.jpg",
+    "rating": 6.4,
+    "release_date": "2025-01-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "MV2nYw6gL_w",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADqR4AAh-4UEa68IywqiKXKRYE"
+    ]
+  },
+  {
+    "csv_id": "573435-bad-boys-ride-or-die",
+    "tmdb_id": 573435,
+    "imdb_id": "",
+    "title": "Bad Boys: Ride or Die",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After their late former Captain is framed, Lowrey and Burnett try to clear his name, only to end up on the run themselves.",
+    "poster": "https://image.tmdb.org/t/p/w500/oGythE98MYleE6mZlGs5oBGkux1.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3q01ACG0MWm0DekhvkPFCXyPZSu.jpg",
+    "rating": 7.3,
+    "release_date": "2024-06-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "uWLNl_KQCAU",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADox4AAh-4UEYTffoWndh1xxYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADpB4AAh-4UEaTzIX2PMTgaxYE"
+    ]
+  },
+  {
     "title": "Balik Taya",
     "csv_id": "1082206-balik-taya",
     "type": "Movie",
@@ -4047,6 +1994,34 @@
     "overview": "Picking up immediately following the events in the feature film, these are the continuing adventures and friendship of 14-year-old tech genius Hiro and his compassionate, cutting-edge robot Baymax. As the new prodigy at San Fransokyo Institute of Technology, Hiro now faces daunting academic challenges and the social trials of being the little man on campus. Off campus, the stakes are raised for the high-tech heroes as they must protect their city from an array of scientifically enhanced villains.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/mCt3coepPkF6QlDQSO9tqI46yIV.jpg",
     "language": "en"
+  },
+  {
+    "csv_id": "702525-bigfoot-family",
+    "tmdb_id": 702525,
+    "imdb_id": "",
+    "title": "Bigfoot Family",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Bigfoot, Adam's father, wants to use his fame for a good cause. Protecting a large wildlife reserve in Alaska sounds like the perfect opportunity! When Bigfoot mysteriously disappears without a trace, Adam and his animal friends will brave anything to find him again and save the nature reserve.",
+    "poster": "https://image.tmdb.org/t/p/w500/vn7sNO6CD8FBHBEVcOiNv08mjy1.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/u6GALns99aM7nDdcY4Cxf6sACdC.jpg",
+    "rating": 7.1,
+    "release_date": "2020-07-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "YewYuPqakzw",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADch8AAh-4UEY-jdbMH2P9BxYE"
+    ]
   },
   {
     "csv_id": "11017-billy-madison",
@@ -4385,6 +2360,56 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADWRAAAh-4UEZM7QOioXEy4RYE"
+    ]
+  },
+  {
+    "csv_id": "459202-boo-2-a-madea-halloween",
+    "tmdb_id": 459202,
+    "imdb_id": "",
+    "title": "Boo 2! A Madea Halloween",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Madea and the gang encounter monsters, goblins and boogeymen at a haunted campground.",
+    "poster": "https://image.tmdb.org/t/p/w500/5nvP4etJ8ecQv8qZM08dK4BAzdK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/noK6DNqqRtKyYbF5tIhrb7YNYpb.jpg",
+    "rating": 5.8,
+    "release_date": "2017-10-20",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "feRTw6OK_Ks",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADxB4AAh-4UEaXPMf_HCqmvhYE"
+    ]
+  },
+  {
+    "csv_id": "380124-boo-a-madea-halloween",
+    "tmdb_id": 380124,
+    "imdb_id": "",
+    "title": "Boo! A Madea Halloween",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Madea winds up in the middle of mayhem when she spends a hilarious, haunted Halloween fending off killers, paranormal poltergeists, ghosts, ghouls, and zombies while keeping a watchful eye on a group of misbehaving teens.",
+    "poster": "https://image.tmdb.org/t/p/w500/82TLEZv1rOJNgllfYD22NkivGDH.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2fC29LRezRnpQwnbjxXSO7dakb.jpg",
+    "rating": 5.8,
+    "release_date": "2016-10-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "-sPHseSGr9Q",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADwx4AAh-4UEYDnohUOUCAlxYE"
     ]
   },
   {
@@ -5027,6 +3052,56 @@
     ]
   },
   {
+    "csv_id": "640-catch-me-if-you-can",
+    "tmdb_id": 640,
+    "imdb_id": "",
+    "title": "Catch Me If You Can",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A true story about Frank Abagnale Jr. who, before his 19th birthday, successfully conned millions of dollars worth of checks as a Pan Am pilot, doctor, and legal prosecutor. An FBI agent makes it his mission to put him behind bars. But Frank not only eludes capture, he revels in the pursuit.",
+    "poster": "https://image.tmdb.org/t/p/w500/ctjEj2xM32OvBXCq8zAdK3ZrsAj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ggC3Brchf4RqPitEh7cROFoeAWn.jpg",
+    "rating": 8,
+    "release_date": "2002-12-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "71rDQ7z4eFg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADHB8AAh-4UEaizcFDwGKHixYE"
+    ]
+  },
+  {
+    "csv_id": "937287-challengers",
+    "tmdb_id": 937287,
+    "imdb_id": "",
+    "title": "Challengers",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Tennis player turned coach Tashi has taken her husband, Art, and transformed him into a world-famous Major champion. To jolt him out of his recent losing streak, she signs him up for a \"Challenger\" event — close to the lowest level of pro tournament — where he finds himself standing across the net from his former best friend and Tashi's former boyfriend.",
+    "poster": "https://image.tmdb.org/t/p/w500/H6vke7zGiuLsz4v4RPeReb9rsv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tq8COKsI99Bivjd4CZIYVGoKcIx.jpg",
+    "rating": 6.9,
+    "release_date": "2024-04-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "-2N3hmRmwHQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADtR4AAh-4UEbyEQZ_DPUDZBYE"
+    ]
+  },
+  {
     "title": "Charade",
     "csv_id": "1722061-charade",
     "type": "Movie",
@@ -5074,6 +3149,62 @@
     "backdrop": "img/FilmHouse.png",
     "language": "en",
     "cast": []
+  },
+  {
+    "csv_id": "523536-checkered-ninja",
+    "tmdb_id": 523536,
+    "imdb_id": "",
+    "title": "Checkered Ninja",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "A possessed Ninja doll teams up with a teenage boy to avenge the murder of a poor child factory worker.",
+    "poster": "https://image.tmdb.org/t/p/w500/dzN5xbp73TI7pjEqZ66ECNxdWJl.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/9s30XbfHZB9gcoQpm1P3i1hcGgH.jpg",
+    "rating": 7.4,
+    "release_date": "2018-12-25",
+    "language": "da",
+    "cast": [],
+    "director": "",
+    "trailer": "3V1CKYQRS40",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADwx8AAh-4UEb0R9nhgoah2RYE"
+    ]
+  },
+  {
+    "csv_id": "778819-checkered-ninja-2",
+    "tmdb_id": 778819,
+    "imdb_id": "",
+    "title": "Checkered Ninja 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "After Phillip Eppermint manages to evade a prison sentence in Thailand, Checkered Ninja comes alive and seeks out Alex. Together, with Alex and his entire family, they now have to go to Thailand to bust Eppermint.",
+    "poster": "https://image.tmdb.org/t/p/w500/fjWiVF2vFwd3mhs1dNoS0SOHxqt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7i6F8CiBDHrZ1THxlsjF9EiSkXd.jpg",
+    "rating": 6.7,
+    "release_date": "2021-08-19",
+    "language": "da",
+    "cast": [],
+    "director": "",
+    "trailer": "RubZfeopTKM",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADHR8AAh-4UEboIAdwgjYerBYE"
+    ]
   },
   {
     "csv_id": "7443-chicken-run",
@@ -5491,6 +3622,34 @@
     ]
   },
   {
+    "csv_id": "109451-cloudy-with-a-chance-of-meatballs-2",
+    "tmdb_id": 109451,
+    "imdb_id": "",
+    "title": "Cloudy with a Chance of Meatballs 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "After the disastrous food storm in the first film, Flint and his friends are forced to leave the town. Flint accepts the invitation from his idol Chester V to join The Live Corp Company, which has been tasked to clean the island, and where the best inventors in the world create technologies for the betterment of mankind. When Flint discovers that his machine still operates and now creates mutant food beasts like living pickles, hungry tacodiles, shrimpanzees and apple pie-thons, he and his friends must return to save the world.",
+    "poster": "https://image.tmdb.org/t/p/w500/ss5NcK2NWFg2YcKKYXLrk8q1myS.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vWriOBVlgW0XWdgbOiijhyLW7B8.jpg",
+    "rating": 6.5,
+    "release_date": "2013-09-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "3QCJTbHU60U",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADiiAAAh-4UEa9o47fb7CZQhYE"
+    ]
+  },
+  {
     "title": "Code Geass: Lelouch of the Rebellion",
     "csv_id": "31724-code-geass",
     "type": "Series",
@@ -5565,6 +3724,84 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADNAkAAh-4SEZGH33XbgtwthYE"
+    ]
+  },
+  {
+    "csv_id": "743032-conjuring-the-devil",
+    "tmdb_id": 743032,
+    "imdb_id": "",
+    "title": "Conjuring the Devil",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A woman who is struggling with the conflict between her faith and her personal life must defend herself against the spirit of a demonic nun who is bent on destroying her.",
+    "poster": "https://image.tmdb.org/t/p/w500/5OMSt8YlxYiYacTEo129a1T2yG4.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3KAR4UzdqYmlDA4VBHC3Lp9x30B.jpg",
+    "rating": 5.3,
+    "release_date": "2020-09-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "8B9_hZ6qsew",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADkyAAAh-4UEYx4sYTSrvO4xYE"
+    ]
+  },
+  {
+    "csv_id": "1022103-conjuring-the-beyond",
+    "tmdb_id": 1022103,
+    "imdb_id": "",
+    "title": "Conjuring: The Beyond",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A sleep study goes awry when participants start to go missing.",
+    "poster": "https://image.tmdb.org/t/p/w500/dNr0mqVSLfIaPlhcmJNRJVzCQBs.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lE7EAyNcpjfb2A79PcJ9gQYkYZp.jpg",
+    "rating": 4.3,
+    "release_date": "2022-09-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "vIP88aSLGEM",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADkiAAAh-4UEbri51AJociBRYE"
+    ]
+  },
+  {
+    "csv_id": "14836-coraline",
+    "tmdb_id": 14836,
+    "imdb_id": "",
+    "title": "Coraline",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Wandering her rambling old house in her boring new town, 11-year-old Coraline discovers a hidden door to a strangely idealized version of her life. In order to stay in the fantasy, she must make a frighteningly real sacrifice.",
+    "poster": "https://image.tmdb.org/t/p/w500/4jeFXQYytChdZYE9JYO7Un87IlW.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/hofnlIyF6bePkgQOpcuRWLvzf15.jpg",
+    "rating": 7.9,
+    "release_date": "2009-02-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "T6iQnnHNF50",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADeB8AAh-4UEb1-IT2eJUMfBYE"
     ]
   },
   {
@@ -5894,6 +4131,31 @@
     "overview": "The X-Men face their most formidable and powerful foe when one of their own, Jean Grey, starts to spiral out of control. During a rescue mission in outer space, Jean is nearly killed when she's hit by a mysterious cosmic force. Once she returns home, this force not only makes her infinitely more powerful, but far more unstable. The X-Men must now band together to save her soul and battle aliens that want to use Grey's new abilities to rule the galaxy.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/cjRUhKyt2Jo3V1KNzc5tpPNfccG.jpg",
     "language": "en"
+  },
+  {
+    "csv_id": "755566-day-shift",
+    "tmdb_id": 755566,
+    "imdb_id": "",
+    "title": "Day Shift",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "An LA vampire hunter has a week to come up with the cash to pay for his kid's tuition and braces. Trying to make a living these days just might kill him.",
+    "poster": "https://image.tmdb.org/t/p/w500/tkl7n5r542S40hnYDI27lGNCACu.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/yjZM4QrgA7PqX18Es6DxvJQH3ba.jpg",
+    "rating": 6.7,
+    "release_date": "2022-08-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "GN_IwBptKi4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADIh8AAh-4UEbsb1AjYdZUNxYE"
+    ]
   },
   {
     "title": "Dead Boy Detectives",
@@ -6236,6 +4498,31 @@
     ]
   },
   {
+    "csv_id": "16186-diary-of-a-mad-black-woman",
+    "tmdb_id": 16186,
+    "imdb_id": "",
+    "title": "Diary of a Mad Black Woman",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Charles, an attorney, and Helen, his devoted wife, seem to have everything – money, a beautiful mansion – the American Dream. However, as Helen prepares to celebrate their 18th wedding anniversary, her life takes an unexpected twist when she comes home to find her clothes packed up in a U-Haul van parked in the driveway. Charles is divorcing her and kicks her out. Helen moves in with her grandmother Madea, an old woman who doesn't take any lip from anyone. Madea helps Helen through these tough times by showing her what is really important in life. Helen is forced to rediscover love, life, and religion in her pursuit for happiness.",
+    "poster": "https://image.tmdb.org/t/p/w500/4w36ckDhsWFPD9XaHOOJb1ru7JZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ds88sDzCE13ZmGBtCfPsltd9qC1.jpg",
+    "rating": 6.5,
+    "release_date": "2005-02-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "nFi0lV3fMRU",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADxh4AAh-4UEYev89xlDfT9xYE"
+    ]
+  },
+  {
     "csv_id": "774741-diary-of-a-wimpy-kid",
     "tmdb_id": 774741,
     "imdb_id": "",
@@ -6479,6 +4766,34 @@
     "trailer": "YhUYKmYEbVQ"
   },
   {
+    "csv_id": "72608-doctor-bull",
+    "tmdb_id": 72608,
+    "imdb_id": "",
+    "title": "Doctor Bull",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "In this engaging adaptation of James Gould Cozzen's novel The Last Adam, film icon Will Rogers portrays Dr. George Bull, a compassionate, highly regarded small-town physician who often prescribes a healthy dose of common sense! But when Bull begins dating a widow (Vera Allen), the local gossips misconstrue the story. To make matters worse, Bull's plainspoken manner earns him an enemy in the wealthy owner of a nearby construction camp. But once it's learned that the camp has caused illness by polluting the local water supply, the good doctor steps in to try to restore the town's health - and his reputation!",
+    "poster": "https://image.tmdb.org/t/p/w500/mlRBJOBTWViKn7qzHRBBAdIdS1X.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jMVUhyqhoTaa2COFlZhTTnLELye.jpg",
+    "rating": 6.7,
+    "release_date": "1933-09-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADKh8AAh-4UEZMj6AZyJTqYBYE"
+    ]
+  },
+  {
     "title": "Doctor Strange",
     "csv_id": "284052-doctor-strange",
     "type": "Movie",
@@ -6617,6 +4932,31 @@
     "runtime": "24 min"
   },
   {
+    "csv_id": "13497-drumline",
+    "tmdb_id": 13497,
+    "imdb_id": "",
+    "title": "Drumline",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A talented street drummer from Harlem enrolls in a Southern university, expecting to lead its marching band's drumline to victory. He initially flounders in his new world, before realizing that it takes more than talent to reach the top.",
+    "poster": "https://image.tmdb.org/t/p/w500/zl7gdxYqKdFCioPT3DAkZR5DDUP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/46scrnII4tNzNQmeULCMCsCmgKA.jpg",
+    "rating": 6.9,
+    "release_date": "2002-12-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "PSki9bBcQh4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADfB8AAh-4UEafKC3AAuyySRYE"
+    ]
+  },
+  {
     "title": "Echo",
     "csv_id": "122226-echo",
     "type": "Series",
@@ -6665,6 +5005,31 @@
     "language": "en",
     "cast": [],
     "trailer": "be19c4aRU-s"
+  },
+  {
+    "csv_id": "14442-ella-enchanted",
+    "tmdb_id": 14442,
+    "imdb_id": "",
+    "title": "Ella Enchanted",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Ella lives in a magical world in which each child, at the moment of their birth, is given a virtuous \"gift\" from a fairy godmother. Ella's so-called gift, however, is obedience. This birthright proves itself to be quite the curse once Ella finds herself in the hands of several unscrupulous characters whom she quite literally cannot disobey. Determined to gain control of her life and decisions, Ella sets off on a journey to find her fairy godmother who she hopes will lift the curse. The path, however, isn't easy -- Ella must outwit a slew of unpleasant obstacles including ogres, giants, wicked stepsisters, elves and Prince Charmont's evil uncle, who wants to take over the crown and rule the kingdom.",
+    "poster": "https://image.tmdb.org/t/p/w500/7AyNzwSEpJEG1gBdgwRfXi1cjs8.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/r4Q7GKzTiAzr1MGU1b13s9L12YZ.jpg",
+    "rating": 6.5,
+    "release_date": "2004-04-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "OoSUHgs7hCs",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADOR8AAh-4UEZkN5KLGL37TxYE"
+    ]
   },
   {
     "title": "Empire",
@@ -6795,6 +5160,31 @@
     ]
   },
   {
+    "csv_id": "522681-escape-room",
+    "tmdb_id": 522681,
+    "imdb_id": "",
+    "title": "Escape Room",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Six strangers find themselves in circumstances beyond their control, and must use their wits to survive.",
+    "poster": "https://image.tmdb.org/t/p/w500/8Ls1tZ6qjGzfGHjBB7ihOnf7f0b.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mWLljCmpqlcYQh7uh51BBMwCZwN.jpg",
+    "rating": 6.5,
+    "release_date": "2019-01-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "6dSKUoV0SNI",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADPR8AAh-4UEaNTw4-nYgwdhYE"
+    ]
+  },
+  {
     "title": "Eternals",
     "csv_id": "524434-eternals",
     "type": "Movie",
@@ -6850,6 +5240,31 @@
     ],
     "director": "Sam Levinson",
     "trailer": "UR4Pxgnm-GA"
+  },
+  {
+    "csv_id": "9352-eurotrip",
+    "tmdb_id": 9352,
+    "imdb_id": "",
+    "title": "EuroTrip",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "When Scott learns that his longtime cyber-buddy from Berlin is a gorgeous young woman, he and his friends embark on a trip across Europe.",
+    "poster": "https://image.tmdb.org/t/p/w500/iLdO4PwbZCCQSa9rchZMwuJm9xe.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fuKb0cuIU9DpUhHrN0ycoFmr63e.jpg",
+    "rating": 6.6,
+    "release_date": "2004-02-20",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "UhaoTcD60q4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADtx4AAh-4UEZVmbLU_S1HARYE"
+    ]
   },
   {
     "title": "Eva",
@@ -6938,6 +5353,31 @@
     ],
     "director": "Michael Mohan",
     "trailer": "vkaO0Kmoicg"
+  },
+  {
+    "csv_id": "264660-ex-machina",
+    "tmdb_id": 264660,
+    "imdb_id": "",
+    "title": "Ex Machina",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Caleb, a coder at the world's largest internet company, wins a competition to spend a week at a private mountain retreat belonging to Nathan, the reclusive CEO of the company. But when Caleb arrives at the remote location he finds that he will have to participate in a strange and fascinating experiment in which he must interact with the world's first true artificial intelligence, housed in the body of a beautiful robot girl.",
+    "poster": "https://image.tmdb.org/t/p/w500/dmJW8IAKHKxFNiUnoDR7JfsK7Rp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/uqOuJ50EtTj7kkDIXP8LCg7G45D.jpg",
+    "rating": 7.6,
+    "release_date": "2015-01-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "sDkEF7Db7Gw",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADlCAAAh-4UEanX1Ld3a1qAxYE"
+    ]
   },
   {
     "title": "Exit 8 (2025)",
@@ -7307,6 +5747,32 @@
     "director": "Sam Taylor-Johnson",
     "trailer": "6FDTMRK7-24",
     "runtime": "125 min"
+  },
+  {
+    "csv_id": "574475-final-destination-bloodlines",
+    "tmdb_id": 574475,
+    "imdb_id": "",
+    "title": "Final Destination Bloodlines",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Plagued by a violent recurring nightmare, college student Stefanie heads home to track down the one person who might be able to break the cycle and save her family from the grisly demise that inevitably awaits them all.",
+    "poster": "https://image.tmdb.org/t/p/w500/6WxhEvFsauuACfv8HyoVX6mZKFj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/uIpJPDNFoeX0TVml9smPrs9KUVx.jpg",
+    "rating": 7,
+    "release_date": "2025-05-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "xitSoRbHJ50",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADRh4AAh-4UEaO1MXklmWEZxYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADRx4AAh-4UEZo3qbnJrGIDxYE"
+    ]
   },
   {
     "title": "Fire Force",
@@ -7697,6 +6163,31 @@
     ],
     "director": "Chuck Lorre",
     "trailer": "ZbdK-QJtFKI"
+  },
+  {
+    "csv_id": "274855-geostorm",
+    "tmdb_id": 274855,
+    "imdb_id": "",
+    "title": "Geostorm",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After an unprecedented series of natural disasters threatened the planet, the world's leaders came together to create an intricate network of satellites to control the global climate and keep everyone safe. But now, something has gone wrong: the system built to protect Earth is attacking it, and it becomes a race against the clock to uncover the real threat before a worldwide geostorm wipes out everything and everyone along with it.",
+    "poster": "https://image.tmdb.org/t/p/w500/nrsx0jEaBgXq4PWo7SooSnYJTv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vIEuJiIZN9EclAJDmD49F2zUzuX.jpg",
+    "rating": 6.1,
+    "release_date": "2017-10-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "w1QSI0CFEWU",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADmSAAAh-4UEYfVq4xgVEXSRYE"
+    ]
   },
   {
     "title": "Gerald's Game",
@@ -8362,6 +6853,31 @@
     "runtime": "86 min"
   },
   {
+    "csv_id": "152601-her",
+    "tmdb_id": 152601,
+    "imdb_id": "",
+    "title": "Her",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "In the not so distant future, Theodore, a lonely writer, purchases a newly developed operating system designed to meet the user's every need. To Theodore's surprise, a romantic relationship develops between him and his operating system. This unconventional love story blends science fiction and romance in a sweet tale that explores the nature of love and the ways that technology isolates and connects us all.",
+    "poster": "https://image.tmdb.org/t/p/w500/eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sPPsR9f4K0movWVQ99u4uMqFzEL.jpg",
+    "rating": 7.8,
+    "release_date": "2013-12-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ne6p6MfLBxc",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADmyAAAh-4UEYxasM30oNFjhYE"
+    ]
+  },
+  {
     "csv_id": "1586941-herman",
     "tmdb_id": 1586941,
     "imdb_id": "",
@@ -8384,6 +6900,33 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADSRcAAq-EQEY5WOHFlV1bfRYE"
+    ]
+  },
+  {
+    "csv_id": "1005166-hey-you",
+    "tmdb_id": 1005166,
+    "imdb_id": "",
+    "title": "Hey, You!",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "The life of an awkward 32 years old software engineer is turned upside down when he finds out the girl he wants to be with is the FANSALONE model he obsesses over and she’s his next-door neighbour.",
+    "poster": "https://image.tmdb.org/t/p/w500/2eMnqNemIj8EqSVnav86xzOBg8i.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ukcadYIDgh5KI90sivC94OnuL3f.jpg",
+    "rating": 7.3,
+    "release_date": "2022-07-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADQx8AAh-4UEY-TJilgEuN9hYE"
     ]
   },
   {
@@ -8545,6 +7088,87 @@
     "director": "",
     "trailer": "",
     "runtime": ""
+  },
+  {
+    "csv_id": "204082-homefront",
+    "tmdb_id": 204082,
+    "imdb_id": "",
+    "title": "Homefront",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Phil Broker, a retired DEA agent, leads a quiet life with his daughter Maddy, until a school bullying incident draws them into a conflict with Morgan “Gator” Bodine, a local crime boss.",
+    "poster": "https://image.tmdb.org/t/p/w500/xcFLM44jgl015wLe7lWC1C1bEEM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kT8orKwz2bmRdHBLnG44yucYtFy.jpg",
+    "rating": 6.9,
+    "release_date": "2013-11-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "BjFTuZH7E2c",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADWCAAAh-4UEaY9fI-iHG98BYE"
+    ]
+  },
+  {
+    "csv_id": "11158-honey-i-blew-up-the-kid",
+    "tmdb_id": 11158,
+    "imdb_id": "",
+    "title": "Honey, I Blew Up the Kid",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "Wayne Szalinski is at it again. But instead of shrinking things, he tries to make a machine that can make things grow. As in the first one, his machine isn't quite accurate. But when he brings Nick & his toddler son Adam to see his invention, the machine unexpectedly starts working. And when Adam comes right up to the machine, he gets zapped along with his stuffed bunny.",
+    "poster": "https://image.tmdb.org/t/p/w500/4EGqDo2pP2ZL0TCcYDGnwsU8liQ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/r4Vx7kne6dovybAJR4LsR4eQCxP.jpg",
+    "rating": 5.3,
+    "release_date": "1992-07-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "-agq5R3b43U",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD7B0AAh-4UEa2doqAcj4InRYE"
+    ]
+  },
+  {
+    "csv_id": "9354-honey-i-shrunk-the-kids",
+    "tmdb_id": 9354,
+    "imdb_id": "",
+    "title": "Honey, I Shrunk the Kids",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "The scientist father of a teenage girl and boy accidentally shrinks his and two other neighborhood teens to the size of insects. Now the teens must fight diminutive dangers as the father searches for them.",
+    "poster": "https://image.tmdb.org/t/p/w500/omQOzahi2NIeiYznNxHFDvNbvo6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jQuP23kN9iEBglGpw4AxRagoqBf.jpg",
+    "rating": 6.3,
+    "release_date": "1989-06-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "_av5kqcMVm4",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD6x0AAh-4UEZMXwJyEFRq6hYE"
+    ]
   },
   {
     "csv_id": "11425-honey-we-shrunk-ourselves",
@@ -8826,6 +7450,56 @@
     "cast": []
   },
   {
+    "csv_id": "26367-i-can-do-bad-all-by-myself",
+    "tmdb_id": 26367,
+    "imdb_id": "",
+    "title": "I Can Do Bad All By Myself",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "When Madea catches teenage Jennifer and her two younger brothers looting her home, she decides to take matters into her own hands and delivers the young delinquents to the only relative they have: their aunt April. A heavy-drinking nightclub singer who lives off of her married boyfriend, April wants nothing to do with the kids.",
+    "poster": "https://image.tmdb.org/t/p/w500/kl8RNyG7jokw2pTLJNwkPhsBAL9.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nJjTb3PwG1s7DxMhFoW5BtrXgnx.jpg",
+    "rating": 6.3,
+    "release_date": "2009-09-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "nkUvBCW-tS4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADxx4AAh-4UEYrZ7G1ENmz7hYE"
+    ]
+  },
+  {
+    "csv_id": "409502-i-m-not-ashamed",
+    "tmdb_id": 409502,
+    "imdb_id": "",
+    "title": "I'm Not Ashamed",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Based on the journal entries of Rachel Joy Scott, the first student killed in the Columbine High School shooting in 1999.",
+    "poster": "https://image.tmdb.org/t/p/w500/P4bxuNq5XT0Wc3MYpoLP52e0P6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rsdFvneLY76JGXQ1rYovyeUtqyc.jpg",
+    "rating": 7.1,
+    "release_date": "2016-10-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "GjgeFACV7oY",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADTR8AAh-4UEYvHCUAAe639ToWBA"
+    ]
+  },
+  {
     "title": "iCarly",
     "csv_id": "5371-icarly",
     "type": "Series",
@@ -8940,6 +7614,31 @@
     "runtime": ""
   },
   {
+    "csv_id": "523139-in-the-tall-grass",
+    "tmdb_id": 523139,
+    "imdb_id": "",
+    "title": "In the Tall Grass",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After hearing a child screaming for help from the green depths of a vast field of tall grass, Becky, a pregnant woman, and Cal, her brother, park their car near a mysterious abandoned church and enter the field, discovering that they are not alone and, for some reason, they are unable to escape a completely inextricable vegetable labyrinth.",
+    "poster": "https://image.tmdb.org/t/p/w500/1RxhzwFkAUqMt215Brb06u8P8pn.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qk8pKinGFWEDZ02NVKuUsBuWuGx.jpg",
+    "rating": 5.5,
+    "release_date": "2019-09-20",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "7afc9gTbVFI",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADVB8AAh-4UEYtgma-YOdLQxYE"
+    ]
+  },
+  {
     "title": "Ip Man: Kung Fu Legend (2026)",
     "csv_id": "1628071-2",
     "type": "Movie",
@@ -8989,6 +7688,31 @@
     "cast": []
   },
   {
+    "csv_id": "253046-jailbait",
+    "tmdb_id": 253046,
+    "imdb_id": "",
+    "title": "Jailbait",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A gritty coming of age thriller about a young girl sent to juvenile prison for the murder of her abusive step father. The film follows Anna Nix's journey into the dark world of an all girls jail where she discovers complex relationships, drugs, mental illness and her eventual search for redemption.",
+    "poster": "https://image.tmdb.org/t/p/w500/bNaKWcYARKnvDBCFEIc0uOQxX2v.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/hdWExtkjIxA3j6r8GdWgRKXuNm9.jpg",
+    "rating": 5.4,
+    "release_date": "2014-02-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "WR-ouRYzlm8",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADWx8AAh-4UEb8-8EicpVDwxYE"
+    ]
+  },
+  {
     "title": "Jessie",
     "csv_id": "38974-jessie",
     "type": "Series",
@@ -9023,6 +7747,106 @@
     "director": "Pamela Eells",
     "trailer": "L6vTO_Ui_TU",
     "runtime": "23 min"
+  },
+  {
+    "csv_id": "245891-john-wick",
+    "tmdb_id": 245891,
+    "imdb_id": "",
+    "title": "John Wick",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Ex-hitman John Wick comes out of retirement to track down the gangsters that took everything from him.",
+    "poster": "https://image.tmdb.org/t/p/w500/wXqWR7dHncNRbxoEGybEy7QTe9h.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ff2ti5DkA9UYLzyqhQfI2kZqEuh.jpg",
+    "rating": 7.5,
+    "release_date": "2014-10-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "6r0s41Ju5XA",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADoiAAAh-4UEY3h47aIT1rYxYE"
+    ]
+  },
+  {
+    "csv_id": "324552-john-wick-chapter-2",
+    "tmdb_id": 324552,
+    "imdb_id": "",
+    "title": "John Wick: Chapter 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "John Wick is forced out of retirement by a former associate looking to seize control of a shadowy international assassins’ guild. Bound by a blood oath to aid him, Wick travels to Rome and does battle against some of the world’s most dangerous killers.",
+    "poster": "https://image.tmdb.org/t/p/w500/hXWBc0ioZP3cN4zCu6SN3YHXZVO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/r17jFHAemzcWPPtoO0UxjIX0xas.jpg",
+    "rating": 7.3,
+    "release_date": "2017-02-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "LZrX9mffH8Y",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADpSAAAh-4UEaXntXr9UJOCBYE"
+    ]
+  },
+  {
+    "csv_id": "458156-john-wick-chapter-3-parabellum",
+    "tmdb_id": 458156,
+    "imdb_id": "",
+    "title": "John Wick: Chapter 3 - Parabellum",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Super-assassin John Wick returns with a $14 million price tag on his head and an army of bounty-hunting killers on his trail. After killing a member of the shadowy international assassin’s guild, the High Table, John Wick is excommunicado, but the world’s most ruthless hit men and women await his every turn.",
+    "poster": "https://image.tmdb.org/t/p/w500/ziEuG1essDuWuC5lpWUaw1uXY2O.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vVpEOvdxVBP2aV166j5Xlvb5Cdc.jpg",
+    "rating": 7.4,
+    "release_date": "2019-05-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "pU8-7BX9uxs",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADoSAAAh-4UEb39Z0rjGrrAhYE"
+    ]
+  },
+  {
+    "csv_id": "603692-john-wick-chapter-4",
+    "tmdb_id": 603692,
+    "imdb_id": "",
+    "title": "John Wick: Chapter 4",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "With the price on his head ever increasing, John Wick uncovers a path to defeating The High Table. But before he can earn his freedom, Wick must face off against a new enemy with powerful alliances across the globe and forces that turn old friends into foes.",
+    "poster": "https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7I6VUdPj6tQECNHdviJkUHD2u89.jpg",
+    "rating": 7.7,
+    "release_date": "2023-03-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "yjRHZEUamCc",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADpyAAAh-4UEbtOy9Qq1q13xYE"
+    ]
   },
   {
     "csv_id": "95479-jujutsu-kaisen",
@@ -9510,6 +8334,84 @@
     ]
   },
   {
+    "csv_id": "395992-life",
+    "tmdb_id": 395992,
+    "imdb_id": "",
+    "title": "Life",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "The six-member crew of the International Space Station is tasked with studying a sample from Mars that may be the first proof of extra-terrestrial life, which proves more intelligent than ever expected.",
+    "poster": "https://image.tmdb.org/t/p/w500/wztfli5NgYDgurVgShNflvnyA3Z.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nNh7vHHISVAaziJEqAq0P9iL52w.jpg",
+    "rating": 6.5,
+    "release_date": "2017-03-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "cuA-xqBw4jE",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD8h8AAh-4UEYk4-iwPIWZWRYE"
+    ]
+  },
+  {
+    "csv_id": "283141-lil-kev",
+    "tmdb_id": 283141,
+    "imdb_id": "",
+    "title": "Lil Kev",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Set in 1993 North Philadelphia, follow 12-year-old Kevin Hart, whose wild imagination and unshakable optimism constantly collide with his neighborhood's harsh realities. At the same time, his no-nonsense mother Nancy juggles night shifts as an E.R. nurse while waging a one-woman war to keep Kev on track – no easy feat with his mischievous older brother Robert blazing all the wrong trails, his trainwreck father Henry's outrageous attempts to win Nancy back, and his ex-con uncle Richard Jr.'s questionable life advice.",
+    "poster": "https://image.tmdb.org/t/p/w500/rnWr6Xr72Lsqf2JH52BdticR3Dc.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fMCewQBoRlPQOZcSmGJOf3cWDMO.jpg",
+    "rating": 7.7,
+    "release_date": "2025-03-06",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "XjK8gozeTbg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADkh4AAh-4UEbGNYNy6QzAWBYE"
+    ]
+  },
+  {
+    "csv_id": "331482-little-women",
+    "tmdb_id": 331482,
+    "imdb_id": "",
+    "title": "Little Women",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Four sisters come of age in America in the aftermath of the Civil War.",
+    "poster": "https://image.tmdb.org/t/p/w500/yn5ihODtZ7ofn8pDYfxCmxh8AXI.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lqxxwTRk0l7CubY6JkJdhnwJEkn.jpg",
+    "rating": 7.9,
+    "release_date": "2019-12-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "AST2-4db4ic",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADXiAAAh-4UEbNBmUg9oqXphYE"
+    ]
+  },
+  {
     "title": "Locke & Key",
     "csv_id": "86423-locke-key",
     "type": "Series",
@@ -9744,6 +8646,33 @@
     "trailer": "ga0iTWXCGa0"
   },
   {
+    "csv_id": "113145-mad-buddies",
+    "tmdb_id": 113145,
+    "imdb_id": "",
+    "title": "Mad Buddies",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Two sworn enemies, Boetie (Leon Schuster) and Beast (Kenneth Nkosi) are forced to do a road trip together on foot, only to discover that they have been conned into being part of a TV reality show.",
+    "poster": "https://image.tmdb.org/t/p/w500/cYLz9eENFrIHLPnJ15mE2omn2eN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/9auAjvVgdc1FDujjXGikljSLJUr.jpg",
+    "rating": 4.5,
+    "release_date": "2012-06-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Iam7Xq1HbZ8",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADfR8AAh-4UEbINyMV7SgcPBYE"
+    ]
+  },
+  {
     "title": "Madame Web",
     "csv_id": "634492-madame-web",
     "type": "Movie",
@@ -9851,6 +8780,131 @@
     "cast": []
   },
   {
+    "csv_id": "15670-madea-goes-to-jail",
+    "tmdb_id": 15670,
+    "imdb_id": "",
+    "title": "Madea Goes to Jail",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After a high-speed car chase, Madea winds up behind bars because her quick temper gets the best of her. Meanwhile, Assistant District Attorney Josh Hardaway lands a case that's too personal to handle: that of a young prostitute and former drug addict named Candace, also a childhood friend. When Candace winds up in jail, Madea takes the young woman under her protective wing.",
+    "poster": "https://image.tmdb.org/t/p/w500/qiXNNmSFXsfUdKDkylBF2LfX0DR.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/oLutveZjcSDVjIgfq7afMIarjpL.jpg",
+    "rating": 6.5,
+    "release_date": "2009-02-20",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "61AeW3d3fWo",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD0x4AAh-4UEYL6n1-0NqyOhYE"
+    ]
+  },
+  {
+    "csv_id": "51017-madea-s-big-happy-family",
+    "tmdb_id": 51017,
+    "imdb_id": "",
+    "title": "Madea's Big Happy Family",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "When Shirley, Madea's niece, receives distressing news about her health, the only thing she wants is her family gathered around her. However, Shirley's three adult children are too preoccupied with their own troubled lives to pay attention to their mother. It is up to Madea, with the help of rowdy Aunt Bam, to bring the clan together and help Shirley deal with her crisis.",
+    "poster": "https://image.tmdb.org/t/p/w500/6qWcpqRfUEFrbKdDvB7tg7h1oXz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fDVFfShvogB52g86V2plsmF3BWF.jpg",
+    "rating": 6.7,
+    "release_date": "2011-04-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "bExi5_p28Mo",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD1h4AAh-4UEYTHgX_yCzCOhYE"
+    ]
+  },
+  {
+    "csv_id": "1246310-madea-s-destination-wedding",
+    "tmdb_id": 1246310,
+    "imdb_id": "",
+    "title": "Madea's Destination Wedding",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Madea packs her best floral dresses and a whole lot of chaos when the Simmons family heads to the Bahamas for her grandniece's whirlwind wedding.",
+    "poster": "https://image.tmdb.org/t/p/w500/jwMwRucnAROgWo9WLLmIqzHmmzi.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rEX85lgoawCWv9l8bgEPRqWtdPp.jpg",
+    "rating": 6,
+    "release_date": "2025-07-10",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "WdAYvmk4QjA",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD2B4AAh-4UEZvjofo6VaOfRYE"
+    ]
+  },
+  {
+    "csv_id": "16781-madea-s-family-reunion",
+    "tmdb_id": 16781,
+    "imdb_id": "",
+    "title": "Madea's Family Reunion",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Southern matriarch Madea has a lot on her plate. Her nieces, Vanessa and Lisa, have relationship troubles - Vanessa moves into Madea's house with her 2 young children and Lisa is engaged to a controlling man that her mother set her up with. In addition, Madea has just been court-ordered to become the guardian of Nikki, a rebellious runaway teenager. Madea must keep the peace and her family together while simultaneously planning her clan's reunion.",
+    "poster": "https://image.tmdb.org/t/p/w500/lAzrDS5bJJSSdPAUxuctCoomXUc.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vFNooLsEgurZjnTEmwS8FWHurDi.jpg",
+    "rating": 6.4,
+    "release_date": "2006-02-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD2h4AAh-4UEYlTSYja_Q9XRYE"
+    ]
+  },
+  {
+    "csv_id": "103370-madea-s-witness-protection",
+    "tmdb_id": 103370,
+    "imdb_id": "",
+    "title": "Madea's Witness Protection",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "For years, mild-mannered Wall Street banker George Needleman has meandered through life oblivious to his family's dysfunction and his company's malfeasance, but he's forced to wake up when he learns that he's been framed in a mob-backed Ponzi scheme. Placed under federal protection, George and his family are shipped down South to Madea's house, where the no-nonsense matriarch whips them all into shape using her special brand of tough love.",
+    "poster": "https://image.tmdb.org/t/p/w500/4P6d7kVDB60Ydmk9WAhrPCWrARI.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lDdTFUonxMymKX2NYbUkJSfJWyj.jpg",
+    "rating": 6.1,
+    "release_date": "2012-06-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "zCrCd8Bn0lU",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADzh4AAh-4UEabhoRd0xJx-RYE"
+    ]
+  },
+  {
     "csv_id": "133282-magical-destroyers",
     "tmdb_id": 133282,
     "imdb_id": "",
@@ -9900,6 +8954,31 @@
     "runtime": "",
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQAD4RsAAghnMUbou2QqJ4yrUBYE"
+    ]
+  },
+  {
+    "csv_id": "10867-malena",
+    "tmdb_id": 10867,
+    "imdb_id": "",
+    "title": "Malena",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "12-year-old Renato experiences three significant events on the same day: the beginning of the Second World War, getting a bike, and witnessing the arrival of the gorgeous Malèna. Through his eyes, we see the curse of beauty and loneliness of Malena, whose husband is presumed dead, and, through his soul, we see his love for her.",
+    "poster": "https://image.tmdb.org/t/p/w500/3OyQTl0IGkbnjDxd3MhztfPE34g.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vadUKKQixxOKWkcuZ1SUEoBQeVG.jpg",
+    "rating": 7.5,
+    "release_date": "2000-10-27",
+    "language": "it",
+    "cast": [],
+    "director": "",
+    "trailer": "73FrJrCgJCI",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADgx8AAh-4UEY4LKqDw1Sx9BYE"
     ]
   },
   {
@@ -10704,6 +9783,31 @@
     "runtime": ""
   },
   {
+    "csv_id": "787-mr-mrs-smith",
+    "tmdb_id": 787,
+    "imdb_id": "",
+    "title": "Mr. & Mrs. Smith",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A husband and wife struggle to keep their marriage alive until they realize they are both secretly working as assassins. Now, their respective assignments require them to kill each other.",
+    "poster": "https://image.tmdb.org/t/p/w500/kjD700RtyhveN3ZbOnSvUSne0Qj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/iFaWUETEE2umP1WY0LUAmjSpzm7.jpg",
+    "rating": 6.7,
+    "release_date": "2005-06-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "TWB_icm5M38",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADsx4AAh-4UEb4Sro4F5ZjThYE"
+    ]
+  },
+  {
     "title": "Ms. Marvel",
     "csv_id": "92782-ms-marvel",
     "type": "Series",
@@ -11096,6 +10200,87 @@
     ]
   },
   {
+    "csv_id": "615453-ne-zha",
+    "tmdb_id": 615453,
+    "imdb_id": "",
+    "title": "Ne Zha",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "A young boy is born as the reincarnation of a demonic power, into a society that hates and fears him. Destined by prophecy to bring destruction to the world, Nezha must choose between good and evil to see if he can change his fate.",
+    "poster": "https://image.tmdb.org/t/p/w500/phM9bb6s9c60LA8qwsdk7U1N2cS.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/k1pJslKr4aDayw9kWwWnlC3MIP3.jpg",
+    "rating": 7.9,
+    "release_date": "2019-07-26",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "PYSiEFeMbZ0",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADlR4AAh-4UEZWo3FK1PTBURYE"
+    ]
+  },
+  {
+    "csv_id": "980477-ne-zha-2",
+    "tmdb_id": 980477,
+    "imdb_id": "",
+    "title": "Ne Zha 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "After a catastrophic event leaves their bodies destroyed, Ne Zha and Ao Bing are granted a fragile second chance at life. As tensions rise between the dragon clans and celestial forces, the two must undergo a series of perilous trials that will test their bond, challenge their identities, and decide the fate of both mortals and immortals.",
+    "poster": "https://image.tmdb.org/t/p/w500/cb5NyNrqiCNNoDkA8FfxHAtypdG.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zxi6WQPVc0uQAG5TtLsKvxYHApC.jpg",
+    "rating": 8.1,
+    "release_date": "2025-01-29",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "ETlOSBR92Fs",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADlh4AAh-4UEbTpehfcUuSYhYE"
+    ]
+  },
+  {
+    "csv_id": "136797-need-for-speed",
+    "tmdb_id": 136797,
+    "imdb_id": "",
+    "title": "Need for Speed",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "The film revolves around a local street-racer who partners with a rich and arrogant business associate, only to find himself framed by his colleague and sent to prison. After he gets out, he joins a New York-to-Los Angeles race to get revenge. But when the ex-partner learns of the scheme, he puts a massive bounty on the racer's head, forcing him to run a cross-country gauntlet of illegal racers in all manner of supercharged vehicles.",
+    "poster": "https://image.tmdb.org/t/p/w500/45D153Bk0bNwonV1w5IBBvqssPV.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/syVAWAnY6fTBDDFntHsM8vFjKex.jpg",
+    "rating": 6.4,
+    "release_date": "2014-03-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "e73J71RZRn8",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADXx8AAh-4UEb7fTsF5sSl5hYE"
+    ]
+  },
+  {
     "csv_id": "195589-neighbors",
     "tmdb_id": 195589,
     "imdb_id": "",
@@ -11206,6 +10391,34 @@
     "trailer": "HyOCCCbxwMQ"
   },
   {
+    "csv_id": "844075-new-gods-yang-jian",
+    "tmdb_id": 844075,
+    "imdb_id": "",
+    "title": "New Gods: Yang Jian",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Fifteen hundred years after the war of gods, the heaven declined. Yang Jian, the God of Erlang, made a living by working as a catcher. One day, Yang Jian was ordered to hunt down a young man, his own nephew.",
+    "poster": "https://image.tmdb.org/t/p/w500/tW5dFOemV4d7hxTcVI2bu4u0C9z.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zxIXvhF5PSZwQ9tvlLIzhcwi7IO.jpg",
+    "rating": 7.5,
+    "release_date": "2022-08-19",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "IaELO-4rPnE",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADcR8AAh-4UEbtFR2FV04OchYE"
+    ]
+  },
+  {
     "title": "Nicky, Ricky, Dicky & Dawn",
     "csv_id": "61854-nicky-ricky-dicky-dawn",
     "type": "Series",
@@ -11295,6 +10508,31 @@
     ]
   },
   {
+    "csv_id": "514619-nobody-s-fool",
+    "tmdb_id": 514619,
+    "imdb_id": "",
+    "title": "Nobody's Fool",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After serving five years in prison, wild child Tanya looks to her buttoned-up, by-the-book sister Danica to help her get back on her feet. The feisty ex-con becomes suspicious and concerned when Danica tells her that she's in a long-distance, online relationship with a mysterious man she's never seen. As the polar opposites start to collide, Tanya soon discovers that her sibling's picture-perfect life may not be what it seems.",
+    "poster": "https://image.tmdb.org/t/p/w500/2VTHRTwLlnFDlNUxc8MEeFwCQTm.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/hCK1V5CNXS9wukjkBfKbZ8ghDtL.jpg",
+    "rating": 6.1,
+    "release_date": "2018-10-31",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "MsFbMw9LO5M",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADCx8AAh-4UEZJ6EFDtMaN-RYE"
+    ]
+  },
+  {
     "title": "Not Another Teen Movie",
     "csv_id": "11397-not-another-teen-movie",
     "type": "Movie",
@@ -11347,6 +10585,31 @@
     "director": "",
     "trailer": "",
     "runtime": ""
+  },
+  {
+    "csv_id": "257-oliver-twist",
+    "tmdb_id": 257,
+    "imdb_id": "",
+    "title": "Oliver Twist",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "When 9-year-old orphan Oliver Twist dares to ask his cruel taskmaster, Mr. Bumble, for a second serving of gruel, he's hired out as an apprentice. Escaping that dismal fate, young Oliver falls in with the street urchin known as the Artful Dodger and his criminal mentor, Fagin. When kindly Mr. Brownlow takes Oliver in, Fagin's evil henchman Bill Sikes plots to kidnap the boy.",
+    "poster": "https://image.tmdb.org/t/p/w500/zhPdYZ3x2uanhM1SyBj4CuL6hSa.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2tfwa81Fg8iD4o8iEtIQRI8UY0F.jpg",
+    "rating": 6.8,
+    "release_date": "2005-09-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "4aUGLJicck8",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADBSAAAh-4UEYRGsCwSWLoWRYE"
+    ]
   },
   {
     "title": "Olóládé",
@@ -11579,6 +10842,31 @@
     ]
   },
   {
+    "csv_id": "527776-overcomer",
+    "tmdb_id": 527776,
+    "imdb_id": "",
+    "title": "Overcomer",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After reluctantly agreeing to coach cross-country, high school basketball Coach John Harrison helps the least likely runner attempt the impossible in the biggest race of the year.",
+    "poster": "https://image.tmdb.org/t/p/w500/rVR3uN1yPRqYBBtNFSrEKCpRhaK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/704pWRU1CihHgIIKRSAZD7juXQy.jpg",
+    "rating": 7.7,
+    "release_date": "2019-08-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "w7DWf7ObFNI",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADnB8AAh-4UEbzfiPSKxlpZBYE"
+    ]
+  },
+  {
     "title": "Palava!",
     "csv_id": "1060526-palava",
     "type": "Movie",
@@ -11667,6 +10955,56 @@
     ],
     "director": "Dimeji Ajibola",
     "runtime": "109 min"
+  },
+  {
+    "csv_id": "388399-patriots-day",
+    "tmdb_id": 388399,
+    "imdb_id": "",
+    "title": "Patriots Day",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "In the aftermath of an unspeakable act of terror, Police Sergeant Tommy Saunders joins courageous survivors, first responders and investigators in a race against the clock to hunt down the Boston Marathon bombers before they strike again.",
+    "poster": "https://image.tmdb.org/t/p/w500/mIDxsJTrOC7NhgOo3GziiHyKfsQ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lWcNlDMmZ6xJVoCZjhFxqVl0TIa.jpg",
+    "rating": 7.1,
+    "release_date": "2016-12-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ykwSo64RYao",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADoh8AAh-4UEZ8h4KLPVqNlhYE"
+    ]
+  },
+  {
+    "csv_id": "845659-perfect-addiction",
+    "tmdb_id": 845659,
+    "imdb_id": "",
+    "title": "Perfect Addiction",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A female boxing trainer discovers that her champion cage-fighter boyfriend has been cheating on her with her sister and decides to seek revenge by training up his arch-rival to challenge him.",
+    "poster": "https://image.tmdb.org/t/p/w500/ucO3NFIvMff71cBRR5EgYXPKWMC.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sE6uilkTOIdg1zbZ3S8UKJ7Q9Av.jpg",
+    "rating": 6.8,
+    "release_date": "2023-02-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "FibtBUxV9hY",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADrB8AAh-4UEaeSqplR_ZlVBYE"
+    ]
   },
   {
     "title": "Peter's To-Do List",
@@ -11965,6 +11303,31 @@
     "trailer": "oLtnNw0KT78"
   },
   {
+    "csv_id": "110490-rags",
+    "tmdb_id": 110490,
+    "imdb_id": "",
+    "title": "Rags",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Rags follows the story of Charlie Prince, an orphan living with his acerbic and unloving stepfather and spoiled, simple-minded stepbrothers. Charlie's dream is to be a singer, and while he is vocally talented and can write music, he can't seem to catch a break. Kadee Worth, on the other hand, is the daughter of music mogul Reginald Worth and is an international pop phenomenon. While the world knows her as a glamorous superstar, she is secretly frustrated with singing other people's songs and wearing clothes other people choose for her. Kadee wants the world to hear and see her true talent. Despite every obstacle that gets thrown in their way, once Charlie and Kadee find one another, they each finally get what they have been looking for – a voice, a stage, an audience and each other.",
+    "poster": "https://image.tmdb.org/t/p/w500/5CfrXWMeGcMlisL1YRCgpFMWiER.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rTHODCYE1nth5sUXwdbZtFhny4M.jpg",
+    "rating": 7.3,
+    "release_date": "2012-05-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "UlPvT8ywd7I",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADrh8AAh-4UEb10Yt6HND_XRYE"
+    ]
+  },
+  {
     "title": "Rancor",
     "csv_id": "1723707-rancor",
     "type": "Movie",
@@ -12038,6 +11401,31 @@
     "backdrop": "https://image.tmdb.org/t/p/w1280/7ZruEnSnHD6Jx5mF0hBt1E306Vt.jpg",
     "language": "ja",
     "cast": []
+  },
+  {
+    "csv_id": "845781-red-one",
+    "tmdb_id": 845781,
+    "imdb_id": "",
+    "title": "Red One",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After Santa Claus (codename: Red One) is kidnapped, the North Pole's Head of Security must team up with the world's most infamous tracker in a globe-trotting, action-packed mission to save Christmas.",
+    "poster": "https://image.tmdb.org/t/p/w500/cdqLnri3NEGcmfnqwk2TSIYtddg.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rOmUuQEZfPXglwFs5ELLLUDKodL.jpg",
+    "rating": 7,
+    "release_date": "2024-10-31",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "7l3hfD74X-4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADmx4AAh-4UEbBolKNOaIHBxYE"
+    ]
   },
   {
     "title": "Rick and Morty",
@@ -12328,6 +11716,31 @@
     ]
   },
   {
+    "csv_id": "417384-scary-stories-to-tell-in-the-dark",
+    "tmdb_id": 417384,
+    "imdb_id": "",
+    "title": "Scary Stories to Tell in the Dark",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Mill Valley, Pennsylvania, Halloween night, 1968. After playing a joke on a school bully, Stella and her friends decide to sneak into a supposedly haunted house that once belonged to the powerful Bellows family, unleashing dark forces that they will be unable to control.",
+    "poster": "https://image.tmdb.org/t/p/w500/uy0dNFbhRhHBLwpOGpcTw9UEwdX.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/snll1zUi2oxIah9qifXOvbfjcrG.jpg",
+    "rating": 6.5,
+    "release_date": "2019-08-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "FLsr5nsa8qg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADsR8AAh-4UEbiHMhFvrMMpBYE"
+    ]
+  },
+  {
     "csv_id": "204154-scavengers-reign",
     "tmdb_id": 204154,
     "imdb_id": "",
@@ -12614,6 +12027,31 @@
     "cast": []
   },
   {
+    "csv_id": "9655-she-s-the-man",
+    "tmdb_id": 9655,
+    "imdb_id": "",
+    "title": "She's the Man",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Viola Hastings is in a real jam. Complications threaten her scheme to pose as her twin brother, Sebastian, and take his place at a new boarding school. She falls in love with her handsome roommate, Duke, who loves beautiful Olivia, who has fallen for Sebastian! As if that were not enough, Viola's twin returns from London ahead of schedule but has no idea that his sister has already replaced him on campus.",
+    "poster": "https://image.tmdb.org/t/p/w500/xRElqFcUVuGf0s2rAQSSNAn1IS9.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/9ys3pySjmZiONZWAy8QhOxv5SDH.jpg",
+    "rating": 6.8,
+    "release_date": "2006-03-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "D4OhwrMidSU",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADvB8AAh-4UEZrP53lDNpCLRYE"
+    ]
+  },
+  {
     "csv_id": "808-shrek",
     "tmdb_id": 808,
     "imdb_id": "",
@@ -12890,6 +12328,31 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADYxcAAq-EQEYQ30fhByYq0BYE"
+    ]
+  },
+  {
+    "csv_id": "939243-sonic-the-hedgehog-3",
+    "tmdb_id": 939243,
+    "imdb_id": "",
+    "title": "Sonic the Hedgehog 3",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Sonic, Knuckles, and Tails reunite against a powerful new adversary, Shadow, a mysterious villain with powers unlike anything they have faced before. With their abilities outmatched in every way, Team Sonic must seek out an unlikely alliance in hopes of stopping Shadow and protecting the planet.",
+    "poster": "https://image.tmdb.org/t/p/w500/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg",
+    "rating": 7.6,
+    "release_date": "2024-12-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "LH1J1EbqCaI",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADqh4AAh-4UEbkznfF58lqthYE"
     ]
   },
   {
@@ -13366,6 +12829,31 @@
     "runtime": ""
   },
   {
+    "csv_id": "297761-suicide-squad",
+    "tmdb_id": 297761,
+    "imdb_id": "",
+    "title": "Suicide Squad",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government, undertaking high-risk black ops missions in exchange for commuted prison sentences.",
+    "poster": "https://image.tmdb.org/t/p/w500/sk3FZgh3sRrmr8vyhaitNobMcfh.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wAk0yKrhAmvsoMvlKs4QImhvK5X.jpg",
+    "rating": 5.9,
+    "release_date": "2016-08-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "m0Xb9BhfVjY",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADDiAAAh-4UEbIXUMPBCCCMRYE"
+    ]
+  },
+  {
     "csv_id": "229926-suicide-squad-isekai",
     "tmdb_id": 229926,
     "imdb_id": "",
@@ -13796,6 +13284,31 @@
     "runtime": "83 min"
   },
   {
+    "csv_id": "225565-that-awkward-moment",
+    "tmdb_id": 225565,
+    "imdb_id": "",
+    "title": "That Awkward Moment",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Best pals Jason and Daniel indulge in casual flings and revel in their carefree, unattached lives. After learning that the marriage of their friend Mikey is over, they gladly welcome him back into their circle. The three young men make a pact to have fun and avoid commitment. However, when all three find themselves involved in serious relationships, they must keep their romances secret from one another.",
+    "poster": "https://image.tmdb.org/t/p/w500/tjDAdesZNYFyRNnZvLT0osc7S2t.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2FfNbWD2ss7BrI1jYVbkWT3CunU.jpg",
+    "rating": 6.1,
+    "release_date": "2014-01-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Mvr-NQrqF6I",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADEyAAAh-4UEZHFNLoZ768phYE"
+    ]
+  },
+  {
     "csv_id": "99624-the-8th-son-are-you-kidding-me",
     "tmdb_id": 99624,
     "imdb_id": "",
@@ -13876,6 +13389,31 @@
     ]
   },
   {
+    "csv_id": "241251-the-boy-next-door",
+    "tmdb_id": 241251,
+    "imdb_id": "",
+    "title": "The Boy Next Door",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A recently cheated on married woman falls for a younger man who has moved in next door, but their torrid affair soon takes a dangerous turn.",
+    "poster": "https://image.tmdb.org/t/p/w500/gicmSeLG6Uh7BF1r1mxZHUQ8r26.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/96iXwJibeNW9RGEa58zYa0SQV6m.jpg",
+    "rating": 4.9,
+    "release_date": "2015-01-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "MgbBwovOOoc",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADGSAAAh-4UEbxlRwv0niOYBYE"
+    ]
+  },
+  {
     "csv_id": "152483-the-boys-presents-diabolical",
     "tmdb_id": 152483,
     "imdb_id": "",
@@ -13903,6 +13441,31 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADbBwAAq-ESEZPvQyl1RQvpxYE"
+    ]
+  },
+  {
+    "csv_id": "9767-the-break-up",
+    "tmdb_id": 9767,
+    "imdb_id": "",
+    "title": "The Break-Up",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Pushed to the breaking-up point after their latest 'why can't you do this one little thing for me?' argument, Brooke calls it quits with her boyfriend Gary. What follows is a hilarious series of remedies, war tactics, overtures and undermining tricks – all encouraged by the former couple's friends and confidantes …and the occasional total stranger! When neither ex is willing to move out of their shared apartment, the only solution is to continue living as hostile roommates until one of them reaches breaking point.",
+    "poster": "https://image.tmdb.org/t/p/w500/ghCLIPRZNAndBoIZJ8f7lN5Mlly.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tukmcuDcTgFesqveQQWKhKXKEzg.jpg",
+    "rating": 5.9,
+    "release_date": "2006-06-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "SfTaJUh3_J4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADuR4AAh-4UEaPrQV56oB4fBYE"
     ]
   },
   {
@@ -14106,6 +13669,31 @@
     ]
   },
   {
+    "csv_id": "296271-the-devil-conspiracy",
+    "tmdb_id": 296271,
+    "imdb_id": "",
+    "title": "The Devil Conspiracy",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A powerful biotech company has breakthrough technology allowing them to clone history’s most influential people with just a few fragments of DNA. Behind this company is a cabal of Satanists that steals the shroud of Christ, putting them in possession of Jesus’ DNA. The clone will serve as the ultimate offering to the devil. The Archangel Michael comes to earth and will stop at nothing to end the devil’s conspiracy.",
+    "poster": "https://image.tmdb.org/t/p/w500/gZCWgbIq2IBDRMJmdx5NeYbbigL.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sp7MPK2K60LLd7A6zjHKsfgjFil.jpg",
+    "rating": 6.4,
+    "release_date": "2023-01-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "6im3vt5yZoY",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADRiAAAh-4UEbtcazvdFqGChYE"
+    ]
+  },
+  {
     "csv_id": "1314481-the-devil-wears-prada-2",
     "tmdb_id": 1314481,
     "imdb_id": "",
@@ -14210,6 +13798,31 @@
     "director": "",
     "trailer": "",
     "runtime": ""
+  },
+  {
+    "csv_id": "836225-the-exorcism-of-god",
+    "tmdb_id": 836225,
+    "imdb_id": "",
+    "title": "The Exorcism of God",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "An American priest working in Mexico is considered a saint by many local parishioners. However, due to a botched exorcism, he carries a secret that’s eating him alive until he gets an opportunity to face his demon one final time.",
+    "poster": "https://image.tmdb.org/t/p/w500/hangTmbxpSV4gpHG7MgSlCWSSFa.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mjIuTXM4FhLAT1apxHULetAZAfj.jpg",
+    "rating": 7.1,
+    "release_date": "2022-03-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "VdLI8I4jZD0",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD3R8AAh-4UEYAAWUSIXg9umEWBA"
+    ]
   },
   {
     "title": "The Fairly OddParents",
@@ -14475,6 +14088,31 @@
     "language": "en"
   },
   {
+    "csv_id": "10591-the-girl-next-door",
+    "tmdb_id": 10591,
+    "imdb_id": "",
+    "title": "The Girl Next Door",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Exceptionally ambitious high schooler Matthew has aspirations for a career in politics when he falls in love with his gorgeous 19-year-old neighbor, Danielle. But Matthew's bright future is jeopardized when he finds Danielle was once a porn star. As Danielle's past catches up with her, Matthew's love for her forces him to re-evaluate his goals.",
+    "poster": "https://image.tmdb.org/t/p/w500/5mVyFHSY2rSsNgD4NfEwV82HigU.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qvcOovScPoRalRxDy50rYSYFree.jpg",
+    "rating": 6.8,
+    "release_date": "2004-04-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "0rD3Qkh-238",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD3h8AAh-4UEbOHsQdCbrrrxYE"
+    ]
+  },
+  {
     "title": "The Guardians of the Galaxy Holiday Special",
     "csv_id": "774752-the-guardians-of-the-galaxy-holiday-special",
     "type": "Movie",
@@ -14523,6 +14161,56 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADdgkAAh-4SEak1LkZfQoMuxYE"
+    ]
+  },
+  {
+    "csv_id": "18785-the-hangover",
+    "tmdb_id": 18785,
+    "imdb_id": "",
+    "title": "The Hangover",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "When three friends finally come to after a raucous night of bachelor-party revelry, they find a baby in the closet and a tiger in the bathroom. But they can't seem to locate their best friend, Doug – who's supposed to be tying the knot. Launching a frantic search for Doug, the trio perseveres through a nasty hangover to try to make it to the church on time.",
+    "poster": "https://image.tmdb.org/t/p/w500/A0uS9rHR56FeBtpjVki16M5xxSW.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/iuRVt8tFiXDPGgzavhuSa3QHRxD.jpg",
+    "rating": 7.3,
+    "release_date": "2009-06-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "tlize92ffnY",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD8R8AAh-4UEYjJNVrAAGNOdEWBA"
+    ]
+  },
+  {
+    "csv_id": "109439-the-hangover-part-iii",
+    "tmdb_id": 109439,
+    "imdb_id": "",
+    "title": "The Hangover Part III",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "This time, there's no wedding. No bachelor party. What could go wrong, right? But when the Wolfpack hits the road, all bets are off.",
+    "poster": "https://image.tmdb.org/t/p/w500/vtxuPWkdllLNLVyGjKYa267ntuH.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/o8ZS811VjYbBi4pRYwILLdWCVey.jpg",
+    "rating": 6.2,
+    "release_date": "2013-05-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "96TelFMZwHc",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADxx8AAh-4UEbw07c153wHihYE"
     ]
   },
   {
@@ -14608,6 +14296,56 @@
     "runtime": "119 min"
   },
   {
+    "csv_id": "205596-the-imitation-game",
+    "tmdb_id": 205596,
+    "imdb_id": "",
+    "title": "The Imitation Game",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Based on the real life story of legendary cryptanalyst Alan Turing, the film portrays the nail-biting race against time by Turing and his brilliant team of code-breakers at Britain's top-secret Government Code and Cypher School at Bletchley Park, during the darkest days of World War II.",
+    "poster": "https://image.tmdb.org/t/p/w500/zSqJ1qFq8NXFfi7JeIYMlzyR0dx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/usuRn9DUKQQr4nBWnrQzlOuZ1Q4.jpg",
+    "rating": 8,
+    "release_date": "2014-11-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "j2jRs4EAvWM",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADBB8AAh-4UEbumw3dPX9gqhYE"
+    ]
+  },
+  {
+    "csv_id": "257211-the-intern",
+    "tmdb_id": 257211,
+    "imdb_id": "",
+    "title": "The Intern",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "70-year-old widower Ben Whittaker has discovered that retirement isn't all it's cracked up to be. Seizing an opportunity to get back in the game, he becomes a senior intern at an online fashion site, founded and run by Jules Ostin.",
+    "poster": "https://image.tmdb.org/t/p/w500/bTQ46fupPbjBfFBHuzfD3hxxL0Q.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rFY9V4Dhq7lbIu6LlpzbL9u2K2E.jpg",
+    "rating": 7.2,
+    "release_date": "2015-09-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "f6dKhzYgksc",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADsR4AAh-4UEZZVRcq9_gK1xYE"
+    ]
+  },
+  {
     "csv_id": "228967-the-interview",
     "tmdb_id": 228967,
     "imdb_id": "",
@@ -14658,6 +14396,31 @@
     ]
   },
   {
+    "csv_id": "205587-the-judge",
+    "tmdb_id": 205587,
+    "imdb_id": "",
+    "title": "The Judge",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A successful lawyer returns to his hometown for his mother's funeral only to discover that his estranged father, the town's judge, is suspected of murder.",
+    "poster": "https://image.tmdb.org/t/p/w500/3K93GWotLXe4FqpErri0xkpLaD5.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sPantp0oQ9idos7Jdwko2r6ZOIa.jpg",
+    "rating": 7.3,
+    "release_date": "2014-10-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ZBvK6ni97W8",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADJyAAAh-4UEah7cv4lp1WnRYE"
+    ]
+  },
+  {
     "title": "The Lady of Monza",
     "csv_id": "124395-la-monaca-di-monza",
     "type": "Movie",
@@ -14678,6 +14441,34 @@
     "director": "",
     "trailer": "",
     "runtime": ""
+  },
+  {
+    "csv_id": "9319-the-last-boy-scout",
+    "tmdb_id": 9319,
+    "imdb_id": "",
+    "title": "The Last Boy Scout",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "Somewhere in Los Angeles, the city of broken dreams, a stripper is murdered. Now, the private detective she had hired and her ex-footballer boyfriend are going to find her murderer... if they don't kill each other first. But the more they dig, the deeper they become enmeshed in a web of extortion, blackmail and corrupt politics hidden beneath the surface of professional football.",
+    "poster": "https://image.tmdb.org/t/p/w500/glPswihcZYoAQ4YM2uJF4UACy8T.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/8AZ8Hjcr4Jr1eR93OW70g9jjUr9.jpg",
+    "rating": 6.8,
+    "release_date": "1991-12-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "6UKLRGyovho",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADKiAAAh-4UEZ9Y0HDndFKthYE"
+    ]
   },
   {
     "csv_id": "763144-the-last-rifleman",
@@ -15110,6 +14901,31 @@
     "runtime": "127 min"
   },
   {
+    "csv_id": "758323-the-pope-s-exorcist",
+    "tmdb_id": 758323,
+    "imdb_id": "",
+    "title": "The Pope's Exorcist",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Father Gabriele Amorth, Chief Exorcist of the Vatican, investigates a young boy's terrifying possession and ends up uncovering a centuries-old conspiracy the Vatican has desperately tried to keep hidden.",
+    "poster": "https://image.tmdb.org/t/p/w500/jFC4LS5qTAT3PinzdEzINfu1CV9.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3oqmk6mNWPatBKcjOOJLp5WW9zN.jpg",
+    "rating": 6.9,
+    "release_date": "2023-04-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "YJXqvnT_rsk",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADOCAAAh-4UEa4YosNhB5ByBYE"
+    ]
+  },
+  {
     "title": "The Pretty Ones Are The Loneliest",
     "csv_id": "1560142-the-pretty-ones-are-the-loneliest",
     "type": "Movie",
@@ -15306,6 +15122,62 @@
     ]
   },
   {
+    "csv_id": "694-the-shining",
+    "tmdb_id": 694,
+    "imdb_id": "",
+    "title": "The Shining",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "Jack Torrance accepts a caretaker job at the Overlook Hotel, where he, along with his wife Wendy and their son Danny, must live isolated from the rest of the world for the winter. But they aren't prepared for the madness that lurks within.",
+    "poster": "https://image.tmdb.org/t/p/w500/uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mmd1HnuvAzFc4iuVJcnBrhDNEKr.jpg",
+    "rating": 8.2,
+    "release_date": "1980-05-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "jAE7dNurHR4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADFR8AAh-4UEZmWoZqbE7XexYE"
+    ]
+  },
+  {
+    "csv_id": "413644-the-son-of-bigfoot",
+    "tmdb_id": 413644,
+    "imdb_id": "",
+    "title": "The Son of Bigfoot",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Teenage outsider Adam sets out on an epic and daring quest to uncover the mystery behind his long-lost dad, only to find out that he is none other than the legendary Bigfoot! He has been hiding deep in the forest for years to protect himself and his family from HairCo., a giant corporation eager to run scientific experiments with his special DNA. As father and son start making up for lost time after the boy's initial disbelief, Adam soon discovers that he too is gifted with superpowers beyond his imagination. But little do they know, HairCo. is on their tail as Adam's traces have led them to Bigfoot!",
+    "poster": "https://image.tmdb.org/t/p/w500/5yCQvhFuFPY0pACxoUpLUlYCxop.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xydu6XhKVFf5FomLi9diWjoWc5d.jpg",
+    "rating": 6.6,
+    "release_date": "2017-07-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "hNqBAdBR8_k",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD3B8AAh-4UEYzvPFSSJAhRhYE"
+    ]
+  },
+  {
     "title": "The Stand Up",
     "csv_id": "1066891-the-stand-up",
     "type": "Movie",
@@ -15363,6 +15235,31 @@
     ]
   },
   {
+    "csv_id": "436969-the-suicide-squad",
+    "tmdb_id": 436969,
+    "imdb_id": "",
+    "title": "The Suicide Squad",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Supervillains Harley Quinn, Bloodsport, Peacemaker and a collection of nutty cons at Belle Reve prison join the super-secret, super-shady Task Force X as they are dropped off at the remote, enemy-infused island of Corto Maltese.",
+    "poster": "https://image.tmdb.org/t/p/w500/q61qEyssk2ku3okWICKArlAdhBn.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rAgsOIhqRS6tUthmHoqnqh9PIAE.jpg",
+    "rating": 7.5,
+    "release_date": "2021-07-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "eg5ciqQzmK0",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADOyAAAh-4UEao3kgyK_G44BYE"
+    ]
+  },
+  {
     "csv_id": "41210-the-switch",
     "tmdb_id": 41210,
     "imdb_id": "",
@@ -15385,6 +15282,31 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADzh0AAq-ESEbYRUCdhv0ZeRYE"
+    ]
+  },
+  {
+    "csv_id": "76489-the-three-stooges",
+    "tmdb_id": 76489,
+    "imdb_id": "",
+    "title": "The Three Stooges",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Left on the doorstep of an orphanage run by nuns, three newborn knuckleheads grow up to be finger-poking, nyuk-nyuking janitors named Larry, Curly and Moe. When they learn that financial problems will soon force the only home they've ever known to close, the trio sets out to raise $830,000 in one month. Out in the world for the very first time, the three innocent bumblers become embroiled in a murder plot and find stardom on a TV reality show.",
+    "poster": "https://image.tmdb.org/t/p/w500/b0nNQCL90RGTwjxLEFsFFLQZKNe.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qiXR2emZXBiqCIXNwq0XRypHTmY.jpg",
+    "rating": 5.8,
+    "release_date": "2012-04-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "RQGXqn00hf4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADYiAAAh-4UEZhpPqxGNSdChYE"
     ]
   },
   {
@@ -15590,6 +15512,31 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADfAkAAh-4SEZohxDeumMzoxYE"
+    ]
+  },
+  {
+    "csv_id": "724495-the-woman-king",
+    "tmdb_id": 724495,
+    "imdb_id": "",
+    "title": "The Woman King",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "The story of the Agojie, the all-female unit of warriors who protected the African Kingdom of Dahomey in the 1800s with skills and a fierceness unlike anything the world has ever seen, and General Nanisca as she trains the next generation of recruits and readies them for battle against an enemy determined to destroy their way of life.",
+    "poster": "https://image.tmdb.org/t/p/w500/438QXt1E3WJWb3PqNniK0tAE5c1.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/p5kb4VwnK0bkxsOmME3SBKAcBoe.jpg",
+    "rating": 7.6,
+    "release_date": "2022-09-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "3RDaPV_rJ1Y",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADPSAAAh-4UEY-buU2DF5D8hYE"
     ]
   },
   {
@@ -16085,6 +16032,31 @@
     ]
   },
   {
+    "csv_id": "290764-tracers",
+    "tmdb_id": 290764,
+    "imdb_id": "",
+    "title": "Tracers",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Wanted by the mafia, a New York City bike messenger escapes into the world of parkour after meeting a beautiful stranger.",
+    "poster": "https://image.tmdb.org/t/p/w500/2XoazCkD4gRlqkJK7q6TOTUx1ta.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mQDbtyPuA60dSmXKjlnJntLesRz.jpg",
+    "rating": 6,
+    "release_date": "2015-01-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "obHGqI9AnP0",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADSiAAAh-4UEZEs_49lgdUGRYE"
+    ]
+  },
+  {
     "csv_id": "1258368-treasure-in-the-sky",
     "tmdb_id": 1258368,
     "imdb_id": "",
@@ -16307,6 +16279,56 @@
     ]
   },
   {
+    "csv_id": "845404-tyler-perry-s-a-madea-homecoming",
+    "tmdb_id": 845404,
+    "imdb_id": "",
+    "title": "Tyler Perry's A Madea Homecoming",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Madea's back - hallelujer! And she's not putting up with any nonsense as family drama erupts at her great-grandson's college graduation celebration.",
+    "poster": "https://image.tmdb.org/t/p/w500/fWJXNc0Q0qIXU8O8hcUmH0iCYzu.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7hzK0D7NGTy1MDJkWL9IQKrTmfq.jpg",
+    "rating": 6.8,
+    "release_date": "2022-02-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "afJXk-RgzoQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD4R4AAh-4UEar8k8UOlEPdxYE"
+    ]
+  },
+  {
+    "csv_id": "748167-uglies",
+    "tmdb_id": 748167,
+    "imdb_id": "",
+    "title": "Uglies",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "In a futuristic dystopia with enforced beauty standards, a teen awaiting mandatory cosmetic surgery embarks on a journey to find her missing friend.",
+    "poster": "https://image.tmdb.org/t/p/w500/jaUu9zHtbcFwrB5Y1DNYE09HMex.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/y4NzXdvpJdwRmsnOT7HdkmHh6Yn.jpg",
+    "rating": 5.7,
+    "release_date": "2024-09-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "OhcOHkgTrQQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADsh4AAh-4UEZ3cS9gsk6kUBYE"
+    ]
+  },
+  {
     "csv_id": "68640-unbreakable-machine-doll",
     "tmdb_id": 68640,
     "imdb_id": "",
@@ -16331,6 +16353,31 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQAD2g8AAh-4UEZ7UJdBRgIRIxYE"
+    ]
+  },
+  {
+    "csv_id": "474335-uncle-drew",
+    "tmdb_id": 474335,
+    "imdb_id": "",
+    "title": "Uncle Drew",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Uncle Drew recruits a squad of older basketball players to return to the court to compete in a tournament.",
+    "poster": "https://image.tmdb.org/t/p/w500/yO2qw2cX0oU1ZrPBKc0PPj1C1NL.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/604nkQ0s7ND7nrQorF0v9rSDpdf.jpg",
+    "rating": 6.7,
+    "release_date": "2018-06-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "9H2SSvQ8ihA",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADTyAAAh-4UEaMEzMLFnh14xYE"
     ]
   },
   {
@@ -16576,6 +16623,34 @@
     ]
   },
   {
+    "csv_id": "10681-wall-e",
+    "tmdb_id": 10681,
+    "imdb_id": "",
+    "title": "WALL·E",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "After hundreds of years doing what he was built for, WALL•E— a robot designed to clean up the earth—discovers a new purpose in life when he meets a sleek search robot named EVE. EVE comes to realize that WALL•E has inadvertently stumbled upon the key to the planet's future, and races back to space to report to the humans. Meanwhile, WALL•E chases EVE across the galaxy and sets into motion one of the most imaginative adventures ever brought to the big screen.",
+    "poster": "https://image.tmdb.org/t/p/w500/hbhFnRzzg6ZDmm8YAmxBnQpQIPh.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nYs4ZwnJBK4AgljhvzwNz7fpr3E.jpg",
+    "rating": 8.1,
+    "release_date": "2008-06-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Tbr_L9Gap_M",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADnh4AAh-4UEbiG9dI5la_zhYE"
+    ]
+  },
+  {
     "title": "WandaVision",
     "csv_id": "85271-wandavision",
     "type": "Series",
@@ -16623,6 +16698,31 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADXxcAAq-EQEbJ5Xw_nhH-fBYE"
+    ]
+  },
+  {
+    "csv_id": "323272-war-room",
+    "tmdb_id": 323272,
+    "imdb_id": "",
+    "title": "War Room",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "The family-friendly movie explores the transformational role prayer plays in the lives of the Jordan family. Tony and Elizabeth Jordan, a middle-class couple who seemingly have it all – great jobs, a beautiful daughter, their dream home. But appearances can be deceiving. In reality, the Jordan’s marriage has become a war zone and their daughter is collateral damage. With the help of Miss Clara, an older, wiser woman, Elizabeth discovers she can start fighting for her family instead of against them. Through a newly energized faith, Elizabeth and Tony’s real enemy doesn’t have a prayer.",
+    "poster": "https://image.tmdb.org/t/p/w500/unxQeVUi5DH01r7ZNvAHwpvX7UK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/oCCvZEbqCCcALQtah8HJm9Ja4HT.jpg",
+    "rating": 7.8,
+    "release_date": "2015-08-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "mIl-XY9t_Lw",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADUSAAAh-4UEZXmv8ePBaTTBYE"
     ]
   },
   {
