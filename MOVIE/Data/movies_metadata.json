@@ -1,5 +1,84 @@
 [
   {
+    "csv_id": "573435-bad-boys-ride-or-die",
+    "tmdb_id": 573435,
+    "imdb_id": "",
+    "title": "Bad Boys: Ride or Die",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After their late former Captain is framed, Lowrey and Burnett try to clear his name, only to end up on the run themselves.",
+    "poster": "https://image.tmdb.org/t/p/w500/oGythE98MYleE6mZlGs5oBGkux1.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3q01ACG0MWm0DekhvkPFCXyPZSu.jpg",
+    "rating": 7.3,
+    "release_date": "2024-06-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "uWLNl_KQCAU",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADox4AAh-4UEYTffoWndh1xxYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADpB4AAh-4UEaTzIX2PMTgaxYE"
+    ]
+  },
+  {
+    "csv_id": "10681-wall-e",
+    "tmdb_id": 10681,
+    "imdb_id": "",
+    "title": "WALL·E",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "After hundreds of years doing what he was built for, WALL•E— a robot designed to clean up the earth—discovers a new purpose in life when he meets a sleek search robot named EVE. EVE comes to realize that WALL•E has inadvertently stumbled upon the key to the planet's future, and races back to space to report to the humans. Meanwhile, WALL•E chases EVE across the galaxy and sets into motion one of the most imaginative adventures ever brought to the big screen.",
+    "poster": "https://image.tmdb.org/t/p/w500/hbhFnRzzg6ZDmm8YAmxBnQpQIPh.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nYs4ZwnJBK4AgljhvzwNz7fpr3E.jpg",
+    "rating": 8.1,
+    "release_date": "2008-06-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Tbr_L9Gap_M",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADnh4AAh-4UEbiG9dI5la_zhYE"
+    ]
+  },
+  {
+    "csv_id": "845781-red-one",
+    "tmdb_id": 845781,
+    "imdb_id": "",
+    "title": "Red One",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After Santa Claus (codename: Red One) is kidnapped, the North Pole's Head of Security must team up with the world's most infamous tracker in a globe-trotting, action-packed mission to save Christmas.",
+    "poster": "https://image.tmdb.org/t/p/w500/cdqLnri3NEGcmfnqwk2TSIYtddg.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rOmUuQEZfPXglwFs5ELLLUDKodL.jpg",
+    "rating": 7,
+    "release_date": "2024-10-31",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "7l3hfD74X-4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADmx4AAh-4UEbBolKNOaIHBxYE"
+    ]
+  },
+  {
     "csv_id": "615453-ne-zha",
     "tmdb_id": 615453,
     "imdb_id": "",
