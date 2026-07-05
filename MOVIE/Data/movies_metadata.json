@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "123548-castlevania-nocturne",
+    "tmdb_id": 123548,
+    "imdb_id": "",
+    "title": "Castlevania: Nocturne",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "As revolution sweeps France, Richter Belmont fights to uphold his family's legacy and prevent the rise of a ruthless, power-hungry vampire ruler.",
+    "poster": "https://image.tmdb.org/t/p/w500/4XJwo95ktJ7xupw1bCMuP91kyYr.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/1swj9HxDkjzsO3yHlSwRA38hMFN.jpg",
+    "rating": 7.8,
+    "release_date": "2023-09-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "_afpwpbKPs0",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADPw8AAh-4UEbWFFZkiDeyTBYE"
+    ]
+  },
+  {
     "csv_id": "105248-cyberpunk-edgerunners",
     "tmdb_id": 105248,
     "imdb_id": "",
