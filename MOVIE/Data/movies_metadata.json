@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "30984-bleach",
+    "tmdb_id": 30984,
+    "imdb_id": "",
+    "title": "Bleach",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "For as long as he can remember, Ichigo Kurosaki has been able to see ghosts. But when he meets Rukia, a Soul Reaper who battles evil spirits known as Hollows, he finds his life is changed forever. Now, with a newfound wealth of spiritual energy, Ichigo discovers his true calling: to protect the living and the dead from evil.",
+    "poster": "https://image.tmdb.org/t/p/w500/5iVUUnE2tgBPypACYNobCKHagfV.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/o0NsbcIvsllg6CJX0FBFY8wWbsn.jpg",
+    "rating": 8.4,
+    "release_date": "2004-10-05",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "0c4IoCA5fY0",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADthAAAh-4UEZNfzvhCvgdpRYE"
+    ]
+  },
+  {
     "csv_id": "204832-mashle-magic-and-muscles",
     "tmdb_id": 204832,
     "imdb_id": "",
