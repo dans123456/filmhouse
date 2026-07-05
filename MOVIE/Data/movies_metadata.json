@@ -1,5 +1,61 @@
 [
   {
+    "csv_id": "9354-honey-i-shrunk-the-kids",
+    "tmdb_id": 9354,
+    "imdb_id": "",
+    "title": "Honey, I Shrunk the Kids",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "The scientist father of a teenage girl and boy accidentally shrinks his and two other neighborhood teens to the size of insects. Now the teens must fight diminutive dangers as the father searches for them.",
+    "poster": "https://image.tmdb.org/t/p/w500/omQOzahi2NIeiYznNxHFDvNbvo6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jQuP23kN9iEBglGpw4AxRagoqBf.jpg",
+    "rating": 6.3,
+    "release_date": "1989-06-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "_av5kqcMVm4",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD6x0AAh-4UEZMXwJyEFRq6hYE"
+    ]
+  },
+  {
+    "csv_id": "11158-honey-i-blew-up-the-kid",
+    "tmdb_id": 11158,
+    "imdb_id": "",
+    "title": "Honey, I Blew Up the Kid",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "Wayne Szalinski is at it again. But instead of shrinking things, he tries to make a machine that can make things grow. As in the first one, his machine isn't quite accurate. But when he brings Nick & his toddler son Adam to see his invention, the machine unexpectedly starts working. And when Adam comes right up to the machine, he gets zapped along with his stuffed bunny.",
+    "poster": "https://image.tmdb.org/t/p/w500/4EGqDo2pP2ZL0TCcYDGnwsU8liQ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/r4Vx7kne6dovybAJR4LsR4eQCxP.jpg",
+    "rating": 5.3,
+    "release_date": "1992-07-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "-agq5R3b43U",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQAD7B0AAh-4UEa2doqAcj4InRYE"
+    ]
+  },
+  {
     "title": "【OSHI NO KO】",
     "csv_id": "203737",
     "type": "Series",
