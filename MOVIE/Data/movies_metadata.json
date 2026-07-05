@@ -1,5 +1,89 @@
 [
   {
+    "csv_id": "896221-trolls-holiday-in-harmony",
+    "tmdb_id": 896221,
+    "imdb_id": "",
+    "title": "Trolls Holiday in Harmony",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Queen Poppy plans the first annual Trolls Kingdom Secret Holiday Gift Swap, but things don't go quite as expected.",
+    "poster": "https://image.tmdb.org/t/p/w500/xl0jqhLC8BwtZT6pXGgKwSygQ4u.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/4yHiFkmrcbXjwDPoI6XscEIz1am.jpg",
+    "rating": 7.2,
+    "release_date": "2021-11-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "okb_--K7p14",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADSwkAAh-4SEa8ZPR10nIu7BYE"
+    ]
+  },
+  {
+    "csv_id": "901362-trolls-band-together",
+    "tmdb_id": 901362,
+    "imdb_id": "",
+    "title": "Trolls Band Together",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "When Branch's brother, Floyd, is kidnapped for his musical talents by a pair of nefarious pop-star villains, Branch and Poppy embark on a harrowing and emotional journey to reunite the other brothers and rescue Floyd from a fate even worse than pop-culture obscurity.",
+    "poster": "https://image.tmdb.org/t/p/w500/3ySgD2xwasTHOK6R9bNZiEwKgYo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mDW6z7I6de6JbUgPOkAEZwKbg7G.jpg",
+    "rating": 7.2,
+    "release_date": "2023-10-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "vDrUY5sZFds",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADSgkAAh-4SEYNTWzGLJHp7xYE"
+    ]
+  },
+  {
+    "csv_id": "136799-trolls",
+    "tmdb_id": 136799,
+    "imdb_id": "",
+    "title": "Trolls",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "After the monstrous Bergens invade Troll Village, Princess Poppy, the happiest Troll ever born, and overly-cautious, curmudgeonly outcast Branch set off on a journey to rescue her friends. Their mission is full of adventure and mishaps, as this mismatched duo try to tolerate each other long enough to get the job done.",
+    "poster": "https://image.tmdb.org/t/p/w500/9VlK2j0THZWzhQPq0W3Oc0IIdBB.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gXyYOWAkk4FdQU3adK8WFj8nN9J.jpg",
+    "rating": 6.6,
+    "release_date": "2016-10-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "xyjm5VQ11TQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADSQkAAh-4SEZqXISMPx5gxRYE"
+    ]
+  },
+  {
     "csv_id": "1075794-leo",
     "tmdb_id": 1075794,
     "imdb_id": "",
