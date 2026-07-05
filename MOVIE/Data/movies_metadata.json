@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "202284-ninja-kamui",
+    "tmdb_id": 202284,
+    "imdb_id": "",
+    "title": "Ninja Kamui",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "A team of assassins exacts a bloody retribution on Joe Logan – a former ninja who escaped his clan – and his family for betraying their ancient code. Rising from his seeming \"death,\" Joe will re-emerge as his former self – Ninja Kamui – to avenge his family and friends and bring down the very clan that made him.",
+    "poster": "https://image.tmdb.org/t/p/w500/A7mYSloFonDcQtHTqyLqEg9rIkh.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/834v3mld18rCJuIUYC2JJvthifT.jpg",
+    "rating": 8.2,
+    "release_date": "2024-02-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "phzYW8uo6JM",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADGA8AAh-4UEZ_AWCyJYsa9hYE"
+    ]
+  },
+  {
     "csv_id": "208891-tengoku-daimakyo",
     "tmdb_id": 208891,
     "imdb_id": "",
