@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "210945-onimusha",
+    "tmdb_id": 210945,
+    "imdb_id": "",
+    "title": "Onimusha",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "With a demonic, soul-consuming weapon in hand, can a legendary swordsman and a samurai brotherhood defeat a bloodthirsty zombie uprising?",
+    "poster": "https://image.tmdb.org/t/p/w500/lfRmDHegR8OpU3859lBz9YHgD79.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7HNkjJlC3Vk6hQ4zMAJC2CcGqMO.jpg",
+    "rating": 7.5,
+    "release_date": "2023-11-02",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "-1wsUxg68Ek",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD-hAAAh-4UEaSJ4jLyrouvxYE"
+    ]
+  },
+  {
     "csv_id": "225180-blue-eye-samurai",
     "tmdb_id": 225180,
     "imdb_id": "",
