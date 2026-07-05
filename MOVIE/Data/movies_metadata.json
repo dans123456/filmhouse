@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "105248-cyberpunk-edgerunners",
+    "tmdb_id": 105248,
+    "imdb_id": "",
+    "title": "Cyberpunk: Edgerunners",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "In a dystopia riddled with corruption and cybernetic implants, a talented but reckless street kid strives to become a mercenary outlaw — an edgerunner.",
+    "poster": "https://image.tmdb.org/t/p/w500/lqcDVZ8pyk08AVftMBildDR3QUK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bRE6zX4iOAejLOQCHryoV5WNu8G.jpg",
+    "rating": 8.5,
+    "release_date": "2022-09-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "JtqIas3bYhg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADOw8AAh-4UEbPjAsMuhnN9BYE"
+    ]
+  },
+  {
     "csv_id": "94605-arcane",
     "tmdb_id": 94605,
     "imdb_id": "",
