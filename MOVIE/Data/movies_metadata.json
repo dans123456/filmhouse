@@ -1,5 +1,82 @@
 [
   {
+    "csv_id": "496243-parasite",
+    "tmdb_id": 496243,
+    "imdb_id": "",
+    "title": "Parasite",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "All unemployed, Ki-taek's family takes peculiar interest in the wealthy and glamorous Parks for their livelihood until they get entangled in an unexpected incident.",
+    "poster": "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wCuUKiRaz0wEESsYqmQy005xvTE.jpg",
+    "rating": 8.5,
+    "release_date": "2019-05-30",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "bM9QabAojCg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADxiAAAh-4UEaP6x86rOl9rhYE"
+    ]
+  },
+  {
+    "csv_id": "402900-ocean-s-eight",
+    "tmdb_id": 402900,
+    "imdb_id": "",
+    "title": "Ocean's Eight",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Debbie Ocean, a criminal mastermind, gathers a crew of female thieves to pull off the heist of the century at New York's annual Met Gala.",
+    "poster": "https://image.tmdb.org/t/p/w500/MvYpKlpFukTivnlBhizGbkAe3v.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/scQf03Fm3jeyv4FH04qvi4fp4wh.jpg",
+    "rating": 7,
+    "release_date": "2018-06-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "n5LoVcVsiSQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADxCAAAh-4UEYa976tFhWVqhYE"
+    ]
+  },
+  {
+    "csv_id": "75612-oblivion",
+    "tmdb_id": 75612,
+    "imdb_id": "",
+    "title": "Oblivion",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Jack Harper is one of the last few drone repairmen stationed on Earth. Part of a massive operation to extract vital resources after decades of war with a terrifying threat known as the Scavs, Jack’s mission is nearly complete. His existence is brought crashing down when he rescues a beautiful  stranger from a downed spacecraft. Her arrival triggers a chain of events that  forces him to question everything he knows and puts the fate of humanity in his hands.",
+    "poster": "https://image.tmdb.org/t/p/w500/bYLM3GpNUZnoFElPXp1zlhDPdtv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2kVt8oj1cSz4GAP0Hi8SESOiH0T.jpg",
+    "rating": 6.7,
+    "release_date": "2013-04-10",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "tx6_JMDFfWI",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADwyAAAh-4UEYi3S9DjEFofxYE"
+    ]
+  },
+  {
     "csv_id": "884605-no-hard-feelings",
     "tmdb_id": 884605,
     "imdb_id": "",
