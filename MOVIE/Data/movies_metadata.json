@@ -1,5 +1,89 @@
 [
   {
+    "csv_id": "615453-ne-zha",
+    "tmdb_id": 615453,
+    "imdb_id": "",
+    "title": "Ne Zha",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "A young boy is born as the reincarnation of a demonic power, into a society that hates and fears him. Destined by prophecy to bring destruction to the world, Nezha must choose between good and evil to see if he can change his fate.",
+    "poster": "https://image.tmdb.org/t/p/w500/phM9bb6s9c60LA8qwsdk7U1N2cS.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/k1pJslKr4aDayw9kWwWnlC3MIP3.jpg",
+    "rating": 7.9,
+    "release_date": "2019-07-26",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "PYSiEFeMbZ0",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADlR4AAh-4UEZWo3FK1PTBURYE"
+    ]
+  },
+  {
+    "csv_id": "980477-ne-zha-2",
+    "tmdb_id": 980477,
+    "imdb_id": "",
+    "title": "Ne Zha 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "After a catastrophic event leaves their bodies destroyed, Ne Zha and Ao Bing are granted a fragile second chance at life. As tensions rise between the dragon clans and celestial forces, the two must undergo a series of perilous trials that will test their bond, challenge their identities, and decide the fate of both mortals and immortals.",
+    "poster": "https://image.tmdb.org/t/p/w500/cb5NyNrqiCNNoDkA8FfxHAtypdG.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zxi6WQPVc0uQAG5TtLsKvxYHApC.jpg",
+    "rating": 8.1,
+    "release_date": "2025-01-29",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "ETlOSBR92Fs",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADlh4AAh-4UEbTpehfcUuSYhYE"
+    ]
+  },
+  {
+    "csv_id": "283141-lil-kev",
+    "tmdb_id": 283141,
+    "imdb_id": "",
+    "title": "Lil Kev",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Set in 1993 North Philadelphia, follow 12-year-old Kevin Hart, whose wild imagination and unshakable optimism constantly collide with his neighborhood's harsh realities. At the same time, his no-nonsense mother Nancy juggles night shifts as an E.R. nurse while waging a one-woman war to keep Kev on track – no easy feat with his mischievous older brother Robert blazing all the wrong trails, his trainwreck father Henry's outrageous attempts to win Nancy back, and his ex-con uncle Richard Jr.'s questionable life advice.",
+    "poster": "https://image.tmdb.org/t/p/w500/rnWr6Xr72Lsqf2JH52BdticR3Dc.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fMCewQBoRlPQOZcSmGJOf3cWDMO.jpg",
+    "rating": 7.7,
+    "release_date": "2025-03-06",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "XjK8gozeTbg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADkh4AAh-4UEbGNYNy6QzAWBYE"
+    ]
+  },
+  {
     "csv_id": "950387-a-minecraft-movie",
     "tmdb_id": 950387,
     "imdb_id": "",
