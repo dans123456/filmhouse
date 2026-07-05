@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "297761-suicide-squad",
+    "tmdb_id": 297761,
+    "imdb_id": "",
+    "title": "Suicide Squad",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government, undertaking high-risk black ops missions in exchange for commuted prison sentences.",
+    "poster": "https://image.tmdb.org/t/p/w500/sk3FZgh3sRrmr8vyhaitNobMcfh.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wAk0yKrhAmvsoMvlKs4QImhvK5X.jpg",
+    "rating": 5.9,
+    "release_date": "2016-08-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "m0Xb9BhfVjY",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADDiAAAh-4UEbIXUMPBCCCMRYE"
+    ]
+  },
+  {
     "csv_id": "257-oliver-twist",
     "tmdb_id": 257,
     "imdb_id": "",
