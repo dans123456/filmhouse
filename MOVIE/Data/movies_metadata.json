@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "897192-diary-of-a-wimpy-kid-rodrick-rules",
+    "tmdb_id": 897192,
+    "imdb_id": "",
+    "title": "Diary of a Wimpy Kid: Rodrick Rules",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "As a new school year begins, Greg is subject to relentless teasing from his brother Rodrick. Will Greg manage to get along with him? Or will a secret ruin everything?",
+    "poster": "https://image.tmdb.org/t/p/w500/iW6ixzkrvdrcxk0umiLZMtlSl9L.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/94QHrTXnxdmIyXWGUpOPe7PU8DL.jpg",
+    "rating": 6.8,
+    "release_date": "2022-12-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "2_kn3spSqyU",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADOwkAAh-4SEYjc6acxToRfhYE"
+    ]
+  },
+  {
     "csv_id": "774741-diary-of-a-wimpy-kid",
     "tmdb_id": 774741,
     "imdb_id": "",
