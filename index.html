@@ -49,9 +49,9 @@
             <g id="icon-download">
                 <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z" fill="currentColor"/>
             </g>
-            <g id="icon-share">
+            <symbol id="icon-share" viewBox="0 0 24 24">
                 <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" fill="currentColor"/>
-            </g>
+            </symbol>
             <g id="icon-star">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="currentColor"/>
             </g>
@@ -357,12 +357,12 @@
                     </div>
 
                     <!-- Invite Friends Button -->
-                    <button class="btn btn-block" id="btn-invite-friends" style="background: rgba(255, 188, 0, 0.05); border: 1px dashed rgba(255, 188, 0, 0.35); color: var(--primary-color); padding: 12px; border-radius: var(--border-radius-sm); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; width: 100%;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <svg class="menu-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: var(--primary-color);"><use href="#icon-share"></use></svg>
-                            <span style="font-size: 13px;">Invite Friends & Share App 🏆</span>
+                    <button class="btn btn-block" id="btn-invite-friends" style="background: rgba(255, 188, 0, 0.05); border: 1px dashed rgba(255, 188, 0, 0.35); color: var(--primary-color); padding: 12px; border-radius: var(--border-radius-sm); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; width: 100%; box-sizing: border-box;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+                            <svg class="menu-icon" style="width: 18px; height: 18px; fill: var(--primary-color); flex-shrink: 0;"><use href="#icon-share"></use></svg>
+                            <span style="font-size: 13px; white-space: nowrap;">Invite Friends 🏆</span>
                         </div>
-                        <span style="font-size: 11px; color: var(--primary-color); background: rgba(255, 188, 0, 0.12); padding: 3px 8px; border-radius: 4px; font-weight: bold;">+5 Points</span>
+                        <span style="font-size: 11px; color: var(--primary-color); background: rgba(255, 188, 0, 0.12); padding: 3px 8px; border-radius: 4px; font-weight: bold; flex-shrink: 0; white-space: nowrap;">+5 Points</span>
                     </button>
                     
                     <div class="profile-avatar-upload-section" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; text-align: center;">
