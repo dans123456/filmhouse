@@ -311,115 +311,159 @@
         <section id="screen-profile" class="app-screen">
             <div class="profile-card-container" style="max-width: 480px; margin: 0 auto; padding: 20px 10px;">
                 <div class="profile-page-card" style="background-color: var(--bg-dark-card); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 24px; backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);">
-                    <h2 class="screen-title" style="margin-bottom: 24px; text-align: center; font-family: var(--font-heading);">My Profile</h2>
                     
-                    <!-- Loyalty Points & Global Ranking Quick Card -->
-                    <div id="profile-loyalty-ranking-card" class="profile-ranking-card" style="background: linear-gradient(135deg, rgba(245, 197, 24, 0.15) 0%, rgba(245, 197, 24, 0.03) 100%); border: 1px solid rgba(245, 197, 24, 0.3); border-radius: var(--border-radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.2s;" onclick="navigateToScreen('leaderboard')">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="background: rgba(245, 197, 24, 0.2); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: #f5c518;">
-                                <svg style="width: 20px; height: 20px; fill: currentColor;"><use href="#icon-trophy"></use></svg>
-                            </div>
-                            <div>
-                                <h4 style="font-size: 13px; font-weight: 700; margin: 0; color: #f5c518;">Loyalty Rewards</h4>
-                                <span id="profile-loyalty-rank-label" style="font-size: 11px; color: var(--text-secondary);">Calculating Rank...</span>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <span id="profile-loyalty-points" style="font-size: 16px; font-weight: 800; color: var(--text-primary); display: block; line-height: 1;">0</span>
-                            <span style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Points</span>
-                        </div>
-                    </div>
-
-                    <!-- Loyalty Points Breakdown Card -->
-                    <div id="profile-points-breakdown-card" style="background-color: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px 16px; margin-bottom: 24px;">
-                        <h4 style="font-size: 11px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
-                            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #f5c518;"><use href="#icon-star"></use></svg>
-                            Points Breakdown
-                        </h4>
-                        <div id="profile-points-breakdown-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: var(--text-secondary);">
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>Downloads (+10 pts each):</span>
-                                <span id="breakdown-downloads" style="font-weight: 600; color: var(--text-primary);">0 pts (0 downloads)</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>Daily Visits (+5/10 pts):</span>
-                                <span id="breakdown-visits" style="font-weight: 600; color: var(--text-primary);">0 pts (0 visits)</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>Shares (+2 pts each):</span>
-                                <span id="breakdown-shares" style="font-weight: 600; color: var(--text-primary);">0 pts (0 shares)</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>Watched List Toggles (+5 pts each):</span>
-                                <span id="breakdown-watched" style="font-weight: 600; color: var(--text-primary);">0 pts (0 watched)</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Invite Friends Button -->
-                    <button class="btn btn-block" id="btn-invite-friends" style="background: rgba(255, 188, 0, 0.05); border: 1px dashed rgba(255, 188, 0, 0.35); color: var(--primary-color); padding: 12px; border-radius: var(--border-radius-sm); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; width: 100%; box-sizing: border-box;">
-                        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-                            <svg class="menu-icon" style="width: 18px; height: 18px; fill: var(--primary-color); flex-shrink: 0;"><use href="#icon-share"></use></svg>
-                            <span style="font-size: 13px; white-space: nowrap;">Invite Friends 🏆</span>
-                        </div>
-                        <span style="font-size: 11px; color: var(--primary-color); background: rgba(255, 188, 0, 0.12); padding: 3px 8px; border-radius: 4px; font-weight: bold; flex-shrink: 0; white-space: nowrap;">+5 Points</span>
-                    </button>
-                    
-                    <div class="profile-avatar-upload-section" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; text-align: center;">
-                        <div class="avatar-upload-wrapper" id="profile-image-upload-wrapper" title="Click to upload profile picture" style="position: relative; width: 100px; height: 100px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid var(--primary-color); box-shadow: 0 0 15px var(--primary-glow);">
+                    <!-- Top Identity Header (Always visible) -->
+                    <div class="profile-avatar-upload-section" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; text-align: center;">
+                        <div class="avatar-upload-wrapper" id="profile-image-upload-wrapper" title="Click to upload profile picture" style="position: relative; width: 90px; height: 90px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid var(--primary-color); box-shadow: 0 0 15px var(--primary-glow);">
                             <img src="./MOVIE/img/FilmHouse3_nobg.png" alt="User Avatar" class="profile-avatar-large" id="profile-page-avatar" style="width: 100%; height: 100%; object-fit: cover;">
                             <div class="avatar-upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 10px; padding: 4px 0; text-align: center; opacity: 0; transition: opacity 0.2s;">
                                 <span>Change</span>
                             </div>
                         </div>
                         <input type="file" id="profile-pic-input" accept="image/*" style="display: none;">
-                        <p style="font-size: 11px; color: var(--text-secondary); margin-top: 8px;">Tap avatar to upload new picture</p>
+                        
+                        <h2 id="profile-display-name" style="margin: 12px 0 2px 0; font-size: 18px; font-weight: bold; font-family: var(--font-heading); color: #fff;">Demo User</h2>
+                        <span id="profile-display-username" style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">@demouser</span>
+                        
+                        <!-- Dynamic Premium Tier Badge -->
+                        <span id="profile-tier-badge" style="font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid rgba(255,188,0,0.2); display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 188, 0, 0.05); color: var(--primary-color); margin-top: 4px;">
+                            <span id="profile-tier-icon">🥉</span>
+                            <span id="profile-tier-name">Bronze Cinephile</span>
+                        </span>
                     </div>
 
-                    <form id="profile-page-form" class="profile-page-form" onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 16px;">
-                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
-                            <label for="profile-page-name" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Full Name</label>
-                            <input type="text" id="profile-page-name" placeholder="Enter Full Name" required style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-primary); width: 100%;">
-                        </div>
-                        
-                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
-                            <label for="profile-page-telegram-tag" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Telegram Username</label>
-                            <input type="text" id="profile-page-telegram-tag" value="@demouser" disabled style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-secondary); width: 100%; opacity: 0.6; cursor: not-allowed;">
-                        </div>
+                    <!-- Profile Tabs -->
+                    <div class="profile-tabs">
+                        <button class="profile-tab-btn active" data-tab="dashboard">
+                            Dashboard 🏆
+                        </button>
+                        <button class="profile-tab-btn" data-tab="settings">
+                            Settings ⚙️
+                        </button>
+                    </div>
 
-                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
-                            <label for="profile-page-telegram-id" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Telegram User ID</label>
-                            <input type="text" id="profile-page-telegram-id" value="000000000" disabled style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-secondary); width: 100%; opacity: 0.6; cursor: not-allowed;">
-                        </div>
-
-                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
-                            <label for="profile-page-contact-pref" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Contact Preference</label>
-                            <select id="profile-page-contact-pref" style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-primary); width: 100%; outline: none; cursor: pointer;">
-                                <option value="telegram">Telegram DM</option>
-                                <option value="email">Email</option>
-                                <option value="none">None</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
-                            <label style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">UI Theme Accent</label>
-                            <div style="display: flex; gap: 12px; align-items: center; background-color: rgba(0,0,0,0.15); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
-                                <div class="accent-option-dot theme-gold-dot active" data-theme="gold" title="IMDb Gold"></div>
-                                <div class="accent-option-dot theme-crimson-dot" data-theme="crimson" title="Netflix Crimson"></div>
-                                <div class="accent-option-dot theme-azure-dot" data-theme="azure" title="Prime Azure"></div>
-                                <div class="accent-option-dot theme-amethyst-dot" data-theme="amethyst" title="Amethyst Purple"></div>
+                    <!-- Dashboard Tab Content -->
+                    <div id="profile-tab-content-dashboard" class="profile-tab-content active">
+                        <!-- Loyalty Points & Global Ranking Quick Card -->
+                        <div id="profile-loyalty-ranking-card" class="profile-ranking-card" style="background: linear-gradient(135deg, rgba(245, 197, 24, 0.15) 0%, rgba(245, 197, 24, 0.03) 100%); border: 1px solid rgba(245, 197, 24, 0.3); border-radius: var(--border-radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.2s;" onclick="navigateToScreen('leaderboard')">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="background: rgba(245, 197, 24, 0.2); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: #f5c518;">
+                                    <svg style="width: 20px; height: 20px; fill: currentColor;"><use href="#icon-trophy"></use></svg>
+                                </div>
+                                <div>
+                                    <h4 style="font-size: 13px; font-weight: 700; margin: 0; color: #f5c518;">Loyalty Rewards</h4>
+                                    <span id="profile-loyalty-rank-label" style="font-size: 11px; color: var(--text-secondary);">Calculating Rank...</span>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <span id="profile-loyalty-points" style="font-size: 16px; font-weight: 800; color: var(--text-primary); display: block; line-height: 1;">0</span>
+                                <span style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Points</span>
                             </div>
                         </div>
 
-                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
-                            <label style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 2px;">Favorite Categories</label>
-                            <div class="edit-genres-checklist" id="profile-genres-checklist" style="display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto; background-color: rgba(0,0,0,0.15); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
-                                <!-- Loaded dynamically -->
+                        <!-- Progress to next Tier milestone card -->
+                        <div id="profile-tier-progress-card" style="background-color: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px 16px; margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 11px;">
+                                <span style="color: var(--text-secondary); font-weight: 500;">Next Rank Progress:</span>
+                                <span id="profile-tier-progress-percent" style="font-weight: 700; color: var(--primary-color);">0%</span>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.06); height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.04); position: relative; width: 100%;">
+                                <div id="profile-tier-progress-fill" style="background: var(--primary-gradient); height: 100%; width: 0%; border-radius: 4px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                            </div>
+                            <span id="profile-tier-progress-text" style="font-size: 10px; color: var(--text-muted); margin-top: 6px; display: block; text-align: center;">0 points needed to unlock next rank</span>
+                        </div>
+
+                        <!-- Loyalty Points Breakdown Card -->
+                        <div id="profile-points-breakdown-card" style="background-color: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px 16px; margin-bottom: 16px;">
+                            <h4 style="font-size: 11px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+                                <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #f5c518;"><use href="#icon-star"></use></svg>
+                                Points Breakdown
+                            </h4>
+                            <div id="profile-points-breakdown-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: var(--text-secondary);">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Downloads (+10 pts each):</span>
+                                    <span id="breakdown-downloads" style="font-weight: 600; color: var(--text-primary);">0 pts (0 downloads)</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Daily Visits (+5/10 pts):</span>
+                                    <span id="breakdown-visits" style="font-weight: 600; color: var(--text-primary);">0 pts (0 visits)</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Shares (+2 pts each):</span>
+                                    <span id="breakdown-shares" style="font-weight: 600; color: var(--text-primary);">0 pts (0 shares)</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Watched List Toggles (+5 pts each):</span>
+                                    <span id="breakdown-watched" style="font-weight: 600; color: var(--text-primary);">0 pts (0 watched)</span>
+                                </div>
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-primary btn-block" id="btn-save-profile-page" style="margin-top: 10px;">Save Profile</button>
-                    </form>
+                        <!-- Invite Friends Button -->
+                        <button class="btn btn-block" id="btn-invite-friends" style="background: rgba(255, 188, 0, 0.05); border: 1px dashed rgba(255, 188, 0, 0.35); color: var(--primary-color); padding: 12px; border-radius: var(--border-radius-sm); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; width: 100%; box-sizing: border-box;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+                                <svg class="menu-icon" style="width: 18px; height: 18px; fill: var(--primary-color); flex-shrink: 0;"><use href="#icon-share"></use></svg>
+                                <span style="font-size: 13px; white-space: nowrap;">Invite Friends 🏆</span>
+                            </div>
+                            <span style="font-size: 11px; color: var(--primary-color); background: rgba(255, 188, 0, 0.12); padding: 3px 8px; border-radius: 4px; font-weight: bold; flex-shrink: 0; white-space: nowrap;">+5 Points</span>
+                        </button>
+
+                        <!-- Free Up Storage Button -->
+                        <button type="button" class="btn btn-block btn-secondary" id="btn-clear-cache" style="font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: var(--border-radius-sm); width: 100%;">
+                            <span>Free Up Storage 🧹</span>
+                        </button>
+                    </div>
+
+                    <!-- Settings Tab Content -->
+                    <div id="profile-tab-content-settings" class="profile-tab-content">
+                        <form id="profile-page-form" class="profile-page-form" onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                                <label for="profile-page-name" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Full Name</label>
+                                <input type="text" id="profile-page-name" placeholder="Enter Full Name" required style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-primary); width: 100%;">
+                            </div>
+                            
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                                <label for="profile-page-telegram-tag" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Telegram Username</label>
+                                <input type="text" id="profile-page-telegram-tag" value="@demouser" disabled style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-secondary); width: 100%; opacity: 0.6; cursor: not-allowed;">
+                            </div>
+
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                                <label for="profile-page-telegram-id" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Telegram User ID</label>
+                                <input type="text" id="profile-page-telegram-id" value="000000000" disabled style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-secondary); width: 100%; opacity: 0.6; cursor: not-allowed;">
+                            </div>
+
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                                <label for="profile-page-contact-pref" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Contact Preference</label>
+                                <select id="profile-page-contact-pref" style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-primary); width: 100%; outline: none; cursor: pointer;">
+                                    <option value="telegram">Telegram DM</option>
+                                    <option value="email">Email</option>
+                                    <option value="none">None</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">UI Theme Accent</label>
+                                <div style="display: flex; gap: 10px; align-items: center; background-color: rgba(0,0,0,0.15); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); flex-wrap: wrap;">
+                                    <div class="accent-option-dot theme-gold-dot active" data-theme="gold" title="IMDb Gold"></div>
+                                    <div class="accent-option-dot theme-crimson-dot" data-theme="crimson" title="Netflix Crimson"></div>
+                                    <div class="accent-option-dot theme-azure-dot" data-theme="azure" title="Prime Azure"></div>
+                                    <div class="accent-option-dot theme-amethyst-dot" data-theme="amethyst" title="Amethyst Purple"></div>
+                                    <div class="accent-option-dot theme-blossom-dot" data-theme="blossom" title="Blossom Pink"></div>
+                                    <div class="accent-option-dot theme-barbie-dot" data-theme="barbie" title="Barbie Pink"></div>
+                                    <div class="accent-option-dot theme-emerald-dot" data-theme="emerald" title="Emerald Mint"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 2px;">Favorite Categories</label>
+                                <div class="edit-genres-checklist" id="profile-genres-checklist" style="display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto; background-color: rgba(0,0,0,0.15); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
+                                    <!-- Loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-block" id="btn-save-profile-page" style="margin-top: 10px;">Save Profile</button>
+                        </form>
+                    </div>
                 </div>
                 
                 <!-- Watchlist Summary Section -->

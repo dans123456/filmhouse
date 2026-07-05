@@ -723,6 +723,12 @@ function loadUserProfile() {
     const pageName = document.getElementById("profile-page-name");
     if (pageName) pageName.value = state.user.fullName;
 
+    const displayFullName = document.getElementById("profile-display-name");
+    if (displayFullName) displayFullName.textContent = state.user.fullName || "Guest User";
+    
+    const displayUsername = document.getElementById("profile-display-username");
+    if (displayUsername) displayUsername.textContent = state.user.username ? `@${state.user.username}` : "@guest";
+
     const pageAvatar = document.getElementById("profile-page-avatar");
     if (pageAvatar) pageAvatar.src = state.user.avatar;
 
@@ -1071,6 +1077,89 @@ function updatePointsUI() {
             }
         }
     }
+
+    // 7. Update Tier Badge and Progress Bar
+    const tierIcon = document.getElementById("profile-tier-icon");
+    const tierName = document.getElementById("profile-tier-name");
+    const tierBadge = document.getElementById("profile-tier-badge");
+    const progressFill = document.getElementById("profile-tier-progress-fill");
+    const progressPercent = document.getElementById("profile-tier-progress-percent");
+    const progressText = document.getElementById("profile-tier-progress-text");
+    
+    const pts = state.user.points || 0;
+    const tier = getUserTier(pts);
+    
+    if (tierIcon) tierIcon.textContent = tier.icon;
+    if (tierName) tierName.textContent = tier.name;
+    if (tierBadge) {
+        tierBadge.style.color = tier.color;
+        tierBadge.style.borderColor = tier.borderColor;
+        tierBadge.style.background = tier.bgColor;
+    }
+    
+    if (tier.nextPts === null) {
+        if (progressFill) progressFill.style.width = "100%";
+        if (progressPercent) progressPercent.textContent = "100%";
+        if (progressText) progressText.textContent = "Congratulations! You have reached the maximum VIP tier! 👑";
+    } else {
+        const range = tier.nextPts - tier.prevPts;
+        const currentProgress = pts - tier.prevPts;
+        const percentage = Math.min(100, Math.max(0, Math.round((currentProgress / range) * 100)));
+        const ptsNeeded = tier.nextPts - pts;
+        
+        if (progressFill) progressFill.style.width = `${percentage}%`;
+        if (progressPercent) progressPercent.textContent = `${percentage}%`;
+        if (progressText) {
+            const nextTier = getUserTier(tier.nextPts);
+            progressText.textContent = `${ptsNeeded} points needed to unlock next rank (${nextTier.name} ${nextTier.icon})`;
+        }
+    }
+}
+
+function getUserTier(points) {
+    const pts = parseInt(points || 0);
+    if (pts >= 1000) {
+        return {
+            name: "VIP Director",
+            icon: "👑",
+            color: "#f5c518",
+            bgColor: "rgba(245, 197, 24, 0.08)",
+            borderColor: "rgba(245, 197, 24, 0.3)",
+            nextPts: null,
+            prevPts: 1000
+        };
+    }
+    if (pts >= 500) {
+        return {
+            name: "Gold Collector",
+            icon: "🥇",
+            color: "#ffbc00",
+            bgColor: "rgba(255, 188, 0, 0.08)",
+            borderColor: "rgba(255, 188, 0, 0.3)",
+            nextPts: 1000,
+            prevPts: 500
+        };
+    }
+    if (pts >= 100) {
+        return {
+            name: "Silver Critic",
+            icon: "🥈",
+            color: "#e0e0e0",
+            bgColor: "rgba(255, 255, 255, 0.08)",
+            borderColor: "rgba(255, 255, 255, 0.2)",
+            nextPts: 500,
+            prevPts: 100
+        };
+    }
+    return {
+        name: "Bronze Cinephile",
+        icon: "🥉",
+        color: "#cd7f32",
+        bgColor: "rgba(205, 127, 50, 0.08)",
+        borderColor: "rgba(205, 127, 50, 0.2)",
+        nextPts: 100,
+        prevPts: 0
+    };
 }
 
 function checkDailyVisitPoints() {
@@ -4637,6 +4726,45 @@ function bindEvents() {
         });
     }
 
+    // Profile screen tabs interaction
+    const tabButtons = document.querySelectorAll(".profile-tab-btn");
+    tabButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const targetTab = btn.getAttribute("data-tab");
+            
+            // Toggle active class on buttons
+            tabButtons.forEach(b => {
+                if (b === btn) b.classList.add("active");
+                else b.classList.remove("active");
+            });
+            
+            // Toggle active content panel
+            const dashboardContent = document.getElementById("profile-tab-content-dashboard");
+            const settingsContent = document.getElementById("profile-tab-content-settings");
+            
+            if (targetTab === "dashboard") {
+                if (dashboardContent) dashboardContent.style.display = "block";
+                if (settingsContent) settingsContent.style.display = "none";
+            } else if (targetTab === "settings") {
+                if (dashboardContent) dashboardContent.style.display = "none";
+                if (settingsContent) settingsContent.style.display = "block";
+            }
+        });
+    });
+
+    // Free Up Storage Cache cleaning utility
+    const btnClearCache = document.getElementById("btn-clear-cache");
+    if (btnClearCache) {
+        btnClearCache.addEventListener("click", () => {
+            // Remove cached movies details but keep user profile data
+            localStorage.removeItem("filmhouse_healed_movies");
+            localStorage.removeItem("filmhouse_search_history");
+            showToast("App cache cleared successfully! 🧹", "success");
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
+        });
+    }
 }
 
 // Firebase Firestore Database Synchronization Helpers
@@ -4704,6 +4832,24 @@ function applyThemeAccent(themeName) {
             glow: 'rgba(168, 85, 247, 0.4)',
             gradient: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)',
             glowBorder: 'rgba(168, 85, 247, 0.3)'
+        },
+        blossom: {
+            color: '#ff8da1',
+            glow: 'rgba(255, 141, 161, 0.4)',
+            gradient: 'linear-gradient(135deg, #ff8da1 0%, #ff527b 100%)',
+            glowBorder: 'rgba(255, 141, 161, 0.3)'
+        },
+        barbie: {
+            color: '#ec4899',
+            glow: 'rgba(236, 72, 153, 0.4)',
+            gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+            glowBorder: 'rgba(236, 72, 153, 0.3)'
+        },
+        emerald: {
+            color: '#10b981',
+            glow: 'rgba(16, 185, 129, 0.4)',
+            gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
+            glowBorder: 'rgba(16, 185, 129, 0.3)'
         }
     };
     const active = themes[themeName] || themes.gold;

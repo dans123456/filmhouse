@@ -3022,5 +3022,47 @@ img {
 .theme-crimson-dot { background: #e50914; }
 .theme-azure-dot { background: #1a9cff; }
 .theme-amethyst-dot { background: #a855f7; }
+.theme-blossom-dot { background: #ff8da1; }
+.theme-barbie-dot { background: #ec4899; }
+.theme-emerald-dot { background: #10b981; }
+
+/* Profile screen tabs styling */
+.profile-tabs {
+    display: flex;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: var(--border-radius-sm);
+    padding: 4px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+.profile-tab-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 13px;
+    border-radius: var(--border-radius-xs);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: var(--font-heading);
+    text-align: center;
+}
+.profile-tab-btn:hover {
+    color: var(--text-primary);
+}
+.profile-tab-btn.active {
+    background: var(--primary-gradient);
+    color: #000 !important;
+    box-shadow: 0 3px 8px var(--primary-glow);
+}
+
+.profile-tab-content {
+    display: none;
+}
+.profile-tab-content.active {
+    display: block;
+}
 
 
