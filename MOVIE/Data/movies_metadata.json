@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "220542-the-apothecary-diaries",
+    "tmdb_id": 220542,
+    "imdb_id": "",
+    "title": "The Apothecary Diaries",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "Maomao lived a peaceful life with her apothecary father. Until one day, she's sold as a lowly servant to the emperor's palace. But she wasn't meant for a compliant life among royalty. So when imperial heirs fall ill, she decides to step in and find a cure! This catches the eye of Jinshi, a handsome palace official who promotes her. Now, she's making a name for herself solving medical mysteries!",
+    "poster": "https://image.tmdb.org/t/p/w500/e3ojpANrFnmJCyeBNTinYwyBCIN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gffVOVZ2Y9cmVIZ26Gt9ByMGCYH.jpg",
+    "rating": 8.6,
+    "release_date": "2023-10-22",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "3lfb_KeqdEM",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADLg8AAh-4UEY2Fnz9Q9kHARYE"
+    ]
+  },
+  {
     "csv_id": "202284-ninja-kamui",
     "tmdb_id": 202284,
     "imdb_id": "",
