@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "417384-scary-stories-to-tell-in-the-dark",
+    "tmdb_id": 417384,
+    "imdb_id": "",
+    "title": "Scary Stories to Tell in the Dark",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Mill Valley, Pennsylvania, Halloween night, 1968. After playing a joke on a school bully, Stella and her friends decide to sneak into a supposedly haunted house that once belonged to the powerful Bellows family, unleashing dark forces that they will be unable to control.",
+    "poster": "https://image.tmdb.org/t/p/w500/uy0dNFbhRhHBLwpOGpcTw9UEwdX.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/snll1zUi2oxIah9qifXOvbfjcrG.jpg",
+    "rating": 6.5,
+    "release_date": "2019-08-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "FLsr5nsa8qg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADsR8AAh-4UEbiHMhFvrMMpBYE"
+    ]
+  },
+  {
     "csv_id": "110490-rags",
     "tmdb_id": 110490,
     "imdb_id": "",
