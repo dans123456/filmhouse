@@ -4303,6 +4303,35 @@ function bindEvents() {
         });
     }
 
+    // Invite Friends logic
+    const btnInviteFriends = document.getElementById("btn-invite-friends");
+    if (btnInviteFriends) {
+        btnInviteFriends.addEventListener("click", () => {
+            const shareText = `Hey! Check out Film House, the ultimate app to watch and download your favorite movies and series directly inside Telegram! 🎬🍿`;
+            const shareUrl = "https://t.me/filmhousenew";
+            const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+            
+            // Award points for sharing
+            if (typeof awardPoints === "function") {
+                awardPoints(5, "share");
+            }
+            
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.openTelegramLink) {
+                try {
+                    tg.openTelegramLink(telegramShareUrl);
+                    return;
+                } catch (e) {
+                    console.error("tg.openTelegramLink failed:", e);
+                }
+            }
+            
+            // Fallback for desktop browser or external views
+            window.open(telegramShareUrl, "_blank");
+            showToast("Opening share screen...");
+        });
+    }
+
     // Collapsible Profile Edit Toggle
     const btnToggleEdit = document.getElementById("btn-toggle-edit-profile");
     const editSection = document.getElementById("profile-edit-section");
