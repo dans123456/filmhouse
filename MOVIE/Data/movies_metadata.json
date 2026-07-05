@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "95479-jujutsu-kaisen",
+    "tmdb_id": 95479,
+    "imdb_id": "",
+    "title": "JUJUTSU KAISEN",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "Yuji Itadori is a boy with tremendous physical strength, though he lives a completely ordinary high school life. One day, to save a classmate who has been attacked by curses, he eats the finger of Ryomen Sukuna, taking the curse into his own soul. From then on, he shares one body with Ryomen Sukuna. Guided by the most powerful of sorcerers, Satoru Gojo, Itadori is admitted to Tokyo Jujutsu High School, an organization that fights the curses... and thus begins the heroic tale of a boy who became a curse to exorcise a curse, a life from which he could never turn back.",
+    "poster": "https://image.tmdb.org/t/p/w500/fHpKWq9ayzSk8nSwqRuaAUemRKh.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lthkKBLe1rX6iThgVFg22O02sJw.jpg",
+    "rating": 8.6,
+    "release_date": "2020-10-03",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "VpO6APNqY1c",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADfxAAAh-4UEZ_BOBHEUgq2hYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADgRAAAh-4UEY9v-LlYleQTRYE"
+    ]
+  },
+  {
     "csv_id": "810693-jujutsu-kaisen-0",
     "tmdb_id": 810693,
     "imdb_id": "",
