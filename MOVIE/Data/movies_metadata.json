@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "92592-bna",
+    "tmdb_id": 92592,
+    "imdb_id": "",
+    "title": "BNA",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "Morphed into a raccoon beastman, Michiru seeks refuge, and answers, with the aid of wolf beastman Shirou inside the special zone of Anima-City.",
+    "poster": "https://image.tmdb.org/t/p/w500/fwFYXaQz0mrY8v1HDky2wJsYa7t.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/45bPhpF6dsONWpzCchS674w87PH.jpg",
+    "rating": 8.2,
+    "release_date": "2020-04-09",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "aUOTU8JZriE",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADWRAAAh-4UEZM7QOioXEy4RYE"
+    ]
+  },
+  {
     "csv_id": "91801-welcome-to-demon-school-iruma-kun",
     "tmdb_id": 91801,
     "imdb_id": "",
