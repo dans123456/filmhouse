@@ -3225,8 +3225,8 @@ function openDownloadModal(movie) {
 
 // Share Media integration
 function shareMovie(movie) {
-    const shareText = `Check out "${movie.title}" on Film House! Rating: ${movie.rating}/10. Play now: https://t.me/FilmHouseFilebot`;
-    const shareUrl = "https://t.me/FilmHouseFilebot";
+    const shareText = `Check out "${movie.title}" on Film House! Rating: ${movie.rating}/10. Play now: https://t.me/Filmhouseappbot`;
+    const shareUrl = "https://t.me/Filmhouseappbot";
     const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
     
     // Award points (+2)
@@ -4334,7 +4334,7 @@ function bindEvents() {
     const optCopy = document.getElementById("share-opt-copy");
     
     const inviteShareText = `Hey! Check out Film House, the ultimate app to watch and download your favorite movies and series directly inside Telegram! 🎬🍿`;
-    const inviteShareUrl = "https://t.me/FilmHouseFilebot";
+    const inviteShareUrl = "https://t.me/Filmhouseappbot";
     const fullInviteMessage = `${inviteShareText}\nPlay now: ${inviteShareUrl}`;
     
     if (optWhatsapp) {
