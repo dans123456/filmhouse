@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "94605-arcane",
+    "tmdb_id": 94605,
+    "imdb_id": "",
+    "title": "Arcane",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Amid the stark discord of twin cities Piltover and Zaun, two sisters fight on rival sides of a war between magic technologies and clashing convictions.",
+    "poster": "https://image.tmdb.org/t/p/w500/abf8tHznhSvl9BAElD2cQeRr7do.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/q8eejQcg1bAqImEV8jh8RtBD4uH.jpg",
+    "rating": 8.8,
+    "release_date": "2021-11-06",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "W4gLFBNGgiY",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADMw8AAh-4UEabFtVhYBEvkRYE"
+    ]
+  },
+  {
     "csv_id": "220542-the-apothecary-diaries",
     "tmdb_id": 220542,
     "imdb_id": "",
