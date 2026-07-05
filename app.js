@@ -3225,8 +3225,8 @@ function openDownloadModal(movie) {
 
 // Share Media integration
 function shareMovie(movie) {
-    const shareText = `Check out "${movie.title}" on Film House! Rating: ${movie.rating}/10. Play now: https://t.me/filmhousenew`;
-    const shareUrl = "https://t.me/filmhousenew";
+    const shareText = `Check out "${movie.title}" on Film House! Rating: ${movie.rating}/10. Play now: https://t.me/FilmHouseFilebot`;
+    const shareUrl = "https://t.me/FilmHouseFilebot";
     const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
     
     // Award points (+2)
@@ -4303,51 +4303,91 @@ function bindEvents() {
         });
     }
 
-    // Invite Friends logic
+    // Invite Friends logic and Share App Modal
     const btnInviteFriends = document.getElementById("btn-invite-friends");
-    if (btnInviteFriends) {
+    const shareModal = document.getElementById("share-app-modal");
+    const btnCloseShareModal = document.getElementById("btn-close-share-modal");
+    
+    if (btnInviteFriends && shareModal) {
         btnInviteFriends.addEventListener("click", () => {
-            const shareText = `Hey! Check out Film House, the ultimate app to watch and download your favorite movies and series directly inside Telegram! 🎬🍿`;
-            const shareUrl = "https://t.me/filmhousenew";
-            const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-            
-            // Award points for sharing
+            shareModal.classList.add("active");
+        });
+    }
+    
+    if (btnCloseShareModal && shareModal) {
+        btnCloseShareModal.addEventListener("click", () => {
+            shareModal.classList.remove("active");
+        });
+    }
+    
+    if (shareModal) {
+        shareModal.addEventListener("click", (e) => {
+            if (e.target === shareModal) {
+                shareModal.classList.remove("active");
+            }
+        });
+    }
+
+    const optWhatsapp = document.getElementById("share-opt-whatsapp");
+    const optTelegram = document.getElementById("share-opt-telegram");
+    const optTwitter = document.getElementById("share-opt-twitter");
+    const optCopy = document.getElementById("share-opt-copy");
+    
+    const inviteShareText = `Hey! Check out Film House, the ultimate app to watch and download your favorite movies and series directly inside Telegram! 🎬🍿`;
+    const inviteShareUrl = "https://t.me/FilmHouseFilebot";
+    const fullInviteMessage = `${inviteShareText}\nPlay now: ${inviteShareUrl}`;
+    
+    if (optWhatsapp) {
+        optWhatsapp.addEventListener("click", () => {
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(fullInviteMessage)}`;
+            window.open(whatsappUrl, "_blank");
             if (typeof awardPoints === "function") {
                 awardPoints(5, "share");
             }
-
-            const triggerTelegramFallback = (url) => {
-                const tg = window.Telegram?.WebApp;
-                if (tg && tg.openTelegramLink) {
-                    try {
-                        tg.openTelegramLink(url);
-                        return;
-                    } catch (e) {
-                        console.error("tg.openTelegramLink failed:", e);
-                    }
+            if (shareModal) shareModal.classList.remove("active");
+        });
+    }
+    
+    if (optTelegram) {
+        optTelegram.addEventListener("click", () => {
+            const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteShareUrl)}&text=${encodeURIComponent(inviteShareText)}`;
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.openTelegramLink) {
+                try {
+                    tg.openTelegramLink(telegramShareUrl);
+                } catch (e) {
+                    window.open(telegramShareUrl, "_blank");
                 }
-                window.open(url, "_blank");
-            };
-            
-            // Try to use the system native sharing dialog (WhatsApp, Instagram, etc.)
-            if (navigator.share) {
-                navigator.share({
-                    title: "Film House",
-                    text: shareText,
-                    url: shareUrl
-                }).then(() => {
-                    console.log("Successful native share");
-                }).catch((err) => {
-                    // Fallback to copying invite link and opening Telegram forwarding if sharing cancelled/failed
-                    console.warn("navigator.share failed, using clipboard/telegram fallback:", err);
-                    copyToClipboard(`${shareText}\nPlay now: ${shareUrl}`);
-                    triggerTelegramFallback(telegramShareUrl);
-                });
             } else {
-                // Clipboard copy + Telegram forwarding fallback for desktops / unsupported browsers
-                copyToClipboard(`${shareText}\nPlay now: ${shareUrl}`);
-                triggerTelegramFallback(telegramShareUrl);
+                window.open(telegramShareUrl, "_blank");
             }
+            if (typeof awardPoints === "function") {
+                awardPoints(5, "share");
+            }
+            if (shareModal) shareModal.classList.remove("active");
+        });
+    }
+    
+    if (optTwitter) {
+        optTwitter.addEventListener("click", () => {
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(fullInviteMessage)}`;
+            window.open(twitterUrl, "_blank");
+            if (typeof awardPoints === "function") {
+                awardPoints(5, "share");
+            }
+            if (shareModal) shareModal.classList.remove("active");
+        });
+    }
+    
+    if (optCopy) {
+        optCopy.addEventListener("click", () => {
+            if (typeof copyToClipboard === "function") {
+                copyToClipboard(fullInviteMessage);
+            }
+            if (typeof awardPoints === "function") {
+                awardPoints(5, "share");
+            }
+            if (shareModal) shareModal.classList.remove("active");
         });
     }
 

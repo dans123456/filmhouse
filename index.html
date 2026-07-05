@@ -359,7 +359,7 @@
                     <!-- Invite Friends Button -->
                     <button class="btn btn-block" id="btn-invite-friends" style="background: rgba(255, 188, 0, 0.05); border: 1px dashed rgba(255, 188, 0, 0.35); color: var(--primary-color); padding: 12px; border-radius: var(--border-radius-sm); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <svg class="menu-icon" style="width: 16px; height: 16px; fill: var(--primary-color);"><use href="#icon-share"></use></svg>
+                            <svg class="menu-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: var(--primary-color);"><use href="#icon-share"></use></svg>
                             <span style="font-size: 13px;">Invite Friends & Share App 🏆</span>
                         </div>
                         <span style="font-size: 11px; color: var(--primary-color); background: rgba(255, 188, 0, 0.12); padding: 3px 8px; border-radius: 4px; font-weight: bold;">+5 Points</span>
@@ -690,6 +690,32 @@
                         <span>Disconnect Account</span>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARE APP MODAL -->
+    <div class="modal-overlay" id="share-app-modal">
+        <div class="modal-container" style="max-width: 360px; padding: 24px; text-align: center; border-radius: var(--border-radius-md); background-color: var(--bg-dark-card); border: 1px solid var(--border-color);">
+            <button class="modal-close-btn" id="btn-close-share-modal" aria-label="Close share">
+                <svg><use href="#icon-close"></use></svg>
+            </button>
+            <h3 style="margin-top: 0; margin-bottom: 12px; font-family: var(--font-heading); color: #fff;">Invite Friends</h3>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Share Film House with your friends and earn +5 Loyalty Points! 🏆</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                <button class="btn btn-block" id="share-opt-whatsapp" style="background: #25D366; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
+                    <span>Share to WhatsApp 💬</span>
+                </button>
+                <button class="btn btn-block" id="share-opt-telegram" style="background: #0088cc; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
+                    <span>Share to Telegram ✈️</span>
+                </button>
+                <button class="btn btn-block" id="share-opt-twitter" style="background: #15181c; border: 1px solid var(--border-color); color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
+                    <span>Share to X (Twitter) 🐦</span>
+                </button>
+                <button class="btn btn-block btn-secondary" id="share-opt-copy" style="font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
+                    <span>Copy Invite Link 🔗</span>
+                </button>
             </div>
         </div>
     </div>
