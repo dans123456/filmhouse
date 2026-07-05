@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "1392796-diary-of-a-wimpy-kid-the-last-straw",
+    "tmdb_id": 1392796,
+    "imdb_id": "",
+    "title": "Diary of a Wimpy Kid: The Last Straw",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "When laidback Greg finds himself at odds with his dad's outsized expectations, pressure builds to turn his act around. After a series of hilarious near disasters, Greg's dad presents him with an ultimatum that just might challenge his wimpy ways for good.",
+    "poster": "https://image.tmdb.org/t/p/w500/emcCjpC289NxAGuVwlItHCTrgT7.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/v8tpkxm7AhLu69eaZKJLsNaSL5.jpg",
+    "rating": 6.7,
+    "release_date": "2025-12-04",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "PYIphkVE5jQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADlQkAAh-4SEab9yWlGFjKGBYE"
+    ]
+  },
+  {
     "csv_id": "23082-the-invention-of-lying",
     "tmdb_id": 23082,
     "imdb_id": "",
