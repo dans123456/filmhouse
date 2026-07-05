@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "61459-parasyte-the-maxim",
+    "tmdb_id": 61459,
+    "imdb_id": "",
+    "title": "Parasyte -the maxim-",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "A species of parasitic aliens descends on Earth and quickly infiltrates humanity by entering the brains of vulnerable targets; insatiable beings that gain total control of their host and are capable of transforming themselves to feed on unsuspecting prey. High school student Shinichi Izumi falls victim to one of these parasites, but the creature fails to take over his brain and ends up in his right hand.",
+    "poster": "https://image.tmdb.org/t/p/w500/cXBfjZSdJelu2r0wKD7qCxS71kb.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zfk6siC4KRXurG4jJzSXHy9szGQ.jpg",
+    "rating": 8.3,
+    "release_date": "2014-10-09",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "2ilVWE9uw88",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADmQ8AAh-4UEbbDoyR_YJUpBYE"
+    ]
+  },
+  {
     "csv_id": "71024-castlevania",
     "tmdb_id": 71024,
     "imdb_id": "",
