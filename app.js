@@ -4315,20 +4315,39 @@ function bindEvents() {
             if (typeof awardPoints === "function") {
                 awardPoints(5, "share");
             }
-            
-            const tg = window.Telegram?.WebApp;
-            if (tg && tg.openTelegramLink) {
-                try {
-                    tg.openTelegramLink(telegramShareUrl);
-                    return;
-                } catch (e) {
-                    console.error("tg.openTelegramLink failed:", e);
+
+            const triggerTelegramFallback = (url) => {
+                const tg = window.Telegram?.WebApp;
+                if (tg && tg.openTelegramLink) {
+                    try {
+                        tg.openTelegramLink(url);
+                        return;
+                    } catch (e) {
+                        console.error("tg.openTelegramLink failed:", e);
+                    }
                 }
-            }
+                window.open(url, "_blank");
+            };
             
-            // Fallback for desktop browser or external views
-            window.open(telegramShareUrl, "_blank");
-            showToast("Opening share screen...");
+            // Try to use the system native sharing dialog (WhatsApp, Instagram, etc.)
+            if (navigator.share) {
+                navigator.share({
+                    title: "Film House",
+                    text: shareText,
+                    url: shareUrl
+                }).then(() => {
+                    console.log("Successful native share");
+                }).catch((err) => {
+                    // Fallback to copying invite link and opening Telegram forwarding if sharing cancelled/failed
+                    console.warn("navigator.share failed, using clipboard/telegram fallback:", err);
+                    copyToClipboard(`${shareText}\nPlay now: ${shareUrl}`);
+                    triggerTelegramFallback(telegramShareUrl);
+                });
+            } else {
+                // Clipboard copy + Telegram forwarding fallback for desktops / unsupported browsers
+                copyToClipboard(`${shareText}\nPlay now: ${shareUrl}`);
+                triggerTelegramFallback(telegramShareUrl);
+            }
         });
     }
 
