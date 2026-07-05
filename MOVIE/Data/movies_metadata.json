@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "71024-castlevania",
+    "tmdb_id": 71024,
+    "imdb_id": "",
+    "title": "Castlevania",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "A vampire hunter fights to save a besieged city from an army of otherworldly beasts controlled by Dracula himself.",
+    "poster": "https://image.tmdb.org/t/p/w500/WzFHnJY44uDERER0xi1jOdoafT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jLE5bsPA9xOKzBWOaOmKbp1DWQS.jpg",
+    "rating": 8.3,
+    "release_date": "2017-07-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "m3jNb7IdJHQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADXg8AAh-4UEbRZEZlJLR_-xYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADZg8AAh-4UEYoV1m0xd5sYxYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADbA8AAh-4UEZeccK8viLXFRYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADcg8AAh-4UEbeJtAsn9Pa6hYE"
+    ]
+  },
+  {
     "csv_id": "123548-castlevania-nocturne",
     "tmdb_id": 123548,
     "imdb_id": "",
