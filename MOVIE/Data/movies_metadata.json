@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "731738-the-paper-tigers",
+    "tmdb_id": 731738,
+    "imdb_id": "",
+    "title": "The Paper Tigers",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Three middle aged men polish their martial arts skills to avenge their fallen master.",
+    "poster": "https://image.tmdb.org/t/p/w500/x54tAgLfS51fO5EcipNJJ9tfSRK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/cjKBBLwFRvBw5pCIwArchGyjCvE.jpg",
+    "rating": 6.7,
+    "release_date": "2020-08-30",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "uh4KU5Ep4ic",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADMgcAAh-4WEbCpCOlu6Z6xxYE"
+    ]
+  },
+  {
     "csv_id": "435565-inside-the-hitchhiker-s-guide-to-the-galaxy",
     "tmdb_id": 435565,
     "imdb_id": "",
