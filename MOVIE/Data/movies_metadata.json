@@ -1,5 +1,114 @@
 [
   {
+    "csv_id": "774741-diary-of-a-wimpy-kid",
+    "tmdb_id": 774741,
+    "imdb_id": "",
+    "title": "Diary of a Wimpy Kid",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Greg Heffley is a scrawny but ambitious kid with an active imagination and big plans to be rich and famous – he just has to survive middle school first.",
+    "poster": "https://image.tmdb.org/t/p/w500/obg6lWuNaZkoSlwrVG4VVk4SmT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/x78cvxbmpBNcHON7x3Iv8vih5Sj.jpg",
+    "rating": 6.3,
+    "release_date": "2021-12-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "a_DhEoPJHes",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADNwkAAh-4SEbi4fLK6u8zohYE"
+    ]
+  },
+  {
+    "csv_id": "62835-colombiana",
+    "tmdb_id": 62835,
+    "imdb_id": "",
+    "title": "Colombiana",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After witnessing her parents’ murder as a child in Bogota, Cataleya Restrepo grows up to be a stone-cold assassin. She works for her uncle as a hitman by day, but her personal time is spent engaging in vigilante murders that she hopes will lead her to her ultimate target: the mobster responsible for her parents' death.",
+    "poster": "https://image.tmdb.org/t/p/w500/rEdGDgRB3gducezNSIyx2lbKQy4.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2PlRuZUjqC58bqm6MOjOAraEdFA.jpg",
+    "rating": 6.6,
+    "release_date": "2011-07-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "HCxPLlFWdFo",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADNAkAAh-4SEZGH33XbgtwthYE"
+    ]
+  },
+  {
+    "csv_id": "520758-chicken-run-dawn-of-the-nugget",
+    "tmdb_id": 520758,
+    "imdb_id": "",
+    "title": "Chicken Run: Dawn of the Nugget",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "A band of fearless chickens flock together to save poultry-kind from an unsettling new threat: a nearby farm that's cooking up something suspicious.",
+    "poster": "https://image.tmdb.org/t/p/w500/eImY0cjbH0bll8EXSqxqEZIZcmY.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/utChUdMhCEWKjHTc8DO5aK8dUVS.jpg",
+    "rating": 6.9,
+    "release_date": "2023-12-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "_-Kz67kea8Q",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADMwkAAh-4SEYU8eElyL_xjRYE"
+    ]
+  },
+  {
+    "csv_id": "7443-chicken-run",
+    "tmdb_id": 7443,
+    "imdb_id": "",
+    "title": "Chicken Run",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "The creators of Wallace & Gromit bring you an exciting and original story about a group of chickens determined to fly the coop–even if they can’t fly! It’s hardly poultry in motion when Rocky attempts to teach Ginger and her feathered friends to fly…but, with teamwork, determination and a little bit o’ cluck, the fearless flock plots one last attempt in a spectacular bid for freedom.",
+    "poster": "https://image.tmdb.org/t/p/w500/8XgmIsbpVamdhwcNVsYzohFZTtT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3eYkMSjWbvTaZso7ow5ub9ikNNq.jpg",
+    "rating": 6.8,
+    "release_date": "2000-06-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "rUSoF2nwPw8",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADMgkAAh-4SEbfJoGCQUxSzxYE"
+    ]
+  },
+  {
     "csv_id": "9615-the-fast-and-the-furious-tokyo-drift",
     "tmdb_id": 9615,
     "imdb_id": "",
