@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "225180-blue-eye-samurai",
+    "tmdb_id": 225180,
+    "imdb_id": "",
+    "title": "BLUE EYE SAMURAI",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Driven by a dream of revenge against those who made her an outcast in Edo-period Japan, a young warrior cuts a bloody path toward her destiny.",
+    "poster": "https://image.tmdb.org/t/p/w500/fXm3JT4WLQVnwukdvghtAblc1wc.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/oCMZpwLBcb3dnRuzEKWNWrw1tHz.jpg",
+    "rating": 8.5,
+    "release_date": "2023-11-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "3ciOn_4XFfE",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD7hAAAh-4UEYPxu6oMoj_VBYE"
+    ]
+  },
+  {
     "csv_id": "204154-scavengers-reign",
     "tmdb_id": 204154,
     "imdb_id": "",
