@@ -1,5 +1,86 @@
 [
   {
+    "csv_id": "778819-checkered-ninja-2",
+    "tmdb_id": 778819,
+    "imdb_id": "",
+    "title": "Checkered Ninja 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "After Phillip Eppermint manages to evade a prison sentence in Thailand, Checkered Ninja comes alive and seeks out Alex. Together, with Alex and his entire family, they now have to go to Thailand to bust Eppermint.",
+    "poster": "https://image.tmdb.org/t/p/w500/fjWiVF2vFwd3mhs1dNoS0SOHxqt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7i6F8CiBDHrZ1THxlsjF9EiSkXd.jpg",
+    "rating": 6.7,
+    "release_date": "2021-08-19",
+    "language": "da",
+    "cast": [],
+    "director": "",
+    "trailer": "RubZfeopTKM",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADHR8AAh-4UEboIAdwgjYerBYE"
+    ]
+  },
+  {
+    "csv_id": "640-catch-me-if-you-can",
+    "tmdb_id": 640,
+    "imdb_id": "",
+    "title": "Catch Me If You Can",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A true story about Frank Abagnale Jr. who, before his 19th birthday, successfully conned millions of dollars worth of checks as a Pan Am pilot, doctor, and legal prosecutor. An FBI agent makes it his mission to put him behind bars. But Frank not only eludes capture, he revels in the pursuit.",
+    "poster": "https://image.tmdb.org/t/p/w500/ctjEj2xM32OvBXCq8zAdK3ZrsAj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ggC3Brchf4RqPitEh7cROFoeAWn.jpg",
+    "rating": 8,
+    "release_date": "2002-12-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "71rDQ7z4eFg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADHB8AAh-4UEaizcFDwGKHixYE"
+    ]
+  },
+  {
+    "csv_id": "694-the-shining",
+    "tmdb_id": 694,
+    "imdb_id": "",
+    "title": "The Shining",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "Jack Torrance accepts a caretaker job at the Overlook Hotel, where he, along with his wife Wendy and their son Danny, must live isolated from the rest of the world for the winter. But they aren't prepared for the madness that lurks within.",
+    "poster": "https://image.tmdb.org/t/p/w500/uAR0AWqhQL1hQa69UDEbb2rE5Wx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mmd1HnuvAzFc4iuVJcnBrhDNEKr.jpg",
+    "rating": 8.2,
+    "release_date": "1980-05-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "jAE7dNurHR4",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADFR8AAh-4UEZmWoZqbE7XexYE"
+    ]
+  },
+  {
     "csv_id": "514619-nobody-s-fool",
     "tmdb_id": 514619,
     "imdb_id": "",
