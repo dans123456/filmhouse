@@ -1,5 +1,61 @@
 [
   {
+    "csv_id": "1045644-minions-more-2",
+    "tmdb_id": 1045644,
+    "imdb_id": "",
+    "title": "Minions & More 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "This collection of 11 short films produced by Illumination includes: From the \"Despicable Me\" franchise: Mower Minions (2016); Yellow Is the New Black (2018); Competition (2015); Cro Minion (2015); Binky Nelson Unpacified (2015); Panic in the Mailroom (2013). From the \"Secret Life of Pets\" franchise: Super Gidget (2019). From the \"Sing\" franchise: Eddie's Life Coach (2017); Gunter Babysits (2017). From the \"Lorax\" franchise: Serenade (2012); Wagon Ho! (2012).",
+    "poster": "https://image.tmdb.org/t/p/w500/j0w5tggQs0VVtXj5OF8kWqME2WG.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/Mk5kQRB5tqQZOQ4vzVttdkNT49.jpg",
+    "rating": 7.4,
+    "release_date": "2022-11-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADYAcAAh-4WEbuyAojEx53lRYE"
+    ]
+  },
+  {
+    "csv_id": "1029119-minions-more-volume-1",
+    "tmdb_id": 1029119,
+    "imdb_id": "",
+    "title": "Minions & More Volume 1",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "This collection of 10 short films produced by Illumination includes: From the \"Despicable Me\" franchise: Puppy (2013); Minion Scouts (2019); Training Wheels (2013); The Secret Life of Kyle (2017); Santa's Little Helpers (2019).  From the \"Grinch\" franchise: The Dog Days of Winter (2019).  From the \"Secret Life of Pets\" franchise: Norman Television (2016); Weenie (2016).  From the \"Sing\" franchise: Love at First Sight (2017).  From the \"Lorax\" franchise: Forces of Nature (2012).",
+    "poster": "https://image.tmdb.org/t/p/w500/hjVIpMS8gOEaLB87kpgEOqdDCrk.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/f2JmxZnY1njU6WlJLSgeDBORaTO.jpg",
+    "rating": 7,
+    "release_date": "2022-09-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "lrykXYY6jks",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADXwcAAh-4WEZKHEaQBKFTEBYE"
+    ]
+  },
+  {
     "csv_id": "438148-minions-the-rise-of-gru",
     "tmdb_id": 438148,
     "imdb_id": "",
