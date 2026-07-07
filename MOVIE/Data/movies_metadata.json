@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "114501-dug-days",
+    "tmdb_id": 114501,
+    "imdb_id": "",
+    "title": "Dug Days",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "A series of shorts that follows the humorous misadventures of Dug, the lovable dog from Disney and Pixar’s “Up.” Each short features everyday events that occur in Dug's backyard, all through the exciting (and slightly distorted) eyes of our favorite talking dog.",
+    "poster": "https://image.tmdb.org/t/p/w500/e5kT33XH2gX7xBFIK1uUJAvU5dj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/pgWgB8AfFOtwKSSoGYbmWsO5Mfq.jpg",
+    "rating": 7.4,
+    "release_date": "2021-09-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "JeuoUHn9Cfg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD8RQAAp6faUaPMnFPq968jhYE"
+    ]
+  },
+  {
     "csv_id": "229407-puppy",
     "tmdb_id": 229407,
     "imdb_id": "",
