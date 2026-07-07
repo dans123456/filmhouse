@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "425274-now-you-see-me-now-you-don-t",
+    "tmdb_id": 425274,
+    "imdb_id": "",
+    "title": "Now You See Me: Now You Don't",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "The original Four Horsemen reunite with a new generation of illusionists to take on powerful diamond heiress Veronika Vanderberg, who leads a criminal empire built on money laundering and trafficking. The new and old magicians must overcome their differences to work together on their most ambitious heist yet.",
+    "poster": "https://image.tmdb.org/t/p/w500/oD3Eey4e4Z259XLm3eD3WGcoJAh.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ufqytAlziHq5pljKByGJ8IKhtEZ.jpg",
+    "rating": 6.5,
+    "release_date": "2025-11-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "lLWESUfW-0A",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADFhUAAp6faUbnecuEl1xppRYE"
+    ]
+  },
+  {
     "csv_id": "291805-now-you-see-me-2",
     "tmdb_id": 291805,
     "imdb_id": "",
