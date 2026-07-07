@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "225171-pluribus",
+    "tmdb_id": 225171,
+    "imdb_id": "",
+    "title": "Pluribus",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "The most miserable person on Earth must save the world from happiness.",
+    "poster": "https://image.tmdb.org/t/p/w500/z7Nga7Q9IGFWs5OEduY2gGFxnX3.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ulm1ex4JFYJByyaPyqTr47MFyEQ.jpg",
+    "rating": 7.9,
+    "release_date": "2025-11-06",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "a6lzvWby9UE",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADARUAAp6faUZL5zcbpCW4chYE"
+    ]
+  },
+  {
     "csv_id": "114501-dug-days",
     "tmdb_id": 114501,
     "imdb_id": "",
