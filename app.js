@@ -3252,8 +3252,10 @@ function openDownloadModal(movie) {
             const anchor = document.createElement("div");
             anchor.className = "download-link-item";
 
+            const linkUrl = typeof link === 'object' && link !== null ? link.url : link;
+
             anchor.addEventListener("click", () => {
-                showConnectionDrawer(link, ADSGRAM_DOWNLOAD_BLOCK_ID);
+                showConnectionDrawer(linkUrl, ADSGRAM_DOWNLOAD_BLOCK_ID);
             });
 
             if (isTVShow) {
@@ -3277,8 +3279,19 @@ function openDownloadModal(movie) {
                 anchor.appendChild(labelWrap);
             } else {
                 // --- MOVIE: Quality layout ---
-                const qLabel = qualityLabels[idx] || `Link ${idx + 1}`;
-                const qIcon = qualityIcons[idx] || "📥";
+                const isObj = typeof link === 'object' && link !== null;
+                const qLabel = isObj && link.quality ? link.quality : (qualityLabels[idx] || `Link ${idx + 1}`);
+                
+                let qIcon = "📥";
+                if (qLabel.includes("720p")) qIcon = "🎬";
+                else if (qLabel.includes("1080p")) qIcon = "🎥";
+                else if (qLabel.includes("4K") || qLabel.includes("2160p")) qIcon = "✨";
+                else if (qLabel.includes("480p")) qIcon = "📱";
+                else if (qLabel.includes("WEBDL")) qIcon = "🌐";
+                else if (qLabel.includes("BluRay")) qIcon = "💿";
+                else {
+                    qIcon = qualityIcons[idx] || "📥";
+                }
 
                 const badge = document.createElement("span");
                 badge.className = "download-link-badge quality-badge";
@@ -3290,9 +3303,16 @@ function openDownloadModal(movie) {
                 const label = document.createElement("span");
                 label.className = "download-link-label";
                 label.textContent = qLabel;
+                
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
-                const qualityText = idx === 0 ? "Standard Quality" : idx === 1 ? "High Quality" : "Ultra HD Quality";
+                
+                let qualityText = "Direct Download";
+                if (qLabel.includes("1080p")) qualityText = "High Quality (1080p)";
+                else if (qLabel.includes("720p")) qualityText = "Standard Quality (720p)";
+                else if (qLabel.includes("4K")) qualityText = "Ultra HD Quality (4K)";
+                else if (qLabel.includes("480p")) qualityText = "Mobile Quality (480p)";
+                
                 sublabel.textContent = `${qualityText} • Watch Ad to Get Link`;
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
@@ -4984,7 +5004,8 @@ function renderUserRequests(requests) {
                 reviewingColor = "var(--primary-color)";
                 readyColor = "#4caf50";
                 activeLineColor = "#4caf50";
-                const dlLink = r._isExplicit ? r.downloadLink : r._matchingMovie.links[0];
+                const rawLink = r._isExplicit ? r.downloadLink : r._matchingMovie.links[0];
+                const dlLink = typeof rawLink === 'object' && rawLink !== null ? rawLink.url : rawLink;
                 actionBtn = `
                     <button class="btn btn-primary btn-sm user-request-dl-btn" data-link="${escapeHTML(dlLink)}" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">
                         Download 📥

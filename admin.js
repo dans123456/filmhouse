@@ -1057,12 +1057,16 @@ function showMovieDetails(movie) {
             
             <!-- Read-Only View -->
             <div id="links-view-container" style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.25); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
-                ${linksList.length ? linksList.map((link, idx) => `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                        <span style="font-size: 12px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 82%;" title="${link}">Link ${idx + 1}: ${link}</span>
-                        <a href="${link}" target="_blank" style="font-size: 12px; color: var(--primary-color); text-decoration: none; font-weight: 600; padding: 2px 8px; background: rgba(255, 188, 0, 0.05); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 4px;">Test 🔗</a>
-                    </div>
-                `).join('') : '<p style="margin: 0; font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px;">No links added</p>'}
+                ${linksList.length ? linksList.map((link, idx) => {
+                    const linkUrl = typeof link === 'object' && link !== null ? link.url : link;
+                    const linkQuality = typeof link === 'object' && link !== null && link.quality ? link.quality : "720p";
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <span style="font-size: 12px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 82%;" title="${escapeHTML(linkUrl)}">Link ${idx + 1} (${escapeHTML(linkQuality)}): ${escapeHTML(linkUrl)}</span>
+                            <a href="${escapeHTML(linkUrl)}" target="_blank" style="font-size: 12px; color: var(--primary-color); text-decoration: none; font-weight: 600; padding: 2px 8px; background: rgba(255, 188, 0, 0.05); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 4px;">Test 🔗</a>
+                        </div>
+                    `;
+                }).join('') : '<p style="margin: 0; font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px;">No links added</p>'}
             </div>
 
             <!-- Editor View (Hidden by default) -->
@@ -1112,10 +1116,14 @@ function showMovieDetails(movie) {
     function renderLinkInputs() {
         inputsWrapper.innerHTML = "";
         currentLinks.forEach((link, idx) => {
+            const urlVal = typeof link === 'object' && link !== null ? link.url : link;
+            const qualityVal = typeof link === 'object' && link !== null && link.quality ? link.quality : "720p";
+            
             const wrapper = document.createElement("div");
             wrapper.style.display = "flex";
             wrapper.style.gap = "8px";
             wrapper.style.alignItems = "center";
+            wrapper.style.marginBottom = "8px";
             
             const input = document.createElement("input");
             input.type = "text";
@@ -1127,10 +1135,41 @@ function showMovieDetails(movie) {
             input.style.border = "1px solid var(--border-color)";
             input.style.color = "#fff";
             input.style.borderRadius = "4px";
-            input.value = link;
+            input.value = urlVal || "";
             input.placeholder = `Telegram Link ${idx + 1}...`;
             input.addEventListener("input", (e) => {
-                currentLinks[idx] = e.target.value.trim();
+                if (typeof currentLinks[idx] !== 'object' || currentLinks[idx] === null) {
+                    currentLinks[idx] = { url: e.target.value.trim(), quality: "720p" };
+                } else {
+                    currentLinks[idx].url = e.target.value.trim();
+                }
+            });
+
+            const select = document.createElement("select");
+            select.style.padding = "6px";
+            select.style.background = "var(--input-bg)";
+            select.style.border = "1px solid var(--border-color)";
+            select.style.color = "#fff";
+            select.style.borderRadius = "4px";
+            select.style.fontSize = "11px";
+            select.style.width = "85px";
+            select.style.cursor = "pointer";
+            
+            const options = ["720p", "1080p", "4K UHD", "480p", "WEBDL", "BluRay"];
+            options.forEach(opt => {
+                const o = document.createElement("option");
+                o.value = opt;
+                o.textContent = opt;
+                if (opt === qualityVal) o.selected = true;
+                select.appendChild(o);
+            });
+            
+            select.addEventListener("change", (e) => {
+                if (typeof currentLinks[idx] !== 'object' || currentLinks[idx] === null) {
+                    currentLinks[idx] = { url: "", quality: e.target.value };
+                } else {
+                    currentLinks[idx].quality = e.target.value;
+                }
             });
             
             const removeBtn = document.createElement("button");
@@ -1147,6 +1186,7 @@ function showMovieDetails(movie) {
             });
             
             wrapper.appendChild(input);
+            wrapper.appendChild(select);
             wrapper.appendChild(removeBtn);
             inputsWrapper.appendChild(wrapper);
         });
@@ -1182,7 +1222,15 @@ function showMovieDetails(movie) {
 
     if (saveLinksBtn) {
         saveLinksBtn.addEventListener("click", () => {
-            const finalLinks = currentLinks.filter(l => l !== "");
+            const finalLinks = currentLinks.filter(l => {
+                const urlVal = typeof l === 'object' && l !== null ? l.url : l;
+                return urlVal && urlVal.trim() !== "";
+            }).map(l => {
+                if (typeof l === 'object' && l !== null) {
+                    return { url: l.url, quality: l.quality || "720p" };
+                }
+                return { url: l, quality: "720p" };
+            });
             
             const newTitle = document.getElementById("edit-movie-title")?.value.trim();
             const newId = document.getElementById("edit-movie-id")?.value.trim();
@@ -1372,18 +1420,31 @@ if (catalogSearchInput) {
     catalogSearchInput.addEventListener("input", renderCatalogList);
 }
 
-let addMovieLinksState = [""];
+let addMovieLinksState = [{ url: "", quality: "720p" }];
 
 function renderAddMovieLinks() {
     const wrapper = document.getElementById("add-movie-links-inputs-wrapper");
     if (!wrapper) return;
     
-    wrapper.innerHTML = addMovieLinksState.map((link, idx) => {
-        const escaped = escapeHTML(link);
+    wrapper.innerHTML = addMovieLinksState.map((linkObj, idx) => {
+        const urlVal = typeof linkObj === 'object' && linkObj !== null ? linkObj.url : linkObj;
+        const qualityVal = typeof linkObj === 'object' && linkObj !== null && linkObj.quality ? linkObj.quality : "720p";
+        const escaped = escapeHTML(urlVal || "");
+        
         return `
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <span style="font-size: 11px; color: var(--text-secondary); font-weight: 700; width: 55px; flex-shrink: 0;">Link ${idx + 1}:</span>
-                <input type="text" class="add-movie-link-input" data-index="${idx}" value="${escaped}" placeholder="Paste Telegram download URL" style="flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px;">
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 11px; color: var(--text-secondary); font-weight: 700; width: 45px; flex-shrink: 0;">Link ${idx + 1}:</span>
+                <input type="text" class="add-movie-link-url-input" data-index="${idx}" value="${escaped}" placeholder="Paste Telegram download URL" style="flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px;">
+                
+                <select class="add-movie-link-quality-select" data-index="${idx}" style="padding: 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; width: 90px; cursor: pointer;">
+                    <option value="720p" ${qualityVal === '720p' ? 'selected' : ''}>720p</option>
+                    <option value="1080p" ${qualityVal === '1080p' ? 'selected' : ''}>1080p</option>
+                    <option value="4K UHD" ${qualityVal === '4K UHD' ? 'selected' : ''}>4K UHD</option>
+                    <option value="480p" ${qualityVal === '480p' ? 'selected' : ''}>480p</option>
+                    <option value="WEBDL" ${qualityVal === 'WEBDL' ? 'selected' : ''}>WEBDL</option>
+                    <option value="BluRay" ${qualityVal === 'BluRay' ? 'selected' : ''}>BluRay</option>
+                </select>
+
                 <button type="button" class="btn-remove-add-movie-link" data-index="${idx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 6px; display: ${addMovieLinksState.length > 1 ? 'block' : 'none'};">
                     <svg style="width: 14px; height: 14px; fill: currentColor;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                 </button>
@@ -1391,11 +1452,27 @@ function renderAddMovieLinks() {
         `;
     }).join('');
     
-    // Bind input updates
-    wrapper.querySelectorAll(".add-movie-link-input").forEach(input => {
+    // Bind url input updates
+    wrapper.querySelectorAll(".add-movie-link-url-input").forEach(input => {
         input.addEventListener("input", (e) => {
             const idx = parseInt(e.target.dataset.index);
-            addMovieLinksState[idx] = e.target.value.trim();
+            if (typeof addMovieLinksState[idx] !== 'object' || addMovieLinksState[idx] === null) {
+                addMovieLinksState[idx] = { url: e.target.value.trim(), quality: "720p" };
+            } else {
+                addMovieLinksState[idx].url = e.target.value.trim();
+            }
+        });
+    });
+
+    // Bind quality select updates
+    wrapper.querySelectorAll(".add-movie-link-quality-select").forEach(select => {
+        select.addEventListener("change", (e) => {
+            const idx = parseInt(e.target.dataset.index);
+            if (typeof addMovieLinksState[idx] !== 'object' || addMovieLinksState[idx] === null) {
+                addMovieLinksState[idx] = { url: "", quality: e.target.value };
+            } else {
+                addMovieLinksState[idx].quality = e.target.value;
+            }
         });
     });
     
@@ -1416,7 +1493,7 @@ const closeModalBtn = document.getElementById("btn-close-movie-modal");
 
 if (openModalBtn && addMovieModal) {
     openModalBtn.addEventListener("click", () => {
-        addMovieLinksState = [""]; // reset links list
+        addMovieLinksState = [{ url: "", quality: "720p" }]; // reset links list
         addMovieModal.classList.add("active");
         renderAddMovieLinks();
         
@@ -1628,7 +1705,7 @@ if (addMovieIdInput) {
 const btnAddMovieLinkInput = document.getElementById("btn-add-movie-link-input");
 if (btnAddMovieLinkInput) {
     btnAddMovieLinkInput.addEventListener("click", () => {
-        addMovieLinksState.push("");
+        addMovieLinksState.push({ url: "", quality: "720p" });
         renderAddMovieLinks();
     });
 }
@@ -1652,7 +1729,15 @@ if (addMovieForm) {
         // Get selected categories
         const checkedCategories = Array.from(document.querySelectorAll(".add-cat-checkbox:checked")).map(cb => cb.value);
         
-        const linksList = addMovieLinksState.filter(l => l !== "");
+        const linksList = addMovieLinksState.filter(l => {
+            const urlVal = typeof l === 'object' && l !== null ? l.url : l;
+            return urlVal && urlVal.trim() !== "";
+        }).map(l => {
+            if (typeof l === 'object' && l !== null) {
+                return { url: l.url, quality: l.quality || "720p" };
+            }
+            return { url: l, quality: "720p" };
+        });
         if (linksList.length === 0) {
             alert("Error: Please add at least one Telegram download link!");
             return;
