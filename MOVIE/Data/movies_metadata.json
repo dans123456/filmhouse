@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "59427-marvel-s-avengers",
+    "tmdb_id": 59427,
+    "imdb_id": "",
+    "title": "Marvel's Avengers",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "The further adventures of the Marvel Universe's mightiest general membership superhero team. With an all-star roster consisting of Iron Man, Captain America, Thor, Hulk, Hawkeye, Falcon and, occasionally--when she feels like it and only when she feels like it--Black Widow, the Avengers are a team in the truest sense. The Avengers save the world from the biggest threats imaginable--threats no single super hero could withstand.",
+    "poster": "https://image.tmdb.org/t/p/w500/aVYPq7FSvsdNQOXVIFnndXJPCXn.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/hutyHRPoY0woAZCJtLmosJHuTjQ.jpg",
+    "rating": 7.5,
+    "release_date": "2013-05-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "30Gy8Q8wQMo",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADRRQAAmjCeUa-_0mNsmqVxxYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADTBQAAmjCeUYlCqq_GVBbpRYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADWRQAAmjCeUYScfeMjr5pEBYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADYBQAAmjCeUZ0ys8vAXafZBYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADYRQAAmjCeUY-AAHR1gmf2MsWBA"
+    ]
+  },
+  {
     "csv_id": "40044-marvel-s-hulk-and-the-agents-of-s-m-a-s-h",
     "tmdb_id": 40044,
     "imdb_id": "",
