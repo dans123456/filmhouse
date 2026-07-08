@@ -10230,14 +10230,14 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "African"
+      "Hollywood/British Movies"
     ],
     "genres": [],
     "overview": "LOVE IN EVERY WORD written by Mfon- Abasi Micheal Inyang is a beautiful piece. In a fast-paced world where love often takes a backseat to ambition, two souls from different worlds cross paths in an unexpected encounter. As emotions spark and cultural differences collide, they must navigate personal fears, societal expectations, and the delicate balance between love and self-discovery. When destiny presents an opportunity for something real, will they take the leap, or will their differences keep them apart?",
-    "poster": "https://i.postimg.cc/pV6jTrBX/photo-2026-07-08-18-34-41.jpg",
-    "backdrop": "https://i.postimg.cc/pV6jTrBX/photo-2026-07-08-18-34-41.jpg",
+    "poster": "",
+    "backdrop": "",
     "rating": 0,
-    "release_date": "2025",
+    "release_date": "",
     "language": "en",
     "cast": [],
     "director": "",
@@ -12215,6 +12215,36 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADpQ8AAmjCeUbzN5QD1I7D7hYE"
+    ]
+  },
+  {
+    "csv_id": "126485-moving",
+    "tmdb_id": 126485,
+    "imdb_id": "",
+    "title": "Moving",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Children who live in hiding with superpowers, along with their parents who live with painful secrets of the past, face enormous dangers together.",
+    "poster": "https://image.tmdb.org/t/p/w500/vf9SNXNAFqzKBGksFwrXhkg9cb7.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/29jWaRhKtey1efp5G7Fu97NAmzz.jpg",
+    "rating": 8.5,
+    "release_date": "2023-08-09",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "_dJuI1_G638",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADiRoAAmjCeUY2eUqYnHsPcBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
