@@ -220,15 +220,66 @@ function updateStatsCounters() {
             Object.entries(categoryCounts).forEach(([cat, count]) => {
                 const displayName = labelMap[cat] || `${cat} 📁`;
                 const box = document.createElement("div");
-                box.style.cssText = "background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;";
+                box.style.cssText = "background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; cursor: pointer; transition: all 0.2s ease;";
                 box.innerHTML = `
                     <span style="color: var(--text-secondary); font-weight: 600;">${escapeHTML(displayName)}</span>
                     <span style="color: var(--primary-color); font-weight: 700;">${count}</span>
                 `;
+                box.addEventListener("mouseenter", () => {
+                    box.style.background = "rgba(255, 188, 0, 0.05)";
+                    box.style.borderColor = "rgba(255, 188, 0, 0.25)";
+                });
+                box.style.border = "1px solid rgba(255,255,255,0.04)";
+                box.addEventListener("mouseleave", () => {
+                    box.style.background = "rgba(255,255,255,0.015)";
+                    box.style.borderColor = "rgba(255,255,255,0.04)";
+                });
+                box.addEventListener("click", () => {
+                    openCategoryMoviesModal(cat, displayName);
+                });
                 categoriesList.appendChild(box);
             });
         } else {
             breakdownContainer.style.display = "none";
+        }
+    }
+
+    // Feature usage stats calculator
+    const featureContainer = document.getElementById("feature-usage-container");
+    const featuresList = document.getElementById("analytics-features-list");
+    if (featureContainer && featuresList) {
+        if (allUsers.length > 0) {
+            featureContainer.style.display = "block";
+            
+            let featureUsage = {
+                "🚪 App Visits & Logins": 0,
+                "🎬 Movie Plays & Streams": 0,
+                "📥 Link Downloads": 0,
+                "🔗 Referral Shares": 0
+            };
+            
+            allUsers.forEach(u => {
+                const bd = u.pointsBreakdown || {};
+                featureUsage["🚪 App Visits & Logins"] += parseInt(bd.visits || 0);
+                featureUsage["🎬 Movie Plays & Streams"] += parseInt(bd.watched || 0);
+                featureUsage["📥 Link Downloads"] += parseInt(bd.downloads || 0);
+                featureUsage["🔗 Referral Shares"] += parseInt(bd.shares || 0);
+            });
+            
+            const sortedFeatures = Object.entries(featureUsage).sort((a, b) => b[1] - a[1]);
+            
+            featuresList.innerHTML = "";
+            sortedFeatures.forEach(([featureName, count]) => {
+                const box = document.createElement("div");
+                box.style.cssText = "background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;";
+                box.innerHTML = `
+                    <span style="color: var(--text-secondary); font-weight: 600;">${escapeHTML(featureName)}</span>
+                    <span style="color: var(--primary-color); font-weight: 700;">${count.toLocaleString()}</span>
+                `;
+                featuresList.appendChild(box);
+            });
+        } else {
+            featureContainer.style.display = "none";
         }
     }
 
@@ -2645,6 +2696,94 @@ if (fulfillForm && fulfillRequestModal) {
             console.error("Error fulfilling requests:", err);
             alert("Failed to fulfill requests: " + err.message);
         });
+    });
+}
+
+// State for Category Browser Modal
+let activeCategoryKey = "";
+let activeCategoryDisplayName = "";
+
+// Close Modal binding
+const catMoviesModal = document.getElementById("category-movies-modal");
+const closeCatMoviesBtn = document.getElementById("btn-close-cat-movies-modal");
+if (closeCatMoviesBtn && catMoviesModal) {
+    closeCatMoviesBtn.addEventListener("click", () => {
+        catMoviesModal.classList.remove("active");
+    });
+}
+
+// Bind Category Search filter input typing
+const catMoviesSearchInput = document.getElementById("cat-movies-search");
+if (catMoviesSearchInput) {
+    catMoviesSearchInput.addEventListener("input", renderCategoryMovies);
+}
+
+function openCategoryMoviesModal(catKey, displayName) {
+    activeCategoryKey = catKey;
+    activeCategoryDisplayName = displayName;
+    
+    const titleEl = document.getElementById("category-modal-title");
+    if (titleEl) titleEl.textContent = displayName;
+    
+    const searchEl = document.getElementById("cat-movies-search");
+    if (searchEl) searchEl.value = "";
+    
+    renderCategoryMovies();
+    if (catMoviesModal) catMoviesModal.classList.add("active");
+}
+
+function renderCategoryMovies() {
+    const listContainer = document.getElementById("category-movies-list");
+    if (!listContainer) return;
+    
+    listContainer.replaceChildren();
+    
+    // Filter movies in active category
+    const catMovies = allCatalogMovies.filter(m => {
+        const cats = m.categories || ["Main"];
+        return cats.includes(activeCategoryKey);
+    });
+    
+    // Filter by search text
+    const searchQuery = (document.getElementById("cat-movies-search")?.value || "").toLowerCase().trim();
+    const filtered = catMovies.filter(m => (m.title || "").toLowerCase().includes(searchQuery) || (m.csv_id || "").toLowerCase().includes(searchQuery));
+    
+    if (filtered.length === 0) {
+        listContainer.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-secondary);">No titles found.</div>`;
+        return;
+    }
+    
+    filtered.forEach(m => {
+        const row = document.createElement("div");
+        row.className = "list-row";
+        row.style.cssText = "cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.015); border-radius: 6px; transition: all 0.2s;";
+        
+        row.addEventListener("mouseenter", () => {
+            row.style.background = "rgba(255, 188, 0, 0.04)";
+        });
+        row.addEventListener("mouseleave", () => {
+            row.style.background = "rgba(255,255,255,0.015)";
+        });
+        
+        const posterUrl = m.poster || "MOVIE/img/FilmHouse3_nobg.png";
+        
+        row.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+                <img src="${escapeHTML(posterUrl)}" style="width: 32px; height: 44px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border-color);" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                <div style="min-width: 0; flex: 1;">
+                    <h5 style="margin: 0 0 2px 0; font-size: 13px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(m.title)}</h5>
+                    <p style="margin: 0; font-size: 11px; color: var(--text-secondary);">ID: ${escapeHTML(m.csv_id)} | Year: ${m.release_date ? escapeHTML(m.release_date.substring(0, 4)) : 'N/A'}</p>
+                </div>
+            </div>
+            <span style="font-size: 11px; color: var(--primary-color); font-weight: 600; flex-shrink: 0; margin-left: 10px;">Edit ➔</span>
+        `;
+        
+        row.addEventListener("click", () => {
+            if (catMoviesModal) catMoviesModal.classList.remove("active");
+            showMovieDetails(m);
+        });
+        
+        listContainer.appendChild(row);
     });
 }
 
