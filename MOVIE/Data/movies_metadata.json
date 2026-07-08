@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "127529-bloodhounds",
+    "tmdb_id": 127529,
+    "imdb_id": "",
+    "title": "Bloodhounds",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Faced with ruthless foes with a violent thirst, two young boxers band together — risking life and limb to bring justice and protect their loved ones.",
+    "poster": "https://image.tmdb.org/t/p/w500/uSQzD7TXsL96J5ggDrJFdUs8uXU.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zhsEnDNCQX5dlI2wbKzV90pV0B9.jpg",
+    "rating": 8.5,
+    "release_date": "2023-06-09",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "eyiR8pO50JE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADaBkAAmjCeUYkDo0xNhNy6RYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "【OSHI NO KO】",
     "csv_id": "203737",
     "type": "Series",
