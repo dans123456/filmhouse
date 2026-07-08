@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "378236-the-emoji-movie",
+    "tmdb_id": 378236,
+    "imdb_id": "",
+    "title": "The Emoji Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Gene, a multi-expressional emoji, sets out on a journey to become a normal emoji.",
+    "poster": "https://image.tmdb.org/t/p/w500/60bTx5z9zL1AqCjZ0gmWoRMJ6Bb.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kTrgxhRSj2sun89bDbnGCPBiey6.jpg",
+    "rating": 5.4,
+    "release_date": "2017-07-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Rd85FEdJfTw",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADkRAAAmjCeUZKTYPqrrwclBYE"
+    ]
+  },
+  {
     "csv_id": "20544-something-the-lord-made",
     "tmdb_id": 20544,
     "imdb_id": "",
