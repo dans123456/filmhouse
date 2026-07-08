@@ -1,5 +1,99 @@
 [
   {
+    "csv_id": "49538-x-men-first-class",
+    "tmdb_id": 49538,
+    "imdb_id": "",
+    "title": "X-Men: First Class",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "Before Charles Xavier and Erik Lensherr took the names Professor X and Magneto, they were two young men discovering their powers for the first time. Before they were arch-enemies, they were closest of friends, working together with other mutants (some familiar, some new), to stop the greatest threat the world has ever known.",
+    "poster": "https://image.tmdb.org/t/p/w500/hNEokmUke0dazoBhttFN0o3L7Xv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/yhp5Pt4GugkCs5mz63qWz5khHXe.jpg",
+    "rating": 7.3,
+    "release_date": "2011-06-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "2BAYQD_j6Xc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD3xQAAmjCeUYsMKGpM3KKBhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "10195-thor",
+    "tmdb_id": 10195,
+    "imdb_id": "",
+    "title": "Thor",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "Against his father Odin's will, The Mighty Thor - a powerful but arrogant warrior god - recklessly reignites an ancient war. Thor is cast down to Earth and forced to live among humans as punishment. Once here, Thor learns what it takes to be a true hero when the most dangerous villain of his world sends the darkest forces of Asgard to invade Earth.",
+    "poster": "https://image.tmdb.org/t/p/w500/prSfAi1xGrhLQNxVSUFh61xQ4Qy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jWAJlgICJbn2kyohrokteRoD3cZ.jpg",
+    "rating": 6.8,
+    "release_date": "2011-04-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "uHBnrJowBZE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD3hQAAmjCeUZpWH8TjUWwARYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "43146-x-men",
+    "tmdb_id": 43146,
+    "imdb_id": "",
+    "title": "X-Men",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime",
+      "Comic"
+    ],
+    "genres": [
+      "Anime",
+      "Comic"
+    ],
+    "overview": "X-Men, still grieving over the death of Phoenix (Jean Grey), are investigating a case of a missing mutant girl in Northern Japan. This leads them to a mysterious virus that turns mutants into monsters. U-Men and the Inner Circle want it.",
+    "poster": "https://image.tmdb.org/t/p/w500/j4MRuaMIpbq8jpXt864R9ebzzuS.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/q0jeVdA1KL4Lp6kalYNfObKfxGW.jpg",
+    "rating": 7.3,
+    "release_date": "2011-04-01",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1xQAAmjCeUYvdcf08F9s5BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "62798-blade",
     "tmdb_id": 62798,
     "imdb_id": "",
