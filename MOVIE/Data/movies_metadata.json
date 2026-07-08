@@ -1,5 +1,30 @@
 [
   {
+    "csv_id": "157004-goosebumps",
+    "tmdb_id": 157004,
+    "imdb_id": "",
+    "title": "Goosebumps",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "A group of five high schoolers embark on a shadowy and twisted journey to investigate the tragic passing three decades earlier of a teen named Harold Biddle – while also unearthing dark secrets from their parents' past.",
+    "poster": "https://image.tmdb.org/t/p/w500/pMrMPlEJAGAKBUWJzeacIwjRU2C.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/j45FEq8BPUJDVm3cGIQye0tqPpL.jpg",
+    "rating": 7.1,
+    "release_date": "2023-10-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "07cTJzm8SFY",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADsxIAAmjCeUaQBQABvGtJ2dwWBA"
+    ]
+  },
+  {
     "csv_id": "8358-cast-away",
     "tmdb_id": 8358,
     "imdb_id": "",
