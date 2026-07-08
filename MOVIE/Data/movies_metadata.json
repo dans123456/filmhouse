@@ -985,6 +985,36 @@
     "runtime": "80 min"
   },
   {
+    "csv_id": "206619-all-that-we-loved",
+    "tmdb_id": 206619,
+    "imdb_id": "",
+    "title": "All That We Loved",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A love story that covers adolescent teenagers having trouble deciding the gravity of love and friendship.",
+    "poster": "https://image.tmdb.org/t/p/w500/pioZKN9PG3LJIcDrU4wfrMwotPF.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sIhx1HwIxTSjJ7chmACsCnMSxb3.jpg",
+    "rating": 7.2,
+    "release_date": "2023-05-05",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "QgYZ8K-WrCI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_RgAAmjCeUZI9AbAR6nztBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "American Pie",
     "csv_id": "2105-american-pie",
     "type": "Movie",
@@ -5491,6 +5521,36 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADKh8AAh-4UEZMj6AZyJTqYBYE"
+    ]
+  },
+  {
+    "csv_id": "214997-doctor-cha",
+    "tmdb_id": 214997,
+    "imdb_id": "",
+    "title": "Doctor Cha",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Twenty years after leaving her medical career, a housewife returns as a first-year resident — struggling to find her footing in a job full of surprises.",
+    "poster": "https://image.tmdb.org/t/p/w500/qgQQeiy2zyfla5y2yiZJGGU4y1I.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/Asd9Mi9pC2B5UQp2pLplzhbd0bB.jpg",
+    "rating": 8.2,
+    "release_date": "2023-04-15",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "L7LfpZoLDlI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADOBkAAmjCeUb8s11SP81hERYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -10082,14 +10142,14 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "African"
+      "Hollywood/British Movies"
     ],
     "genres": [],
     "overview": "LOVE IN EVERY WORD written by Mfon- Abasi Micheal Inyang is a beautiful piece. In a fast-paced world where love often takes a backseat to ambition, two souls from different worlds cross paths in an unexpected encounter. As emotions spark and cultural differences collide, they must navigate personal fears, societal expectations, and the delicate balance between love and self-discovery. When destiny presents an opportunity for something real, will they take the leap, or will their differences keep them apart?",
-    "poster": "https://i.postimg.cc/pV6jTrBX/photo-2026-07-08-18-34-41.jpg",
-    "backdrop": "https://i.postimg.cc/pV6jTrBX/photo-2026-07-08-18-34-41.jpg",
+    "poster": "",
+    "backdrop": "",
     "rating": 0,
-    "release_date": "2025",
+    "release_date": "",
     "language": "en",
     "cast": [],
     "director": "",
