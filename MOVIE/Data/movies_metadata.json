@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "1226863-the-super-mario-galaxy-movie",
+    "tmdb_id": 1226863,
+    "imdb_id": "",
+    "title": "The Super Mario Galaxy Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Having thwarted Bowser's previous plot to marry Princess Peach, Mario and Luigi now face a fresh threat in Bowser Jr., who is determined to liberate his father from captivity and restore the family legacy. Alongside companions new and old, the brothers travel across the stars to stop the young heir's crusade.",
+    "poster": "https://image.tmdb.org/t/p/w500/eJGWx219ZcEMVQJhAgMiqo8tYY.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kxQiIJ4gVcD3K6o14MJ72p5yRcE.jpg",
+    "rating": 8.2,
+    "release_date": "2026-04-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "En5QZmL5R1s",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQAD_BEAAmjCeUbEMyaOca_D_xYE"
+    ]
+  },
+  {
     "csv_id": "974576-conclave",
     "tmdb_id": 974576,
     "imdb_id": "",
