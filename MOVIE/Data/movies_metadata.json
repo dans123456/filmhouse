@@ -1,5 +1,91 @@
 [
   {
+    "csv_id": "135615-american-born-chinese",
+    "tmdb_id": 135615,
+    "imdb_id": "",
+    "title": "American Born Chinese",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Average teenager Jin Wang juggles his high school social life with his immigrant home life. When he meets a new foreign student on the first day of the school year, even more worlds collide as Jin is unwittingly entangled in a battle of Chinese mythological gods.",
+    "poster": "https://image.tmdb.org/t/p/w500/cwTYt6DKuMY6RSmQ269fpYH9ELN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/n5StTpznGP2zuagcZlQ3qUWZsrX.jpg",
+    "rating": 6.6,
+    "release_date": "2023-05-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "YrV3pOo3ycU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBhsAAmjCeUZUchrfeuo-EBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "194797-doona",
+    "tmdb_id": 194797,
+    "imdb_id": "",
+    "title": "Doona!",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A college student navigates life and school while dealing with a unique predicament — he's living with a beautiful former K-pop sensation.",
+    "poster": "https://image.tmdb.org/t/p/w500/bQhiOkU3lCu5pwCqPdNVG5GBLlj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/1aBYcDp9CVbwU4h6mOYkkUgMPEl.jpg",
+    "rating": 7.7,
+    "release_date": "2023-10-20",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "v4rtx48siJI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBBsAAmjCeUaVI_s3-n5HwBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "234751-miss-lucky-go",
+    "tmdb_id": 234751,
+    "imdb_id": "",
+    "title": "Miss Lucky Go!",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Aspiring figurine designer Chen Miran enrolls in university for a fresh start but ends up in the same class as her ex, Zhong Weiqiong, who once dumped her coldly. Determined to win her back, Zhong schemes to reignite their love, unaware their past breakup was a misunderstanding. As old feelings resurface and they reconcile, a surprising rival appears, threatening to unravel their newfound happiness.",
+    "poster": "https://image.tmdb.org/t/p/w500/wS8VgxuuEEPJ8iw4PSatAdHtUrE.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/odkwwprXZki88f05mXVOUTDaNO6.jpg",
+    "rating": 8.8,
+    "release_date": "2023-09-13",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_hoAAmjCeUanmQABNeA3tuQWBA",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "157847-cold-blooded-intern",
     "tmdb_id": 157847,
     "imdb_id": "",
