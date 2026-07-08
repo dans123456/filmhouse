@@ -1,153 +1,5 @@
 [
   {
-    "csv_id": "196550-a-date-with-the-future",
-    "tmdb_id": 196550,
-    "imdb_id": "",
-    "title": "A Date With the Future",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series"
-    ],
-    "genres": [],
-    "overview": "A decade after being rescued from a devastating earthquake, Xu Lai returns to China as a reporter and dog trainer. Reuniting with firefighter Jin Shichuan—who doesn’t recognize her—they clash at first but are soon forced to work together to form a search and rescue dog team. As they face life-threatening missions side by side, their past connection resurfaces and a deeper bond begins to grow.",
-    "poster": "https://image.tmdb.org/t/p/w500/uYMaig5XjfeeTkmwOzqrFAdnngk.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/feckhJNtJEakFv4nozOCn0Pykvh.jpg",
-    "rating": 7.5,
-    "release_date": "2023-06-02",
-    "language": "zh",
-    "cast": [],
-    "director": "",
-    "trailer": "o4gorkpFgbs",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADTBoAAmjCeUYMyn4xNarGERYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "214529-family-the-unbreakable-bond",
-    "tmdb_id": 214529,
-    "imdb_id": "",
-    "title": "Family: The Unbreakable Bond",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "Kwon Do-hun is an expert sniper and a secret agent working for the National Intelligence Service. To conceal his true identity, he lives a double life as a regular trading company employee, keeping even his wife Kang Yu-ra in the dark. Though he is occupied with his work, Do-hun cherishes his wife deeply. Meanwhile, Yu-ra, a dedicated homemaker, harbors a secret. Their tranquil existence is thrown into turmoil when Jo Tae-gu emerges, posing a threat to their carefully crafted façade.",
-    "poster": "https://image.tmdb.org/t/p/w500/w7NpD7m91PZcStQPRk70AluZkVd.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/kaQaozuVjKczUTXVZLgGr2Kpt9f.jpg",
-    "rating": 7.4,
-    "release_date": "2023-04-17",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "iupuHeCxNec",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD-hkAAmjCeUaLPC0P52N6IxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "211796-stealer-the-treasure-keeper",
-    "tmdb_id": 211796,
-    "imdb_id": "",
-    "title": "Stealer: The Treasure Keeper",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "A comic action drama in which a veiled cultural asset thief 'Skunk' and an unofficial cultural asset recovery team 'Karma' unite against those who cannot be judged by the law.",
-    "poster": "https://image.tmdb.org/t/p/w500/mLY8DBG4Taz70PzBQS8hgL3Cost.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/kDFgtd1yQIt21mXg9JTx0IKLZyK.jpg",
-    "rating": 4.3,
-    "release_date": "2023-04-12",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "7TNxHvuN7WY",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADthkAAmjCeUYgjKqrbyZvyRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "844386-the-ghost-station",
-    "tmdb_id": 844386,
-    "imdb_id": "",
-    "title": "The Ghost Station",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "Reporter Na-yeong and her partner investigate a series of mysterious deaths and a perplexing case where her source was allegedly already dead at the time of their interview. Together they end up confronting a terrifying truth.",
-    "poster": "https://image.tmdb.org/t/p/w500/gx5dkBdGSFCijowANbLF5Ew7mOD.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/dCWKwPjSdZ1xYvlifL91HdmvvNv.jpg",
-    "rating": 6.5,
-    "release_date": "2023-04-19",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "OBUp2M2Fnng",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqxkAAmjCeUbMVE9OHQ3yWhYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "127529-bloodhounds",
-    "tmdb_id": 127529,
-    "imdb_id": "",
-    "title": "Bloodhounds",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "Faced with ruthless foes with a violent thirst, two young boxers band together — risking life and limb to bring justice and protect their loved ones.",
-    "poster": "https://image.tmdb.org/t/p/w500/uSQzD7TXsL96J5ggDrJFdUs8uXU.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/zhsEnDNCQX5dlI2wbKzV90pV0B9.jpg",
-    "rating": 8.5,
-    "release_date": "2023-06-09",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "eyiR8pO50JE",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADaBkAAmjCeUYkDo0xNhNy6RYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
     "title": "【OSHI NO KO】",
     "csv_id": "203737",
     "type": "Series",
@@ -379,6 +231,34 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADeSAAAh-4UEY-eYdBy009NxYE"
+    ]
+  },
+  {
+    "csv_id": "196550-a-date-with-the-future",
+    "tmdb_id": 196550,
+    "imdb_id": "",
+    "title": "A Date With the Future",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "A decade after being rescued from a devastating earthquake, Xu Lai returns to China as a reporter and dog trainer. Reuniting with firefighter Jin Shichuan—who doesn’t recognize her—they clash at first but are soon forced to work together to form a search and rescue dog team. As they face life-threatening missions side by side, their past connection resurfaces and a deeper bond begins to grow.",
+    "poster": "https://image.tmdb.org/t/p/w500/uYMaig5XjfeeTkmwOzqrFAdnngk.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/feckhJNtJEakFv4nozOCn0Pykvh.jpg",
+    "rating": 7.5,
+    "release_date": "2023-06-02",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "o4gorkpFgbs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADTBoAAmjCeUYMyn4xNarGERYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -2671,6 +2551,36 @@
     "director": "Moses Inwang",
     "trailer": "XmaAAL_QN6g",
     "runtime": "118 min"
+  },
+  {
+    "csv_id": "127529-bloodhounds",
+    "tmdb_id": 127529,
+    "imdb_id": "",
+    "title": "Bloodhounds",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Faced with ruthless foes with a violent thirst, two young boxers band together — risking life and limb to bring justice and protect their loved ones.",
+    "poster": "https://image.tmdb.org/t/p/w500/uSQzD7TXsL96J5ggDrJFdUs8uXU.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zhsEnDNCQX5dlI2wbKzV90pV0B9.jpg",
+    "rating": 8.5,
+    "release_date": "2023-06-09",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "eyiR8pO50JE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADaBkAAmjCeUYkDo0xNhNy6RYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "csv_id": "980382-bloodthirst",
@@ -6555,6 +6465,36 @@
     "trailer": "7h8zJHywjAw"
   },
   {
+    "csv_id": "214529-family-the-unbreakable-bond",
+    "tmdb_id": 214529,
+    "imdb_id": "",
+    "title": "Family: The Unbreakable Bond",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Kwon Do-hun is an expert sniper and a secret agent working for the National Intelligence Service. To conceal his true identity, he lives a double life as a regular trading company employee, keeping even his wife Kang Yu-ra in the dark. Though he is occupied with his work, Do-hun cherishes his wife deeply. Meanwhile, Yu-ra, a dedicated homemaker, harbors a secret. Their tranquil existence is thrown into turmoil when Jo Tae-gu emerges, posing a threat to their carefully crafted façade.",
+    "poster": "https://image.tmdb.org/t/p/w500/w7NpD7m91PZcStQPRk70AluZkVd.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kaQaozuVjKczUTXVZLgGr2Kpt9f.jpg",
+    "rating": 7.4,
+    "release_date": "2023-04-17",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "iupuHeCxNec",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD-hkAAmjCeUaLPC0P52N6IxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "166424-fantastic-four",
     "tmdb_id": 166424,
     "imdb_id": "",
@@ -10290,14 +10230,14 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "African"
     ],
     "genres": [],
     "overview": "LOVE IN EVERY WORD written by Mfon- Abasi Micheal Inyang is a beautiful piece. In a fast-paced world where love often takes a backseat to ambition, two souls from different worlds cross paths in an unexpected encounter. As emotions spark and cultural differences collide, they must navigate personal fears, societal expectations, and the delicate balance between love and self-discovery. When destiny presents an opportunity for something real, will they take the leap, or will their differences keep them apart?",
-    "poster": "",
-    "backdrop": "",
+    "poster": "https://i.postimg.cc/pV6jTrBX/photo-2026-07-08-18-34-41.jpg",
+    "backdrop": "https://i.postimg.cc/pV6jTrBX/photo-2026-07-08-18-34-41.jpg",
     "rating": 0,
-    "release_date": "",
+    "release_date": "2025",
     "language": "en",
     "cast": [],
     "director": "",
@@ -16134,6 +16074,36 @@
     "trailer": "MnpaXmOXdaY"
   },
   {
+    "csv_id": "211796-stealer-the-treasure-keeper",
+    "tmdb_id": 211796,
+    "imdb_id": "",
+    "title": "Stealer: The Treasure Keeper",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A comic action drama in which a veiled cultural asset thief 'Skunk' and an unofficial cultural asset recovery team 'Karma' unite against those who cannot be judged by the law.",
+    "poster": "https://image.tmdb.org/t/p/w500/mLY8DBG4Taz70PzBQS8hgL3Cost.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kDFgtd1yQIt21mXg9JTx0IKLZyK.jpg",
+    "rating": 4.3,
+    "release_date": "2023-04-12",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "7TNxHvuN7WY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADthkAAmjCeUYgjKqrbyZvyRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "Submission",
     "csv_id": "66389-submission",
     "type": "Series",
@@ -17234,6 +17204,34 @@
     "trailer": "EUb_04MdnMI"
   },
   {
+    "csv_id": "1728356-the-day-we-lost-hope",
+    "tmdb_id": 1728356,
+    "imdb_id": "",
+    "title": "The Day We Lost Hope",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/XNr6Cfhg/photo-2026-07-08-20-46-47.jpg",
+    "backdrop": "https://i.postimg.cc/XNr6Cfhg/photo-2026-07-08-20-46-47.jpg",
+    "rating": 0,
+    "release_date": "2025",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADWhoAAmjCeUaVoxAHjGmprRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1284465-the-death-of-robin-hood",
     "tmdb_id": 1284465,
     "imdb_id": "",
@@ -17739,6 +17737,36 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADPRAAAghnOUbmaZnnOLl4nBYE"
+    ]
+  },
+  {
+    "csv_id": "844386-the-ghost-station",
+    "tmdb_id": 844386,
+    "imdb_id": "",
+    "title": "The Ghost Station",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Reporter Na-yeong and her partner investigate a series of mysterious deaths and a perplexing case where her source was allegedly already dead at the time of their interview. Together they end up confronting a terrifying truth.",
+    "poster": "https://image.tmdb.org/t/p/w500/gx5dkBdGSFCijowANbLF5Ew7mOD.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dCWKwPjSdZ1xYvlifL91HdmvvNv.jpg",
+    "rating": 6.5,
+    "release_date": "2023-04-19",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "OBUp2M2Fnng",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqxkAAmjCeUbMVE9OHQ3yWhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
