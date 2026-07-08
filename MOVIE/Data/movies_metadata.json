@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "40044-marvel-s-hulk-and-the-agents-of-s-m-a-s-h",
+    "tmdb_id": 40044,
+    "imdb_id": "",
+    "title": "Marvel's Hulk and the Agents of S.M.A.S.H.",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "Joined by the Agents of S.M.A.S.H., a humorously dysfunctional group of teammates who double as family, Hulk tackles threats that are too enormous for any other heroes to handle.",
+    "poster": "https://image.tmdb.org/t/p/w500/gkGIiIIkHOeVXzwjBNFTRqTCnqF.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7p0QLfjFx1iJzJ6iB82mp7E9qIH.jpg",
+    "rating": 6.2,
+    "release_date": "2013-08-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADKhQAAmjCeUbh_8nWIiijpxYE",
+      "https://t.me/filmHouseFile1bot?start=BQADAQADLRQAAmjCeUa71b-w3LwnWRYE"
+    ]
+  },
+  {
     "csv_id": "1403-marvel-s-agents-of-s-h-i-e-l-d",
     "tmdb_id": 1403,
     "imdb_id": "",
