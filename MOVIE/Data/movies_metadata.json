@@ -1,5 +1,172 @@
 [
   {
+    "csv_id": "3854-the-spectacular-spider-man",
+    "tmdb_id": 3854,
+    "imdb_id": "",
+    "title": "The Spectacular Spider-Man",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "Having spent the summer engaging common criminals with his new-found powers, not so typical 16-year-old Peter Parker must conceal his secret identity and battle super-villains in the real world as he enters his junior year of high school.",
+    "poster": "https://image.tmdb.org/t/p/w500/dCNxOhXT7c4lqYuRpdM3m8s9XDp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fypGcrQCyb9vQ7L8AM6PHCjQSBC.jpg",
+    "rating": 8.6,
+    "release_date": "2008-03-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "wkbKbeEEr0s",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmR8AAp4PgEYkZe9TOS2JqRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmh8AAp4PgEZoWBM6obf6qBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "14613-next-avengers-heroes-of-tomorrow",
+    "tmdb_id": 14613,
+    "imdb_id": "",
+    "title": "Next Avengers: Heroes of Tomorrow",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "The children of the Avengers hone their powers and go head to head with the very enemy responsible for their parents' demise.",
+    "poster": "https://image.tmdb.org/t/p/w500/1y4J9HZJoTIMdt77wCq80uXaQJ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6V6rhHkqYvJGlxIQ9mvZuIoY6c9.jpg",
+    "rating": 7,
+    "release_date": "2008-09-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "swn4H4sqm1A",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlh8AAp4PgEY1e34AAdfl_lEWBA",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "6549-wolverine-and-the-x-men",
+    "tmdb_id": 6549,
+    "imdb_id": "",
+    "title": "Wolverine and the X-Men",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "Wolverine and the X-Men must join together again to not only battle the increasingly powerful Mutant Response Division, but also to prevent a catastrophic future that Xavier has warned Wolverine must never come to pass.",
+    "poster": "https://image.tmdb.org/t/p/w500/oSeJ2nESB77iC6SLo4qcqoadjdt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/uPbpYFYXlUdTDEmfoubKNfdEZZx.jpg",
+    "rating": 7.5,
+    "release_date": "2009-01-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "g6YZF1usS4M",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlR8AAp4PgEZ0yLRnXrqcPxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "2080-x-men-origins-wolverine",
+    "tmdb_id": 2080,
+    "imdb_id": "",
+    "title": "X-Men Origins: Wolverine",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "After seeking to live a normal life after 200 years, Logan sets out to avenge a death by undergoing the mutant Weapon X program and becoming Wolverine.",
+    "poster": "https://image.tmdb.org/t/p/w500/yj8LbTju1p7CUJg7US2unSBk33s.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/p4GzAzjlL7lXIVGvayg7zvzGTSi.jpg",
+    "rating": 6.3,
+    "release_date": "2009-04-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "8TQ-gD4UCmI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjR8AAp4PgEYtYY0QGyu1SRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "394355-hulk-vs",
+    "tmdb_id": 394355,
+    "imdb_id": "",
+    "title": "Hulk Vs.",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "Two stories featuring Marvel's anti-hero The Incredible Hulk and his encounters with the X-Man Wolverine and the god known as Thor.",
+    "poster": "https://image.tmdb.org/t/p/w500/cjUNXJIXBHmKjpI0oH5MmEKgOTt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tl5nJ9zH3YyGMZjeRrgZMu6wHOt.jpg",
+    "rating": 6.6,
+    "release_date": "2009-01-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjh8AAp4PgEZXk6DCZwZ_7BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "7330-iron-man-armored-adventures",
     "tmdb_id": 7330,
     "imdb_id": "",
