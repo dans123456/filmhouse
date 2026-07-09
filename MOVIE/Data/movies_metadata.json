@@ -1,5 +1,77 @@
 [
   {
+    "csv_id": "7330-iron-man-armored-adventures",
+    "tmdb_id": 7330,
+    "imdb_id": "",
+    "title": "Iron Man: Armored Adventures",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "As Iron Man, teenage child prodigy Tony Stark uses his technological inventions to fight various similarly technologically advanced threats. His friends, James \"Rhodey\" Rhodes and Pepper Potts, help him on his courageous and dangerous adventures.",
+    "poster": "https://image.tmdb.org/t/p/w500/kIJGgBwh37V2nfgnJFaN7zDIjdv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/geoJ7FkV4NXAhZ7pYNCOWGYEBLV.jpg",
+    "rating": 7.4,
+    "release_date": "2009-04-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "0FQaXyAymTg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADih8AAp4PgEarqDjgdqVN5BYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADix8AAp4PgEb8FrRLeJlwhRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "21781-the-super-hero-squad-show",
+    "tmdb_id": 21781,
+    "imdb_id": "",
+    "title": "The Super Hero Squad Show",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "The Super Hero Squad Show is an American cartoon series by Marvel Animation. It is based on the Marvel Super Hero Squad action figure line from Hasbro, which portray the Avengers, the X-Men, and various other characters of the Marvel Universe in a cartoonish super-deformed-style. It is also a self-aware parody of the Marvel characters, with influences taken from on the comedic Mini Marvels series of parody comic books, in that the heroes tend to find themselves in comedic situations, and have cartoonish bents in comparison to their usually serious personalities, and is an overall comedic take on the Avengers. The series' animation was produced by Film Roman and Marvel Animation.",
+    "poster": "https://image.tmdb.org/t/p/w500/3CdaaPZdU1Xv2c6hDaSVWhsXtuO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tSbZytA2RSLVXgEjTNTb27ZkvjZ.jpg",
+    "rating": 7.5,
+    "release_date": "2009-09-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhh8AAp4PgEbi-7Sr5I63fRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhx8AAp4PgEa66HAKOawufhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1084244-toy-story-5",
     "tmdb_id": 1084244,
     "imdb_id": "",
