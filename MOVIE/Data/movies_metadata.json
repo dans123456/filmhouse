@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "233205-captivating-the-king",
+    "tmdb_id": 233205,
+    "imdb_id": "",
+    "title": "Captivating the King",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Amid a royal and political power struggle, a king entangles with an intriguing woman — whose hidden desire for revenge transforms into unintended love.",
+    "poster": "https://image.tmdb.org/t/p/w500/wNdHCRkS0Xrz6niq3tpAwuLZk7c.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wqh98k12bgxpbE2tONUITxkWmlH.jpg",
+    "rating": 7.6,
+    "release_date": "2024-01-21",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "_1t7mqiqtkk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyh4AAp4PgEaqhChYcs3w3BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "215072-a-shop-for-killers",
     "tmdb_id": 215072,
     "imdb_id": "",
