@@ -1,5 +1,65 @@
 [
   {
+    "csv_id": "206686-chicken-nugget",
+    "tmdb_id": 206686,
+    "imdb_id": "",
+    "title": "Chicken Nugget",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A woman steps into an odd machine and becomes... a chicken nugget?! Now, it's up to her father and admirer to embark on a zany quest to bring her back.",
+    "poster": "https://image.tmdb.org/t/p/w500/9hefpkltcFLcZSKXr65l0mPMRKn.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7pg8P17yImSmR7z5QO3nF0d7RB1.jpg",
+    "rating": 6.3,
+    "release_date": "2024-03-15",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "9OWhVGM6xmA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbh4AAp4PgEalQVSNoqhX-hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "117376-vincenzo",
+    "tmdb_id": 117376,
+    "imdb_id": "",
+    "title": "Vincenzo",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "During a visit to his motherland, a Korean-Italian mafia lawyer gives an unrivaled conglomerate a taste of its own medicinewith a side of justice.",
+    "poster": "https://image.tmdb.org/t/p/w500/qbkSS1cTjT4DzIwD44bdhTuYgdT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sf7NCqyVUNoyjYuwW5oJke1T1lH.jpg",
+    "rating": 8.5,
+    "release_date": "2021-02-20",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "S12-4mXCNj4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADVR4AAp4PgEbTPWOnLvoudBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "241506-it-s-okay-to-not-be-okay",
     "tmdb_id": 241506,
     "imdb_id": "",
