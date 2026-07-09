@@ -1,5 +1,65 @@
 [
   {
+    "csv_id": "215072-a-shop-for-killers",
+    "tmdb_id": 215072,
+    "imdb_id": "",
+    "title": "A Shop for Killers",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A niece who lost her parents and grew up in the hands of an uncle who runs a shopping mall faces a new truth after her uncle's sudden death.",
+    "poster": "https://image.tmdb.org/t/p/w500/7yUY1HUyQuybbvkAAhLzQ7x1l9g.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mWVeYmtCfA3zvSeZtW5bN2Khe01.jpg",
+    "rating": 8.3,
+    "release_date": "2024-01-17",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "69nzLpyMSHw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnR4AAp4PgEZTXoxPjqvSQRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "202783-a-killer-paradox",
+    "tmdb_id": 202783,
+    "imdb_id": "",
+    "title": "A Killer Paradox",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "When one accidental killing leads to another, an ordinary young man finds himself stuck in an endless cat-and-mouse chase with a shrewd detective.",
+    "poster": "https://image.tmdb.org/t/p/w500/i2yYZGT2If8XcCZS9ASF1g13MiT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/viQZtznvR20oTTSbXp6MPAWkGB2.jpg",
+    "rating": 7.4,
+    "release_date": "2024-02-09",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "X2rXQ0rEfPI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlh4AAp4PgEZPj5hDZfzdYRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "206686-chicken-nugget",
     "tmdb_id": 206686,
     "imdb_id": "",
