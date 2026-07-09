@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "241506-it-s-okay-to-not-be-okay",
+    "tmdb_id": 241506,
+    "imdb_id": "",
+    "title": "It's Okay to Not Be Okay",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "An author with severe antisocial tendencies learns to confront her deep emotional wounds when she meets a stranger who challenges her cold facade.",
+    "poster": "https://image.tmdb.org/t/p/w500/7rQ7E7u0y8VJgnUeDT6oF1J32Gu.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dNAp924hXUYxaGxGJRLlB0dvu8e.jpg",
+    "rating": 9.7,
+    "release_date": "2025-07-21",
+    "language": "tl",
+    "cast": [],
+    "director": "",
+    "trailer": "KwP3VzowPhE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD5RAAAmjCgUbXupfjv2nlTBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "108261-mr-queen",
     "tmdb_id": 108261,
     "imdb_id": "",
