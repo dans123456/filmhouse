@@ -6140,6 +6140,9 @@ function updateFarmingUI() {
     const timerText = document.getElementById("mining-timer-text");
     const counter = document.getElementById("mining-live-counter");
     const logoBox = document.getElementById("mining-logo-box-el");
+    const progressContainer = document.getElementById("mining-progress-container");
+    const progressFill = document.getElementById("mining-progress-fill");
+    const progressPercent = document.getElementById("mining-progress-percent");
 
     if (!btn) return;
 
@@ -6152,9 +6155,10 @@ function updateFarmingUI() {
             logoBox.className = "mining-logo-box";
             logoBox.style.setProperty("--farm-pct", "0%");
         }
+        if (progressContainer) progressContainer.style.display = "none";
         statusText.textContent = "Mining Inactive";
         counter.textContent = "+0.000";
-        timerText.textContent = "8-hour session • Earn 10 points";
+        timerText.textContent = "8-hour session • Earn 80 points";
         btn.textContent = "Start Mining ⚡";
         btn.style.background = "var(--primary-gradient)";
         btn.style.color = "#000";
@@ -6168,6 +6172,11 @@ function updateFarmingUI() {
                 logoBox.className = "mining-logo-box complete";
                 logoBox.style.setProperty("--farm-pct", "100%");
             }
+            if (progressContainer) {
+                progressContainer.style.display = "block";
+                if (progressFill) progressFill.style.width = "100%";
+                if (progressPercent) progressPercent.textContent = "100%";
+            }
             statusText.textContent = "Session Complete!";
             counter.textContent = `+${FARMING_REWARD.toFixed(3)}`;
             timerText.textContent = "Claim your Loyalty Points now!";
@@ -6180,6 +6189,7 @@ function updateFarmingUI() {
             if (logoBox) {
                 logoBox.className = "mining-logo-box active";
             }
+            if (progressContainer) progressContainer.style.display = "block";
             btn.textContent = "Mining... 🔋";
             btn.style.background = "rgba(255,255,255,0.05)";
             btn.style.color = "var(--text-muted)";
@@ -6195,6 +6205,12 @@ function updateFarmingUI() {
                     const pct = (curElapsed / FARMING_DURATION) * 100;
                     if (logoBox) {
                         logoBox.style.setProperty("--farm-pct", `${pct}%`);
+                    }
+                    if (progressFill) {
+                        progressFill.style.width = `${pct}%`;
+                    }
+                    if (progressPercent) {
+                        progressPercent.textContent = `${Math.floor(pct)}%`;
                     }
                     
                     const timeLeftMs = FARMING_DURATION - curElapsed;
