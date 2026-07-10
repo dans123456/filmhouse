@@ -5015,7 +5015,7 @@ function renderUserRequests(requests) {
                 const dlLink = typeof rawLink === 'object' && rawLink !== null ? rawLink.url : rawLink;
                 actionBtn = `
                     <button class="btn btn-primary btn-sm user-request-dl-btn" data-link="${escapeHTML(dlLink)}" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">
-                        Download 📥
+                        Claim 🎁
                     </button>
                 `;
             } else if (r.status === "priority") {
@@ -5106,7 +5106,7 @@ function renderUserRequests(requests) {
                     const rewardsDrawer = document.getElementById("rewards-drawer");
                     if (rewardsDrawer) rewardsDrawer.classList.remove("active");
                     
-                    showConnectionDrawer(dlBtn.getAttribute("data-link"), ADSGRAM_DOWNLOAD_BLOCK_ID);
+                    showConnectionDrawer(dlBtn.getAttribute("data-link"), ADSGRAM_DOWNLOAD_BLOCK_ID, true);
                 });
             }
             
@@ -5840,7 +5840,7 @@ function convertToTelegramScheme(url) {
 }
 
 // Premium Connection Drawer Loader Transition
-function showConnectionDrawer(targetLink, blockId) {
+function showConnectionDrawer(targetLink, blockId, skipAd = false) {
     if (!targetLink || typeof targetLink !== "string") return;
     targetLink = targetLink.trim();
 
@@ -5944,11 +5944,15 @@ function showConnectionDrawer(targetLink, blockId) {
     drawer.offsetHeight; // force reflow
     drawer.classList.add("active");
 
-    // Brief premium animation (800 ms), then start ad flow while drawer is still visible
+    // Brief premium animation (800 ms), then start ad flow (if not skipped) while drawer is still visible
     setTimeout(async () => {
-        setStatus("Preparing ad…");
-
-        await showAdRewardFlow((msg) => setStatus(msg), blockId);
+        if (!skipAd) {
+            setStatus("Preparing ad…");
+            await showAdRewardFlow((msg) => setStatus(msg), blockId);
+        } else {
+            setStatus("Verifying claim authorization…");
+            await delay(800); // Brief premium transition delay
+        }
 
         // Ad flow finished
         if (titleEl) titleEl.textContent = "Connection Secured ✓";
