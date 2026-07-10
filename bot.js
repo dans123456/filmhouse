@@ -89,15 +89,16 @@ function setupBot(bot) {
             console.error("Error registering user on /start:", err);
         }
 
+        const escapedFullName = fullName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         const imagePath = path.join(__dirname, "MOVIE", "img", "FilmHouse.png");
-        const caption = `Hey There 🗣️ *${fullName}* 😎 😊, I'm 🍿 *Film House* 🍿's cloud bot. You can access all Series 🙈 and Movies 😌 through me. Just Make sure you are a member of our Channel @FilmHouseBUP 🤟`;
+        const caption = `Hey There 🗣️ <b>${escapedFullName}</b> 😎 😊, I'm 🍿 <b>Film House</b> 🍿's cloud bot. You can access all Series 🙈 and Movies 😌 through me. Just Make sure you are a member of our Channel @FilmHouseBUP 🤟`;
 
         const replyMarkup = {
             inline_keyboard: [
                 [
                     {
                         text: "Launch Film House 🚀",
-                        web_app: { url: "https://t.me/Filmhouseappbot/filmhouseapp" }
+                        url: "https://t.me/Filmhouseappbot/filmhouseapp"
                     }
                 ],
                 [
@@ -116,21 +117,21 @@ function setupBot(bot) {
                     { source: imagePath },
                     {
                         caption: caption,
-                        parse_mode: 'Markdown',
+                        parse_mode: 'HTML',
                         reply_markup: replyMarkup
                     }
                 );
             } catch (err) {
                 console.error("Failed to send welcome photo, falling back to text:", err);
                 return ctx.reply(caption, {
-                    parse_mode: 'Markdown',
+                    parse_mode: 'HTML',
                     reply_markup: replyMarkup
                 });
             }
         }
         
         return ctx.reply(caption, {
-            parse_mode: 'Markdown',
+            parse_mode: 'HTML',
             reply_markup: replyMarkup
         });
     });
@@ -285,7 +286,7 @@ function setupBot(bot) {
                         [
                             {
                                 text: "Launch Film House 🚀",
-                                web_app: { url: "https://t.me/Filmhouseappbot/filmhouseapp" }
+                                url: "https://t.me/Filmhouseappbot/filmhouseapp"
                             }
                         ]
                     ]
