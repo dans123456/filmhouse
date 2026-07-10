@@ -6,6 +6,19 @@ const path = require("path");
 // Initialize Firebase Admin
 if (process.env.FIREBASE_CONFIG) {
     admin.initializeApp();
+} else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+        const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+        });
+        console.log("Firebase Admin initialized using FIREBASE_SERVICE_ACCOUNT environment variable.");
+    } catch (err) {
+        console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT env variable:", err);
+        admin.initializeApp({
+            projectId: "film-house-2"
+        });
+    }
 } else {
     try {
         const serviceAccount = require("./firebase-key.json");
