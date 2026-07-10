@@ -1,5 +1,89 @@
 [
   {
+    "csv_id": "220102-spider-noir",
+    "tmdb_id": 220102,
+    "imdb_id": "",
+    "title": "Spider-Noir",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Ben Reilly, an aging and down on his luck private investigator in 1930s New York, is forced to grapple with his past life as the city's one and only superhero.",
+    "poster": "https://image.tmdb.org/t/p/w500/oD8WSVqz84ZRfelkr7JPeJwR9Iv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6t2FvBr9DS8MOq0m5FAwPBCdAW5.jpg",
+    "rating": 8.5,
+    "release_date": "2026-05-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "e5QW457407U",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADJxkAAp4PiEbQLP2CrDdHzRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "158300-knuckles",
+    "tmdb_id": 158300,
+    "imdb_id": "",
+    "title": "Knuckles",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Knuckles embarks on a hilarious and action-packed journey of self-discovery as he agrees to train Wade as his protégé and teach him the ways of the Echidna warrior.",
+    "poster": "https://image.tmdb.org/t/p/w500/sK6Nr6KNUA4WlAHyNBTioz9FK87.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/aMpNvgWjPimLldhKgwtCt5NjLen.jpg",
+    "rating": 7.3,
+    "release_date": "2024-04-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "1kETt59yn6A",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFRkAAp4PiEbtg2o8Wpg_aBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "47907-extraordinary",
+    "tmdb_id": 47907,
+    "imdb_id": "",
+    "title": "Extraordinary",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "In a world where everyone develops a power on their 18th birthday, Jen didn't. She's turning 25 and is still waiting to get hers. Adrift in a big, confusing world and armed with nothing but a bit of hope and a lot of desperation, Jen begins her journey to find her maybe-superpower. But in doing so, she might discover the joy of being just kind of ok.",
+    "poster": "https://image.tmdb.org/t/p/w500/uyDIWMAwfLqiIz0QQm0MPDE0085.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bqj5BcE2mMLvCLMFtcLveo9GPf6.jpg",
+    "rating": 7.3,
+    "release_date": "2023-01-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "WXxw6wXlBHw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_xgAAp4PiEblndQGm9GHJxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "211079-supersex",
     "tmdb_id": 211079,
     "imdb_id": "",
