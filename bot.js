@@ -2,6 +2,16 @@ const { Telegraf } = require("telegraf");
 const admin = require("firebase-admin");
 const fs = require("fs");
 const path = require("path");
+const http = require("http");
+
+// Start a dummy HTTP server to bind to Render's PORT to pass healthchecks and prevent sleeping
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("Film House Bot is active and running! 🍿");
+}).listen(PORT, () => {
+    console.log(`Dummy health check HTTP server listening on port ${PORT}`);
+});
 
 // Initialize Firebase Admin
 if (process.env.FIREBASE_CONFIG) {
