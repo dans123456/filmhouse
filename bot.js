@@ -193,8 +193,11 @@ function setupBot(bot) {
     });
 
     // Command: /help
-    bot.command('help', (ctx) => {
-        return ctx.reply(
+    bot.command('help', async (ctx) => {
+        const userId = String(ctx.from.id);
+        const userIsAdmin = await isAdmin(userId);
+
+        let helpMsg = 
             `📖 *Film House Help & Guide*\n\n` +
             `• Click the *Launch Film House* button to open the movie library.\n` +
             `• Request films or series directly inside the app if they aren't available.\n` +
@@ -202,13 +205,17 @@ function setupBot(bot) {
             `*Commands List:*\n` +
             `/start - Open the welcome screen and launch app\n` +
             `/settings - View your profile info and points status\n` +
-            `/help - Display this help guide\n\n` +
-            `_Admins Only:_\n` +
-            `/broadcast <msg> - Broadcast a message to all users\n` +
-            `/ban <user_id> - Ban a user from the bot and app\n` +
-            `/unban <user_id> - Unban a restricted user`,
-            { parse_mode: 'Markdown' }
-        );
+            `/help - Display this help guide`;
+
+        if (userIsAdmin) {
+            helpMsg += 
+                `\n\n_Admins Only:_\n` +
+                `/broadcast <msg> - Broadcast a message to all users\n` +
+                `/ban <user_id> - Ban a user from the bot and app\n` +
+                `/unban <user_id> - Unban a restricted user`;
+        }
+
+        return ctx.reply(helpMsg, { parse_mode: 'Markdown' });
     });
 
     // Command: /settings
