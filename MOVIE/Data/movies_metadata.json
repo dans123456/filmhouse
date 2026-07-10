@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "322430-the-polygamist",
+    "tmdb_id": 322430,
+    "imdb_id": "",
+    "title": "The Polygamist",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Social media darling, Joyce, is the picture of marital perfection — until her cheating husband's conquests ignite a scandalous emotional meltdown.",
+    "poster": "https://image.tmdb.org/t/p/w500/emnQZe22rYBCsbZ7h1TUAkYEzrZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/hGCQ0tsJMpKjfrnCyYY0kMY2kY1.jpg",
+    "rating": 8.8,
+    "release_date": "2026-06-12",
+    "language": "zu",
+    "cast": [],
+    "director": "",
+    "trailer": "KBJllQVRuAA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADsQsAAp4PiEZY3C4w0DblCBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1927-hulk",
     "tmdb_id": 1927,
     "imdb_id": "",
