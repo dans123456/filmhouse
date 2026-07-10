@@ -1647,11 +1647,30 @@
     "csv_id": "82428-all-american",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADVA8AAgiQKETmC9JqwRuhTBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADNwQAAgiQMER8mcjQ28_DuhYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADOAQAAgiQMEQanB1xm3YREBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADOQQAAgiQMERWMp_GRgPVNxYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADgwQAAgiQMEQ7N3K6F9_g0RYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADVA8AAgiQKETmC9JqwRuhTBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADNwQAAgiQMER8mcjQ28_DuhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADOAQAAgiQMEQanB1xm3YREBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADOQQAAgiQMERWMp_GRgPVNxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADgwQAAgiQMEQ7N3K6F9_g0RYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADWBkAAp4PiEYpKxWBo8ycVhYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/c8FTtjQcQfqSI0McmVc1OOOf7Z7.jpg",
     "rating": 8.1,
@@ -1672,7 +1691,8 @@
       "Greta Onieogou"
     ],
     "director": "April Blair",
-    "runtime": "43 min"
+    "runtime": "43 min",
+    "trailer": ""
   },
   {
     "title": "All American: Homecoming",
@@ -9912,6 +9932,10 @@
       },
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD9xgAAp4PiEaWOJj1kOxcoxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADZBkAAp4PiEY5dxV7txk_jBYE",
         "quality": "720p"
       }
     ],
