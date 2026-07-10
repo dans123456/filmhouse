@@ -1,5 +1,95 @@
 [
   {
+    "csv_id": "111110-one-piece",
+    "tmdb_id": 111110,
+    "imdb_id": "",
+    "title": "ONE PIECE",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "With his straw hat and ragtag crew, young pirate Monkey D. Luffy goes on an epic voyage for treasure.",
+    "poster": "https://image.tmdb.org/t/p/w500/blWCPEqDGLBuLB9u89CxP9ORQP4.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qD211Hb5XwFxrszzBBe5EUYJerh.jpg",
+    "rating": 8.1,
+    "release_date": "2023-08-31",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "l6kp780S-os",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADuxkAAp4PiEYYTlhgqaBvKhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "157432-megamind-rules",
+    "tmdb_id": 157432,
+    "imdb_id": "",
+    "title": "Megamind Rules!",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Megamind finds his footing as the new protector of Metro City and faces a legion of villains while becoming the world's first hero influencer.",
+    "poster": "https://image.tmdb.org/t/p/w500/yI9Tus6ZpPlBmb1AsrOSkI9nGXj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ng3O6ngeFl56HaP2Ij8FU8JB2Gs.jpg",
+    "rating": 5.4,
+    "release_date": "2024-03-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "mDNmQ4cJiVk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADgxkAAp4PiEbHl2zQ6YA90RYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "205281-subway-surfers-the-animated-series",
+    "tmdb_id": 205281,
+    "imdb_id": "",
+    "title": "Subway Surfers: The Animated Series",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "These misfit teens have skating adventures in their small town and sometimes get stopped by the cops, but the landing of certain alien technology changes these kids' lives.",
+    "poster": "https://image.tmdb.org/t/p/w500/pvCoF2zFotVoKGYPh6tLe1EE7EQ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/hbd3nIrw1i8Qpiu1fvqS09auz5C.jpg",
+    "rating": 6.4,
+    "release_date": "2018-06-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "9_glFdNKy9U",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADfxkAAp4PiEbJlKuuD8B-zBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "220102-spider-noir",
     "tmdb_id": 220102,
     "imdb_id": "",
