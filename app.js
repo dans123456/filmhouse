@@ -3589,42 +3589,22 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                     fallbackTriggered = true;
                     cleanupAndRestore();
                     
-                    status("Task not available or already completed. Watch a quick video ad to secure your connection:");
+                    status("Task not available. Launching video ad…");
                     if (titleEl) titleEl.textContent = "Secure Connection";
                     
-                    // Show a fallback button for the video ad instead of popping it up automatically
-                    const existingFallbackBtn = container.querySelector(".fallback-video-btn");
-                    if (existingFallbackBtn) existingFallbackBtn.remove();
-                    
-                    const fallbackBtn = document.createElement("button");
-                    fallbackBtn.className = "btn btn-primary btn-block fallback-video-btn";
-                    fallbackBtn.style.marginTop = "16px";
-                    fallbackBtn.textContent = "Watch Video Ad 🎬";
-                    
-                    fallbackBtn.addEventListener("click", () => {
-                        fallbackBtn.disabled = true;
-                        fallbackBtn.textContent = "Loading Ad…";
-                        status("Loading premium ad buffer…");
-                        
-                        const videoController = state.adsgramControllers[id];
-                        if (videoController) {
-                            videoController.show().then(() => {
-                                status("Ad completed! Reward received ✓");
-                                fallbackBtn.remove();
-                                safeResolve();
-                            }).catch((videoErr) => {
-                                console.warn("Standard video ad failed as well:", videoErr);
-                                status("No buffer available – continuing");
-                                fallbackBtn.remove();
-                                safeResolve();
-                            });
-                        } else {
-                            fallbackBtn.remove();
+                    const videoController = state.adsgramControllers[id];
+                    if (videoController) {
+                        videoController.show().then(() => {
+                            status("Ad completed! Reward received ✓");
                             safeResolve();
-                        }
-                    });
-                    
-                    container.appendChild(fallbackBtn);
+                        }).catch((videoErr) => {
+                            console.warn("Standard video ad failed as well:", videoErr);
+                            status("No ad buffer available – continuing");
+                            safeResolve();
+                        });
+                    } else {
+                        safeResolve();
+                    }
                 };
                 
                 // Bind to all variations of reward, error and not found events to ensure compatibility
