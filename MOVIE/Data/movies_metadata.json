@@ -6,12 +6,10 @@
     "title": "The Witcher",
     "type": "Series",
     "categories": [
-      "Main"
+      "Main",
+      "Hollywood/British Series"
     ],
-    "genres": [
-      "Drama",
-      "Action & Adventure"
-    ],
+    "genres": [],
     "overview": "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts.",
     "poster": "https://image.tmdb.org/t/p/w500/AoGsDM02UVt0npBA8OvpDcZbaMi.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/foGkPxpw9h8zln81j63mix5B7m8.jpg",
@@ -23,7 +21,14 @@
     "trailer": "eb90gqGYP9c",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADjQwAAp4PiEZAt73WGBr5ChYE, https://t.me/FilmHouseFilebot?start=BQADAQADjwwAAp4PiEbSk6iAZxt6WBYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADjQwAAp4PiEZAt73WGBr5ChYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADjwwAAp4PiEbSk6iAZxt6WBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
