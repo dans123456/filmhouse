@@ -4967,15 +4967,15 @@ function renderUserRequests(requests) {
             (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
         );
         const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
-        const isExplicit = r.status === "fulfilled" && r.downloadLink;
+        const isExplicit = (r.status === "fulfilled" || r.status === "claimed") && r.downloadLink;
         const isFulfilled = isMatched || isExplicit;
-        const isClaimed = isFulfilled && acknowledgedFulfillments.includes(r.docId);
+        const isClaimed = isFulfilled && (r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId));
         
         if (isClaimed) {
             historyRequests.push({ ...r, _matchingMovie: matchingMovie, _isExplicit: isExplicit });
         } else {
             activeRequests.push({ ...r, _matchingMovie: matchingMovie, _isMatched: isMatched, _isExplicit: isExplicit });
-            if (isFulfilled && !acknowledgedFulfillments.includes(r.docId)) {
+            if (isFulfilled && !(r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId))) {
                 hasNewFulfillment = true;
             }
         }
@@ -5099,6 +5099,15 @@ function renderUserRequests(requests) {
                     updateHeaderNotificationDot();
                     updateHomeFulfillmentBanner();
                     
+                    // Mark as claimed in Firestore in the background
+                    if (db) {
+                        db.collection("requests").doc(r.docId).update({
+                            claimed: true,
+                            claimedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            status: "claimed"
+                        }).catch(err => console.error("Error updating claim in Firestore:", err));
+                    }
+                    
                     // Re-render so claimed request moves to history immediately
                     renderUserRequests(currentUserRequests);
                     
@@ -5177,8 +5186,9 @@ function updateHomeFulfillmentBanner() {
             (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
         );
         const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
-        const isExplicit = r.status === "fulfilled" && r.downloadLink;
-        return (isMatched || isExplicit) && !acknowledgedFulfillments.includes(r.docId);
+        const isExplicit = (r.status === "fulfilled" || r.status === "claimed") && r.downloadLink;
+        const isClaimed = (isMatched || isExplicit) && (r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId));
+        return (isMatched || isExplicit) && !isClaimed;
     });
     
     if (unacknowledgedFulfilled.length > 0) {

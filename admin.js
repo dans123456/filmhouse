@@ -2889,12 +2889,12 @@ if (fulfillForm && fulfillRequestModal) {
         });
         
         batch.commit().then(async () => {
-            // Send Telegram Bot notifications
             const requesters = [];
             currentFulfillDocIds.forEach(id => {
                 const req = allRequests.find(r => r.docId === id);
                 if (req && req.requestedById) {
                     requesters.push({
+                        docId: id,
                         id: req.requestedById,
                         username: req.requestedBy || "User"
                     });
@@ -2902,9 +2902,8 @@ if (fulfillForm && fulfillRequestModal) {
             });
 
             if (telegramBotToken && requesters.length > 0) {
-                const notifyMsg = `🍿 *Good news!*\n\nYour request for *${currentFulfillTitle}* is ready! 🎉\n\nClick below to download/watch it directly:\n🔗 ${downloadLink}\n\nThank you for requesting! Enjoy watching! 🎬`;
-
                 requesters.forEach(async (req) => {
+                    const notifyMsg = `🍿 *Good news!*\n\nYour request for *${currentFulfillTitle}* is ready! 🎉\n\nClick below to download/watch it directly:\n🔗 https://t.me/Filmhouseappbot?start=claim_${req.docId}\n\nThank you for requesting! Enjoy watching! 🎬`;
                     try {
                         await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
                             method: "POST",

@@ -89,6 +89,39 @@ function setupBot(bot) {
             console.error("Error registering user on /start:", err);
         }
 
+        // Check for deep-link claim payload (start=claim_docId)
+        const payload = ctx.startPayload || (ctx.message && ctx.message.text ? ctx.message.text.split(" ")[1] : "");
+        if (payload && payload.startsWith("claim_")) {
+            const docId = payload.substring(6);
+            try {
+                const docRef = db.collection("requests").doc(docId);
+                const doc = await docRef.get();
+                if (doc.exists) {
+                    const reqData = doc.data();
+                    // Mark as claimed in Firestore
+                    await docRef.update({
+                        claimed: true,
+                        claimedAt: admin.firestore.FieldValue.serverTimestamp(),
+                        status: "claimed"
+                    });
+
+                    // Send the download link directly to the user
+                    const dlLink = reqData.downloadLink;
+                    if (dlLink) {
+                        return await ctx.reply(
+                            `🍿 *Your Requested Movie is Ready!* 🍿\n\n` +
+                            `Here is your direct link to watch/download *${reqData.title}*:\n` +
+                            `🔗 ${dlLink}\n\n` +
+                            `This request has been marked as claimed on your account. Enjoy watching! 🎬`,
+                            { parse_mode: "Markdown" }
+                        );
+                    }
+                }
+            } catch (err) {
+                console.error("Error processing claim start payload:", err);
+            }
+        }
+
         const escapedFullName = fullName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         const imagePath = path.join(__dirname, "MOVIE", "img", "FilmHouse.png");
         const caption = `Hey There 🗣️ <b>${escapedFullName}</b> 😎 😊, I'm 🍿 <b>Film House</b> 🍿's cloud bot. You can access all Series 🙈 and Movies 😌 through me. Just Make sure you are a member of our Channel @FilmHouseBUP 🤟`;
