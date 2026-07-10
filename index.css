@@ -3151,4 +3151,26 @@ img {
     }
 }
 
+/* Floating particles in mining logo box */
+.mining-particle {
+    will-change: transform, opacity;
+}
+
+@keyframes float-particle {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(0.4);
+        opacity: 0;
+    }
+    15% {
+        opacity: 0.9;
+    }
+    85% {
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateY(-115px) rotate(360deg) scale(1.1);
+        opacity: 0;
+    }
+}
+
 

@@ -6151,9 +6151,13 @@ function updateFarmingUI() {
     if (startedAt === 0) {
         // Inactive mining state
         clearInterval(farmingInterval);
+        clearInterval(particleInterval);
+        particleInterval = null;
         if (logoBox) {
             logoBox.className = "mining-logo-box";
             logoBox.style.setProperty("--farm-pct", "0%");
+            const particles = logoBox.querySelectorAll(".mining-particle");
+            particles.forEach(p => p.remove());
         }
         if (progressContainer) progressContainer.style.display = "none";
         statusText.textContent = "Mining Inactive";
@@ -6168,9 +6172,13 @@ function updateFarmingUI() {
         if (elapsed >= FARMING_DURATION) {
             // Completed mining state, wait for claim
             clearInterval(farmingInterval);
+            clearInterval(particleInterval);
+            particleInterval = null;
             if (logoBox) {
                 logoBox.className = "mining-logo-box complete";
                 logoBox.style.setProperty("--farm-pct", "100%");
+                const particles = logoBox.querySelectorAll(".mining-particle");
+                particles.forEach(p => p.remove());
             }
             if (progressContainer) {
                 progressContainer.style.display = "block";
@@ -6225,6 +6233,76 @@ function updateFarmingUI() {
             tick();
             clearInterval(farmingInterval);
             farmingInterval = setInterval(tick, 1000);
+            startFarmingParticles();
         }
     }
+}
+
+let particleInterval = null;
+function startFarmingParticles() {
+    const logoBox = document.getElementById("mining-logo-box-el");
+    if (!logoBox) return;
+
+    if (particleInterval) return;
+
+    particleInterval = setInterval(() => {
+        if (!logoBox.classList.contains("active")) {
+            clearInterval(particleInterval);
+            particleInterval = null;
+            return;
+        }
+
+        const isAvatarParticle = Math.random() < 0.25 && state.user.avatar;
+        
+        if (isAvatarParticle) {
+            const img = document.createElement("img");
+            img.src = state.user.avatar;
+            img.className = "mining-particle";
+            
+            const left = Math.random() * 70 + 15;
+            const size = Math.random() * 6 + 14; // 14px to 20px
+            const duration = Math.random() * 1.5 + 2;
+            
+            img.style.cssText = `
+                position: absolute;
+                bottom: 10px;
+                left: ${left}%;
+                width: ${size}px;
+                height: ${size}px;
+                border-radius: 50%;
+                border: 1px solid rgba(255, 188, 0, 0.6);
+                box-shadow: 0 0 6px rgba(255, 188, 0, 0.4);
+                opacity: 0;
+                z-index: 3;
+                pointer-events: none;
+                object-fit: cover;
+                animation: float-particle ${duration}s ease-in-out forwards;
+            `;
+            logoBox.appendChild(img);
+            setTimeout(() => img.remove(), duration * 1000);
+        } else {
+            const particle = document.createElement("div");
+            particle.className = "mining-particle";
+            
+            const icons = ["🍿", "🎬", "⭐", "🪙", "🎞️"];
+            particle.textContent = icons[Math.floor(Math.random() * icons.length)];
+            
+            const left = Math.random() * 70 + 15;
+            const size = Math.random() * 6 + 10; // 10px to 16px
+            const duration = Math.random() * 1.5 + 2;
+            
+            particle.style.cssText = `
+                position: absolute;
+                bottom: 10px;
+                left: ${left}%;
+                font-size: ${size}px;
+                opacity: 0;
+                z-index: 3;
+                pointer-events: none;
+                animation: float-particle ${duration}s ease-in-out forwards;
+            `;
+            logoBox.appendChild(particle);
+            setTimeout(() => particle.remove(), duration * 1000);
+        }
+    }, 450);
 }
