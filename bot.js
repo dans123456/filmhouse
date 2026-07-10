@@ -256,9 +256,11 @@ function setupBot(bot) {
             return ctx.reply("❌ Unauthorized. This command is restricted to administrators.");
         }
 
+        const replyTo = ctx.message.reply_to_message;
         const messageText = ctx.message.text.substring(10).trim(); // remove "/broadcast" prefix
-        if (!messageText) {
-            return ctx.reply("Please specify a message to broadcast. Format: `/broadcast <message>`", { parse_mode: 'Markdown' });
+        
+        if (!replyTo && !messageText) {
+            return ctx.reply("Please specify a message to broadcast. Either:\n1. Reply to any message (text, image, video, file) with `/broadcast`.\n2. Use: `/broadcast <text>`", { parse_mode: 'Markdown' });
         }
 
         ctx.reply("✈️ *Starting broadcast...*", { parse_mode: 'Markdown' });
@@ -272,7 +274,13 @@ function setupBot(bot) {
                 const u = doc.data();
                 if (u.id) {
                     try {
-                        await ctx.telegram.sendMessage(u.id, messageText, { parse_mode: "Markdown" });
+                        if (replyTo) {
+                            // Copy the replied-to message (copies photos, videos, files, captions, and inline buttons)
+                            await ctx.telegram.copyMessage(u.id, ctx.chat.id, replyTo.message_id);
+                        } else {
+                            // Fallback to text message broadcast
+                            await ctx.telegram.sendMessage(u.id, messageText, { parse_mode: "Markdown" });
+                        }
                         successCount++;
                     } catch (err) {
                         failedCount++;
