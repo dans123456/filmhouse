@@ -1,5 +1,7 @@
 const { Telegraf } = require("telegraf");
 const admin = require("firebase-admin");
+const fs = require("fs");
+const path = require("path");
 
 // Initialize Firebase Admin
 if (process.env.FIREBASE_CONFIG) {
@@ -87,22 +89,46 @@ function setupBot(bot) {
             console.error("Error registering user on /start:", err);
         }
 
-        return ctx.reply(
-            `👋 *Welcome to Film House, ${fullName}!* 🎬🍿\n\nWatch and download your favorite movies and series directly inside Telegram!`,
-            {
-                parse_mode: 'Markdown',
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            {
-                                text: "Launch Film House 🚀",
-                                web_app: { url: "https://t.me/Filmhouseappbot/filmhouseapp" }
-                            }
-                        ]
-                    ]
-                }
+        const imagePath = path.join(__dirname, "MOVIE", "img", "FilmHouse.png");
+        const caption = `Hey There 🗣️ *${fullName}* 😎 😊, I'm 🍿 *Film House* 🍿's cloud bot. You can access all Series 🙈 and Movies 😌 through me. Just Make sure you are a member of our Channel @FilmHouseBUP 🤟`;
+
+        const replyMarkup = {
+            inline_keyboard: [
+                [
+                    {
+                        text: "Launch Film House 🚀",
+                        web_app: { url: "https://t.me/Filmhouseappbot/filmhouseapp" }
+                    }
+                ],
+                [
+                    { text: "Help 📖", callback_data: "bot_help" },
+                    { text: "About ℹ️", callback_data: "bot_about" }
+                ],
+                [
+                    { text: "Join Channel 📢", url: "https://t.me/FilmHouseBUP" }
+                ]
+            ]
+        };
+
+        if (fs.existsSync(imagePath)) {
+            try {
+                return await ctx.replyWithPhoto(
+                    { source: imagePath },
+                    {
+                        caption: caption,
+                        parse_mode: 'Markdown',
+                        reply_markup: replyMarkup
+                    }
+                );
+            } catch (err) {
+                console.error("Failed to send welcome photo:", err);
             }
-        );
+        }
+        
+        return ctx.reply(caption, {
+            parse_mode: 'Markdown',
+            reply_markup: replyMarkup
+        });
     });
 
     // Command: /help
@@ -261,7 +287,39 @@ function setupBot(bot) {
                     ]
                 }
             }
-        );
+    });
+
+    // Callback Query Handler for Inline Buttons
+    bot.on('callback_query', async (ctx) => {
+        const data = ctx.callbackQuery.data;
+        
+        try {
+            if (data === "bot_help") {
+                await ctx.answerCbQuery();
+                return ctx.reply(
+                    `📖 *Film House Help & Guide*\n\n` +
+                    `• Tap the *Launch Film House* button to open the movie catalog.\n` +
+                    `• Select any movie or series to watch/download.\n` +
+                    `• If a title is missing, tap *Request* to submit it to our admins.\n` +
+                    `• You will receive a direct notification message in this chat as soon as it is ready!`,
+                    { parse_mode: 'Markdown' }
+                );
+            }
+            
+            if (data === "bot_about") {
+                await ctx.answerCbQuery();
+                return ctx.reply(
+                    `ℹ️ *About Film House*\n\n` +
+                    `Film House is your ultimate Telegram movie library.\n` +
+                    `• Fast streaming & direct high-speed downloads.\n` +
+                    `• Custom request queue with instant automated DM notifications.\n` +
+                    `• Built-in loyalty rewards system.`,
+                    { parse_mode: 'Markdown' }
+                );
+            }
+        } catch (err) {
+            console.error("Error in callback_query handler:", err);
+        }
     });
 }
 
