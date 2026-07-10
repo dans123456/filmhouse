@@ -1,5 +1,64 @@
 [
   {
+    "csv_id": "399579-alita-battle-angel",
+    "tmdb_id": 399579,
+    "imdb_id": "",
+    "title": "Alita: Battle Angel",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "When Alita awakens with no memory of who she is in a future world she does not recognize, she is taken in by Ido, a compassionate doctor who realizes that somewhere in this abandoned cyborg shell is the heart and soul of a young woman with an extraordinary past.",
+    "poster": "https://image.tmdb.org/t/p/w500/xRWht48C2V8XNfzvPehyClOvDni.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jXDselREPq8TOVGM4dzBBUM7xVk.jpg",
+    "rating": 7.3,
+    "release_date": "2019-01-31",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "puKWa8hrvA8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD7hoAAp4PiEb7sKqAVaYxUhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "237512-jurassic-world-chaos-theory",
+    "tmdb_id": 237512,
+    "imdb_id": "",
+    "title": "Jurassic World: Chaos Theory",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "The Camp Cretaceous gang comes together to unravel a mystery when they discover a global conspiracy that brings danger to dinosaurs — and to themselves.",
+    "poster": "https://image.tmdb.org/t/p/w500/c2Od0cY2IeayDj5osUxZSAD1QK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qjPC0KYEhdWAIPmCtAkg0j1iJXC.jpg",
+    "rating": 8.3,
+    "release_date": "2024-05-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ftbjh-3OsuA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADgxoAAp4PiEYcE2X_FSPRnhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "250670-maxton-hall-the-world-between-us",
     "tmdb_id": 250670,
     "imdb_id": "",
@@ -7776,7 +7835,10 @@
     "csv_id": "106379-fallout",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADWAQAApi0qEXDThlb8jLh2RYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADyxoAAp4PiEb4jcJZEx_VwxYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/c15BtJxCXMrISLVmysdsnZUPQft.jpg",
     "rating": 8.1,
