@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "117465-hell-s-paradise",
+    "tmdb_id": 117465,
+    "imdb_id": "",
+    "title": "Hell's Paradise",
+    "type": "Series",
+    "categories": [
+      "Main"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "For a chance at a pardon, a ninja assassin joins other condemned criminals on a journey to a mysterious island to retrieve an elixir of immortality.",
+    "poster": "https://image.tmdb.org/t/p/w500/1V9I7SvZbYoMbSvdtnlkkq9SB1k.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vjiIuR3XGpoGSumQ7DziPAmxIYR.jpg",
+    "rating": 8.2,
+    "release_date": "2023-04-01",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "PkCcADlua1w",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADwB8AAp4PiEaSCNE5w62IQBYE"
+    ]
+  },
+  {
     "csv_id": "812225-black-clover-sword-of-the-wizard-king",
     "tmdb_id": 812225,
     "imdb_id": "",
