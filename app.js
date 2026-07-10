@@ -117,6 +117,7 @@ const state = {
         points: 0,
         badge: "",
         badgeExpiresAt: 0,
+        farmingStartedAt: 0,
         pointsBreakdown: { downloads: 0, visits: 0, shares: 0, watched: 0 },
         dailyStats: {
             date: "",
@@ -659,6 +660,7 @@ function loadUserProfile() {
     state.user.points = profile.points || 0;
     state.user.badge = profile.badge || null;
     state.user.badgeExpiresAt = profile.badgeExpiresAt || 0;
+    state.user.farmingStartedAt = profile.farmingStartedAt || 0;
     state.user.pointsBreakdown = profile.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
     state.user.dailyStats = profile.dailyStats || {
         date: new Date().toISOString().split("T")[0],
@@ -965,6 +967,7 @@ function awardPoints(points, reason) {
     else if (reason === "task") reasonText = "completing the task";
     else if (reason === "visit") reasonText = "your daily visit";
     else if (reason === "share") reasonText = "sharing a movie";
+    else if (reason === "mining") reasonText = "mining rewards";
     else if (reason === "watched") reasonText = points > 0 ? "marking a movie as watched" : "removing a movie from watched list";
     
     if (points > 0) {
@@ -1738,6 +1741,8 @@ function navigateToScreen(targetScreenId) {
         renderWatchlistGrid();
     } else if (targetScreenId === "profile") {
         loadUserProfile();
+    } else if (targetScreenId === "mining") {
+        updateFarmingUI();
     } else if (targetScreenId === "leaderboard") {
         renderLeaderboard();
     }
@@ -4050,6 +4055,72 @@ function bindEvents() {
         });
     });
 
+    // Profile Help Button
+    const btnProfileHelp = document.getElementById("btn-profile-help");
+    if (btnProfileHelp) {
+        btnProfileHelp.addEventListener("click", () => {
+            navigateToScreen("help");
+        });
+    }
+
+    // Points Mining Action Button
+    const btnFarmAction = document.getElementById("btn-farm-action");
+    if (btnFarmAction) {
+        btnFarmAction.addEventListener("click", () => {
+            const startedAt = state.user.farmingStartedAt || 0;
+            if (startedAt === 0) {
+                // Start mining session
+                const now = Date.now();
+                state.user.farmingStartedAt = now;
+                
+                // Save local profile cache
+                const saved = localStorage.getItem("filmhouse_user_profile");
+                let profile = {};
+                if (saved) {
+                    try { profile = JSON.parse(saved); } catch (e) {}
+                }
+                profile.farmingStartedAt = now;
+                localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+                
+                // Sync to Firestore
+                if (typeof firebase !== "undefined" && db && state.user.id) {
+                    db.collection("users").doc(state.user.id).update({
+                        farmingStartedAt: now
+                    }).catch(err => console.warn("Error saving farming state:", err));
+                }
+                
+                updateFarmingUI();
+                showToast("Mining session started! Check back in 8 hours.", "success");
+            } else {
+                const elapsed = Date.now() - startedAt;
+                if (elapsed >= FARMING_DURATION) {
+                    // Claim farming rewards
+                    state.user.farmingStartedAt = 0;
+                    
+                    // Save local profile cache
+                    const saved = localStorage.getItem("filmhouse_user_profile");
+                    let profile = {};
+                    if (saved) {
+                        try { profile = JSON.parse(saved); } catch (e) {}
+                    }
+                    profile.farmingStartedAt = 0;
+                    localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+                    
+                    // Sync to Firestore
+                    if (typeof firebase !== "undefined" && db && state.user.id) {
+                        db.collection("users").doc(state.user.id).update({
+                            farmingStartedAt: 0
+                        }).catch(err => console.warn("Error updating farming state:", err));
+                    }
+                    
+                    // Award the reward points!
+                    awardPoints(FARMING_REWARD, "mining");
+                    updateFarmingUI();
+                }
+            }
+        });
+    }
+
     // Segmented watchlist toggle tabs
     const btnToggleWatchlist = document.getElementById("btn-toggle-watchlist");
     const btnToggleWatched = document.getElementById("btn-toggle-watched");
@@ -4783,9 +4854,22 @@ function syncUserToFirestore() {
     userRef.get().then(doc => {
         if (doc.exists) {
             const docData = doc.data();
-            if (docData && docData.banned === true) {
-                showBannedScreen();
-                return;
+            if (docData) {
+                if (docData.banned === true) {
+                    showBannedScreen();
+                    return;
+                }
+                if (docData.farmingStartedAt !== undefined) {
+                    state.user.farmingStartedAt = docData.farmingStartedAt;
+                    const saved = localStorage.getItem("filmhouse_user_profile");
+                    if (saved) {
+                        try {
+                            const profile = JSON.parse(saved);
+                            profile.farmingStartedAt = docData.farmingStartedAt;
+                            localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+                        } catch (e) {}
+                    }
+                }
             }
         }
         const data = {
@@ -4796,6 +4880,7 @@ function syncUserToFirestore() {
             points: state.user.points || 0,
             badge: state.user.badge || "",
             badgeExpiresAt: state.user.badgeExpiresAt || 0,
+            farmingStartedAt: state.user.farmingStartedAt || 0,
             pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
             dailyStats: state.user.dailyStats || {},
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
@@ -4814,6 +4899,7 @@ function syncUserToFirestore() {
             points: state.user.points || 0,
             badge: state.user.badge || "",
             badgeExpiresAt: state.user.badgeExpiresAt || 0,
+            farmingStartedAt: state.user.farmingStartedAt || 0,
             pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
             dailyStats: state.user.dailyStats || {},
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
@@ -6040,4 +6126,89 @@ function showBannedScreen() {
     document.body.style.overflow = "hidden";
     document.body.style.pointerEvents = "none";
     overlay.style.pointerEvents = "auto"; // only allow interacting with the overlay itself
+}
+
+// Passive Points Farming (Mining) System
+const FARMING_DURATION = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+const FARMING_REWARD = 80; // points awarded (10 pts per hour)
+const FARMING_RATE = FARMING_REWARD / FARMING_DURATION; // points per millisecond
+let farmingInterval = null;
+
+function updateFarmingUI() {
+    const btn = document.getElementById("btn-farm-action");
+    const statusText = document.getElementById("mining-status-text");
+    const timerText = document.getElementById("mining-timer-text");
+    const counter = document.getElementById("mining-live-counter");
+    const logoBox = document.getElementById("mining-logo-box-el");
+
+    if (!btn) return;
+
+    const startedAt = state.user.farmingStartedAt || 0;
+
+    if (startedAt === 0) {
+        // Inactive mining state
+        clearInterval(farmingInterval);
+        if (logoBox) {
+            logoBox.className = "mining-logo-box";
+            logoBox.style.setProperty("--farm-pct", "0%");
+        }
+        statusText.textContent = "Mining Inactive";
+        counter.textContent = "+0.000";
+        timerText.textContent = "8-hour session • Earn 10 points";
+        btn.textContent = "Start Mining ⚡";
+        btn.style.background = "var(--primary-gradient)";
+        btn.style.color = "#000";
+        btn.disabled = false;
+    } else {
+        const elapsed = Date.now() - startedAt;
+        if (elapsed >= FARMING_DURATION) {
+            // Completed mining state, wait for claim
+            clearInterval(farmingInterval);
+            if (logoBox) {
+                logoBox.className = "mining-logo-box complete";
+                logoBox.style.setProperty("--farm-pct", "100%");
+            }
+            statusText.textContent = "Session Complete!";
+            counter.textContent = `+${FARMING_REWARD.toFixed(3)}`;
+            timerText.textContent = "Claim your Loyalty Points now!";
+            btn.textContent = "Claim Points 🪙";
+            btn.style.background = "linear-gradient(135deg, #00c853 0%, #009624 100%)";
+            btn.style.color = "#fff";
+            btn.disabled = false;
+        } else {
+            // Currently active mining state
+            if (logoBox) {
+                logoBox.className = "mining-logo-box active";
+            }
+            btn.textContent = "Mining... 🔋";
+            btn.style.background = "rgba(255,255,255,0.05)";
+            btn.style.color = "var(--text-muted)";
+            btn.disabled = true;
+
+            const tick = () => {
+                const curElapsed = Date.now() - state.user.farmingStartedAt;
+                if (curElapsed >= FARMING_DURATION) {
+                    updateFarmingUI();
+                } else {
+                    const pointsMined = curElapsed * FARMING_RATE;
+                    counter.textContent = `+${pointsMined.toFixed(3)}`;
+                    const pct = (curElapsed / FARMING_DURATION) * 100;
+                    if (logoBox) {
+                        logoBox.style.setProperty("--farm-pct", `${pct}%`);
+                    }
+                    
+                    const timeLeftMs = FARMING_DURATION - curElapsed;
+                    const hrs = Math.floor(timeLeftMs / (3600 * 1000));
+                    const mins = Math.floor((timeLeftMs % (3600 * 1000)) / (60 * 1000));
+                    const secs = Math.floor((timeLeftMs % (60 * 1000)) / 1000);
+                    timerText.textContent = `Ends in ${hrs}h ${mins}m ${secs}s`;
+                    statusText.textContent = "Mining points...";
+                }
+            };
+
+            tick();
+            clearInterval(farmingInterval);
+            farmingInterval = setInterval(tick, 1000);
+        }
+    }
 }

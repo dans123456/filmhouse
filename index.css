@@ -3065,4 +3065,90 @@ img {
     display: block;
 }
 
+/* ==========================================================================
+   MINING SCREEN STYLES
+   ========================================================================== */
+.mining-logo-box {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Base image styling */
+.mining-logo-bg,
+.mining-logo-fill {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Background image - greyscale/empty container */
+.mining-logo-bg {
+    filter: grayscale(1) opacity(0.12);
+    z-index: 1;
+}
+
+/* Foreground image - colorful fill */
+.mining-logo-fill {
+    z-index: 2;
+    filter: drop-shadow(0 0 15px rgba(255, 188, 0, 0.4)) saturate(1.2);
+    clip-path: inset(calc(100% - var(--farm-pct, 0%)) 0 0 0);
+    transition: clip-path 0.5s cubic-bezier(0.1, 0.8, 0.25, 1);
+}
+
+/* Heartbeat pulse animation when mining is active */
+.mining-logo-box.active {
+    animation: mining-pulse 2s infinite ease-in-out;
+    border-color: rgba(255, 188, 0, 0.25);
+    box-shadow: 0 0 20px rgba(255, 188, 0, 0.06);
+}
+
+@keyframes mining-pulse {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 5px rgba(255, 188, 0, 0.1));
+    }
+    50% {
+        transform: scale(1.03);
+        filter: drop-shadow(0 0 18px rgba(255, 188, 0, 0.35));
+    }
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 5px rgba(255, 188, 0, 0.1));
+    }
+}
+
+/* Complete state glow overlay */
+.mining-logo-box.complete {
+    animation: mining-complete-glow 1.5s infinite alternate ease-in-out;
+    border-color: rgba(0, 200, 83, 0.4);
+}
+
+.mining-logo-box.complete .mining-logo-fill {
+    filter: drop-shadow(0 0 25px rgba(0, 200, 83, 0.6)) saturate(1.4);
+}
+
+@keyframes mining-complete-glow {
+    0% {
+        box-shadow: 0 0 10px rgba(0, 200, 83, 0.1);
+        transform: translateY(0);
+    }
+    100% {
+        box-shadow: 0 0 25px rgba(0, 200, 83, 0.35);
+        transform: translateY(-4px);
+    }
+}
+
 

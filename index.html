@@ -215,9 +215,9 @@
             <svg class="nav-icon"><use href="#icon-feedback"></use></svg>
             <span>Feedback</span>
         </button>
-        <button class="bottom-nav-item" data-target="help">
-            <svg class="nav-icon"><use href="#icon-info"></use></svg>
-            <span>Help</span>
+        <button class="bottom-nav-item" data-target="mining">
+            <svg class="nav-icon"><use href="#icon-coin"></use></svg>
+            <span>Mining</span>
         </button>
     </nav>
 
@@ -304,6 +304,48 @@
                 <h3>Your Watchlist is Empty</h3>
                 <p>Bookmark movies while exploring to save them here for later!</p>
                 <button class="btn btn-primary" id="btn-watchlist-explore">Explore Movies</button>
+            </div>
+        </section>
+
+        <!-- MINING SCREEN -->
+        <section id="screen-mining" class="app-screen">
+            <div class="mining-card-container" style="max-width: 480px; margin: 0 auto; padding: 20px 10px; text-align: center;">
+                <h2 class="screen-title" style="margin-bottom: 8px;">Points Mining</h2>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 24px;">Mine free Loyalty Points passively every 8 hours!</p>
+                
+                <div class="mining-panel" style="background-color: var(--bg-dark-card); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 32px 24px; backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.25);">
+                    
+                    <!-- Double Logo Fill Animation -->
+                    <div class="mining-logo-box" id="mining-logo-box-el">
+                        <img src="MOVIE/img/FilmHouse3_nobg.png" class="mining-logo-bg" alt="Film House Logo Background">
+                        <img src="MOVIE/img/FilmHouse3_nobg.png" class="mining-logo-fill" alt="Film House Logo Foreground Fill">
+                    </div>
+                    
+                    <!-- Mining Status indicators -->
+                    <div style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span id="mining-status-text" style="font-size: 15px; font-weight: 700; color: #fff; font-family: var(--font-heading);">Mining Inactive</span>
+                        <span id="mining-timer-text" style="font-size: 12px; color: var(--text-muted); font-weight: 600;">8-hour session • Earn 80 points</span>
+                    </div>
+
+                    <!-- Live ticking counter -->
+                    <div style="margin-top: 16px; background: rgba(255, 188, 0, 0.05); border: 1px solid rgba(255, 188, 0, 0.15); border-radius: 12px; padding: 12px 24px; min-width: 160px;">
+                        <span id="mining-live-counter" style="font-size: 24px; font-weight: 800; color: #ffbc00; font-family: monospace; display: block;">+0.000</span>
+                        <span style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Farmed this session</span>
+                    </div>
+                    
+                    <!-- Action button -->
+                    <button id="btn-farm-action" class="btn btn-primary" style="margin-top: 28px; width: 100%; max-width: 280px; padding: 14px; font-size: 14px; font-weight: 800; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 15px var(--primary-glow); border: none;">Start Mining ⚡</button>
+                    
+                </div>
+                
+                <!-- Quick Info box -->
+                <div style="margin-top: 20px; background-color: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 16px; text-align: left; display: flex; gap: 12px; align-items: flex-start;">
+                    <span style="font-size: 20px;">💡</span>
+                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                        <strong style="color: #fff; display: block; margin-bottom: 2px;">How passive mining works:</strong>
+                        Start the miner and close the app—mining runs in the background. Return here in 8 hours to claim your reward and restart the session!
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -409,8 +451,13 @@
                         </button>
 
                         <!-- Free Up Storage Button -->
-                        <button type="button" class="btn btn-block btn-secondary" id="btn-clear-cache" style="font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: var(--border-radius-sm); width: 100%;">
+                        <button type="button" class="btn btn-block btn-secondary" id="btn-clear-cache" style="font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: var(--border-radius-sm); width: 100%; margin-bottom: 12px;">
                             <span>Free Up Storage 🧹</span>
+                        </button>
+
+                        <!-- Help & Support Button -->
+                        <button type="button" class="btn btn-block btn-secondary" id="btn-profile-help" style="font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: var(--border-radius-sm); width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);">
+                            <span>Help & Support 🛠️</span>
                         </button>
                     </div>
 
