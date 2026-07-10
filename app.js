@@ -3505,7 +3505,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 
                 rewardEl.replaceChildren(rewardTitle, rewardValue);
  
-                // Safety timeout fallback: if task doesn't load or trigger within 3 seconds, auto-fallback to video ad
+                // Safety timeout fallback: if task doesn't load or trigger within 8 seconds, auto-fallback to video ad
                 let fallbackTriggered = false;
                 const safetyTimeout = setTimeout(() => {
                     if (!fallbackTriggered) {
@@ -3513,7 +3513,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                         console.log("Adsgram task load timeout - falling back to video ad");
                         handleFallback("timeout");
                     }
-                }, 3000);
+                }, 8000);
 
                 const btnEl = document.createElement("div");
                 btnEl.setAttribute("slot", "button");
@@ -3612,6 +3612,14 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 taskEl.addEventListener("reward", handleReward);
                 taskEl.addEventListener("onReward", handleReward);
                 taskEl.addEventListener("onreward", handleReward);
+                
+                const handleStart = () => {
+                    clearTimeout(safetyTimeout);
+                    console.log("Adsgram task loaded and started successfully");
+                };
+
+                taskEl.addEventListener("onStart", handleStart);
+                taskEl.addEventListener("onstart", handleStart);
                 
                 taskEl.addEventListener("onError", handleFallback);
                 taskEl.addEventListener("onerror", handleFallback);
