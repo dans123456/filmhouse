@@ -1,1786 +1,5 @@
 [
   {
-    "csv_id": "1595852-boulevard",
-    "tmdb_id": 1595852,
-    "imdb_id": "",
-    "title": "Boulevard",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Hasley, a girl with a list of unfulfilled dreams, and Luke, a complex and vulnerable boy marked by a tragic past, find refuge on the boulevard, where they discover whether love can conquer all.",
-    "poster": "https://image.tmdb.org/t/p/w500/fvk8wxyQXLlrBIMuglDxdMYLgBW.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/98uiDns59GUw26SQSCFmuSHTki3.jpg",
-    "rating": 4.5,
-    "release_date": "2026-04-10",
-    "language": "es",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD7hIAAp4PiEbod7POfTBFDxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1321008-black-box-flight-298",
-    "tmdb_id": 1321008,
-    "imdb_id": "",
-    "title": "Black Box (Flight 298)",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A routine domestic flight turns into the flight from hell through a series of inexplicable phenomena and raw terror. Surreal encounters blur the boundaries between reality and nightmare. Passengers fight against all the odds in an attempt to survive while combating bizarre technological malfunctions, accelerating supernatural events and alien influences.",
-    "poster": "https://image.tmdb.org/t/p/w500/O7vJPEWsnLrKqPYHIHKG8zlEK1.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/ce0RjYfcgzQeiT3PjaARWv5PVQO.jpg",
-    "rating": 6.2,
-    "release_date": "2026-06-25",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "y-nf8hUFd98",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhw0AAp4PiEbnjLchco_klRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "71912-the-witcher",
-    "tmdb_id": 71912,
-    "imdb_id": "",
-    "title": "The Witcher",
-    "type": "Series",
-    "categories": [
-      "Main"
-    ],
-    "genres": [
-      "Drama",
-      "Action & Adventure"
-    ],
-    "overview": "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts.",
-    "poster": "https://image.tmdb.org/t/p/w500/AoGsDM02UVt0npBA8OvpDcZbaMi.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/foGkPxpw9h8zln81j63mix5B7m8.jpg",
-    "rating": 7.9,
-    "release_date": "2019-12-20",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "eb90gqGYP9c",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADjQwAAp4PiEZAt73WGBr5ChYE",
-        "quality": "720p"
-      },
-      {
-        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADjwwAAp4PiEbSk6iAZxt6WBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "322430-the-polygamist",
-    "tmdb_id": 322430,
-    "imdb_id": "",
-    "title": "The Polygamist",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "African"
-    ],
-    "genres": [
-      "African"
-    ],
-    "overview": "Social media darling, Joyce, is the picture of marital perfection — until her cheating husband's conquests ignite a scandalous emotional meltdown.",
-    "poster": "https://image.tmdb.org/t/p/w500/emnQZe22rYBCsbZ7h1TUAkYEzrZ.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/hGCQ0tsJMpKjfrnCyYY0kMY2kY1.jpg",
-    "rating": 8.8,
-    "release_date": "2026-06-12",
-    "language": "zu",
-    "cast": [],
-    "director": "",
-    "trailer": "KBJllQVRuAA",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADsQsAAp4PiEZY3C4w0DblCBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1927-hulk",
-    "tmdb_id": 1927,
-    "imdb_id": "",
-    "title": "Hulk",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Comic"
-    ],
-    "overview": "Bruce Banner, a genetics researcher with a tragic past, suffers massive radiation exposure in his laboratory that causes him to transform into a raging green monster when he gets angry.",
-    "poster": "https://image.tmdb.org/t/p/w500/UllIft2jLSBaay3zQyMV4GNdfy.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/8vQBXqDbb30qNpBcNYwTesSg75.jpg",
-    "rating": 5.6,
-    "release_date": "2003-06-19",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "2ErnLuJKQA4",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD4x8AAp4PgEYWAAHt8PuFeSwWBA",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "36658-x2",
-    "tmdb_id": 36658,
-    "imdb_id": "",
-    "title": "X2",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Professor Charles Xavier and his team of genetically gifted superheroes face a rising tide of anti-mutant sentiment led by Col. William Stryker. Storm, Wolverine and Jean Grey must join Magneto and Mystique to unhinge Stryker's scheme to exterminate all mutants.",
-    "poster": "https://image.tmdb.org/t/p/w500/bst4alFUXCxISwdRUKSMhhkrX1M.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/7TYITrR804tLITNur3b8VLCK6tw.jpg",
-    "rating": 7,
-    "release_date": "2003-04-27",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "yVzqz_zpP20",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD4R8AAp4PgEaLT5kKwDmLDBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "557-spider-man",
-    "tmdb_id": 557,
-    "imdb_id": "",
-    "title": "Spider-Man",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Comic"
-    ],
-    "overview": "After being bitten by a genetically altered spider at Oscorp, nerdy but endearing high school student Peter Parker is endowed with amazing powers to become the superhero known as Spider-Man.",
-    "poster": "https://image.tmdb.org/t/p/w500/kjdJntyBeEvqm9w97QGBdxPptzj.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/zQ8AxTPiCiS5nnwXpwTBPBHSaa5.jpg",
-    "rating": 7.3,
-    "release_date": "2002-05-01",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "t06RUxPbp_c",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1x8AAp4PgEYd-GgCG4v6WxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "36586-blade-ii",
-    "tmdb_id": 36586,
-    "imdb_id": "",
-    "title": "Blade II",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Blade forms an uneasy alliance with the vampire council in order to combat the Reapers, who are feeding on vampires.",
-    "poster": "https://image.tmdb.org/t/p/w500/yDHwo3eWcMiy5LnnEnlGV9iLu9k.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/86b0NGY1i0bt3ckhkcHxiCSMxk1.jpg",
-    "rating": 6.6,
-    "release_date": "2002-03-22",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "fcCQ7xk8zzM",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1R8AAp4PgEa3CHzsob9lGBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1664-spider-man-the-new-animated-series",
-    "tmdb_id": 1664,
-    "imdb_id": "",
-    "title": "Spider-Man: The New Animated Series",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Series",
-      "Comic"
-    ],
-    "genres": [
-      "Animated Movies",
-      "Comic"
-    ],
-    "overview": "Bitten by an irradiated spider, teenager Peter Parker gains arachnid-like powers that make him both a hero to those in need and a vigilante wanted by the police.",
-    "poster": "https://image.tmdb.org/t/p/w500/9g1YPyKtpB0aNlgVb0N8YASKLZN.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/nVHovBi2yqZAYW17273ytA8SE7c.jpg",
-    "rating": 7.2,
-    "release_date": "2003-07-11",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1B8AAp4PgEYBJZmsfcMe2RYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "92983-vagabond",
-    "tmdb_id": 92983,
-    "imdb_id": "",
-    "title": "Vagabond",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "Stuntman Cha Dal-geon gets involved in a tragic airplane crash and ends up discovering a national corruption scandal in the process. Go Hae-ri, the oldest daughter of a deceased marine, decides to work for the National Intelligence Service as a secret ops agent in order to support her mom and younger siblings, although all she wanted to do is to become a civil servant.",
-    "poster": "https://image.tmdb.org/t/p/w500/8Sud9wqG7WZMXesZhPZ4lergRvp.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/6BdGjKqud1rFcEa7p2zGfc29z5H.jpg",
-    "rating": 8.3,
-    "release_date": "2019-09-20",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "tyhnEHCUtv4",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD0B8AAp4PgEYo9th5F_BqXBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "2901-fantastic-four",
-    "tmdb_id": 2901,
-    "imdb_id": "",
-    "title": "Fantastic Four",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Series",
-      "Classic Movies"
-    ],
-    "genres": [
-      "Animated Movies",
-      "Classic Movies"
-    ],
-    "overview": "When Reed Richards, Sue and Johnny Storm and pilot Ben Grimm take a premature space flight on a new shuttle, they find themselves massively bombarded with cosmic radiation. Barely managing to re-enter and land safely, the quartet find themselves forever transformed with superpowers. Deciding to use these new powers to help people, they form the Fantastic Four, a superhero team dedicated to the protection of Earth from menaces like the Latverian King Dr. Doom and Galactus, the planet consumer.",
-    "poster": "https://image.tmdb.org/t/p/w500/jPVGruDYZtImosRkNv7eZhqxT1p.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/mYKYwihv940xGyDt2XckkBryNnP.jpg",
-    "rating": 6.6,
-    "release_date": "1994-09-24",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADzB8AAp4PgEbBrWHZo6-Q_BYE",
-        "quality": "720p"
-      },
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADzR8AAp4PgEajufLAStxktxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "36668-x-men-the-last-stand",
-    "tmdb_id": 36668,
-    "imdb_id": "",
-    "title": "X-Men: The Last Stand",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Comic"
-    ],
-    "overview": "When a cure is found to treat mutations, lines are drawn amongst the X-Men led by Professor Charles Xavier, and Magneto's Brotherhood of Mutants.",
-    "poster": "https://image.tmdb.org/t/p/w500/a2xicU8DpKtRizOHjQLC1JyCSRS.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/sBl1n4Oi2wX81EtXIb8NsPqJf3W.jpg",
-    "rating": 6.4,
-    "release_date": "2006-05-24",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "X8ozc_dQprk",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyx8AAp4PgEaVWfUjgp98TBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "18882-man-thing",
-    "tmdb_id": 18882,
-    "imdb_id": "",
-    "title": "Man-Thing",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Agents of an oil tycoon vanish while exploring a swamp marked for drilling. The local sheriff investigates and faces a Seminole legend come to life: Man-Thing, a shambling swamp-monster whose touch burns those who feel fear.",
-    "poster": "https://image.tmdb.org/t/p/w500/kfPPnOygXSGaBFpsCUyu7xQdkoO.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/qgoqb6IkNYA7NE6bgBhAnP2FEQ5.jpg",
-    "rating": 4.3,
-    "release_date": "2005-04-21",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "RTUL1GWbrRw",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyh8AAp4PgEZU0FxTyvyvdxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "9738-fantastic-four",
-    "tmdb_id": 9738,
-    "imdb_id": "",
-    "title": "Fantastic Four",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "During a space voyage, four scientists are altered by cosmic rays: Reed Richards gains the ability to stretch his body; Sue Storm can become invisible; Johnny Storm controls fire; and Ben Grimm is turned into a super-strong … thing. Together, these \"Fantastic Four\" must now thwart the evil plans of Dr. Doom and save the world from certain destruction.",
-    "poster": "https://image.tmdb.org/t/p/w500/4YMcYEFS8sFuW3soP1HVmgR3cSm.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/2cDXXLirYsoP6rk9B8yrvNHbbFy.jpg",
-    "rating": 5.8,
-    "release_date": "2005-06-29",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "QIx2jkXYu34",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyR8AAp4PgEZA3PXlAAHKwAYWBA",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "9947-elektra",
-    "tmdb_id": 9947,
-    "imdb_id": "",
-    "title": "Elektra",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Elektra the warrior survives a near-death experience, becomes an assassin-for-hire, and tries to protect her two latest targets, a single father and his young daughter, from a group of supernatural assassins.",
-    "poster": "https://image.tmdb.org/t/p/w500/gC6s6NKHneSrOKyQZnUMb443RKU.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/2JMOTj6DFjNcg9KToctmfTV55EW.jpg",
-    "rating": 5.1,
-    "release_date": "2005-01-13",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "etfIjKxKzqw",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyB8AAp4PgEaQ_m0iBtznCRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "36648-blade-trinity",
-    "tmdb_id": 36648,
-    "imdb_id": "",
-    "title": "Blade: Trinity",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "For years, Blade has fought against the vampires in the cover of the night. But now, after falling into the crosshairs of the FBI, he is forced out into the daylight, where he is driven to join forces with a clan of human vampire hunters he never knew existed—The Nightstalkers. Together with Abigail and Hannibal, two deftly trained Nightstalkers, Blade follows a trail of blood to the ancient creature that is also hunting him—the original vampire, Dracula.",
-    "poster": "https://image.tmdb.org/t/p/w500/6f7iXvPOnf83MaLB1JmPzUor1rr.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/63eAFgJtN6ZTyFFzlAOoZLhlYqc.jpg",
-    "rating": 5.9,
-    "release_date": "2004-12-08",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "qcHEDGs7eAY",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADxh8AAp4PgEaBaLwI8Htu_BYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "558-spider-man-2",
-    "tmdb_id": 558,
-    "imdb_id": "",
-    "title": "Spider-Man 2",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Comic"
-    ],
-    "overview": "Peter Parker is going through a major identity crisis. Burned out from being Spider-Man, he decides to shelve his superhero alter ego, which leaves the city suffering in the wake of carnage left by the evil Doc Ock. In the meantime, Parker still can't act on his feelings for Mary Jane Watson, a girl he's loved since childhood. A certain anger begins to brew in his best friend Harry Osborn as well...",
-    "poster": "https://image.tmdb.org/t/p/w500/aGuvNAaaZuWXYQQ6N2v7DeuP6mB.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/6al048Lat3eLVQOuKtc9h6Tu94d.jpg",
-    "rating": 7.3,
-    "release_date": "2004-06-25",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "CA5vsCnLm34",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADwh8AAp4PgEae0cZMS0tvBRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "7220-the-punisher",
-    "tmdb_id": 7220,
-    "imdb_id": "",
-    "title": "The Punisher",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Comic"
-    ],
-    "overview": "When undercover FBI agent Frank Castle's wife and son are slaughtered, he becomes 'the Punisher' -- a ruthless vigilante willing to go to any length to avenge his family.",
-    "poster": "https://image.tmdb.org/t/p/w500/7rmA1HwYp2GKM85BL0cVwCaosGr.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/ziexSS07RmowuyqAdJMh1sGxjHg.jpg",
-    "rating": 6.4,
-    "release_date": "2004-04-15",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "TqVSFchQEyM",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADwR8AAp4PgEa-ro3dcS_M6RYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "4619-blade-the-series",
-    "tmdb_id": 4619,
-    "imdb_id": "",
-    "title": "Blade: The Series",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series"
-    ],
-    "genres": [],
-    "overview": "Blade is a half-man, half-vampire who employs his extraordinary powers in a crusade to save mankind from the demonic creatures who walk the night. Set in Detroit, Blade investigates the vampire house of Chthon. Along the way he forms an uneasy alliance with Krista Starr, a former military veteran who becomes entrenched in the world of vampires while investigating the murder of her twin brother.",
-    "poster": "https://image.tmdb.org/t/p/w500/xthJ8MoYaJROntPHaI5mUrXd4Qs.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/aZkUbLPcPoLKRxu4T7i2RnL3y3n.jpg",
-    "rating": 6.5,
-    "release_date": "2006-06-28",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "wjgHNDO3kLY",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADtx8AAp4PgEZdX4Euyo056hYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "14611-ultimate-avengers-2",
-    "tmdb_id": 14611,
-    "imdb_id": "",
-    "title": "Ultimate Avengers 2",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Animated Movies",
-      "Comic"
-    ],
-    "overview": "Mysterious Wakanda lies in the darkest heart of Africa, unknown to most of the world. An isolated land hidden behind closed borders, fiercely protected by its young king: Black Panther. But when brutal alien invaders attack, the threat leaves Black Panther with no option but to go against the sacred decrees of his people and ask for help from outsiders.",
-    "poster": "https://image.tmdb.org/t/p/w500/sMFyYZR9krqcQC99G6jnb10Zv4P.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/xv77AFzMUiTuUsC5qn31jBB21An.jpg",
-    "rating": 6.8,
-    "release_date": "2006-08-08",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "gl4jsZcYt9k",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsx8AAp4PgEYQwcyJiuKA-RYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "14609-ultimate-avengers-the-movie",
-    "tmdb_id": 14609,
-    "imdb_id": "",
-    "title": "Ultimate Avengers: The Movie",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Animated Movies",
-      "Comic"
-    ],
-    "overview": "When a nuclear missile was fired at Washington in 1945, Captain America managed to detonate it in the upper atmosphere. But then he fell miles into the icy depths of the North Atlantic, where he remained lost for over sixty years. But now, with the world facing the very same evil, Captain America must rise again as our last hope for survival.",
-    "poster": "https://image.tmdb.org/t/p/w500/iMCkGHVrYRdqKROPRPmVaJVSlg3.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/lJRGgbi4Slsz171vcJ0Ctgiea6v.jpg",
-    "rating": 6.9,
-    "release_date": "2006-02-21",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "IQ9QjHVaurM",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsh8AAp4PgEY8P_QvXii_fxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "132-fantastic-four-world-s-greatest-heroes",
-    "tmdb_id": 132,
-    "imdb_id": "",
-    "title": "Fantastic Four: World's Greatest Heroes",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Series"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "Mr. Fantastic, the Invisible Woman, the Human Torch, and the Thing battle some of their greatest foes, including Doctor Doom, Ronan the Accuser, the Multiple Man, and Mole Man.",
-    "poster": "https://image.tmdb.org/t/p/w500/zCtCW0JlbMpzfQDAX1bO1o1KLi.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/q0bLjLCBZGhnMcRprx2gWRGdlrp.jpg",
-    "rating": 7.5,
-    "release_date": "2006-09-02",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "220329277",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsB8AAp4PgEbnbd1-aQ4dChYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "559-spider-man-3",
-    "tmdb_id": 559,
-    "imdb_id": "",
-    "title": "Spider-Man 3",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Comic"
-    ],
-    "overview": "The seemingly invincible Spider-Man goes up against an all-new crop of villains—including the shape-shifting Sandman. While Spider-Man’s superpowers are altered by an alien organism, his alter ego, Peter Parker, deals with nemesis Eddie Brock and also gets caught up in a love triangle.",
-    "poster": "https://image.tmdb.org/t/p/w500/qFmwhVUoUSXjkKRmca5yGDEXBIj.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/w1oD1MzHjnBJc5snKupIQaSBLIh.jpg",
-    "rating": 6.5,
-    "release_date": "2007-05-01",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "e5wUilOeOmg",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADrR8AAp4PgEZ7mKh6BhJsAxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1250-ghost-rider",
-    "tmdb_id": 1250,
-    "imdb_id": "",
-    "title": "Ghost Rider",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "In order to save his dying father, young stunt cyclist Johnny Blaze sells his soul to Mephistopheles and sadly parts from the pure-hearted Roxanne Simpson, the love of his life. Years later, Johnny's path crosses again with Roxanne, now a go-getting reporter, and also with Mephistopheles, who offers to release Johnny's soul if Johnny becomes the fabled, fiery 'Ghost Rider'.",
-    "poster": "https://image.tmdb.org/t/p/w500/d9Oan9XJJ6gRJa64Ifsgp1sXbC4.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/zbV32WKHFuEYLXLTpr0rmVjQn11.jpg",
-    "rating": 5.6,
-    "release_date": "2007-01-15",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "nu6R7ypaz5g",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqx8AAp4PgEYS2vH3Ne-CRhYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "13056-punisher-war-zone",
-    "tmdb_id": 13056,
-    "imdb_id": "",
-    "title": "Punisher: War Zone",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Comic"
-    ],
-    "overview": "Waging his one-man war on the world of organized crime, ruthless vigilante-hero Frank Castle sets his sights on overeager mob boss Billy Russoti. After Russoti is left horribly disfigured by Castle, he sets out for vengeance under his new alias: Jigsaw. With the \"Punisher Task Force\" hot on his trail and the FBI unable to take Jigsaw in, Frank must stand up to the formidable army that Jigsaw has recruited before more of his evil deeds go unpunished.",
-    "poster": "https://image.tmdb.org/t/p/w500/oOvKJgYUIpfswGHAdW6159bPbvM.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/dqPZpQy6PJINOJtld17NgIERusH.jpg",
-    "rating": 5.9,
-    "release_date": "2008-12-05",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "liABMxEvPAc",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADpB8AAp4PgEYaxsp1u0SmiRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1724-the-incredible-hulk",
-    "tmdb_id": 1724,
-    "imdb_id": "",
-    "title": "The Incredible Hulk",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Comic"
-    ],
-    "overview": "Scientist Bruce Banner scours the planet for an antidote to the unbridled force of rage within him: the Hulk. But when the military masterminds who dream of exploiting his powers force him back to civilization, he finds himself coming face to face with a new, deadly foe.",
-    "poster": "https://image.tmdb.org/t/p/w500/gKzYx79y0AQTL4UAk1cBQJ3nvrm.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/jPu8yiadqgzwFPGKJmGo637ASVP.jpg",
-    "rating": 6.2,
-    "release_date": "2008-06-12",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "dz6eBeW19Lg",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADox8AAp4PgEZJZHwYy1yQwxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1726-iron-man",
-    "tmdb_id": 1726,
-    "imdb_id": "",
-    "title": "Iron Man",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Comic"
-    ],
-    "overview": "After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil.",
-    "poster": "https://image.tmdb.org/t/p/w500/78lPtwv72eTNqFW9COBYI0dWDJa.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/cyecB7godJ6kNHGONFjUyVN9OX5.jpg",
-    "rating": 7.7,
-    "release_date": "2008-04-30",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "8ugaeA-nMTc",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADoR8AAp4PgEa-u8rb24eGHhYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "14830-doctor-strange",
-    "tmdb_id": 14830,
-    "imdb_id": "",
-    "title": "Doctor Strange",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "Dr. Stephen Strange embarks on a wondrous journey to the heights of a Tibetan mountain, where he seeks healing at the feet of the mysterious Ancient One.",
-    "poster": "https://image.tmdb.org/t/p/w500/7ygcpWXsWmEc83j7zE8P0lvC0Q.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/r72uEx8x2aFNygkr1cJeDIZJsbG.jpg",
-    "rating": 6.8,
-    "release_date": "2007-08-14",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "L4kCgHvsACo",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADoB8AAp4PgEa8y51CGEsVhBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "13647-the-invincible-iron-man",
-    "tmdb_id": 13647,
-    "imdb_id": "",
-    "title": "The Invincible Iron Man",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Animated Movies",
-      "Comic"
-    ],
-    "overview": "When a cocky industrialist's efforts to raise an ancient Chinese temple leads him to be seriously wounded and captured by enemy forces, he must use his ideas for a revolutionary power armor in order to fight back as a superhero.",
-    "poster": "https://image.tmdb.org/t/p/w500/eebNTSRa5Hh5skPKGdGJIJpo9Ls.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/x6gi2yn51sjRBMt6xeVTPVGFeSB.jpg",
-    "rating": 6.1,
-    "release_date": "2007-01-23",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "h9KTDwT-MAA",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnx8AAp4PgEalMN8lRJp1TBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "3854-the-spectacular-spider-man",
-    "tmdb_id": 3854,
-    "imdb_id": "",
-    "title": "The Spectacular Spider-Man",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Series",
-      "Comic"
-    ],
-    "genres": [
-      "Animated Movies",
-      "Comic"
-    ],
-    "overview": "Having spent the summer engaging common criminals with his new-found powers, not so typical 16-year-old Peter Parker must conceal his secret identity and battle super-villains in the real world as he enters his junior year of high school.",
-    "poster": "https://image.tmdb.org/t/p/w500/dCNxOhXT7c4lqYuRpdM3m8s9XDp.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/fypGcrQCyb9vQ7L8AM6PHCjQSBC.jpg",
-    "rating": 8.6,
-    "release_date": "2008-03-08",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "wkbKbeEEr0s",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmR8AAp4PgEYkZe9TOS2JqRYE",
-        "quality": "720p"
-      },
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmh8AAp4PgEZoWBM6obf6qBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "14613-next-avengers-heroes-of-tomorrow",
-    "tmdb_id": 14613,
-    "imdb_id": "",
-    "title": "Next Avengers: Heroes of Tomorrow",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Animated Movies",
-      "Comic"
-    ],
-    "overview": "The children of the Avengers hone their powers and go head to head with the very enemy responsible for their parents' demise.",
-    "poster": "https://image.tmdb.org/t/p/w500/1y4J9HZJoTIMdt77wCq80uXaQJ.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/6V6rhHkqYvJGlxIQ9mvZuIoY6c9.jpg",
-    "rating": 7,
-    "release_date": "2008-09-02",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "swn4H4sqm1A",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlh8AAp4PgEY1e34AAdfl_lEWBA",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "6549-wolverine-and-the-x-men",
-    "tmdb_id": 6549,
-    "imdb_id": "",
-    "title": "Wolverine and the X-Men",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Series",
-      "Comic"
-    ],
-    "genres": [
-      "Animated Movies",
-      "Comic"
-    ],
-    "overview": "Wolverine and the X-Men must join together again to not only battle the increasingly powerful Mutant Response Division, but also to prevent a catastrophic future that Xavier has warned Wolverine must never come to pass.",
-    "poster": "https://image.tmdb.org/t/p/w500/oSeJ2nESB77iC6SLo4qcqoadjdt.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/uPbpYFYXlUdTDEmfoubKNfdEZZx.jpg",
-    "rating": 7.5,
-    "release_date": "2009-01-23",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "g6YZF1usS4M",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlR8AAp4PgEZ0yLRnXrqcPxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "2080-x-men-origins-wolverine",
-    "tmdb_id": 2080,
-    "imdb_id": "",
-    "title": "X-Men Origins: Wolverine",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Comic"
-    ],
-    "overview": "After seeking to live a normal life after 200 years, Logan sets out to avenge a death by undergoing the mutant Weapon X program and becoming Wolverine.",
-    "poster": "https://image.tmdb.org/t/p/w500/yj8LbTju1p7CUJg7US2unSBk33s.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/p4GzAzjlL7lXIVGvayg7zvzGTSi.jpg",
-    "rating": 6.3,
-    "release_date": "2009-04-28",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "8TQ-gD4UCmI",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjR8AAp4PgEYtYY0QGyu1SRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "394355-hulk-vs",
-    "tmdb_id": 394355,
-    "imdb_id": "",
-    "title": "Hulk Vs.",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies",
-      "Comic"
-    ],
-    "genres": [
-      "Animated Movies",
-      "Comic"
-    ],
-    "overview": "Two stories featuring Marvel's anti-hero The Incredible Hulk and his encounters with the X-Man Wolverine and the god known as Thor.",
-    "poster": "https://image.tmdb.org/t/p/w500/cjUNXJIXBHmKjpI0oH5MmEKgOTt.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/tl5nJ9zH3YyGMZjeRrgZMu6wHOt.jpg",
-    "rating": 6.6,
-    "release_date": "2009-01-13",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjh8AAp4PgEZXk6DCZwZ_7BYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "7330-iron-man-armored-adventures",
-    "tmdb_id": 7330,
-    "imdb_id": "",
-    "title": "Iron Man: Armored Adventures",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Series",
-      "Comic"
-    ],
-    "genres": [
-      "Animated Movies",
-      "Comic"
-    ],
-    "overview": "As Iron Man, teenage child prodigy Tony Stark uses his technological inventions to fight various similarly technologically advanced threats. His friends, James \"Rhodey\" Rhodes and Pepper Potts, help him on his courageous and dangerous adventures.",
-    "poster": "https://image.tmdb.org/t/p/w500/kIJGgBwh37V2nfgnJFaN7zDIjdv.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/geoJ7FkV4NXAhZ7pYNCOWGYEBLV.jpg",
-    "rating": 7.4,
-    "release_date": "2009-04-24",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "0FQaXyAymTg",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADih8AAp4PgEarqDjgdqVN5BYE",
-        "quality": "720p"
-      },
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADix8AAp4PgEb8FrRLeJlwhRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "21781-the-super-hero-squad-show",
-    "tmdb_id": 21781,
-    "imdb_id": "",
-    "title": "The Super Hero Squad Show",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Series"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "The Super Hero Squad Show is an American cartoon series by Marvel Animation. It is based on the Marvel Super Hero Squad action figure line from Hasbro, which portray the Avengers, the X-Men, and various other characters of the Marvel Universe in a cartoonish super-deformed-style. It is also a self-aware parody of the Marvel characters, with influences taken from on the comedic Mini Marvels series of parody comic books, in that the heroes tend to find themselves in comedic situations, and have cartoonish bents in comparison to their usually serious personalities, and is an overall comedic take on the Avengers. The series' animation was produced by Film Roman and Marvel Animation.",
-    "poster": "https://image.tmdb.org/t/p/w500/3CdaaPZdU1Xv2c6hDaSVWhsXtuO.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/tSbZytA2RSLVXgEjTNTb27ZkvjZ.jpg",
-    "rating": 7.5,
-    "release_date": "2009-09-14",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhh8AAp4PgEbi-7Sr5I63fRYE",
-        "quality": "720p"
-      },
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhx8AAp4PgEa66HAKOawufhYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1084244-toy-story-5",
-    "tmdb_id": 1084244,
-    "imdb_id": "",
-    "title": "Toy Story 5",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
-    ],
-    "genres": [
-      "Animated Movies"
-    ],
-    "overview": "When Bonnie receives a Lilypad tablet as a gift and becomes obsessed, Buzz, Woody, Jessie and the rest of the gang's jobs become exponentially harder when they have to go head to head with the all-new threat to playtime.",
-    "poster": "https://image.tmdb.org/t/p/w500/ovGJ69DW9T0nFCw8uDegqCzu9rh.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/qjTqY5coNiz6sVtPng40IzltsoN.jpg",
-    "rating": 7.4,
-    "release_date": "2026-06-17",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "QftAW9TTmuQ",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADeB8AAp4PgEZZ9seff2eH-BYE",
-        "quality": "720p"
-      },
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADeh8AAp4PgEaYwzLrfQzLZxYE",
-        "quality": "1080p"
-      }
-    ]
-  },
-  {
-    "csv_id": "152471-ghost-doctor",
-    "tmdb_id": 152471,
-    "imdb_id": "",
-    "title": "Ghost Doctor",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "A skilled surgeon becomes a coma patient and possesses a first-year resident who is the polar opposite of him in expertise and personality.",
-    "poster": "https://image.tmdb.org/t/p/w500/1TWwuZR398ytSZX0RdsOyECu9sC.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/suTqAJACZ1XwUNhOBnKtytKLjSR.jpg",
-    "rating": 7.9,
-    "release_date": "2022-01-03",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "8oGZYYL7AUw",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbx8AAp4PgEb1r2qA0Qbl8RYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "221851-marry-my-husband",
-    "tmdb_id": 221851,
-    "imdb_id": "",
-    "title": "Marry My Husband",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "Kang Ji-won, a terminally ill cancer patient, is killed by her husband and best friend after she witnesses them having an affair. She wakes up 10 years before the incident and decides to seek revenge with the help of Yu Ji-hyuk, a director at the company where she works. Now, she must reclaim her fate and eliminate the trash from her life.",
-    "poster": "https://image.tmdb.org/t/p/w500/899KcBqooj8nEyPcAEU3h7AdfUo.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/bd1uYBQnd9HRex77LTiMughdKKK.jpg",
-    "rating": 8.5,
-    "release_date": "2024-01-01",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "4URidE59IAI",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADLR8AAp4PgEaDe0U4bdUrzBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "226107-love-song-for-illusion",
-    "tmdb_id": 226107,
-    "imdb_id": "",
-    "title": "Love Song for Illusion",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "The heart-fluttering love story and the fierce obsession between a man with two conflicting personalities and a woman who loves him.",
-    "poster": "https://image.tmdb.org/t/p/w500/AoBRquuCzphHHWBlJFamxFl1wTY.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/SnI8rxqP9jNenCxNusrMde31ro.jpg",
-    "rating": 7.9,
-    "release_date": "2024-01-02",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "3vkGu5R1IKo",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFh8AAp4PgEYsjoVHQKXoXBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "220074-flex-x-cop",
-    "tmdb_id": 220074,
-    "imdb_id": "",
-    "title": "Flex x Cop",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "A chaebol cop joins forces with a gritty detective to take down criminals with a touch of wealth and a whole lot of wit.",
-    "poster": "https://image.tmdb.org/t/p/w500/wuqKpbKx37T4II93NiQWHnbCu3L.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/nOGPxfYqd0f3oeFGGinpDOP68MQ.jpg",
-    "rating": 8,
-    "release_date": "2024-01-26",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "fsRLcPlGsxE",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAEHwACng-ARkEK6Def6bhpFgQ",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "233205-captivating-the-king",
-    "tmdb_id": 233205,
-    "imdb_id": "",
-    "title": "Captivating the King",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "Amid a royal and political power struggle, a king entangles with an intriguing woman — whose hidden desire for revenge transforms into unintended love.",
-    "poster": "https://image.tmdb.org/t/p/w500/wNdHCRkS0Xrz6niq3tpAwuLZk7c.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/wqh98k12bgxpbE2tONUITxkWmlH.jpg",
-    "rating": 7.6,
-    "release_date": "2024-01-21",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "_1t7mqiqtkk",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyh4AAp4PgEaqhChYcs3w3BYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "215072-a-shop-for-killers",
-    "tmdb_id": 215072,
-    "imdb_id": "",
-    "title": "A Shop for Killers",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "A niece who lost her parents and grew up in the hands of an uncle who runs a shopping mall faces a new truth after her uncle's sudden death.",
-    "poster": "https://image.tmdb.org/t/p/w500/7yUY1HUyQuybbvkAAhLzQ7x1l9g.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/mWVeYmtCfA3zvSeZtW5bN2Khe01.jpg",
-    "rating": 8.3,
-    "release_date": "2024-01-17",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "69nzLpyMSHw",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnR4AAp4PgEZTXoxPjqvSQRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "202783-a-killer-paradox",
-    "tmdb_id": 202783,
-    "imdb_id": "",
-    "title": "A Killer Paradox",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "When one accidental killing leads to another, an ordinary young man finds himself stuck in an endless cat-and-mouse chase with a shrewd detective.",
-    "poster": "https://image.tmdb.org/t/p/w500/i2yYZGT2If8XcCZS9ASF1g13MiT.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/viQZtznvR20oTTSbXp6MPAWkGB2.jpg",
-    "rating": 7.4,
-    "release_date": "2024-02-09",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "X2rXQ0rEfPI",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlh4AAp4PgEZPj5hDZfzdYRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "206686-chicken-nugget",
-    "tmdb_id": 206686,
-    "imdb_id": "",
-    "title": "Chicken Nugget",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "A woman steps into an odd machine and becomes... a chicken nugget?! Now, it's up to her father and admirer to embark on a zany quest to bring her back.",
-    "poster": "https://image.tmdb.org/t/p/w500/9hefpkltcFLcZSKXr65l0mPMRKn.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/7pg8P17yImSmR7z5QO3nF0d7RB1.jpg",
-    "rating": 6.3,
-    "release_date": "2024-03-15",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "9OWhVGM6xmA",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbh4AAp4PgEalQVSNoqhX-hYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "117376-vincenzo",
-    "tmdb_id": 117376,
-    "imdb_id": "",
-    "title": "Vincenzo",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "During a visit to his motherland, a Korean-Italian mafia lawyer gives an unrivaled conglomerate a taste of its own medicinewith a side of justice.",
-    "poster": "https://image.tmdb.org/t/p/w500/qbkSS1cTjT4DzIwD44bdhTuYgdT.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/sf7NCqyVUNoyjYuwW5oJke1T1lH.jpg",
-    "rating": 8.5,
-    "release_date": "2021-02-20",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "S12-4mXCNj4",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADVR4AAp4PgEbTPWOnLvoudBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "241506-it-s-okay-to-not-be-okay",
-    "tmdb_id": 241506,
-    "imdb_id": "",
-    "title": "It's Okay to Not Be Okay",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series"
-    ],
-    "genres": [],
-    "overview": "An author with severe antisocial tendencies learns to confront her deep emotional wounds when she meets a stranger who challenges her cold facade.",
-    "poster": "https://image.tmdb.org/t/p/w500/7rQ7E7u0y8VJgnUeDT6oF1J32Gu.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/dNAp924hXUYxaGxGJRLlB0dvu8e.jpg",
-    "rating": 9.7,
-    "release_date": "2025-07-21",
-    "language": "tl",
-    "cast": [],
-    "director": "",
-    "trailer": "KwP3VzowPhE",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD5RAAAmjCgUbXupfjv2nlTBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "108261-mr-queen",
-    "tmdb_id": 108261,
-    "imdb_id": "",
-    "title": "Mr. Queen",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "A modern chef suddenly becomes trapped inside the body of a queen from the Joseon era, which causes chaos for everyone involved.",
-    "poster": "https://image.tmdb.org/t/p/w500/ozuyMnOO5pekDklyPpUL1Htkuzy.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/zs803kZR1rT5niAakQokxtp3Uqv.jpg",
-    "rating": 8.5,
-    "release_date": "2020-12-12",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "dImREPX_Pbk",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqhsAAmjCeUbtugQEwBibyxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "74682-i-am-not-a-robot",
-    "tmdb_id": 74682,
-    "imdb_id": "",
-    "title": "I Am Not a Robot",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "Kim Min Gyu has wealth and success, but lives an isolated life due to his allergy of people. He then meets and falls in love with a girl who is pretending to be a robot for her ex-boyfriend, a genius robots professor.",
-    "poster": "https://image.tmdb.org/t/p/w500/2l1KTliFU7SjNT1OpTojbvjEnZe.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/lBlvg7qJ9aiuUdt5JXqAAb486o1.jpg",
-    "rating": 8.3,
-    "release_date": "2017-12-06",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "gGumnmOarco",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnhsAAmjCeUZ7IeG8i1RcMBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "210733-hidden-love",
-    "tmdb_id": 210733,
-    "imdb_id": "",
-    "title": "Hidden Love",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series"
-    ],
-    "genres": [],
-    "overview": "Since high school, Sang Zhi has had a crush on Duan Jiaxu. When fate brings them together again, they find a chance to embark on a sweet relationship.",
-    "poster": "https://image.tmdb.org/t/p/w500/riGzESa9N9toumP9OhMmg0QvFPD.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/wQlJJJ50gKphCci0SmoetUXmJN4.jpg",
-    "rating": 8.5,
-    "release_date": "2023-06-20",
-    "language": "zh",
-    "cast": [],
-    "director": "",
-    "trailer": "zAjrImdpchA",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADgxsAAmjCeUbfX2fJ2M1sLxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "210781-my-lovely-liar",
-    "tmdb_id": 210781,
-    "imdb_id": "",
-    "title": "My Lovely Liar",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "A woman who can't trust people because of her ability to hear lies and a mystic composer who hid his indescribable identity, become involved in each other's lives to uncover the truth.",
-    "poster": "https://image.tmdb.org/t/p/w500/msYlN0cIpuTKlWYnEStdoBuHmvX.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/pxjR0Wds0gkwY8pYDYExf6DuLoL.jpg",
-    "rating": 7.6,
-    "release_date": "2023-07-31",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "XWcT4q10EgU",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADTRsAAmjCeUZAvK2I3FCk1xYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "209502-a-good-day-to-be-a-dog",
-    "tmdb_id": 209502,
-    "imdb_id": "",
-    "title": "A Good Day to be a Dog",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "Hae-na who is bound to inherit her family curse which is turning into a dog after getting her first kiss. The only way to break the curse is to get a second kiss. The problem is the guy who gave Hae-na her first kiss is afraid of dogs.",
-    "poster": "https://image.tmdb.org/t/p/w500/5w68XVoHs3hetvBMhOvguLbvikf.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/zfGAkCE73Hj45hrAVfYWhkbv4f7.jpg",
-    "rating": 8.3,
-    "release_date": "2023-10-11",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "a-yTO3TWJ88",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADOhsAAmjCeUblZw8oO0WInxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "206689-tell-me-that-you-love-me",
-    "tmdb_id": 206689,
-    "imdb_id": "",
-    "title": "Tell Me That You Love Me",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "Since he lost his hearing, Cha Jin-woo has gotten used to his solitary life. One day, an aspiring actress Jung Mo-eun, enters his quiet daily routine.",
-    "poster": "https://image.tmdb.org/t/p/w500/u8GTmtL8VkulRyq4z6xuQ9x2klw.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/tTOxnft2N2JwdodCUFNfoD0PrjS.jpg",
-    "rating": 7.9,
-    "release_date": "2023-11-27",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFxsAAmjCeUa2E-uFshkRzRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "135615-american-born-chinese",
-    "tmdb_id": 135615,
-    "imdb_id": "",
-    "title": "American Born Chinese",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series",
-      "Korean Drama"
-    ],
-    "genres": [],
-    "overview": "Average teenager Jin Wang juggles his high school social life with his immigrant home life. When he meets a new foreign student on the first day of the school year, even more worlds collide as Jin is unwittingly entangled in a battle of Chinese mythological gods.",
-    "poster": "https://image.tmdb.org/t/p/w500/cwTYt6DKuMY6RSmQ269fpYH9ELN.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/n5StTpznGP2zuagcZlQ3qUWZsrX.jpg",
-    "rating": 6.6,
-    "release_date": "2023-05-24",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "YrV3pOo3ycU",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBhsAAmjCeUZUchrfeuo-EBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "194797-doona",
-    "tmdb_id": 194797,
-    "imdb_id": "",
-    "title": "Doona!",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "A college student navigates life and school while dealing with a unique predicament — he's living with a beautiful former K-pop sensation.",
-    "poster": "https://image.tmdb.org/t/p/w500/bQhiOkU3lCu5pwCqPdNVG5GBLlj.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/1aBYcDp9CVbwU4h6mOYkkUgMPEl.jpg",
-    "rating": 7.7,
-    "release_date": "2023-10-20",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "v4rtx48siJI",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBBsAAmjCeUaVI_s3-n5HwBYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "234751-miss-lucky-go",
-    "tmdb_id": 234751,
-    "imdb_id": "",
-    "title": "Miss Lucky Go!",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series"
-    ],
-    "genres": [],
-    "overview": "Aspiring figurine designer Chen Miran enrolls in university for a fresh start but ends up in the same class as her ex, Zhong Weiqiong, who once dumped her coldly. Determined to win her back, Zhong schemes to reignite their love, unaware their past breakup was a misunderstanding. As old feelings resurface and they reconcile, a surprising rival appears, threatening to unravel their newfound happiness.",
-    "poster": "https://image.tmdb.org/t/p/w500/wS8VgxuuEEPJ8iw4PSatAdHtUrE.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/odkwwprXZki88f05mXVOUTDaNO6.jpg",
-    "rating": 8.8,
-    "release_date": "2023-09-13",
-    "language": "zh",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_hoAAmjCeUanmQABNeA3tuQWBA",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "157847-cold-blooded-intern",
-    "tmdb_id": 157847,
-    "imdb_id": "",
-    "title": "Cold Blooded Intern",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "A woman in her 40s returns to work as an intern after seven years of being disconnected from work, and starts to endure and survive in a jungle-like society again.",
-    "poster": "https://image.tmdb.org/t/p/w500/mtKT9FiapZqcJLFflisIVvqWqXo.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/rp2X05VLwntQskglPac81cXlu8c.jpg",
-    "rating": 5.5,
-    "release_date": "2023-08-11",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "QT1-AGKtIE0",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsRoAAmjCeUbLHh3VCuFKpRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "156888-mask-girl",
-    "tmdb_id": 156888,
-    "imdb_id": "",
-    "title": "Mask Girl",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Korean Drama"
-    ],
-    "genres": [
-      "Korean Drama"
-    ],
-    "overview": "An office worker who is insecure about her looks becomes a masked internet personality by night — until a chain of ill-fated events overtakes her life.",
-    "poster": "https://image.tmdb.org/t/p/w500/3O8uTUpt76ShtEtNNrOJpcwQROH.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/sfagVOgXVONyDAOI4BjnofLcYpv.jpg",
-    "rating": 7.4,
-    "release_date": "2023-08-18",
-    "language": "ko",
-    "cast": [],
-    "director": "",
-    "trailer": "Gebl7um3jUg",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmBoAAmjCeUbrZBrLP76iLhYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
     "title": "【OSHI NO KO】",
     "csv_id": "203737",
     "type": "Series",
@@ -2043,6 +262,66 @@
     ]
   },
   {
+    "csv_id": "209502-a-good-day-to-be-a-dog",
+    "tmdb_id": 209502,
+    "imdb_id": "",
+    "title": "A Good Day to be a Dog",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Hae-na who is bound to inherit her family curse which is turning into a dog after getting her first kiss. The only way to break the curse is to get a second kiss. The problem is the guy who gave Hae-na her first kiss is afraid of dogs.",
+    "poster": "https://image.tmdb.org/t/p/w500/5w68XVoHs3hetvBMhOvguLbvikf.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zfGAkCE73Hj45hrAVfYWhkbv4f7.jpg",
+    "rating": 8.3,
+    "release_date": "2023-10-11",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "a-yTO3TWJ88",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADOhsAAmjCeUblZw8oO0WInxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "202783-a-killer-paradox",
+    "tmdb_id": 202783,
+    "imdb_id": "",
+    "title": "A Killer Paradox",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "When one accidental killing leads to another, an ordinary young man finds himself stuck in an endless cat-and-mouse chase with a shrewd detective.",
+    "poster": "https://image.tmdb.org/t/p/w500/i2yYZGT2If8XcCZS9ASF1g13MiT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/viQZtznvR20oTTSbXp6MPAWkGB2.jpg",
+    "rating": 7.4,
+    "release_date": "2024-02-09",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "X2rXQ0rEfPI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlh4AAp4PgEZPj5hDZfzdYRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "A Lot Like Love",
     "csv_id": "1138052-a-lot-like-love",
     "type": "Movie",
@@ -2219,6 +498,36 @@
     "director": "Jonathan Judge",
     "trailer": "cDmGHalUdZU",
     "runtime": "72 min"
+  },
+  {
+    "csv_id": "215072-a-shop-for-killers",
+    "tmdb_id": 215072,
+    "imdb_id": "",
+    "title": "A Shop for Killers",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A niece who lost her parents and grew up in the hands of an uncle who runs a shopping mall faces a new truth after her uncle's sudden death.",
+    "poster": "https://image.tmdb.org/t/p/w500/7yUY1HUyQuybbvkAAhLzQ7x1l9g.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mWVeYmtCfA3zvSeZtW5bN2Khe01.jpg",
+    "rating": 8.3,
+    "release_date": "2024-01-17",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "69nzLpyMSHw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnR4AAp4PgEZTXoxPjqvSQRYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "title": "A Simple Lie",
@@ -2823,6 +1132,35 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_RgAAmjCeUZI9AbAR6nztBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "135615-american-born-chinese",
+    "tmdb_id": 135615,
+    "imdb_id": "",
+    "title": "American Born Chinese",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Korean Drama"
+    ],
+    "genres": [],
+    "overview": "Average teenager Jin Wang juggles his high school social life with his immigrant home life. When he meets a new foreign student on the first day of the school year, even more worlds collide as Jin is unwittingly entangled in a battle of Chinese mythological gods.",
+    "poster": "https://image.tmdb.org/t/p/w500/cwTYt6DKuMY6RSmQ269fpYH9ELN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/n5StTpznGP2zuagcZlQ3qUWZsrX.jpg",
+    "rating": 6.6,
+    "release_date": "2023-05-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "YrV3pOo3ycU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBhsAAmjCeUZUchrfeuo-EBYE",
         "quality": "720p"
       }
     ]
@@ -4143,6 +2481,34 @@
     ]
   },
   {
+    "csv_id": "1321008-black-box-flight-298",
+    "tmdb_id": 1321008,
+    "imdb_id": "",
+    "title": "Black Box (Flight 298)",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A routine domestic flight turns into the flight from hell through a series of inexplicable phenomena and raw terror. Surreal encounters blur the boundaries between reality and nightmare. Passengers fight against all the odds in an attempt to survive while combating bizarre technological malfunctions, accelerating supernatural events and alien influences.",
+    "poster": "https://image.tmdb.org/t/p/w500/O7vJPEWsnLrKqPYHIHKG8zlEK1.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ce0RjYfcgzQeiT3PjaARWv5PVQO.jpg",
+    "rating": 6.2,
+    "release_date": "2026-06-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "y-nf8hUFd98",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhw0AAp4PiEbnjLchco_klRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "Black Panther",
     "csv_id": "284054-black-panther",
     "type": "Movie",
@@ -4217,6 +2583,90 @@
     "overview": "Natasha Romanoff, also known as Black Widow, confronts the darker parts of her ledger when a dangerous conspiracy with ties to her past arises. Pursued by a force that will stop at nothing to bring her down, Natasha must deal with her history as a spy and the broken relationships left in her wake long before she became an Avenger.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/6azpBJGcLx9SKif8h9VMnflBfa.jpg",
     "language": "en"
+  },
+  {
+    "csv_id": "36586-blade-ii",
+    "tmdb_id": 36586,
+    "imdb_id": "",
+    "title": "Blade II",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Blade forms an uneasy alliance with the vampire council in order to combat the Reapers, who are feeding on vampires.",
+    "poster": "https://image.tmdb.org/t/p/w500/yDHwo3eWcMiy5LnnEnlGV9iLu9k.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/86b0NGY1i0bt3ckhkcHxiCSMxk1.jpg",
+    "rating": 6.6,
+    "release_date": "2002-03-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "fcCQ7xk8zzM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1R8AAp4PgEa3CHzsob9lGBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "4619-blade-the-series",
+    "tmdb_id": 4619,
+    "imdb_id": "",
+    "title": "Blade: The Series",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Blade is a half-man, half-vampire who employs his extraordinary powers in a crusade to save mankind from the demonic creatures who walk the night. Set in Detroit, Blade investigates the vampire house of Chthon. Along the way he forms an uneasy alliance with Krista Starr, a former military veteran who becomes entrenched in the world of vampires while investigating the murder of her twin brother.",
+    "poster": "https://image.tmdb.org/t/p/w500/xthJ8MoYaJROntPHaI5mUrXd4Qs.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/aZkUbLPcPoLKRxu4T7i2RnL3y3n.jpg",
+    "rating": 6.5,
+    "release_date": "2006-06-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "wjgHNDO3kLY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADtx8AAp4PgEZdX4Euyo056hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "36648-blade-trinity",
+    "tmdb_id": 36648,
+    "imdb_id": "",
+    "title": "Blade: Trinity",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "For years, Blade has fought against the vampires in the cover of the night. But now, after falling into the crosshairs of the FBI, he is forced out into the daylight, where he is driven to join forces with a clan of human vampire hunters he never knew existed—The Nightstalkers. Together with Abigail and Hannibal, two deftly trained Nightstalkers, Blade follows a trail of blood to the ancient creature that is also hunting him—the original vampire, Dracula.",
+    "poster": "https://image.tmdb.org/t/p/w500/6f7iXvPOnf83MaLB1JmPzUor1rr.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/63eAFgJtN6ZTyFFzlAOoZLhlYqc.jpg",
+    "rating": 5.9,
+    "release_date": "2004-12-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "qcHEDGs7eAY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADxh8AAp4PgEaBaLwI8Htu_BYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "csv_id": "30984-bleach",
@@ -4554,6 +3004,34 @@
     "director": "",
     "trailer": "",
     "runtime": ""
+  },
+  {
+    "csv_id": "1595852-boulevard",
+    "tmdb_id": 1595852,
+    "imdb_id": "",
+    "title": "Boulevard",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Hasley, a girl with a list of unfulfilled dreams, and Luke, a complex and vulnerable boy marked by a tragic past, find refuge on the boulevard, where they discover whether love can conquer all.",
+    "poster": "https://image.tmdb.org/t/p/w500/fvk8wxyQXLlrBIMuglDxdMYLgBW.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/98uiDns59GUw26SQSCFmuSHTki3.jpg",
+    "rating": 4.5,
+    "release_date": "2026-04-10",
+    "language": "es",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD7hIAAp4PiEbod7POfTBFDxYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "title": "Boycott",
@@ -5088,6 +3566,36 @@
     "language": "en"
   },
   {
+    "csv_id": "233205-captivating-the-king",
+    "tmdb_id": 233205,
+    "imdb_id": "",
+    "title": "Captivating the King",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Amid a royal and political power struggle, a king entangles with an intriguing woman — whose hidden desire for revenge transforms into unintended love.",
+    "poster": "https://image.tmdb.org/t/p/w500/wNdHCRkS0Xrz6niq3tpAwuLZk7c.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wqh98k12bgxpbE2tONUITxkWmlH.jpg",
+    "rating": 7.6,
+    "release_date": "2024-01-21",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "_1t7mqiqtkk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyh4AAp4PgEaqhChYcs3w3BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1329471-carolina-caroline",
     "tmdb_id": 1329471,
     "imdb_id": "",
@@ -5434,6 +3942,36 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADHR8AAh-4UEboIAdwgjYerBYE"
+    ]
+  },
+  {
+    "csv_id": "206686-chicken-nugget",
+    "tmdb_id": 206686,
+    "imdb_id": "",
+    "title": "Chicken Nugget",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A woman steps into an odd machine and becomes... a chicken nugget?! Now, it's up to her father and admirer to embark on a zany quest to bring her back.",
+    "poster": "https://image.tmdb.org/t/p/w500/9hefpkltcFLcZSKXr65l0mPMRKn.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7pg8P17yImSmR7z5QO3nF0d7RB1.jpg",
+    "rating": 6.3,
+    "release_date": "2024-03-15",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "9OWhVGM6xmA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbh4AAp4PgEalQVSNoqhX-hYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -5905,6 +4443,36 @@
     "backdrop": "https://image.tmdb.org/t/p/w1280/5hS2OIuZSKGkR8R5l3bY5zh04Ce.jpg",
     "language": "ja",
     "cast": []
+  },
+  {
+    "csv_id": "157847-cold-blooded-intern",
+    "tmdb_id": 157847,
+    "imdb_id": "",
+    "title": "Cold Blooded Intern",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A woman in her 40s returns to work as an intern after seven years of being disconnected from work, and starts to endure and survive in a jungle-like society again.",
+    "poster": "https://image.tmdb.org/t/p/w500/mtKT9FiapZqcJLFflisIVvqWqXo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rp2X05VLwntQskglPac81cXlu8c.jpg",
+    "rating": 5.5,
+    "release_date": "2023-08-11",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "QT1-AGKtIE0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsRoAAmjCeUbLHh3VCuFKpRYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "csv_id": "696393-cold-storage",
@@ -7397,6 +5965,37 @@
     ]
   },
   {
+    "csv_id": "14830-doctor-strange",
+    "tmdb_id": 14830,
+    "imdb_id": "",
+    "title": "Doctor Strange",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Dr. Stephen Strange embarks on a wondrous journey to the heights of a Tibetan mountain, where he seeks healing at the feet of the mysterious Ancient One.",
+    "poster": "https://image.tmdb.org/t/p/w500/7ygcpWXsWmEc83j7zE8P0lvC0Q.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/r72uEx8x2aFNygkr1cJeDIZJsbG.jpg",
+    "rating": 6.8,
+    "release_date": "2007-08-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "L4kCgHvsACo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADoB8AAp4PgEa8y51CGEsVhBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "Doctor Strange",
     "csv_id": "284052-doctor-strange",
     "type": "Movie",
@@ -7496,6 +6095,36 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD4xgAAmjCeUaTpodFP0hXqBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "194797-doona",
+    "tmdb_id": 194797,
+    "imdb_id": "",
+    "title": "Doona!",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A college student navigates life and school while dealing with a unique predicament — he's living with a beautiful former K-pop sensation.",
+    "poster": "https://image.tmdb.org/t/p/w500/bQhiOkU3lCu5pwCqPdNVG5GBLlj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/1aBYcDp9CVbwU4h6mOYkkUgMPEl.jpg",
+    "rating": 7.7,
+    "release_date": "2023-10-20",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "v4rtx48siJI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBBsAAmjCeUaVI_s3-n5HwBYE",
         "quality": "720p"
       }
     ]
@@ -7767,6 +6396,34 @@
     "language": "en",
     "cast": [],
     "trailer": "be19c4aRU-s"
+  },
+  {
+    "csv_id": "9947-elektra",
+    "tmdb_id": 9947,
+    "imdb_id": "",
+    "title": "Elektra",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Elektra the warrior survives a near-death experience, becomes an assassin-for-hire, and tries to protect her two latest targets, a single father and his young daughter, from a group of supernatural assassins.",
+    "poster": "https://image.tmdb.org/t/p/w500/gC6s6NKHneSrOKyQZnUMb443RKU.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2JMOTj6DFjNcg9KToctmfTV55EW.jpg",
+    "rating": 5.1,
+    "release_date": "2005-01-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "etfIjKxKzqw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyB8AAp4PgEaQ_m0iBtznCRYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "csv_id": "14442-ella-enchanted",
@@ -8280,6 +6937,71 @@
     ]
   },
   {
+    "csv_id": "2901-fantastic-four",
+    "tmdb_id": 2901,
+    "imdb_id": "",
+    "title": "Fantastic Four",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Classic Movies"
+    ],
+    "overview": "When Reed Richards, Sue and Johnny Storm and pilot Ben Grimm take a premature space flight on a new shuttle, they find themselves massively bombarded with cosmic radiation. Barely managing to re-enter and land safely, the quartet find themselves forever transformed with superpowers. Deciding to use these new powers to help people, they form the Fantastic Four, a superhero team dedicated to the protection of Earth from menaces like the Latverian King Dr. Doom and Galactus, the planet consumer.",
+    "poster": "https://image.tmdb.org/t/p/w500/jPVGruDYZtImosRkNv7eZhqxT1p.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mYKYwihv940xGyDt2XckkBryNnP.jpg",
+    "rating": 6.6,
+    "release_date": "1994-09-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADzB8AAp4PgEbBrWHZo6-Q_BYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADzR8AAp4PgEajufLAStxktxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "9738-fantastic-four",
+    "tmdb_id": 9738,
+    "imdb_id": "",
+    "title": "Fantastic Four",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "During a space voyage, four scientists are altered by cosmic rays: Reed Richards gains the ability to stretch his body; Sue Storm can become invisible; Johnny Storm controls fire; and Ben Grimm is turned into a super-strong … thing. Together, these \"Fantastic Four\" must now thwart the evil plans of Dr. Doom and save the world from certain destruction.",
+    "poster": "https://image.tmdb.org/t/p/w500/4YMcYEFS8sFuW3soP1HVmgR3cSm.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2cDXXLirYsoP6rk9B8yrvNHbbFy.jpg",
+    "rating": 5.8,
+    "release_date": "2005-06-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "QIx2jkXYu34",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyR8AAp4PgEZA3PXlAAHKwAYWBA",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "166424-fantastic-four",
     "tmdb_id": 166424,
     "imdb_id": "",
@@ -8328,6 +7050,37 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjxQAAmjCeUYtCqxNC7LmPxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "132-fantastic-four-world-s-greatest-heroes",
+    "tmdb_id": 132,
+    "imdb_id": "",
+    "title": "Fantastic Four: World's Greatest Heroes",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Mr. Fantastic, the Invisible Woman, the Human Torch, and the Thing battle some of their greatest foes, including Doctor Doom, Ronan the Accuser, the Multiple Man, and Mole Man.",
+    "poster": "https://image.tmdb.org/t/p/w500/zCtCW0JlbMpzfQDAX1bO1o1KLi.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/q0bLjLCBZGhnMcRprx2gWRGdlrp.jpg",
+    "rating": 7.5,
+    "release_date": "2006-09-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "220329277",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsB8AAp4PgEbnbd1-aQ4dChYE",
         "quality": "720p"
       }
     ]
@@ -8724,6 +7477,36 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADHgkAAh-4SEZWwjzXqruKehYE"
+    ]
+  },
+  {
+    "csv_id": "220074-flex-x-cop",
+    "tmdb_id": 220074,
+    "imdb_id": "",
+    "title": "Flex x Cop",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A chaebol cop joins forces with a gritty detective to take down criminals with a touch of wealth and a whole lot of wit.",
+    "poster": "https://image.tmdb.org/t/p/w500/wuqKpbKx37T4II93NiQWHnbCu3L.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nOGPxfYqd0f3oeFGGinpDOP68MQ.jpg",
+    "rating": 8,
+    "release_date": "2024-01-26",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "fsRLcPlGsxE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAEHwACng-ARkEK6Def6bhpFgQ",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -9160,6 +7943,64 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADBxUAAp6faUZeI2eP_uAenhYE"
+    ]
+  },
+  {
+    "csv_id": "152471-ghost-doctor",
+    "tmdb_id": 152471,
+    "imdb_id": "",
+    "title": "Ghost Doctor",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A skilled surgeon becomes a coma patient and possesses a first-year resident who is the polar opposite of him in expertise and personality.",
+    "poster": "https://image.tmdb.org/t/p/w500/1TWwuZR398ytSZX0RdsOyECu9sC.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/suTqAJACZ1XwUNhOBnKtytKLjSR.jpg",
+    "rating": 7.9,
+    "release_date": "2022-01-03",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "8oGZYYL7AUw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbx8AAp4PgEb1r2qA0Qbl8RYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1250-ghost-rider",
+    "tmdb_id": 1250,
+    "imdb_id": "",
+    "title": "Ghost Rider",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "In order to save his dying father, young stunt cyclist Johnny Blaze sells his soul to Mephistopheles and sadly parts from the pure-hearted Roxanne Simpson, the love of his life. Years later, Johnny's path crosses again with Roxanne, now a go-getting reporter, and also with Mephistopheles, who offers to release Johnny's soul if Johnny becomes the fabled, fiery 'Ghost Rider'.",
+    "poster": "https://image.tmdb.org/t/p/w500/d9Oan9XJJ6gRJa64Ifsgp1sXbC4.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zbV32WKHFuEYLXLTpr0rmVjQn11.jpg",
+    "rating": 5.6,
+    "release_date": "2007-01-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "nu6R7ypaz5g",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqx8AAp4PgEYS2vH3Ne-CRhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -10012,6 +8853,34 @@
     ]
   },
   {
+    "csv_id": "210733-hidden-love",
+    "tmdb_id": 210733,
+    "imdb_id": "",
+    "title": "Hidden Love",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Since high school, Sang Zhi has had a crush on Duan Jiaxu. When fate brings them together again, they find a chance to embark on a sweet relationship.",
+    "poster": "https://image.tmdb.org/t/p/w500/riGzESa9N9toumP9OhMmg0QvFPD.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wQlJJJ50gKphCci0SmoetUXmJN4.jpg",
+    "rating": 8.5,
+    "release_date": "2023-06-20",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "zAjrImdpchA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADgxsAAmjCeUbfX2fJ2M1sLxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "High (School) On Sex",
     "csv_id": "203906-high-school-on-sex",
     "type": "Series",
@@ -10467,6 +9336,70 @@
     ]
   },
   {
+    "csv_id": "1927-hulk",
+    "tmdb_id": 1927,
+    "imdb_id": "",
+    "title": "Hulk",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "Bruce Banner, a genetics researcher with a tragic past, suffers massive radiation exposure in his laboratory that causes him to transform into a raging green monster when he gets angry.",
+    "poster": "https://image.tmdb.org/t/p/w500/UllIft2jLSBaay3zQyMV4GNdfy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/8vQBXqDbb30qNpBcNYwTesSg75.jpg",
+    "rating": 5.6,
+    "release_date": "2003-06-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "2ErnLuJKQA4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD4x8AAp4PgEYWAAHt8PuFeSwWBA",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "394355-hulk-vs",
+    "tmdb_id": 394355,
+    "imdb_id": "",
+    "title": "Hulk Vs.",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "Two stories featuring Marvel's anti-hero The Incredible Hulk and his encounters with the X-Man Wolverine and the god known as Thor.",
+    "poster": "https://image.tmdb.org/t/p/w500/cjUNXJIXBHmKjpI0oH5MmEKgOTt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tl5nJ9zH3YyGMZjeRrgZMu6wHOt.jpg",
+    "rating": 6.6,
+    "release_date": "2009-01-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjh8AAp4PgEZXk6DCZwZ_7BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1382832-hungry",
     "tmdb_id": 1382832,
     "imdb_id": "",
@@ -10586,6 +9519,36 @@
     "backdrop": "https://image.tmdb.org/t/p/w1280/bAnHzJ6AMhOhnV3C0kTxkpCqpgM.jpg",
     "language": "en",
     "cast": []
+  },
+  {
+    "csv_id": "74682-i-am-not-a-robot",
+    "tmdb_id": 74682,
+    "imdb_id": "",
+    "title": "I Am Not a Robot",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Kim Min Gyu has wealth and success, but lives an isolated life due to his allergy of people. He then meets and falls in love with a girl who is pretending to be a robot for her ex-boyfriend, a genius robots professor.",
+    "poster": "https://image.tmdb.org/t/p/w500/2l1KTliFU7SjNT1OpTojbvjEnZe.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lBlvg7qJ9aiuUdt5JXqAAb486o1.jpg",
+    "rating": 8.3,
+    "release_date": "2017-12-06",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "gGumnmOarco",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnhsAAmjCeUZ7IeG8i1RcMBYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "csv_id": "26367-i-can-do-bad-all-by-myself",
@@ -10931,6 +9894,37 @@
     "runtime": ""
   },
   {
+    "csv_id": "1726-iron-man",
+    "tmdb_id": 1726,
+    "imdb_id": "",
+    "title": "Iron Man",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil.",
+    "poster": "https://image.tmdb.org/t/p/w500/78lPtwv72eTNqFW9COBYI0dWDJa.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/cyecB7godJ6kNHGONFjUyVN9OX5.jpg",
+    "rating": 7.7,
+    "release_date": "2008-04-30",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "8ugaeA-nMTc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADoR8AAp4PgEa-u8rb24eGHhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "45418-iron-man",
     "tmdb_id": 45418,
     "imdb_id": "",
@@ -11025,6 +10019,43 @@
     ]
   },
   {
+    "csv_id": "7330-iron-man-armored-adventures",
+    "tmdb_id": 7330,
+    "imdb_id": "",
+    "title": "Iron Man: Armored Adventures",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "As Iron Man, teenage child prodigy Tony Stark uses his technological inventions to fight various similarly technologically advanced threats. His friends, James \"Rhodey\" Rhodes and Pepper Potts, help him on his courageous and dangerous adventures.",
+    "poster": "https://image.tmdb.org/t/p/w500/kIJGgBwh37V2nfgnJFaN7zDIjdv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/geoJ7FkV4NXAhZ7pYNCOWGYEBLV.jpg",
+    "rating": 7.4,
+    "release_date": "2009-04-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "0FQaXyAymTg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADih8AAp4PgEarqDjgdqVN5BYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADix8AAp4PgEb8FrRLeJlwhRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "169934-iron-man-rise-of-technovore",
     "tmdb_id": 169934,
     "imdb_id": "",
@@ -11078,6 +10109,34 @@
     "backdrop": "https://image.tmdb.org/t/p/w1280/kiOEVg5BkzLE0pWoPKecXd7wZ2Q.jpg",
     "language": "en",
     "cast": []
+  },
+  {
+    "csv_id": "241506-it-s-okay-to-not-be-okay",
+    "tmdb_id": 241506,
+    "imdb_id": "",
+    "title": "It's Okay to Not Be Okay",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "An author with severe antisocial tendencies learns to confront her deep emotional wounds when she meets a stranger who challenges her cold facade.",
+    "poster": "https://image.tmdb.org/t/p/w500/7rQ7E7u0y8VJgnUeDT6oF1J32Gu.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dNAp924hXUYxaGxGJRLlB0dvu8e.jpg",
+    "rating": 9.7,
+    "release_date": "2025-07-21",
+    "language": "tl",
+    "cast": [],
+    "director": "",
+    "trailer": "KwP3VzowPhE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD5RAAAmjCgUbXupfjv2nlTBYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "csv_id": "253046-jailbait",
@@ -11923,6 +10982,36 @@
     "trailer": "nW948Va-l10"
   },
   {
+    "csv_id": "None",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Love & New Notes 2026",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "No synopsis available.",
+    "poster": "https://m.media-amazon.com/images/M/MV5BZjBmOGIyMDYtMzM4MS00ZTg3LWFhMjgtYTI3ZGFmYzA5YWZlXkEyXkFqcGc@._V1_.jpg",
+    "backdrop": "https://m.media-amazon.com/images/M/MV5BZjBmOGIyMDYtMzM4MS00ZTg3LWFhMjgtYTI3ZGFmYzA5YWZlXkEyXkFqcGc@._V1_.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD8xIAAp4PiEZVnce5UMNxFRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1223826-love-and-life",
     "tmdb_id": 1223826,
     "imdb_id": "",
@@ -12058,6 +11147,36 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADtCAAAh-4UEbz4UqIzJKCIhYE"
+    ]
+  },
+  {
+    "csv_id": "226107-love-song-for-illusion",
+    "tmdb_id": 226107,
+    "imdb_id": "",
+    "title": "Love Song for Illusion",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "The heart-fluttering love story and the fierce obsession between a man with two conflicting personalities and a woman who loves him.",
+    "poster": "https://image.tmdb.org/t/p/w500/AoBRquuCzphHHWBlJFamxFl1wTY.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/SnI8rxqP9jNenCxNusrMde31ro.jpg",
+    "rating": 7.9,
+    "release_date": "2024-01-02",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "3vkGu5R1IKo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFh8AAp4PgEYsjoVHQKXoXBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -12502,6 +11621,64 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADgx8AAh-4UEY4LKqDw1Sx9BYE"
+    ]
+  },
+  {
+    "csv_id": "18882-man-thing",
+    "tmdb_id": 18882,
+    "imdb_id": "",
+    "title": "Man-Thing",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Agents of an oil tycoon vanish while exploring a swamp marked for drilling. The local sheriff investigates and faces a Seminole legend come to life: Man-Thing, a shambling swamp-monster whose touch burns those who feel fear.",
+    "poster": "https://image.tmdb.org/t/p/w500/kfPPnOygXSGaBFpsCUyu7xQdkoO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qgoqb6IkNYA7NE6bgBhAnP2FEQ5.jpg",
+    "rating": 4.3,
+    "release_date": "2005-04-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "RTUL1GWbrRw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyh8AAp4PgEZU0FxTyvyvdxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "221851-marry-my-husband",
+    "tmdb_id": 221851,
+    "imdb_id": "",
+    "title": "Marry My Husband",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Kang Ji-won, a terminally ill cancer patient, is killed by her husband and best friend after she witnesses them having an affair. She wakes up 10 years before the incident and decides to seek revenge with the help of Yu Ji-hyuk, a director at the company where she works. Now, she must reclaim her fate and eliminate the trash from her life.",
+    "poster": "https://image.tmdb.org/t/p/w500/899KcBqooj8nEyPcAEU3h7AdfUo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bd1uYBQnd9HRex77LTiMughdKKK.jpg",
+    "rating": 8.5,
+    "release_date": "2024-01-01",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "4URidE59IAI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADLR8AAp4PgEaDe0U4bdUrzBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -13390,6 +12567,36 @@
     ]
   },
   {
+    "csv_id": "156888-mask-girl",
+    "tmdb_id": 156888,
+    "imdb_id": "",
+    "title": "Mask Girl",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "An office worker who is insecure about her looks becomes a masked internet personality by night — until a chain of ill-fated events overtakes her life.",
+    "poster": "https://image.tmdb.org/t/p/w500/3O8uTUpt76ShtEtNNrOJpcwQROH.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sfagVOgXVONyDAOI4BjnofLcYpv.jpg",
+    "rating": 7.4,
+    "release_date": "2023-08-18",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "Gebl7um3jUg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmBoAAmjCeUbrZBrLP76iLhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "Matilda",
     "csv_id": "10830-matilda",
     "type": "Movie",
@@ -13718,6 +12925,34 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADVgcAAh-4WEYAASK2sTqUOGYWBA"
+    ]
+  },
+  {
+    "csv_id": "234751-miss-lucky-go",
+    "tmdb_id": 234751,
+    "imdb_id": "",
+    "title": "Miss Lucky Go!",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Aspiring figurine designer Chen Miran enrolls in university for a fresh start but ends up in the same class as her ex, Zhong Weiqiong, who once dumped her coldly. Determined to win her back, Zhong schemes to reignite their love, unaware their past breakup was a misunderstanding. As old feelings resurface and they reconcile, a surprising rival appears, threatening to unravel their newfound happiness.",
+    "poster": "https://image.tmdb.org/t/p/w500/wS8VgxuuEEPJ8iw4PSatAdHtUrE.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/odkwwprXZki88f05mXVOUTDaNO6.jpg",
+    "rating": 8.8,
+    "release_date": "2023-09-13",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_hoAAmjCeUanmQABNeA3tuQWBA",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -14136,6 +13371,36 @@
     ]
   },
   {
+    "csv_id": "108261-mr-queen",
+    "tmdb_id": 108261,
+    "imdb_id": "",
+    "title": "Mr. Queen",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A modern chef suddenly becomes trapped inside the body of a queen from the Joseon era, which causes chaos for everyone involved.",
+    "poster": "https://image.tmdb.org/t/p/w500/ozuyMnOO5pekDklyPpUL1Htkuzy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zs803kZR1rT5niAakQokxtp3Uqv.jpg",
+    "rating": 8.5,
+    "release_date": "2020-12-12",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "dImREPX_Pbk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqhsAAmjCeUbtugQEwBibyxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "Ms. Marvel",
     "csv_id": "92782-ms-marvel",
     "type": "Series",
@@ -14512,6 +13777,36 @@
     ]
   },
   {
+    "csv_id": "210781-my-lovely-liar",
+    "tmdb_id": 210781,
+    "imdb_id": "",
+    "title": "My Lovely Liar",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A woman who can't trust people because of her ability to hear lies and a mystic composer who hid his indescribable identity, become involved in each other's lives to uncover the truth.",
+    "poster": "https://image.tmdb.org/t/p/w500/msYlN0cIpuTKlWYnEStdoBuHmvX.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/pxjR0Wds0gkwY8pYDYExf6DuLoL.jpg",
+    "rating": 7.6,
+    "release_date": "2023-07-31",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "XWcT4q10EgU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADTRsAAmjCeUZAvK2I3FCk1xYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "Naked Weapon",
     "csv_id": "10855",
     "type": "Movie",
@@ -14775,6 +14070,39 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADcR8AAh-4UEbtFR2FV04OchYE"
+    ]
+  },
+  {
+    "csv_id": "14613-next-avengers-heroes-of-tomorrow",
+    "tmdb_id": 14613,
+    "imdb_id": "",
+    "title": "Next Avengers: Heroes of Tomorrow",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "The children of the Avengers hone their powers and go head to head with the very enemy responsible for their parents' demise.",
+    "poster": "https://image.tmdb.org/t/p/w500/1y4J9HZJoTIMdt77wCq80uXaQJ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6V6rhHkqYvJGlxIQ9mvZuIoY6c9.jpg",
+    "rating": 7,
+    "release_date": "2008-09-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "swn4H4sqm1A",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlh8AAp4PgEY1e34AAdfl_lEWBA",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -16050,6 +15378,37 @@
     "director": "",
     "trailer": "",
     "runtime": ""
+  },
+  {
+    "csv_id": "13056-punisher-war-zone",
+    "tmdb_id": 13056,
+    "imdb_id": "",
+    "title": "Punisher: War Zone",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "Waging his one-man war on the world of organized crime, ruthless vigilante-hero Frank Castle sets his sights on overeager mob boss Billy Russoti. After Russoti is left horribly disfigured by Castle, he sets out for vengeance under his new alias: Jigsaw. With the \"Punisher Task Force\" hot on his trail and the FBI unable to take Jigsaw in, Frank must stand up to the formidable army that Jigsaw has recruited before more of his evil deeds go unpunished.",
+    "poster": "https://image.tmdb.org/t/p/w500/oOvKJgYUIpfswGHAdW6159bPbvM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dqPZpQy6PJINOJtld17NgIERusH.jpg",
+    "rating": 5.9,
+    "release_date": "2008-12-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "liABMxEvPAc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADpB8AAp4PgEYaxsp1u0SmiRYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "csv_id": "229407-puppy",
@@ -17477,6 +16836,99 @@
     ]
   },
   {
+    "csv_id": "557-spider-man",
+    "tmdb_id": 557,
+    "imdb_id": "",
+    "title": "Spider-Man",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "After being bitten by a genetically altered spider at Oscorp, nerdy but endearing high school student Peter Parker is endowed with amazing powers to become the superhero known as Spider-Man.",
+    "poster": "https://image.tmdb.org/t/p/w500/kjdJntyBeEvqm9w97QGBdxPptzj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zQ8AxTPiCiS5nnwXpwTBPBHSaa5.jpg",
+    "rating": 7.3,
+    "release_date": "2002-05-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "t06RUxPbp_c",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1x8AAp4PgEYd-GgCG4v6WxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "558-spider-man-2",
+    "tmdb_id": 558,
+    "imdb_id": "",
+    "title": "Spider-Man 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "Peter Parker is going through a major identity crisis. Burned out from being Spider-Man, he decides to shelve his superhero alter ego, which leaves the city suffering in the wake of carnage left by the evil Doc Ock. In the meantime, Parker still can't act on his feelings for Mary Jane Watson, a girl he's loved since childhood. A certain anger begins to brew in his best friend Harry Osborn as well...",
+    "poster": "https://image.tmdb.org/t/p/w500/aGuvNAaaZuWXYQQ6N2v7DeuP6mB.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6al048Lat3eLVQOuKtc9h6Tu94d.jpg",
+    "rating": 7.3,
+    "release_date": "2004-06-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "CA5vsCnLm34",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADwh8AAp4PgEae0cZMS0tvBRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "559-spider-man-3",
+    "tmdb_id": 559,
+    "imdb_id": "",
+    "title": "Spider-Man 3",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "The seemingly invincible Spider-Man goes up against an all-new crop of villains—including the shape-shifting Sandman. While Spider-Man’s superpowers are altered by an alien organism, his alter ego, Peter Parker, deals with nemesis Eddie Brock and also gets caught up in a love triangle.",
+    "poster": "https://image.tmdb.org/t/p/w500/qFmwhVUoUSXjkKRmca5yGDEXBIj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/w1oD1MzHjnBJc5snKupIQaSBLIh.jpg",
+    "rating": 6.5,
+    "release_date": "2007-05-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "e5wUilOeOmg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADrR8AAp4PgEZ7mKh6BhJsAxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "10079-spider-man-unlimited",
     "tmdb_id": 10079,
     "imdb_id": "",
@@ -17643,6 +17095,39 @@
     "overview": "Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/AeK2MPOpYrOOgZNfFnfwp0L8tNn.jpg",
     "language": "en"
+  },
+  {
+    "csv_id": "1664-spider-man-the-new-animated-series",
+    "tmdb_id": 1664,
+    "imdb_id": "",
+    "title": "Spider-Man: The New Animated Series",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "Bitten by an irradiated spider, teenager Peter Parker gains arachnid-like powers that make him both a hero to those in need and a vigilante wanted by the police.",
+    "poster": "https://image.tmdb.org/t/p/w500/9g1YPyKtpB0aNlgVb0N8YASKLZN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nVHovBi2yqZAYW17273ytA8SE7c.jpg",
+    "rating": 7.2,
+    "release_date": "2003-07-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1B8AAp4PgEYBJZmsfcMe2RYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "title": "Spidey and His Amazing Friends",
@@ -18353,6 +17838,36 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADOgkAAq-EQEaO6CqrdqMpkhYE"
+    ]
+  },
+  {
+    "csv_id": "206689-tell-me-that-you-love-me",
+    "tmdb_id": 206689,
+    "imdb_id": "",
+    "title": "Tell Me That You Love Me",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Since he lost his hearing, Cha Jin-woo has gotten used to his solitary life. One day, an aspiring actress Jung Mo-eun, enters his quiet daily routine.",
+    "poster": "https://image.tmdb.org/t/p/w500/u8GTmtL8VkulRyq4z6xuQ9x2klw.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tTOxnft2N2JwdodCUFNfoD0PrjS.jpg",
+    "rating": 7.9,
+    "release_date": "2023-11-27",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFxsAAmjCeUa2E-uFshkRzRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -19893,6 +19408,37 @@
     ]
   },
   {
+    "csv_id": "1724-the-incredible-hulk",
+    "tmdb_id": 1724,
+    "imdb_id": "",
+    "title": "The Incredible Hulk",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "Scientist Bruce Banner scours the planet for an antidote to the unbridled force of rage within him: the Hulk. But when the military masterminds who dream of exploiting his powers force him back to civilization, he finds himself coming face to face with a new, deadly foe.",
+    "poster": "https://image.tmdb.org/t/p/w500/gKzYx79y0AQTL4UAk1cBQJ3nvrm.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jPu8yiadqgzwFPGKJmGo637ASVP.jpg",
+    "rating": 6.2,
+    "release_date": "2008-06-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "dz6eBeW19Lg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADox8AAp4PgEZJZHwYy1yQwxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "257211-the-intern",
     "tmdb_id": 257211,
     "imdb_id": "",
@@ -19965,6 +19511,39 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADkgkAAh-4SEbCKkJgIVsiAhYE"
+    ]
+  },
+  {
+    "csv_id": "13647-the-invincible-iron-man",
+    "tmdb_id": 13647,
+    "imdb_id": "",
+    "title": "The Invincible Iron Man",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "When a cocky industrialist's efforts to raise an ancient Chinese temple leads him to be seriously wounded and captured by enemy forces, he must use his ideas for a revolutionary power armor in order to fight back as a superhero.",
+    "poster": "https://image.tmdb.org/t/p/w500/eebNTSRa5Hh5skPKGdGJIJpo9Ls.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/x6gi2yn51sjRBMt6xeVTPVGFeSB.jpg",
+    "rating": 6.1,
+    "release_date": "2007-01-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "h9KTDwT-MAA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnx8AAp4PgEalMN8lRJp1TBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -20573,6 +20152,36 @@
     "runtime": "127 min"
   },
   {
+    "csv_id": "322430-the-polygamist",
+    "tmdb_id": 322430,
+    "imdb_id": "",
+    "title": "The Polygamist",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Social media darling, Joyce, is the picture of marital perfection — until her cheating husband's conquests ignite a scandalous emotional meltdown.",
+    "poster": "https://image.tmdb.org/t/p/w500/emnQZe22rYBCsbZ7h1TUAkYEzrZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/hGCQ0tsJMpKjfrnCyYY0kMY2kY1.jpg",
+    "rating": 8.8,
+    "release_date": "2026-06-12",
+    "language": "zu",
+    "cast": [],
+    "director": "",
+    "trailer": "KBJllQVRuAA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADsQsAAp4PiEZY3C4w0DblCBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "758323-the-pope-s-exorcist",
     "tmdb_id": 758323,
     "imdb_id": "",
@@ -20651,6 +20260,37 @@
     "director": "",
     "trailer": "",
     "runtime": ""
+  },
+  {
+    "csv_id": "7220-the-punisher",
+    "tmdb_id": 7220,
+    "imdb_id": "",
+    "title": "The Punisher",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "When undercover FBI agent Frank Castle's wife and son are slaughtered, he becomes 'the Punisher' -- a ruthless vigilante willing to go to any length to avenge his family.",
+    "poster": "https://image.tmdb.org/t/p/w500/7rmA1HwYp2GKM85BL0cVwCaosGr.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ziexSS07RmowuyqAdJMh1sGxjHg.jpg",
+    "rating": 6.4,
+    "release_date": "2004-04-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "TqVSFchQEyM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADwR8AAp4PgEa-ro3dcS_M6RYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "title": "The Really Loud House",
@@ -20878,6 +20518,43 @@
     ]
   },
   {
+    "csv_id": "3854-the-spectacular-spider-man",
+    "tmdb_id": 3854,
+    "imdb_id": "",
+    "title": "The Spectacular Spider-Man",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "Having spent the summer engaging common criminals with his new-found powers, not so typical 16-year-old Peter Parker must conceal his secret identity and battle super-villains in the real world as he enters his junior year of high school.",
+    "poster": "https://image.tmdb.org/t/p/w500/dCNxOhXT7c4lqYuRpdM3m8s9XDp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fypGcrQCyb9vQ7L8AM6PHCjQSBC.jpg",
+    "rating": 8.6,
+    "release_date": "2008-03-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "wkbKbeEEr0s",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmR8AAp4PgEYkZe9TOS2JqRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmh8AAp4PgEZoWBM6obf6qBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "The Stand Up",
     "csv_id": "1066891-the-stand-up",
     "type": "Movie",
@@ -20982,6 +20659,41 @@
     "runtime": "",
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADOyAAAh-4UEao3kgyK_G44BYE"
+    ]
+  },
+  {
+    "csv_id": "21781-the-super-hero-squad-show",
+    "tmdb_id": 21781,
+    "imdb_id": "",
+    "title": "The Super Hero Squad Show",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "The Super Hero Squad Show is an American cartoon series by Marvel Animation. It is based on the Marvel Super Hero Squad action figure line from Hasbro, which portray the Avengers, the X-Men, and various other characters of the Marvel Universe in a cartoonish super-deformed-style. It is also a self-aware parody of the Marvel characters, with influences taken from on the comedic Mini Marvels series of parody comic books, in that the heroes tend to find themselves in comedic situations, and have cartoonish bents in comparison to their usually serious personalities, and is an overall comedic take on the Avengers. The series' animation was produced by Film Roman and Marvel Animation.",
+    "poster": "https://image.tmdb.org/t/p/w500/3CdaaPZdU1Xv2c6hDaSVWhsXtuO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tSbZytA2RSLVXgEjTNTb27ZkvjZ.jpg",
+    "rating": 7.5,
+    "release_date": "2009-09-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhh8AAp4PgEbi-7Sr5I63fRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhx8AAp4PgEa66HAKOawufhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -21345,6 +21057,40 @@
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADeRUAAmjCeUb-IVyUT2vARxYE",
         "quality": "1080p"
+      }
+    ]
+  },
+  {
+    "csv_id": "71912-the-witcher",
+    "tmdb_id": 71912,
+    "imdb_id": "",
+    "title": "The Witcher",
+    "type": "Series",
+    "categories": [
+      "Main"
+    ],
+    "genres": [
+      "Drama",
+      "Action & Adventure"
+    ],
+    "overview": "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts.",
+    "poster": "https://image.tmdb.org/t/p/w500/AoGsDM02UVt0npBA8OvpDcZbaMi.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/foGkPxpw9h8zln81j63mix5B7m8.jpg",
+    "rating": 7.9,
+    "release_date": "2019-12-20",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "eb90gqGYP9c",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADjQwAAp4PiEZAt73WGBr5ChYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADjwwAAp4PiEbSk6iAZxt6WBYE",
+        "quality": "720p"
       }
     ]
   },
@@ -22009,6 +21755,41 @@
     ]
   },
   {
+    "csv_id": "1084244-toy-story-5",
+    "tmdb_id": 1084244,
+    "imdb_id": "",
+    "title": "Toy Story 5",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "When Bonnie receives a Lilypad tablet as a gift and becomes obsessed, Buzz, Woody, Jessie and the rest of the gang's jobs become exponentially harder when they have to go head to head with the all-new threat to playtime.",
+    "poster": "https://image.tmdb.org/t/p/w500/ovGJ69DW9T0nFCw8uDegqCzu9rh.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qjTqY5coNiz6sVtPng40IzltsoN.jpg",
+    "rating": 7.4,
+    "release_date": "2026-06-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "QftAW9TTmuQ",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADeB8AAp4PgEZZ9seff2eH-BYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADeh8AAp4PgEaYwzLrfQzLZxYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
     "csv_id": "290764-tracers",
     "tmdb_id": 290764,
     "imdb_id": "",
@@ -22334,6 +22115,72 @@
     ]
   },
   {
+    "csv_id": "14611-ultimate-avengers-2",
+    "tmdb_id": 14611,
+    "imdb_id": "",
+    "title": "Ultimate Avengers 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "Mysterious Wakanda lies in the darkest heart of Africa, unknown to most of the world. An isolated land hidden behind closed borders, fiercely protected by its young king: Black Panther. But when brutal alien invaders attack, the threat leaves Black Panther with no option but to go against the sacred decrees of his people and ask for help from outsiders.",
+    "poster": "https://image.tmdb.org/t/p/w500/sMFyYZR9krqcQC99G6jnb10Zv4P.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xv77AFzMUiTuUsC5qn31jBB21An.jpg",
+    "rating": 6.8,
+    "release_date": "2006-08-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "gl4jsZcYt9k",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsx8AAp4PgEYQwcyJiuKA-RYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "14609-ultimate-avengers-the-movie",
+    "tmdb_id": 14609,
+    "imdb_id": "",
+    "title": "Ultimate Avengers: The Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "When a nuclear missile was fired at Washington in 1945, Captain America managed to detonate it in the upper atmosphere. But then he fell miles into the icy depths of the North Atlantic, where he remained lost for over sixty years. But now, with the world facing the very same evil, Captain America must rise again as our last hope for survival.",
+    "poster": "https://image.tmdb.org/t/p/w500/iMCkGHVrYRdqKROPRPmVaJVSlg3.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lJRGgbi4Slsz171vcJ0Ctgiea6v.jpg",
+    "rating": 6.9,
+    "release_date": "2006-02-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "IQ9QjHVaurM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsh8AAp4PgEY8P_QvXii_fxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "68640-unbreakable-machine-doll",
     "tmdb_id": 68640,
     "imdb_id": "",
@@ -22489,6 +22336,36 @@
     ]
   },
   {
+    "csv_id": "92983-vagabond",
+    "tmdb_id": 92983,
+    "imdb_id": "",
+    "title": "Vagabond",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "Stuntman Cha Dal-geon gets involved in a tragic airplane crash and ends up discovering a national corruption scandal in the process. Go Hae-ri, the oldest daughter of a deceased marine, decides to work for the National Intelligence Service as a secret ops agent in order to support her mom and younger siblings, although all she wanted to do is to become a civil servant.",
+    "poster": "https://image.tmdb.org/t/p/w500/8Sud9wqG7WZMXesZhPZ4lergRvp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6BdGjKqud1rFcEa7p2zGfc29z5H.jpg",
+    "rating": 8.3,
+    "release_date": "2019-09-20",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "tyhnEHCUtv4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD0B8AAp4PgEYo9th5F_BqXBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "4251-veer-zaara",
     "tmdb_id": 4251,
     "imdb_id": "",
@@ -22615,6 +22492,36 @@
     "backdrop": "https://image.tmdb.org/t/p/w1280/3V4kLQg0kSqPLctI5ziYWabAZYF.jpg",
     "language": "en",
     "cast": []
+  },
+  {
+    "csv_id": "117376-vincenzo",
+    "tmdb_id": 117376,
+    "imdb_id": "",
+    "title": "Vincenzo",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "During a visit to his motherland, a Korean-Italian mafia lawyer gives an unrivaled conglomerate a taste of its own medicinewith a side of justice.",
+    "poster": "https://image.tmdb.org/t/p/w500/qbkSS1cTjT4DzIwD44bdhTuYgdT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sf7NCqyVUNoyjYuwW5oJke1T1lH.jpg",
+    "rating": 8.5,
+    "release_date": "2021-02-20",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "S12-4mXCNj4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADVR4AAp4PgEbTPWOnLvoudBYE",
+        "quality": "720p"
+      }
+    ]
   },
   {
     "csv_id": "75214-violet-evergarden",
@@ -23213,6 +23120,39 @@
     ]
   },
   {
+    "csv_id": "6549-wolverine-and-the-x-men",
+    "tmdb_id": 6549,
+    "imdb_id": "",
+    "title": "Wolverine and the X-Men",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Comic"
+    ],
+    "overview": "Wolverine and the X-Men must join together again to not only battle the increasingly powerful Mutant Response Division, but also to prevent a catastrophic future that Xavier has warned Wolverine must never come to pass.",
+    "poster": "https://image.tmdb.org/t/p/w500/oSeJ2nESB77iC6SLo4qcqoadjdt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/uPbpYFYXlUdTDEmfoubKNfdEZZx.jpg",
+    "rating": 7.5,
+    "release_date": "2009-01-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "g6YZF1usS4M",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlR8AAp4PgEZ0yLRnXrqcPxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "Wonder Man",
     "csv_id": "198178-wonder-man",
     "type": "Series",
@@ -23347,6 +23287,37 @@
     "cast": []
   },
   {
+    "csv_id": "2080-x-men-origins-wolverine",
+    "tmdb_id": 2080,
+    "imdb_id": "",
+    "title": "X-Men Origins: Wolverine",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "After seeking to live a normal life after 200 years, Logan sets out to avenge a death by undergoing the mutant Weapon X program and becoming Wolverine.",
+    "poster": "https://image.tmdb.org/t/p/w500/yj8LbTju1p7CUJg7US2unSBk33s.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/p4GzAzjlL7lXIVGvayg7zvzGTSi.jpg",
+    "rating": 6.3,
+    "release_date": "2009-04-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "8TQ-gD4UCmI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjR8AAp4PgEYtYY0QGyu1SRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "title": "X-Men: Apocalypse",
     "csv_id": "246655-x-men-apocalypse",
     "type": "Movie",
@@ -23398,6 +23369,65 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD3xQAAmjCeUYsMKGpM3KKBhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "36668-x-men-the-last-stand",
+    "tmdb_id": 36668,
+    "imdb_id": "",
+    "title": "X-Men: The Last Stand",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "overview": "When a cure is found to treat mutations, lines are drawn amongst the X-Men led by Professor Charles Xavier, and Magneto's Brotherhood of Mutants.",
+    "poster": "https://image.tmdb.org/t/p/w500/a2xicU8DpKtRizOHjQLC1JyCSRS.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sBl1n4Oi2wX81EtXIb8NsPqJf3W.jpg",
+    "rating": 6.4,
+    "release_date": "2006-05-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "X8ozc_dQprk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyx8AAp4PgEaVWfUjgp98TBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "36658-x2",
+    "tmdb_id": 36658,
+    "imdb_id": "",
+    "title": "X2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Professor Charles Xavier and his team of genetically gifted superheroes face a rising tide of anti-mutant sentiment led by Col. William Stryker. Storm, Wolverine and Jean Grey must join Magneto and Mystique to unhinge Stryker's scheme to exterminate all mutants.",
+    "poster": "https://image.tmdb.org/t/p/w500/bst4alFUXCxISwdRUKSMhhkrX1M.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7TYITrR804tLITNur3b8VLCK6tw.jpg",
+    "rating": 7,
+    "release_date": "2003-04-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "yVzqz_zpP20",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD4R8AAp4PgEaLT5kKwDmLDBYE",
         "quality": "720p"
       }
     ]
