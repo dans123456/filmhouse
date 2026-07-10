@@ -47,6 +47,23 @@ const db = admin.firestore();
 
 // Bot setup helper
 function setupBot(bot) {
+    // Middleware to automatically make all context replies direct thread replies to the triggering message
+    bot.use(async (ctx, next) => {
+        const messageId = ctx.message ? ctx.message.message_id : (ctx.callbackQuery && ctx.callbackQuery.message ? ctx.callbackQuery.message.message_id : undefined);
+        if (messageId) {
+            const originalReply = ctx.reply;
+            ctx.reply = function (text, extra) {
+                return originalReply.call(ctx, text, Object.assign({ reply_to_message_id: messageId }, extra || {}));
+            };
+
+            const originalReplyWithPhoto = ctx.replyWithPhoto;
+            ctx.replyWithPhoto = function (photo, extra) {
+                return originalReplyWithPhoto.call(ctx, photo, Object.assign({ reply_to_message_id: messageId }, extra || {}));
+            };
+        }
+        return next();
+    });
+
     // Middleware to check if user is banned
     bot.use(async (ctx, next) => {
         if (!ctx.from) return next();
