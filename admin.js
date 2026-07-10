@@ -107,6 +107,23 @@ function showToast(message, type = "success") {
     }, 3000);
 }
 
+// Collapsible Panel Toggle Helper
+function togglePanel(contentId, chevronId) {
+    const content = document.getElementById(contentId);
+    const chevron = document.getElementById(chevronId);
+    if (!content) return;
+    
+    if (content.style.display === "none") {
+        content.style.display = "block";
+        if (chevron) chevron.style.transform = "rotate(180deg)";
+    } else {
+        content.style.display = "none";
+        if (chevron) {
+            chevron.style.transform = "rotate(0deg)";
+        }
+    }
+}
+
 // Film House - Standalone Admin Command Center Logic
 const firebaseConfig = {
     apiKey: "AIzaSyCXs2tNgG07tAlsCkR96PNNIVIDyDkJD78",
@@ -3248,6 +3265,9 @@ document.addEventListener("DOMContentLoaded", () => {
             btnStartBroadcast.disabled = true;
             btnStartBroadcast.textContent = "Broadcasting... ✈️";
             
+            const cancelBtn = document.getElementById("btn-cancel-broadcast");
+            if (cancelBtn) cancelBtn.style.display = "block";
+            
             // Show progress panel
             const progressContainer = document.getElementById("broadcast-progress-container");
             const statusLabel = document.getElementById("broadcast-status-label");
@@ -3311,6 +3331,8 @@ document.addEventListener("DOMContentLoaded", () => {
             isBroadcasting = false;
             btnStartBroadcast.disabled = false;
             btnStartBroadcast.textContent = "Send Broadcast Message ✈️";
+            
+            if (cancelBtn) cancelBtn.style.display = "none";
             
             if (statusLabel) {
                 statusLabel.textContent = shouldCancelBroadcast 

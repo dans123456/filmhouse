@@ -243,6 +243,26 @@ function setupBot(bot) {
             return ctx.reply(`❌ Error unbanning user: ${err.message}`);
         }
     });
+
+    // Default reply for regular text messages (Automation)
+    bot.on('text', (ctx) => {
+        return ctx.reply(
+            `🤖 *Hello!* I am the Film House Bot.\n\nTo search, request, or watch movies/series, please tap the button below to launch the Film House Web App! 🍿`,
+            {
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "Launch Film House 🚀",
+                                web_app: { url: "https://t.me/Filmhouseappbot/filmhouseapp" }
+                            }
+                        ]
+                    ]
+                }
+            }
+        );
+    });
 }
 
 // Bot Initializer

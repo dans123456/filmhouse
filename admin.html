@@ -473,64 +473,68 @@
 
     <!-- SYSTEM CONFIGURATION PANEL -->
     <div class="glass-panel" style="border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 24px;">
-        <div class="section-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div class="section-header collapsible-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePanel('settings-content', 'settings-chevron')">
             <h4 class="section-title" style="color: #fff; display: flex; align-items: center; gap: 8px; margin: 0;">⚙️ System Configuration</h4>
+            <span id="settings-chevron" style="color: var(--text-secondary); transition: transform 0.2s;">▼</span>
+        </div>
+
+        <div id="settings-content" style="display: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
             <!-- Settings Tabs -->
-            <div style="display: flex; gap: 6px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <div style="display: flex; gap: 6px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px; width: fit-content;">
                 <button class="settings-tab-btn active" data-target="settings-github" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; border: none; background: var(--primary-gradient); color: #000; cursor: pointer; transition: all 0.2s; font-family: inherit;">GitHub Updates</button>
                 <button class="settings-tab-btn" data-target="settings-telegram" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; font-family: inherit;">Telegram Bot</button>
                 <button class="settings-tab-btn" data-target="settings-admins" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; font-family: inherit;">Admin Access</button>
             </div>
-        </div>
 
-        <!-- Tab 1: GitHub -->
-        <div class="settings-tab-content" id="settings-github" style="display: block;">
-            <div class="form-row">
-                <div class="form-group" style="flex: 2;">
-                    <label for="github-token">Personal Access Token (PAT)</label>
-                    <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxx">
+            <!-- Tab 1: GitHub -->
+            <div class="settings-tab-content" id="settings-github" style="display: block;">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="github-token">Personal Access Token (PAT)</label>
+                        <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxx">
+                    </div>
+                    <div class="form-group" style="flex: 1; justify-content: flex-end; display: flex; gap: 8px; flex-direction: row;">
+                        <button class="btn btn-primary" id="btn-save-github-token" style="height: 42px; margin-top: auto; flex: 1;">Save Token</button>
+                        <button class="btn btn-secondary" id="btn-test-github-conn" style="height: 42px; margin-top: auto; flex: 1;">Test Connection</button>
+                    </div>
                 </div>
-                <div class="form-group" style="flex: 1; justify-content: flex-end; display: flex; gap: 8px; flex-direction: row;">
-                    <button class="btn btn-primary" id="btn-save-github-token" style="height: 42px; margin-top: auto; flex: 1;">Save Token</button>
-                    <button class="btn btn-secondary" id="btn-test-github-conn" style="height: 42px; margin-top: auto; flex: 1;">Test Connection</button>
-                </div>
+                <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px; margin-bottom: 0;">
+                    * The token is stored safely only in your local browser's storage and never sent to any external server (except directly to GitHub API).
+                </p>
             </div>
-            <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px; margin-bottom: 0;">
-                * The token is stored safely only in your local browser's storage and never sent to any external server (except directly to GitHub API).
-            </p>
-        </div>
 
-        <!-- Tab 2: Telegram Bot -->
-        <div class="settings-tab-content" id="settings-telegram" style="display: none;">
-            <div class="form-row">
-                <div class="form-group" style="flex: 2;">
-                    <label for="telegram-bot-token">Telegram Bot Token</label>
-                    <input type="password" id="telegram-bot-token" placeholder="e.g. 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
+            <!-- Tab 2: Telegram Bot -->
+            <div class="settings-tab-content" id="settings-telegram" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="telegram-bot-token">Telegram Bot Token</label>
+                        <input type="password" id="telegram-bot-token" placeholder="e.g. 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
+                    </div>
+                    <div class="form-group" style="flex: 1; justify-content: flex-end; display: flex; gap: 8px; flex-direction: row;">
+                        <button class="btn btn-primary" id="btn-save-telegram-token" style="height: 42px; margin-top: auto; flex: 1; background: linear-gradient(135deg, #0088cc 0%, #00a2ed 100%); color: #fff; box-shadow: 0 0 10px rgba(0, 136, 204, 0.2); border: none;">Save Token</button>
+                        <button class="btn btn-secondary" id="btn-test-telegram-conn" style="height: 42px; margin-top: auto; flex: 1; border-color: rgba(0, 136, 204, 0.3); color: #0088cc;">Test Bot</button>
+                    </div>
                 </div>
-                <div class="form-group" style="flex: 1; justify-content: flex-end; display: flex; gap: 8px; flex-direction: row;">
-                    <button class="btn btn-primary" id="btn-save-telegram-token" style="height: 42px; margin-top: auto; flex: 1; background: linear-gradient(135deg, #0088cc 0%, #00a2ed 100%); color: #fff; box-shadow: 0 0 10px rgba(0, 136, 204, 0.2); border: none;">Save Token</button>
-                    <button class="btn btn-secondary" id="btn-test-telegram-conn" style="height: 42px; margin-top: auto; flex: 1; border-color: rgba(0, 136, 204, 0.3); color: #0088cc;">Test Bot</button>
-                </div>
+                <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px; margin-bottom: 0;">
+                    * The bot token will be securely synchronized to your Firestore database so the dashboard and backend can send messages.
+                </p>
             </div>
-            <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px; margin-bottom: 0;">
-                * The bot token will be securely synchronized to your Firestore database so the dashboard and backend can send messages.
-            </p>
-        </div>
 
-        <!-- Tab 3: Admin Access -->
-        <div class="settings-tab-content" id="settings-admins" style="display: none;">
-            <div class="form-row">
-                <div class="form-group" style="flex: 2;">
-                    <label for="admin-tg-ids">Authorized Telegram User IDs (Comma-separated)</label>
-                    <input type="text" id="admin-tg-ids" placeholder="e.g. 1329840839, 1175336733">
+            <!-- Tab 3: Admin Access -->
+            <div class="settings-tab-content" id="settings-admins" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="admin-tg-ids">Authorized Telegram User IDs (Comma-separated)</label>
+                        <input type="text" id="admin-tg-ids" placeholder="e.g. 1329840839, 1175336733">
+                    </div>
+                    <div class="form-group" style="flex: 1; justify-content: flex-end;">
+                        <button class="btn btn-secondary" id="btn-save-admins" style="height: 42px; margin-top: auto; border-color: rgba(0, 188, 212, 0.3); color: #00bcd4; width: 100%;">Update Admins</button>
+                    </div>
                 </div>
-                <div class="form-group" style="flex: 1; justify-content: flex-end;">
-                    <button class="btn btn-secondary" id="btn-save-admins" style="height: 42px; margin-top: auto; border-color: rgba(0, 188, 212, 0.3); color: #00bcd4; width: 100%;">Update Admins</button>
-                </div>
+                <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px; margin-bottom: 0;">
+                    Authorized IDs have full access to this admin dashboard. Master admin IDs: <strong>1329840839</strong>, <strong>1175336733</strong> (cannot be removed).
+                </p>
             </div>
-            <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px; margin-bottom: 0;">
-                Authorized IDs have full access to this admin dashboard. Master admin IDs: <strong>1329840839</strong>, <strong>1175336733</strong> (cannot be removed).
-            </p>
         </div>
     </div>
 
@@ -648,58 +652,63 @@
     </div>
 
     <!-- BOT BROADCASTING CENTER SECTION -->
-    <div class="glass-panel" style="border: 1px solid rgba(0, 136, 204, 0.15);">
-        <div class="section-header">
-            <h4 class="section-title" style="color: #0088cc;">📢 Telegram Bot Broadcasting Center</h4>
-            <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;" id="broadcast-recipient-count">Target: 0 Users</span>
+    <div class="glass-panel" style="border: 1px solid rgba(0, 136, 204, 0.15); margin-bottom: 24px;">
+        <div class="section-header collapsible-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePanel('broadcasting-content', 'broadcasting-chevron')">
+            <h4 class="section-title" style="color: #0088cc; display: flex; align-items: center; gap: 8px; margin: 0;">📢 Telegram Bot Broadcasting Center</h4>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;" id="broadcast-recipient-count">Target: 0 Users</span>
+                <span id="broadcasting-chevron" style="color: var(--text-secondary); transition: transform 0.2s;">▼</span>
+            </div>
         </div>
         
-        <div class="form-row" style="margin-bottom: 15px;">
-            <div class="form-group" style="flex: 1; min-width: 200px;">
-                <label for="broadcast-target">Audience Target</label>
-                <select id="broadcast-target" style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; cursor: pointer; width: 100%;">
-                    <option value="all">All Registered Users</option>
-                    <option value="single">Specific User ID</option>
-                </select>
+        <div id="broadcasting-content" style="display: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+            <div class="form-row" style="margin-bottom: 15px;">
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="broadcast-target">Audience Target</label>
+                    <select id="broadcast-target" style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; cursor: pointer; width: 100%;">
+                        <option value="all">All Registered Users</option>
+                        <option value="single">Specific User ID</option>
+                    </select>
+                </div>
+                <div class="form-group" id="broadcast-userid-group" style="flex: 1; min-width: 200px; display: none;">
+                    <label for="broadcast-userid">Target Telegram User ID</label>
+                    <input type="text" id="broadcast-userid" placeholder="e.g. 1329840839" style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; width: 100%; box-sizing: border-box;">
+                </div>
             </div>
-            <div class="form-group" id="broadcast-userid-group" style="flex: 1; min-width: 200px; display: none;">
-                <label for="broadcast-userid">Target Telegram User ID</label>
-                <input type="text" id="broadcast-userid" placeholder="e.g. 1329840839" style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; width: 100%; box-sizing: border-box;">
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="broadcast-message">Message Content (Markdown Supported)</label>
+                <textarea id="broadcast-message" rows="5" placeholder="Type your message here... Use *bold*, _italic_, or [link text](url) for formatting." style="padding: 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; resize: vertical; width: 100%; box-sizing: border-box; font-family: inherit;"></textarea>
+                <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: var(--text-secondary);">
+                    <span>Tip: Rate limits are handled automatically.</span>
+                    <span id="broadcast-char-counter">0 chars</span>
+                </div>
             </div>
+
+            <!-- Broadcast Progress Container (Hidden by default) -->
+            <div id="broadcast-progress-container" style="display: none; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                    <span style="font-weight: 600;" id="broadcast-status-label">Broadcasting in progress...</span>
+                    <span id="broadcast-progress-ratio" style="font-family: monospace;">0 / 0</span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+                    <div id="broadcast-progress-bar" style="background: linear-gradient(90deg, #0088cc 0%, #00a2ed 100%); width: 0%; height: 100%; transition: width: 0.1s linear;"></div>
+                </div>
+
+                <div style="display: flex; gap: 20px; font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+                    <div>🟢 Success: <span id="broadcast-success-count" style="font-weight: 700; color: #4caf50;">0</span></div>
+                    <div>🔴 Failed: <span id="broadcast-failed-count" style="font-weight: 700; color: #ff3b30;">0</span></div>
+                </div>
+                
+                <button class="btn btn-secondary btn-sm" id="btn-cancel-broadcast" style="border-color: rgba(255, 59, 48, 0.3); color: #ff3b30; font-size: 11px; padding: 6px 12px; background: rgba(255, 59, 48, 0.05); border: 1px solid rgba(255, 59, 48, 0.25); cursor: pointer; border-radius: 4px; display: none;">Cancel Broadcast</button>
+            </div>
+
+            <button class="btn btn-primary btn-block" id="btn-start-broadcast" style="background: linear-gradient(135deg, #0088cc 0%, #00a2ed 100%); color: #fff; font-weight: bold; border: none; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+                <span>Send Broadcast Message ✈️</span>
+            </button>
         </div>
-
-        <div class="form-group" style="margin-bottom: 15px;">
-            <label for="broadcast-message">Message Content (Markdown Supported)</label>
-            <textarea id="broadcast-message" rows="5" placeholder="Type your message here... Use *bold*, _italic_, or [link text](url) for formatting." style="padding: 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; resize: vertical; width: 100%; box-sizing: border-box; font-family: inherit;"></textarea>
-            <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: var(--text-secondary);">
-                <span>Tip: Rate limits are handled automatically.</span>
-                <span id="broadcast-char-counter">0 chars</span>
-            </div>
-        </div>
-
-        <!-- Broadcast Progress Container (Hidden by default) -->
-        <div id="broadcast-progress-container" style="display: none; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 15px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                <span style="font-weight: 600;" id="broadcast-status-label">Broadcasting in progress...</span>
-                <span id="broadcast-progress-ratio" style="font-family: monospace;">0 / 0</span>
-            </div>
-            
-            <!-- Progress Bar -->
-            <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
-                <div id="broadcast-progress-bar" style="background: linear-gradient(90deg, #0088cc 0%, #00a2ed 100%); width: 0%; height: 100%; transition: width: 0.1s linear;"></div>
-            </div>
-
-            <div style="display: flex; gap: 20px; font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                <div>🟢 Success: <span id="broadcast-success-count" style="font-weight: 700; color: #4caf50;">0</span></div>
-                <div>🔴 Failed: <span id="broadcast-failed-count" style="font-weight: 700; color: #ff3b30;">0</span></div>
-            </div>
-            
-            <button class="btn btn-secondary btn-sm" id="btn-cancel-broadcast" style="border-color: rgba(255, 59, 48, 0.3); color: #ff3b30; font-size: 11px; padding: 6px 12px; background: rgba(255, 59, 48, 0.05); border: 1px solid rgba(255, 59, 48, 0.25); cursor: pointer; border-radius: 4px;">Cancel Broadcast</button>
-        </div>
-
-        <button class="btn btn-primary btn-block" id="btn-start-broadcast" style="background: linear-gradient(135deg, #0088cc 0%, #00a2ed 100%); color: #fff; font-weight: bold; border: none; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
-            <span>Send Broadcast Message ✈️</span>
-        </button>
     </div>
 
     <div class="glass-panel">

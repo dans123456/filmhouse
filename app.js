@@ -5309,6 +5309,27 @@ function logMovieRequestToFirestore(movie) {
         requestedAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
         showToast("Movie request registered in database!", "success");
+        
+        // Automated Telegram confirmation message to the requesting user
+        if (state.user.id) {
+            db.collection("settings").doc("telegram").get().then(tgDoc => {
+                if (tgDoc.exists) {
+                    const token = tgDoc.data().botToken;
+                    if (token) {
+                        const text = `🍿 *Request Received!*\n\nYour request for *${movie.title}* (${movie.type}) has been logged in our queue.\n\nWe will notify you here as soon as it is fulfilled! 🚀`;
+                        fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                chat_id: String(state.user.id),
+                                text: text,
+                                parse_mode: "Markdown"
+                            })
+                        }).catch(err => console.warn("Failed to send bot notification for request:", err));
+                    }
+                }
+            }).catch(err => console.warn("Error fetching bot token for request notification:", err));
+        }
     }).catch(err => {
         console.error("Error logging movie request:", err);
     });
