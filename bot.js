@@ -259,8 +259,8 @@ function setupBot(bot) {
                         }
                     ],
                     [
-                        { text: "Help 📖", callback_data: "bot_help" },
-                        { text: "About ℹ️", callback_data: "bot_about" }
+                        { text: "Help 📖", callback_data: "settings_help" },
+                        { text: "About ℹ️", callback_data: "settings_about" }
                     ]
                 ]
             };
@@ -436,12 +436,44 @@ function setupBot(bot) {
     // Callback Query Handler for Inline Buttons
     bot.on('callback_query', async (ctx) => {
         const data = ctx.callbackQuery.data;
-        const replyToId = ctx.callbackQuery.message ? ctx.callbackQuery.message.message_id : undefined;
+        const userId = String(ctx.from.id);
+        const fullName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" ");
+        const escapedFullName = fullName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        // Helper to edit the message caption (for photo messages) or text (for fallback text messages) in-place
+        const editMessageInPlace = async (text, extra) => {
+            try {
+                // Try editing caption first (works if the original message has a photo)
+                await ctx.editMessageCaption(text, extra);
+            } catch (err) {
+                // Fallback: Try editing text (works if the original message is plain text)
+                try {
+                    await ctx.editMessageText(text, extra);
+                } catch (textErr) {
+                    console.error("Failed to edit message in-place:", textErr);
+                }
+            }
+        };
         
         try {
+            // --- Welcome Card Navigation ---
             if (data === "bot_help") {
                 await ctx.answerCbQuery();
-                return ctx.reply(
+                const helpMarkup = {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "Launch Film House 🚀",
+                                url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                            }
+                        ],
+                        [
+                            { text: "« Back to Menu 🔙", callback_data: "bot_menu" }
+                        ]
+                    ]
+                };
+                
+                return await editMessageInPlace(
                     `📖 *Film House Help & Guide*\n\n` +
                     `• Tap the *Launch Film House* button to open the movie catalog.\n` +
                     `• Select any movie or series to watch/download.\n` +
@@ -449,14 +481,28 @@ function setupBot(bot) {
                     `• You will receive a direct notification message in this chat as soon as it is ready!`,
                     { 
                         parse_mode: 'Markdown',
-                        reply_to_message_id: replyToId
+                        reply_markup: helpMarkup
                     }
                 );
             }
             
             if (data === "bot_about") {
                 await ctx.answerCbQuery();
-                return ctx.reply(
+                const aboutMarkup = {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "Launch Film House 🚀",
+                                url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                            }
+                        ],
+                        [
+                            { text: "« Back to Menu 🔙", callback_data: "bot_menu" }
+                        ]
+                    ]
+                };
+
+                return await editMessageInPlace(
                     `ℹ️ *About Film House*\n\n` +
                     `Film House is your ultimate Telegram movie library.\n` +
                     `• Direct high-speed downloads.\n` +
@@ -464,9 +510,137 @@ function setupBot(bot) {
                     `• Built-in loyalty rewards system.`,
                     { 
                         parse_mode: 'Markdown',
-                        reply_to_message_id: replyToId
+                        reply_markup: aboutMarkup
                     }
                 );
+            }
+
+            if (data === "bot_menu") {
+                await ctx.answerCbQuery();
+                const menuMarkup = {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "Launch Film House 🚀",
+                                url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                            }
+                        ],
+                        [
+                            { text: "Help 📖", callback_data: "bot_help" },
+                            { text: "About ℹ️", callback_data: "bot_about" }
+                        ],
+                        [
+                            { text: "Join Channel 📢", url: "https://t.me/FilmHouseBUP" }
+                        ]
+                    ]
+                };
+
+                const welcomeCaption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start watching and downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @FilmHouseBUP to stay updated! 🤟</i>`;
+
+                return await editMessageInPlace(welcomeCaption, {
+                    parse_mode: 'HTML',
+                    reply_markup: menuMarkup
+                });
+            }
+
+            // --- Settings Card Navigation ---
+            if (data === "settings_help") {
+                await ctx.answerCbQuery();
+                const helpMarkup = {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "Open Web App 🚀",
+                                url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                            }
+                        ],
+                        [
+                            { text: "« Back to Settings 🔙", callback_data: "settings_menu" }
+                        ]
+                    ]
+                };
+
+                return await editMessageInPlace(
+                    `📖 *Film House Help & Guide*\n\n` +
+                    `• Tap the *Launch Film House* button to open the movie catalog.\n` +
+                    `• Select any movie or series to watch/download.\n` +
+                    `• If a title is missing, tap *Request* to submit it to our admins.\n` +
+                    `• You will receive a direct notification message in this chat as soon as it is ready!`,
+                    { 
+                        parse_mode: 'Markdown',
+                        reply_markup: helpMarkup
+                    }
+                );
+            }
+
+            if (data === "settings_about") {
+                await ctx.answerCbQuery();
+                const aboutMarkup = {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "Open Web App 🚀",
+                                url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                            }
+                        ],
+                        [
+                            { text: "« Back to Settings 🔙", callback_data: "settings_menu" }
+                        ]
+                    ]
+                };
+
+                return await editMessageInPlace(
+                    `ℹ️ *About Film House*\n\n` +
+                    `Film House is your ultimate Telegram movie library.\n` +
+                    `• Direct high-speed downloads.\n` +
+                    `• Custom request queue with instant automated DM notifications.\n` +
+                    `• Built-in loyalty rewards system.`,
+                    { 
+                        parse_mode: 'Markdown',
+                        reply_markup: aboutMarkup
+                    }
+                );
+            }
+
+            if (data === "settings_menu") {
+                await ctx.answerCbQuery();
+                try {
+                    const userDoc = await db.collection("users").doc(userId).get();
+                    if (userDoc.exists) {
+                        const u = userDoc.data();
+                        const points = u.points || 0;
+                        const badge = u.badge || "No Active Badge";
+                        
+                        const settingsMarkup = {
+                            inline_keyboard: [
+                                [
+                                    {
+                                        text: "Open Web App 🚀",
+                                        url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                                    }
+                                ],
+                                [
+                                    { text: "Help 📖", callback_data: "settings_help" },
+                                    { text: "About ℹ️", callback_data: "settings_about" }
+                                ]
+                            ]
+                        };
+
+                        await editMessageInPlace(
+                            `👤 *Your Profile Status*\n\n` +
+                            `• *Telegram ID:* \`${userId}\`\n` +
+                            `• *Username:* @${u.username || "None"}\n` +
+                            `• *Loyalty Points:* 🪙 \`${points.toLocaleString()}\` pts\n` +
+                            `• *VIP Badge:* 🏆 \`${badge}\``,
+                            { 
+                                parse_mode: 'Markdown',
+                                reply_markup: settingsMarkup
+                            }
+                        );
+                    }
+                } catch (dbErr) {
+                    console.error("Error reloading settings in callback query:", dbErr);
+                }
             }
         } catch (err) {
             console.error("Error in callback_query handler:", err);
