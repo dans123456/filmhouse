@@ -23183,7 +23183,14 @@
     "csv_id": "119051-wednesday",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADHggAAka6CUTPqNfxJS4nJBYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADHggAAka6CUTPqNfxJS4nJBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADZxgAAp4PiEYOw0GHztxSzBYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/36xXlhEpQqVVPuiZhfoQuaY4OlA.jpg",
     "rating": 8.3,
