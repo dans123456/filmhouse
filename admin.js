@@ -2213,7 +2213,9 @@ function generateCSVContent() {
         // Output up to 40 links columns
         const linksList = movie.links || [];
         for (let i = 0; i < 40; i++) {
-            row.push(escapeCSV(linksList[i] || ''));
+            const linkVal = linksList[i];
+            const linkUrl = typeof linkVal === 'object' && linkVal !== null ? linkVal.url : linkVal;
+            row.push(escapeCSV(linkUrl || ''));
         }
         
         return row.join(',');
