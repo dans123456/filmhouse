@@ -1,5 +1,61 @@
 [
   {
+    "csv_id": "1071585-m3gan-2-0",
+    "tmdb_id": 1071585,
+    "imdb_id": "",
+    "title": "M3GAN 2.0",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After the underlying tech for M3GAN is stolen and misused by a powerful defense contractor to create a military-grade weapon known as Amelia, M3GAN's creator Gemma realizes that the only option is to resurrect M3GAN and give her a few upgrades, making her faster, stronger, and more lethal.",
+    "poster": "https://image.tmdb.org/t/p/w500/oekamLQrwlJjRNmfaBE4llIvkir.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/cT9ZfwoPDk8JbgkessmQgxAWiaM.jpg",
+    "rating": 7.2,
+    "release_date": "2025-06-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "1FeiTZMtwLA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADlSIAAp4PiEaUc5uXh8sXxxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "536554-m3gan",
+    "tmdb_id": 536554,
+    "imdb_id": "",
+    "title": "M3GAN",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A brilliant toy company roboticist uses artificial intelligence to develop M3GAN, a life-like doll programmed to emotionally bond with her newly orphaned niece. But when the doll's programming works too well, she becomes overprotective of her new friend with terrifying results.",
+    "poster": "https://image.tmdb.org/t/p/w500/d9nBoowhjiiYc4FBNtQkPY7c11H.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qd4EKTuudkws9lW76Dn9C0tnuVA.jpg",
+    "rating": 7,
+    "release_date": "2022-12-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "OoDHM_A1axc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADBAADJw0AAhp_gVKy5OIZem1lKhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "222233-doctor-slump",
     "tmdb_id": 222233,
     "imdb_id": "",
