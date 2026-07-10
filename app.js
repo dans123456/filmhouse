@@ -3334,8 +3334,8 @@ function openDownloadModal(movie) {
 
 // Share Media integration
 function shareMovie(movie) {
-    const shareText = `Check out "${movie.title}" on Film House! Rating: ${movie.rating}/10. Play now: https://t.me/Filmhouseappbot`;
-    const shareUrl = "https://t.me/Filmhouseappbot";
+    const shareText = `Check out "${movie.title}" on Film House! Rating: ${movie.rating}/10. Play now: https://t.me/Filmhouseappbot/filmhouseapp`;
+    const shareUrl = "https://t.me/Filmhouseappbot/filmhouseapp";
     const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
     
     // Award points (+2)
@@ -4443,7 +4443,7 @@ function bindEvents() {
     const optCopy = document.getElementById("share-opt-copy");
     
     const inviteShareText = `Hey! Check out Film House, the ultimate app to watch and download your favorite movies and series directly inside Telegram! 🎬🍿`;
-    const inviteShareUrl = "https://t.me/Filmhouseappbot";
+    const inviteShareUrl = "https://t.me/Filmhouseappbot/filmhouseapp";
     const fullInviteMessage = `${inviteShareText}\nPlay now: ${inviteShareUrl}`;
     
     if (optWhatsapp) {
@@ -4789,9 +4789,16 @@ function bindEvents() {
 
 // Firebase Firestore Database Synchronization Helpers
 function syncUserToFirestore() {
-    if (typeof firebase === "undefined" || !db) return;
+    if (typeof firebase === "undefined" || !db || !state.user.id) return;
     const userRef = db.collection("users").doc(state.user.id);
     userRef.get().then(doc => {
+        if (doc.exists) {
+            const docData = doc.data();
+            if (docData && docData.banned === true) {
+                showBannedScreen();
+                return;
+            }
+        }
         const data = {
             id: state.user.id,
             username: state.user.username || "guest",
@@ -5527,6 +5534,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 1. Initial login credentials grab
     handleTelegramAuth();
+    
+    // Check ban status on startup
+    if (typeof firebase !== "undefined" && db && state.user.id) {
+        db.collection("users").doc(state.user.id).get().then(doc => {
+            if (doc.exists && doc.data().banned === true) {
+                showBannedScreen();
+            }
+        }).catch(err => console.warn("Error checking ban status:", err));
+    }
     const profileExists = !!localStorage.getItem("filmhouse_user_profile");
     
     // Auto-create profile if inside Telegram
@@ -5950,4 +5966,54 @@ function showConnectionDrawer(targetLink, blockId) {
         // Attempt automatic redirect as a convenience fallback (may be blocked by browser popup settings)
         openLink();
     }, 800);
+}
+
+function showBannedScreen() {
+    // Stop any splash screen timers
+    const preloader = document.getElementById("preloader");
+    if (preloader) preloader.style.display = "none";
+    
+    // Check if banned screen already exists
+    if (document.getElementById("banned-screen-overlay")) return;
+    
+    const overlay = document.createElement("div");
+    overlay.id = "banned-screen-overlay";
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #07080c;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        font-family: 'Outfit', sans-serif;
+        text-align: center;
+        padding: 24px;
+        box-sizing: border-box;
+    `;
+    
+    overlay.innerHTML = `
+        <div style="background: rgba(255, 59, 48, 0.05); border: 1px solid rgba(255, 59, 48, 0.2); border-radius: 16px; padding: 32px; max-width: 400px; box-shadow: 0 10px 30px rgba(255, 59, 48, 0.05);">
+            <div style="font-size: 64px; margin-bottom: 20px;">🚫</div>
+            <h2 style="font-size: 22px; margin: 0 0 12px 0; font-weight: 700; color: #ff3b30;">Access Restricted</h2>
+            <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 20px 0;">
+                Your account access to Film House has been restricted due to a violation of our terms of service or guidelines.
+            </p>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 0;">
+                If you believe this is a mistake, please contact support.
+            </p>
+        </div>
+    `;
+    
+    document.body.prepend(overlay);
+    
+    // Disable any scrolls or inputs
+    document.body.style.overflow = "hidden";
+    document.body.style.pointerEvents = "none";
+    overlay.style.pointerEvents = "auto"; // only allow interacting with the overlay itself
 }

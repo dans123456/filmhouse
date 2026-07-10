@@ -1,0 +1,13 @@
+{
+  "name": "filmhouse-bot",
+  "version": "1.0.0",
+  "description": "Telegram Bot commands backend for Film House",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.8.0",
+    "telegraf": "^4.12.2"
+  }
+}

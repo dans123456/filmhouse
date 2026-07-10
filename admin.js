@@ -615,6 +615,7 @@ let allCatalogMovies = [];
 let originalCatalogCount = 0;
 let catalogChangesMade = false;
 let githubToken = ""; // Global cache for token
+let telegramBotToken = ""; // Global cache for Telegram Bot Token
 const TMDB_API_KEY = localStorage.getItem("filmhouse_tmdb_key") || "a3a9df05cdacd9f23c885f2756466395";
 let pendingImportChanges = null;
 let newlyAddedIds = [];
@@ -630,6 +631,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const tokenInput = document.getElementById("github-token");
         if (tokenInput) {
             tokenInput.value = githubToken;
+        }
+    }
+
+    const localTgToken = localStorage.getItem("filmhouse_telegram_bot_token");
+    if (localTgToken) {
+        telegramBotToken = localTgToken;
+        const tgTokenInput = document.getElementById("telegram-bot-token");
+        if (tgTokenInput) {
+            tgTokenInput.value = telegramBotToken;
         }
     }
 
@@ -654,6 +664,23 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         } catch (e) {
             console.error("Error loading GitHub token from Firestore:", e);
+        }
+
+        try {
+            const tgDoc = await db.collection("settings").doc("telegram").get();
+            if (tgDoc.exists) {
+                const dbTgToken = tgDoc.data().botToken || "";
+                if (dbTgToken && dbTgToken !== telegramBotToken) {
+                    telegramBotToken = dbTgToken;
+                    localStorage.setItem("filmhouse_telegram_bot_token", dbTgToken);
+                    const tgTokenInput = document.getElementById("telegram-bot-token");
+                    if (tgTokenInput) {
+                        tgTokenInput.value = telegramBotToken;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Error loading Telegram Token from Firestore:", e);
         }
     }
 
@@ -779,6 +806,101 @@ if (saveTokenBtn) {
             } else {
                 alert("GitHub Personal Access Token saved locally!");
             }
+        }
+    });
+}
+
+// Save Telegram Bot Token to Firestore & localStorage
+const saveTelegramTokenBtn = document.getElementById("btn-save-telegram-token");
+if (saveTelegramTokenBtn) {
+    saveTelegramTokenBtn.addEventListener("click", async () => {
+        const tokenInput = document.getElementById("telegram-bot-token");
+        if (tokenInput) {
+            const token = tokenInput.value.trim();
+            // Save locally first for instant access
+            localStorage.setItem("filmhouse_telegram_bot_token", token);
+            telegramBotToken = token;
+            
+            if (db) {
+                try {
+                    await db.collection("settings").doc("telegram").set({
+                        botToken: token,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert("Telegram Bot Token saved locally and securely in Firestore!");
+                } catch (e) {
+                    console.error("Error saving Telegram token to Firestore:", e);
+                    alert("Token saved locally! (Note: Firestore cloud sync failed - check your database rules).");
+                }
+            } else {
+                alert("Telegram Bot Token saved locally!");
+            }
+        }
+    });
+}
+
+// Test Connection for Telegram Bot Token
+const testTelegramBtn = document.getElementById("btn-test-telegram-conn");
+if (testTelegramBtn) {
+    testTelegramBtn.addEventListener("click", async () => {
+        const tokenInput = document.getElementById("telegram-bot-token");
+        const token = tokenInput ? tokenInput.value.trim() : "";
+        if (!token) {
+            alert("Please enter a Telegram Bot Token first!");
+            return;
+        }
+
+        testTelegramBtn.disabled = true;
+        testTelegramBtn.textContent = "Testing... ⏳";
+
+        // Determine destination chat ID: try current admin ID, fallback to prompt
+        const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
+        let testChatId = tgUser ? String(tgUser.id) : null;
+        
+        if (!testChatId) {
+            const urlParams = new URLSearchParams(window.location.search);
+            testChatId = urlParams.get("tg_id") || urlParams.get("admin_id");
+        }
+
+        if (!testChatId) {
+            testChatId = prompt("Enter your Telegram User ID to receive the test message:");
+        }
+
+        if (!testChatId) {
+            testTelegramBtn.disabled = false;
+            testTelegramBtn.textContent = "Test Bot";
+            return;
+        }
+
+        const testMsg = `🤖 *Film House Bot Diagnostic*\n\nConnection successful! This bot is correctly configured and ready to broadcast and notify users. 🚀`;
+
+        try {
+            const url = `https://api.telegram.org/bot${token}/sendMessage`;
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    chat_id: testChatId.trim(),
+                    text: testMsg,
+                    parse_mode: "Markdown"
+                })
+            });
+
+            const result = await response.json();
+            if (response.ok && result.ok) {
+                alert("Success! Check your bot chat for the diagnostic test message.");
+            } else {
+                console.error("Telegram API Error response:", result);
+                alert(`Failed to send test message.\nError: ${result.description || "Unknown error"}\n\nMake sure you have started a chat with the bot first!`);
+            }
+        } catch (err) {
+            console.error("Telegram connection error:", err);
+            alert(`Network error testing Telegram Bot: ${err.message}`);
+        } finally {
+            testTelegramBtn.disabled = false;
+            testTelegramBtn.textContent = "Test Bot";
         }
     });
 }
@@ -2539,7 +2661,7 @@ if (fulfillForm && fulfillRequestModal) {
         if (existingMovie) {
             if (!existingMovie.links) existingMovie.links = [];
             if (!existingMovie.links.includes(downloadLink)) {
-                existingMovie.links.unshift(downloadLink);
+                existingMovie.links.push(downloadLink);
                 catalogChangesMade = true;
                 if (!newlyUpdatedIds.includes(existingMovie.csv_id)) {
                     newlyUpdatedIds.push(existingMovie.csv_id);
@@ -2653,6 +2775,38 @@ if (fulfillForm && fulfillRequestModal) {
         });
         
         batch.commit().then(async () => {
+            // Send Telegram Bot notifications
+            const requesters = [];
+            currentFulfillDocIds.forEach(id => {
+                const req = allRequests.find(r => r.docId === id);
+                if (req && req.requestedById) {
+                    requesters.push({
+                        id: req.requestedById,
+                        username: req.requestedBy || "User"
+                    });
+                }
+            });
+
+            if (telegramBotToken && requesters.length > 0) {
+                const notifyMsg = `🍿 *Good news!*\n\nYour request for *${currentFulfillTitle}* is ready! 🎉\n\nClick below to download/watch it directly:\n🔗 ${downloadLink}\n\nThank you for requesting! Enjoy watching! 🎬`;
+
+                requesters.forEach(async (req) => {
+                    try {
+                        await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                chat_id: req.id.trim(),
+                                text: notifyMsg,
+                                parse_mode: "Markdown"
+                            })
+                        });
+                    } catch (err) {
+                        console.error(`Failed to notify requester ${req.id}:`, err);
+                    }
+                });
+            }
+
             // Auto-Publish to GitHub in background if token exists!
             const token = (document.getElementById("github-token")?.value.trim()) || (githubToken ? githubToken.trim() : "");
             if (token) {
@@ -2871,5 +3025,221 @@ function renderCategoryMovies() {
         listContainer.appendChild(row);
     });
 }
+
+// --- TELEGRAM BOT BROADCASTING CENTER LOGIC ---
+let isBroadcasting = false;
+let shouldCancelBroadcast = false;
+
+// DOM bindings for Broadcasting
+document.addEventListener("DOMContentLoaded", () => {
+    const broadcastTarget = document.getElementById("broadcast-target");
+    const broadcastUserIdGroup = document.getElementById("broadcast-userid-group");
+    const broadcastUserid = document.getElementById("broadcast-userid");
+    const broadcastMessage = document.getElementById("broadcast-message");
+    const broadcastCharCounter = document.getElementById("broadcast-char-counter");
+    const btnStartBroadcast = document.getElementById("btn-start-broadcast");
+    const btnCancelBroadcast = document.getElementById("btn-cancel-broadcast");
+    
+    // UI elements update on user profile list sync to show target count
+    const updateTargetCountLabel = () => {
+        const target = broadcastTarget ? broadcastTarget.value : "all";
+        const countLabel = document.getElementById("broadcast-recipient-count");
+        if (!countLabel) return;
+        
+        if (target === "all") {
+            const count = (typeof allUsers !== 'undefined' && allUsers) ? allUsers.length : 0;
+            countLabel.textContent = `Target: ${count} Registered Users`;
+        } else {
+            countLabel.textContent = `Target: 1 Specific User`;
+        }
+    };
+    
+    // Toggle User ID input
+    if (broadcastTarget && broadcastUserIdGroup) {
+        broadcastTarget.addEventListener("change", () => {
+            const val = broadcastTarget.value;
+            broadcastUserIdGroup.style.display = val === "single" ? "block" : "none";
+            updateTargetCountLabel();
+        });
+    }
+    
+    // Character Counter
+    if (broadcastMessage && broadcastCharCounter) {
+        broadcastMessage.addEventListener("input", () => {
+            const chars = broadcastMessage.value.length;
+            broadcastCharCounter.textContent = `${chars} chars`;
+        });
+    }
+    
+    // Start Broadcast click listener
+    if (btnStartBroadcast) {
+        btnStartBroadcast.addEventListener("click", async () => {
+            if (isBroadcasting) return;
+            
+            const message = broadcastMessage.value.trim();
+            if (!message) {
+                alert("Please enter a message to broadcast!");
+                return;
+            }
+            
+            if (!telegramBotToken) {
+                alert("Please configure and save your Telegram Bot Token in Settings first!");
+                return;
+            }
+            
+            const targetType = broadcastTarget.value;
+            let targetUsers = [];
+            
+            if (targetType === "single") {
+                const singleId = broadcastUserid.value.trim();
+                if (!singleId) {
+                    alert("Please enter a target Telegram User ID!");
+                    return;
+                }
+                targetUsers = [{ id: singleId }];
+            } else {
+                // Get all users from Firestore or state
+                if (typeof allUsers !== 'undefined' && allUsers && allUsers.length > 0) {
+                    targetUsers = allUsers.map(u => ({
+                        id: String(u.id),
+                        username: u.username || ""
+                    }));
+                } else {
+                    if (typeof firebase === 'undefined' || !db) {
+                        alert("Firestore is not connected!");
+                        return;
+                    }
+                    btnStartBroadcast.disabled = true;
+                    btnStartBroadcast.textContent = "Fetching users... ⏳";
+                    try {
+                        const snapshot = await db.collection("users").get();
+                        snapshot.forEach(doc => {
+                            const u = doc.data();
+                            if (u.id) {
+                                targetUsers.push({
+                                    id: String(u.id),
+                                    username: u.username || ""
+                                });
+                            }
+                        });
+                    } catch (e) {
+                        console.error("Error fetching users for broadcast:", e);
+                        alert("Failed to fetch user list from database: " + e.message);
+                        btnStartBroadcast.disabled = false;
+                        btnStartBroadcast.textContent = "Send Broadcast Message ✈️";
+                        return;
+                    }
+                }
+            }
+            
+            if (targetUsers.length === 0) {
+                alert("No registered users found to receive this message.");
+                btnStartBroadcast.disabled = false;
+                btnStartBroadcast.textContent = "Send Broadcast Message ✈️";
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to send this broadcast to ${targetUsers.length} recipient(s)?`)) {
+                btnStartBroadcast.disabled = false;
+                btnStartBroadcast.textContent = "Send Broadcast Message ✈️";
+                return;
+            }
+            
+            // Start Broadcasting loop
+            isBroadcasting = true;
+            shouldCancelBroadcast = false;
+            btnStartBroadcast.disabled = true;
+            btnStartBroadcast.textContent = "Broadcasting... ✈️";
+            
+            // Show progress panel
+            const progressContainer = document.getElementById("broadcast-progress-container");
+            const statusLabel = document.getElementById("broadcast-status-label");
+            const progressRatio = document.getElementById("broadcast-progress-ratio");
+            const progressBar = document.getElementById("broadcast-progress-bar");
+            const successEl = document.getElementById("broadcast-success-count");
+            const failedEl = document.getElementById("broadcast-failed-count");
+            
+            if (progressContainer) progressContainer.style.display = "block";
+            if (statusLabel) statusLabel.textContent = "Broadcasting messages...";
+            if (successEl) successEl.textContent = "0";
+            if (failedEl) failedEl.textContent = "0";
+            
+            let successCount = 0;
+            let failedCount = 0;
+            const total = targetUsers.length;
+            
+            for (let i = 0; i < total; i++) {
+                if (shouldCancelBroadcast) {
+                    if (statusLabel) statusLabel.textContent = "Broadcast cancelled.";
+                    break;
+                }
+                
+                const user = targetUsers[i];
+                
+                // Update UI progress
+                if (progressRatio) progressRatio.textContent = `${i + 1} / ${total}`;
+                if (progressBar) progressBar.style.width = `${Math.round(((i + 1) / total) * 100)}%`;
+                
+                try {
+                    const response = await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            chat_id: user.id.trim(),
+                            text: message,
+                            parse_mode: "Markdown"
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (response.ok && result.ok) {
+                        successCount++;
+                        if (successEl) successEl.textContent = successCount;
+                    } else {
+                        console.warn(`Failed to send to ${user.id}:`, result);
+                        failedCount++;
+                        if (failedEl) failedEl.textContent = failedCount;
+                    }
+                } catch (err) {
+                    console.warn(`Network error sending to ${user.id}:`, err);
+                    failedCount++;
+                    if (failedEl) failedEl.textContent = failedCount;
+                }
+                
+                // Delay 50ms to respect Telegram rate limit (max 30 msgs/sec)
+                await new Promise(r => setTimeout(r, 50));
+            }
+            
+            // Broadcast completed
+            isBroadcasting = false;
+            btnStartBroadcast.disabled = false;
+            btnStartBroadcast.textContent = "Send Broadcast Message ✈️";
+            
+            if (statusLabel) {
+                statusLabel.textContent = shouldCancelBroadcast 
+                    ? `Broadcast Cancelled. Sent to ${successCount}/${total} users successfully.` 
+                    : `Completed! Sent to ${successCount}/${total} users successfully.`;
+            }
+        });
+    }
+    
+    // Cancel Broadcast
+    if (btnCancelBroadcast) {
+        btnCancelBroadcast.addEventListener("click", () => {
+            if (isBroadcasting) {
+                shouldCancelBroadcast = true;
+                btnCancelBroadcast.textContent = "Cancelling... ⏳";
+                btnCancelBroadcast.disabled = true;
+                setTimeout(() => {
+                    btnCancelBroadcast.textContent = "Cancel Broadcast";
+                    btnCancelBroadcast.disabled = false;
+                }, 1000);
+            }
+        });
+    }
+
+    // Trigger update count label on startup
+    setTimeout(updateTargetCountLabel, 2000);
+});
 
 
