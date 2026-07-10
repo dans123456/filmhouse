@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "75123-a-korean-odyssey",
+    "tmdb_id": 75123,
+    "imdb_id": "",
+    "title": "A Korean Odyssey",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A self-serving mythical creature's bid for invincibility backfires when he finds himself at the mercy of a woman who can see otherworldly beings.",
+    "poster": "https://image.tmdb.org/t/p/w500/uJfF9m2bDXZf6Lng8kkyd0o0Qjz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6oxQe4fyYJQT77NBNLQzbW7pf4Z.jpg",
+    "rating": 8.1,
+    "release_date": "2017-12-23",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "vf0HtEMlQCU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlBQAAp4PiEaeRTGVqOMLERYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "126035-nevertheless",
     "tmdb_id": 126035,
     "imdb_id": "",
