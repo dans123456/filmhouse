@@ -290,6 +290,17 @@ async function init() {
         const bot = new Telegraf(botToken);
         setupBot(bot);
         
+        // Register Commands Menu in Telegram dynamically
+        bot.telegram.setMyCommands([
+            { command: 'start', description: 'Launch the Film House Web App 🚀' },
+            { command: 'settings', description: 'View your profile & points status 🪙' },
+            { command: 'help', description: 'Get details on how to use Film House 📖' }
+        ]).then(() => {
+            console.log("Bot commands menu registered successfully!");
+        }).catch(err => {
+            console.error("Failed to register bot commands menu:", err);
+        });
+
         bot.launch();
         console.log("Film House Bot successfully started! 🚀 Running command listener...");
 
