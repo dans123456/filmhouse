@@ -34,6 +34,79 @@ const safeStorage = (() => {
 })();
 const localStorage = safeStorage;
 
+// Premium Floating Toast Notification Helper
+function showToast(message, type = "success") {
+    console.log(`[Toast] [${type}] ${message}`);
+    let toastContainer = document.getElementById("admin-toast-container");
+    if (!toastContainer) {
+        toastContainer = document.createElement("div");
+        toastContainer.id = "admin-toast-container";
+        toastContainer.style.cssText = `
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000000;
+            pointer-events: none;
+            font-family: system-ui, -apple-system, sans-serif;
+        `;
+        document.body.appendChild(toastContainer);
+    }
+
+    const toast = document.createElement("div");
+    toast.style.cssText = `
+        background: rgba(18, 20, 29, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        pointer-events: auto;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 250px;
+    `;
+
+    if (type === "success") {
+        toast.style.borderLeft = "4px solid #4caf50";
+        toast.innerHTML = `<span>✅</span> <span>${message}</span>`;
+    } else if (type === "error" || type === "danger") {
+        toast.style.borderLeft = "4px solid #f44336";
+        toast.innerHTML = `<span>❌</span> <span>${message}</span>`;
+    } else if (type === "warning") {
+        toast.style.borderLeft = "4px solid #ff9800";
+        toast.innerHTML = `<span>⚠️</span> <span>${message}</span>`;
+    } else if (type === "info") {
+        toast.style.borderLeft = "4px solid #2196f3";
+        toast.innerHTML = `<span>ℹ️</span> <span>${message}</span>`;
+    } else {
+        toast.style.borderLeft = "4px solid #ffd700";
+        toast.innerHTML = `<span>🔔</span> <span>${message}</span>`;
+    }
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = "1";
+        toast.style.transform = "translateY(0)";
+    }, 10);
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-20px)";
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+
 // Film House - Standalone Admin Command Center Logic
 const firebaseConfig = {
     apiKey: "AIzaSyCXs2tNgG07tAlsCkR96PNNIVIDyDkJD78",
@@ -684,6 +757,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // Tab Switching for Settings Panel
+    const tabBtns = document.querySelectorAll(".settings-tab-btn");
+    tabBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            tabBtns.forEach(b => {
+                b.classList.remove("active");
+                b.style.background = "transparent";
+                b.style.color = "var(--text-secondary)";
+            });
+            btn.classList.add("active");
+            btn.style.background = "var(--primary-gradient)";
+            btn.style.color = "#000";
+
+            const contents = document.querySelectorAll(".settings-tab-content");
+            contents.forEach(c => c.style.display = "none");
+
+            const targetId = btn.getAttribute("data-target");
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+                targetContent.style.display = "block";
+            }
+        });
+    });
+
     // Verify Admin Access
     verifyAdminAccess();
 });
@@ -772,10 +869,10 @@ if (saveAdminsBtn) {
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 adminInput.value = finalIds.join(", ");
-                alert("Authorized Admin IDs updated successfully in your Firebase database!");
+                showToast("Authorized Admin IDs updated successfully in your Firebase database! 🛡️", "success");
             } catch (e) {
                 console.error("Error saving admin list to Firestore:", e);
-                alert("Failed to update Admin IDs. Make sure your database rules permit this write.");
+                showToast("Failed to update Admin IDs. Check your database rules.", "error");
             }
         }
     });
@@ -798,13 +895,13 @@ if (saveTokenBtn) {
                         token: token,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    alert("GitHub Personal Access Token saved locally and securely in Firestore!");
+                    showToast("GitHub Personal Access Token saved securely in Firestore! 🚀", "success");
                 } catch (e) {
                     console.error("Error saving token to Firestore:", e);
-                    alert("Token saved locally! (Note: Firestore cloud sync failed - check your database rules).");
+                    showToast("Token saved locally! (Note: Firestore database sync failed).", "warning");
                 }
             } else {
-                alert("GitHub Personal Access Token saved locally!");
+                showToast("GitHub Personal Access Token saved locally!", "info");
             }
         }
     });
@@ -827,13 +924,13 @@ if (saveTelegramTokenBtn) {
                         botToken: token,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    alert("Telegram Bot Token saved locally and securely in Firestore!");
+                    showToast("Telegram Bot Token saved securely in Firestore! 🤖", "success");
                 } catch (e) {
                     console.error("Error saving Telegram token to Firestore:", e);
-                    alert("Token saved locally! (Note: Firestore cloud sync failed - check your database rules).");
+                    showToast("Token saved locally! (Note: Firestore database sync failed).", "warning");
                 }
             } else {
-                alert("Telegram Bot Token saved locally!");
+                showToast("Telegram Bot Token saved locally!", "info");
             }
         }
     });
@@ -846,7 +943,7 @@ if (testTelegramBtn) {
         const tokenInput = document.getElementById("telegram-bot-token");
         const token = tokenInput ? tokenInput.value.trim() : "";
         if (!token) {
-            alert("Please enter a Telegram Bot Token first!");
+            showToast("Please enter a Telegram Bot Token first!", "warning");
             return;
         }
 
@@ -890,14 +987,14 @@ if (testTelegramBtn) {
 
             const result = await response.json();
             if (response.ok && result.ok) {
-                alert("Success! Check your bot chat for the diagnostic test message.");
+                showToast("Success! Check your bot chat for the diagnostic test message. 💌", "success");
             } else {
                 console.error("Telegram API Error response:", result);
-                alert(`Failed to send test message.\nError: ${result.description || "Unknown error"}\n\nMake sure you have started a chat with the bot first!`);
+                showToast(`Failed: ${result.description || "Unknown error"}. Start chat with bot first!`, "error");
             }
         } catch (err) {
             console.error("Telegram connection error:", err);
-            alert(`Network error testing Telegram Bot: ${err.message}`);
+            showToast(`Network error testing Telegram Bot: ${err.message}`, "error");
         } finally {
             testTelegramBtn.disabled = false;
             testTelegramBtn.textContent = "Test Bot";
