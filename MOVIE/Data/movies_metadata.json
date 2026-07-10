@@ -24,7 +24,14 @@
     "trailer": "PkCcADlua1w",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADwB8AAp4PiEaSCNE5w62IQBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADwB8AAp4PiEaSCNE5w62IQBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADxx8AAp4PiEZAatl1mycJ1RYE",
+        "quality": "720p"
+      }
     ]
   },
   {
