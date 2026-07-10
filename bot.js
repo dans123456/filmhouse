@@ -121,7 +121,11 @@ function setupBot(bot) {
                     }
                 );
             } catch (err) {
-                console.error("Failed to send welcome photo:", err);
+                console.error("Failed to send welcome photo, falling back to text:", err);
+                return ctx.reply(caption, {
+                    parse_mode: 'Markdown',
+                    reply_markup: replyMarkup
+                });
             }
         }
         
@@ -287,6 +291,7 @@ function setupBot(bot) {
                     ]
                 }
             }
+        );
     });
 
     // Callback Query Handler for Inline Buttons
