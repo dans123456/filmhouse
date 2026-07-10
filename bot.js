@@ -124,7 +124,7 @@ function setupBot(bot) {
 
         const escapedFullName = fullName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         const imagePath = path.join(__dirname, "MOVIE", "img", "FilmHouse.png");
-        const caption = `Hey There 🗣️ <b>${escapedFullName}</b> 😎 😊, I'm 🍿 <b>Film House</b> 🍿's cloud bot. You can access all Series 🙈 and Movies 😌 through me. Just Make sure you are a member of our Channel @FilmHouseBUP 🤟`;
+        const caption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start watching and downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @FilmHouseBUP to stay updated! 🤟</i>`;
 
         const replyMarkup = {
             inline_keyboard: [
