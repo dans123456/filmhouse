@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "224042-pauline",
+    "tmdb_id": 224042,
+    "imdb_id": "",
+    "title": "Pauline",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Pauline gets pregnant after a one-night stand with Lukas. Something is very wrong with the pregnancy. When Luke reveals that he is the son of the devil incarnate and heir to hell, nothing is ever the same again. Between the fronts of demons and angels, Pauline's pregnancy also gives her supernatural abilities. She becomes the decisive force in the epic battle between good and evil.",
+    "poster": "https://image.tmdb.org/t/p/w500/sE4qMJJ3fwGZkBgYin3OA2lrGoL.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vkYe6fNVgQdm8EOeKRoNILrusiD.jpg",
+    "rating": 5.8,
+    "release_date": "2024-05-22",
+    "language": "de",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADIRoAAp4PiEb0yc5Yl5v5TRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "135157-alchemy-of-souls",
     "tmdb_id": 135157,
     "imdb_id": "",
