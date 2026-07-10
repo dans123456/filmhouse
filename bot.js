@@ -214,6 +214,11 @@ function setupBot(bot) {
         }
     });
 
+    // Command: /ping
+    bot.command('ping', (ctx) => {
+        return ctx.reply("🏓 Pong! I am online and running.");
+    });
+
     // Command: /broadcast (Admin Only)
     bot.command('broadcast', async (ctx) => {
         const userId = String(ctx.from.id);
@@ -391,7 +396,9 @@ async function init() {
         bot.telegram.setMyCommands([
             { command: 'start', description: 'Launch the Film House Web App 🚀' },
             { command: 'settings', description: 'View your profile & points status 🪙' },
-            { command: 'help', description: 'Get details on how to use Film House 📖' }
+            { command: 'help', description: 'Get details on how to use Film House 📖' },
+            { command: 'broadcast', description: 'Broadcast Message to Users (Admins Only) 📢' },
+            { command: 'ping', description: 'Check if the bot is alive 🏓' }
         ]).then(() => {
             console.log("Bot commands menu registered successfully!");
         }).catch(err => {
