@@ -6,10 +6,12 @@
     "title": "The Witcher",
     "type": "Series",
     "categories": [
-      "Main",
-      "Hollywood/British Series"
+      "Main"
     ],
-    "genres": [],
+    "genres": [
+      "Drama",
+      "Action & Adventure"
+    ],
     "overview": "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts.",
     "poster": "https://image.tmdb.org/t/p/w500/AoGsDM02UVt0npBA8OvpDcZbaMi.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/foGkPxpw9h8zln81j63mix5B7m8.jpg",
