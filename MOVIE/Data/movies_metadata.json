@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "250670-maxton-hall-the-world-between-us",
+    "tmdb_id": 250670,
+    "imdb_id": "",
+    "title": "Maxton Hall – The World Between Us",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "When Ruby unwittingly witnesses an explosive secret at Maxton Hall private school, the arrogant millionaire heir James Beaufort has to deal with the quick-witted scholarship student for better or worse: He is determined to silence Ruby. Their passionate exchange of words unexpectedly ignites a spark...",
+    "poster": "https://image.tmdb.org/t/p/w500/slKAbvY2CjAIyJFqoLSh1WICzg6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dkhjP3GK44gkxmKzrgYzHs8hbtf.jpg",
+    "rating": 8.3,
+    "release_date": "2024-05-09",
+    "language": "de",
+    "cast": [],
+    "director": "",
+    "trailer": "nAdH1yyUAbc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADcRoAAp4PiEbLHWbZVaXOVBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "90461-monsters-at-work",
     "tmdb_id": 90461,
     "imdb_id": "",
