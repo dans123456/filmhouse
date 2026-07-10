@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "211079-supersex",
+    "tmdb_id": 211079,
+    "imdb_id": "",
+    "title": "Supersex",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Inspired by true events, this is the story of how Rocco Siffredi escaped a humble life and emerged as the world's greatest porn star.",
+    "poster": "https://image.tmdb.org/t/p/w500/9tSS4VeR5lYzny2c6Fj6lgYszRP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3zEl5KzXhjeC8naTwFpBrxGKXQj.jpg",
+    "rating": 6.7,
+    "release_date": "2024-03-06",
+    "language": "it",
+    "cast": [],
+    "director": "",
+    "trailer": "7Fr5-U7WGlI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD7RgAAp4PiEaPPSa63bRJcxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "157061-the-devil-s-hour",
     "tmdb_id": 157061,
     "imdb_id": "",
@@ -9794,8 +9822,14 @@
     "csv_id": "94997-house-of-the-dragon",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADRgoAArCt0UUhqaSHiqNxHBYE",
-      "https://t.me/+buByzJSLOUA0NWI0"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADRgoAArCt0UUhqaSHiqNxHBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD9xgAAp4PiEaWOJj1kOxcoxYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/7V0Ebks0GgpKvQ7QbLAIdX5dos4.jpg",
     "rating": 8.4,
