@@ -1,5 +1,218 @@
 [
   {
+    "csv_id": "1216512-the-casagrandes-movie",
+    "tmdb_id": 1216512,
+    "imdb_id": "",
+    "title": "The Casagrandes Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "On a birthday trip to Mexico, 12-year-old Ronnie Anne accidentally frees a demigod trapped in a mountain and needs her family's help to set things right.",
+    "poster": "https://image.tmdb.org/t/p/w500/1ZHetsKD44xB63ZjTjqryC0CtoL.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/9L6qUlNYbL6XgYTXPKOlMtphzSu.jpg",
+    "rating": 7.1,
+    "release_date": "2024-03-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "jOCIRd7kQZ8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADnyEAAp4PiEauNQo1ZE8prhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADoCEAAp4PiEYYiKL15hvh2hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1094556-the-thundermans-return",
+    "tmdb_id": 1094556,
+    "imdb_id": "",
+    "title": "The Thundermans Return",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Twins Phoebe and Max are enjoying their superhero lifestyle, but when one 'save' goes awry, the Thundermans are sent back to Hiddenville. While Hank and Barb enjoy their return, and Billy and Nora look forward to a normal high school life, Max and Phoebe are determined to regain their superhero status.",
+    "poster": "https://image.tmdb.org/t/p/w500/2J5eeroLDY0d45mVjpuGhcLZs3W.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6SLyu9ygASsrOqkCpjAwtyG9PWW.jpg",
+    "rating": 7,
+    "release_date": "2024-03-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "gYA5WOFhd-Y",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADniEAAp4PiEa4Oa0qjnDOmRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "59268-the-haunted-hathaways",
+    "tmdb_id": 59268,
+    "imdb_id": "",
+    "title": "The Haunted Hathaways",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "When Michelle Hathaway relocates to New Orleans to open a bakery with her daughters Taylor and Frankie, they quickly learn that life in the “Big Easy” is very different. Unbeknownst to them, their new home is already occupied by a ghost family comprised of jazz musician father Ray Preston and his sons Miles and Louie. After agreeing to live under one roof, they come to care about and rely on one another while driving each other crazy – just like any normal family would. Though leery at first, the Hathaways soon discover how much fun life can be when living with ghosts.",
+    "poster": "https://image.tmdb.org/t/p/w500/dUhGlPZVWf8KCt4xMZtG1cymHRZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/feRjWFGB5uNcQXAVe68L3tDhzpU.jpg",
+    "rating": 7.2,
+    "release_date": "2013-07-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADkCEAAp4PiEZRoqloetv1fxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADkSEAAp4PiEZFl3iZBVmC-BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1280768-no-time-to-spy-a-loud-house-movie",
+    "tmdb_id": 1280768,
+    "imdb_id": "",
+    "title": "No Time to Spy: A Loud House Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Lincoln and the Louds are ecstatic to welcome their new Gran-Gran, Myrtle, into the family with a tropical wedding celebration; but the festivities are cut short when an old nemesis from Myrtle's secret agent past appears on the island.",
+    "poster": "https://image.tmdb.org/t/p/w500/mh4Mk95u7fdY4D4t5kRGQpQbVFy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nL0q3UcNj4MOMluIUE42bc7PtW0.jpg",
+    "rating": 7.1,
+    "release_date": "2024-06-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "3gPGMqXUFl0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADjiEAAp4PiEa8odZSlDPBHxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "231394-tales-of-the-teenage-mutant-ninja-turtles",
+    "tmdb_id": 231394,
+    "imdb_id": "",
+    "title": "Tales of the Teenage Mutant Ninja Turtles",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "The Turtles — Leo, Raph, Donnie and Mikey — each will go it alone for the first time. Faced with new threats and teaming up with old allies, the Turtles will discover who they really are when they don’t have their brothers at their sides.",
+    "poster": "https://image.tmdb.org/t/p/w500/o0ZlpvK0Ewd3iJYUyYPfwAAeR88.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bTiPmPW4ZVmyFJNsxVK1UK3R96H.jpg",
+    "rating": 7.7,
+    "release_date": "2024-08-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "qZo7A_XBNeE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADhSEAAp4PiEbLus2uNvVq-BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "129565-the-fairly-oddparents-fairly-odder",
+    "tmdb_id": 129565,
+    "imdb_id": "",
+    "title": "The Fairly OddParents: Fairly Odder",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "When Ty Turner uproots his life to reunite with his high school sweetheart, Rachel Raskin, in the colorful town of Dimmsdale, his cautious 13-year-old daughter Vivian is thrust into a new world, and a new school alongside new step-brother and town star, Roy, a jock with a heart of gold. Lucky for Viv she’s inherited Wanda and Cosmo, two Fairy Godparents she’ll share with Roy, to help them both find their way.",
+    "poster": "https://image.tmdb.org/t/p/w500/zpENUVs55Y4FuAUDaST1cNXvISK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3LkNHMZKRRStyKU8zobbNSasS86.jpg",
+    "rating": 6.3,
+    "release_date": "2022-03-31",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Cy1GoiMrN28",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADFgkAAhsfEEdNFpDIbphlshYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "254653-the-thundermans-undercover",
+    "tmdb_id": 254653,
+    "imdb_id": "",
+    "title": "The Thundermans: Undercover",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Twins Phoebe and Max Thunderman embark on a mission to alleviate the threat in the seaside town of Secret Shores, as well as helping Chloe develop her superhero abilities by bringing her along on their undercover mission. Chloe forms a bond with two classmates while they investigate suspicious activity coming from the local school, who don’t realize their new friend has secret powers. As the danger increases, the Thunderman trio must stay in town indefinitely, leaving the squabbling twins in charge of raising their younger sister.",
+    "poster": "https://image.tmdb.org/t/p/w500/zeynuCJTLvZBpNYtAzi5clXfBiq.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/yEmGiYvCyJ32xuPZbmytTjXzF4S.jpg",
+    "rating": 8.3,
+    "release_date": "2025-01-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "lp98X-9x144",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADeCEAAp4PiEa3D7mnaNWN6RYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1006228-breakwater",
     "tmdb_id": 1006228,
     "imdb_id": "",
@@ -16515,10 +16728,22 @@
     "csv_id": "1877-phineas-and-ferb",
     "type": "Series",
     "links": [
-      "https://t.me/+cJUgTGPMeXoyM2Nk",
-      "https://t.me/+cJUgTGPMeXoyM2Nk",
-      "https://t.me/+cJUgTGPMeXoyM2Nk",
-      "https://t.me/+cJUgTGPMeXoyM2Nk"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADrCEAAp4PiEbYQ6QWDodiahYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADrSEAAp4PiEY84zMAAXH_OTIWBA",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADryEAAp4PiEZgtkfdMODT3xYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADsSEAAp4PiEbxUirfRXy0OxYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/g6TidT7be954rrzPPBTIXkSmfXj.jpg",
     "rating": 7.9,
@@ -16531,8 +16756,8 @@
     ],
     "categories": [
       "Main",
-      "Animated Movies",
       "Hollywood/British Series",
+      "Animated Movies",
       "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 1877,
