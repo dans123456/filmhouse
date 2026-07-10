@@ -22479,7 +22479,14 @@
     "csv_id": "120462-them",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADNgUAAvSgAAFH-ud7OlxipzMWBA"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADNgUAAvSgAAFH-ud7OlxipzMWBA",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD0SAAAp4PiEYYdmQfFrE5sRYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/bJw1VZ4ACt5TnAvJbHcprzgYc1E.jpg",
     "rating": 7.6,
