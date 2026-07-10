@@ -215,7 +215,10 @@ function setupBot(bot) {
                 `/unban <user_id> - Unban a restricted user`;
         }
 
-        return ctx.reply(helpMsg, { parse_mode: 'Markdown' });
+        return ctx.reply(helpMsg, { 
+            parse_mode: 'Markdown',
+            reply_to_message_id: ctx.message.message_id
+        });
     });
 
     // Command: /settings
@@ -253,18 +256,23 @@ function setupBot(bot) {
                 `• *VIP Badge:* 🏆 \`${badge}\``,
                 { 
                     parse_mode: 'Markdown',
-                    reply_markup: replyMarkup
+                    reply_markup: replyMarkup,
+                    reply_to_message_id: ctx.message.message_id
                 }
             );
         } catch (err) {
             console.error("Error loading settings:", err);
-            return ctx.reply("❌ Error loading your profile settings.");
+            return ctx.reply("❌ Error loading your profile settings.", {
+                reply_to_message_id: ctx.message.message_id
+            });
         }
     });
 
     // Command: /ping
     bot.command('ping', (ctx) => {
-        return ctx.reply("🏓 Pong! I am online and running.");
+        return ctx.reply("🏓 Pong! I am online and running.", {
+            reply_to_message_id: ctx.message.message_id
+        });
     });
 
     // Command: /broadcast (Admin Only)
@@ -278,10 +286,16 @@ function setupBot(bot) {
         const messageText = ctx.message.text.substring(10).trim(); // remove "/broadcast" prefix
         
         if (!replyTo && !messageText) {
-            return ctx.reply("Please specify a message to broadcast. Either:\n1. Reply to any message (text, image, video, file) with `/broadcast`.\n2. Use: `/broadcast <text>`", { parse_mode: 'Markdown' });
+            return ctx.reply("Please specify a message to broadcast. Either:\n1. Reply to any message (text, image, video, file) with `/broadcast`.\n2. Use: `/broadcast <text>`", { 
+                parse_mode: 'Markdown',
+                reply_to_message_id: ctx.message.message_id
+            });
         }
 
-        ctx.reply("✈️ *Starting broadcast...*", { parse_mode: 'Markdown' });
+        ctx.reply("✈️ *Starting broadcast...*", { 
+            parse_mode: 'Markdown',
+            reply_to_message_id: ctx.message.message_id
+        });
 
         try {
             const snapshot = await db.collection("users").get();
@@ -308,10 +322,15 @@ function setupBot(bot) {
                 }
             }
 
-            return ctx.reply(`📢 *Broadcast Finished*\n\n🟢 Success: \`${successCount}\`\n🔴 Failed: \`${failedCount}\``, { parse_mode: 'Markdown' });
+            return ctx.reply(`📢 *Broadcast Finished*\n\n🟢 Success: \`${successCount}\`\n🔴 Failed: \`${failedCount}\``, { 
+                parse_mode: 'Markdown',
+                reply_to_message_id: ctx.message.message_id
+            });
         } catch (err) {
             console.error("Broadcast failed:", err);
-            return ctx.reply(`❌ Broadcast failed: ${err.message}`);
+            return ctx.reply(`❌ Broadcast failed: ${err.message}`, {
+                reply_to_message_id: ctx.message.message_id
+            });
         }
     });
 
@@ -375,6 +394,7 @@ function setupBot(bot) {
             `🤖 *Hello!* I am the Film House Bot.\n\nTo search, request, or watch movies/series, please tap the button below to launch the Film House Web App! 🍿`,
             {
                 parse_mode: 'Markdown',
+                reply_to_message_id: ctx.message.message_id,
                 reply_markup: {
                     inline_keyboard: [
                         [
@@ -392,6 +412,7 @@ function setupBot(bot) {
     // Callback Query Handler for Inline Buttons
     bot.on('callback_query', async (ctx) => {
         const data = ctx.callbackQuery.data;
+        const replyToId = ctx.callbackQuery.message ? ctx.callbackQuery.message.message_id : undefined;
         
         try {
             if (data === "bot_help") {
@@ -402,7 +423,10 @@ function setupBot(bot) {
                     `• Select any movie or series to watch/download.\n` +
                     `• If a title is missing, tap *Request* to submit it to our admins.\n` +
                     `• You will receive a direct notification message in this chat as soon as it is ready!`,
-                    { parse_mode: 'Markdown' }
+                    { 
+                        parse_mode: 'Markdown',
+                        reply_to_message_id: replyToId
+                    }
                 );
             }
             
@@ -414,7 +438,10 @@ function setupBot(bot) {
                     `• Direct high-speed downloads.\n` +
                     `• Custom request queue with instant automated DM notifications.\n` +
                     `• Built-in loyalty rewards system.`,
-                    { parse_mode: 'Markdown' }
+                    { 
+                        parse_mode: 'Markdown',
+                        reply_to_message_id: replyToId
+                    }
                 );
             }
         } catch (err) {
