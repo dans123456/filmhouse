@@ -1640,7 +1640,7 @@ function renderHistoryGrid() {
         img.className = "movie-card-poster";
         img.src = movie.poster;
         img.alt = movie.title;
-        img.loading = "eager";
+        img.loading = "lazy";
         imgWrapper.appendChild(img);
 
         if (movie.rating > 0) {
@@ -1989,7 +1989,7 @@ function renderFeaturedGrid(fromDiscover = false) {
         img.className = "movie-card-poster";
         img.src = movie.poster;
         img.alt = movie.title;
-        img.loading = "eager";
+        img.loading = "lazy";
         imgWrapper.appendChild(img);
 
         // Dynamic NEW Badge Overlay for top additions
@@ -2153,7 +2153,7 @@ function renderRecommendations() {
         img.className = "movie-card-poster";
         img.src = movie.poster;
         img.alt = movie.title;
-        img.loading = "eager";
+        img.loading = "lazy";
         imgWrapper.appendChild(img);
 
         if (movie.rating > 0) {

@@ -5,7 +5,7 @@ import urllib.parse
 import time
 import os
 
-API_KEY = "a3a9df05cdacd9f23c885f2756466395"
+API_KEY = "d638f7775bfa1b8d456dfd028ccbef19"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_PATH = os.path.join(BASE_DIR, "Data", "datafile.csv")
 OUTPUT_PATH = os.path.join(BASE_DIR, "Data", "movies_metadata.json")
