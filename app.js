@@ -3431,8 +3431,8 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
         }
 
         // Initialize video controller if not already done
-        if (!state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID]) {
-            state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID] = window.Adsgram.init({ blockId: ADSGRAM_DOWNLOAD_BLOCK_ID });
+        if (!state.adsgramControllers[id]) {
+            state.adsgramControllers[id] = window.Adsgram.init({ blockId: id });
         }
 
         // Try playing Task first if this is a movie download request
@@ -3606,7 +3606,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                         fallbackBtn.textContent = "Loading Ad…";
                         status("Loading premium ad buffer…");
                         
-                        const videoController = state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID];
+                        const videoController = state.adsgramControllers[id];
                         if (videoController) {
                             videoController.show().then(() => {
                                 status("Ad completed! Reward received ✓");
@@ -3639,7 +3639,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 taskEl.addEventListener("onbannernotfound", handleFallback);
             } else {
                 // Drawer elements missing, fallback to standard video ad
-                const videoController = state.adsgramControllers[ADSGRAM_DOWNLOAD_BLOCK_ID];
+                const videoController = state.adsgramControllers[id];
                 if (videoController) {
                     videoController.show().then(() => {
                         safeResolve();
