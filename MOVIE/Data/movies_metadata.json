@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "201834-ted",
+    "tmdb_id": 201834,
+    "imdb_id": "",
+    "title": "ted",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "It's 1993 and Ted the bear's moment of fame has passed, leaving him living with his best friend, 16-year-old John Bennett, who lives in a working-class Boston home with his parents and cousin. Ted may not be the best influence on John, but when it comes right down to it, he's willing to go out on a limb to help his friend and his family.",
+    "poster": "https://image.tmdb.org/t/p/w500/cPn71YFDENH0JkWUezlsLyWmLfN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xaiKpxuf9YGuTsqpdK5HSbD8M8f.jpg",
+    "rating": 8,
+    "release_date": "2024-01-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "aq2Vt7OvQG0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADeBgAAp4PiEZ5GzgQ2nh9VBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "218539-my-demon",
     "tmdb_id": 218539,
     "imdb_id": "",
@@ -3530,9 +3558,18 @@
     "csv_id": "91239-bridgerton",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADtQoAApMnOEZPHMP6lq5YKBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADtwoAApMnOEbu4rTarMxwGxYE",
-      "https://t.me/+f2bSAcXJDCpmNGJk"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADtQoAApMnOEZPHMP6lq5YKBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADtwoAApMnOEbu4rTarMxwGxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjhgAAp4PiEZiz1hmFvS8khYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/uXTg565ahu9RwonCX1V2Hex1NU6.jpg",
     "rating": 8.1,
