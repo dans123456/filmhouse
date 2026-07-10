@@ -286,10 +286,17 @@ function setupBot(bot) {
         const messageText = ctx.message.text.substring(10).trim(); // remove "/broadcast" prefix
         
         if (!replyTo && !messageText) {
-            return ctx.reply("Please specify a message to broadcast. Either:\n1. Reply to any message (text, image, video, file) with `/broadcast`.\n2. Use: `/broadcast <text>`", { 
-                parse_mode: 'Markdown',
-                reply_to_message_id: ctx.message.message_id
-            });
+            return ctx.reply(
+                "📢 *How to use /broadcast*:\n\n" +
+                "• *To broadcast a post (with image/video/caption)*:\n" +
+                "  Send the post to this chat, then *Reply* directly to that post with `/broadcast`.\n\n" +
+                "• *To broadcast a simple text message*:\n" +
+                "  Type: `/broadcast <your message>`",
+                { 
+                    parse_mode: 'Markdown',
+                    reply_to_message_id: ctx.message.message_id
+                }
+            );
         }
 
         ctx.reply("✈️ *Starting broadcast...*", { 
