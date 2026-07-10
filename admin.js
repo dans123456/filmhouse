@@ -3014,7 +3014,7 @@ if (fulfillForm && fulfillRequestModal) {
                                 renderCatalogList();
                                 updatePublishButtonState();
                                 fulfillRequestModal.classList.remove("active");
-                                alert(`Successfully fulfilled requests and published "${currentFulfillTitle}" directly live to GitHub! 🚀`);
+                                showToast(`Successfully fulfilled requests and published "${currentFulfillTitle}" directly live to GitHub! 🚀`, "success");
                                 return;
                             }
                         }
@@ -3029,7 +3029,7 @@ if (fulfillForm && fulfillRequestModal) {
                     renderCatalogList();
                     updatePublishButtonState();
                     fulfillRequestModal.classList.remove("active");
-                    alert(`Firestore updated successfully! However, auto-publishing to GitHub failed: ${publishErr.message || 'Network issue'}.\n\nPlease click the 'Publish Changes 🚀' button in the header to retry pushing the catalog changes to your app.`);
+                    showToast(`Firestore updated! Note: GitHub publish failed. Use 'Publish Changes' in the header to retry.`, "warning");
                 }
             } else {
                 if (submitBtn) {
@@ -3039,7 +3039,7 @@ if (fulfillForm && fulfillRequestModal) {
                 renderCatalogList();
                 updatePublishButtonState();
                 fulfillRequestModal.classList.remove("active");
-                alert(`Successfully fulfilled all requests for "${currentFulfillTitle}" in Firestore!\n\n(Note: No GitHub token was active to auto-publish. Staged locally. Please click 'Publish Changes 🚀' in the header to save to GitHub.)`);
+                showToast(`Successfully fulfilled requests for "${currentFulfillTitle}" in Firestore! Click 'Publish Changes' in the header to push live.`, "info");
             }
         }).catch(err => {
             if (submitBtn) {
@@ -3047,7 +3047,7 @@ if (fulfillForm && fulfillRequestModal) {
                 submitBtn.textContent = "Fulfill Request";
             }
             console.error("Error fulfilling requests:", err);
-            alert("Failed to fulfill requests: " + err.message);
+            showToast("Failed to fulfill requests: " + err.message, "error");
         });
     });
 }
