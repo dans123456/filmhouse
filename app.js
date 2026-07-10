@@ -90,7 +90,7 @@ function getTmdbApiKey() {
     if (userKey) return userKey;
     // Log a warning regarding demo key usage for horizontal scaling and security
     console.warn("Using fallback demo TMDB API key. Please set your own key in Profile settings!");
-    return "a3a9df05cdacd9f23c885f2756466395";
+    return "d638f7775bfa1b8d456dfd028ccbef19";
 }
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const CSV_FILE_PATH = "./MOVIE/Data/datafile.csv";
