@@ -519,7 +519,13 @@ function renderRequestsList() {
         if (r.status === "priority") {
             counts[key].isPriority = true;
         }
-        if (r.status !== "fulfilled") {
+        
+        const inCatalog = allCatalogMovies && allCatalogMovies.some(m => 
+            m.title && m.title.toLowerCase().trim() === r.title.toLowerCase().trim()
+        );
+        const fulfilled = r.status === "fulfilled" || r.status === "claimed" || inCatalog;
+        
+        if (!fulfilled) {
             counts[key].isFulfilled = false;
         }
     });
