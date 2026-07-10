@@ -1,5 +1,67 @@
 [
   {
+    "csv_id": "210684-in-the-know",
+    "tmdb_id": 210684,
+    "imdb_id": "",
+    "title": "In the Know",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Lauren Caspian is public radio's third most popular host. He's a well-meaning, hypocritical nimrod, just like you and me. He's also a stop motion puppet. Each episode follows the making of an episode of Lauren's show In the Know, in which Lauren conducts in-depth interviews with real world human guests. Lauren collaborates with a diverse crew of NPR staff. They are also puppets and nimrods.",
+    "poster": "https://image.tmdb.org/t/p/w500/gDZwEThWQDSpMz6mVAizer14yLc.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3cKhfBxbCqBilFrBBbJmZGiG0d1.jpg",
+    "rating": 6.5,
+    "release_date": "2024-01-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Ci_PnX7kegM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADShsAAp4PiEY-Ul9x03zXphYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "114481-iw-j",
+    "tmdb_id": 114481,
+    "imdb_id": "",
+    "title": "Iwájú",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Two friends in a futuristic Nigeria discover secrets and dangers hidden in their different worlds.",
+    "poster": "https://image.tmdb.org/t/p/w500/pu1J9Fn8gQW0JvTVB8CheQ0Tw3p.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/cGbnK0qMvIhf9m5ZT29GTIAQhtE.jpg",
+    "rating": 6.8,
+    "release_date": "2024-02-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "mB5efZKWIrU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADKBsAAp4PiEYDop-Mv0UtzBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "399579-alita-battle-angel",
     "tmdb_id": 399579,
     "imdb_id": "",
@@ -9580,8 +9642,14 @@
     "csv_id": "158154-heartbreak-high",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD9xcAAkKtqEUwnUmKkbcKNBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD-xcAAkKtqEUnJcs8YU_fqxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADiRsAAp4PiEZxLrHpwY0TahYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjhsAAp4PiEapRHTmCCZbcRYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/1KTYMK7N2vRe8PowCyb799DbDRR.jpg",
     "rating": 7.2,
