@@ -3462,6 +3462,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 taskContainer.style.justifyContent = "center";
                 
                 const taskEl = document.createElement("adsgram-task");
+                taskEl.setAttribute("block-id", ADSGRAM_TASK_BLOCK_ID);
                 taskEl.setAttribute("data-block-id", ADSGRAM_TASK_BLOCK_ID);
                 
                 // Style taskEl natively as the card to match app design
