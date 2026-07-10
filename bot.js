@@ -385,7 +385,7 @@ function setupBot(bot) {
                 return ctx.reply(
                     `ℹ️ *About Film House*\n\n` +
                     `Film House is your ultimate Telegram movie library.\n` +
-                    `• Fast streaming & direct high-speed downloads.\n` +
+                    `• Direct high-speed downloads.\n` +
                     `• Custom request queue with instant automated DM notifications.\n` +
                     `• Built-in loyalty rewards system.`,
                     { parse_mode: 'Markdown' }
