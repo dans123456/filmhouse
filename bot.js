@@ -230,13 +230,31 @@ function setupBot(bot) {
             const points = u.points || 0;
             const badge = u.badge || "No Active Badge";
             
+            const replyMarkup = {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "Open Web App 🚀",
+                            url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                        }
+                    ],
+                    [
+                        { text: "Help 📖", callback_data: "bot_help" },
+                        { text: "About ℹ️", callback_data: "bot_about" }
+                    ]
+                ]
+            };
+            
             return ctx.reply(
                 `👤 *Your Profile Status*\n\n` +
                 `• *Telegram ID:* \`${userId}\`\n` +
                 `• *Username:* @${u.username || "None"}\n` +
                 `• *Loyalty Points:* 🪙 \`${points.toLocaleString()}\` pts\n` +
                 `• *VIP Badge:* 🏆 \`${badge}\``,
-                { parse_mode: 'Markdown' }
+                { 
+                    parse_mode: 'Markdown',
+                    reply_markup: replyMarkup
+                }
             );
         } catch (err) {
             console.error("Error loading settings:", err);
