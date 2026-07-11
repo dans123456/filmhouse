@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "65950-kiznaiver",
+    "tmdb_id": 65950,
+    "imdb_id": "",
+    "title": "Kiznaiver",
+    "type": "Series",
+    "categories": [
+      "Main"
+    ],
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Animation",
+      "Drama"
+    ],
+    "overview": "The anime's setting is a fictional Japanese city named Sugomori City. One day, Noriko Sonosaki tells her classmate Katsuhira Agata, \"You have been selected to be a Kiznaiver.\" The Kizuna System, which allows Katsuhira to share his wounds, connects him to the classmates whose lives and personalities completely differ from his. The Kizuna System is an incomplete system for the implementation of world peace that connects people through wounds. All those who are connected to this system are called Kiznaivers. When one Kiznaiver is wounded, the system divides and transmits the wound among the other Kiznaivers. Sugomori City is built on reclaimed land, but as the years go by, the city's population is decreasing. The story is set in this town where Katsuhira and the others live.",
+    "poster": "https://image.tmdb.org/t/p/w500/wk0zTNzmB8L2cR1lkvDMMFGAqvJ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wosCqZNuCSP7MnNRJOy665yXs4Z.jpg",
+    "rating": 7.6,
+    "release_date": "2016-04-09",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "cFZckSHAddI",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADIQYAAnavkUbZO42Di8yzjxYE"
+    ]
+  },
+  {
     "csv_id": "1321439-the-wrong-paris",
     "tmdb_id": 1321439,
     "imdb_id": "",
