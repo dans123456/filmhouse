@@ -2210,7 +2210,7 @@ img {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    z-index: 1500;
+    z-index: 1000000;
     pointer-events: none;
     width: 90%;
     max-width: 320px;
