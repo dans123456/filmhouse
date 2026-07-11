@@ -2914,7 +2914,7 @@ if (fulfillForm && fulfillRequestModal) {
 
             if (telegramBotToken && requesters.length > 0) {
                 requesters.forEach(async (req) => {
-                    const notifyMsg = `🍿 *Good news!*\n\nYour request for *${currentFulfillTitle}* is ready! 🎉\n\nClick below to download/watch it directly:\n🔗 https://t.me/Filmhouseappbot?start=claim_${req.docId}\n\nThank you for requesting! Enjoy watching! 🎬`;
+                    const notifyMsg = `🍿 *Good news!*\n\nYour request for *${currentFulfillTitle}* has been fulfilled! 🎉\n\nHere is your direct download/watch link:\n🔗 ${downloadLink}\n\nThank you for using Film House! Enjoy watching! 🎬`;
                     try {
                         await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
                             method: "POST",

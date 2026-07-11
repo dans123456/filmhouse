@@ -3258,10 +3258,22 @@ function openDownloadModal(movie) {
             anchor.className = "download-link-item";
 
             const linkUrl = typeof link === 'object' && link !== null ? link.url : link;
+            
+            const matchingRequest = currentUserRequests && currentUserRequests.find(r => 
+                r.title && r.title.toLowerCase().trim() === movie.title.toLowerCase().trim() &&
+                r.status === "fulfilled"
+            );
 
-            anchor.addEventListener("click", () => {
-                showConnectionDrawer(linkUrl, ADSGRAM_DOWNLOAD_BLOCK_ID);
-            });
+            if (matchingRequest) {
+                anchor.addEventListener("click", () => {
+                    showToast("Fulfillment download unlocked! Connecting directly...", "success");
+                    window.open(linkUrl, "_blank");
+                });
+            } else {
+                anchor.addEventListener("click", () => {
+                    showConnectionDrawer(linkUrl, ADSGRAM_DOWNLOAD_BLOCK_ID);
+                });
+            }
 
             if (isTVShow) {
                 // --- TV SERIES: Season layout ---
@@ -3278,7 +3290,11 @@ function openDownloadModal(movie) {
                 label.textContent = `Season ${seasonNum}`;
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
-                sublabel.textContent = "Unlock & Download Season • Ad";
+                if (matchingRequest) {
+                    sublabel.textContent = "Unlock Season • Free Fulfillment (No Ads)";
+                } else {
+                    sublabel.textContent = "Unlock & Download Season • Ad";
+                }
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
                 anchor.appendChild(labelWrap);
@@ -3318,7 +3334,11 @@ function openDownloadModal(movie) {
                 else if (qLabel.includes("4K")) qualityText = "Ultra HD Quality (4K)";
                 else if (qLabel.includes("480p")) qualityText = "Mobile Quality (480p)";
                 
-                sublabel.textContent = `${qualityText} • Watch Ad to Get Link`;
+                if (matchingRequest) {
+                    sublabel.textContent = `${qualityText} • Free Fulfillment (No Ads)`;
+                } else {
+                    sublabel.textContent = `${qualityText} • Watch Ad to Get Link`;
+                }
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
                 anchor.appendChild(labelWrap);
