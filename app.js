@@ -2582,6 +2582,8 @@ function openDetailModal(movie) {
     const body = document.getElementById("detail-modal-body");
     if (!modal || !body) return;
 
+    logAppEvent("view", movie.csv_id || movie.id, movie.title);
+
     // Normalize movie fields to prevent crashes on missing metadata (CSV imports/batch adds)
     movie.poster = movie.poster || "MOVIE/img/FilmHouse3_nobg.png";
     movie.backdrop = movie.backdrop || "MOVIE/img/FilmHouse.png";
@@ -3122,6 +3124,7 @@ function toggleWatchlist(movie) {
     triggerHaptic("light");
     if (index === -1) {
         state.watchlist.push(movieId);
+        logAppEvent("watchlist", movieId, (typeof movie === "object" && movie.title ? movie.title : movieId));
         // Persist external movie metadata if it's not a local database movie
         if (typeof movie === 'object' && movie.links && movie.links.length === 0) {
             saveExternalMovieLocally(movie);
@@ -3294,10 +3297,12 @@ function openDownloadModal(movie) {
             if (matchingRequest) {
                 anchor.addEventListener("click", () => {
                     showToast("Fulfillment download unlocked! Connecting directly...", "success");
+                    logAppEvent("download", movie.csv_id || movie.id, movie.title);
                     window.open(linkUrl, "_blank");
                 });
             } else {
                 anchor.addEventListener("click", () => {
+                    logAppEvent("download", movie.csv_id || movie.id, movie.title);
                     showConnectionDrawer(linkUrl, ADSGRAM_DOWNLOAD_BLOCK_ID);
                 });
             }
@@ -3771,6 +3776,7 @@ async function performGlobalTmdbDiscover() {
 async function performGlobalTmdbSearch(query) {
     if (!query || query.trim().length < 3 || state.searchQuery !== query) return;
     
+    logAppEvent("search", query.trim(), query.trim());
     console.log("[Search Debug] Starting global search for query:", query);
     try {
         const apiKey = getTmdbApiKey();
@@ -6491,4 +6497,16 @@ function renderHomeLeaderboardHighlights() {
         console.warn("Error fetching home leaderboard highlights:", err);
         container.style.display = "none";
     });
+}
+
+// Log analytical/engagement events to Firestore activity_logs
+function logAppEvent(type, movieId, movieTitle) {
+    if (typeof firebase === "undefined" || !db || !state.user.id) return;
+    db.collection("activity_logs").add({
+        type: type, // "search", "download", "watchlist", "view"
+        movieId: String(movieId || ""),
+        movieTitle: String(movieTitle || ""),
+        userId: state.user.id,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(err => console.warn("Error logging app event:", err));
 }

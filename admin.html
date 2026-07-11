@@ -649,6 +649,34 @@
                 <!-- Dynamically populated -->
             </div>
         </div>
+
+        <!-- Platform Activity & Media Rankings Sub-Panel -->
+        <div id="activity-rankings-container" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+                    <span>🔥 Activity & Media Rankings</span>
+                    <span id="rankings-loader" style="font-size: 9px; color: var(--primary-color); display: none; text-transform: none; font-weight: 600;">(Syncing...)</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <select id="ranking-duration-select" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 6px; outline: none; cursor: pointer; font-family: var(--font-primary);">
+                        <option value="2days">Last 2 Days</option>
+                        <option value="week" selected>Last Week</option>
+                        <option value="month">Last Month</option>
+                        <option value="year">Last Year</option>
+                    </select>
+                    <select id="ranking-metric-select" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 6px; outline: none; cursor: pointer; font-family: var(--font-primary);">
+                        <option value="search">Most Searched 🔍</option>
+                        <option value="download" selected>Most Downloaded 📥</option>
+                        <option value="watchlist">Most on Watchlist ⭐️</option>
+                        <option value="view">Most Watched 🎬</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="analytics-rankings-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 4px;">
+                <div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 12px 0;">Select options to load rankings data...</div>
+            </div>
+        </div>
     </div>
 
     <!-- BOT BROADCASTING CENTER SECTION -->

@@ -3369,6 +3369,110 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Trigger update count label on startup
     setTimeout(updateTargetCountLabel, 2000);
+
+    // Platform Activity Rankings Listener
+    const durationSelect = document.getElementById("ranking-duration-select");
+    const metricSelect = document.getElementById("ranking-metric-select");
+    
+    if (durationSelect && metricSelect) {
+        const handleRankingChange = () => {
+            loadActivityRankings(durationSelect.value, metricSelect.value);
+        };
+        durationSelect.addEventListener("change", handleRankingChange);
+        metricSelect.addEventListener("change", handleRankingChange);
+        
+        // Initial load once analytics finishes syncing
+        setTimeout(handleRankingChange, 2500);
+    }
 });
+
+// Platform Activity Rankings Aggregator
+function loadActivityRankings(duration, metric) {
+    const listContainer = document.getElementById("analytics-rankings-list");
+    const loader = document.getElementById("rankings-loader");
+    if (!listContainer) return;
+    
+    if (loader) loader.style.display = "inline";
+    
+    if (typeof firebase === "undefined" || !db) {
+        listContainer.innerHTML = `<div style="text-align: center; color: #ff3b30; font-size: 11px; padding: 12px 0;">Database connection offline</div>`;
+        if (loader) loader.style.display = "none";
+        return;
+    }
+    
+    const now = new Date();
+    let cutoffDate;
+    if (duration === "2days") {
+        cutoffDate = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+    } else if (duration === "week") {
+        cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else if (duration === "month") {
+        cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    } else if (duration === "year") {
+        cutoffDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+    }
+    
+    // Query by type and filter timestamp in memory to avoid missing index exceptions
+    db.collection("activity_logs")
+        .where("type", "==", metric)
+        .get()
+        .then(snapshot => {
+            const counts = {};
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Safe handling of serverTimestamp/toDate
+                const ts = data.timestamp ? (typeof data.timestamp.toDate === "function" ? data.timestamp.toDate() : new Date(data.timestamp)) : null;
+                if (!ts || ts < cutoffDate) return;
+                
+                const title = data.movieTitle || data.movieId || "Unknown";
+                counts[title] = (counts[title] || 0) + 1;
+            });
+            
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+            
+            listContainer.replaceChildren();
+            
+            if (sorted.length === 0) {
+                listContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 12px 0;">No activity recorded for this period</div>`;
+                if (loader) loader.style.display = "none";
+                return;
+            }
+            
+            const medals = ["🥇", "🥈", "🥉"];
+            
+            sorted.forEach(([title, count], idx) => {
+                const row = document.createElement("div");
+                row.style.cssText = "display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 12px; font-size: 11px; transition: background 0.2s ease; margin-bottom: 4px;";
+                
+                const rankText = idx < 3 ? medals[idx] : `#${idx + 1}`;
+                
+                row.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">
+                        <span style="font-weight: 800; color: ${idx === 0 ? '#ffbc00' : 'var(--text-secondary)'}; width: 22px; flex-shrink: 0; text-align: center;">${rankText}</span>
+                        <span style="color: #fff; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${escapeHTML(title)}</span>
+                    </div>
+                    <span style="color: var(--primary-color); font-weight: 700; flex-shrink: 0; margin-left: 10px;">${count} count${count === 1 ? "" : "s"}</span>
+                `;
+                
+                row.addEventListener("mouseenter", () => {
+                    row.style.background = "rgba(255, 188, 0, 0.03)";
+                    row.style.borderColor = "rgba(255, 188, 0, 0.15)";
+                });
+                row.addEventListener("mouseleave", () => {
+                    row.style.background = "rgba(255,255,255,0.015)";
+                    row.style.borderColor = "rgba(255,255,255,0.04)";
+                });
+                
+                listContainer.appendChild(row);
+            });
+            
+            if (loader) loader.style.display = "none";
+        })
+        .catch(err => {
+            console.error("Error loading activity rankings:", err);
+            listContainer.innerHTML = `<div style="text-align: center; color: #ff3b30; font-size: 11px; padding: 12px 0;">Error retrieving analytics: ${escapeHTML(err.message)}</div>`;
+            if (loader) loader.style.display = "none";
+        });
+}
 
 
