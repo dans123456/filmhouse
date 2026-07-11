@@ -1897,15 +1897,18 @@ function renderFeaturedGrid(fromDiscover = false) {
 
     const filtersActive = state.filters.genre !== "All" || state.filters.genre2 !== "All" || state.filters.rating > 0 || state.filters.year !== "All";
 
-    // Toggle Carousel and Recommendations visibility based on search activity, filter activity, or active category
+    // Toggle Carousel, Recommendations and Leaderboard Highlights visibility based on search activity, filter activity, or active category
     const carousel = document.getElementById("hero-carousel");
     const recs = document.getElementById("recommendations-section-wrapper");
+    const highlights = document.getElementById("home-leaderboard-highlights");
     if (state.searchQuery || state.activeCategory !== "Main" || filtersActive) {
         if (carousel) carousel.style.display = "none";
         if (recs) recs.style.display = "none";
+        if (highlights) highlights.style.display = "none";
     } else {
         if (carousel) carousel.style.display = "";
         renderRecommendations();
+        renderHomeLeaderboardHighlights();
     }
 
     // Update Grid Title header based on search query or active category
@@ -3533,7 +3536,7 @@ function renderFAQAccordion() {
         },
         {
             q: "Why are some movie links not loading?",
-            a: "Telegram files are hosted inside custom channels. Ensure you have the Telegram app installed and have joined our primary updates channel (@filmhousenew) to resolve connections."
+            a: "Telegram files are hosted inside custom channels. Ensure you have the Telegram app installed and have joined our primary updates channel (@filmhouse_main) to resolve connections."
         },
         {
             q: "How can I request new films?",
@@ -6376,4 +6379,116 @@ function loadMiningTaskAd() {
     taskEl.addEventListener("onbannernotfound", handleFallback);
 
     box.style.display = "block";
+}
+
+// Render Top 3 users as highlights on the home screen
+function renderHomeLeaderboardHighlights() {
+    const container = document.getElementById("home-leaderboard-highlights");
+    const usersContainer = document.getElementById("home-leaderboard-users");
+    const goBtn = document.getElementById("btn-home-go-leaderboard");
+    if (!container || !usersContainer) return;
+
+    // Single click handler binding
+    if (goBtn && !goBtn.dataset.bound) {
+        goBtn.dataset.bound = "true";
+        goBtn.addEventListener("click", () => {
+            navigateToScreen("leaderboard");
+        });
+    }
+
+    if (typeof firebase === "undefined" || !db) {
+        container.style.display = "none";
+        return;
+    }
+
+    const badgePrefix = window.location.pathname.includes("/MOVIE/") ? "" : "MOVIE/";
+
+    db.collection("users").orderBy("points", "desc").limit(10).get().then(snapshot => {
+        const topUsers = [];
+        const seenUsernames = new Set();
+        
+        snapshot.forEach(doc => {
+            const u = doc.data();
+            if (topUsers.length >= 3) return;
+            
+            // Skip duplicates (e.g. testing accounts)
+            if (u.username && u.username !== "guest" && u.username !== "" && seenUsernames.has(u.username)) return;
+            if (u.username && u.username !== "guest" && u.username !== "") seenUsernames.add(u.username);
+            
+            topUsers.push({
+                username: u.username || "guest",
+                fullName: u.fullName || "Collector",
+                points: u.points || 0,
+                avatar: u.avatar || (badgePrefix + "img/FilmHouse3_nobg.png")
+            });
+        });
+
+        if (topUsers.length === 0) {
+            container.style.display = "none";
+            return;
+        }
+
+        usersContainer.innerHTML = "";
+        const medals = ["🥇", "🥈", "🥉"];
+        const colors = ["#ffbc00", "#e0e0e0", "#cd7f32"];
+
+        topUsers.forEach((user, idx) => {
+            const card = document.createElement("div");
+            card.style.cssText = `
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.04);
+                border-radius: 12px;
+                padding: 10px 4px;
+                position: relative;
+                max-width: 31%;
+                box-sizing: border-box;
+            `;
+
+            // Medal badge
+            const medal = document.createElement("span");
+            medal.textContent = medals[idx];
+            medal.style.cssText = "position: absolute; top: -6px; right: -6px; font-size: 14px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));";
+            card.appendChild(medal);
+
+            // Avatar
+            const img = document.createElement("img");
+            img.src = user.avatar;
+            img.alt = user.fullName;
+            img.style.cssText = `
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid ${colors[idx]};
+                background: #000;
+                margin-bottom: 5px;
+            `;
+            img.onerror = () => { img.src = badgePrefix + "img/FilmHouse3_nobg.png"; };
+            card.appendChild(img);
+
+            // Name
+            const nameEl = document.createElement("span");
+            nameEl.textContent = user.username ? `@${user.username}` : "Collector";
+            nameEl.style.cssText = "font-size: 9px; font-weight: 700; color: #fff; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;";
+            card.appendChild(nameEl);
+
+            // Points
+            const ptsEl = document.createElement("span");
+            ptsEl.textContent = `${user.points} pts`;
+            ptsEl.style.cssText = `font-size: 8px; font-weight: 700; color: ${colors[idx]}; display: block; margin-top: 1px;`;
+            card.appendChild(ptsEl);
+
+            usersContainer.appendChild(card);
+        });
+
+        container.style.display = "block";
+    }).catch(err => {
+        console.warn("Error fetching home leaderboard highlights:", err);
+        container.style.display = "none";
+    });
 }

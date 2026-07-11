@@ -164,7 +164,7 @@ function setupBot(bot) {
 
         const escapedFullName = fullName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         const imagePath = path.join(__dirname, "MOVIE", "img", "FilmHouse.png");
-        const caption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @FilmHouseBUP to stay updated! 🤟</i>`;
+        const caption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @filmhouse_main to stay updated! 🤟</i>`;
 
         const replyMarkup = {
             inline_keyboard: [
@@ -179,7 +179,7 @@ function setupBot(bot) {
                     { text: "About ℹ️", callback_data: "bot_about" }
                 ],
                 [
-                    { text: "Join Channel 📢", url: "https://t.me/FilmHouseBUP" }
+                    { text: "Join Channel 📢", url: "https://t.me/filmhouse_main" }
                 ]
             ]
         };
@@ -530,12 +530,12 @@ function setupBot(bot) {
                             { text: "About ℹ️", callback_data: "bot_about" }
                         ],
                         [
-                            { text: "Join Channel 📢", url: "https://t.me/FilmHouseBUP" }
+                            { text: "Join Channel 📢", url: "https://t.me/filmhouse_main" }
                         ]
                     ]
                 };
 
-                const welcomeCaption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @FilmHouseBUP to stay updated! 🤟</i>`;
+                const welcomeCaption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @filmhouse_main to stay updated! 🤟</i>`;
 
                 return await editMessageInPlace(welcomeCaption, {
                     parse_mode: 'HTML',
