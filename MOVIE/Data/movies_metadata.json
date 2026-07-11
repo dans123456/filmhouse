@@ -1,5 +1,148 @@
 [
   {
+    "csv_id": "155437-reginald-the-vampire",
+    "tmdb_id": 155437,
+    "imdb_id": "",
+    "title": "Reginald the Vampire",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Imagine a world populated by beautiful, fit and vain vampires. Reginald Andres tumbles headlong into it as an unlikely hero who will have to navigate every kind of obstacle – the girl he loves but can’t be with, a bully manager at work and the vampire chieftain who wants him dead. Fortunately, Reginald discovers he has a few unrecognized powers of his own.",
+    "poster": "https://image.tmdb.org/t/p/w500/38kvKPyz7u3iTbip1tg4hXSLfsh.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bT3h6uPhhUoq2HWqDu8IdWjA2rF.jpg",
+    "rating": 5.3,
+    "release_date": "2022-10-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "pFUsj2Qzzg0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADpQ4AAnavkUalZygsDgm5NBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "196214-the-full-monty",
+    "tmdb_id": 196214,
+    "imdb_id": "",
+    "title": "The Full Monty",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "The Full Monty gang is back after 25 years, swapping their stage costumes for dognapping, racing pigeons, and one very unconventional hostage situation. Gaz might be older, but he's no wiser. And his best friend, Dave, refuses to get sucked into any more of his antics. But when tragedy strikes, the whole Monty gang must pull together for a common purpose: to honor an old friend.",
+    "poster": "https://image.tmdb.org/t/p/w500/tp8FUhXt14pr8acWzrOmrIRbX97.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nJKJU0GP0aNj95TCIGz9z28sDt3.jpg",
+    "rating": 7.3,
+    "release_date": "2023-06-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "WqQPANV_QUM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADqA4AAnavkUYPRycCuT01ZxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "197373-based-on-a-true-story",
+    "tmdb_id": 197373,
+    "imdb_id": "",
+    "title": "Based on a True Story",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "The lives of a realtor, a plumber and a former tennis star unexpectedly collide, exposing America’s obsession with true crime, murder and the slow-close toilet seat.",
+    "poster": "https://image.tmdb.org/t/p/w500/5xPLk78TFStBi1dQAlG2mnoSK60.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/yVWlvUHX02ARZte4aBep6GPkkck.jpg",
+    "rating": 7,
+    "release_date": "2023-06-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "HO4uLABrIuc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADqg4AAnavkUa6ixKasyut1hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "86621-quicksand",
+    "tmdb_id": 86621,
+    "imdb_id": "",
+    "title": "Quicksand",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "After a tragedy at a school sends shock waves through a wealthy Stockholm suburb, a seemingly well-adjusted teen finds herself on trial for murder.",
+    "poster": "https://image.tmdb.org/t/p/w500/dyktLijhV8QY65cAqGIir2PjOc5.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/hommfvABPU02k99lihPyxjDjBNK.jpg",
+    "rating": 7.1,
+    "release_date": "2019-04-05",
+    "language": "sv",
+    "cast": [],
+    "director": "",
+    "trailer": "nr-lJ_MVljw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADqw4AAnavkUZJJlsLBGqU4xYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "128024-unicorn-warriors-eternal",
+    "tmdb_id": 128024,
+    "imdb_id": "",
+    "title": "Unicorn: Warriors Eternal",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "An evil force is looming across the dark, thick-aired streets of industrial revolution London when a group of heroes dubbed Unicorn are accidentally reawakened in the bodies of teenagers instead of adult hosts they’ve embodied in the past.",
+    "poster": "https://image.tmdb.org/t/p/w500/w0uHVrvCQYAWA4gj4j1GOCFM54a.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mkhT6YETfnvcox56THaVon6NrKF.jpg",
+    "rating": 7.3,
+    "release_date": "2023-05-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "KbeNXwd9uLg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADrA4AAnavkUZCMLj5aUw-FxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1263200-the-way-we-speak",
     "tmdb_id": 1263200,
     "imdb_id": "",
