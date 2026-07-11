@@ -790,8 +790,8 @@ function loadUserProfile() {
     // Sync profile movie summary sections
     renderProfileMovieSummaries();
 
-    // Sync profile data to Firestore database
-    syncUserToFirestore();
+    // Sync profile data to Firestore database on startup (with load check)
+    syncUserToFirestore(true);
 
     // Start real-time listener for user's movie requests
     startUserRequestsListener();
@@ -4708,73 +4708,67 @@ function bindEvents() {
 }
 
 // Firebase Firestore Database Synchronization Helpers
-function syncUserToFirestore() {
+function syncUserToFirestore(forceFetch = false) {
     if (typeof firebase === "undefined" || !db || !state.user.id) return;
     const userRef = db.collection("users").doc(state.user.id);
-    userRef.get().then(doc => {
-        if (doc.exists) {
-            const docData = doc.data();
-            if (docData) {
-                if (docData.banned === true) {
-                    showBannedScreen();
-                    return;
-                }
-                if (docData.farmingStartedAt !== undefined) {
-                    state.user.farmingStartedAt = docData.farmingStartedAt;
-                    const saved = localStorage.getItem("filmhouse_user_profile");
-                    if (saved) {
-                        try {
-                            const profile = JSON.parse(saved);
-                            profile.farmingStartedAt = docData.farmingStartedAt;
-                            localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
-                        } catch (e) {}
+
+    const data = {
+        id: state.user.id,
+        username: state.user.username || "guest",
+        fullName: state.user.fullName || "Guest User",
+        avatar: state.user.avatar || "",
+        points: state.user.points || 0,
+        badge: state.user.badge || "",
+        badgeExpiresAt: state.user.badgeExpiresAt || 0,
+        farmingStartedAt: state.user.farmingStartedAt || 0,
+        checkInStreak: state.user.checkInStreak || 0,
+        lastCheckInDate: state.user.lastCheckInDate || "",
+        pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
+        dailyStats: state.user.dailyStats || {},
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    if (forceFetch) {
+        userRef.get().then(doc => {
+            if (doc.exists) {
+                const docData = doc.data();
+                if (docData) {
+                    if (docData.banned === true) {
+                        showBannedScreen();
+                        return;
+                    }
+                    if (docData.farmingStartedAt !== undefined) {
+                        state.user.farmingStartedAt = docData.farmingStartedAt;
+                        data.farmingStartedAt = docData.farmingStartedAt;
+                        const saved = localStorage.getItem("filmhouse_user_profile");
+                        if (saved) {
+                            try {
+                                const profile = JSON.parse(saved);
+                                profile.farmingStartedAt = docData.farmingStartedAt;
+                                localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+                            } catch (e) {}
+                        }
+                    }
+                    if (docData.checkInStreak !== undefined) {
+                        state.user.checkInStreak = docData.checkInStreak;
+                        data.checkInStreak = docData.checkInStreak;
+                    }
+                    if (docData.lastCheckInDate !== undefined) {
+                        state.user.lastCheckInDate = docData.lastCheckInDate;
+                        data.lastCheckInDate = docData.lastCheckInDate;
                     }
                 }
-                if (docData.checkInStreak !== undefined) {
-                    state.user.checkInStreak = docData.checkInStreak;
-                }
-                if (docData.lastCheckInDate !== undefined) {
-                    state.user.lastCheckInDate = docData.lastCheckInDate;
-                }
             }
-        }
-        const data = {
-            id: state.user.id,
-            username: state.user.username || "guest",
-            fullName: state.user.fullName || "Guest User",
-            avatar: state.user.avatar || "",
-            points: state.user.points || 0,
-            badge: state.user.badge || "",
-            badgeExpiresAt: state.user.badgeExpiresAt || 0,
-            farmingStartedAt: state.user.farmingStartedAt || 0,
-            checkInStreak: state.user.checkInStreak || 0,
-            lastCheckInDate: state.user.lastCheckInDate || "",
-            pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
-            dailyStats: state.user.dailyStats || {},
-            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        if (!doc.exists) {
-            data.joinedDate = firebase.firestore.FieldValue.serverTimestamp();
-        }
+            if (!doc.exists) {
+                data.joinedDate = firebase.firestore.FieldValue.serverTimestamp();
+            }
+            userRef.set(data, { merge: true }).catch(err => console.warn("Firestore set error:", err));
+        }).catch(err => {
+            userRef.set(data, { merge: true }).catch(e => console.warn("Firestore fallback set error:", e));
+        });
+    } else {
         userRef.set(data, { merge: true }).catch(err => console.warn("Firestore set error:", err));
-    }).catch(err => {
-        // Fallback set in case of get permission issues
-        userRef.set({
-            id: state.user.id,
-            username: state.user.username || "guest",
-            fullName: state.user.fullName || "Guest User",
-            avatar: state.user.avatar || "",
-            points: state.user.points || 0,
-            badge: state.user.badge || "",
-            badgeExpiresAt: state.user.badgeExpiresAt || 0,
-            farmingStartedAt: state.user.farmingStartedAt || 0,
-            checkInStreak: state.user.checkInStreak || 0,
-            lastCheckInDate: state.user.lastCheckInDate || "",
-            pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
-            dailyStats: state.user.dailyStats || {},
-            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }).catch(e => console.warn("Firestore fallback set error:", e));
-    });
+    }
 }
 
 // Apply Theme Accent custom properties
