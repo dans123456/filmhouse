@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "252-everybody-hates-chris",
+    "tmdb_id": 252,
+    "imdb_id": "",
+    "title": "Everybody Hates Chris",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Chris is a teenager growing up as the eldest of three children in Brooklyn, New York during the early 1980s. Uprooted to a new neighborhood and bused to a predominantly white middle school two-hours away by his strict, hard-working parents, Chris struggles to find his place while keeping his siblings in line at home and surmounting the challenges of junior high.",
+    "poster": "https://image.tmdb.org/t/p/w500/zX0xZnyReJxtGAqDOS3WcsgpOgx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qji729gwCW88RpIIWidlaLTul3V.jpg",
+    "rating": 8.1,
+    "release_date": "2005-09-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADFBIAAnavkUY8pWhV_7m-shYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADFxIAAnavkUZG4AAB64uk92gWBA",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "86248-upload",
     "tmdb_id": 86248,
     "imdb_id": "",
