@@ -3521,7 +3521,11 @@
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD0BgAAp4PiEZo8WGqcWUKWhYE",
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADNRAAAnavkUY60ZRbKbD4XxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADVRAAAnavkUb6BhwaWZBjFBYE",
         "quality": "720p"
       }
     ]
@@ -10679,8 +10683,18 @@
     "csv_id": "85552-euphoria",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD6gQAAkADiEUFc7DUzvXnAAEWBA",
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD7gQAAkADiEVOwJJngnuZHRYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADQhAAAnavkUZyXbF3oYqVWxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADfBAAAnavkUaXDM3wahq_ARYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADoRAAAnavkUY86NkzH5ngIhYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/ypmtwojDd751Peszi62DVLytqqC.jpg",
     "rating": 8.3,
