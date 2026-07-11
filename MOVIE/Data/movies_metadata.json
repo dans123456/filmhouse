@@ -1,5 +1,41 @@
 [
   {
+    "csv_id": "86248-upload",
+    "tmdb_id": 86248,
+    "imdb_id": "",
+    "title": "Upload",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "In 2033, people who are near death can be “uploaded” into virtual reality hotels run by 6 tech firms. Cash-strapped Nora lives in Brooklyn and works customer service for the luxurious “Lakeview” digital afterlife. When L.A. party-boy/coder Nathan’s self-driving car crashes, his high-maintenance girlfriend uploads him permanently into Nora’s VR world.",
+    "poster": "https://image.tmdb.org/t/p/w500/6TPGDrU9MyWbn2TpggJphVAVXiq.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/moH3PdysmUl8vrsYVM4l2ZZiRAd.jpg",
+    "rating": 7.8,
+    "release_date": "2020-04-30",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "0ZfZj2bn_xg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADBBEAAnavkUb1zGoizpGWTRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADBhEAAnavkUag-dsB4vgtsBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADCREAAnavkUb-cWRJcud4sBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "207318-everybody-still-hates-chris",
     "tmdb_id": 207318,
     "imdb_id": "",
