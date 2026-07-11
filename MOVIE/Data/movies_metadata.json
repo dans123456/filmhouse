@@ -10185,7 +10185,14 @@
     "csv_id": "64264-game-shakers",
     "type": "Series",
     "links": [
-      "https://t.me/+cJUgTGPMeXoyM2Nk"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADvQcAAp4PkEasq0vAF-QKKxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/+cJUgTGPMeXoyM2Nk",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/7TMp3RMf9DCZaaR9XeAQ1N6tby4.jpg",
     "rating": 7.3,
