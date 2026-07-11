@@ -667,47 +667,57 @@
             </div>
         </div>
         
-        <!-- Catalog Breakdown Sub-Panel -->
-        <div id="catalog-breakdown-container" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 14px; display: none;">
-            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px;">📚 Catalog Category Distribution</div>
-            <div id="analytics-categories-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
-                <!-- Dynamically populated -->
-            </div>
-        </div>
-
-        <!-- Feature Usage Analytics Sub-Panel -->
-        <div id="feature-usage-container" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 14px; display: none;">
-            <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px;">🔥 Feature Engagement Statistics</div>
-            <div id="analytics-features-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
-                <!-- Dynamically populated -->
-            </div>
-        </div>
-
-        <!-- Platform Activity & Media Rankings Sub-Panel -->
-        <div id="activity-rankings-container" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-                <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
-                    <span>🔥 Activity & Media Rankings</span>
-                    <span id="rankings-loader" style="font-size: 9px; color: var(--primary-color); display: none; text-transform: none; font-weight: 600;">(Syncing...)</span>
-                </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <select id="ranking-duration-select" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 6px; outline: none; cursor: pointer; font-family: var(--font-primary);">
-                        <option value="2days">Last 2 Days</option>
-                        <option value="week" selected>Last Week</option>
-                        <option value="month">Last Month</option>
-                        <option value="year">Last Year</option>
-                    </select>
-                    <select id="ranking-metric-select" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 6px; outline: none; cursor: pointer; font-family: var(--font-primary);">
-                        <option value="search">Most Searched 🔍</option>
-                        <option value="download" selected>Most Downloaded 📥</option>
-                        <option value="watchlist">Most on Watchlist ⭐️</option>
-                        <option value="view">Most Watched 🎬</option>
-                    </select>
-                </div>
+        <!-- Collapsible Detailed Insights Block -->
+        <div style="margin-top: 18px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+            <div class="collapsible-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePanel('detailed-analytics-content', 'detailed-analytics-chevron')">
+                <span style="font-size: 11px; color: var(--primary-color); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔍 Detailed Insights & Rankings</span>
+                <span id="detailed-analytics-chevron" style="color: var(--text-secondary); transition: transform 0.2s; font-size: 10px;">▼</span>
             </div>
             
-            <div id="analytics-rankings-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 4px;">
-                <div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 12px 0;">Select options to load rankings data...</div>
+            <div id="detailed-analytics-content" style="display: none; margin-top: 14px;">
+                <!-- Catalog Breakdown Sub-Panel -->
+                <div id="catalog-breakdown-container" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 14px; display: none;">
+                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px;">📚 Catalog Category Distribution</div>
+                    <div id="analytics-categories-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Feature Usage Analytics Sub-Panel -->
+                <div id="feature-usage-container" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 14px; display: none;">
+                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px;">🔥 Feature Engagement Statistics</div>
+                    <div id="analytics-features-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Platform Activity & Media Rankings Sub-Panel -->
+                <div id="activity-rankings-container" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+                            <span>🔥 Activity & Media Rankings</span>
+                            <span id="rankings-loader" style="font-size: 9px; color: var(--primary-color); display: none; text-transform: none; font-weight: 600;">(Syncing...)</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <select id="ranking-duration-select" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 6px; outline: none; cursor: pointer; font-family: var(--font-primary);">
+                                <option value="2days">Last 2 Days</option>
+                                <option value="week" selected>Last Week</option>
+                                <option value="month">Last Month</option>
+                                <option value="year">Last Year</option>
+                            </select>
+                            <select id="ranking-metric-select" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 6px; outline: none; cursor: pointer; font-family: var(--font-primary);">
+                                <option value="search">Most Searched 🔍</option>
+                                <option value="download" selected>Most Downloaded 📥</option>
+                                <option value="watchlist">Most on Watchlist ⭐️</option>
+                                <option value="view">Most Watched 🎬</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="analytics-rankings-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 4px;">
+                        <div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 12px 0;">Select options to load rankings data...</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
