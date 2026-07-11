@@ -150,9 +150,9 @@ function setupBot(bot) {
                     if (dlLink) {
                         return await ctx.reply(
                             `🍿 *Your Requested Movie is Ready!* 🍿\n\n` +
-                            `Here is your direct link to watch/download *${reqData.title}*:\n` +
+                            `Here is your direct download link for *${reqData.title}*:\n` +
                             `🔗 ${dlLink}\n\n` +
-                            `This request has been marked as claimed on your account. Enjoy watching! 🎬`,
+                            `This request has been marked as claimed on your account. Enjoy your download! 🎬`,
                             { parse_mode: "Markdown" }
                         );
                     }
@@ -164,7 +164,7 @@ function setupBot(bot) {
 
         const escapedFullName = fullName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         const imagePath = path.join(__dirname, "MOVIE", "img", "FilmHouse.png");
-        const caption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start watching and downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @FilmHouseBUP to stay updated! 🤟</i>`;
+        const caption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @FilmHouseBUP to stay updated! 🤟</i>`;
 
         const replyMarkup = {
             inline_keyboard: [
@@ -415,7 +415,7 @@ function setupBot(bot) {
     // Default reply for regular text messages (Automation)
     bot.on('text', (ctx) => {
         return ctx.reply(
-            `🤖 *Hello!* I am the Film House Bot.\n\nTo search, request, or watch movies/series, please tap the button below to launch the Film House Web App! 🍿`,
+            `🤖 *Hello!* I am the Film House Bot.\n\nTo search, request, or download movies/series, please tap the button below to launch the Film House Web App! 🍿`,
             {
                 parse_mode: 'Markdown',
                 reply_to_message_id: ctx.message.message_id,
@@ -476,7 +476,7 @@ function setupBot(bot) {
                 return await editMessageInPlace(
                     `📖 *Film House Help & Guide*\n\n` +
                     `• Tap the *Launch Film House* button to open the movie catalog.\n` +
-                    `• Select any movie or series to watch/download.\n` +
+                    `• Select any movie or series to download.\n` +
                     `• If a title is missing, tap *Request* to submit it to our admins.\n` +
                     `• You will receive a direct notification message in this chat as soon as it is ready!`,
                     { 
@@ -535,7 +535,7 @@ function setupBot(bot) {
                     ]
                 };
 
-                const welcomeCaption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start watching and downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @FilmHouseBUP to stay updated! 🤟</i>`;
+                const welcomeCaption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @FilmHouseBUP to stay updated! 🤟</i>`;
 
                 return await editMessageInPlace(welcomeCaption, {
                     parse_mode: 'HTML',
@@ -563,7 +563,7 @@ function setupBot(bot) {
                 return await editMessageInPlace(
                     `📖 *Film House Help & Guide*\n\n` +
                     `• Tap the *Launch Film House* button to open the movie catalog.\n` +
-                    `• Select any movie or series to watch/download.\n` +
+                    `• Select any movie or series to download.\n` +
                     `• If a title is missing, tap *Request* to submit it to our admins.\n` +
                     `• You will receive a direct notification message in this chat as soon as it is ready!`,
                     { 

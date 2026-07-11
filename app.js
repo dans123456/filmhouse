@@ -5203,14 +5203,10 @@ function renderUserRequests(requests) {
                         }).catch(err => console.error("Error updating claim in Firestore:", err));
                     }
                     
+                    showToast("Claimed! Direct links have been sent to your Telegram DM. 🍿", "success");
+                    
                     // Re-render so claimed request moves to history immediately
                     renderUserRequests(currentUserRequests);
-                    
-                    // Close the rewards drawer so the connection drawer can be seen and clicked!
-                    const rewardsDrawer = document.getElementById("rewards-drawer");
-                    if (rewardsDrawer) rewardsDrawer.classList.remove("active");
-                    
-                    showConnectionDrawer(dlBtn.getAttribute("data-link"), ADSGRAM_DOWNLOAD_BLOCK_ID, true);
                 });
             }
             
