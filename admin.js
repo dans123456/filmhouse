@@ -708,6 +708,7 @@ function clearFulfilledRequests() {
 
 // Catalog state
 let allCatalogMovies = [];
+let selectedEditorPicks = []; // Tracker for Editor's Choice spotlights (max 10)
 let originalCatalogCount = 0;
 let catalogChangesMade = false;
 let githubToken = ""; // Global cache for token
@@ -803,6 +804,51 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
     });
+
+    // Initialize Editor's Choice Manager
+    if (db) {
+        db.collection("settings").doc("admin_picks").get().then(doc => {
+            if (doc.exists) {
+                selectedEditorPicks = doc.data().ids || [];
+            }
+            renderEditorsChoiceSelectionList();
+        }).catch(err => {
+            console.warn("Failed to load admin picks on load:", err);
+            renderEditorsChoiceSelectionList();
+        });
+    }
+
+    const edSearch = document.getElementById("editors-choice-search");
+    if (edSearch) {
+        edSearch.addEventListener("input", () => {
+            renderEditorsChoiceSelectionList();
+        });
+    }
+
+    const edSaveBtn = document.getElementById("btn-save-editors-choice");
+    if (edSaveBtn) {
+        edSaveBtn.addEventListener("click", () => {
+            if (typeof firebase === "undefined" || !db) {
+                alert("Database connection offline!");
+                return;
+            }
+            edSaveBtn.disabled = true;
+            edSaveBtn.textContent = "Saving Spotlight Picks... ⏳";
+            
+            db.collection("settings").doc("admin_picks").set({
+                ids: selectedEditorPicks
+            }).then(() => {
+                showToast("Editor's Choice spotlight updated successfully! 🎬", "success");
+                edSaveBtn.disabled = false;
+                edSaveBtn.textContent = "Save Spotlight Picks 💾";
+            }).catch(err => {
+                console.error("Error saving editor picks:", err);
+                alert("Failed to save picks: " + err.message);
+                edSaveBtn.disabled = false;
+                edSaveBtn.textContent = "Save Spotlight Picks 💾";
+            });
+        });
+    }
 
     // Verify Admin Access
     verifyAdminAccess();
@@ -1114,6 +1160,7 @@ async function loadCatalog() {
                         originalCatalogCount = allCatalogMovies.length;
                         updatePublishButtonState();
                         renderCatalogList();
+                        renderEditorsChoiceSelectionList();
                         return;
                     } else {
                         localStorage.removeItem("filmhouse_unpublished_catalog");
@@ -1171,6 +1218,7 @@ async function loadCatalog() {
         allCatalogMovies = responseData;
         originalCatalogCount = allCatalogMovies.length;
         renderCatalogList();
+        renderEditorsChoiceSelectionList();
     } catch (e) {
         console.error("Failed to load catalog:", e);
         if (listContainer) {
@@ -3473,6 +3521,119 @@ function loadActivityRankings(duration, metric) {
             listContainer.innerHTML = `<div style="text-align: center; color: #ff3b30; font-size: 11px; padding: 12px 0;">Error retrieving analytics: ${escapeHTML(err.message)}</div>`;
             if (loader) loader.style.display = "none";
         });
+}
+
+// Render Checkable Catalog List for Editor's Choice Manager
+function renderEditorsChoiceSelectionList() {
+    const container = document.getElementById("editors-choice-selection-list");
+    const counter = document.getElementById("editors-choice-counter");
+    if (!container) return;
+
+    container.replaceChildren();
+
+    if (allCatalogMovies.length === 0) {
+        container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">No movies loaded in catalog.</div>`;
+        if (counter) counter.textContent = `0 / 10 selected`;
+        return;
+    }
+
+    const searchQuery = (document.getElementById("editors-choice-search")?.value || "").toLowerCase().trim();
+    const filtered = allCatalogMovies.filter(m => {
+        const title = (m.title || "").toLowerCase();
+        const id = (m.csv_id || "").toLowerCase();
+        return title.includes(searchQuery) || id.includes(searchQuery);
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-secondary); font-size: 12px;">No matching titles.</div>`;
+        return;
+    }
+
+    // Sort to display checked items at the very top for conveniency, then alphabetical
+    filtered.sort((a, b) => {
+        const aChecked = selectedEditorPicks.includes(a.csv_id);
+        const bChecked = selectedEditorPicks.includes(b.csv_id);
+        if (aChecked && !bChecked) return -1;
+        if (!aChecked && bChecked) return 1;
+        return a.title.localeCompare(b.title);
+    });
+
+    filtered.forEach(m => {
+        const row = document.createElement("div");
+        row.className = "list-row";
+        row.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border-color);";
+
+        const left = document.createElement("div");
+        left.style.cssText = "display: flex; align-items: center; gap: 12px; overflow: hidden; max-width: 80%;";
+
+        const isChecked = selectedEditorPicks.includes(m.csv_id);
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = isChecked;
+        cb.style.cssText = "width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary-color);";
+        
+        cb.addEventListener("change", (e) => {
+            const id = m.csv_id;
+            if (cb.checked) {
+                if (selectedEditorPicks.length >= 10) {
+                    cb.checked = false;
+                    showToast("Warning: You can select a maximum of 10 spotlight picks! 🚫", "warning");
+                    return;
+                }
+                if (!selectedEditorPicks.includes(id)) {
+                    selectedEditorPicks.push(id);
+                }
+            } else {
+                selectedEditorPicks = selectedEditorPicks.filter(item => item !== id);
+            }
+            if (counter) counter.textContent = `${selectedEditorPicks.length} / 10 selected`;
+            
+            // Highlight selected rows
+            if (cb.checked) {
+                row.style.background = "rgba(255, 188, 0, 0.04)";
+                row.style.borderColor = "rgba(255, 188, 0, 0.15)";
+            } else {
+                row.style.background = "transparent";
+                row.style.borderColor = "var(--border-color)";
+            }
+        });
+
+        // Add visual highlighting on load
+        if (isChecked) {
+            row.style.background = "rgba(255, 188, 0, 0.04)";
+            row.style.borderColor = "rgba(255, 188, 0, 0.15)";
+        }
+
+        const details = document.createElement("div");
+        details.style.cssText = "display: flex; flex-direction: column; overflow: hidden;";
+
+        const title = document.createElement("span");
+        title.textContent = m.title;
+        title.style.cssText = "color: #fff; font-size: 13px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;";
+        
+        const typeBadge = document.createElement("span");
+        typeBadge.textContent = m.type === "Series" ? "📺 Series" : "🎬 Movie";
+        typeBadge.style.cssText = `font-size: 10px; font-weight: 700; margin-top: 2px; color: ${m.type === "Series" ? "var(--primary-color)" : "#00bcd4"};`;
+
+        details.appendChild(title);
+        details.appendChild(typeBadge);
+
+        left.appendChild(cb);
+        left.appendChild(details);
+        row.appendChild(left);
+
+        // Click row to toggle check safely
+        row.addEventListener("click", (e) => {
+            if (e.target !== cb) {
+                cb.click();
+            }
+        });
+
+        container.appendChild(row);
+    });
+
+    if (counter) counter.textContent = `${selectedEditorPicks.length} / 10 selected`;
 }
 
 

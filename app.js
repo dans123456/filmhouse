@@ -125,6 +125,7 @@ const state = {
     filteredMovies: [],    // Currently active subset after search/category filter
     watchlist: [],         // IDs of movies in the watchlist
     history: [],           // IDs of recently viewed movies
+    editorPicks: [],       // Admin picks IDs for Editor's Choice carousel
     activeCategory: "Main",
     searchQuery: "",
     user: {
@@ -1897,9 +1898,9 @@ function renderFeaturedGrid(fromDiscover = false) {
 
     const filtersActive = state.filters.genre !== "All" || state.filters.genre2 !== "All" || state.filters.rating > 0 || state.filters.year !== "All";
 
-    // Toggle Carousel, Recommendations and Leaderboard Highlights visibility based on search activity, filter activity, or active category
+    // Toggle Carousel, Editor's Choice and Leaderboard Highlights visibility based on search activity, filter activity, or active category
     const carousel = document.getElementById("hero-carousel");
-    const recs = document.getElementById("recommendations-section-wrapper");
+    const recs = document.getElementById("editors-choice-section-wrapper");
     const highlights = document.getElementById("home-leaderboard-highlights");
     if (state.searchQuery || state.activeCategory !== "Main" || filtersActive) {
         if (carousel) carousel.style.display = "none";
@@ -1907,7 +1908,7 @@ function renderFeaturedGrid(fromDiscover = false) {
         if (highlights) highlights.style.display = "none";
     } else {
         if (carousel) carousel.style.display = "";
-        renderRecommendations();
+        renderEditorsChoice();
         renderHomeLeaderboardHighlights();
     }
 
@@ -2093,10 +2094,11 @@ function renderFeaturedGrid(fromDiscover = false) {
 }
 
 // Render Recommendations Section based on user Watchlist and History preferences
-function renderRecommendations() {
-    const wrapper = document.getElementById("recommendations-section-wrapper");
-    const grid = document.getElementById("recommendations-grid-container");
-    if (!wrapper || !grid) return;
+// Render Editor's Choice Section based on admin selections from settings/admin_picks
+function renderEditorsChoice() {
+    const wrapper = document.getElementById("editors-choice-section-wrapper");
+    const container = document.getElementById("editors-choice-scroll-container");
+    if (!wrapper || !container) return;
 
     const filtersActive = state.filters.genre !== "All" || state.filters.genre2 !== "All" || state.filters.rating > 0 || state.filters.year !== "All";
     const shouldShow = !state.searchQuery && state.activeCategory === "Main" && !filtersActive;
@@ -2105,77 +2107,31 @@ function renderRecommendations() {
         return;
     }
 
-    // Determine user preference genres / categories from watchlist and history
-    const userGenres = new Set();
-    const userCategories = new Set();
-
-    // Exclude the first 12 movies shown in the main Featured grid to prevent visual duplication at the top of the page
-    const featuredMain = state.movies
-        .filter(m => m.categories && m.categories.includes("Main"))
-        .slice(0, 12);
-    const featuredMainIds = featuredMain.map(m => m.csv_id);
-
-    const preferredMovieIds = [...state.watchlist, ...state.history];
-    const preferredMovies = state.movies.filter(m => preferredMovieIds.includes(m.csv_id));
-
-    preferredMovies.forEach(m => {
-        if (m.genres) m.genres.forEach(g => userGenres.add(g));
-        if (m.categories) m.categories.forEach(c => {
-            if (c !== "Main") userCategories.add(c);
-        });
-    });
-
-    let recommended = [];
-    if (preferredMovies.length > 0) {
-        // Filter out movies already in watchlist, history, or currently in the top Featured grid
-        recommended = state.movies.filter(m => 
-            !preferredMovieIds.includes(m.csv_id) && 
-            !featuredMainIds.includes(m.csv_id) && 
-            (
-                (m.genres && m.genres.some(g => userGenres.has(g))) ||
-                (m.categories && m.categories.some(c => userCategories.has(c)))
-            )
-        );
-        
-        // Shuffle the recommended matches to ensure they are varied on each load
-        for (let i = recommended.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [recommended[i], recommended[j]] = [recommended[j], recommended[i]];
-        }
+    let picks = [];
+    if (Array.isArray(state.editorPicks) && state.editorPicks.length > 0) {
+        // Map matches from catalog
+        picks = state.editorPicks.map(id => state.movies.find(m => m.csv_id === id)).filter(Boolean);
     }
 
-    // If no specific recommendations or watchlist is empty, fallback to highly rated movies
-    if (recommended.length === 0) {
-        const candidates = state.movies.filter(m => 
-            !preferredMovieIds.includes(m.csv_id) && 
-            !featuredMainIds.includes(m.csv_id) && 
-            m.rating >= 7.0
-        );
-        
-        // Shuffle the candidates to ensure recommendations are varied
-        for (let i = candidates.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
-        }
-        
-        recommended = candidates;
+    // Fallback if no picks are loaded/saved yet (use top 10 rated catalog movies)
+    if (picks.length === 0) {
+        picks = state.movies.filter(m => m.rating >= 7.5).slice(0, 10);
     }
 
-    // Limit to top 6 recommendations
-    recommended = recommended.slice(0, 6);
-
-    if (recommended.length === 0) {
+    if (picks.length === 0) {
         wrapper.style.display = "none";
         return;
     }
 
     wrapper.style.display = "block";
-    grid.replaceChildren();
+    container.replaceChildren();
 
-    recommended.forEach(movie => {
+    picks.forEach(movie => {
         const card = document.createElement("div");
         card.className = "movie-card";
         card.dataset.id = movie.csv_id;
+        // Inline sizing to force horizontal inline display inside the flex row
+        card.style.cssText = "min-width: 110px; max-width: 110px; flex-shrink: 0; margin-bottom: 0;";
 
         const imgWrapper = document.createElement("div");
         imgWrapper.className = "movie-card-poster-wrapper";
@@ -2210,10 +2166,13 @@ function renderRecommendations() {
 
         const info = document.createElement("div");
         info.className = "movie-card-info";
+        info.style.padding = "6px 2px";
 
         const title = document.createElement("h4");
         title.className = "movie-card-title";
         title.textContent = movie.title;
+        title.style.fontSize = "11px";
+        title.style.lineHeight = "1.2";
         info.appendChild(title);
 
         const metaRow = document.createElement("div");
@@ -2229,7 +2188,7 @@ function renderRecommendations() {
             openDetailModal(movie);
         });
 
-        grid.appendChild(card);
+        container.appendChild(card);
     });
 }
 
@@ -5696,11 +5655,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderCategoriesBar();
     renderGenreChips();
 
+    // 7. Load Editor Picks from Firestore
+    if (typeof firebase !== "undefined" && db) {
+        try {
+            const doc = await db.collection("settings").doc("admin_picks").get();
+            if (doc.exists) {
+                state.editorPicks = doc.data().ids || [];
+            }
+        } catch (err) {
+            console.warn("Error loading editor picks:", err);
+        }
+    }
+
     // 7. Load grid results list
     renderFeaturedGrid();
 
-    // 7b. Load recommendations list
-    renderRecommendations();
+    // 7b. Render Editor's Choice carousel
+    renderEditorsChoice();
 
     // 8. Load FAQs panel answers
     renderFAQAccordion();

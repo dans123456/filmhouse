@@ -610,6 +610,39 @@
         </div>
     </div>
 
+    <!-- EDITOR'S CHOICE SPOTLIGHT MANAGER -->
+    <div class="glass-panel" style="border: 1px solid rgba(255, 188, 0, 0.15); margin-bottom: 24px;">
+        <div class="section-header collapsible-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePanel('editors-choice-content', 'editors-choice-chevron')">
+            <h4 class="section-title" style="color: #ffbc00; display: flex; align-items: center; gap: 8px; margin: 0;">🎬 Editor's Choice Manager</h4>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="editors-choice-counter" style="font-size: 11px; font-weight: 700; color: #ffbc00; background: rgba(255, 188, 0, 0.1); border: 1px solid rgba(255, 188, 0, 0.2); padding: 2px 8px; border-radius: 20px;">0 / 10 selected</span>
+                <span id="editors-choice-chevron" style="color: var(--text-secondary); transition: transform 0.2s;">▼</span>
+            </div>
+        </div>
+
+        <div id="editors-choice-content" style="margin-top: 16px; display: none;">
+            <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
+                Spotlight exactly 10 movies/series inside the horizontal slider on the homepage.
+            </div>
+
+            <!-- Search box -->
+            <div class="search-container">
+                <input type="text" id="editors-choice-search" placeholder="Search titles to spotlight...">
+            </div>
+
+            <!-- Scrollable list of movies with checkboxes -->
+            <div class="table-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 16px;">
+                <div id="editors-choice-selection-list" style="display: flex; flex-direction: column;">
+                    <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">Loading catalog database...</div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="btn btn-primary" id="btn-save-editors-choice" style="font-weight: 700;">Save Spotlight Picks 💾</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Platform Analytics Dashboard -->
     <div class="glass-panel" id="admin-analytics-panel">
         <div class="section-header">
