@@ -1,5 +1,125 @@
 [
   {
+    "csv_id": "220801-fool-me-once",
+    "tmdb_id": 220801,
+    "imdb_id": "",
+    "title": "Fool Me Once",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "When ex-soldier Maya sees her murdered husband on a secret nanny cam, she uncovers a deadly conspiracy that stretches deep into the past.",
+    "poster": "https://image.tmdb.org/t/p/w500/Ertv4WLEyHgi8zN4ldOKgPcGAZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/v9OgLxYCq5newNdtF8dQAFENs4l.jpg",
+    "rating": 7.1,
+    "release_date": "2024-01-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "nhC8AG8cwcc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADWw8AAnavkUYaf_SgzR5WQBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "87739-the-queen-s-gambit",
+    "tmdb_id": 87739,
+    "imdb_id": "",
+    "title": "The Queen's Gambit",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "In a 1950s orphanage, a young girl reveals an astonishing talent for chess and begins an unlikely journey to stardom while grappling with addiction.",
+    "poster": "https://image.tmdb.org/t/p/w500/zU0htwkhNvBQdVSIKB9s6hgVeFK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/34OGjFEbHj0E3lE2w0iTUVq0CBz.jpg",
+    "rating": 8.4,
+    "release_date": "2020-10-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "oZn3qSgmLqI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADWA8AAnavkUbTpG27aa9g1BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "123192-the-crowded-room",
+    "tmdb_id": 123192,
+    "imdb_id": "",
+    "title": "The Crowded Room",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "In 1979 Manhattan, a young man is arrested for a shocking crime — and an unlikely investigator must solve the mystery behind it.",
+    "poster": "https://image.tmdb.org/t/p/w500/vRmopCFp0j1eJGbILLsYsYzxmL8.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kv9KH67hsVJ8RLplUBoc1kZlAtY.jpg",
+    "rating": 7.7,
+    "release_date": "2023-06-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "4w1xZA7pX2c",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADUg8AAnavkUZjfC5ClgrkPBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "107113-only-murders-in-the-building",
+    "tmdb_id": 107113,
+    "imdb_id": "",
+    "title": "Only Murders in the Building",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Three strangers share an obsession with true crime and suddenly find themselves wrapped up in one.",
+    "poster": "https://image.tmdb.org/t/p/w500/1yjFVQZuW8aofZ5Cgol8iImsVFp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/WCnEPf4ZNPjszndmrFlDxZ5Uvd.jpg",
+    "rating": 8.4,
+    "release_date": "2021-08-31",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "UNVGmVP2f_E",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADxg4AAnavkUb0letcd5RiMxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADyQ4AAnavkUZP7w1MHkx0dRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADyg4AAnavkUZIqxzdhkYIAhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "155437-reginald-the-vampire",
     "tmdb_id": 155437,
     "imdb_id": "",
@@ -11698,7 +11818,14 @@
     "csv_id": "205715-gen-v",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADHAoAAt0TaUYURiKK3i37_hYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADHAoAAt0TaUYURiKK3i37_hYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADbw8AAnavkUYRSTpG3RKrlRYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/tEv842Nd5uMSavURG4aQO1pNtst.jpg",
     "rating": 7.7,
