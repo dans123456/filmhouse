@@ -1629,6 +1629,9 @@ function renderCatalogList() {
         
         listContainer.appendChild(row);
     });
+    
+    // Automatically keep the requests list in sync with catalog changes
+    renderRequestsList();
 }
 
 function deleteMovie(csvId) {
