@@ -5785,7 +5785,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             updatePointsUI();
             renderDailyMissions();
             updateHeaderNotificationDot();
-            fetchAndRenderLeaderboard();
         });
     }
     if (rewardsClose && rewardsDrawer) {
