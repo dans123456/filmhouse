@@ -1765,6 +1765,7 @@ function navigateToScreen(targetScreenId) {
         loadUserProfile();
     } else if (targetScreenId === "mining") {
         updateFarmingUI();
+        loadMiningTaskAd();
     } else if (targetScreenId === "leaderboard") {
         renderLeaderboard();
     }
@@ -6295,4 +6296,90 @@ function saveProfileToLocalStorage() {
     profile.points = state.user.points;
     profile.pointsBreakdown = state.user.pointsBreakdown;
     localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+}
+
+// Mining Page Booster Task Ad Loader
+function loadMiningTaskAd() {
+    const box = document.getElementById("mining-task-box");
+    const placeholder = document.getElementById("mining-task-placeholder");
+    if (!box || !placeholder) return;
+
+    // Only load if running inside real Telegram environment with Adsgram
+    const isTelegramEnv = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== "";
+    if (!isTelegramEnv || !window.Adsgram || !ADSGRAM_TASK_BLOCK_ID) {
+        box.style.display = "none";
+        return;
+    }
+
+    placeholder.replaceChildren();
+
+    const taskEl = document.createElement("adsgram-task");
+    taskEl.setAttribute("block-id", ADSGRAM_TASK_BLOCK_ID);
+    taskEl.setAttribute("data-block-id", ADSGRAM_TASK_BLOCK_ID);
+
+    taskEl.style.display = "block";
+    taskEl.style.width = "100%";
+    taskEl.style.background = "rgba(255, 255, 255, 0.03)";
+    taskEl.style.border = "1px solid rgba(255, 255, 255, 0.08)";
+    taskEl.style.borderRadius = "16px";
+    taskEl.style.padding = "16px 14px";
+    taskEl.style.boxSizing = "border-box";
+    taskEl.style.setProperty("--adsgram-task-button-width", "95px");
+    taskEl.style.setProperty("--adsgram-task-icon-size", "44px");
+    taskEl.style.setProperty("--adsgram-task-font-size", "14px");
+
+    // Setup slots matching the app design
+    const rewardEl = document.createElement("div");
+    rewardEl.setAttribute("slot", "reward");
+    rewardEl.style.cssText = "display: flex; flex-direction: column; align-items: flex-start; gap: 2px; margin-top: 6px; width: 100%; text-align: left;";
+    
+    const rewardTitle = document.createElement("span");
+    rewardTitle.textContent = "TASK REWARD";
+    rewardTitle.style.cssText = "font-size: 9px; font-weight: 700; color: rgba(255, 255, 255, 0.35); letter-spacing: 1px;";
+    
+    const rewardValue = document.createElement("span");
+    rewardValue.textContent = "+10 Points 🪙";
+    rewardValue.style.cssText = "font-size: 13px; font-weight: 700; color: #ffbc00;";
+    rewardEl.replaceChildren(rewardTitle, rewardValue);
+
+    const btnEl = document.createElement("div");
+    btnEl.setAttribute("slot", "button");
+    btnEl.textContent = "Start ⚡";
+    btnEl.style.cssText = "background: var(--primary-gradient); color: #000000; padding: 10px 12px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; width: 100%; box-sizing: border-box; transition: all 0.2s ease; box-shadow: 0 3px 10px var(--primary-glow);";
+
+    const claimEl = document.createElement("div");
+    claimEl.setAttribute("slot", "claim");
+    claimEl.textContent = "Claim 🎁";
+    claimEl.style.cssText = "background: linear-gradient(135deg, #00c853, #009624); color: #fff; padding: 10px 12px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; width: 100%; box-sizing: border-box; transition: all 0.2s ease; box-shadow: 0 3px 10px rgba(0, 200, 83, 0.25);";
+
+    const doneEl = document.createElement("div");
+    doneEl.setAttribute("slot", "done");
+    doneEl.textContent = "Done ✓";
+    doneEl.style.cssText = "background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border: 1px solid var(--border-color); padding: 10px 12px; border-radius: 10px; font-weight: 700; font-size: 12px; text-align: center; width: 100%; box-sizing: border-box;";
+
+    taskEl.replaceChildren(rewardEl, btnEl, claimEl, doneEl);
+    placeholder.appendChild(taskEl);
+
+    // Event handlers
+    const handleReward = () => {
+        showToast("Bonus task completed! +10 Points awarded! 🏆", "success");
+        awardPoints(10, "task");
+        syncUserToFirestore();
+        box.style.display = "none";
+    };
+
+    const handleFallback = () => {
+        box.style.display = "none";
+    };
+
+    taskEl.addEventListener("reward", handleReward);
+    taskEl.addEventListener("onReward", handleReward);
+    taskEl.addEventListener("onreward", handleReward);
+
+    taskEl.addEventListener("onError", handleFallback);
+    taskEl.addEventListener("onerror", handleFallback);
+    taskEl.addEventListener("onBannerNotFound", handleFallback);
+    taskEl.addEventListener("onbannernotfound", handleFallback);
+
+    box.style.display = "block";
 }
