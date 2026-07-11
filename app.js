@@ -126,6 +126,7 @@ const state = {
     watchlist: [],         // IDs of movies in the watchlist
     history: [],           // IDs of recently viewed movies
     editorPicks: [],       // Admin picks IDs for Editor's Choice carousel
+    visibleCount: 24,      // Snappy DOM load limits
     activeCategory: "Main",
     searchQuery: "",
     user: {
@@ -1461,7 +1462,7 @@ function saveProfile(isFromPage = false) {
     if (chevron) chevron.classList.remove("chevron-rotated");
 
     generateNotificationAlerts();
-    renderRecommendations();
+    renderEditorsChoice();
 }
 
 // Notifications Engine
@@ -1758,8 +1759,9 @@ function navigateToScreen(targetScreenId) {
 
     // Custom view actions
     if (targetScreenId === "home") {
+        state.visibleCount = 24;
         renderFeaturedGrid();
-        renderRecommendations();
+        renderEditorsChoice();
     } else if (targetScreenId === "watchlist") {
         renderWatchlistGrid();
     } else if (targetScreenId === "profile") {
@@ -1839,6 +1841,7 @@ function renderCategoriesBar() {
             
             button.classList.add("active");
             state.activeCategory = cat;
+            state.visibleCount = 24;
             
             const heading = document.getElementById("grid-title");
             if (heading) heading.textContent = categoryLabels[cat] || cat;
@@ -1868,6 +1871,7 @@ function renderGenreChips() {
         
         chip.addEventListener("click", () => {
             state.filters.genre = genre;
+            state.visibleCount = 24;
             // Sync with filter select element if present
             const genreSelect = document.getElementById("filter-genre");
             if (genreSelect) {
@@ -2007,8 +2011,12 @@ function renderFeaturedGrid(fromDiscover = false) {
         return;
     }
 
+    // Render list capped at state.visibleCount to optimize DOM workload
+    const totalCount = list.length;
+    const sliced = list.slice(0, state.visibleCount);
+
     // Build movie cards securely
-    list.forEach(movie => {
+    sliced.forEach(movie => {
         const card = document.createElement("div");
         card.className = "movie-card";
         card.dataset.id = movie.csv_id;
@@ -2091,6 +2099,31 @@ function renderFeaturedGrid(fromDiscover = false) {
 
         grid.appendChild(card);
     });
+
+    // Render "Show More" button if catalog size exceeds current visible limit
+    if (totalCount > state.visibleCount) {
+        const loadMoreBtn = document.createElement("button");
+        loadMoreBtn.className = "btn btn-secondary";
+        loadMoreBtn.style.cssText = "grid-column: 1 / -1; margin: 16px auto 24px auto; padding: 10px 24px; font-weight: 700; border-radius: 24px; font-size: 12px; display: block; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: #fff; cursor: pointer; transition: all 0.2s; font-family: var(--font-primary);";
+        loadMoreBtn.textContent = `Show More (+${totalCount - state.visibleCount} titles) 🎬`;
+        
+        loadMoreBtn.addEventListener("mouseenter", () => {
+            loadMoreBtn.style.background = "var(--primary-gradient)";
+            loadMoreBtn.style.color = "#000";
+            loadMoreBtn.style.borderColor = "var(--primary-color)";
+        });
+        loadMoreBtn.addEventListener("mouseleave", () => {
+            loadMoreBtn.style.background = "rgba(255,255,255,0.03)";
+            loadMoreBtn.style.color = "#fff";
+            loadMoreBtn.style.borderColor = "var(--border-color)";
+        });
+        
+        loadMoreBtn.addEventListener("click", () => {
+            state.visibleCount += 24;
+            renderFeaturedGrid();
+        });
+        grid.appendChild(loadMoreBtn);
+    }
 }
 
 // Render Recommendations Section based on user Watchlist and History preferences
@@ -3107,7 +3140,7 @@ function toggleWatchlist(movie) {
     if (countLabel) countLabel.textContent = state.watchlist.length;
 
     // Refresh recommendations list dynamically
-    renderRecommendations();
+    renderEditorsChoice();
 }
 
 function saveExternalMovieLocally(movie) {
@@ -3169,7 +3202,7 @@ function addWatchHistory(movie) {
     if (countLabel) countLabel.textContent = state.history.length;
 
     // Refresh recommendations list dynamically
-    renderRecommendations();
+    renderEditorsChoice();
 }
 
 function loadWatchHistory() {
@@ -4056,6 +4089,7 @@ function bindEvents() {
         searchInput.addEventListener("input", (e) => {
             const query = e.target.value;
             state.searchQuery = query;
+            state.visibleCount = 24;
             if (clearBtn) {
                 clearBtn.style.display = query ? "flex" : "none";
             }
@@ -4078,6 +4112,7 @@ function bindEvents() {
             clearBtn.addEventListener("click", () => {
                 searchInput.value = "";
                 state.searchQuery = "";
+                state.visibleCount = 24;
                 state.externalSearchResults = [];
                 clearBtn.style.display = "none";
                 if (dropdown) {
@@ -4178,6 +4213,7 @@ function bindEvents() {
             state.filters.genre2 = genreVal2;
             state.filters.rating = ratingVal;
             state.filters.year = yearVal;
+            state.visibleCount = 24;
 
             renderFeaturedGrid();
             renderGenreChips();
@@ -4203,6 +4239,7 @@ function bindEvents() {
             state.filters.genre2 = "All";
             state.filters.rating = 0;
             state.filters.year = "All";
+            state.visibleCount = 24;
             state.externalSearchResults = [];
 
             renderFeaturedGrid();
