@@ -3441,7 +3441,6 @@ function initializeAdsgram(blockId) {
     return state.adsgramControllers[id];
 }
 
-// Adsgram ad integration helper – returns a Promise
 function showAdRewardFlow(onStatusUpdate, blockId) {
     const status = (msg) => { if (typeof onStatusUpdate === "function") onStatusUpdate(msg); };
 
@@ -3502,234 +3501,19 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
             state.adsgramControllers[id] = window.Adsgram.init({ blockId: id });
         }
 
-        // Try playing Task first if this is a movie download or request action
-        if ((id === ADSGRAM_DOWNLOAD_BLOCK_ID || id === ADSGRAM_REQUEST_BLOCK_ID) && ADSGRAM_TASK_BLOCK_ID) {
-            status("Checking for task…");
-            
-            const drawer = document.getElementById("connection-drawer");
-            const spinnerWrapper = drawer ? drawer.querySelector(".connection-spinner-wrapper") : null;
-            const container = drawer ? drawer.querySelector(".connection-drawer-container") : null;
-            const titleEl = drawer ? drawer.querySelector(".connection-title") : null;
-            
-            if (drawer && container) {
-                // Hide spinner during task interaction
-                if (spinnerWrapper) spinnerWrapper.style.display = "none";
-                if (titleEl) titleEl.textContent = id === ADSGRAM_REQUEST_BLOCK_ID ? "Request Task" : "Premium Task";
-                status("Complete the task below to secure connection:");
-                
-                // Remove any existing task containers
-                const existingTaskContainer = container.querySelector(".adsgram-task-container");
-                if (existingTaskContainer) existingTaskContainer.remove();
-                
-                const taskContainer = document.createElement("div");
-                taskContainer.className = "adsgram-task-container";
-                taskContainer.style.width = "100%";
-                taskContainer.style.marginTop = "20px";
-                taskContainer.style.display = "flex";
-                taskContainer.style.justifyContent = "center";
-                
-                const taskEl = document.createElement("adsgram-task");
-                taskEl.setAttribute("block-id", ADSGRAM_TASK_BLOCK_ID);
-                taskEl.setAttribute("data-block-id", ADSGRAM_TASK_BLOCK_ID);
-                
-                // Style taskEl natively as the card to match app design
-                taskEl.style.display = "block";
-                taskEl.style.width = "100%";
-                taskEl.style.background = "rgba(255, 255, 255, 0.03)";
-                taskEl.style.border = "1px solid rgba(255, 255, 255, 0.08)";
-                taskEl.style.borderRadius = "16px";
-                taskEl.style.padding = "16px 14px";
-                taskEl.style.boxSizing = "border-box";
-                
-                // Add native CSS variables for the shadow DOM task layout
-                taskEl.style.setProperty("--adsgram-task-button-width", "95px");
-                taskEl.style.setProperty("--adsgram-task-icon-size", "44px");
-                taskEl.style.setProperty("--adsgram-task-font-size", "14px");
-                
-                // Setup slots matching the app theme securely (Vanilla JS DOM Manipulation)
-                const rewardEl = document.createElement("div");
-                rewardEl.setAttribute("slot", "reward");
-                rewardEl.style.display = "flex";
-                rewardEl.style.flexDirection = "column";
-                rewardEl.style.alignItems = "flex-start";
-                rewardEl.style.gap = "2px";
-                rewardEl.style.marginTop = "6px";
-                rewardEl.style.width = "100%";
-                rewardEl.style.textAlign = "left";
-                
-                const rewardTitle = document.createElement("span");
-                rewardTitle.textContent = "TASK REWARD";
-                rewardTitle.style.fontSize = "9px";
-                rewardTitle.style.fontWeight = "700";
-                rewardTitle.style.color = "rgba(255, 255, 255, 0.35)";
-                rewardTitle.style.letterSpacing = "1px";
-                
-                const rewardValue = document.createElement("span");
-                rewardValue.textContent = "+10 Points 🪙";
-                rewardValue.style.fontSize = "13px";
-                rewardValue.style.fontWeight = "700";
-                rewardValue.style.color = "#ffbc00";
-                
-                rewardEl.replaceChildren(rewardTitle, rewardValue);
- 
-                // Safety timeout fallback: if task doesn't load or trigger within 8 seconds, auto-fallback to video ad
-                let fallbackTriggered = false;
-                const safetyTimeout = setTimeout(() => {
-                    if (!fallbackTriggered) {
-                        fallbackTriggered = true;
-                        console.log("Adsgram task load timeout - falling back to video ad");
-                        handleFallback("timeout");
-                    }
-                }, 8000);
-
-                const btnEl = document.createElement("div");
-                btnEl.setAttribute("slot", "button");
-                btnEl.textContent = "Start ⚡";
-                btnEl.style.background = "var(--primary-gradient)";
-                btnEl.style.color = "#000000";
-                btnEl.style.padding = "10px 12px";
-                btnEl.style.borderRadius = "10px";
-                btnEl.style.fontWeight = "700";
-                btnEl.style.fontSize = "12px";
-                btnEl.style.cursor = "pointer";
-                btnEl.style.textAlign = "center";
-                btnEl.style.width = "100%";
-                btnEl.style.boxSizing = "border-box";
-                btnEl.style.transition = "all 0.2s ease";
-                btnEl.style.boxShadow = "0 3px 10px var(--primary-glow)";
-                btnEl.addEventListener("click", () => {
-                    clearTimeout(safetyTimeout);
-                    status("Task started! Return here and tap 'Claim 🎁' after completing the task in Telegram.");
-                });
- 
-                const claimEl = document.createElement("div");
-                claimEl.setAttribute("slot", "claim");
-                claimEl.textContent = "Claim 🎁";
-                claimEl.style.background = "linear-gradient(135deg, #00c853, #009624)";
-                claimEl.style.color = "#fff";
-                claimEl.style.padding = "10px 12px";
-                claimEl.style.borderRadius = "10px";
-                claimEl.style.fontWeight = "700";
-                claimEl.style.fontSize = "12px";
-                claimEl.style.cursor = "pointer";
-                claimEl.style.textAlign = "center";
-                claimEl.style.width = "100%";
-                claimEl.style.boxSizing = "border-box";
-                claimEl.style.transition = "all 0.2s ease";
-                claimEl.style.boxShadow = "0 3px 10px rgba(0, 200, 83, 0.25)";
-                claimEl.addEventListener("click", () => {
-                    clearTimeout(safetyTimeout);
-                });
- 
-                const doneEl = document.createElement("div");
-                doneEl.setAttribute("slot", "done");
-                doneEl.textContent = "Done ✓";
-                doneEl.style.background = "rgba(255, 255, 255, 0.05)";
-                doneEl.style.color = "var(--text-secondary)";
-                doneEl.style.border = "1px solid var(--border-color)";
-                doneEl.style.padding = "10px 12px";
-                doneEl.style.borderRadius = "10px";
-                doneEl.style.fontWeight = "700";
-                doneEl.style.fontSize = "12px";
-                doneEl.style.textAlign = "center";
-                doneEl.style.width = "100%";
-                doneEl.style.boxSizing = "border-box";
- 
-                taskEl.replaceChildren(rewardEl, btnEl, claimEl, doneEl);
-                taskContainer.appendChild(taskEl);
-                container.appendChild(taskContainer);
-                
-                // Auto-launch the task by programmatically clicking the Start button after 800ms
-                setTimeout(() => {
-                    if (!fallbackTriggered && btnEl) {
-                        console.log("Auto-launching Adsgram task...");
-                        btnEl.click();
-                    }
-                }, 800);
-                
-                const cleanupAndRestore = () => {
-                    clearTimeout(safetyTimeout);
-                    taskContainer.remove();
-                    if (spinnerWrapper) spinnerWrapper.style.display = "flex";
-                };
-                
-                const handleReward = () => {
-                    fallbackTriggered = true;
-                    cleanupAndRestore();
-                    status("Task completed! Reward received ✓");
-                    awardPoints(10, "task");
-                    safeResolve();
-                };
-                
-                const handleFallback = (err) => {
-                    fallbackTriggered = true;
-                    cleanupAndRestore();
-                    
-                    status("Task not available. Launching video ad…");
-                    if (titleEl) titleEl.textContent = "Secure Connection";
-                    
-                    const videoController = state.adsgramControllers[id];
-                    if (videoController) {
-                        videoController.show().then(() => {
-                            status("Ad completed! Reward received ✓");
-                            safeResolve();
-                        }).catch((videoErr) => {
-                            console.warn("Standard video ad failed as well:", videoErr);
-                            status("No ad buffer available – continuing");
-                            safeResolve();
-                        });
-                    } else {
-                        safeResolve();
-                    }
-                };
-                
-                // Bind to all variations of reward, error and not found events to ensure compatibility
-                taskEl.addEventListener("reward", handleReward);
-                taskEl.addEventListener("onReward", handleReward);
-                taskEl.addEventListener("onreward", handleReward);
-                
-                const handleStart = () => {
-                    clearTimeout(safetyTimeout);
-                    console.log("Adsgram task loaded and started successfully");
-                };
-
-                taskEl.addEventListener("onStart", handleStart);
-                taskEl.addEventListener("onstart", handleStart);
-                
-                taskEl.addEventListener("onError", handleFallback);
-                taskEl.addEventListener("onerror", handleFallback);
-                
-                taskEl.addEventListener("onBannerNotFound", handleFallback);
-                taskEl.addEventListener("onbannernotfound", handleFallback);
-            } else {
-                // Drawer elements missing, fallback to standard video ad
-                const videoController = state.adsgramControllers[id];
-                if (videoController) {
-                    videoController.show().then(() => {
-                        safeResolve();
-                    }).catch(() => {
-                        safeResolve();
-                    });
-                } else {
-                    safeResolve();
-                }
-            }
-        } else {
-            // Non-download ad request (e.g. trailer watch), play standard ad directly
-            status("Loading ad…");
-            const controller = state.adsgramControllers[id];
-            if (controller) {
-                controller.show().then(() => {
-                    status("Reward received ✓");
-                    safeResolve();
-                }).catch((err) => {
-                    console.warn("Adsgram ad skipped or error:", err);
-                    status("No ad available – continuing");
-                    safeResolve();
-                });
-            } else {
+        status("Loading ad…");
+        const controller = state.adsgramControllers[id];
+        if (controller) {
+            controller.show().then(() => {
+                status("Reward received ✓");
                 safeResolve();
-            }
+            }).catch((err) => {
+                console.warn("Adsgram ad skipped or error:", err);
+                status("No ad available – continuing");
+                safeResolve();
+            });
+        } else {
+            safeResolve();
         }
     });
 }
