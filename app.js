@@ -3458,8 +3458,27 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
     const isTelegramEnv = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== "";
 
     return new Promise((resolve) => {
+        // Temporarily mock showAlert during the ad flow to suppress empty ad buffer error alerts
+        const tg = window.Telegram?.WebApp;
+        let originalShowAlert = null;
+        if (tg && tg.showAlert) {
+            originalShowAlert = tg.showAlert;
+            tg.showAlert = function(options, callback) {
+                console.log("Mocked WebApp.showAlert invoked:", options);
+                const msg = typeof options === "string" ? options : (options?.message || "");
+                if (msg.toLowerCase().includes("ad") || msg.toLowerCase().includes("oops") || msg.toLowerCase().includes("moment") || msg.toLowerCase().includes("later")) {
+                    if (typeof callback === "function") callback();
+                    return;
+                }
+                originalShowAlert.call(tg, options, callback);
+            };
+        }
+
         let resolved = false;
         const safeResolve = () => {
+            if (tg && originalShowAlert) {
+                tg.showAlert = originalShowAlert;
+            }
             if (!resolved) { resolved = true; resolve(); }
         };
 
@@ -3619,6 +3638,14 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 taskEl.replaceChildren(rewardEl, btnEl, claimEl, doneEl);
                 taskContainer.appendChild(taskEl);
                 container.appendChild(taskContainer);
+                
+                // Auto-launch the task by programmatically clicking the Start button after 800ms
+                setTimeout(() => {
+                    if (!fallbackTriggered && btnEl) {
+                        console.log("Auto-launching Adsgram task...");
+                        btnEl.click();
+                    }
+                }, 800);
                 
                 const cleanupAndRestore = () => {
                     clearTimeout(safetyTimeout);
@@ -6113,6 +6140,8 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
             actionBtn.textContent = "Start Bot & Get Movie 📥";
         } else if (blockId === ADSGRAM_REQUEST_BLOCK_ID) {
             actionBtn.textContent = "Proceed to Request Group 💬";
+        } else if (blockId === ADSGRAM_DOWNLOAD_BLOCK_ID) {
+            actionBtn.textContent = "Get Movie File 📥";
         } else if (targetLink.includes("joinchat") || targetLink.includes("/+")) {
             actionBtn.textContent = "Join Telegram Channel 📢";
         } else {
