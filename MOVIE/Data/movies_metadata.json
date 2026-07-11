@@ -1,5 +1,34 @@
 [
   {
+    "csv_id": "82879-radiant",
+    "tmdb_id": 82879,
+    "imdb_id": "",
+    "title": "RADIANT",
+    "type": "Series",
+    "categories": [
+      "Main"
+    ],
+    "genres": [
+      "Action & Adventure",
+      "Animation",
+      "Comedy",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Seth is a boy who seeks to become a great magician, and a group of witches who seek to travel to the Radiant. Radiant is a mythical land that spawns monsters called \"Néméses\" which fall to the world from the sky. While traveling, they are also hunted by The Inquisition.",
+    "poster": "https://image.tmdb.org/t/p/w500/yPeqnwD63wf23ZHlzEFeQLnZD3K.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dRLA68Kkh5c04NpSg2ZrKQxV01f.jpg",
+    "rating": 7.2,
+    "release_date": "2018-10-06",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "qZwtUu3p1zg",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADeQgAAnavkUYDXkIhAAEVpsIWBA"
+    ]
+  },
+  {
     "csv_id": "65950-kiznaiver",
     "tmdb_id": 65950,
     "imdb_id": "",
