@@ -717,7 +717,7 @@ async function init() {
                                         [
                                             {
                                                 text: "Claim Points 🪙",
-                                                url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                                                url: "https://t.me/Filmhouseappbot/filmhouseapp?startapp=mining"
                                             }
                                         ]
                                     ]

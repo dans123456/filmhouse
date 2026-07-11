@@ -5497,6 +5497,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 1. Initial login credentials grab
     handleTelegramAuth();
+
+    // Parse Telegram startapp parameter (e.g. startapp=mining)
+    let initialScreen = "home";
+    if (state.isTelegram && window.Telegram && window.Telegram.WebApp) {
+        const initData = window.Telegram.WebApp.initDataUnsafe;
+        if (initData && initData.start_param) {
+            const param = initData.start_param.toLowerCase().trim();
+            if (param === "mining") {
+                initialScreen = "mining";
+            }
+        }
+    }
     
     // Check ban status on startup
     if (typeof firebase !== "undefined" && db && state.user.id) {
@@ -5718,6 +5730,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 10. Bind triggers & event click listeners
     bindEvents();
+
+    // 10b. Handle startup startapp routing parameter redirection
+    if (initialScreen === "mining") {
+        navigateToScreen("mining");
+    }
 
     // 11. Clear loader splash page with a cinematic 1.5s delay presentation
     const loader = document.getElementById("preloader");
