@@ -689,6 +689,58 @@ async function init() {
         bot.launch();
         console.log("Film House Bot successfully started! 🚀 Running command listener...");
 
+        // Background loop for farming completion reminders
+        setInterval(async () => {
+            try {
+                const now = Date.now();
+                const duration = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+                const cutoff = now - duration;
+
+                const snapshot = await db.collection("users")
+                    .where("farmingStartedAt", ">", 0)
+                    .where("farmingStartedAt", "<=", cutoff)
+                    .get();
+
+                snapshot.forEach(async (doc) => {
+                    const userData = doc.data();
+                    if (userData.farmingReminded === true) return;
+
+                    const userId = doc.id;
+                    try {
+                        await bot.telegram.sendMessage(
+                            userId,
+                            `⚡ *Mining Session Complete!* ⚡\n\nYour 8-hour session has finished. Launch the app now to claim your *80 Loyalty Points* and start your next session! 🍿`,
+                            {
+                                parse_mode: "Markdown",
+                                reply_markup: {
+                                    inline_keyboard: [
+                                        [
+                                            {
+                                                text: "Claim Points 🪙",
+                                                url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            }
+                        );
+                        await db.collection("users").doc(userId).update({
+                            farmingReminded: true
+                        });
+                        console.log(`Farming completion notification sent to user ${userId}`);
+                    } catch (notifyErr) {
+                        // Mark as reminded anyway to prevent duplicate loop attempts
+                        await db.collection("users").doc(userId).update({
+                            farmingReminded: true
+                        });
+                        console.warn(`Could not send farming reminder to ${userId}:`, notifyErr.message);
+                    }
+                });
+            } catch (err) {
+                console.error("Error in farming reminder cron loop:", err);
+            }
+        }, 60 * 1000); // check every 60 seconds
+
         // Graceful stop hooks
         process.once('SIGINT', () => bot.stop('SIGINT'));
         process.once('SIGTERM', () => bot.stop('SIGTERM'));

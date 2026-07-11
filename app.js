@@ -8,6 +8,24 @@ if (window.Telegram && window.Telegram.WebApp) {
     }
 }
 
+// Native Telegram WebApp Haptic Feedback Helper
+function triggerHaptic(type = "light") {
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+        try {
+            const haptic = window.Telegram.WebApp.HapticFeedback;
+            if (type === "success" || type === "error" || type === "warning") {
+                haptic.notificationOccurred(type);
+            } else if (type === "selection") {
+                haptic.selectionChanged();
+            } else {
+                haptic.impactOccurred(type);
+            }
+        } catch (e) {
+            console.warn("Haptic feedback failed:", e);
+        }
+    }
+}
+
 // Load Eruda In-App Mobile Console if ?debug=true is passed in URL
 (function() {
     try {
@@ -118,6 +136,8 @@ const state = {
         badge: "",
         badgeExpiresAt: 0,
         farmingStartedAt: 0,
+        checkInStreak: 0,
+        lastCheckInDate: "",
         pointsBreakdown: { downloads: 0, visits: 0, shares: 0, watched: 0 },
         dailyStats: {
             date: "",
@@ -661,6 +681,8 @@ function loadUserProfile() {
     state.user.badge = profile.badge || null;
     state.user.badgeExpiresAt = profile.badgeExpiresAt || 0;
     state.user.farmingStartedAt = profile.farmingStartedAt || 0;
+    state.user.checkInStreak = profile.checkInStreak || 0;
+    state.user.lastCheckInDate = profile.lastCheckInDate || "";
     state.user.pointsBreakdown = profile.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
     state.user.dailyStats = profile.dailyStats || {
         date: new Date().toISOString().split("T")[0],
@@ -3093,6 +3115,7 @@ function createMetaDivider() {
 function toggleWatchlist(movie) {
     const movieId = typeof movie === 'object' ? movie.csv_id : movie;
     const index = state.watchlist.indexOf(movieId);
+    triggerHaptic("light");
     if (index === -1) {
         state.watchlist.push(movieId);
         // Persist external movie metadata if it's not a local database movie
@@ -4072,6 +4095,7 @@ function bindEvents() {
         item.addEventListener("click", () => {
             const target = item.getAttribute("data-target");
             navigateToScreen(target);
+            triggerHaptic("selection");
         });
     });
 
@@ -4105,17 +4129,20 @@ function bindEvents() {
                 // Sync to Firestore
                 if (typeof firebase !== "undefined" && db && state.user.id) {
                     db.collection("users").doc(state.user.id).update({
-                        farmingStartedAt: now
+                        farmingStartedAt: now,
+                        farmingReminded: false
                     }).catch(err => console.warn("Error saving farming state:", err));
                 }
                 
                 updateFarmingUI();
+                triggerHaptic("medium");
                 showToast("Mining session started! Check back in 8 hours.", "success");
             } else {
                 const elapsed = Date.now() - startedAt;
                 if (elapsed >= FARMING_DURATION) {
                     // Claim farming rewards
                     state.user.farmingStartedAt = 0;
+                    triggerHaptic("success");
                     
                     // Save local profile cache
                     const saved = localStorage.getItem("filmhouse_user_profile");
@@ -4129,7 +4156,8 @@ function bindEvents() {
                     // Sync to Firestore
                     if (typeof firebase !== "undefined" && db && state.user.id) {
                         db.collection("users").doc(state.user.id).update({
-                            farmingStartedAt: 0
+                            farmingStartedAt: 0,
+                            farmingReminded: false
                         }).catch(err => console.warn("Error updating farming state:", err));
                     }
                     
@@ -4890,6 +4918,12 @@ function syncUserToFirestore() {
                         } catch (e) {}
                     }
                 }
+                if (docData.checkInStreak !== undefined) {
+                    state.user.checkInStreak = docData.checkInStreak;
+                }
+                if (docData.lastCheckInDate !== undefined) {
+                    state.user.lastCheckInDate = docData.lastCheckInDate;
+                }
             }
         }
         const data = {
@@ -4901,6 +4935,8 @@ function syncUserToFirestore() {
             badge: state.user.badge || "",
             badgeExpiresAt: state.user.badgeExpiresAt || 0,
             farmingStartedAt: state.user.farmingStartedAt || 0,
+            checkInStreak: state.user.checkInStreak || 0,
+            lastCheckInDate: state.user.lastCheckInDate || "",
             pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
             dailyStats: state.user.dailyStats || {},
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
@@ -4920,6 +4956,8 @@ function syncUserToFirestore() {
             badge: state.user.badge || "",
             badgeExpiresAt: state.user.badgeExpiresAt || 0,
             farmingStartedAt: state.user.farmingStartedAt || 0,
+            checkInStreak: state.user.checkInStreak || 0,
+            lastCheckInDate: state.user.lastCheckInDate || "",
             pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
             dailyStats: state.user.dailyStats || {},
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
@@ -5471,18 +5509,10 @@ function renderDailyMissions() {
     if (!list) return;
     
     checkAndResetDailyMissions();
+    renderStreakCalendar();
     const stats = state.user.dailyStats;
     
     const missions = [
-        {
-            id: "login",
-            title: "Daily Login 🗓️",
-            desc: "Log into the app today to check in.",
-            target: 1,
-            current: 1,
-            claimed: stats.checkInClaimed,
-            reward: 5
-        },
         {
             id: "share",
             title: "Social Promoter 🔗",
@@ -6321,4 +6351,128 @@ function startFarmingParticles() {
             setTimeout(() => particle.remove(), duration * 1000);
         }
     }, 450);
+}
+
+// 7-Day Daily Check-in Streak Calendar
+function renderStreakCalendar() {
+    const grid = document.getElementById("streak-days-grid");
+    const countText = document.getElementById("streak-count-text");
+    if (!grid || !countText) return;
+
+    const today = new Date().toISOString().split("T")[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+
+    let streak = state.user.checkInStreak || 0;
+    let lastDate = state.user.lastCheckInDate || "";
+
+    // Check if streak was broken (missed more than 1 day)
+    if (lastDate !== today && lastDate !== yesterday && lastDate !== "") {
+        streak = 0;
+        state.user.checkInStreak = 0;
+        state.user.lastCheckInDate = "";
+        saveProfileToLocalStorage();
+    }
+
+    const alreadyClaimedToday = (lastDate === today);
+    countText.textContent = `${streak} Day${streak === 1 ? "" : "s"} Streak`;
+
+    const dayRewards = [5, 10, 15, 20, 25, 30, 50];
+
+    grid.replaceChildren();
+
+    for (let d = 1; d <= 7; d++) {
+        const dayBox = document.createElement("div");
+        dayBox.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 4px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            position: relative;
+            min-height: 54px;
+        `;
+
+        const isClaimed = d <= streak;
+        const isActiveClaim = (!alreadyClaimedToday && d === (streak === 7 ? 1 : streak + 1));
+
+        const reward = dayRewards[d - 1];
+
+        if (isClaimed) {
+            dayBox.style.background = "rgba(76, 175, 80, 0.12)";
+            dayBox.style.border = "1px solid rgba(76, 175, 80, 0.3)";
+            dayBox.style.color = "#4caf50";
+            dayBox.innerHTML = `
+                <span style="opacity: 0.8; font-size: 8px; margin-bottom: 2px;">Day ${d}</span>
+                <span style="font-size: 12px; margin: 2px 0;">✓</span>
+                <span style="font-size: 8px;">Claimed</span>
+            `;
+        } else if (isActiveClaim) {
+            dayBox.style.background = "linear-gradient(135deg, #ff9f00 0%, #ffbc00 100%)";
+            dayBox.style.color = "#000";
+            dayBox.style.boxShadow = "0 0 10px rgba(255, 188, 0, 0.4)";
+            dayBox.style.cursor = "pointer";
+            dayBox.innerHTML = `
+                <span style="font-weight: 800; font-size: 8px; margin-bottom: 2px;">Day ${d}</span>
+                <span style="font-size: 11px; font-weight: 900; margin: 1px 0;">+${reward}</span>
+                <span style="font-size: 8px; font-weight: 800;">Claim 🪙</span>
+            `;
+            
+            dayBox.addEventListener("click", () => {
+                claimStreakReward(d, reward);
+            });
+        } else {
+            dayBox.style.background = "rgba(255, 255, 255, 0.02)";
+            dayBox.style.border = "1px solid rgba(255, 255, 255, 0.05)";
+            dayBox.style.color = "var(--text-secondary)";
+            dayBox.style.opacity = "0.6";
+            dayBox.innerHTML = `
+                <span style="font-size: 8px; margin-bottom: 2px;">Day ${d}</span>
+                <span style="font-size: 10px; font-weight: 800; margin: 2px 0;">+${reward}</span>
+                <span style="font-size: 8px; opacity: 0.6;">${d === 7 ? "🎁 VIP" : "Locked"}</span>
+            `;
+        }
+
+        grid.appendChild(dayBox);
+    }
+}
+
+function claimStreakReward(dayNum, rewardAmount) {
+    const today = new Date().toISOString().split("T")[0];
+    
+    let newStreak = state.user.checkInStreak || 0;
+    if (newStreak === 7) {
+        newStreak = 1;
+    } else {
+        newStreak += 1;
+    }
+    
+    state.user.checkInStreak = newStreak;
+    state.user.lastCheckInDate = today;
+    
+    triggerHaptic("success");
+    awardPoints(rewardAmount, "visit");
+    saveProfileToLocalStorage();
+    syncUserToFirestore();
+    
+    renderStreakCalendar();
+    renderDailyMissions();
+    
+    showToast(`Day ${dayNum} check-in claimed! +${rewardAmount} points awarded! 🗓️`, "success");
+}
+
+function saveProfileToLocalStorage() {
+    const saved = localStorage.getItem("filmhouse_user_profile");
+    let profile = {};
+    if (saved) {
+        try { profile = JSON.parse(saved); } catch (e) {}
+    }
+    profile.checkInStreak = state.user.checkInStreak;
+    profile.lastCheckInDate = state.user.lastCheckInDate;
+    profile.points = state.user.points;
+    profile.pointsBreakdown = state.user.pointsBreakdown;
+    localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
 }
