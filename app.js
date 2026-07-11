@@ -3483,8 +3483,8 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
             state.adsgramControllers[id] = window.Adsgram.init({ blockId: id });
         }
 
-        // Try playing Task first if this is a movie download request
-        if (id === ADSGRAM_DOWNLOAD_BLOCK_ID && ADSGRAM_TASK_BLOCK_ID) {
+        // Try playing Task first if this is a movie download or request action
+        if ((id === ADSGRAM_DOWNLOAD_BLOCK_ID || id === ADSGRAM_REQUEST_BLOCK_ID) && ADSGRAM_TASK_BLOCK_ID) {
             status("Checking for task…");
             
             const drawer = document.getElementById("connection-drawer");
@@ -3495,7 +3495,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
             if (drawer && container) {
                 // Hide spinner during task interaction
                 if (spinnerWrapper) spinnerWrapper.style.display = "none";
-                if (titleEl) titleEl.textContent = "Premium Task";
+                if (titleEl) titleEl.textContent = id === ADSGRAM_REQUEST_BLOCK_ID ? "Request Task" : "Premium Task";
                 status("Complete the task below to secure connection:");
                 
                 // Remove any existing task containers
@@ -6064,7 +6064,9 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
     };
 
     // Reset state & ensure spinner is showing and any old action button is removed
-    if (titleEl) titleEl.textContent = "Securing Premium Connection…";
+    if (titleEl) {
+        titleEl.textContent = blockId === ADSGRAM_REQUEST_BLOCK_ID ? "Securing Request Link…" : "Securing Premium Connection…";
+    }
     setStatus("Initializing…");
     const spinnerWrapper = drawer.querySelector(".connection-spinner-wrapper");
     if (spinnerWrapper) spinnerWrapper.style.display = "flex";
@@ -6086,11 +6088,15 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
         }
 
         // Ad flow finished
-        if (titleEl) titleEl.textContent = "Connection Secured ✓";
+        if (titleEl) {
+            titleEl.textContent = blockId === ADSGRAM_REQUEST_BLOCK_ID ? "Request Link Ready ✓" : "Connection Secured ✓";
+        }
         
         // Show helpful message instructing user what to do in the bot chat
         if (targetLink.includes("start=")) {
             setStatus("Ready! Tap the button below to open Telegram. Make sure to tap 'START' at the bottom of the bot chat to receive your movie!");
+        } else if (blockId === ADSGRAM_REQUEST_BLOCK_ID) {
+            setStatus("Your request link is ready. Tap below to proceed to the Request Group!");
         } else {
             setStatus("Your connection is secured. Tap below to proceed!");
         }
@@ -6106,6 +6112,8 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
         
         if (targetLink.includes("start=")) {
             actionBtn.textContent = "Start Bot & Get Movie 📥";
+        } else if (blockId === ADSGRAM_REQUEST_BLOCK_ID) {
+            actionBtn.textContent = "Proceed to Request Group 💬";
         } else if (targetLink.includes("joinchat") || targetLink.includes("/+")) {
             actionBtn.textContent = "Join Telegram Channel 📢";
         } else {
