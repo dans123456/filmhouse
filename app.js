@@ -4327,16 +4327,8 @@ function bindEvents() {
                         if (tgDoc.exists) {
                             const token = tgDoc.data().botToken;
                             if (token) {
-                                const text = `📝 *New Feedback Submitted!*\n\n*User:* @${state.user.username || "guest"}\n*Type:* ${category}\n*Subject:* ${subject}\n\n*Message:* ${message}`;
-                                fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({
-                                        chat_id: "@filmhousemain",
-                                        text: text,
-                                        parse_mode: "Markdown"
-                                    })
-                                }).catch(err => console.warn("Failed to send feedback notification to bot:", err));
+                                const text = `📝 *New Feedback Submitted!*\n\n*User:* @${state.user.username || "guest"} (ID: \`${state.user.id || ""}\`)\n*Type:* ${category}\n*Subject:* ${subject}\n\n*Message:* ${message}`;
+                                notifyAdminsViaBot(token, text);
                             }
                         }
                     });
@@ -5414,17 +5406,9 @@ function logMovieRequestToFirestore(movie) {
                             body: JSON.stringify(postBody)
                         }).catch(err => console.warn("Failed to send bot notification for request:", err));
 
-                        // Notify the main Telegram group/channel of the request
-                        const channelText = `🍿 *New Movie Request!*\n\n*User:* @${state.user.username || "guest"}\n*Title:* ${movie.title} (${movie.type})\n\n📢 Let's get it added! 🚀`;
-                        fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                chat_id: "@filmhousemain",
-                                text: channelText,
-                                parse_mode: "Markdown"
-                            })
-                        }).catch(err => console.warn("Failed to send channel notification for request:", err));
+                        // Notify administrators of the movie request privately
+                        const adminText = `🍿 *New Movie Request!*\n\n*User:* @${state.user.username || "guest"} (ID: \`${state.user.id}\`)\n*Title:* ${movie.title} (${movie.type})`;
+                        notifyAdminsViaBot(token, adminText);
                     }
                 }
             }).catch(err => console.warn("Error fetching bot token for request notification:", err));
@@ -6690,4 +6674,38 @@ function updateUserGreeting() {
         const style = state.user.greetingFontStyle || "default";
         greetingEl.classList.add(`font-style-${style}`);
     }
+}
+
+// Notify all authorized admins privately via Telegram
+function notifyAdminsViaBot(token, text) {
+    if (typeof firebase === "undefined" || !db) return;
+    const defaultAdmins = ["1329840839", "1175336733"];
+    db.collection("settings").doc("admins").get().then(doc => {
+        const adminList = doc.exists ? doc.data().ids || [] : [];
+        const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList]));
+        allAdmins.forEach(adminId => {
+            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: String(adminId),
+                    text: text,
+                    parse_mode: "Markdown"
+                })
+            }).catch(err => console.warn(`Failed to notify admin ${adminId}:`, err));
+        });
+    }).catch(() => {
+        // Fallback to default admins
+        defaultAdmins.forEach(adminId => {
+            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: String(adminId),
+                    text: text,
+                    parse_mode: "Markdown"
+                })
+            }).catch(err => console.warn(`Failed to notify default admin ${adminId}:`, err));
+        });
+    });
 }
