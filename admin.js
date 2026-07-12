@@ -191,6 +191,7 @@ function extractTmdbIdAndType(inputVal) {
 
 // Global Datasets for local search filter matching (saves Firestore quota reads)
 let allUsers = [];
+let adminIdsList = ["1329840839", "1175336733"];
 let allRequests = [];
 let requestFilterTab = "actionable"; // actionable | priority | pending | fulfilled | all
 
@@ -222,8 +223,20 @@ if (db) {
         snapshot.forEach(doc => {
             allUsers.push(doc.data());
         });
-        updateStatsCounters();
-        renderUsersList();
+        db.collection("settings").doc("admins").get().then(adminDoc => {
+            const adminIds = adminDoc.exists ? adminDoc.data().ids || [] : [];
+            const defaultAdmins = ["1329840839", "1175336733"];
+            adminIdsList = Array.from(new Set([...defaultAdmins, ...adminIds]));
+            
+            updateStatsCounters();
+            renderUsersList();
+            populateAllocatorDropdowns();
+        }).catch(err => {
+            console.warn("Admins list fetch fail:", err);
+            updateStatsCounters();
+            renderUsersList();
+            populateAllocatorDropdowns();
+        });
     }, err => {
         console.error("Users sync issue:", err);
     });
@@ -3652,5 +3665,132 @@ function renderEditorsChoiceSelectionList() {
 
     if (counter) counter.textContent = `${selectedEditorPicks.length} / 10 selected`;
 }
+
+// Populate dropdown lists for Source Admin and Recipient User
+function populateAllocatorDropdowns() {
+    const senderSelect = document.getElementById("allocate-sender");
+    const recipientSelect = document.getElementById("allocate-recipient");
+    if (!senderSelect || !recipientSelect) return;
+    
+    const prevSender = senderSelect.value;
+    const prevRecipient = recipientSelect.value;
+    
+    senderSelect.replaceChildren();
+    recipientSelect.replaceChildren();
+    
+    const defaultSenderOpt = document.createElement("option");
+    defaultSenderOpt.value = "";
+    defaultSenderOpt.textContent = "-- Select Source Admin --";
+    senderSelect.appendChild(defaultSenderOpt);
+    
+    const defaultRecipientOpt = document.createElement("option");
+    defaultRecipientOpt.value = "";
+    defaultRecipientOpt.textContent = "-- Select Recipient User --";
+    recipientSelect.appendChild(defaultRecipientOpt);
+    
+    allUsers.forEach(u => {
+        const userIdStr = u.id ? String(u.id) : "";
+        const isAdmin = adminIdsList.includes(userIdStr);
+        const nameText = `${u.fullName || "Guest"} (@${u.username || "guest"}) [${u.points || 0} pts]`;
+        
+        if (isAdmin) {
+            const opt = document.createElement("option");
+            opt.value = userIdStr;
+            opt.textContent = nameText;
+            senderSelect.appendChild(opt);
+        } else {
+            const opt = document.createElement("option");
+            opt.value = userIdStr;
+            opt.textContent = nameText;
+            recipientSelect.appendChild(opt);
+        }
+    });
+    
+    senderSelect.value = prevSender;
+    recipientSelect.value = prevRecipient;
+}
+
+// Bind Points Allocator Click Listener
+document.addEventListener("DOMContentLoaded", () => {
+    const btnAllocate = document.getElementById("btn-allocate-points");
+    if (btnAllocate) {
+        btnAllocate.addEventListener("click", () => {
+            const senderId = document.getElementById("allocate-sender")?.value;
+            const recipientId = document.getElementById("allocate-recipient")?.value;
+            const amountInput = document.getElementById("allocate-amount");
+            const amount = parseInt(amountInput?.value || 0);
+            
+            if (!senderId) {
+                alert("Please select a Source Admin Account!");
+                return;
+            }
+            if (!recipientId) {
+                alert("Please select a Recipient User!");
+                return;
+            }
+            if (amount <= 0 || isNaN(amount)) {
+                alert("Please enter a valid points transfer amount greater than 0!");
+                return;
+            }
+            
+            const senderUser = allUsers.find(u => String(u.id) === String(senderId));
+            const recipientUser = allUsers.find(u => String(u.id) === String(recipientId));
+            
+            if (!senderUser) {
+                alert("Source Admin not found in user list!");
+                return;
+            }
+            if (!recipientUser) {
+                alert("Recipient User not found in user list!");
+                return;
+            }
+            
+            const senderPoints = parseInt(senderUser.points || 0);
+            if (senderPoints < amount) {
+                alert(`Insufficient admin points! Source Admin has ${senderPoints} points, cannot transfer ${amount} points.`);
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to allocate ${amount} points from admin ${senderUser.fullName} to user ${recipientUser.fullName}?`)) {
+                return;
+            }
+            
+            // Perform Firestore updates
+            const senderRef = db.collection("users").doc(String(senderId));
+            const recipientRef = db.collection("users").doc(String(recipientId));
+            
+            const batch = db.batch();
+            batch.update(senderRef, { points: senderPoints - amount });
+            batch.update(recipientRef, { points: parseInt(recipientUser.points || 0) + amount });
+            
+            batch.commit().then(() => {
+                alert(`Successfully allocated +${amount} points from ${senderUser.fullName} to ${recipientUser.fullName}!`);
+                if (amountInput) amountInput.value = "";
+                
+                // Notify recipient via Telegram DM
+                db.collection("settings").doc("telegram").get().then(tgDoc => {
+                    if (tgDoc.exists) {
+                        const token = tgDoc.data().botToken;
+                        if (token) {
+                            const text = `🎁 *Points Reward Allocated!*\n\nAn administrator has allocated *+${amount} Points* to your Film House account balance! Thank you for using our app! 🍿`;
+                            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    chat_id: String(recipientId),
+                                    text: text,
+                                    parse_mode: "Markdown"
+                                })
+                            }).catch(err => console.warn("Failed to notify recipient of points allocation:", err));
+                        }
+                    }
+                });
+            }).catch(err => {
+                console.error("Points allocation batch error:", err);
+                alert("Database update failed! Check logs.");
+            });
+        });
+    }
+});
 
 

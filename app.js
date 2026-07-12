@@ -1230,56 +1230,87 @@ function renderLeaderboard() {
     
     // If Firebase is available, load live leaderboard
     if (typeof firebase !== "undefined" && db) {
-        db.collection("users").orderBy("points", "desc").limit(40).get().then(async (snapshot) => {
-            const list = [];
-            const seenIds = new Set();
-            const seenUsernames = new Set();
-            const seenFullNames = new Set();
-            
-            snapshot.forEach(doc => {
-                const u = doc.data();
+        db.collection("settings").doc("admins").get().then(adminDoc => {
+            const adminIds = adminDoc.exists ? adminDoc.data().ids || [] : [];
+            const defaultAdmins = ["1329840839", "1175336733"];
+            const allAdminIds = Array.from(new Set([...defaultAdmins, ...adminIds]));
+
+            db.collection("users").orderBy("points", "desc").limit(60).get().then(async (snapshot) => {
+                const list = [];
+                const staffList = [];
+                const seenIds = new Set();
+                const seenUsernames = new Set();
+                const seenFullNames = new Set();
                 
-                // Skip if duplicate ID
-                if (u.id && seenIds.has(u.id)) return;
-                // Skip if duplicate username (unless it is "guest" or empty)
-                if (u.username && u.username !== "guest" && u.username !== "" && seenUsernames.has(u.username)) return;
-                // Skip if duplicate display name (unless it is a generic guest/demo name)
-                const isGuestName = !u.fullName || u.fullName.includes("Guest") || u.fullName.includes("Demo User");
-                if (u.fullName && !isGuestName && u.fullName !== "" && seenFullNames.has(u.fullName)) return;
-                
-                if (u.id) seenIds.add(u.id);
-                if (u.username && u.username !== "guest" && u.username !== "") seenUsernames.add(u.username);
-                if (u.fullName && !isGuestName && u.fullName !== "") seenFullNames.add(u.fullName);
-                
-                const isMe = u.id === state.user.id;
-                
-                // Limit output to top 25 unique users
-                if (list.length >= 25) return;
-                
-                list.push({
-                    username: u.username || "guest",
-                    fullName: u.fullName || "Guest Collector",
-                    points: u.points || 0,
-                    avatar: u.avatar || (badgePrefix + "img/FilmHouse3_nobg.png"),
-                    badge: getAchievementBadge(u.points || 0, u.badge),
-                    isCurrentUser: isMe
+                snapshot.forEach(doc => {
+                    const u = doc.data();
+                    const userIdStr = u.id ? String(u.id) : "";
+                    
+                    // Skip if duplicate ID
+                    if (u.id && seenIds.has(u.id)) return;
+                    // Skip if duplicate username (unless it is "guest" or empty)
+                    if (u.username && u.username !== "guest" && u.username !== "" && seenUsernames.has(u.username)) return;
+                    // Skip if duplicate display name (unless it is a generic guest/demo name)
+                    const isGuestName = !u.fullName || u.fullName.includes("Guest") || u.fullName.includes("Demo User");
+                    if (u.fullName && !isGuestName && u.fullName !== "" && seenFullNames.has(u.fullName)) return;
+                    
+                    if (u.id) seenIds.add(u.id);
+                    if (u.username && u.username !== "guest" && u.username !== "") seenUsernames.add(u.username);
+                    if (u.fullName && !isGuestName && u.fullName !== "") seenFullNames.add(u.fullName);
+                    
+                    const isMe = u.id === state.user.id;
+                    const avatarVal = u.avatar || (badgePrefix + "img/FilmHouse3_nobg.png");
+                    const badgeVal = getAchievementBadge(u.points || 0, u.badge);
+
+                    const isStaff = allAdminIds.includes(userIdStr);
+                    if (isStaff) {
+                        staffList.push({
+                            username: u.username || "guest",
+                            fullName: u.fullName || "Guest Curator",
+                            points: u.points || 0,
+                            avatar: avatarVal,
+                            badge: badgeVal,
+                            isCurrentUser: isMe
+                        });
+                    } else {
+                        // Limit output of regular leaderboard to top 25 unique users
+                        if (list.length >= 25) return;
+                        list.push({
+                            username: u.username || "guest",
+                            fullName: u.fullName || "Guest Collector",
+                            points: u.points || 0,
+                            avatar: avatarVal,
+                            badge: badgeVal,
+                            isCurrentUser: isMe
+                        });
+                    }
                 });
+                
+                // If current user is not in top 25, get their rank
+                let userRank = 1;
+                try {
+                    const allUsersSnapshot = await db.collection("users").where("points", ">", state.user.points || 0).get();
+                    let nonAdminGreaterCount = 0;
+                    allUsersSnapshot.forEach(doc => {
+                        const uid = doc.data().id ? String(doc.data().id) : "";
+                        if (!allAdminIds.includes(uid)) {
+                            nonAdminGreaterCount++;
+                        }
+                    });
+                    userRank = nonAdminGreaterCount + 1;
+                } catch (e) {
+                    console.error("Error fetching user rank:", e);
+                    const index = list.findIndex(item => item.isCurrentUser);
+                    userRank = index !== -1 ? index + 1 : list.length + 1;
+                }
+                
+                displayLeaderboardData(list, userRank, staffList);
+            }).catch(err => {
+                console.warn("Failed to load live leaderboard, falling back to demo data:", err);
+                renderStaticLeaderboard();
             });
-            
-            // If current user is not in top 25, get their rank
-            let userRank = 1;
-            try {
-                const rankSnapshot = await db.collection("users").where("points", ">", state.user.points || 0).get();
-                userRank = rankSnapshot.size + 1;
-            } catch (e) {
-                console.error("Error fetching user rank:", e);
-                const index = list.findIndex(item => item.isCurrentUser);
-                userRank = index !== -1 ? index + 1 : list.length + 1;
-            }
-            
-            displayLeaderboardData(list, userRank);
         }).catch(err => {
-            console.warn("Failed to load live leaderboard, falling back to demo data:", err);
+            console.warn("Failed to load admins list, falling back to standard list:", err);
             renderStaticLeaderboard();
         });
     } else {
@@ -1289,10 +1320,10 @@ function renderLeaderboard() {
     function renderStaticLeaderboard() {
         const list = getDynamicLeaderboard();
         const userRank = calculateUserRank();
-        displayLeaderboardData(list, userRank);
+        displayLeaderboardData(list, userRank, []);
     }
     
-    function displayLeaderboardData(list, userRank) {
+    function displayLeaderboardData(list, userRank, staffList = []) {
         userRankCard.replaceChildren();
         rowsContainer.replaceChildren();
         
@@ -1311,6 +1342,29 @@ function renderLeaderboard() {
             </div>
         `;
         userRankCard.innerHTML = userCardHTML;
+        
+        // Render Pinned Staff / Curators if present
+        if (staffList && staffList.length > 0) {
+            const staffContainer = document.createElement("div");
+            staffContainer.className = "leaderboard-pinned-staff-container";
+            staffContainer.innerHTML = `
+                <div class="leaderboard-pinned-staff-title">
+                    <span>👑 Film House Curators</span>
+                </div>
+                <div class="leaderboard-pinned-staff-list">
+                    ${staffList.map(s => `
+                        <div class="leaderboard-staff-item">
+                            <div class="leaderboard-staff-left">
+                                <img src="${escapeHTML(s.avatar)}" alt="${escapeHTML(s.fullName)}" class="leaderboard-staff-avatar" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
+                                <span class="leaderboard-staff-name">${escapeHTML(s.fullName)}</span>
+                            </div>
+                            <span class="leaderboard-staff-points">${s.points} pts</span>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+            rowsContainer.appendChild(staffContainer);
+        }
         
         list.forEach((item, index) => {
             const rank = index + 1;
@@ -1770,6 +1824,13 @@ function navigateToScreen(targetScreenId) {
     const activeScreen = document.getElementById(`screen-${targetScreenId}`);
     if (activeScreen) {
         activeScreen.classList.add("active");
+    }
+
+    // Toggle body class to hide bottom navigation bar on mobile if searching
+    if (targetScreenId !== "home") {
+        document.body.classList.remove("search-active");
+    } else if (state.searchQuery && state.searchQuery.trim().length > 0) {
+        document.body.classList.add("search-active");
     }
 
     // Highlight corresponding bottom navigation tab if applicable
@@ -4138,6 +4199,12 @@ function bindEvents() {
                 clearBtn.style.display = query ? "flex" : "none";
             }
             
+            if (query.trim().length > 0) {
+                document.body.classList.add("search-active");
+            } else {
+                document.body.classList.remove("search-active");
+            }
+            
             renderAutocomplete(query);
 
             if (query.trim().length < 3) {
@@ -4163,6 +4230,7 @@ function bindEvents() {
                     dropdown.style.display = "none";
                     dropdown.innerHTML = "";
                 }
+                document.body.classList.remove("search-active");
                 renderFeaturedGrid();
                 searchInput.focus();
             });
@@ -5939,6 +6007,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (loader) {
         setTimeout(() => {
             loader.classList.add("fade-out");
+            // Initialize tour guide overlay
+            initWelcomeTourHandlers();
         }, 2500);
     }
     } catch (err) {
@@ -6673,6 +6743,101 @@ function updateUserGreeting() {
         greetingEl.className = "header-user-greeting";
         const style = state.user.greetingFontStyle || "default";
         greetingEl.classList.add(`font-style-${style}`);
+    }
+}
+
+// Welcome Tour Controller State
+let currentTourStep = 1;
+
+function startWelcomeTour() {
+    const tourOverlay = document.getElementById("app-tour-overlay");
+    if (!tourOverlay) return;
+    
+    currentTourStep = 1;
+    showTourStep(1);
+    tourOverlay.classList.add("active");
+}
+
+function showTourStep(stepNum) {
+    currentTourStep = stepNum;
+    
+    // Hide all steps
+    const steps = document.querySelectorAll(".tour-step");
+    steps.forEach(s => s.classList.remove("active"));
+    
+    // Show active step
+    const activeStep = document.querySelector(`.tour-step[data-step="${stepNum}"]`);
+    if (activeStep) activeStep.classList.add("active");
+    
+    // Update navigation dots
+    const dots = document.querySelectorAll(".tour-dot");
+    dots.forEach(d => {
+        d.classList.toggle("active", parseInt(d.getAttribute("data-step")) === stepNum);
+    });
+    
+    // Handle back button visibility
+    const backBtn = document.getElementById("btn-tour-prev");
+    if (backBtn) {
+        backBtn.style.visibility = stepNum === 1 ? "hidden" : "visible";
+    }
+    
+    // Handle next button label
+    const nextBtn = document.getElementById("btn-tour-next");
+    if (nextBtn) {
+        nextBtn.textContent = stepNum === 5 ? "Finish" : "Next";
+    }
+}
+
+function closeWelcomeTour() {
+    const tourOverlay = document.getElementById("app-tour-overlay");
+    if (tourOverlay) {
+        tourOverlay.classList.remove("active");
+    }
+    localStorage.setItem("filmhouse_tour_completed", "true");
+}
+
+function initWelcomeTourHandlers() {
+    const nextBtn = document.getElementById("btn-tour-next");
+    const prevBtn = document.getElementById("btn-tour-prev");
+    const skipBtn = document.getElementById("btn-tour-skip");
+    const tourBtn = document.getElementById("btn-profile-tutorial");
+    
+    if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+            if (currentTourStep < 5) {
+                showTourStep(currentTourStep + 1);
+            } else {
+                closeWelcomeTour();
+            }
+        });
+    }
+    
+    if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+            if (currentTourStep > 1) {
+                showTourStep(currentTourStep - 1);
+            }
+        });
+    }
+    
+    if (skipBtn) {
+        skipBtn.addEventListener("click", () => {
+            closeWelcomeTour();
+        });
+    }
+    
+    if (tourBtn) {
+        tourBtn.addEventListener("click", () => {
+            startWelcomeTour();
+        });
+    }
+
+    // Auto-start for new visitors
+    const completed = localStorage.getItem("filmhouse_tour_completed");
+    if (completed !== "true") {
+        setTimeout(() => {
+            startWelcomeTour();
+        }, 1200);
     }
 }
 

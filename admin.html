@@ -789,6 +789,41 @@
         </div>
     </div>
 
+    <!-- ADMIN POINTS ALLOCATION TOOL -->
+    <div class="glass-panel" style="border: 1px solid rgba(255, 188, 0, 0.15); margin-bottom: 24px;">
+        <div class="section-header collapsible-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePanel('allocator-content', 'allocator-chevron')">
+            <h4 class="section-title" style="color: #ffbc00; display: flex; align-items: center; gap: 8px; margin: 0;">🎁 Admin Points Allocator</h4>
+            <span id="allocator-chevron" style="color: var(--text-secondary); transition: transform 0.2s;">▼</span>
+        </div>
+        
+        <div id="allocator-content" style="display: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+            <div class="form-row" style="margin-bottom: 15px;">
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="allocate-sender">Source Admin Account</label>
+                    <select id="allocate-sender" style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; cursor: pointer; width: 100%;">
+                        <option value="">-- Select Source Admin --</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="allocate-recipient">Recipient User</label>
+                    <select id="allocate-recipient" style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; cursor: pointer; width: 100%;">
+                        <option value="">-- Select Recipient User --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row" style="margin-bottom: 15px;">
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="allocate-amount">Points to Transfer</label>
+                    <input type="number" id="allocate-amount" placeholder="e.g. 100" min="1" style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; width: 100%; box-sizing: border-box;">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-block" id="btn-allocate-points" style="background: var(--primary-gradient); color: #000; font-weight: bold; border: none; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+                <span>Allocate Points 🎁</span>
+            </button>
+        </div>
+    </div>
+
     <div class="glass-panel">
         <div class="section-header">
             <h4 class="section-title">👥 App User Profiles</h4>

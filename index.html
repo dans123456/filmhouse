@@ -473,6 +473,11 @@
                             <span>Free Up Storage 🧹</span>
                         </button>
 
+                        <!-- Tutorial Guide Button -->
+                        <button type="button" class="btn btn-block btn-secondary" id="btn-profile-tutorial" style="font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: var(--border-radius-sm); width: 100%; margin-bottom: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);">
+                            <span>Tutorial Guide 📖</span>
+                        </button>
+
                         <!-- Help & Support Button -->
                         <button type="button" class="btn btn-block btn-secondary" id="btn-profile-help" style="font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: var(--border-radius-sm); width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);">
                             <span>Help & Support 🛠️</span>
@@ -1069,6 +1074,51 @@
 
     <!-- TOAST NOTIFICATION CONTAINER -->
     <div class="toast-container" id="toast-container"></div>
+
+    <!-- APP WELCOME WALKTHROUGH TOUR OVERLAY -->
+    <div id="app-tour-overlay" class="tour-overlay">
+        <div class="tour-card">
+            <button class="tour-skip-btn" id="btn-tour-skip">Skip</button>
+            <div class="tour-content">
+                <div class="tour-step active" data-step="1">
+                    <div class="tour-icon">🍿</div>
+                    <h3>Welcome to Film House!</h3>
+                    <p>Your premium gateway to movies & series directly inside Telegram. Let's show you around so you can get the best experience!</p>
+                </div>
+                <div class="tour-step" data-step="2">
+                    <div class="tour-icon">🔍</div>
+                    <h3>Smart Search & Filters</h3>
+                    <p>Use the search bar at the top of the Home page to find any movie or series. Tap the filter icon next to it to narrow down by genre, release year, or rating!</p>
+                </div>
+                <div class="tour-step" data-step="3">
+                    <div class="tour-icon">⚡</div>
+                    <h3>Mine Free Points</h3>
+                    <p>Navigate to the <strong>Mining</strong> tab in the bottom bar to start your 8-hour mining session. Claim 80 points daily and perform tasks to accumulate rewards!</p>
+                </div>
+                <div class="tour-step" data-step="4">
+                    <div class="tour-icon">🚀</div>
+                    <h3>Request & Boost</h3>
+                    <p>Can't find a movie? Search and tap <strong>Request Movie</strong>. Accumulate 1,000 points and tap <strong>Boost Request</strong> to expedite its upload! You'll get a direct Telegram DM containing the download files as soon as it's fulfilled!</p>
+                </div>
+                <div class="tour-step" data-step="5">
+                    <div class="tour-icon">🎁</div>
+                    <h3>Daily Missions & Streaks</h3>
+                    <p>Complete daily missions (like sharing a link or watching ads) to earn bonus points. Check-in daily in the Reward Center to build a 7-day streak and unlock extra rewards!</p>
+                </div>
+            </div>
+            <div class="tour-nav-row">
+                <button class="btn btn-secondary btn-sm" id="btn-tour-prev" style="visibility: hidden;">Back</button>
+                <div class="tour-dots">
+                    <span class="tour-dot active" data-step="1"></span>
+                    <span class="tour-dot" data-step="2"></span>
+                    <span class="tour-dot" data-step="3"></span>
+                    <span class="tour-dot" data-step="4"></span>
+                    <span class="tour-dot" data-step="5"></span>
+                </div>
+                <button class="btn btn-primary btn-sm" id="btn-tour-next">Next</button>
+            </div>
+        </div>
+    </div>
 
     <script src="app.js?v=43"></script>
 </body>

@@ -3245,4 +3245,183 @@ img {
     }
 }
 
+/* Bottom Nav search active sliding transition */
+body.search-active .bottom-nav {
+    transform: translateY(100%) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.bottom-nav {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease !important;
+}
+
+/* Walkthrough onboarding tour guide styles */
+.tour-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.tour-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+.tour-card {
+    background-color: var(--bg-dark-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 24px;
+    width: 90%;
+    max-width: 360px;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+.tour-skip-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    outline: none;
+    padding: 4px;
+}
+.tour-skip-btn:hover {
+    color: var(--primary-color);
+}
+.tour-content {
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.tour-step {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+.tour-step.active {
+    display: flex;
+}
+.tour-icon {
+    font-size: 40px;
+    filter: drop-shadow(0 0 10px var(--primary-glow));
+    margin-bottom: 4px;
+}
+.tour-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    color: #fff;
+    font-family: var(--font-heading);
+}
+.tour-card p {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+.tour-nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
+}
+.tour-dots {
+    display: flex;
+    gap: 6px;
+}
+.tour-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+}
+.tour-dot.active {
+    background-color: var(--primary-color);
+    transform: scale(1.2);
+    box-shadow: 0 0 6px var(--primary-glow);
+}
+
+/* Leaderboard Staff section */
+.leaderboard-pinned-staff-container {
+    margin-bottom: 18px;
+    background: linear-gradient(135deg, rgba(255, 188, 0, 0.08) 0%, rgba(255, 188, 0, 0.02) 100%);
+    border: 1px solid rgba(255, 188, 0, 0.25);
+    border-radius: var(--border-radius-sm);
+    padding: 12px 14px;
+}
+.leaderboard-pinned-staff-title {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.leaderboard-pinned-staff-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.leaderboard-staff-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+.leaderboard-staff-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.leaderboard-staff-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--primary-color);
+}
+.leaderboard-staff-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+}
+.leaderboard-staff-points {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
 
