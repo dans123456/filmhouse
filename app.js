@@ -126,6 +126,7 @@ const state = {
     watchlist: [],         // IDs of movies in the watchlist
     history: [],           // IDs of recently viewed movies
     editorPicks: [],       // Admin picks IDs for Editor's Choice carousel
+    editorsChoiceTitle: "Editor's Choice 🎬", // Customizable spotlight section title
     visibleCount: 24,      // Snappy DOM load limits
     activeCategory: "Main",
     searchQuery: "",
@@ -1825,11 +1826,6 @@ function renderCategoriesBar() {
         button.className = `category-pill ${state.activeCategory === cat ? 'active' : ''}`;
         button.title = categoryLabels[cat] || cat;
 
-        const iconWrapper = document.createElement("div");
-        iconWrapper.className = "category-pill-icon";
-        iconWrapper.innerHTML = categoryIcons[cat] || categoryIcons["Main"];
-        button.appendChild(iconWrapper);
-
         const textLabel = document.createElement("span");
         textLabel.className = "category-pill-text";
         textLabel.textContent = categoryLabels[cat] || cat;
@@ -1902,18 +1898,15 @@ function renderFeaturedGrid(fromDiscover = false) {
 
     const filtersActive = state.filters.genre !== "All" || state.filters.genre2 !== "All" || state.filters.rating > 0 || state.filters.year !== "All";
 
-    // Toggle Carousel, Editor's Choice and Leaderboard Highlights visibility based on search activity, filter activity, or active category
+    // Toggle Carousel and Editor's Choice visibility based on search activity, filter activity, or active category
     const carousel = document.getElementById("hero-carousel");
     const recs = document.getElementById("editors-choice-section-wrapper");
-    const highlights = document.getElementById("home-leaderboard-highlights");
     if (state.searchQuery || state.activeCategory !== "Main" || filtersActive) {
         if (carousel) carousel.style.display = "none";
         if (recs) recs.style.display = "none";
-        if (highlights) highlights.style.display = "none";
     } else {
         if (carousel) carousel.style.display = "";
         renderEditorsChoice();
-        renderHomeLeaderboardHighlights();
     }
 
     // Update Grid Title header based on search query or active category
@@ -2157,6 +2150,12 @@ function renderEditorsChoice() {
     }
 
     wrapper.style.display = "block";
+    
+    const titleHeader = wrapper.querySelector(".section-title");
+    if (titleHeader) {
+        titleHeader.textContent = state.editorsChoiceTitle || "Editor's Choice 🎬";
+    }
+
     container.replaceChildren();
 
     picks.forEach(movie => {
@@ -5257,7 +5256,8 @@ function logMovieRequestToFirestore(movie) {
         requestedBy: state.user.username || "guest",
         requestedById: state.user.id || "",
         requestedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
+    }).then((docRef) => {
+        const docId = docRef.id;
         showToast("Movie request registered in database!", "success");
         
         // Automated Telegram confirmation message to the requesting user
@@ -5266,15 +5266,34 @@ function logMovieRequestToFirestore(movie) {
                 if (tgDoc.exists) {
                     const token = tgDoc.data().botToken;
                     if (token) {
-                        const text = `🍿 *Request Received!*\n\nYour request for *${movie.title}* (${movie.type}) has been logged in our queue.\n\nWe will notify you here as soon as it is fulfilled! 🚀`;
+                        const canBoost = parseInt(state.user.points || 0) >= 1000;
+                        const text = canBoost 
+                            ? `🍿 *Request Received!*\n\nYour request for *${movie.title}* (${movie.type}) has been logged in our queue.\n\n💡 *Boost Available!* You can boost this request to *High Priority* for 1,000 points to get it faster! 🚀`
+                            : `🍿 *Request Received!*\n\nYour request for *${movie.title}* (${movie.type}) has been logged in our queue.\n\nWe will notify you here as soon as it is fulfilled! 🚀`;
+
+                        const postBody = {
+                            chat_id: String(state.user.id),
+                            text: text,
+                            parse_mode: "Markdown"
+                        };
+
+                        if (canBoost) {
+                            postBody.reply_markup = {
+                                inline_keyboard: [
+                                    [
+                                        {
+                                            text: "Boost Request 🚀 (1,000 pts)",
+                                            url: `https://t.me/Filmhouseappbot/filmhouseapp?startapp=boost_${docId}`
+                                        }
+                                    ]
+                                ]
+                            };
+                        }
+
                         fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                chat_id: String(state.user.id),
-                                text: text,
-                                parse_mode: "Markdown"
-                            })
+                            body: JSON.stringify(postBody)
                         }).catch(err => console.warn("Failed to send bot notification for request:", err));
                     }
                 }
@@ -5498,14 +5517,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 1. Initial login credentials grab
     handleTelegramAuth();
 
-    // Parse Telegram startapp parameter (e.g. startapp=mining)
+    // Parse Telegram startapp parameter (e.g. startapp=mining or boost_docId)
     let initialScreen = "home";
+    let boostRequestDocId = null;
     if (state.isTelegram && window.Telegram && window.Telegram.WebApp) {
         const initData = window.Telegram.WebApp.initDataUnsafe;
         if (initData && initData.start_param) {
-            const param = initData.start_param.toLowerCase().trim();
+            const rawParam = initData.start_param.trim();
+            const param = rawParam.toLowerCase();
             if (param === "mining") {
                 initialScreen = "mining";
+            } else if (param.startsWith("boost_")) {
+                boostRequestDocId = rawParam.substring(6);
             }
         }
     }
@@ -5710,6 +5733,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const doc = await db.collection("settings").doc("admin_picks").get();
             if (doc.exists) {
                 state.editorPicks = doc.data().ids || [];
+                state.editorsChoiceTitle = doc.data().title || "Editor's Choice 🎬";
             }
         } catch (err) {
             console.warn("Error loading editor picks:", err);
@@ -5734,6 +5758,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 10b. Handle startup startapp routing parameter redirection
     if (initialScreen === "mining") {
         navigateToScreen("mining");
+    }
+
+    if (boostRequestDocId) {
+        setTimeout(() => {
+            if (typeof firebase !== "undefined" && db) {
+                db.collection("requests").doc(boostRequestDocId).get().then(doc => {
+                    if (doc.exists) {
+                        const req = doc.data();
+                        if (req.status === "priority") {
+                            showToast(`Request for "${req.title}" is already boosted!`, "info");
+                            return;
+                        }
+                        if (confirm(`Would you like to spend 1,000 points to boost your request for "${req.title}" to High Priority?`)) {
+                            boostRequestToPriority(boostRequestDocId);
+                        }
+                    } else {
+                        showToast("Request not found or has been completed.", "error");
+                    }
+                }).catch(err => console.warn("Error loading boost request details:", err));
+            }
+        }, 3000);
     }
 
     // 11. Clear loader splash page with a cinematic 1.5s delay presentation
@@ -6410,118 +6455,6 @@ function loadMiningTaskAd() {
     taskEl.addEventListener("onbannernotfound", handleFallback);
 
     box.style.display = "block";
-}
-
-// Render Top 3 users as highlights on the home screen
-function renderHomeLeaderboardHighlights() {
-    const container = document.getElementById("home-leaderboard-highlights");
-    const usersContainer = document.getElementById("home-leaderboard-users");
-    const goBtn = document.getElementById("btn-home-go-leaderboard");
-    if (!container || !usersContainer) return;
-
-    // Single click handler binding
-    if (goBtn && !goBtn.dataset.bound) {
-        goBtn.dataset.bound = "true";
-        goBtn.addEventListener("click", () => {
-            navigateToScreen("leaderboard");
-        });
-    }
-
-    if (typeof firebase === "undefined" || !db) {
-        container.style.display = "none";
-        return;
-    }
-
-    const badgePrefix = window.location.pathname.includes("/MOVIE/") ? "" : "MOVIE/";
-
-    db.collection("users").orderBy("points", "desc").limit(10).get().then(snapshot => {
-        const topUsers = [];
-        const seenUsernames = new Set();
-        
-        snapshot.forEach(doc => {
-            const u = doc.data();
-            if (topUsers.length >= 3) return;
-            
-            // Skip duplicates (e.g. testing accounts)
-            if (u.username && u.username !== "guest" && u.username !== "" && seenUsernames.has(u.username)) return;
-            if (u.username && u.username !== "guest" && u.username !== "") seenUsernames.add(u.username);
-            
-            topUsers.push({
-                username: u.username || "guest",
-                fullName: u.fullName || "Collector",
-                points: u.points || 0,
-                avatar: u.avatar || (badgePrefix + "img/FilmHouse3_nobg.png")
-            });
-        });
-
-        if (topUsers.length === 0) {
-            container.style.display = "none";
-            return;
-        }
-
-        usersContainer.innerHTML = "";
-        const medals = ["🥇", "🥈", "🥉"];
-        const colors = ["#ffbc00", "#e0e0e0", "#cd7f32"];
-
-        topUsers.forEach((user, idx) => {
-            const card = document.createElement("div");
-            card.style.cssText = `
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                background: rgba(255, 255, 255, 0.02);
-                border: 1px solid rgba(255, 255, 255, 0.04);
-                border-radius: 12px;
-                padding: 10px 4px;
-                position: relative;
-                max-width: 31%;
-                box-sizing: border-box;
-            `;
-
-            // Medal badge
-            const medal = document.createElement("span");
-            medal.textContent = medals[idx];
-            medal.style.cssText = "position: absolute; top: -6px; right: -6px; font-size: 14px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));";
-            card.appendChild(medal);
-
-            // Avatar
-            const img = document.createElement("img");
-            img.src = user.avatar;
-            img.alt = user.fullName;
-            img.style.cssText = `
-                width: 34px;
-                height: 34px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 2px solid ${colors[idx]};
-                background: #000;
-                margin-bottom: 5px;
-            `;
-            img.onerror = () => { img.src = badgePrefix + "img/FilmHouse3_nobg.png"; };
-            card.appendChild(img);
-
-            // Name
-            const nameEl = document.createElement("span");
-            nameEl.textContent = user.username ? `@${user.username}` : "Collector";
-            nameEl.style.cssText = "font-size: 9px; font-weight: 700; color: #fff; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;";
-            card.appendChild(nameEl);
-
-            // Points
-            const ptsEl = document.createElement("span");
-            ptsEl.textContent = `${user.points} pts`;
-            ptsEl.style.cssText = `font-size: 8px; font-weight: 700; color: ${colors[idx]}; display: block; margin-top: 1px;`;
-            card.appendChild(ptsEl);
-
-            usersContainer.appendChild(card);
-        });
-
-        container.style.display = "block";
-    }).catch(err => {
-        console.warn("Error fetching home leaderboard highlights:", err);
-        container.style.display = "none";
-    });
 }
 
 // Log analytical/engagement events to Firestore activity_logs

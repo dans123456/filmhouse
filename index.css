@@ -915,52 +915,25 @@ img {
 .category-pill {
     flex-shrink: 0;
     scroll-snap-align: start;
-    width: 82px;
-    height: 84px;
+    padding: 6px 14px;
+    height: 32px;
     background-color: var(--bg-dark-card);
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-md);
+    border-radius: 20px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 8px 4px;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     box-sizing: border-box;
 }
 
-.category-pill-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.03);
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.25s ease;
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    flex-shrink: 0;
-}
-
-.category-pill-icon svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-    display: block;
-}
-
 .category-pill-text {
-    font-size: 10px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--text-secondary);
     text-align: center;
-    width: 100%;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     transition: all 0.25s ease;
 }
 

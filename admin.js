@@ -810,6 +810,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         db.collection("settings").doc("admin_picks").get().then(doc => {
             if (doc.exists) {
                 selectedEditorPicks = doc.data().ids || [];
+                const titleInput = document.getElementById("editors-choice-title-input");
+                if (titleInput) {
+                    titleInput.value = doc.data().title || "Editor's Choice 🎬";
+                }
             }
             renderEditorsChoiceSelectionList();
         }).catch(err => {
@@ -835,8 +839,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             edSaveBtn.disabled = true;
             edSaveBtn.textContent = "Saving Spotlight Picks... ⏳";
             
+            const customTitle = document.getElementById("editors-choice-title-input")?.value.trim() || "Editor's Choice 🎬";
             db.collection("settings").doc("admin_picks").set({
-                ids: selectedEditorPicks
+                ids: selectedEditorPicks,
+                title: customTitle
             }).then(() => {
                 showToast("Editor's Choice spotlight updated successfully! 🎬", "success");
                 edSaveBtn.disabled = false;
@@ -3263,12 +3269,19 @@ document.addEventListener("DOMContentLoaded", () => {
             let targetUsers = [];
             
             if (targetType === "single") {
-                const singleId = broadcastUserid.value.trim();
-                if (!singleId) {
-                    alert("Please enter a target Telegram User ID!");
+                const rawIds = broadcastUserid.value.trim();
+                if (!rawIds) {
+                    alert("Please enter target Telegram User ID(s)!");
                     return;
                 }
-                targetUsers = [{ id: singleId }];
+                const parsedIds = rawIds.split(",")
+                    .map(id => id.trim())
+                    .filter(id => id.length > 0);
+                if (parsedIds.length === 0) {
+                    alert("Please enter valid Telegram User ID(s)!");
+                    return;
+                }
+                targetUsers = parsedIds.map(id => ({ id: id }));
             } else {
                 // Get all users from Firestore or state
                 if (typeof allUsers !== 'undefined' && allUsers && allUsers.length > 0) {

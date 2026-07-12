@@ -625,6 +625,12 @@
                 Spotlight exactly 10 movies/series inside the horizontal slider on the homepage.
             </div>
 
+            <!-- Title Editor -->
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label for="editors-choice-title-input" style="display: block; margin-bottom: 8px; font-weight: 600; color: #ffbc00; font-size: 13px;">Spotlight Section Title</label>
+                <input type="text" id="editors-choice-title-input" placeholder="e.g. Editor's Choice, Christmas Specials, Holiday Picks..." style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none;">
+            </div>
+
             <!-- Search box -->
             <div class="search-container">
                 <input type="text" id="editors-choice-search" placeholder="Search titles to spotlight...">
@@ -738,12 +744,12 @@
                     <label for="broadcast-target">Audience Target</label>
                     <select id="broadcast-target" style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; cursor: pointer; width: 100%;">
                         <option value="all">All Registered Users</option>
-                        <option value="single">Specific User ID</option>
+                        <option value="single">Specific User ID(s)</option>
                     </select>
                 </div>
                 <div class="form-group" id="broadcast-userid-group" style="flex: 1; min-width: 200px; display: none;">
-                    <label for="broadcast-userid">Target Telegram User ID</label>
-                    <input type="text" id="broadcast-userid" placeholder="e.g. 1329840839" style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; width: 100%; box-sizing: border-box;">
+                    <label for="broadcast-userid">Target Telegram User ID(s) (Comma separated)</label>
+                    <input type="text" id="broadcast-userid" placeholder="e.g. 1329840839, 987654321" style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; width: 100%; box-sizing: border-box;">
                 </div>
             </div>
 
