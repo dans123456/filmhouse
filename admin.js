@@ -3271,7 +3271,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let targetUsers = [];
             
             if (targetType === "channel") {
-                targetUsers = [{ id: "@filmhousemain" }];
+                targetUsers = [{ id: "-1002098683402" }];
             } else if (targetType === "single") {
                 const rawIds = broadcastUserid.value.trim();
                 if (!rawIds) {
