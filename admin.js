@@ -278,7 +278,7 @@ function updateStatsCounters() {
 
     // Completed requests fulfillment rate
     const totalReqCount = allRequests.length;
-    const fulfilledReqCount = allRequests.filter(r => r.status === "fulfilled").length;
+    const fulfilledReqCount = allRequests.filter(r => r.status === "fulfilled" || r.status === "claimed" || r.claimed === true).length;
     const fulfillmentRate = totalReqCount > 0 ? Math.round((fulfilledReqCount / totalReqCount) * 100) : 100;
     const statFulfillmentRate = document.getElementById("stat-fulfillment-rate");
     if (statFulfillmentRate) {
@@ -694,7 +694,7 @@ if (filterTabContainer) {
 function clearFulfilledRequests() {
     if (typeof firebase === "undefined" || !db) return;
     
-    const fulfilledDocs = allRequests.filter(r => r.status === "fulfilled");
+    const fulfilledDocs = allRequests.filter(r => r.status === "fulfilled" || r.status === "claimed" || r.claimed === true);
     if (fulfilledDocs.length === 0) {
         showToast("No fulfilled requests to clear.", "info");
         return;
