@@ -1,5 +1,61 @@
 [
   {
+    "csv_id": "42382-mr-d",
+    "tmdb_id": 42382,
+    "imdb_id": "",
+    "title": "Mr. D",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Based on Gerry Dee's real-life experiences as a high school teacher before he switched to comedy full-time, MR. D is a story about a charming, under-qualified teacher trying to fake his way through a teaching job, just like he often fakes his way through life.",
+    "poster": "https://image.tmdb.org/t/p/w500/XhBWi3V3Hi0Mwu3ctXVXQgv2OX.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/Fd8oNE1KNEEE0SIILQgss43cwV.jpg",
+    "rating": 7.3,
+    "release_date": "2012-01-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ql4mQLnSM1c",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmwkAAhoLoUbzXD1nvWk7HRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADngkAAhoLoUbap7y388StcxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADpAkAAhoLoUZxwY04MiVbFxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADpgkAAhoLoUaKAAHkuIuybR4WBA",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADpwkAAhoLoUYyWvM03YES1BYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqgkAAhoLoUYzChRcg5AuORYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADrQkAAhoLoUbOXAvbwFhQexYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADrgkAAhoLoUYldvLAe44kPxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1151344-the-list",
     "tmdb_id": 1151344,
     "imdb_id": "",
