@@ -6962,6 +6962,11 @@ function showTourStep(stepNum) {
     const filterPanel = document.getElementById("search-filters-panel");
     const searchWrapper = document.querySelector(".search-bar-wrapper");
     const searchInput = document.getElementById("global-search-input");
+    const tourCard = document.querySelector(".tour-card");
+
+    // Clean up previous highlights
+    const highlighted = document.querySelectorAll(".tour-highlight-target");
+    highlighted.forEach(el => el.classList.remove("tour-highlight-target"));
 
     // Close overlays/drawers by default
     if (rewardsDrawer) rewardsDrawer.classList.remove("active");
@@ -6971,21 +6976,47 @@ function showTourStep(stepNum) {
     }
     if (searchWrapper) searchWrapper.classList.remove("expanded");
 
+    if (tourCard) {
+        // Reset card margins & position
+        tourCard.style.alignSelf = "center";
+        tourCard.style.marginTop = "0";
+        tourCard.style.marginBottom = "0";
+    }
+
     if (stepNum === 1) {
         // Welcome screen
         navigateToScreen("home");
     } else if (stepNum === 2) {
         // Search & Filters screen
         navigateToScreen("home");
-        if (searchWrapper) searchWrapper.classList.add("expanded");
-        if (searchInput) searchInput.focus();
+        if (searchWrapper) {
+            searchWrapper.classList.add("expanded");
+            searchWrapper.classList.add("tour-highlight-target");
+        }
+        if (searchInput) {
+            searchInput.focus();
+        }
         if (filterToggle && filterPanel) {
             filterToggle.classList.add("active");
             filterPanel.style.display = "flex";
         }
+        if (tourCard) {
+            // Push card down so the top search element is visible
+            tourCard.style.alignSelf = "flex-end";
+            tourCard.style.marginBottom = "80px";
+        }
     } else if (stepNum === 3) {
         // Mining screen
         navigateToScreen("mining");
+        const farmActionBtn = document.getElementById("btn-farm-action");
+        if (farmActionBtn) {
+            farmActionBtn.classList.add("tour-highlight-target");
+        }
+        if (tourCard) {
+            // Push card up so the bottom miner action is visible
+            tourCard.style.alignSelf = "flex-start";
+            tourCard.style.marginTop = "80px";
+        }
     } else if (stepNum === 4) {
         // Request & Boost screen (open Reward Center drawer)
         navigateToScreen("home");
@@ -6994,6 +7025,16 @@ function showTourStep(stepNum) {
             if (typeof updatePointsUI === "function") updatePointsUI();
             if (typeof renderDailyMissions === "function") renderDailyMissions();
             if (typeof updateHeaderNotificationDot === "function") updateHeaderNotificationDot();
+            
+            // Highlight the drawer content container
+            const drawerContainer = rewardsDrawer.querySelector(".drawer-container");
+            if (drawerContainer) {
+                drawerContainer.classList.add("tour-highlight-target");
+            }
+        }
+        if (tourCard) {
+            tourCard.style.alignSelf = "flex-start";
+            tourCard.style.marginTop = "80px";
         }
     } else if (stepNum === 5) {
         // Personalization screen (Profile -> Settings tab)
@@ -7004,6 +7045,14 @@ function showTourStep(stepNum) {
                 btn.click();
             }
         });
+        const profileForm = document.getElementById("profile-page-form");
+        if (profileForm) {
+            profileForm.classList.add("tour-highlight-target");
+        }
+        if (tourCard) {
+            tourCard.style.alignSelf = "flex-start";
+            tourCard.style.marginTop = "80px";
+        }
     } else if (stepNum === 6) {
         // Daily Missions screen (open Reward Center drawer)
         navigateToScreen("home");
@@ -7012,6 +7061,15 @@ function showTourStep(stepNum) {
             if (typeof updatePointsUI === "function") updatePointsUI();
             if (typeof renderDailyMissions === "function") renderDailyMissions();
             if (typeof updateHeaderNotificationDot === "function") updateHeaderNotificationDot();
+            
+            const drawerContainer = rewardsDrawer.querySelector(".drawer-container");
+            if (drawerContainer) {
+                drawerContainer.classList.add("tour-highlight-target");
+            }
+        }
+        if (tourCard) {
+            tourCard.style.alignSelf = "flex-start";
+            tourCard.style.marginTop = "80px";
         }
     }
 }
@@ -7022,6 +7080,10 @@ function closeWelcomeTour() {
         tourOverlay.classList.remove("active");
     }
     localStorage.setItem("filmhouse_tour_completed", "true");
+    
+    // Clean up highlights
+    const highlighted = document.querySelectorAll(".tour-highlight-target");
+    highlighted.forEach(el => el.classList.remove("tour-highlight-target"));
     
     // Close any drawers that were opened during the tour
     const rewardsDrawer = document.getElementById("rewards-drawer");
