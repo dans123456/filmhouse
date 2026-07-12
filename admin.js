@@ -3227,6 +3227,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (target === "all") {
             const count = (typeof allUsers !== 'undefined' && allUsers) ? allUsers.length : 0;
             countLabel.textContent = `Target: ${count} Registered Users`;
+        } else if (target === "channel") {
+            countLabel.textContent = `Target: @filmhousemain Channel`;
         } else {
             countLabel.textContent = `Target: 1 Specific User`;
         }
@@ -3268,7 +3270,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const targetType = broadcastTarget.value;
             let targetUsers = [];
             
-            if (targetType === "single") {
+            if (targetType === "channel") {
+                targetUsers = [{ id: "@filmhousemain" }];
+            } else if (targetType === "single") {
                 const rawIds = broadcastUserid.value.trim();
                 if (!rawIds) {
                     alert("Please enter target Telegram User ID(s)!");

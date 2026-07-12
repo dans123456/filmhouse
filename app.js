@@ -4313,6 +4313,36 @@ function bindEvents() {
             });
             localStorage.setItem("filmhouse_user_feedbacks", JSON.stringify(feedbackList));
 
+            // Sync feedback to Firestore and notify channel
+            if (typeof firebase !== "undefined" && db) {
+                db.collection("feedbacks").add({
+                    user: state.user.username || "guest",
+                    userId: state.user.id || "",
+                    category: category,
+                    subject: subject,
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    db.collection("settings").doc("telegram").get().then(tgDoc => {
+                        if (tgDoc.exists) {
+                            const token = tgDoc.data().botToken;
+                            if (token) {
+                                const text = `📝 *New Feedback Submitted!*\n\n*User:* @${state.user.username || "guest"}\n*Type:* ${category}\n*Subject:* ${subject}\n\n*Message:* ${message}`;
+                                fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                        chat_id: "@filmhousemain",
+                                        text: text,
+                                        parse_mode: "Markdown"
+                                    })
+                                }).catch(err => console.warn("Failed to send feedback notification to bot:", err));
+                            }
+                        }
+                    });
+                }).catch(err => console.warn("Error saving feedback to Firestore:", err));
+            }
+
             showToast("Feedback submitted successfully!");
             feedbackForm.reset();
             navigateToScreen("home");
@@ -4787,17 +4817,38 @@ function syncUserToFirestore(forceFetch = false) {
                         showBannedScreen();
                         return;
                     }
+                    if (docData.points !== undefined) {
+                        state.user.points = docData.points;
+                        data.points = docData.points;
+                    }
+                    if (docData.pointsBreakdown !== undefined) {
+                        state.user.pointsBreakdown = docData.pointsBreakdown;
+                        data.pointsBreakdown = docData.pointsBreakdown;
+                    }
+                    if (docData.fullName !== undefined) {
+                        state.user.fullName = docData.fullName;
+                        data.fullName = docData.fullName;
+                    }
+                    if (docData.avatar !== undefined) {
+                        state.user.avatar = docData.avatar;
+                        data.avatar = docData.avatar;
+                    }
+                    if (docData.greetingFontStyle !== undefined) {
+                        state.user.greetingFontStyle = docData.greetingFontStyle;
+                        data.greetingFontStyle = docData.greetingFontStyle;
+                    }
+                    if (docData.favoriteCategories !== undefined) {
+                        state.user.favoriteCategories = docData.favoriteCategories;
+                        data.favoriteCategories = docData.favoriteCategories;
+                    }
+                    if (docData.notificationsEnabled !== undefined) state.user.notificationsEnabled = docData.notificationsEnabled;
+                    if (docData.subAnime !== undefined) state.user.subAnime = docData.subAnime;
+                    if (docData.subHollywood !== undefined) state.user.subHollywood = docData.subHollywood;
+                    if (docData.subRecs !== undefined) state.user.subRecs = docData.subRecs;
+                    if (docData.contactPreference !== undefined) state.user.contactPreference = docData.contactPreference;
                     if (docData.farmingStartedAt !== undefined) {
                         state.user.farmingStartedAt = docData.farmingStartedAt;
                         data.farmingStartedAt = docData.farmingStartedAt;
-                        const saved = localStorage.getItem("filmhouse_user_profile");
-                        if (saved) {
-                            try {
-                                const profile = JSON.parse(saved);
-                                profile.farmingStartedAt = docData.farmingStartedAt;
-                                localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
-                            } catch (e) {}
-                        }
                     }
                     if (docData.checkInStreak !== undefined) {
                         state.user.checkInStreak = docData.checkInStreak;
@@ -4807,6 +4858,27 @@ function syncUserToFirestore(forceFetch = false) {
                         state.user.lastCheckInDate = docData.lastCheckInDate;
                         data.lastCheckInDate = docData.lastCheckInDate;
                     }
+                    if (docData.dailyStats !== undefined) {
+                        state.user.dailyStats = docData.dailyStats;
+                        data.dailyStats = docData.dailyStats;
+                    }
+                    if (docData.badge !== undefined) {
+                        state.user.badge = docData.badge;
+                        data.badge = docData.badge;
+                    }
+                    if (docData.badgeExpiresAt !== undefined) {
+                        state.user.badgeExpiresAt = docData.badgeExpiresAt;
+                        data.badgeExpiresAt = docData.badgeExpiresAt;
+                    }
+
+                    // Save fully synchronized state to local storage
+                    saveProfileToLocalStorage();
+
+                    // Reload UI with updated state
+                    updatePointsUI();
+                    updateUserGreeting();
+                    renderStreakCalendar();
+                    renderDailyMissions();
                 }
             }
             if (!doc.exists) {
@@ -5341,6 +5413,18 @@ function logMovieRequestToFirestore(movie) {
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(postBody)
                         }).catch(err => console.warn("Failed to send bot notification for request:", err));
+
+                        // Notify the main Telegram group/channel of the request
+                        const channelText = `🍿 *New Movie Request!*\n\n*User:* @${state.user.username || "guest"}\n*Title:* ${movie.title} (${movie.type})\n\n📢 Let's get it added! 🚀`;
+                        fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                chat_id: "@filmhousemain",
+                                text: channelText,
+                                parse_mode: "Markdown"
+                            })
+                        }).catch(err => console.warn("Failed to send channel notification for request:", err));
                     }
                 }
             }).catch(err => console.warn("Error fetching bot token for request notification:", err));
@@ -5378,6 +5462,9 @@ function saveDailyStats() {
     }
     profile.dailyStats = state.user.dailyStats;
     localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+    
+    // Sync immediately to Firestore to prevent data resets
+    syncUserToFirestore();
 }
 
 function renderDailyMissions() {
@@ -5505,15 +5592,45 @@ function claimMissionReward(missionId) {
 function updateMissionProgress(actionType, count = 1) {
     checkAndResetDailyMissions();
     const stats = state.user.dailyStats;
+    
+    let oldVal = 0;
+    let target = 0;
+    let title = "";
+    let reward = 0;
+    
     if (actionType === "share") {
-        stats.sharesCount = (stats.sharesCount || 0) + count;
+        oldVal = stats.sharesCount || 0;
+        stats.sharesCount = oldVal + count;
+        target = 1;
+        title = "Social Promoter 🔗";
+        reward = 10;
     } else if (actionType === "ad") {
-        stats.adWatchesCount = (stats.adWatchesCount || 0) + count;
+        oldVal = stats.adWatchesCount || 0;
+        stats.adWatchesCount = oldVal + count;
+        target = 5;
+        title = "Ad Explorer 📺";
+        reward = 25;
     } else if (actionType === "download") {
-        stats.downloadsCount = (stats.downloadsCount || 0) + count;
+        oldVal = stats.downloadsCount || 0;
+        stats.downloadsCount = oldVal + count;
+        target = 3;
+        title = "Movie Collector 📥";
+        reward = 15;
     }
+    
     saveDailyStats();
     renderDailyMissions();
+
+    const newVal = stats[actionType === "share" ? "sharesCount" : (actionType === "ad" ? "adWatchesCount" : "downloadsCount")] || 0;
+    if (oldVal < target && newVal >= target) {
+        // Send a visual reminder / alert that the mission is completed
+        showToast(`🎉 Daily Mission Completed: ${title}! Claim +${reward} points in Reward Center! 🪙`, "success");
+        triggerHaptic("success");
+        
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.showAlert(`🎉 Daily Mission Completed: ${title}!\n\nOpen the Reward Center to claim your +${reward} points! 🪙`);
+        }
+    }
 }
 
 function startMissionsResetTimer() {
@@ -6411,15 +6528,25 @@ function claimStreakReward(dayNum, rewardAmount) {
 }
 
 function saveProfileToLocalStorage() {
-    const saved = localStorage.getItem("filmhouse_user_profile");
-    let profile = {};
-    if (saved) {
-        try { profile = JSON.parse(saved); } catch (e) {}
-    }
-    profile.checkInStreak = state.user.checkInStreak;
-    profile.lastCheckInDate = state.user.lastCheckInDate;
-    profile.points = state.user.points;
-    profile.pointsBreakdown = state.user.pointsBreakdown;
+    const profile = {
+        fullName: state.user.fullName,
+        avatar: state.user.avatar,
+        greetingFontStyle: state.user.greetingFontStyle || "default",
+        favoriteCategories: state.user.favoriteCategories || [],
+        notificationsEnabled: state.user.notificationsEnabled !== undefined ? state.user.notificationsEnabled : true,
+        subAnime: state.user.subAnime !== undefined ? state.user.subAnime : true,
+        subHollywood: state.user.subHollywood !== undefined ? state.user.subHollywood : true,
+        subRecs: state.user.subRecs !== undefined ? state.user.subRecs : true,
+        contactPreference: state.user.contactPreference || "telegram",
+        points: state.user.points || 0,
+        pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
+        checkInStreak: state.user.checkInStreak || 0,
+        lastCheckInDate: state.user.lastCheckInDate || "",
+        farmingStartedAt: state.user.farmingStartedAt || 0,
+        badge: state.user.badge || "",
+        badgeExpiresAt: state.user.badgeExpiresAt || 0,
+        dailyStats: state.user.dailyStats || {}
+    };
     localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
 }
 

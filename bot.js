@@ -413,7 +413,26 @@ function setupBot(bot) {
     });
 
     // Default reply for regular text messages (Automation)
-    bot.on('text', (ctx) => {
+    bot.on('text', async (ctx) => {
+        // Forward group messages to admins or notify them
+        if (ctx.chat.type === "group" || ctx.chat.type === "supergroup") {
+            const userId = String(ctx.from.id);
+            const userTag = ctx.from.username ? `@${ctx.from.username}` : ctx.from.first_name;
+            const text = ctx.message.text;
+            
+            const defaultAdmins = ["1329840839", "1175336733"];
+            const notifyText = `💬 *New Message in Group!*\n\n*From:* ${userTag} (ID: \`${userId}\`)\n*Message:* ${text}`;
+            
+            for (const adminId of defaultAdmins) {
+                try {
+                    await ctx.telegram.sendMessage(adminId, notifyText, { parse_mode: "Markdown" });
+                } catch (e) {
+                    console.warn(`Could not notify admin ${adminId} of group message:`, e.message);
+                }
+            }
+            return;
+        }
+
         return ctx.reply(
             `🤖 *Hello!* I am the Film House Bot.\n\nTo search, request, or download movies/series, please tap the button below to launch the Film House Web App! 🍿`,
             {
