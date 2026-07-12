@@ -1,5 +1,89 @@
 [
   {
+    "csv_id": "442062-goosebumps-2-haunted-halloween",
+    "tmdb_id": 442062,
+    "imdb_id": "",
+    "title": "Goosebumps 2: Haunted Halloween",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Be careful what you wish for. With their after school junk business, best friends Sonny and Sam hope to find treasure in other people’s trash. But when cleaning out the old Stine house, they open a locked book that frees a supernatural nightmare – Slappy! Now, with the help of Sonny’s sister Sarah, they’re in a race against time to get the sinister dummy and all the creatures he’s brought to life back into the pages before he unleashes total pandemonium!",
+    "poster": "https://image.tmdb.org/t/p/w500/t2wy38iiMpB8WsgJi3lYeDnGh2H.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/h5BvesqaxL7V3vl1CmaR8waGyiM.jpg",
+    "rating": 6.1,
+    "release_date": "2018-10-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "3mT-BdZQ4Uc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD7hIAAhoLoUYTk1mRz_PAlBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "257445-goosebumps",
+    "tmdb_id": 257445,
+    "imdb_id": "",
+    "title": "Goosebumps",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After moving to a small town, Zach Cooper finds a silver lining when he meets next door neighbor Hannah, the daughter of bestselling Goosebumps series author R.L. Stine. When Zach unintentionally unleashes real monsters from their manuscripts and they begin to terrorize the town, it’s suddenly up to Stine, Zach and Hannah to get all of them back in the books where they belong.",
+    "poster": "https://image.tmdb.org/t/p/w500/aeZT9pqEgrmXOGdESFkAuVjX6kw.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6mPe4rBHzDMal2oL6hVgOBkaHz9.jpg",
+    "rating": 6.3,
+    "release_date": "2015-08-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "dr8hmqAgbtg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD7RIAAhoLoUYMQgTS0KDByBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "824853-daddy-s-perfect-little-girl",
+    "tmdb_id": 824853,
+    "imdb_id": "",
+    "title": "Daddy's Perfect Little Girl",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A 12-year-old girl becomes jealous when her adoptive father develops a budding relationship with a woman and her teenage son.",
+    "poster": "https://image.tmdb.org/t/p/w500/yfOguNYHRFgrezUjRPwwahio1ef.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gj5DYnwdGM1wpK20csmPtzcn9VB.jpg",
+    "rating": 7,
+    "release_date": "2021-04-30",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD6hIAAhoLoUaUhzBWErMwvBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "10096-13-going-on-30",
     "tmdb_id": 10096,
     "imdb_id": "",
