@@ -4551,12 +4551,20 @@ function bindEvents() {
     const optCopy = document.getElementById("share-opt-copy");
     
     const inviteShareText = `Hey! Check out Film House, the ultimate app to watch and download your favorite movies and series directly inside Telegram! 🎬🍿`;
-    const inviteShareUrl = "https://t.me/Filmhouseappbot/filmhouseapp";
-    const fullInviteMessage = `${inviteShareText}\nPlay now: ${inviteShareUrl}`;
+    
+    // Dynamic invitation URL builder
+    const getInviteShareUrl = () => {
+        const referrerParam = state.user && state.user.id && state.user.id !== "000000000" ? `?start=ref_${state.user.id}` : "";
+        return `https://t.me/Filmhouseappbot${referrerParam}`;
+    };
+
+    const getFullInviteMessage = () => {
+        return `${inviteShareText}\nPlay now: ${getInviteShareUrl()}`;
+    };
     
     if (optWhatsapp) {
         optWhatsapp.addEventListener("click", () => {
-            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(fullInviteMessage)}`;
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(getFullInviteMessage())}`;
             window.open(whatsappUrl, "_blank");
             if (typeof awardPoints === "function") {
                 awardPoints(5, "share");
@@ -4567,7 +4575,7 @@ function bindEvents() {
     
     if (optTelegram) {
         optTelegram.addEventListener("click", () => {
-            const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteShareUrl)}&text=${encodeURIComponent(inviteShareText)}`;
+            const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(getInviteShareUrl())}&text=${encodeURIComponent(inviteShareText)}`;
             const tg = window.Telegram?.WebApp;
             if (tg && tg.openTelegramLink) {
                 try {
@@ -4587,7 +4595,7 @@ function bindEvents() {
     
     if (optTwitter) {
         optTwitter.addEventListener("click", () => {
-            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(fullInviteMessage)}`;
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(getFullInviteMessage())}`;
             window.open(twitterUrl, "_blank");
             if (typeof awardPoints === "function") {
                 awardPoints(5, "share");
@@ -4599,7 +4607,7 @@ function bindEvents() {
     if (optCopy) {
         optCopy.addEventListener("click", () => {
             if (typeof copyToClipboard === "function") {
-                copyToClipboard(fullInviteMessage);
+                copyToClipboard(getFullInviteMessage());
             }
             if (typeof awardPoints === "function") {
                 awardPoints(5, "share");

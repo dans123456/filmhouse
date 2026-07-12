@@ -103,6 +103,7 @@ function setupBot(bot) {
         console.log(`User /start: ${fullName} (@${username}, ID: ${userId})`);
 
         // Register user in Firestore
+        let isNewUser = false;
         try {
             const userRef = db.collection("users").doc(userId);
             const userDoc = await userRef.get();
@@ -115,6 +116,7 @@ function setupBot(bot) {
             };
             
             if (!userDoc.exists) {
+                isNewUser = true;
                 data.points = 0;
                 data.badge = "";
                 data.badgeExpiresAt = 0;
@@ -131,6 +133,40 @@ function setupBot(bot) {
 
         // Check for deep-link claim payload (start=claim_docId)
         const payload = ctx.startPayload || (ctx.message && ctx.message.text ? ctx.message.text.split(" ")[1] : "");
+
+        // Process referral points if new user joined via shared link
+        if (isNewUser && payload && payload.startsWith("ref_")) {
+            const referrerId = payload.substring(4);
+            if (referrerId !== userId) {
+                try {
+                    const referrerRef = db.collection("users").doc(referrerId);
+                    const referrerDoc = await referrerRef.get();
+                    if (referrerDoc.exists) {
+                        const referrerData = referrerDoc.data();
+                        const currentPoints = referrerData.points || 0;
+                        const newPoints = currentPoints + 5;
+                        const breakdown = referrerData.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
+                        breakdown.shares = (breakdown.shares || 0) + 1;
+
+                        await referrerRef.update({
+                            points: newPoints,
+                            pointsBreakdown: breakdown
+                        });
+
+                        // Notify the referrer privately in their bot DM
+                        await ctx.telegram.sendMessage(
+                            referrerId,
+                            `🔔 *New Referral!* 🔔\n\n` +
+                            `Your friend *${fullName}* has joined Film House using your invite link! 🎉\n\n` +
+                            `You have been awarded *+5 Loyalty Points*! 🏆`,
+                            { parse_mode: "Markdown" }
+                        ).catch(err => console.warn(`Failed to send referral message to ${referrerId}:`, err));
+                    }
+                } catch (err) {
+                    console.error("Error processing referral points:", err);
+                }
+            }
+        }
         if (payload && payload.startsWith("claim_")) {
             const docId = payload.substring(6);
             try {
