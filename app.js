@@ -4784,6 +4784,49 @@ function bindEvents() {
         });
     }
 
+    // Reset Account / Delete Profile logic for testing and database cleanup
+    const btnResetAccount = document.getElementById("btn-reset-account");
+    if (btnResetAccount) {
+        btnResetAccount.addEventListener("click", () => {
+            const confirmed = confirm("⚠️ Are you sure you want to RESET your account? This will DELETE your profile from the database and clear all points, so you can test as a completely fresh new user. Proceed?");
+            if (confirmed) {
+                triggerHaptic("warning");
+                
+                // Show loading state on button
+                btnResetAccount.disabled = true;
+                btnResetAccount.textContent = "Deleting Profile... ⏳";
+                
+                // Clear local storage profile keys
+                localStorage.removeItem("filmhouse_user_profile");
+                localStorage.removeItem("filmhouse_tour_completed");
+                localStorage.removeItem("acknowledged_fulfillments");
+
+                // Delete from Firestore
+                if (db && state.user.id) {
+                    db.collection("users").doc(state.user.id).delete()
+                        .then(() => {
+                            showToast("Profile deleted from Firestore successfully!", "success");
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        })
+                        .catch(err => {
+                            console.error("Error deleting document from Firestore:", err);
+                            showToast("Failed to delete from Firestore. Clearing local data and reloading...", "warning");
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        });
+                } else {
+                    showToast("No active database connection found. Reloading...", "warning");
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }
+            }
+        });
+    }
+
     // Simulated Telegram OAuth handlers
     const btnOAuth = document.getElementById("btn-telegram-login-oauth");
     const btnGuest = document.getElementById("btn-telegram-login-guest");
