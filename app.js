@@ -6784,7 +6784,7 @@ function showTourStep(stepNum) {
     // Handle next button label
     const nextBtn = document.getElementById("btn-tour-next");
     if (nextBtn) {
-        nextBtn.textContent = stepNum === 5 ? "Finish" : "Next";
+        nextBtn.textContent = stepNum === 6 ? "Finish" : "Next";
     }
 }
 
@@ -6804,7 +6804,7 @@ function initWelcomeTourHandlers() {
     
     if (nextBtn) {
         nextBtn.addEventListener("click", () => {
-            if (currentTourStep < 5) {
+            if (currentTourStep < 6) {
                 showTourStep(currentTourStep + 1);
             } else {
                 closeWelcomeTour();
