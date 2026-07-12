@@ -6574,7 +6574,7 @@ function loadMiningTaskAd() {
     rewardTitle.style.cssText = "font-size: 9px; font-weight: 700; color: rgba(255, 255, 255, 0.35); letter-spacing: 1px;";
     
     const rewardValue = document.createElement("span");
-    rewardValue.textContent = "+10 Points 🪙";
+    rewardValue.textContent = "+50 Points 🪙";
     rewardValue.style.cssText = "font-size: 13px; font-weight: 700; color: #ffbc00;";
     rewardEl.replaceChildren(rewardTitle, rewardValue);
 
@@ -6598,8 +6598,8 @@ function loadMiningTaskAd() {
 
     // Event handlers
     const handleReward = () => {
-        showToast("Bonus task completed! +10 Points awarded! 🏆", "success");
-        awardPoints(10, "task");
+        showToast("Bonus task completed! +50 Points awarded! 🏆", "success");
+        awardPoints(50, "task");
         syncUserToFirestore();
         box.style.display = "none";
     };
