@@ -364,6 +364,12 @@
                         Start the miner and close the app—mining runs in the background. Return here in 8 hours to claim your reward and restart the session!
                     </div>
                 </div>
+
+                <!-- How to Mine Guide Button -->
+                <button id="btn-mining-guide" class="btn btn-secondary btn-block" style="margin-top: 12px; font-weight: bold; background: rgba(255, 188, 0, 0.05); border: 1px solid rgba(255, 188, 0, 0.2); color: #ffbc00; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+                    How to Mine Points? 📖
+                </button>
+            </div>
             </div>
         </section>
 
@@ -1123,6 +1129,47 @@
                 </div>
                 <button class="btn btn-primary btn-sm" id="btn-tour-next">Next</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MINING TUTORIAL GUIDE MODAL -->
+    <div class="modal-overlay" id="mining-guide-modal">
+        <div class="modal-container" style="max-width: 400px; width: 90%; padding: 24px; border-radius: var(--border-radius-md); background-color: var(--bg-dark-card); border: 1px solid var(--border-color); text-align: center; position: relative;">
+            <button class="modal-close-btn" id="btn-close-mining-guide" aria-label="Close guide" style="position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px;">
+                <svg style="width: 18px; height: 18px; fill: currentColor;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+            </button>
+            <h3 style="margin-top: 0; margin-bottom: 16px; font-family: var(--font-heading); color: #ffbc00; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; font-weight: 700;">
+                ⚡ Mining Tutorial Guide
+            </h3>
+            
+            <!-- Stepper Container -->
+            <div class="mining-steps-flow" style="display: flex; flex-direction: column; gap: 20px; text-align: left; margin-bottom: 24px;">
+                <div style="display: flex; gap: 14px; align-items: flex-start;">
+                    <div style="background: rgba(255, 188, 0, 0.1); border: 1px solid #ffbc00; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: #ffbc00; font-weight: bold; font-size: 13px; flex-shrink: 0;">1</div>
+                    <div>
+                        <strong style="color: #fff; font-size: 13px; display: block; margin-bottom: 2px;">Start the Session</strong>
+                        <span style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">Tap the <b>Start Mining ⚡</b> button. This initializes an 8-hour mining period.</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 14px; align-items: flex-start;">
+                    <div style="background: rgba(255, 188, 0, 0.1); border: 1px solid #ffbc00; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: #ffbc00; font-weight: bold; font-size: 13px; flex-shrink: 0;">2</div>
+                    <div>
+                        <strong style="color: #fff; font-size: 13px; display: block; margin-bottom: 2px;">Earn Passively Offline</strong>
+                        <span style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">You don't need to keep the app open! Mining runs passively in the background. You accumulate points at a rate of 10 points per hour.</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 14px; align-items: flex-start;">
+                    <div style="background: rgba(255, 188, 0, 0.1); border: 1px solid #ffbc00; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: #ffbc00; font-weight: bold; font-size: 13px; flex-shrink: 0;">3</div>
+                    <div>
+                        <strong style="color: #fff; font-size: 13px; display: block; margin-bottom: 2px;">Claim & Restart</strong>
+                        <span style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">After 8 hours, return here and tap <b>Claim Points 🪙</b> to add the 80 points to your balance, then restart mining!</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-block" id="btn-mining-guide-ok" style="font-weight: bold; width: 100%;">Got It! 👍</button>
         </div>
     </div>
 

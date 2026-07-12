@@ -1217,11 +1217,23 @@ function checkDailyVisitPoints() {
     }
 }
 
+let leaderboardUnsubscribe = null;
+
 function renderLeaderboard() {
     const userRankCard = document.getElementById("leaderboard-user-rank-card");
     const rowsContainer = document.getElementById("leaderboard-rows-container");
     if (!userRankCard || !rowsContainer) return;
     
+    // Clear previous listener if any
+    if (typeof leaderboardUnsubscribe === "function") {
+        try {
+            leaderboardUnsubscribe();
+        } catch (e) {
+            console.warn("Error unsubscribing leaderboard:", e);
+        }
+        leaderboardUnsubscribe = null;
+    }
+
     // Clear containers and show loading state
     userRankCard.innerHTML = `<div style="padding: 10px; text-align: center; color: var(--text-secondary); width: 100%;">Loading ranking...</div>`;
     rowsContainer.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--text-secondary);">Loading global leaderboard...</div>`;
@@ -1235,7 +1247,8 @@ function renderLeaderboard() {
             const defaultAdmins = ["1329840839", "1175336733"];
             const allAdminIds = Array.from(new Set([...defaultAdmins, ...adminIds]));
 
-            db.collection("users").orderBy("points", "desc").limit(60).get().then(async (snapshot) => {
+            // Subscribe to real-time updates using onSnapshot
+            leaderboardUnsubscribe = db.collection("users").orderBy("points", "desc").limit(60).onSnapshot(async (snapshot) => {
                 const list = [];
                 const staffList = [];
                 const seenIds = new Set();
@@ -1305,8 +1318,8 @@ function renderLeaderboard() {
                 }
                 
                 displayLeaderboardData(list, userRank, staffList);
-            }).catch(err => {
-                console.warn("Failed to load live leaderboard, falling back to demo data:", err);
+            }, (err) => {
+                console.warn("Failed to subscribe to live leaderboard, falling back to demo data:", err);
                 renderStaticLeaderboard();
             });
         }).catch(err => {
@@ -1812,6 +1825,16 @@ function clearWatchHistory() {
 
 // View Routing Manager
 function navigateToScreen(targetScreenId) {
+    // Unsubscribe from leaderboard if navigating away
+    if (targetScreenId !== "leaderboard" && typeof leaderboardUnsubscribe === "function") {
+        try {
+            leaderboardUnsubscribe();
+        } catch (e) {
+            console.warn("Error unsubscribing leaderboard:", e);
+        }
+        leaderboardUnsubscribe = null;
+    }
+
     // Hide all screens
     const screens = document.querySelectorAll(".app-screen");
     screens.forEach(s => s.classList.remove("active"));
@@ -4025,6 +4048,31 @@ function bindEvents() {
         });
     }
 
+    // Mining Tutorial Guide Modal Event Listeners
+    const btnMiningGuide = document.getElementById("btn-mining-guide");
+    const miningGuideModal = document.getElementById("mining-guide-modal");
+    const btnCloseMiningGuide = document.getElementById("btn-close-mining-guide");
+    const btnMiningGuideOk = document.getElementById("btn-mining-guide-ok");
+
+    if (btnMiningGuide && miningGuideModal) {
+        btnMiningGuide.addEventListener("click", () => {
+            miningGuideModal.classList.add("active");
+            triggerHaptic("selection");
+        });
+    }
+    if (btnCloseMiningGuide && miningGuideModal) {
+        btnCloseMiningGuide.addEventListener("click", () => {
+            miningGuideModal.classList.remove("active");
+            triggerHaptic("selection");
+        });
+    }
+    if (btnMiningGuideOk && miningGuideModal) {
+        btnMiningGuideOk.addEventListener("click", () => {
+            miningGuideModal.classList.remove("active");
+            triggerHaptic("success");
+        });
+    }
+
     // Points Mining Action Button
     const btnFarmAction = document.getElementById("btn-farm-action");
     if (btnFarmAction) {
@@ -5227,6 +5275,30 @@ function renderUserRequests(requests) {
                             claimedAt: firebase.firestore.FieldValue.serverTimestamp(),
                             status: "claimed"
                         }).catch(err => console.error("Error updating claim in Firestore:", err));
+                    }
+
+                    // Send direct links to user's Telegram DM
+                    if (db && state.user.id) {
+                        db.collection("settings").doc("telegram").get().then(tgDoc => {
+                            if (tgDoc.exists) {
+                                const token = tgDoc.data().botToken;
+                                if (token) {
+                                    const notifyMsg = `🍿 *Your Requested Movie is Ready!* 🍿\n\n` +
+                                        `Here is your direct download/watch link for *${r.title}*:\n` +
+                                        `🔗 ${dlLink}\n\n` +
+                                        `Enjoy watching! 🎬`;
+                                    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({
+                                            chat_id: String(state.user.id),
+                                            text: notifyMsg,
+                                            parse_mode: "Markdown"
+                                        })
+                                    }).catch(err => console.warn("Failed to send bot notification for claiming:", err));
+                                }
+                            }
+                        }).catch(err => console.warn("Error fetching bot token for claiming notification:", err));
                     }
                     
                     showToast("Claimed! Direct links have been sent to your Telegram DM. 🍿", "success");
@@ -6786,6 +6858,65 @@ function showTourStep(stepNum) {
     if (nextBtn) {
         nextBtn.textContent = stepNum === 6 ? "Finish" : "Next";
     }
+
+    // --- Interactive Walkthrough Tour Navigation ---
+    const rewardsDrawer = document.getElementById("rewards-drawer");
+    const filterToggle = document.getElementById("search-filter-toggle");
+    const filterPanel = document.getElementById("search-filters-panel");
+    const searchWrapper = document.querySelector(".search-bar-wrapper");
+    const searchInput = document.getElementById("global-search-input");
+
+    // Close overlays/drawers by default
+    if (rewardsDrawer) rewardsDrawer.classList.remove("active");
+    if (filterToggle && filterPanel) {
+        filterToggle.classList.remove("active");
+        filterPanel.style.display = "none";
+    }
+    if (searchWrapper) searchWrapper.classList.remove("expanded");
+
+    if (stepNum === 1) {
+        // Welcome screen
+        navigateToScreen("home");
+    } else if (stepNum === 2) {
+        // Search & Filters screen
+        navigateToScreen("home");
+        if (searchWrapper) searchWrapper.classList.add("expanded");
+        if (searchInput) searchInput.focus();
+        if (filterToggle && filterPanel) {
+            filterToggle.classList.add("active");
+            filterPanel.style.display = "flex";
+        }
+    } else if (stepNum === 3) {
+        // Mining screen
+        navigateToScreen("mining");
+    } else if (stepNum === 4) {
+        // Request & Boost screen (open Reward Center drawer)
+        navigateToScreen("home");
+        if (rewardsDrawer) {
+            rewardsDrawer.classList.add("active");
+            if (typeof updatePointsUI === "function") updatePointsUI();
+            if (typeof renderDailyMissions === "function") renderDailyMissions();
+            if (typeof updateHeaderNotificationDot === "function") updateHeaderNotificationDot();
+        }
+    } else if (stepNum === 5) {
+        // Personalization screen (Profile -> Settings tab)
+        navigateToScreen("profile");
+        const tabButtons = document.querySelectorAll(".profile-tab-btn");
+        tabButtons.forEach(btn => {
+            if (btn.getAttribute("data-tab") === "settings") {
+                btn.click();
+            }
+        });
+    } else if (stepNum === 6) {
+        // Daily Missions screen (open Reward Center drawer)
+        navigateToScreen("home");
+        if (rewardsDrawer) {
+            rewardsDrawer.classList.add("active");
+            if (typeof updatePointsUI === "function") updatePointsUI();
+            if (typeof renderDailyMissions === "function") renderDailyMissions();
+            if (typeof updateHeaderNotificationDot === "function") updateHeaderNotificationDot();
+        }
+    }
 }
 
 function closeWelcomeTour() {
@@ -6794,6 +6925,22 @@ function closeWelcomeTour() {
         tourOverlay.classList.remove("active");
     }
     localStorage.setItem("filmhouse_tour_completed", "true");
+    
+    // Close any drawers that were opened during the tour
+    const rewardsDrawer = document.getElementById("rewards-drawer");
+    if (rewardsDrawer) rewardsDrawer.classList.remove("active");
+    
+    const filterToggle = document.getElementById("search-filter-toggle");
+    const filterPanel = document.getElementById("search-filters-panel");
+    if (filterToggle && filterPanel) {
+        filterToggle.classList.remove("active");
+        filterPanel.style.display = "none";
+    }
+
+    const searchWrapper = document.querySelector(".search-bar-wrapper");
+    if (searchWrapper) searchWrapper.classList.remove("expanded");
+
+    navigateToScreen("home");
 }
 
 function initWelcomeTourHandlers() {
