@@ -12,7 +12,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&family=Pacifico&family=Playfair+Display:ital,wght@1,600&family=Cinzel:wght@600&family=Orbitron:wght@600&display=swap" rel="stylesheet">
     
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -520,6 +520,17 @@
                             </div>
 
                             <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                                <label for="profile-page-font-style" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">Greeting Font Style</label>
+                                <select id="profile-page-font-style" style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: var(--text-primary); width: 100%; outline: none; cursor: pointer;">
+                                    <option value="default">Default Sans-Serif</option>
+                                    <option value="signature">Signature (Pacifico)</option>
+                                    <option value="elegant">Elegant Script (Playfair)</option>
+                                    <option value="classic">Classic Serif (Cinzel)</option>
+                                    <option value="futuristic">Futuristic Tech (Orbitron)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
                                 <label style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 2px;">Favorite Categories</label>
                                 <div class="edit-genres-checklist" id="profile-genres-checklist" style="display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto; background-color: rgba(0,0,0,0.15); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
                                     <!-- Loaded dynamically -->
@@ -734,6 +745,16 @@
                                 <div class="edit-genres-checklist" id="edit-genres-checklist" style="display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; background-color: rgba(0,0,0,0.15); padding: 8px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color);">
                                     <!-- Dynamically loaded category checkboxes -->
                                 </div>
+                            </div>
+                            <div class="form-group" style="gap: 4px;">
+                                <label for="edit-profile-font-style" style="font-size: 11px; color: var(--text-secondary);">Greeting Font Style</label>
+                                <select id="edit-profile-font-style" style="background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 8px 10px; font-size: 12px; width: 100%; color: #fff; outline: none; box-sizing: border-box;">
+                                    <option value="default">Default Sans-Serif</option>
+                                    <option value="signature">Signature (Pacifico)</option>
+                                    <option value="elegant">Elegant Script (Playfair)</option>
+                                    <option value="classic">Classic Serif (Cinzel)</option>
+                                    <option value="futuristic">Futuristic Tech (Orbitron)</option>
+                                </select>
                             </div>
                             
                             <button class="btn btn-primary btn-sm btn-block" id="btn-save-profile-changes">Save Profile</button>

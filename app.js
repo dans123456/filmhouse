@@ -135,6 +135,7 @@ const state = {
         username: "demouser",
         fullName: "Demo User",
         avatar: "img/FilmHouse3_nobg.png",
+        greetingFontStyle: "default",
         points: 0,
         badge: "",
         badgeExpiresAt: 0,
@@ -659,6 +660,7 @@ function loadUserProfile() {
     const defaultProfile = {
         fullName: state.user.fullName,
         avatar: state.user.avatar,
+        greetingFontStyle: "default",
         favoriteCategories: [],
         notificationsEnabled: true,
         subAnime: true,
@@ -681,6 +683,7 @@ function loadUserProfile() {
 
     // Merge into state
     state.user.fullName = profile.fullName || state.user.fullName;
+    state.user.greetingFontStyle = profile.greetingFontStyle || "default";
     state.user.points = profile.points || 0;
     state.user.badge = profile.badge || null;
     state.user.badgeExpiresAt = profile.badgeExpiresAt || 0;
@@ -728,6 +731,12 @@ function loadUserProfile() {
     // Sync input values in UI
     const inputName = document.getElementById("edit-profile-name");
     if (inputName) inputName.value = state.user.fullName;
+
+    // Sync greeting font style selectors in UI
+    const editFontStyleSelect = document.getElementById("edit-profile-font-style");
+    if (editFontStyleSelect) editFontStyleSelect.value = state.user.greetingFontStyle;
+    const pageFontStyleSelect = document.getElementById("profile-page-font-style");
+    if (pageFontStyleSelect) pageFontStyleSelect.value = state.user.greetingFontStyle;
 
     const notifToggle = document.getElementById("settings-notifications-toggle");
     if (notifToggle) notifToggle.checked = state.user.notificationsEnabled;
@@ -1400,6 +1409,9 @@ function saveProfile(isFromPage = false) {
         const pageName = document.getElementById("profile-page-name");
         if (pageName) state.user.fullName = pageName.value.trim() || state.user.fullName;
 
+        const pageFontStyle = document.getElementById("profile-page-font-style");
+        if (pageFontStyle) state.user.greetingFontStyle = pageFontStyle.value;
+
         const pageContactPref = document.getElementById("profile-page-contact-pref");
         if (pageContactPref) state.user.contactPreference = pageContactPref.value;
 
@@ -1416,6 +1428,9 @@ function saveProfile(isFromPage = false) {
         // Sync from Drawer fields
         const inputName = document.getElementById("edit-profile-name");
         if (inputName) state.user.fullName = inputName.value.trim() || state.user.fullName;
+
+        const inputFontStyle = document.getElementById("edit-profile-font-style");
+        if (inputFontStyle) state.user.greetingFontStyle = inputFontStyle.value;
 
         const checklist = document.getElementById("edit-genres-checklist");
         if (checklist) {
@@ -1443,6 +1458,7 @@ function saveProfile(isFromPage = false) {
     const profileObj = {
         fullName: state.user.fullName,
         avatar: state.user.avatar,
+        greetingFontStyle: state.user.greetingFontStyle || "default",
         favoriteCategories: state.user.favoriteCategories,
         notificationsEnabled: state.user.notificationsEnabled,
         subAnime: state.user.subAnime,
@@ -6541,5 +6557,10 @@ function updateUserGreeting() {
     if (greetingEl) {
         const firstName = (state.user.fullName || "Collector").split(" ")[0];
         greetingEl.textContent = `Hi, ${firstName} 👋`;
+
+        // Clear previous classes and apply custom styled font-style font selection
+        greetingEl.className = "header-user-greeting";
+        const style = state.user.greetingFontStyle || "default";
+        greetingEl.classList.add(`font-style-${style}`);
     }
 }

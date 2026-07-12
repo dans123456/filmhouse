@@ -346,6 +346,58 @@ img {
     }
 }
 
+.header-user-greeting {
+    transition: all 0.3s ease;
+    display: block;
+}
+
+/* Greeting Font Custom Styles */
+.font-style-default {
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+    text-shadow: none !important;
+    letter-spacing: normal !important;
+}
+.font-style-signature {
+    font-family: 'Pacifico', cursive !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+    text-shadow: none !important;
+    letter-spacing: normal !important;
+    color: #ffbc00 !important;
+    margin-top: -2px !important;
+}
+.font-style-elegant {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    font-style: italic !important;
+    text-shadow: none !important;
+    letter-spacing: normal !important;
+    color: #ffbc00 !important;
+}
+.font-style-classic {
+    font-family: 'Cinzel', serif !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+    text-shadow: none !important;
+    letter-spacing: 0.8px !important;
+    color: #e5a900 !important;
+}
+.font-style-futuristic {
+    font-family: 'Orbitron', sans-serif !important;
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+    text-shadow: 0 0 6px rgba(255, 188, 0, 0.6) !important;
+    letter-spacing: 0.5px !important;
+    color: #fff !important;
+}
+
 /* Search Bar */
 .search-bar-wrapper {
     flex-grow: 1;
