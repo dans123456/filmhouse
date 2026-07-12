@@ -4554,8 +4554,8 @@ function bindEvents() {
     
     // Dynamic invitation URL builder
     const getInviteShareUrl = () => {
-        const referrerParam = state.user && state.user.id && state.user.id !== "000000000" ? `?start=ref_${state.user.id}` : "";
-        return `https://t.me/Filmhouseappbot${referrerParam}`;
+        const referrerParam = state.user && state.user.id && state.user.id !== "000000000" ? `?startapp=ref_${state.user.id}` : "";
+        return `https://t.me/Filmhouseappbot/filmhouseapp${referrerParam}`;
     };
 
     const getFullInviteMessage = () => {
@@ -5042,6 +5042,52 @@ function syncUserToFirestore(forceFetch = false) {
             }
             if (!doc.exists) {
                 data.joinedDate = firebase.firestore.FieldValue.serverTimestamp();
+
+                // Process client-side referral if the user joined via a startapp parameter
+                const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe : null;
+                if (initData && initData.start_param) {
+                    const rawParam = initData.start_param.trim();
+                    if (rawParam.startsWith("ref_")) {
+                        const referrerId = rawParam.substring(4);
+                        if (referrerId !== state.user.id) {
+                            db.collection("users").doc(referrerId).get().then(refDoc => {
+                                if (refDoc.exists) {
+                                    const refData = refDoc.data();
+                                    const currentPoints = refData.points || 0;
+                                    const newPoints = currentPoints + 5;
+                                    const breakdown = refData.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
+                                    breakdown.shares = (breakdown.shares || 0) + 1;
+
+                                    db.collection("users").doc(referrerId).update({
+                                        points: newPoints,
+                                        pointsBreakdown: breakdown
+                                    }).then(() => {
+                                        // Notify the referrer via Telegram Bot sendMessage API
+                                        db.collection("settings").doc("telegram").get().then(tgDoc => {
+                                            if (tgDoc.exists) {
+                                                const token = tgDoc.data().botToken;
+                                                if (token) {
+                                                    const notifyMsg = `🔔 *New Referral!* 🔔\n\n` +
+                                                        `Your friend *${state.user.fullName || "A user"}* has joined Film House using your invite link! 🎉\n\n` +
+                                                        `You have been awarded *+5 Loyalty Points*! 🏆`;
+                                                    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                                                        method: "POST",
+                                                        headers: { "Content-Type": "application/json" },
+                                                        body: JSON.stringify({
+                                                            chat_id: String(referrerId),
+                                                            text: notifyMsg,
+                                                            parse_mode: "Markdown"
+                                                        })
+                                                    }).catch(err => console.warn("Failed to send bot notification for referral:", err));
+                                                }
+                                            }
+                                        }).catch(err => console.warn(err));
+                                    }).catch(err => console.warn("Error updating referrer points:", err));
+                                }
+                            }).catch(err => console.warn("Error fetching referrer doc:", err));
+                        }
+                    }
+                }
             }
             userRef.set(data, { merge: true }).catch(err => console.warn("Firestore set error:", err));
         }).catch(err => {
