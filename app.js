@@ -5374,6 +5374,10 @@ function renderUserRequests(requests) {
                         }).catch(err => console.error("Error updating claim in Firestore:", err));
                     }
 
+                    // Resolve the download link inside the event listener scope
+                    const rawLink = r._isExplicit ? r.downloadLink : (r._matchingMovie && r._matchingMovie.links ? r._matchingMovie.links[0] : "");
+                    const dlLink = typeof rawLink === 'object' && rawLink !== null ? rawLink.url : rawLink;
+
                     // Send direct links to user's Telegram DM
                     if (db && state.user.id) {
                         db.collection("settings").doc("telegram").get().then(tgDoc => {
