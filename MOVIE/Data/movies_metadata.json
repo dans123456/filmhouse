@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "2382-freaks-and-geeks",
+    "tmdb_id": 2382,
+    "imdb_id": "",
+    "title": "Freaks and Geeks",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "High school mathlete Lindsay Weir rebels and begins hanging out with a crowd of burnouts (the \"freaks\"), while her brother Sam Weir navigates a different part of the social universe with his nerdy friends (the \"geeks\").",
+    "poster": "https://image.tmdb.org/t/p/w500/tPqV63zcW6ZV0Hd48DMGb5UzQIG.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/1lOGkpGa9SjZ2uP1PxfxDkSXRNs.jpg",
+    "rating": 8.2,
+    "release_date": "1999-09-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "E0oJ-uYWakw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADGRIAAhoLoUYo9Ll0QlwQCxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "890215-you-hurt-my-feelings",
     "tmdb_id": 890215,
     "imdb_id": "",
