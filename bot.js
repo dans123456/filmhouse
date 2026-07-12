@@ -134,10 +134,13 @@ function setupBot(bot) {
         // Check for deep-link claim payload (start=claim_docId)
         const payload = ctx.startPayload || (ctx.message && ctx.message.text ? ctx.message.text.split(" ")[1] : "");
 
-        // Process referral points if new user joined via shared link
-        if (isNewUser && payload && payload.startsWith("ref_")) {
+        // Process referral points if user joined via shared link
+        if (payload && payload.startsWith("ref_")) {
             const referrerId = payload.substring(4);
-            if (referrerId !== userId) {
+            if (referrerId === userId) {
+                // Self-referral check
+                await ctx.reply("⚠️ *You cannot refer yourself!* Share your link with friends to earn points. 🎁", { parse_mode: "Markdown" }).catch(err => console.warn(err));
+            } else if (isNewUser) {
                 try {
                     const referrerRef = db.collection("users").doc(referrerId);
                     const referrerDoc = await referrerRef.get();
@@ -165,6 +168,9 @@ function setupBot(bot) {
                 } catch (err) {
                     console.error("Error processing referral points:", err);
                 }
+            } else {
+                // User already exists in database
+                await ctx.reply("ℹ️ *You are already a member of Film House!* Invite links only award points for new users who join for the first time. 🍿", { parse_mode: "Markdown" }).catch(err => console.warn(err));
             }
         }
         if (payload && payload.startsWith("claim_")) {
