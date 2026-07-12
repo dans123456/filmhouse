@@ -709,6 +709,47 @@ img {
     display: block;
 }
 
+#screen-home.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Home Screen Flex Order Indices */
+#screen-home .hero-carousel-container {
+    order: 1;
+}
+#screen-home .categories-container-outer {
+    order: 2;
+}
+#screen-home .genre-chips-container {
+    order: 3;
+}
+#screen-home #editors-choice-section-wrapper {
+    order: 4;
+}
+#screen-home .movie-listing-section {
+    order: 5;
+}
+
+/* Reordering and Hiding on Search */
+#screen-home.search-active .categories-container-outer {
+    display: none !important;
+}
+#screen-home.search-active .genre-chips-container {
+    order: 1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* Drag to Scroll styles */
+.categories-bar, .horizontal-scroll-wrapper, .hero-carousel-container {
+    cursor: grab;
+}
+.categories-bar.dragging, .horizontal-scroll-wrapper.dragging, .hero-carousel-container.dragging {
+    cursor: grabbing !important;
+    user-select: none;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }

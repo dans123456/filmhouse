@@ -157,6 +157,7 @@ const state = {
     filters: {
         genre: "All",
         genre2: "All",
+        selectedGenres: ["All"],
         rating: 0,
         year: "All"
     },
@@ -828,6 +829,9 @@ function loadUserProfile() {
     } catch (e) {
         console.warn("Could not merge healed movie details cache:", e);
     }
+    
+    // Sync top-left personalized name greeting
+    updateUserGreeting();
 }
 
 // Render Watchlist and Watched List mini horizontal scrolls on the Profile page
@@ -1862,27 +1866,34 @@ function renderGenreChips() {
     
     genres.forEach(genre => {
         const chip = document.createElement("div");
-        chip.className = `genre-chip ${state.filters.genre === genre ? "active" : ""}`;
+        const isActive = state.filters.selectedGenres.includes(genre);
+        chip.className = `genre-chip ${isActive ? "active" : ""}`;
         chip.textContent = genre;
         
         chip.addEventListener("click", () => {
-            state.filters.genre = genre;
-            state.visibleCount = 24;
-            // Sync with filter select element if present
-            const genreSelect = document.getElementById("filter-genre");
-            if (genreSelect) {
-                genreSelect.value = genre;
+            if (genre === "All") {
+                state.filters.selectedGenres = ["All"];
+            } else {
+                // Remove "All" if it was active
+                state.filters.selectedGenres = state.filters.selectedGenres.filter(g => g !== "All");
+                
+                // Toggle clicked genre
+                if (state.filters.selectedGenres.includes(genre)) {
+                    state.filters.selectedGenres = state.filters.selectedGenres.filter(g => g !== genre);
+                } else {
+                    state.filters.selectedGenres.push(genre);
+                }
+                
+                // If empty, set back to "All"
+                if (state.filters.selectedGenres.length === 0) {
+                    state.filters.selectedGenres = ["All"];
+                }
             }
             
-            // Re-render chips to update active styling
-            document.querySelectorAll(".genre-chip").forEach(c => {
-                if (c.textContent === genre) {
-                    c.classList.add("active");
-                } else {
-                    c.classList.remove("active");
-                }
-            });
+            state.visibleCount = 24;
             
+            // Re-render chips to update active styling
+            renderGenreChips();
             renderFeaturedGrid();
         });
         
@@ -1897,6 +1908,16 @@ function renderFeaturedGrid(fromDiscover = false) {
     grid.replaceChildren();
 
     const filtersActive = state.filters.genre !== "All" || state.filters.genre2 !== "All" || state.filters.rating > 0 || state.filters.year !== "All";
+
+    // Toggle search-active class on screen-home for layout shifting
+    const homeScreen = document.getElementById("screen-home");
+    if (homeScreen) {
+        if (state.searchQuery) {
+            homeScreen.classList.add("search-active");
+        } else {
+            homeScreen.classList.remove("search-active");
+        }
+    }
 
     // Toggle Carousel and Editor's Choice visibility based on search activity, filter activity, or active category
     const carousel = document.getElementById("hero-carousel");
@@ -1959,6 +1980,14 @@ function renderFeaturedGrid(fromDiscover = false) {
             const filteredExternal = state.externalSearchResults.filter(ext => !localTmdbIds.has(ext.tmdb_id));
             list = [...list, ...filteredExternal];
         }
+    }
+
+    // Apply Multi-select homepage genre chips
+    if (state.filters.selectedGenres && !state.filters.selectedGenres.includes("All")) {
+        list = list.filter(m => {
+            if (!m.genres) return false;
+            return m.genres.some(g => state.filters.selectedGenres.includes(g));
+        });
     }
 
     // Apply Advanced Dropdown Filters
@@ -4238,6 +4267,7 @@ function bindEvents() {
             state.filters.genre2 = "All";
             state.filters.rating = 0;
             state.filters.year = "All";
+            state.filters.selectedGenres = ["All"];
             state.visibleCount = 24;
             state.externalSearchResults = [];
 
@@ -5516,6 +5546,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 1. Initial login credentials grab
     handleTelegramAuth();
+    updateUserGreeting();
 
     // Parse Telegram startapp parameter (e.g. startapp=mining or boost_docId)
     let initialScreen = "home";
@@ -5754,6 +5785,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 10. Bind triggers & event click listeners
     bindEvents();
+
+    // 10c. Enable drag to scroll for horizontal sliders on PC
+    enableDragToScroll(document.getElementById("categories-bar-slider"));
+    enableDragToScroll(document.getElementById("editors-choice-scroll-container"));
+    enableDragToScroll(document.getElementById("hero-carousel"));
 
     // 10b. Handle startup startapp routing parameter redirection
     if (initialScreen === "mining") {
@@ -6467,4 +6503,43 @@ function logAppEvent(type, movieId, movieTitle) {
         userId: state.user.id,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(err => console.warn("Error logging app event:", err));
+}
+
+// Drag-to-scroll handler for PC horizontal carousels
+function enableDragToScroll(slider) {
+    if (!slider) return;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        slider.classList.add('dragging');
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+    });
+    slider.addEventListener('mouseleave', () => {
+        isDown = false;
+        slider.classList.remove('dragging');
+    });
+    slider.addEventListener('mouseup', () => {
+        isDown = false;
+        slider.classList.remove('dragging');
+    });
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 1.5; // scroll speed multiplier
+        slider.scrollLeft = scrollLeft - walk;
+    });
+}
+
+// Update personalized user name greeting on header
+function updateUserGreeting() {
+    const greetingEl = document.getElementById("header-user-greeting");
+    if (greetingEl) {
+        const firstName = (state.user.fullName || "Collector").split(" ")[0];
+        greetingEl.textContent = `Hi, ${firstName} 👋`;
+    }
 }
