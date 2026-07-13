@@ -205,8 +205,32 @@ function setupBot(bot) {
         }
 
         const escapedFullName = fullName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        const imagePath = path.join(__dirname, "MOVIE", "img", "FilmHouse.png");
-        const caption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @filmhouse_main to stay updated! 🤟</i>`;
+
+        // Load custom welcome config from Firestore settings/welcome
+        let welcomeText = null;
+        let welcomePhotoFileId = null;
+        let welcomePhotoUrl = null;
+        try {
+            const welcomeDoc = await db.collection("settings").doc("welcome").get();
+            if (welcomeDoc.exists) {
+                const welcomeData = welcomeDoc.data();
+                welcomeText = welcomeData.text || null;
+                welcomePhotoFileId = welcomeData.fileId || null;
+                welcomePhotoUrl = welcomeData.photoUrl || null;
+            }
+        } catch (err) {
+            console.warn("Failed to load custom welcome settings:", err);
+        }
+
+        let caption = "";
+        if (welcomeText) {
+            caption = welcomeText
+                .replace(/{name}/g, escapedFullName)
+                .replace(/{fullname}/g, escapedFullName)
+                .replace(/{username}/g, username);
+        } else {
+            caption = `🍿 <b>Welcome to Film House, ${escapedFullName}!</b> 🍿\n\nTo start downloading movies & series:\n1. Click the <b>Launch Film House 🚀</b> button below to open the movie library.\n2. Tap any movie or season to unlock download links.\n3. Can't find a title? Request it inside the app and we will notify you here directly!\n\n<i>Make sure you join our channel @filmhouse_main to stay updated! 🤟</i>`;
+        }
 
         const replyMarkup = {
             inline_keyboard: [
@@ -226,10 +250,10 @@ function setupBot(bot) {
             ]
         };
 
-        if (fs.existsSync(imagePath)) {
+        if (welcomePhotoFileId) {
             try {
                 return await ctx.replyWithPhoto(
-                    { source: imagePath },
+                    welcomePhotoFileId,
                     {
                         caption: caption,
                         parse_mode: 'HTML',
@@ -237,11 +261,36 @@ function setupBot(bot) {
                     }
                 );
             } catch (err) {
-                console.error("Failed to send welcome photo, falling back to text:", err);
-                return ctx.reply(caption, {
-                    parse_mode: 'HTML',
-                    reply_markup: replyMarkup
-                });
+                console.error("Failed to send welcome photo file ID, falling back to text:", err);
+            }
+        } else if (welcomePhotoUrl) {
+            try {
+                return await ctx.replyWithPhoto(
+                    welcomePhotoUrl,
+                    {
+                        caption: caption,
+                        parse_mode: 'HTML',
+                        reply_markup: replyMarkup
+                    }
+                );
+            } catch (err) {
+                console.error("Failed to send welcome photo URL, falling back to text:", err);
+            }
+        } else {
+            const imagePath = path.join(__dirname, "MOVIE", "img", "FilmHouse.png");
+            if (fs.existsSync(imagePath)) {
+                try {
+                    return await ctx.replyWithPhoto(
+                        { source: imagePath },
+                        {
+                            caption: caption,
+                            parse_mode: 'HTML',
+                            reply_markup: replyMarkup
+                        }
+                    );
+                } catch (err) {
+                    console.error("Failed to send welcome photo, falling back to text:", err);
+                }
             }
         }
         
@@ -451,6 +500,92 @@ function setupBot(bot) {
         } catch (err) {
             console.error("Error unbanning user:", err);
             return ctx.reply(`❌ Error unbanning user: ${err.message}`);
+        }
+    });
+
+    // Command: /setwelcomecaption <text> (Admin Only)
+    bot.command('setwelcomecaption', async (ctx) => {
+        const userId = String(ctx.from.id);
+        if (!(await isAdmin(userId))) {
+            return ctx.reply("❌ Unauthorized. This command is restricted to administrators.");
+        }
+
+        const newCaption = ctx.message.text.substring(18).trim(); // remove "/setwelcomecaption" prefix
+        if (!newCaption) {
+            return ctx.reply(
+                "📝 *How to use /setwelcomecaption*:\n\n" +
+                "Type: `/setwelcomecaption <welcome text>`\n\n" +
+                "You can use placeholders like `{name}` or `{username}` which will be automatically replaced with the visitor's name/username.\n" +
+                "For example:\n`/setwelcomecaption Welcome {name} to Film House! 🍿`",
+                { parse_mode: 'Markdown' }
+            );
+        }
+
+        try {
+            await db.collection("settings").doc("welcome").set({
+                text: newCaption
+            }, { merge: true });
+
+            return ctx.reply("✅ *Welcome text caption has been successfully updated!*", { parse_mode: 'Markdown' });
+        } catch (err) {
+            console.error("Error setting welcome caption:", err);
+            return ctx.reply("❌ Failed to update welcome caption in Firestore.");
+        }
+    });
+
+    // Command: /setwelcomephoto (Admin Only)
+    bot.command('setwelcomephoto', async (ctx) => {
+        const userId = String(ctx.from.id);
+        if (!(await isAdmin(userId))) {
+            return ctx.reply("❌ Unauthorized. This command is restricted to administrators.");
+        }
+
+        let photoMsg = null;
+        if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
+            photoMsg = ctx.message.reply_to_message;
+        } else if (ctx.message.photo) {
+            photoMsg = ctx.message;
+        }
+
+        if (!photoMsg) {
+            return ctx.reply(
+                "🖼️ *How to use /setwelcomephoto*:\n\n" +
+                "• *Method 1*: Send a photo directly to this chat, then *Reply* to it with the command `/setwelcomephoto`.\n" +
+                "• *Method 2*: Upload a photo and set its *Caption* directly to `/setwelcomephoto`.",
+                { parse_mode: 'Markdown' }
+            );
+        }
+
+        try {
+            const photoArray = photoMsg.photo;
+            const highestResPhoto = photoArray[photoArray.length - 1];
+            const fileId = highestResPhoto.file_id;
+
+            await db.collection("settings").doc("welcome").set({
+                fileId: fileId,
+                photoUrl: null // clear URL to prioritize fileId
+            }, { merge: true });
+
+            return ctx.reply("✅ *Welcome photo has been successfully updated!*", { parse_mode: 'Markdown' });
+        } catch (err) {
+            console.error("Error setting welcome photo:", err);
+            return ctx.reply("❌ Failed to update welcome photo in Firestore.");
+        }
+    });
+
+    // Command: /resetwelcome (Admin Only)
+    bot.command('resetwelcome', async (ctx) => {
+        const userId = String(ctx.from.id);
+        if (!(await isAdmin(userId))) {
+            return ctx.reply("❌ Unauthorized. This command is restricted to administrators.");
+        }
+
+        try {
+            await db.collection("settings").doc("welcome").delete();
+            return ctx.reply("🔄 *Welcome settings have been reset to app default values.*", { parse_mode: 'Markdown' });
+        } catch (err) {
+            console.error("Error deleting welcome doc:", err);
+            return ctx.reply("❌ Failed to delete welcome document in Firestore.");
         }
     });
 
@@ -749,6 +884,162 @@ async function init() {
 
         bot.launch();
         console.log("Film House Bot successfully started! 🚀 Running command listener...");
+
+        // Real-time listener for feedbacks additions (sends direct Telegram message to admins)
+        db.collection("feedbacks").onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (change.type === "added") {
+                    const data = change.doc.data();
+                    // Avoid sending notifications for historical documents on initial connection
+                    if (data.timestamp) {
+                        const docMs = data.timestamp.toMillis ? data.timestamp.toMillis() : new Date(data.timestamp).getTime();
+                        if (Date.now() - docMs > 15000) return;
+                    }
+                    const user = data.user || "guest";
+                    const userId = data.userId || "unknown";
+                    const category = data.category || "General";
+                    const subject = data.subject || "No Subject";
+                    const msg = data.message || "No Message";
+
+                    const adminText = `📝 *New Feedback Submitted!*\n\n*User:* @${user} (ID: \`${userId}\`)\n*Type:* ${category}\n*Subject:* ${subject}\n\n*Message:* ${msg}`;
+                    
+                    const defaultAdmins = ["1329840839", "1175336733"];
+                    try {
+                        const adminDoc = await db.collection("settings").doc("admins").get();
+                        const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
+                        const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList]));
+                        for (const adminId of allAdmins) {
+                            try {
+                                await bot.telegram.sendMessage(adminId, adminText, { parse_mode: "Markdown" });
+                                console.log(`Feedback DM notification successfully sent to admin ${adminId}`);
+                            } catch (e) {
+                                console.warn(`Failed to notify admin ${adminId} of feedback:`, e.message);
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Error fetching admin list for feedback notify:", err);
+                    }
+                }
+            });
+        }, (err) => console.error("Feedbacks listener error:", err));
+
+        // Real-time listener for requests additions and status changes (boosted, claimed, fulfilled)
+        db.collection("requests").onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                const data = change.doc.data();
+                const docId = change.doc.id;
+                const userId = data.userId;
+                const title = data.title;
+                const type = data.type;
+                const username = data.user || "guest";
+                const downloadLink = data.downloadLink;
+
+                if (!userId) return;
+
+                if (change.type === "added") {
+                    if (data.timestamp) {
+                        const docMs = data.timestamp.toMillis ? data.timestamp.toMillis() : new Date(data.timestamp).getTime();
+                        if (Date.now() - docMs > 15000) return; // skip historical
+                    }
+
+                    // 1. Send confirmation to requesting user
+                    const canBoost = !data.boosted;
+                    const text = `🍿 *Request Received!*\n\nYour request for *${title}* (${type}) has been logged in our queue.\n\n` +
+                        (canBoost 
+                            ? `💡 *Boost Available!* You can boost this request to *High Priority* for 1,000 points to get it faster! 🚀`
+                            : `We will notify you here as soon as it is fulfilled! 🚀`);
+
+                    const replyMarkup = canBoost ? {
+                        inline_keyboard: [
+                            [
+                                {
+                                    text: "Boost Request 🚀 (1,000 pts)",
+                                    url: `https://t.me/Filmhouseappbot/filmhouseapp?startapp=boost_${docId}`
+                                }
+                            ]
+                        ]
+                    } : undefined;
+
+                    try {
+                        await bot.telegram.sendMessage(userId, text, {
+                            parse_mode: "Markdown",
+                            reply_markup: replyMarkup
+                        });
+                    } catch (e) {
+                        console.warn(`Failed to send request confirmation to ${userId}:`, e.message);
+                    }
+
+                    // 2. Notify admins
+                    const adminText = `🍿 *New Movie Request!*\n\n*User:* @${username} (ID: \`${userId}\`)\n*Title:* ${title} (${type})`;
+                    const defaultAdmins = ["1329840839", "1175336733"];
+                    try {
+                        const adminDoc = await db.collection("settings").doc("admins").get();
+                        const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
+                        const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList]));
+                        for (const adminId of allAdmins) {
+                            try {
+                                await bot.telegram.sendMessage(adminId, adminText, { parse_mode: "Markdown" });
+                            } catch (e) {
+                                console.warn(`Failed to notify admin ${adminId} of request:`, e.message);
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Error fetching admin list for request notify:", err);
+                    }
+
+                } else if (change.type === "modified") {
+                    if (data.status === "priority" && data.notifiedPriority !== true) {
+                        // Mark as notified in Firestore
+                        await db.collection("requests").doc(docId).update({ notifiedPriority: true }).catch(() => {});
+
+                        const text = `🚀 *Request Boosted!*\n\nYour request for *${title}* has been successfully boosted to *High Priority*! Our team is on it! 🍿`;
+                        try {
+                            await bot.telegram.sendMessage(userId, text, { parse_mode: "Markdown" });
+                        } catch (e) {
+                            console.warn(`Failed to send boost confirmation to ${userId}:`, e.message);
+                        }
+
+                        // Notify admins of the boost
+                        const adminText = `⚡ *Movie Request Boosted to Priority!*\n\n*User:* @${username} (ID: \`${userId}\`)\n*Title:* ${title} (${type})`;
+                        const defaultAdmins = ["1329840839", "1175336733"];
+                        try {
+                            const adminDoc = await db.collection("settings").doc("admins").get();
+                            const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
+                            const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList]));
+                            for (const adminId of allAdmins) {
+                                try {
+                                    await bot.telegram.sendMessage(adminId, adminText, { parse_mode: "Markdown" });
+                                } catch (e) {
+                                    console.warn(`Failed to notify admin ${adminId} of boost:`, e.message);
+                                }
+                            }
+                        } catch (err) {}
+                    }
+
+                    if (data.status === "fulfilled" && data.notifiedFulfilled !== true && downloadLink) {
+                        await db.collection("requests").doc(docId).update({ notifiedFulfilled: true }).catch(() => {});
+
+                        const text = `🎉 *Good news!*\n\nYour request for *${title}* has been fulfilled! 🍿\n\nHere is your direct download/watch link:\n🔗 ${downloadLink}\n\nThank you for using Film House! Enjoy watching! 🎬`;
+                        try {
+                            await bot.telegram.sendMessage(userId, text, { parse_mode: "Markdown" });
+                        } catch (e) {
+                            console.warn(`Failed to send fulfillment notification to ${userId}:`, e.message);
+                        }
+                    }
+
+                    if (data.status === "claimed" && data.notifiedClaimed !== true && downloadLink) {
+                        await db.collection("requests").doc(docId).update({ notifiedClaimed: true }).catch(() => {});
+
+                        const text = `🍿 *Your Requested Movie is Ready!* 🍿\n\nHere is your direct download/watch link for *${title}*:\n🔗 ${downloadLink}\n\nEnjoy watching! 🎬`;
+                        try {
+                            await bot.telegram.sendMessage(userId, text, { parse_mode: "Markdown" });
+                        } catch (e) {
+                            console.warn(`Failed to send claim notification to ${userId}:`, e.message);
+                        }
+                    }
+                }
+            });
+        }, (err) => console.error("Requests listener error:", err));
 
         // Background loop for farming completion reminders
         setInterval(async () => {

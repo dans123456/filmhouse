@@ -3264,7 +3264,7 @@ body.search-active .bottom-nav {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: transparent; /* No blocking dark backdrop */
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     display: flex;
@@ -3272,29 +3272,34 @@ body.search-active .bottom-nav {
     justify-content: center;
     z-index: 99999;
     opacity: 0;
-    pointer-events: none;
+    pointer-events: none; /* Let clicks pass through overlay to screen underneath */
     visibility: hidden; /* Hide completely from touch system when inactive */
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 .tour-overlay.active {
     opacity: 1;
-    pointer-events: auto;
+    pointer-events: none;
     visibility: visible;
 }
 .tour-card {
-    pointer-events: auto; /* Re-enable pointer events on the card */
-    background-color: var(--bg-dark-card);
-    border: 1px solid var(--border-color);
+    pointer-events: auto; /* Re-enable pointer events on the card itself */
+    background-color: rgba(18, 22, 33, 0.95);
+    border: 1.5px solid var(--primary-color);
     border-radius: var(--border-radius-md);
     padding: 16px 20px;
-    width: 85%;
-    max-width: 290px;
+    width: 88%;
+    max-width: 310px;
     box-sizing: border-box;
-    position: relative;
+    position: fixed;
+    bottom: calc(var(--nav-height) + 16px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     gap: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px var(--primary-glow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     text-align: center;
 }
 .tour-skip-btn {

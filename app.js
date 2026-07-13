@@ -4505,7 +4505,7 @@ function bindEvents() {
             });
             localStorage.setItem("filmhouse_user_feedbacks", JSON.stringify(feedbackList));
 
-            // Sync feedback to Firestore and notify channel
+            // Sync feedback to Firestore (notifications are handled securely by backend bot listener)
             if (typeof firebase !== "undefined" && db) {
                 db.collection("feedbacks").add({
                     user: state.user.username || "guest",
@@ -4514,16 +4514,6 @@ function bindEvents() {
                     subject: subject,
                     message: message,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(() => {
-                    db.collection("settings").doc("telegram").get().then(tgDoc => {
-                        if (tgDoc.exists) {
-                            const token = tgDoc.data().botToken;
-                            if (token) {
-                                const text = `📝 *New Feedback Submitted!*\n\n*User:* @${state.user.username || "guest"} (ID: \`${state.user.id || ""}\`)\n*Type:* ${category}\n*Subject:* ${subject}\n\n*Message:* ${message}`;
-                                notifyAdminsViaBot(token, text);
-                            }
-                        }
-                    });
                 }).catch(err => console.warn("Error saving feedback to Firestore:", err));
             }
 
@@ -5118,52 +5108,6 @@ function syncUserToFirestore(forceFetch = false) {
             }
             if (!doc.exists) {
                 data.joinedDate = firebase.firestore.FieldValue.serverTimestamp();
-
-                // Process client-side referral if the user joined via a startapp parameter
-                const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe : null;
-                if (initData && initData.start_param) {
-                    const rawParam = initData.start_param.trim();
-                    if (rawParam.startsWith("ref_")) {
-                        const referrerId = rawParam.substring(4);
-                        if (referrerId !== state.user.id) {
-                            db.collection("users").doc(referrerId).get().then(refDoc => {
-                                if (refDoc.exists) {
-                                    const refData = refDoc.data();
-                                    const currentPoints = refData.points || 0;
-                                    const newPoints = currentPoints + 5;
-                                    const breakdown = refData.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
-                                    breakdown.shares = (breakdown.shares || 0) + 1;
-
-                                    db.collection("users").doc(referrerId).update({
-                                        points: newPoints,
-                                        pointsBreakdown: breakdown
-                                    }).then(() => {
-                                        // Notify the referrer via Telegram Bot sendMessage API
-                                        db.collection("settings").doc("telegram").get().then(tgDoc => {
-                                            if (tgDoc.exists) {
-                                                const token = tgDoc.data().botToken;
-                                                if (token) {
-                                                    const notifyMsg = `🔔 *New Referral!* 🔔\n\n` +
-                                                        `Your friend *${state.user.fullName || "A user"}* has joined Film House using your invite link! 🎉\n\n` +
-                                                        `You have been awarded *+5 Loyalty Points*! 🏆`;
-                                                    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                                                        method: "POST",
-                                                        headers: { "Content-Type": "application/json" },
-                                                        body: JSON.stringify({
-                                                            chat_id: String(referrerId),
-                                                            text: notifyMsg,
-                                                            parse_mode: "Markdown"
-                                                        })
-                                                    }).catch(err => console.warn("Failed to send bot notification for referral:", err));
-                                                }
-                                            }
-                                        }).catch(err => console.warn(err));
-                                    }).catch(err => console.warn("Error updating referrer points:", err));
-                                }
-                            }).catch(err => console.warn("Error fetching referrer doc:", err));
-                        }
-                    }
-                }
             }
             userRef.set(data, { merge: true }).catch(err => console.warn("Firestore set error:", err));
         }).catch(err => {
@@ -5454,29 +5398,7 @@ function renderUserRequests(requests) {
                     const rawLink = r._isExplicit ? r.downloadLink : (r._matchingMovie && r._matchingMovie.links ? r._matchingMovie.links[0] : "");
                     const dlLink = typeof rawLink === 'object' && rawLink !== null ? rawLink.url : rawLink;
 
-                    // Send direct links to user's Telegram DM
-                    if (db && state.user.id) {
-                        db.collection("settings").doc("telegram").get().then(tgDoc => {
-                            if (tgDoc.exists) {
-                                const token = tgDoc.data().botToken;
-                                if (token) {
-                                    const notifyMsg = `🍿 *Your Requested Movie is Ready!* 🍿\n\n` +
-                                        `Here is your direct download/watch link for *${r.title}*:\n` +
-                                        `🔗 ${dlLink}\n\n` +
-                                        `Enjoy watching! 🎬`;
-                                    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                                        method: "POST",
-                                        headers: { "Content-Type": "application/json" },
-                                        body: JSON.stringify({
-                                            chat_id: String(state.user.id),
-                                            text: notifyMsg,
-                                            parse_mode: "Markdown"
-                                        })
-                                    }).catch(err => console.warn("Failed to send bot notification for claiming:", err));
-                                }
-                            }
-                        }).catch(err => console.warn("Error fetching bot token for claiming notification:", err));
-                    }
+                    // DM notification with download links is handled by the backend bot Firestore listener when request is claimed
                     
                     showToast("Claimed! Direct links have been sent to your Telegram DM. 🍿", "success");
                     
@@ -5684,52 +5606,8 @@ function logMovieRequestToFirestore(movie) {
         requestedById: state.user.id || "",
         requestedAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then((docRef) => {
-        const docId = docRef.id;
         showToast("Movie request registered in database!", "success");
-        
-        // Automated Telegram confirmation message to the requesting user
-        if (state.user.id) {
-            db.collection("settings").doc("telegram").get().then(tgDoc => {
-                if (tgDoc.exists) {
-                    const token = tgDoc.data().botToken;
-                    if (token) {
-                        const canBoost = parseInt(state.user.points || 0) >= 1000;
-                        const text = canBoost 
-                            ? `🍿 *Request Received!*\n\nYour request for *${movie.title}* (${movie.type}) has been logged in our queue.\n\n💡 *Boost Available!* You can boost this request to *High Priority* for 1,000 points to get it faster! 🚀`
-                            : `🍿 *Request Received!*\n\nYour request for *${movie.title}* (${movie.type}) has been logged in our queue.\n\nWe will notify you here as soon as it is fulfilled! 🚀`;
-
-                        const postBody = {
-                            chat_id: String(state.user.id),
-                            text: text,
-                            parse_mode: "Markdown"
-                        };
-
-                        if (canBoost) {
-                            postBody.reply_markup = {
-                                inline_keyboard: [
-                                    [
-                                        {
-                                            text: "Boost Request 🚀 (1,000 pts)",
-                                            url: `https://t.me/Filmhouseappbot/filmhouseapp?startapp=boost_${docId}`
-                                        }
-                                    ]
-                                ]
-                            };
-                        }
-
-                        fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(postBody)
-                        }).catch(err => console.warn("Failed to send bot notification for request:", err));
-
-                        // Notify administrators of the movie request privately
-                        const adminText = `🍿 *New Movie Request!*\n\n*User:* @${state.user.username || "guest"} (ID: \`${state.user.id}\`)\n*Title:* ${movie.title} (${movie.type})`;
-                        notifyAdminsViaBot(token, adminText);
-                    }
-                }
-            }).catch(err => console.warn("Error fetching bot token for request notification:", err));
-        }
+        // Telegram confirmation and admin notification are handled on the backend bot via Firestore collection listener
     }).catch(err => {
         console.error("Error logging movie request:", err);
     });
@@ -7046,7 +6924,7 @@ function showTourStep(stepNum) {
     // Handle next button label
     const nextBtn = document.getElementById("btn-tour-next");
     if (nextBtn) {
-        nextBtn.textContent = stepNum === 5 ? "Finish" : "Next";
+        nextBtn.textContent = stepNum === 6 ? "Finish" : "Next";
     }
 
     // --- Interactive Walkthrough Tour Navigation ---
@@ -7055,7 +6933,6 @@ function showTourStep(stepNum) {
     const filterPanel = document.getElementById("search-filters-panel");
     const searchWrapper = document.querySelector(".search-bar-wrapper");
     const searchInput = document.getElementById("global-search-input");
-    const tourCard = document.querySelector(".tour-card");
 
     // Clean up previous highlights
     const highlighted = document.querySelectorAll(".tour-highlight-target");
@@ -7069,13 +6946,6 @@ function showTourStep(stepNum) {
     }
     if (searchWrapper) searchWrapper.classList.remove("expanded");
 
-    if (tourCard) {
-        // Reset card margins & position
-        tourCard.style.alignSelf = "center";
-        tourCard.style.marginTop = "0";
-        tourCard.style.marginBottom = "0";
-    }
-
     if (stepNum === 1) {
         // Welcome screen
         navigateToScreen("home");
@@ -7088,48 +6958,29 @@ function showTourStep(stepNum) {
         }
         if (searchInput) {
             searchInput.focus();
-        }
-        if (filterToggle && filterPanel) {
-            filterToggle.classList.add("active");
-            filterPanel.style.display = "flex";
-        }
-        if (tourCard) {
-            // Push card down so the top search element is visible
-            tourCard.style.alignSelf = "flex-end";
-            tourCard.style.marginBottom = "80px";
+            // Simulate typing "anime" letter-by-letter for the user
+            let searchVal = "";
+            const term = "anime";
+            let letterIdx = 0;
+            searchInput.value = "";
+            state.searchQuery = "";
+            
+            const typeLetter = () => {
+                if (currentTourStep !== 2) return; // cancel if user navigated away
+                if (letterIdx < term.length) {
+                    searchVal += term[letterIdx];
+                    searchInput.value = searchVal;
+                    state.searchQuery = searchVal;
+                    renderAutocomplete(searchVal);
+                    letterIdx++;
+                    setTimeout(typeLetter, 120);
+                } else {
+                    renderFeaturedGrid();
+                }
+            };
+            setTimeout(typeLetter, 300);
         }
     } else if (stepNum === 3) {
-        // Mining screen
-        navigateToScreen("mining");
-        const farmActionBtn = document.getElementById("btn-farm-action");
-        if (farmActionBtn) {
-            farmActionBtn.classList.add("tour-highlight-target");
-        }
-        if (tourCard) {
-            // Push card up so the bottom miner action is visible
-            tourCard.style.alignSelf = "flex-start";
-            tourCard.style.marginTop = "80px";
-        }
-    } else if (stepNum === 4) {
-        // Reward Center, Requests & Missions (open Reward Center drawer)
-        navigateToScreen("home");
-        if (rewardsDrawer) {
-            rewardsDrawer.classList.add("active");
-            if (typeof updatePointsUI === "function") updatePointsUI();
-            if (typeof renderDailyMissions === "function") renderDailyMissions();
-            if (typeof updateHeaderNotificationDot === "function") updateHeaderNotificationDot();
-            
-            // Highlight the drawer content container
-            const drawerContainer = rewardsDrawer.querySelector(".drawer-container");
-            if (drawerContainer) {
-                drawerContainer.classList.add("tour-highlight-target");
-            }
-        }
-        if (tourCard) {
-            tourCard.style.alignSelf = "flex-start";
-            tourCard.style.marginTop = "80px";
-        }
-    } else if (stepNum === 5) {
         // Personalization screen (Profile -> Settings tab)
         navigateToScreen("profile");
         const tabButtons = document.querySelectorAll(".profile-tab-btn");
@@ -7142,9 +6993,52 @@ function showTourStep(stepNum) {
         if (profileForm) {
             profileForm.classList.add("tour-highlight-target");
         }
-        if (tourCard) {
-            tourCard.style.alignSelf = "flex-start";
-            tourCard.style.marginTop = "80px";
+    } else if (stepNum === 4) {
+        // Mining screen
+        navigateToScreen("mining");
+        const minerCard = document.querySelector(".miner-card") || document.getElementById("btn-farm-action");
+        if (minerCard) {
+            minerCard.classList.add("tour-highlight-target");
+        }
+    } else if (stepNum === 5) {
+        // Reward Center, Requests & Missions (open Reward Center drawer)
+        navigateToScreen("home");
+        if (rewardsDrawer) {
+            rewardsDrawer.classList.add("active");
+            if (typeof updatePointsUI === "function") updatePointsUI();
+            if (typeof renderDailyMissions === "function") renderDailyMissions();
+            if (typeof updateHeaderNotificationDot === "function") updateHeaderNotificationDot();
+            
+            // Highlight the drawer content container
+            const drawerContainer = rewardsDrawer.querySelector(".connection-drawer-container");
+            if (drawerContainer) {
+                drawerContainer.classList.add("tour-highlight-target");
+            }
+            
+            // Animate points display count-up logic
+            const pointsDisplay = document.getElementById("rewards-points-display");
+            if (pointsDisplay) {
+                let counter = 0;
+                const targetPoints = parseInt(state.user.points || 0);
+                const increment = () => {
+                    if (currentTourStep !== 5) return;
+                    if (counter < 25) {
+                        pointsDisplay.textContent = Math.floor(Math.random() * 2000).toLocaleString();
+                        counter++;
+                        setTimeout(increment, 20);
+                    } else {
+                        pointsDisplay.textContent = targetPoints.toLocaleString();
+                    }
+                };
+                increment();
+            }
+        }
+    } else if (stepNum === 6) {
+        // User Feedback screen
+        navigateToScreen("feedback");
+        const feedbackCard = document.querySelector(".feedback-card") || document.getElementById("feedback-form");
+        if (feedbackCard) {
+            feedbackCard.classList.add("tour-highlight-target");
         }
     }
 }
@@ -7185,7 +7079,7 @@ function initWelcomeTourHandlers() {
     
     if (nextBtn) {
         nextBtn.addEventListener("click", () => {
-            if (currentTourStep < 5) {
+            if (currentTourStep < 6) {
                 showTourStep(currentTourStep + 1);
             } else {
                 closeWelcomeTour();
@@ -7222,36 +7116,3 @@ function initWelcomeTourHandlers() {
     }
 }
 
-// Notify all authorized admins privately via Telegram
-function notifyAdminsViaBot(token, text) {
-    if (typeof firebase === "undefined" || !db) return;
-    const defaultAdmins = ["1329840839", "1175336733"];
-    db.collection("settings").doc("admins").get().then(doc => {
-        const adminList = doc.exists ? doc.data().ids || [] : [];
-        const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList]));
-        allAdmins.forEach(adminId => {
-            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    chat_id: String(adminId),
-                    text: text,
-                    parse_mode: "Markdown"
-                })
-            }).catch(err => console.warn(`Failed to notify admin ${adminId}:`, err));
-        });
-    }).catch(() => {
-        // Fallback to default admins
-        defaultAdmins.forEach(adminId => {
-            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    chat_id: String(adminId),
-                    text: text,
-                    parse_mode: "Markdown"
-                })
-            }).catch(err => console.warn(`Failed to notify default admin ${adminId}:`, err));
-        });
-    });
-}
