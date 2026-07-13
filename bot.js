@@ -1019,9 +1019,35 @@ async function init() {
                     if (data.status === "fulfilled" && data.notifiedFulfilled !== true && downloadLink) {
                         await db.collection("requests").doc(docId).update({ notifiedFulfilled: true }).catch(() => {});
 
-                        const text = `🎉 *Good news!*\n\nYour request for *${title}* has been fulfilled! 🍿\n\nHere is your direct download/watch link:\n🔗 ${downloadLink}\n\nThank you for using Film House! Enjoy watching! 🎬`;
+                        const isSeries = (data.type || "").toLowerCase() === "series" || (data.type || "").toLowerCase() === "tv";
+                        let detailText = "";
+                        let buttonText = "Download/Watch Now 🎬";
+                        if (isSeries) {
+                            detailText = "💡 *Note:* This is a Series request. The button below contains *Season 1 only*. To download or watch the remaining seasons, please open the Film House App! 📺";
+                            buttonText = "Get Season 1 🍿";
+                        } else {
+                            detailText = "💡 *Note:* This is a single movie request, so this contains the full film. Enjoy! 🍿";
+                            buttonText = "Get Movie 🎬";
+                        }
+
+                        const text = `🎉 *Good news!*\n\n` +
+                                     `Your request for *${title}* has been fulfilled! 🍿\n\n` +
+                                     `${detailText}\n\n` +
+                                     `Thank you for using Film House!`;
                         try {
-                            await bot.telegram.sendMessage(userId, text, { parse_mode: "Markdown" });
+                            await bot.telegram.sendMessage(userId, text, {
+                                parse_mode: "Markdown",
+                                reply_markup: {
+                                    inline_keyboard: [
+                                        [
+                                            {
+                                                text: buttonText,
+                                                url: downloadLink
+                                            }
+                                        ]
+                                    ]
+                                }
+                            });
                         } catch (e) {
                             console.warn(`Failed to send fulfillment notification to ${userId}:`, e.message);
                         }
@@ -1030,9 +1056,34 @@ async function init() {
                     if (data.status === "claimed" && data.notifiedClaimed !== true && downloadLink) {
                         await db.collection("requests").doc(docId).update({ notifiedClaimed: true }).catch(() => {});
 
-                        const text = `🍿 *Your Requested Movie is Ready!* 🍿\n\nHere is your direct download/watch link for *${title}*:\n🔗 ${downloadLink}\n\nEnjoy watching! 🎬`;
+                        const isSeries = (data.type || "").toLowerCase() === "series" || (data.type || "").toLowerCase() === "tv";
+                        let detailText = "";
+                        let buttonText = "Download/Watch Now 🎬";
+                        if (isSeries) {
+                            detailText = "💡 *Note:* This is a Series. The button below contains *Season 1 only*. To download or watch the remaining seasons, please open the Film House App! 📺";
+                            buttonText = "Get Season 1 🍿";
+                        } else {
+                            detailText = "💡 *Note:* This contains the full film. Enjoy! 🍿";
+                            buttonText = "Get Movie 🎬";
+                        }
+
+                        const text = `🍿 *Your Requested Movie is Ready!* 🍿\n\n` +
+                                     `Here is your direct link for *${title}*:\n\n` +
+                                     `${detailText}`;
                         try {
-                            await bot.telegram.sendMessage(userId, text, { parse_mode: "Markdown" });
+                            await bot.telegram.sendMessage(userId, text, {
+                                parse_mode: "Markdown",
+                                reply_markup: {
+                                    inline_keyboard: [
+                                        [
+                                            {
+                                                text: buttonText,
+                                                url: downloadLink
+                                            }
+                                        ]
+                                    ]
+                                }
+                            });
                         } catch (e) {
                             console.warn(`Failed to send claim notification to ${userId}:`, e.message);
                         }

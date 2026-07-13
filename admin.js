@@ -2979,24 +2979,7 @@ if (fulfillForm && fulfillRequestModal) {
                 }
             });
 
-            if (telegramBotToken && requesters.length > 0) {
-                requesters.forEach(async (req) => {
-                    const notifyMsg = `🍿 *Good news!*\n\nYour request for *${currentFulfillTitle}* has been fulfilled! 🎉\n\nHere is your direct download/watch link:\n🔗 ${downloadLink}\n\nThank you for using Film House! Enjoy watching! 🎬`;
-                    try {
-                        await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                chat_id: req.id.trim(),
-                                text: notifyMsg,
-                                parse_mode: "Markdown"
-                            })
-                        });
-                    } catch (err) {
-                        console.error(`Failed to notify requester ${req.id}:`, err);
-                    }
-                });
-            }
+            // Telegram notification is handled on the backend bot via Firestore requests collection snapshot listener
 
             // Auto-Publish to GitHub in background if token exists!
             const token = (document.getElementById("github-token")?.value.trim()) || (githubToken ? githubToken.trim() : "");
