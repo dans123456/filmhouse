@@ -3275,6 +3275,7 @@ body.search-active .bottom-nav {
 }
 .tour-overlay.active {
     opacity: 1;
+    pointer-events: auto;
 }
 .tour-card {
     pointer-events: auto; /* Re-enable pointer events on the card */

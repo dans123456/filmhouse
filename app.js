@@ -295,6 +295,17 @@ async function initializeDatabase() {
                     if (!m.poster) {
                         m.poster = "MOVIE/img/FilmHouse3_nobg.png";
                     }
+                    
+                    // Precompute search string for highly responsive filtering
+                    m._searchStr = [
+                        m.title,
+                        m.overview,
+                        (m.genres || []).join(" "),
+                        (m.cast || []).join(" "),
+                        m.director,
+                        m.type,
+                        (m.categories || []).join(" ")
+                    ].filter(Boolean).join(" ").toLowerCase();
                 });
                 state.newMovieIds = data.slice(0, 10).map(m => m.csv_id);
                 state.movies = shuffleAndPinNewMovies(data);
@@ -323,6 +334,17 @@ async function initializeDatabase() {
                     if (m.backdrop && m.backdrop.startsWith("img/")) {
                         m.backdrop = "MOVIE/" + m.backdrop;
                     }
+                    
+                    // Precompute search string for highly responsive filtering
+                    m._searchStr = [
+                        m.title,
+                        m.overview,
+                        (m.genres || []).join(" "),
+                        (m.cast || []).join(" "),
+                        m.director,
+                        m.type,
+                        (m.categories || []).join(" ")
+                    ].filter(Boolean).join(" ").toLowerCase();
                 });
                 state.newMovieIds = parsed.slice(0, 10).map(m => m.csv_id);
                 state.movies = shuffleAndPinNewMovies(parsed);
@@ -573,7 +595,7 @@ async function initializeDatabase() {
             }
         }
 
-        enrichedList.push({
+        const movieObj = {
             csv_id: movie_id_str,
             tmdb_id: details ? details.id : null,
             imdb_id: imdbId,
@@ -592,7 +614,17 @@ async function initializeDatabase() {
             trailer,
             runtime,
             links
-        });
+        };
+        movieObj._searchStr = [
+            movieObj.title,
+            movieObj.overview,
+            (movieObj.genres || []).join(" "),
+            (movieObj.cast || []).join(" "),
+            movieObj.director,
+            movieObj.type,
+            (movieObj.categories || []).join(" ")
+        ].filter(Boolean).join(" ").toLowerCase();
+        enrichedList.push(movieObj);
 
         // Small spacing delay between fetch calls to avoid API lockups
         await delay(60);
@@ -2094,16 +2126,21 @@ function renderFeaturedGrid(fromDiscover = false) {
 
     // Apply Search Term
     if (state.searchQuery) {
-        const query = state.searchQuery.toLowerCase();
-        list = list.filter(m => 
-            (m.title && m.title.toLowerCase().includes(query)) ||
-            (m.overview && m.overview.toLowerCase().includes(query)) ||
-            (m.genres && m.genres.some(g => g && g.toLowerCase().includes(query))) ||
-            (m.cast && m.cast.some(c => c && c.toLowerCase().includes(query))) ||
-            (m.director && m.director.toLowerCase().includes(query)) ||
-            (m.type && m.type.toLowerCase().includes(query)) ||
-            (m.categories && m.categories.some(c => c && c.toLowerCase().includes(query)))
-        );
+        const query = state.searchQuery.toLowerCase().trim();
+        list = list.filter(m => {
+            if (m._searchStr) {
+                return m._searchStr.includes(query);
+            }
+            // Fallback filtering if search string is not precomputed
+            const titleMatch = m.title && m.title.toLowerCase().includes(query);
+            const overviewMatch = m.overview && m.overview.toLowerCase().includes(query);
+            const genresMatch = m.genres && m.genres.some(g => g && g.toLowerCase().includes(query));
+            const castMatch = m.cast && m.cast.some(c => c && c.toLowerCase().includes(query));
+            const directorMatch = m.director && m.director.toLowerCase().includes(query);
+            const typeMatch = m.type && m.type.toLowerCase().includes(query);
+            const categoriesMatch = m.categories && m.categories.some(c => c && c.toLowerCase().includes(query));
+            return titleMatch || overviewMatch || genresMatch || castMatch || directorMatch || typeMatch || categoriesMatch;
+        });
 
         if (state.externalSearchResults && state.externalSearchResults.length > 0) {
             const localTmdbIds = new Set(list.map(m => m.tmdb_id).filter(id => id));
@@ -4269,6 +4306,7 @@ function bindEvents() {
             dropdown.style.display = "flex";
         };
 
+        let localSearchDebounceTimer = null;
         searchInput.addEventListener("input", (e) => {
             const query = e.target.value;
             state.searchQuery = query;
@@ -4285,11 +4323,19 @@ function bindEvents() {
             
             renderAutocomplete(query);
 
-            if (query.trim().length < 3) {
-                state.externalSearchResults = [];
-                renderFeaturedGrid();
-            } else {
-                renderFeaturedGrid();
+            // Debounce local grid rendering to prevent keystroke input stuttering/lag
+            clearTimeout(localSearchDebounceTimer);
+            localSearchDebounceTimer = setTimeout(() => {
+                if (query.trim().length < 3) {
+                    state.externalSearchResults = [];
+                    renderFeaturedGrid();
+                } else {
+                    renderFeaturedGrid();
+                }
+            }, 180);
+
+            // Debounce external TMDB global search (only for queries length >= 3)
+            if (query.trim().length >= 3) {
                 clearTimeout(searchDebounceTimer);
                 searchDebounceTimer = setTimeout(() => {
                     performGlobalTmdbSearch(query);
