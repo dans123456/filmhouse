@@ -672,9 +672,15 @@ async function initializeDatabase() {
                         state.movies[idx] = { ...state.movies[idx], ...docData };
                     } else {
                         state.movies.unshift(docData);
+                        if (state.newMovieIds && !state.newMovieIds.includes(csv_id)) {
+                            state.newMovieIds.push(csv_id);
+                        }
                     }
                 } else if (change.type === "removed") {
                     state.movies = state.movies.filter(m => m.csv_id !== csv_id);
+                    if (state.newMovieIds) {
+                        state.newMovieIds = state.newMovieIds.filter(id => id !== csv_id);
+                    }
                 }
             });
             

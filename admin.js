@@ -661,12 +661,21 @@ function deleteMovieTitleRequests(title, docIds) {
         return;
     }
     
-    const batch = db.batch();
-    docIds.forEach(id => {
-        batch.delete(db.collection("requests").doc(id));
+    // Chunk document IDs in sizes of 500 to stay within Firestore limits
+    const chunks = [];
+    for (let i = 0; i < docIds.length; i += 500) {
+        chunks.push(docIds.slice(i, i + 500));
+    }
+    
+    const promises = chunks.map(chunk => {
+        const batch = db.batch();
+        chunk.forEach(id => {
+            batch.delete(db.collection("requests").doc(id));
+        });
+        return batch.commit();
     });
     
-    batch.commit().then(() => {
+    Promise.all(promises).then(() => {
         showToast(`Successfully deleted ${docIds.length} request(s) for "${title}"!`, "success");
         allRequests = allRequests.filter(r => !docIds.includes(r.docId));
         renderRequestsList();
@@ -2477,26 +2486,38 @@ if (publishBtn) {
                 lastKnownJsonSha = jsonResData.content.sha;
             }
             
-            // Sync changes to Firestore movies collection
+            // Sync changes to Firestore movies collection (chunked in groups of 400 to avoid Firestore limits)
             if (typeof db !== "undefined" && db) {
                 try {
-                    const fsBatch = db.batch();
-                    
-                    // Write/update added and updated movies
+                    const operations = [];
                     allCatalogMovies.forEach(m => {
                         if (newlyAddedIds.includes(m.csv_id) || newlyUpdatedIds.includes(m.csv_id)) {
-                            const movieRef = db.collection("movies").doc(m.csv_id);
-                            fsBatch.set(movieRef, m, { merge: true });
+                            operations.push({ type: "set", docId: m.csv_id, data: m });
                         }
                     });
-                    
-                    // Delete deleted movies from Firestore
                     newlyDeletedIds.forEach(id => {
-                        const movieRef = db.collection("movies").doc(id);
-                        fsBatch.delete(movieRef);
+                        operations.push({ type: "delete", docId: id });
                     });
                     
-                    await fsBatch.commit();
+                    const opChunks = [];
+                    for (let i = 0; i < operations.length; i += 400) {
+                        opChunks.push(operations.slice(i, i + 400));
+                    }
+                    
+                    const fsPromises = opChunks.map(chunk => {
+                        const fsBatch = db.batch();
+                        chunk.forEach(op => {
+                            const movieRef = db.collection("movies").doc(op.docId);
+                            if (op.type === "set") {
+                                fsBatch.set(movieRef, op.data, { merge: true });
+                            } else if (op.type === "delete") {
+                                fsBatch.delete(movieRef);
+                            }
+                        });
+                        return fsBatch.commit();
+                    });
+                    
+                    await Promise.all(fsPromises);
                 } catch (fsErr) {
                     console.warn("Failed to commit Firestore movie catalog changes:", fsErr);
                 }
@@ -3031,22 +3052,29 @@ if (fulfillForm && fulfillRequestModal) {
             }
         }
         
-        // 2. Commit Firestore batch update
-        const batch = db.batch();
-        currentFulfillDocIds.forEach(id => {
-            const ref = db.collection("requests").doc(id);
-            batch.update(ref, {
-                status: "fulfilled",
-                downloadLink: downloadLink
-            });
-        });
-        
-        if (movieToSync) {
-            const movieRef = db.collection("movies").doc(movieToSync.csv_id);
-            batch.set(movieRef, movieToSync, { merge: true });
+        // 2. Commit Firestore batch update (chunked into groups of 450 to avoid Firestore limits)
+        const requestChunks = [];
+        for (let i = 0; i < currentFulfillDocIds.length; i += 450) {
+            requestChunks.push(currentFulfillDocIds.slice(i, i + 450));
         }
-        
-        batch.commit().then(async () => {
+ 
+        const fulfillPromises = requestChunks.map((chunk, chunkIdx) => {
+            const batch = db.batch();
+            chunk.forEach(id => {
+                const ref = db.collection("requests").doc(id);
+                batch.update(ref, {
+                    status: "fulfilled",
+                    downloadLink: downloadLink
+                });
+            });
+            if (chunkIdx === 0 && movieToSync) {
+                const movieRef = db.collection("movies").doc(movieToSync.csv_id);
+                batch.set(movieRef, movieToSync, { merge: true });
+            }
+            return batch.commit();
+        });
+ 
+        Promise.all(fulfillPromises).then(async () => {
             const requesters = [];
             currentFulfillDocIds.forEach(id => {
                 const req = allRequests.find(r => r.docId === id);
