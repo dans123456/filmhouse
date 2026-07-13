@@ -195,6 +195,14 @@ let adminIdsList = ["1329840839", "1175336733"];
 let allRequests = [];
 let requestFilterTab = "actionable"; // actionable | priority | pending | fulfilled | all
 
+function getPosterUrl(posterPath) {
+    if (!posterPath) return "MOVIE/img/FilmHouse3_nobg.png";
+    if (posterPath.startsWith("img/")) {
+        return "MOVIE/" + posterPath;
+    }
+    return posterPath;
+}
+
 // Initialize Firebase & Firestore
 let db = null;
 const statusTextEl = document.getElementById("status-text");
@@ -1308,7 +1316,7 @@ function showMovieDetails(movie) {
     if (!detailsBody || !movieDetailsModal) return;
     
     const badgeColor = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv' ? 'var(--primary-color)' : '#00bcd4';
-    const posterUrl = movie.poster || "MOVIE/img/FilmHouse3_nobg.png";
+    const posterUrl = getPosterUrl(movie.poster);
     const linksList = movie.links || [];
     
     detailsBody.innerHTML = `
@@ -1708,7 +1716,7 @@ function renderCatalogList() {
         row.className = "list-row";
         row.style.cursor = "pointer";
         
-        const posterUrl = m.poster || "MOVIE/img/FilmHouse3_nobg.png";
+        const posterUrl = getPosterUrl(m.poster);
         const badgeColor = (m.type || "").toLowerCase() === 'series' || (m.type || "").toLowerCase() === 'tv' ? 'var(--primary-color)' : '#00bcd4';
         
         let diffBadge = "";
@@ -3003,7 +3011,7 @@ if (fulfillForm && fulfillRequestModal) {
                     imdb_id: "",
                     title: tmdbData.title || tmdbData.name || currentFulfillTitle,
                     type: isSeries ? 'Series' : 'Movie',
-                    categories: ["Main"],
+                    categories: isSeries ? ["Main", "Hollywood/British Series"] : ["Main", "Hollywood/British Movies"],
                     genres: tmdbData.genres ? tmdbData.genres.map(g => g.name) : [],
                     overview: tmdbData.overview || "No synopsis available.",
                     poster: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : "img/FilmHouse3_nobg.png",
@@ -3031,7 +3039,7 @@ if (fulfillForm && fulfillRequestModal) {
                     imdb_id: "",
                     title: currentFulfillTitle,
                     type: isSeries ? 'Series' : 'Movie',
-                    categories: ["Main"],
+                    categories: isSeries ? ["Main", "Hollywood/British Series"] : ["Main", "Hollywood/British Movies"],
                     genres: [],
                     overview: "No synopsis available.",
                     poster: "img/FilmHouse3_nobg.png",
@@ -3286,7 +3294,7 @@ function renderCategoryMovies() {
             row.style.background = "rgba(255,255,255,0.015)";
         });
         
-        const posterUrl = m.poster || "MOVIE/img/FilmHouse3_nobg.png";
+        const posterUrl = getPosterUrl(m.poster);
         
         row.innerHTML = `
             <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">

@@ -667,6 +667,19 @@ async function initializeDatabase() {
                 ].filter(Boolean).join(" ").toLowerCase();
 
                 if (change.type === "added" || change.type === "modified") {
+                    // Ensure local category array has correct subcategories based on media type
+                    if (!docData.categories || !Array.isArray(docData.categories) || docData.categories.length <= 1) {
+                        docData.categories = docData.categories || ["Main"];
+                        if (!docData.categories.includes("Main")) {
+                            docData.categories.push("Main");
+                        }
+                        const isTV = (docData.type || "").toLowerCase() === "series" || (docData.type || "").toLowerCase() === "tv";
+                        const subCat = isTV ? "Hollywood/British Series" : "Hollywood/British Movies";
+                        if (!docData.categories.includes(subCat)) {
+                            docData.categories.push(subCat);
+                        }
+                    }
+
                     const idx = state.movies.findIndex(m => m.csv_id === csv_id);
                     if (idx !== -1) {
                         state.movies[idx] = { ...state.movies[idx], ...docData };
@@ -723,8 +736,8 @@ function handleTelegramAuth() {
         const tgUser = tg.initDataUnsafe?.user;
         if (tgUser) {
             state.user.id = tgUser.id ? String(tgUser.id) : state.user.id;
-            state.user.username = tgUser.username || state.user.username;
-            state.user.fullName = [tgUser.first_name, tgUser.last_name].filter(n => n).join(" ") || state.user.fullName;
+            state.user.username = tgUser.username || (tgUser.first_name ? tgUser.first_name.replace(/\s+/g, '') : "User_" + state.user.id);
+            state.user.fullName = [tgUser.first_name, tgUser.last_name].filter(n => n).join(" ") || state.user.fullName || "Telegram User";
             if (tgUser.photo_url) {
                 state.user.avatar = tgUser.photo_url;
             }
