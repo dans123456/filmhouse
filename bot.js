@@ -928,17 +928,18 @@ async function init() {
             snapshot.docChanges().forEach(async (change) => {
                 const data = change.doc.data();
                 const docId = change.doc.id;
-                const userId = data.userId;
+                const userId = data.userId || data.requestedById;
                 const title = data.title;
                 const type = data.type;
-                const username = data.user || "guest";
+                const username = data.user || data.requestedBy || "guest";
                 const downloadLink = data.downloadLink;
+                const timestamp = data.timestamp || data.requestedAt;
 
                 if (!userId) return;
 
                 if (change.type === "added") {
-                    if (data.timestamp) {
-                        const docMs = data.timestamp.toMillis ? data.timestamp.toMillis() : new Date(data.timestamp).getTime();
+                    if (timestamp) {
+                        const docMs = timestamp.toMillis ? timestamp.toMillis() : new Date(timestamp).getTime();
                         if (Date.now() - docMs > 15000) return; // skip historical
                     }
 
