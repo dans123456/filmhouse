@@ -2212,11 +2212,14 @@ function renderFeaturedGrid(fromDiscover = false) {
         }
     }
 
-    // Apply Multi-select homepage genre chips
+    // Apply Multi-select homepage genre chips (AND logic to narrow down matching results case-insensitively)
     if (state.filters.selectedGenres && !state.filters.selectedGenres.includes("All")) {
         list = list.filter(m => {
             if (!m.genres) return false;
-            return m.genres.some(g => state.filters.selectedGenres.includes(g));
+            return state.filters.selectedGenres.every(sel => {
+                const selLower = sel.toLowerCase().trim();
+                return m.genres.some(g => g && g.toLowerCase().trim() === selLower);
+            });
         });
     }
 
