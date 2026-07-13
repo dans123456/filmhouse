@@ -5998,13 +5998,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
     
-    // Check ban status on startup
+    // Sync latest user points, check-in streak, and ban status from Firestore on startup
     if (typeof firebase !== "undefined" && db && state.user.id) {
-        db.collection("users").doc(state.user.id).get().then(doc => {
-            if (doc.exists && doc.data().banned === true) {
-                showBannedScreen();
-            }
-        }).catch(err => console.warn("Error checking ban status:", err));
+        syncUserToFirestore(true);
     }
 
     // Fetch live list of admins to cache globally on startup
@@ -7050,7 +7046,7 @@ function showTourStep(stepNum) {
     // Handle next button label
     const nextBtn = document.getElementById("btn-tour-next");
     if (nextBtn) {
-        nextBtn.textContent = stepNum === 6 ? "Finish" : "Next";
+        nextBtn.textContent = stepNum === 5 ? "Finish" : "Next";
     }
 
     // --- Interactive Walkthrough Tour Navigation ---
@@ -7115,7 +7111,7 @@ function showTourStep(stepNum) {
             tourCard.style.marginTop = "80px";
         }
     } else if (stepNum === 4) {
-        // Request & Boost screen (open Reward Center drawer)
+        // Reward Center, Requests & Missions (open Reward Center drawer)
         navigateToScreen("home");
         if (rewardsDrawer) {
             rewardsDrawer.classList.add("active");
@@ -7145,24 +7141,6 @@ function showTourStep(stepNum) {
         const profileForm = document.getElementById("profile-page-form");
         if (profileForm) {
             profileForm.classList.add("tour-highlight-target");
-        }
-        if (tourCard) {
-            tourCard.style.alignSelf = "flex-start";
-            tourCard.style.marginTop = "80px";
-        }
-    } else if (stepNum === 6) {
-        // Daily Missions screen (open Reward Center drawer)
-        navigateToScreen("home");
-        if (rewardsDrawer) {
-            rewardsDrawer.classList.add("active");
-            if (typeof updatePointsUI === "function") updatePointsUI();
-            if (typeof renderDailyMissions === "function") renderDailyMissions();
-            if (typeof updateHeaderNotificationDot === "function") updateHeaderNotificationDot();
-            
-            const drawerContainer = rewardsDrawer.querySelector(".drawer-container");
-            if (drawerContainer) {
-                drawerContainer.classList.add("tour-highlight-target");
-            }
         }
         if (tourCard) {
             tourCard.style.alignSelf = "flex-start";
@@ -7207,7 +7185,7 @@ function initWelcomeTourHandlers() {
     
     if (nextBtn) {
         nextBtn.addEventListener("click", () => {
-            if (currentTourStep < 6) {
+            if (currentTourStep < 5) {
                 showTourStep(currentTourStep + 1);
             } else {
                 closeWelcomeTour();
