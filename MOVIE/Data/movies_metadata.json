@@ -13208,9 +13208,24 @@
   {
     "title": "Angels' Brigade",
     "csv_id": "31251-victorious",
-    "type": "Movie",
+    "type": "Series",
     "links": [
-      "https://t.me/+cJUgTGPMeXoyM2Nk"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADRwYAAhoLqUYqg6uR8_DNbhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADSAYAAhoLqUa5jQLbTJ4y3BYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADSgYAAhoLqUYoonF4kuR-GxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADTQYAAhoLqUZyHqHbsXni4hYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/l4TzXV6PiMndm1Hdm3Uvs9cVHZ3.jpg",
     "rating": 3.2,
