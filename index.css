@@ -779,7 +779,7 @@ img {
 #screen-home .categories-container-outer {
     order: 2;
 }
-#screen-home .genre-chips-container {
+#screen-home .genre-chips-container-outer {
     order: 3;
 }
 #screen-home #editors-choice-section-wrapper {
@@ -793,7 +793,7 @@ img {
 #screen-home.search-active .categories-container-outer {
     display: none !important;
 }
-#screen-home.search-active .genre-chips-container {
+#screen-home.search-active .genre-chips-container-outer {
     order: 1;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -1036,6 +1036,15 @@ img {
     transition: all 0.25s ease;
 }
 
+.category-pill-icon {
+    font-size: 14px;
+    margin-right: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease;
+}
+
 .category-pill:hover {
     background-color: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.15);
@@ -1043,9 +1052,7 @@ img {
 }
 
 .category-pill:hover .category-pill-icon {
-    background-color: rgba(255, 188, 0, 0.1);
-    color: var(--primary-color);
-    border-color: rgba(255, 188, 0, 0.2);
+    transform: scale(1.2) rotate(4deg);
 }
 
 .category-pill:hover .category-pill-text {
@@ -1059,10 +1066,7 @@ img {
 }
 
 .category-pill.active .category-pill-icon {
-    background-color: var(--primary-color);
-    color: #000000;
-    border-color: transparent;
-    box-shadow: 0 0 10px var(--primary-glow);
+    transform: scale(1.2);
 }
 
 .category-pill.active .category-pill-text {

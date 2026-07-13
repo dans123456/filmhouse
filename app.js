@@ -1972,25 +1972,30 @@ function renderCategoriesBar() {
         "Erotic Movies": "Erotic"
     };
 
-    const categoryIcons = {
-        "Main": `<svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>`, // Home icon
-        "Hollywood/British Movies": `<svg viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4zm2 14H4V8h16v10z" fill="currentColor"/></svg>`, // clapperboard
-        "Hollywood/British Series": `<svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 14H3V8h18v12z" fill="currentColor"/></svg>`, // TV
-        "Bollywood": `<svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/></svg>`, // Music note (bollywood standard)
-        "Korean Drama": `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/></svg>`, // Heart
-        "African": `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="currentColor"/></svg>`, // Globe outline
-        "Anime": `<svg viewBox="0 0 24 24"><path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-3.5-6c.83 1.43 2.45 2.5 4.5 2.5s3.67-1.07 4.5-2.5h-9z" fill="currentColor"/></svg>`, // Smiley/Cartoon face
-        "Comic": `<svg viewBox="0 0 24 24"><path d="M21 5c-1.11-.9-3.13-1.86-5-2-1.92-.14-4 .6-5 1.5C10 3.6 7.92 2.86 6 3c-1.87.14-3.89 1.1-5 2v14c0 1.1.9 2 2 2h4c1.78 0 3.61.85 5 1.5 1.39-.65 3.22-1.5 5-1.5h4c1.1 0 2-.9 2-2V5zm-2 13h-3c-1.38 0-2.61.57-3.5 1.5V6c.9-.9 2.12-1.5 3.5-1.5h3v13.5z" fill="currentColor"/></svg>`, // Book
-        "Animated Movies": `<svg viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.5c-1.34 1.9-3.53 3-5 3s-3.66-1.1-5-3h10z" fill="currentColor"/></svg>`, // Winking smiley
-        "Kids Shows and Movies (Nickelodeon and Disney)": `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" fill="currentColor"/></svg>`, // Teddy/Toy Plus
-        "Classic Movies": `<svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v3c0 2.44 1.72 4.48 4 4.9V19H5v2h14v-2h-2v-4.1c2.28-.42 4-2.46 4-4.9V7c0-1.1-.9-2-2-2zM5 10V7h2v3H5zm14 0h-2V7h2v3z" fill="currentColor"/></svg>`, // Trophy
-        "Erotic Movies": `<svg viewBox="0 0 24 24"><path d="M12.01 21.49L12 21.5c-4.42 0-8-3.58-8-8 0-3.32 2.01-6.17 4.9-7.39l.71-.3 1.41 1.42c-.22.61-.3 1.25-.21 1.89l.1 1.01h1.01c1.38 0 2.63.56 3.54 1.47l.7.71.3.71c1.22 2.89.37 6.3-2.06 8.35-.91.77-2.09 1.18-3.3 1.18zM6 13.5c0 3.31 2.69 6 6 6s6-2.69 6-6c0-.98-.24-1.92-.68-2.76-.55-.38-1.22-.59-1.92-.59h-.94l.21.93c.18.82.02 1.66-.45 2.37l-.54.81-.81.54c-.71.47-1.55.63-2.37.45L8 14.54v.94c0 .7-.21 1.37-.59 1.92-.41-.53-.61-1.17-.61-1.82 0-1.66 1.34-3 3-3V11c-3.31 0-6 2.69-6 6z" fill="currentColor"/></svg>` // Fire
+    const categoryEmojis = {
+        "Main": "🍿",
+        "Hollywood/British Movies": "🎬",
+        "Hollywood/British Series": "📺",
+        "Bollywood": "🎶",
+        "Korean Drama": "🫰",
+        "African": "🌍",
+        "Anime": "🌸",
+        "Comic": "💥",
+        "Animated Movies": "🎨",
+        "Kids Shows and Movies (Nickelodeon and Disney)": "🧸",
+        "Classic Movies": "🎞️",
+        "Erotic Movies": "💋"
     };
 
     categoryList.forEach(cat => {
         const button = document.createElement("button");
         button.className = `category-pill ${state.activeCategory === cat ? 'active' : ''}`;
         button.title = categoryLabels[cat] || cat;
+
+        const iconEl = document.createElement("span");
+        iconEl.className = "category-pill-icon";
+        iconEl.textContent = categoryEmojis[cat] || "🍿";
+        button.appendChild(iconEl);
 
         const textLabel = document.createElement("span");
         textLabel.className = "category-pill-text";
