@@ -1,5 +1,45 @@
 [
   {
+    "csv_id": "31251-victorious",
+    "tmdb_id": 31251,
+    "imdb_id": "",
+    "title": "Victorious",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Aspiring singer Tori Vega navigates life while attending a performing arts high school called Hollywood Arts.",
+    "poster": "https://image.tmdb.org/t/p/w500/2Jc4L48qEwN9HyzqsdaSX1BCGMJ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jpR7mT5nFAzWSGPseLpfFisoUtN.jpg",
+    "rating": 8.2,
+    "release_date": "2010-03-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "XwoSe9OfM9Y",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADRwYAAhoLqUYqg6uR8_DNbhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADSAYAAhoLqUa5jQLbTJ4y3BYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADSgYAAhoLqUYoonF4kuR-GxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADTQYAAhoLqUZyHqHbsXni4hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "338967-zombieland-double-tap",
     "tmdb_id": 338967,
     "imdb_id": "",
@@ -13204,55 +13244,6 @@
     "director": "Jennifer Gatero",
     "trailer": "teA8AmxVGFY",
     "runtime": "79 min"
-  },
-  {
-    "title": "Angels' Brigade",
-    "csv_id": "31251-victorious",
-    "type": "Series",
-    "links": [
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADRwYAAhoLqUYqg6uR8_DNbhYE",
-        "quality": "720p"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADSAYAAhoLqUa5jQLbTJ4y3BYE",
-        "quality": "720p"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADSgYAAhoLqUYoonF4kuR-GxYE",
-        "quality": "720p"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADTQYAAhoLqUZyHqHbsXni4hYE",
-        "quality": "720p"
-      }
-    ],
-    "poster": "https://image.tmdb.org/t/p/w500/l4TzXV6PiMndm1Hdm3Uvs9cVHZ3.jpg",
-    "rating": 3.2,
-    "release_date": "1979-02-01",
-    "genres": [
-      "Action",
-      "Comedy"
-    ],
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Classic Movies"
-    ],
-    "tmdb_id": 31251,
-    "overview": "Seven women decide to fight the local drug cartel. When Las Vegas pop singer Michelle's brother is found severely beaten, he's discovered to have been on illegal drugs. Michelle meets with April, her brother's teacher, who reveals that she's secretly been gathering intelligence on the cartel's local processing plant, and Michelle agrees to help April with a plan to destroy the plant. With Michelle's fame opening the door, they recruit four more women with special skills and connections to help them carry out their audacious goal.",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/nSG1Ydpdo0cjVrbrxozU1YdPpAk.jpg",
-    "language": "en",
-    "cast": [
-      "Sylvia Anderson",
-      "Lieu Chinh",
-      "Jacqulin Cole",
-      "Liza Greer",
-      "Robin Greer"
-    ],
-    "director": "Greydon Clark",
-    "trailer": "43fqIstqGN8",
-    "runtime": "97 min"
   },
   {
     "csv_id": "9506-anger-management",
