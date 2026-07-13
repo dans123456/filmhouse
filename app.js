@@ -788,13 +788,17 @@ function loadUserProfile() {
     // Merge into state
     state.user.fullName = profile.fullName || state.user.fullName;
     state.user.greetingFontStyle = profile.greetingFontStyle || "default";
-    state.user.points = profile.points || 0;
+    if (state.user.points === 0 && profile.points) {
+        state.user.points = profile.points;
+    }
     state.user.badge = profile.badge || null;
     state.user.badgeExpiresAt = profile.badgeExpiresAt || 0;
     state.user.farmingStartedAt = profile.farmingStartedAt || 0;
     state.user.checkInStreak = profile.checkInStreak || 0;
     state.user.lastCheckInDate = profile.lastCheckInDate || "";
-    state.user.pointsBreakdown = profile.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
+    if ((!state.user.pointsBreakdown || state.user.pointsBreakdown.downloads === 0) && profile.pointsBreakdown) {
+        state.user.pointsBreakdown = profile.pointsBreakdown;
+    }
     state.user.dailyStats = profile.dailyStats || {
         date: new Date().toISOString().split("T")[0],
         checkInClaimed: false,
@@ -808,9 +812,10 @@ function loadUserProfile() {
     checkAndResetDailyMissions();
     
     if (profile.avatar) {
-        const isStoredDefault = !profile.avatar.startsWith("data:") && !profile.avatar.startsWith("http");
+        const isCustomUploaded = profile.avatar.startsWith("data:");
         const hasTelegramPhoto = state.user.avatar && state.user.avatar.startsWith("http");
-        if (!hasTelegramPhoto || !isStoredDefault) {
+        // Only overwrite fresh Telegram photo if user uploaded a custom base64 image
+        if (isCustomUploaded || !hasTelegramPhoto) {
             state.user.avatar = profile.avatar;
         }
     }
