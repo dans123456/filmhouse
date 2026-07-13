@@ -614,6 +614,12 @@ function renderRequestsList() {
             `;
         }
 
+        const deleteBtnMarkup = `
+            <button class="btn-delete-requests" style="background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.3); border-radius: 4px; padding: 6px 12px; color: #ff3b30; font-weight: 700; font-size: 11px; cursor: pointer; transition: background 0.2s;">
+                Delete 🗑️
+            </button>
+        `;
+
         row.innerHTML = `
             <div class="user-details" style="flex: 1;">
                 <h5 style="margin: 0; display: flex; align-items: center;">
@@ -622,11 +628,12 @@ function renderRequestsList() {
                 </h5>
                 <p style="text-transform: uppercase; margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary);">${escapeHTML(req.type)}</p>
             </div>
-            <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="req-count" style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">
-                    ${req.count} ${req.count === 1 ? 'request' : 'requests'}
+                    ${req.count} ${req.count === 1 ? 'req' : 'reqs'}
                 </div>
                 ${fulfillBtnMarkup}
+                ${deleteBtnMarkup}
             </div>
         `;
 
@@ -637,7 +644,35 @@ function renderRequestsList() {
             });
         }
 
+        const deleteBtn = row.querySelector(".btn-delete-requests");
+        if (deleteBtn) {
+            deleteBtn.addEventListener("click", () => {
+                deleteMovieTitleRequests(req.title, req.docIds);
+            });
+        }
+
         listContainer.appendChild(row);
+    });
+}
+
+function deleteMovieTitleRequests(title, docIds) {
+    if (typeof firebase === "undefined" || !db) return;
+    if (!confirm(`Are you sure you want to delete all requests for "${title}"? This will permanently remove ${docIds.length} request document(s) from the database.`)) {
+        return;
+    }
+    
+    const batch = db.batch();
+    docIds.forEach(id => {
+        batch.delete(db.collection("requests").doc(id));
+    });
+    
+    batch.commit().then(() => {
+        showToast(`Successfully deleted ${docIds.length} request(s) for "${title}"!`, "success");
+        allRequests = allRequests.filter(r => !docIds.includes(r.docId));
+        renderRequestsList();
+    }).catch(err => {
+        console.error("Error deleting requests:", err);
+        showToast("Failed to delete requests: " + err.message, "error");
     });
 }
 
@@ -730,6 +765,7 @@ const TMDB_API_KEY = localStorage.getItem("filmhouse_tmdb_key") || "d638f7775bfa
 let pendingImportChanges = null;
 let newlyAddedIds = [];
 let newlyUpdatedIds = [];
+let newlyDeletedIds = [];
 let lastKnownJsonSha = null;
 
 // Load GitHub token on startup from Firestore and localStorage
@@ -1175,6 +1211,7 @@ async function loadCatalog() {
                         allCatalogMovies = draft.allCatalogMovies;
                         newlyAddedIds = draft.newlyAddedIds || [];
                         newlyUpdatedIds = draft.newlyUpdatedIds || [];
+                        newlyDeletedIds = draft.newlyDeletedIds || [];
                         catalogChangesMade = true;
                         originalCatalogCount = allCatalogMovies.length;
                         updatePublishButtonState();
@@ -1703,6 +1740,13 @@ function renderCatalogList() {
 
 function deleteMovie(csvId) {
     allCatalogMovies = allCatalogMovies.filter(m => m.csv_id !== csvId);
+    if (!newlyDeletedIds.includes(csvId)) {
+        newlyDeletedIds.push(csvId);
+    }
+    // Also remove from local additions and updates to prevent redundant writes
+    newlyAddedIds = newlyAddedIds.filter(id => id !== csvId);
+    newlyUpdatedIds = newlyUpdatedIds.filter(id => id !== csvId);
+    
     catalogChangesMade = true;
     updatePublishButtonState();
     renderCatalogList();
@@ -1717,7 +1761,8 @@ function updatePublishButtonState() {
             localStorage.setItem("filmhouse_unpublished_catalog", JSON.stringify({
                 allCatalogMovies,
                 newlyAddedIds,
-                newlyUpdatedIds
+                newlyUpdatedIds,
+                newlyDeletedIds
             }));
         } else {
             publishBtn.style.display = "none";
@@ -2432,10 +2477,36 @@ if (publishBtn) {
                 lastKnownJsonSha = jsonResData.content.sha;
             }
             
+            // Sync changes to Firestore movies collection
+            if (typeof db !== "undefined" && db) {
+                try {
+                    const fsBatch = db.batch();
+                    
+                    // Write/update added and updated movies
+                    allCatalogMovies.forEach(m => {
+                        if (newlyAddedIds.includes(m.csv_id) || newlyUpdatedIds.includes(m.csv_id)) {
+                            const movieRef = db.collection("movies").doc(m.csv_id);
+                            fsBatch.set(movieRef, m, { merge: true });
+                        }
+                    });
+                    
+                    // Delete deleted movies from Firestore
+                    newlyDeletedIds.forEach(id => {
+                        const movieRef = db.collection("movies").doc(id);
+                        fsBatch.delete(movieRef);
+                    });
+                    
+                    await fsBatch.commit();
+                } catch (fsErr) {
+                    console.warn("Failed to commit Firestore movie catalog changes:", fsErr);
+                }
+            }
+            
             alert("Catalog CSV and enriched JSON database successfully published directly to GitHub! Updates are live instantly.");
             catalogChangesMade = false;
             newlyAddedIds = [];
             newlyUpdatedIds = [];
+            newlyDeletedIds = [];
             localStorage.removeItem("filmhouse_unpublished_catalog"); // Clear draft!
             updatePublishButtonState();
             renderCatalogList();
@@ -2849,6 +2920,7 @@ if (fulfillForm && fulfillRequestModal) {
         // 1. Sync to local CSV catalog
         const matchTitle = currentFulfillTitle.toLowerCase().trim();
         const existingMovie = allCatalogMovies.find(m => m.title.toLowerCase().trim() === matchTitle);
+        let movieToSync = null;
         
         if (existingMovie) {
             if (!existingMovie.links) existingMovie.links = [];
@@ -2859,6 +2931,7 @@ if (fulfillForm && fulfillRequestModal) {
                     newlyUpdatedIds.push(existingMovie.csv_id);
                 }
             }
+            movieToSync = existingMovie;
         } else {
             // Create a new catalog entry
             let isSeries = false;
@@ -2926,6 +2999,7 @@ if (fulfillForm && fulfillRequestModal) {
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(csvId);
                 catalogChangesMade = true;
+                movieToSync = newMovie;
             } else {
                 const slug = currentFulfillTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
                 const csvId = `manual-${Date.now()}-${slug}`;
@@ -2953,6 +3027,7 @@ if (fulfillForm && fulfillRequestModal) {
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(csvId);
                 catalogChangesMade = true;
+                movieToSync = newMovie;
             }
         }
         
@@ -2965,6 +3040,11 @@ if (fulfillForm && fulfillRequestModal) {
                 downloadLink: downloadLink
             });
         });
+        
+        if (movieToSync) {
+            const movieRef = db.collection("movies").doc(movieToSync.csv_id);
+            batch.set(movieRef, movieToSync, { merge: true });
+        }
         
         batch.commit().then(async () => {
             const requesters = [];

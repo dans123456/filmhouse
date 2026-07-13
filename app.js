@@ -634,6 +634,58 @@ async function initializeDatabase() {
     state.movies = shuffleAndPinNewMovies(enrichedList);
     localStorage.setItem("filmhouse_enriched_db_v5", JSON.stringify(enrichedList));
     statusEl.textContent = "Complete!";
+
+    // 4. Start real-time Firestore sync of custom catalog additions/updates
+    if (typeof firebase !== "undefined" && db) {
+        db.collection("movies").onSnapshot(snapshot => {
+            snapshot.docChanges().forEach(change => {
+                const docData = change.doc.data();
+                const csv_id = change.doc.id;
+                
+                docData.csv_id = csv_id;
+                
+                // Prepend MOVIE/ to local assets relative paths to resolve 404s
+                if (docData.poster && docData.poster.startsWith("img/")) {
+                    docData.poster = "MOVIE/" + docData.poster;
+                }
+                if (docData.backdrop && docData.backdrop.startsWith("img/")) {
+                    docData.backdrop = "MOVIE/" + docData.backdrop;
+                }
+                if (!docData.poster) {
+                    docData.poster = "MOVIE/img/FilmHouse3_nobg.png";
+                }
+                
+                // Precompute search index
+                docData._searchStr = [
+                    docData.title,
+                    docData.overview,
+                    (docData.genres || []).join(" "),
+                    (docData.cast || []).join(" "),
+                    docData.director,
+                    docData.type,
+                    (docData.categories || []).join(" ")
+                ].filter(Boolean).join(" ").toLowerCase();
+
+                if (change.type === "added" || change.type === "modified") {
+                    const idx = state.movies.findIndex(m => m.csv_id === csv_id);
+                    if (idx !== -1) {
+                        state.movies[idx] = { ...state.movies[idx], ...docData };
+                    } else {
+                        state.movies.unshift(docData);
+                    }
+                } else if (change.type === "removed") {
+                    state.movies = state.movies.filter(m => m.csv_id !== csv_id);
+                }
+            });
+            
+            // Re-render feed display if currently active on home screen
+            if (state.activeScreen === "home") {
+                renderFeaturedGrid();
+                renderCarouselBanner();
+                renderEditorsChoice();
+            }
+        }, err => console.warn("Firestore live catalog sync warning:", err));
+    }
 }
 
 function anyMatch(text, arr) {
@@ -2327,7 +2379,8 @@ function renderEditorsChoice() {
     const container = document.getElementById("editors-choice-scroll-container");
     if (!wrapper || !container) return;
 
-    const filtersActive = state.filters.genre !== "All" || state.filters.genre2 !== "All" || state.filters.rating > 0 || state.filters.year !== "All";
+    const isGenreChipActive = state.filters.selectedGenres && !state.filters.selectedGenres.includes("All");
+    const filtersActive = state.filters.genre !== "All" || state.filters.genre2 !== "All" || state.filters.rating > 0 || state.filters.year !== "All" || isGenreChipActive;
     const shouldShow = !state.searchQuery && state.activeCategory === "Main" && !filtersActive;
     if (!shouldShow) {
         wrapper.style.display = "none";
