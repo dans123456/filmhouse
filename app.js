@@ -92,6 +92,7 @@ const firebaseConfig = {
 };
 
 let db = null;
+let globalAdminIds = ["1329840839", "1175336733"];
 if (typeof firebase !== "undefined") {
     try {
         firebase.initializeApp(firebaseConfig);
@@ -1031,11 +1032,27 @@ function updatePointsUI() {
     // 3. Profile screen rank label
     const profileRankLabel = document.getElementById("profile-loyalty-rank-label");
     if (profileRankLabel) {
-        if (typeof firebase !== "undefined" && db) {
+        if (typeof globalAdminIds !== "undefined" && globalAdminIds.includes(String(state.user.id))) {
+            profileRankLabel.textContent = "Global Ranking: Staff Curator 👑";
+        } else if (typeof firebase !== "undefined" && db) {
             db.collection("users").where("points", ">", state.user.points || 0).get().then(snap => {
-                const rank = snap.size + 1;
+                let nonAdminGreaterCount = 0;
+                snap.forEach(doc => {
+                    const uid = doc.data().id ? String(doc.data().id) : "";
+                    if (typeof globalAdminIds !== "undefined" && !globalAdminIds.includes(uid)) {
+                        nonAdminGreaterCount++;
+                    }
+                });
+                const rank = nonAdminGreaterCount + 1;
                 db.collection("users").get().then(totalSnap => {
-                    profileRankLabel.textContent = `Global Ranking: #${rank} of ${totalSnap.size}`;
+                    let totalUsersCount = 0;
+                    totalSnap.forEach(doc => {
+                        const uid = doc.data().id ? String(doc.data().id) : "";
+                        if (typeof globalAdminIds !== "undefined" && !globalAdminIds.includes(uid)) {
+                            totalUsersCount++;
+                        }
+                    });
+                    profileRankLabel.textContent = `Global Ranking: #${rank} of ${totalUsersCount || totalSnap.size}`;
                 }).catch(() => {
                     profileRankLabel.textContent = `Global Ranking: #${rank}`;
                 });
@@ -1317,7 +1334,8 @@ function renderLeaderboard() {
                     userRank = index !== -1 ? index + 1 : list.length + 1;
                 }
                 
-                displayLeaderboardData(list, userRank, staffList);
+                const isCurrentUserStaff = allAdminIds.includes(String(state.user.id));
+                displayLeaderboardData(list, userRank, staffList, isCurrentUserStaff);
             }, (err) => {
                 console.warn("Failed to subscribe to live leaderboard, falling back to demo data:", err);
                 renderStaticLeaderboard();
@@ -1333,14 +1351,27 @@ function renderLeaderboard() {
     function renderStaticLeaderboard() {
         const list = getDynamicLeaderboard();
         const userRank = calculateUserRank();
-        displayLeaderboardData(list, userRank, []);
+        const isCurrentUserStaff = typeof globalAdminIds !== "undefined" && globalAdminIds.includes(String(state.user.id));
+        displayLeaderboardData(list, userRank, [], isCurrentUserStaff);
     }
     
-    function displayLeaderboardData(list, userRank, staffList = []) {
+    function displayLeaderboardData(list, userRank, staffList = [], isCurrentUserStaff = false) {
         userRankCard.replaceChildren();
         rowsContainer.replaceChildren();
         
         const userAvatarPath = state.user.avatar || (badgePrefix + "img/FilmHouse3_nobg.png");
+        
+        let rankHTML = `
+            <span style="font-size: 16px; font-weight: 800; color: #f5c518; display: block; line-height: 1;">#${userRank}</span>
+            <span style="font-size: 10px; color: var(--text-secondary); font-weight: 500;">Rank | ${state.user.points || 0} pts</span>
+        `;
+        if (isCurrentUserStaff) {
+            rankHTML = `
+                <span style="font-size: 13px; font-weight: 800; color: var(--primary-color); display: block; line-height: 1.2; text-transform: uppercase;">👑 Staff</span>
+                <span style="font-size: 9px; color: var(--text-secondary); font-weight: 500;">Curator | ${state.user.points || 0} pts</span>
+            `;
+        }
+        
         const userCardHTML = `
             <div style="display: flex; align-items: center; gap: 12px;">
                 <img src="${userAvatarPath}" alt="Your Avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #f5c518;" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
@@ -1350,8 +1381,7 @@ function renderLeaderboard() {
                 </div>
             </div>
             <div style="text-align: right;">
-                <span style="font-size: 16px; font-weight: 800; color: #f5c518; display: block; line-height: 1;">#${userRank}</span>
-                <span style="font-size: 10px; color: var(--text-secondary); font-weight: 500;">Rank | ${state.user.points || 0} pts</span>
+                ${rankHTML}
             </div>
         `;
         userRankCard.innerHTML = userCardHTML;
@@ -5930,6 +5960,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }).catch(err => console.warn("Error checking ban status:", err));
     }
+
+    // Fetch live list of admins to cache globally on startup
+    if (typeof firebase !== "undefined" && db) {
+        db.collection("settings").doc("admins").get().then(adminDoc => {
+            if (adminDoc.exists && adminDoc.data().ids) {
+                const defaultAdmins = ["1329840839", "1175336733"];
+                globalAdminIds = Array.from(new Set([...defaultAdmins, ...adminDoc.data().ids]));
+            }
+            updatePointsUI(); // Refresh UI once admin IDs are loaded
+        }).catch(err => console.warn("Error loading admins settings:", err));
+    }
     const profileExists = !!localStorage.getItem("filmhouse_user_profile");
     
     // Auto-create profile if inside Telegram
@@ -5958,7 +5999,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         db.collection("users")
             .orderBy("points", "desc")
-            .limit(10)
+            .limit(30)
             .get()
             .then(snapshot => {
                 list.innerHTML = "";
@@ -5966,6 +6007,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 
                 snapshot.forEach(doc => {
                     const u = doc.data();
+                    const userIdStr = u.id ? String(u.id) : "";
+                    
+                    // Skip admins/staff members in homepage rankings list
+                    if (typeof globalAdminIds !== "undefined" && globalAdminIds.includes(userIdStr)) return;
+                    if (rank > 10) return; // Limit to top 10
+                    
                     const points = parseInt(u.points || 0);
                     const name = escapeHTML(u.fullName || u.username || `User ${doc.id.substring(0, 4)}`);
                     
