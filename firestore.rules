@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Movies catalog: Read and write allowed for client-side admin panel updates
+    match /movies/{movie} {
+      allow read, write: if true;
+    }
+    
+    // Settings: Read and write allowed for client-side admin panel settings updates
+    match /settings/{setting} {
+      allow read, write: if true;
+    }
+    
+    // Users: Read and write allowed
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+    
+    // Requests: Read and write allowed
+    match /requests/{requestId} {
+      allow read, write: if true;
+    }
+    
+    // Feedbacks: Create-only (cannot read, update or delete other feedbacks from web client)
+    match /feedbacks/{feedbackId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+    
+    // Activity Logs: Create-only
+    match /activity_logs/{logId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+    
+    // Default fallback: Deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

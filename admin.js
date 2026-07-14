@@ -34,6 +34,8 @@ const safeStorage = (() => {
 })();
 const localStorage = safeStorage;
 
+let isCurrentUserSlaveAdmin = false;
+
 // Premium Floating Toast Notification Helper
 function showToast(message, type = "success") {
     console.log(`[Toast] [${type}] ${message}`);
@@ -225,11 +227,20 @@ try {
 
 // Bind Live Snapshot Listeners
 if (db) {
-    // 1. Real-time Users Listener
-    db.collection("users").orderBy("lastSeen", "desc").onSnapshot(snapshot => {
+    // 1. Real-time Users Listener (without query sorting to prevent Firestore from excluding documents missing 'lastSeen')
+    db.collection("users").onSnapshot(snapshot => {
         allUsers = [];
         snapshot.forEach(doc => {
-            allUsers.push(doc.data());
+            const u = doc.data();
+            u.id = u.id || doc.id;
+            allUsers.push(u);
+        });
+        
+        // Sort locally by lastSeen (descending) safely
+        allUsers.sort((a, b) => {
+            const timeA = a.lastSeen ? (a.lastSeen.toMillis ? a.lastSeen.toMillis() : new Date(a.lastSeen).getTime()) : 0;
+            const timeB = b.lastSeen ? (b.lastSeen.toMillis ? b.lastSeen.toMillis() : new Date(b.lastSeen).getTime()) : 0;
+            return timeB - timeA;
         });
         db.collection("settings").doc("admins").get().then(adminDoc => {
             const adminIds = adminDoc.exists ? adminDoc.data().ids || [] : [];
@@ -438,6 +449,22 @@ function renderUsersList() {
         row.style.alignItems = "stretch";
         row.style.padding = "12px 16px";
 
+        if (isCurrentUserSlaveAdmin) {
+            row.innerHTML = `
+                <div class="user-summary" style="display: flex; align-items: center; justify-content: space-between; width: 100%; user-select: none;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <img src="${escapeHTML(u.avatar) || 'MOVIE/img/FilmHouse3_nobg.png'}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                        <h5 style="margin: 0; font-size: 14px; font-weight: 600; color: #fff;">${escapeHTML(u.fullName) || 'Guest User'}</h5>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="points-badge" style="margin: 0;">${u.points || 0} pts</div>
+                    </div>
+                </div>
+            `;
+            listContainer.appendChild(row);
+            return;
+        }
+
         const joinedDateStr = u.joinedDate ? new Date(u.joinedDate.seconds * 1000).toLocaleDateString() : "Unknown";
         const bd = u.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
         
@@ -528,6 +555,7 @@ function renderRequestsList() {
             counts[key] = { 
                 title: r.title, 
                 type: r.type, 
+                year: r.year || "",
                 count: 0, 
                 isPriority: false, 
                 isFulfilled: true,
@@ -611,7 +639,7 @@ function renderRequestsList() {
 
         let fulfillBtnMarkup = "";
         if (!req.isFulfilled) {
-            fulfillBtnMarkup = `
+            fulfillBtnMarkup = isCurrentUserSlaveAdmin ? "" : `
                 <button class="btn-fulfill-request" data-title="${escapeHTML(req.title)}" style="background: var(--primary-gradient); border: none; border-radius: 4px; padding: 6px 12px; color: #000; font-weight: 700; font-size: 11px; cursor: pointer; transition: opacity 0.2s;">
                     Fulfill 📥
                 </button>
@@ -622,7 +650,7 @@ function renderRequestsList() {
             `;
         }
 
-        const deleteBtnMarkup = `
+        const deleteBtnMarkup = isCurrentUserSlaveAdmin ? "" : `
             <button class="btn-delete-requests" style="background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.3); border-radius: 4px; padding: 6px 12px; color: #ff3b30; font-weight: 700; font-size: 11px; cursor: pointer; transition: background 0.2s;">
                 Delete 🗑️
             </button>
@@ -631,7 +659,7 @@ function renderRequestsList() {
         row.innerHTML = `
             <div class="user-details" style="flex: 1;">
                 <h5 style="margin: 0; display: flex; align-items: center;">
-                    ${escapeHTML(req.title)}
+                    ${escapeHTML(req.title)}${req.year ? ` (${req.year})` : ""}
                     ${badgeMarkup}
                 </h5>
                 <p style="text-transform: uppercase; margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary);">${escapeHTML(req.type)}</p>
@@ -927,20 +955,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // Admin Access Control Verification
+// Admin Access Control Verification
 async function verifyAdminAccess() {
     const defaultAdmins = ["1329840839", "1175336733"];
     let authorizedIds = [...defaultAdmins];
+    let masters = [...defaultAdmins];
+    let slaves = [];
 
     if (db) {
         try {
             const adminDoc = await db.collection("settings").doc("admins").get();
             if (adminDoc.exists) {
-                const storedIds = adminDoc.data().ids || [];
+                const data = adminDoc.data();
+                const storedIds = data.ids || [];
                 authorizedIds = Array.from(new Set([...defaultAdmins, ...storedIds.map(id => String(id).trim())]));
+                masters = Array.from(new Set([...defaultAdmins, ...(data.masters || []).map(id => String(id).trim())]));
+                slaves = (data.slaves || []).map(id => String(id).trim());
             } else {
                 // Seed initial admins doc in Firestore if missing
                 await db.collection("settings").doc("admins").set({
                     ids: defaultAdmins,
+                    masters: defaultAdmins,
+                    slaves: [],
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }
@@ -949,9 +985,13 @@ async function verifyAdminAccess() {
         }
     }
 
-    const adminInput = document.getElementById("admin-tg-ids");
-    if (adminInput) {
-        adminInput.value = authorizedIds.join(", ");
+    const masterInput = document.getElementById("admin-master-tg-ids");
+    if (masterInput) {
+        masterInput.value = masters.join(", ");
+    }
+    const slaveInput = document.getElementById("admin-slave-tg-ids");
+    if (slaveInput) {
+        slaveInput.value = slaves.join(", ");
     }
 
     // Context & Bypass checks
@@ -968,6 +1008,52 @@ async function verifyAdminAccess() {
     const idBox = document.getElementById("your-tg-id-box");
     if (idBox) {
         idBox.textContent = currentTgId ? `Your Telegram User ID: ${currentTgId}` : "Not running inside Telegram WebApp";
+    }
+
+    // Determine current user's role
+    if (currentTgId && slaves.includes(currentTgId) && !masters.includes(currentTgId)) {
+        isCurrentUserSlaveAdmin = true;
+    }
+
+    // Apply view restrictions if they are a slave admin
+    if (isCurrentUserSlaveAdmin) {
+        const panelsToHide = [
+            "settings-panel",
+            "stats-grid",
+            "requests-panel",
+            "editors-choice-panel",
+            "broadcast-panel",
+            "allocator-panel"
+        ];
+        panelsToHide.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = "none";
+        });
+
+        // Update header title to content curation center
+        const adminTitle = document.querySelector(".admin-title span:last-child");
+        if (adminTitle) {
+            adminTitle.textContent = "CONTENT CURATION CENTER";
+        }
+
+        // Add a clean curating banner/indicator styles
+        const header = document.querySelector(".admin-header");
+        if (header) {
+            header.style.border = "1px solid rgba(255, 188, 0, 0.4)";
+            header.style.background = "linear-gradient(135deg, rgba(255, 188, 0, 0.08) 0%, rgba(22, 24, 35, 0.3) 100%)";
+        }
+        const statusText = document.getElementById("status-text");
+        if (statusText) {
+            statusText.textContent = "CONTENT CURATOR MODE";
+            statusText.style.color = "#ffbc00";
+            statusText.parentElement.style.color = "#ffbc00";
+            statusText.parentElement.style.background = "rgba(255, 188, 0, 0.1)";
+            statusText.parentElement.style.borderColor = "rgba(255, 188, 0, 0.3)";
+        }
+        const liveDot = document.querySelector(".live-dot");
+        if (liveDot) {
+            liveDot.style.backgroundColor = "#ffbc00";
+        }
     }
 
     // In production, block access if not authorized
@@ -991,29 +1077,41 @@ async function verifyAdminAccess() {
 const saveAdminsBtn = document.getElementById("btn-save-admins");
 if (saveAdminsBtn) {
     saveAdminsBtn.addEventListener("click", async () => {
-        const adminInput = document.getElementById("admin-tg-ids");
-        if (adminInput && db) {
-            const rawInput = adminInput.value.trim();
+        const masterInput = document.getElementById("admin-master-tg-ids");
+        const slaveInput = document.getElementById("admin-slave-tg-ids");
+        if (db) {
             const defaultAdmins = ["1329840839", "1175336733"];
             
-            // Map input and filter empty
-            let inputIds = rawInput.split(",")
-                .map(id => id.trim())
-                .filter(id => id && /^\d+$/.test(id)); // Allow only numeric IDs
+            let masterIds = [];
+            if (masterInput) {
+                masterIds = masterInput.value.trim().split(",")
+                    .map(id => id.trim())
+                    .filter(id => id && /^\d+$/.test(id));
+            }
+            const finalMasters = Array.from(new Set([...defaultAdmins, ...masterIds]));
 
-            // Merge with master default admins
-            const finalIds = Array.from(new Set([...defaultAdmins, ...inputIds]));
+            let slaveIds = [];
+            if (slaveInput) {
+                slaveIds = slaveInput.value.trim().split(",")
+                    .map(id => id.trim())
+                    .filter(id => id && /^\d+$/.test(id));
+            }
+
+            const finalAllIds = Array.from(new Set([...finalMasters, ...slaveIds]));
 
             try {
                 await db.collection("settings").doc("admins").set({
-                    ids: finalIds,
+                    ids: finalAllIds,
+                    masters: finalMasters,
+                    slaves: slaveIds,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                adminInput.value = finalIds.join(", ");
-                showToast("Authorized Admin IDs updated successfully in your Firebase database! 🛡️", "success");
+                if (masterInput) masterInput.value = finalMasters.join(", ");
+                if (slaveInput) slaveInput.value = slaveIds.join(", ");
+                showToast("Authorized Admins and Roles updated successfully in Firestore! 🛡️", "success");
             } catch (e) {
                 console.error("Error saving admin list to Firestore:", e);
-                showToast("Failed to update Admin IDs. Check your database rules.", "error");
+                showToast("Failed to update Admin list. Check your database rules.", "error");
             }
         }
     });

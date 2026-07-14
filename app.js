@@ -152,7 +152,8 @@ const state = {
             adWatchesCount: 0,
             adWatchesClaimed: false,
             downloadsCount: 0,
-            downloadsClaimed: false
+            downloadsClaimed: false,
+            inviteShared: false
         }
     },
     isTelegram: false,
@@ -807,7 +808,8 @@ function loadUserProfile() {
         adWatchesCount: 0,
         adWatchesClaimed: false,
         downloadsCount: 0,
-        downloadsClaimed: false
+        downloadsClaimed: false,
+        inviteShared: false
     };
     checkAndResetDailyMissions();
     
@@ -1482,7 +1484,7 @@ function renderLeaderboard() {
         
         const userCardHTML = `
             <div style="display: flex; align-items: center; gap: 12px;">
-                <img src="${userAvatarPath}" alt="Your Avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #f5c518;" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
+                <img src="${escapeHTML(userAvatarPath)}" alt="Your Avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #f5c518;" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
                 <div>
                     <h4 style="font-size: 13px; font-weight: 700; margin: 0; color: var(--text-primary);">You (${escapeHTML(state.user.fullName)})</h4>
                     <span class="leaderboard-badge">${escapeHTML(getAchievementBadge(state.user.points || 0, state.user.badge))}</span>
@@ -4717,8 +4719,15 @@ function bindEvents() {
         optWhatsapp.addEventListener("click", () => {
             const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(getFullInviteMessage())}`;
             window.open(whatsappUrl, "_blank");
-            if (typeof awardPoints === "function") {
-                awardPoints(5, "share");
+            checkAndResetDailyMissions();
+            if (!state.user.dailyStats.inviteShared) {
+                state.user.dailyStats.inviteShared = true;
+                saveDailyStats();
+                if (typeof awardPoints === "function") {
+                    awardPoints(5, "share");
+                }
+            } else {
+                showToast("Invite link shared! (Daily reward already claimed)", "info");
             }
             if (shareModal) shareModal.classList.remove("active");
         });
@@ -4737,8 +4746,15 @@ function bindEvents() {
             } else {
                 window.open(telegramShareUrl, "_blank");
             }
-            if (typeof awardPoints === "function") {
-                awardPoints(5, "share");
+            checkAndResetDailyMissions();
+            if (!state.user.dailyStats.inviteShared) {
+                state.user.dailyStats.inviteShared = true;
+                saveDailyStats();
+                if (typeof awardPoints === "function") {
+                    awardPoints(5, "share");
+                }
+            } else {
+                showToast("Invite link shared! (Daily reward already claimed)", "info");
             }
             if (shareModal) shareModal.classList.remove("active");
         });
@@ -4748,8 +4764,15 @@ function bindEvents() {
         optTwitter.addEventListener("click", () => {
             const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(getFullInviteMessage())}`;
             window.open(twitterUrl, "_blank");
-            if (typeof awardPoints === "function") {
-                awardPoints(5, "share");
+            checkAndResetDailyMissions();
+            if (!state.user.dailyStats.inviteShared) {
+                state.user.dailyStats.inviteShared = true;
+                saveDailyStats();
+                if (typeof awardPoints === "function") {
+                    awardPoints(5, "share");
+                }
+            } else {
+                showToast("Invite link shared! (Daily reward already claimed)", "info");
             }
             if (shareModal) shareModal.classList.remove("active");
         });
@@ -4760,8 +4783,15 @@ function bindEvents() {
             if (typeof copyToClipboard === "function") {
                 copyToClipboard(getFullInviteMessage());
             }
-            if (typeof awardPoints === "function") {
-                awardPoints(5, "share");
+            checkAndResetDailyMissions();
+            if (!state.user.dailyStats.inviteShared) {
+                state.user.dailyStats.inviteShared = true;
+                saveDailyStats();
+                if (typeof awardPoints === "function") {
+                    awardPoints(5, "share");
+                }
+            } else {
+                showToast("Invite link copied to clipboard!", "success");
             }
             if (shareModal) shareModal.classList.remove("active");
         });
@@ -5441,7 +5471,7 @@ function renderUserRequests(requests) {
             item.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px;">
                     <div>
-                        <h5 style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; font-family: var(--font-heading);">${escapeHTML(r.title)}</h5>
+                        <h5 style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; font-family: var(--font-heading);">${escapeHTML(r.title)}${r.year ? ` (${r.year})` : ""}</h5>
                         <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">${escapeHTML(r.type)}</span>
                     </div>
                     <div style="display: flex; align-items: center;">
@@ -5483,9 +5513,20 @@ function renderUserRequests(requests) {
                     const rawLink = r._isExplicit ? r.downloadLink : (r._matchingMovie && r._matchingMovie.links ? r._matchingMovie.links[0] : "");
                     const dlLink = typeof rawLink === 'object' && rawLink !== null ? rawLink.url : rawLink;
 
-                    // DM notification with download links is handled by the backend bot Firestore listener when request is claimed
+                    // Open link directly in the app browser
+                    if (dlLink) {
+                        if (typeof Telegram !== "undefined" && Telegram.WebApp && Telegram.WebApp.openLink) {
+                            try {
+                                Telegram.WebApp.openLink(dlLink);
+                            } catch (e) {
+                                window.open(dlLink, "_blank");
+                            }
+                        } else {
+                            window.open(dlLink, "_blank");
+                        }
+                    }
                     
-                    showToast("Claimed! Direct links have been sent to your Telegram DM. 🍿", "success");
+                    showToast("Claimed! Opening download link... 🍿", "success");
                     
                     // Re-render so claimed request moves to history immediately
                     renderUserRequests(currentUserRequests);
@@ -5508,7 +5549,7 @@ function renderUserRequests(requests) {
                 item.style.cssText = "background: rgba(255,255,255,0.015); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px;";
                 item.innerHTML = `
                     <div style="flex: 1;">
-                        <h5 style="margin: 0 0 2px 0; font-size: 11px; font-weight: 600; color: var(--text-secondary);">${escapeHTML(r.title)}</h5>
+                        <h5 style="margin: 0 0 2px 0; font-size: 11px; font-weight: 600; color: var(--text-secondary);">${escapeHTML(r.title)}${r.year ? ` (${r.year})` : ""}</h5>
                         <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">${escapeHTML(r.type)}</span>
                     </div>
                     <span style="font-size: 10px; background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.2); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700;">✅ Claimed</span>
@@ -5687,6 +5728,7 @@ function logMovieRequestToFirestore(movie) {
         tmdb_id: movie.tmdb_id || null,
         csv_id: movie.csv_id || "",
         type: movie.type || "Movie",
+        year: movie.release_date ? movie.release_date.substring(0, 4) : "",
         requestedBy: state.user.username || "guest",
         requestedById: state.user.id || "",
         requestedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -5710,7 +5752,8 @@ function checkAndResetDailyMissions() {
             adWatchesCount: 0,
             adWatchesClaimed: false,
             downloadsCount: 0,
-            downloadsClaimed: false
+            downloadsClaimed: false,
+            inviteShared: false
         };
         saveDailyStats();
     }

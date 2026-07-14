@@ -64,6 +64,23 @@ function setupBot(bot) {
         return next();
     });
 
+    // In-memory rate limiting map (cooldown) to prevent command spamming
+    const commandCooldowns = new Map();
+    bot.use(async (ctx, next) => {
+        if (!ctx.from || !ctx.message) return next();
+        const userId = String(ctx.from.id);
+        const now = Date.now();
+        const lastTime = commandCooldowns.get(userId) || 0;
+        
+        if (now - lastTime < 1000) { // 1 second cooldown per message/command
+            console.log(`Rate limiting user ${userId} to prevent spam.`);
+            return; // silently discard the update to prevent spamming
+        }
+        
+        commandCooldowns.set(userId, now);
+        return next();
+    });
+
     // Middleware to check if user is banned
     bot.use(async (ctx, next) => {
         if (!ctx.from) return next();
@@ -90,6 +107,20 @@ function setupBot(bot) {
             return allAdmins.includes(String(userId));
         } catch (err) {
             console.warn("Failed to read admin list from Firestore, falling back to default admins:", err);
+            return defaultAdmins.includes(String(userId));
+        }
+    }
+
+    // Helper: Check if user is an authorized master admin
+    async function isMasterAdmin(userId) {
+        const defaultAdmins = ["1329840839", "1175336733"];
+        try {
+            const doc = await db.collection("settings").doc("admins").get();
+            const masters = doc.exists ? doc.data().masters || [] : [];
+            const allMasters = [...defaultAdmins, ...masters];
+            return allMasters.includes(String(userId));
+        } catch (err) {
+            console.warn("Failed to read master admin list from Firestore, falling back to default admins:", err);
             return defaultAdmins.includes(String(userId));
         }
     }
@@ -180,6 +211,13 @@ function setupBot(bot) {
                 const doc = await docRef.get();
                 if (doc.exists) {
                     const reqData = doc.data();
+
+                    // If already claimed, don't send the duplicate message
+                    if (reqData.claimed === true || reqData.status === "claimed") {
+                        console.log(`Request ${docId} is already claimed. Skipping duplicate bot message.`);
+                        return;
+                    }
+
                     // Mark as claimed in Firestore
                     await docRef.update({
                         claimed: true,
@@ -190,9 +228,10 @@ function setupBot(bot) {
                     // Send the download link directly to the user
                     const dlLink = reqData.downloadLink;
                     if (dlLink) {
+                        const yearSuffix = reqData.year ? ` (${reqData.year})` : "";
                         return await ctx.reply(
                             `🍿 *Your Requested Movie is Ready!* 🍿\n\n` +
-                            `Here is your direct download link for *${reqData.title}*:\n` +
+                            `Here is your direct download link for *${reqData.title}*${yearSuffix}:\n` +
                             `🔗 ${dlLink}\n\n` +
                             `This request has been marked as claimed on your account. Enjoy your download! 🎬`,
                             { parse_mode: "Markdown" }
@@ -386,8 +425,8 @@ function setupBot(bot) {
     // Command: /broadcast (Admin Only)
     bot.command('broadcast', async (ctx) => {
         const userId = String(ctx.from.id);
-        if (!(await isAdmin(userId))) {
-            return ctx.reply("❌ Unauthorized. This command is restricted to administrators.");
+        if (!(await isMasterAdmin(userId))) {
+            return ctx.reply("❌ Unauthorized. This command is restricted to Master Administrators.");
         }
 
         const replyTo = ctx.message.reply_to_message;
@@ -452,8 +491,8 @@ function setupBot(bot) {
     // Command: /ban <user_id> (Admin Only)
     bot.command('ban', async (ctx) => {
         const userId = String(ctx.from.id);
-        if (!(await isAdmin(userId))) {
-            return ctx.reply("❌ Unauthorized.");
+        if (!(await isMasterAdmin(userId))) {
+            return ctx.reply("❌ Unauthorized. This command is restricted to Master Administrators.");
         }
 
         const targetId = ctx.message.text.substring(4).trim(); // remove "/ban" prefix
@@ -479,8 +518,8 @@ function setupBot(bot) {
     // Command: /unban <user_id> (Admin Only)
     bot.command('unban', async (ctx) => {
         const userId = String(ctx.from.id);
-        if (!(await isAdmin(userId))) {
-            return ctx.reply("❌ Unauthorized.");
+        if (!(await isMasterAdmin(userId))) {
+            return ctx.reply("❌ Unauthorized. This command is restricted to Master Administrators.");
         }
 
         const targetId = ctx.message.text.substring(6).trim(); // remove "/unban" prefix
@@ -506,8 +545,8 @@ function setupBot(bot) {
     // Command: /setwelcomecaption <text> (Admin Only)
     bot.command('setwelcomecaption', async (ctx) => {
         const userId = String(ctx.from.id);
-        if (!(await isAdmin(userId))) {
-            return ctx.reply("❌ Unauthorized. This command is restricted to administrators.");
+        if (!(await isMasterAdmin(userId))) {
+            return ctx.reply("❌ Unauthorized. This command is restricted to Master Administrators.");
         }
 
         const newCaption = ctx.message.text.substring(18).trim(); // remove "/setwelcomecaption" prefix
@@ -536,8 +575,8 @@ function setupBot(bot) {
     // Command: /setwelcomephoto (Admin Only)
     bot.command('setwelcomephoto', async (ctx) => {
         const userId = String(ctx.from.id);
-        if (!(await isAdmin(userId))) {
-            return ctx.reply("❌ Unauthorized. This command is restricted to administrators.");
+        if (!(await isMasterAdmin(userId))) {
+            return ctx.reply("❌ Unauthorized. This command is restricted to Master Administrators.");
         }
 
         let photoMsg = null;
@@ -576,8 +615,8 @@ function setupBot(bot) {
     // Command: /resetwelcome (Admin Only)
     bot.command('resetwelcome', async (ctx) => {
         const userId = String(ctx.from.id);
-        if (!(await isAdmin(userId))) {
-            return ctx.reply("❌ Unauthorized. This command is restricted to administrators.");
+        if (!(await isMasterAdmin(userId))) {
+            return ctx.reply("❌ Unauthorized. This command is restricted to Master Administrators.");
         }
 
         try {
@@ -931,11 +970,14 @@ async function init() {
                 const userId = data.userId || data.requestedById;
                 const title = data.title;
                 const type = data.type;
+                const year = data.year || "";
                 const username = data.user || data.requestedBy || "guest";
                 const downloadLink = data.downloadLink;
                 const timestamp = data.timestamp || data.requestedAt;
 
                 if (!userId) return;
+
+                const yearSuffix = year ? ` (${year})` : "";
 
                 if (change.type === "added") {
                     if (timestamp) {
@@ -945,7 +987,7 @@ async function init() {
 
                     // 1. Send confirmation to requesting user
                     const canBoost = !data.boosted;
-                    const text = `🍿 *Request Received!*\n\nYour request for *${title}* (${type}) has been logged in our queue.\n\n` +
+                    const text = `🍿 *Request Received!*\n\nYour request for *${title}*${yearSuffix} (${type}) has been logged in our queue.\n\n` +
                         (canBoost 
                             ? `💡 *Boost Available!* You can boost this request to *High Priority* for 1,000 points to get it faster! 🚀`
                             : `We will notify you here as soon as it is fulfilled! 🚀`);
@@ -971,7 +1013,7 @@ async function init() {
                     }
 
                     // 2. Notify admins
-                    const adminText = `🍿 *New Movie Request!*\n\n*User:* @${username} (ID: \`${userId}\`)\n*Title:* ${title} (${type})`;
+                    const adminText = `🍿 *New Movie Request!*\n\n*User:* @${username} (ID: \`${userId}\`)\n*Title:* ${title}${yearSuffix} (${type})`;
                     const defaultAdmins = ["1329840839", "1175336733"];
                     try {
                         const adminDoc = await db.collection("settings").doc("admins").get();
@@ -993,7 +1035,7 @@ async function init() {
                         // Mark as notified in Firestore
                         await db.collection("requests").doc(docId).update({ notifiedPriority: true }).catch(() => {});
 
-                        const text = `🚀 *Request Boosted!*\n\nYour request for *${title}* has been successfully boosted to *High Priority*! Our team is on it! 🍿`;
+                        const text = `🚀 *Request Boosted!*\n\nYour request for *${title}*${yearSuffix} has been successfully boosted to *High Priority*! Our team is on it! 🍿`;
                         try {
                             await bot.telegram.sendMessage(userId, text, { parse_mode: "Markdown" });
                         } catch (e) {
@@ -1001,7 +1043,7 @@ async function init() {
                         }
 
                         // Notify admins of the boost
-                        const adminText = `⚡ *Movie Request Boosted to Priority!*\n\n*User:* @${username} (ID: \`${userId}\`)\n*Title:* ${title} (${type})`;
+                        const adminText = `⚡ *Movie Request Boosted to Priority!*\n\n*User:* @${username} (ID: \`${userId}\`)\n*Title:* ${title}${yearSuffix} (${type})`;
                         const defaultAdmins = ["1329840839", "1175336733"];
                         try {
                             const adminDoc = await db.collection("settings").doc("admins").get();
@@ -1032,7 +1074,7 @@ async function init() {
                         }
 
                         const text = `🎉 *Good news!*\n\n` +
-                                     `Your request for *${title}* has been fulfilled! 🍿\n\n` +
+                                     `Your request for *${title}*${yearSuffix} has been fulfilled! 🍿\n\n` +
                                      `${detailText}\n\n` +
                                      `Thank you for using Film House!`;
                         try {
@@ -1054,41 +1096,7 @@ async function init() {
                         }
                     }
 
-                    if (data.status === "claimed" && data.notifiedClaimed !== true && downloadLink) {
-                        await db.collection("requests").doc(docId).update({ notifiedClaimed: true }).catch(() => {});
 
-                        const isSeries = (data.type || "").toLowerCase() === "series" || (data.type || "").toLowerCase() === "tv";
-                        let detailText = "";
-                        let buttonText = "Download/Watch Now 🎬";
-                        if (isSeries) {
-                            detailText = "💡 *Note:* This is a Series. The button below contains *Season 1 only*. To download or watch the remaining seasons, please open the Film House App! 📺";
-                            buttonText = "Get Season 1 🍿";
-                        } else {
-                            detailText = "💡 *Note:* This contains the full film. Enjoy! 🍿";
-                            buttonText = "Get Movie 🎬";
-                        }
-
-                        const text = `🍿 *Your Requested Movie is Ready!* 🍿\n\n` +
-                                     `Here is your direct link for *${title}*:\n\n` +
-                                     `${detailText}`;
-                        try {
-                            await bot.telegram.sendMessage(userId, text, {
-                                parse_mode: "Markdown",
-                                reply_markup: {
-                                    inline_keyboard: [
-                                        [
-                                            {
-                                                text: buttonText,
-                                                url: downloadLink
-                                            }
-                                        ]
-                                    ]
-                                }
-                            });
-                        } catch (e) {
-                            console.warn(`Failed to send claim notification to ${userId}:`, e.message);
-                        }
-                    }
                 }
             });
         }, (err) => console.error("Requests listener error:", err));
