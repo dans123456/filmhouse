@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "292696-the-first-jasmine",
+    "tmdb_id": 292696,
+    "imdb_id": "",
+    "title": "The First Jasmine",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "Eldest daughter Ye Li marries the crippled Prince Mo Xiuyao, while her sister Ye Ying weds Prince Mo Jinglei the same day. A descendant of Lishan, Ye Li secretly seeks revenge on those who wronged her clan. Suspected by her husband, who also hides a revenge plan, the couple gradually become allies. Meanwhile, Prince Jinglei plots to seize the throne. In the end, Ye Li and Mo Xiuyao join forces to defeat their enemies and restore peace to the empire.",
+    "poster": "https://image.tmdb.org/t/p/w500/ygvVoUa6S88aT3vPMi1WVUt2meo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gxkcHgZJfyGZOtVPdfGOtFnmwHT.jpg",
+    "rating": 8.4,
+    "release_date": "2026-06-09",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADmBUAAjMrsEapm71gZJuBrhYE"
+    ]
+  },
+  {
     "csv_id": "65766-lab-rats-elite-force",
     "tmdb_id": 65766,
     "imdb_id": "",
