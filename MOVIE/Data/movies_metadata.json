@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "126437-aoashi",
+    "tmdb_id": 126437,
+    "imdb_id": "",
+    "title": "Aoashi",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation"
+    ],
+    "overview": "Ashito Aoi is a young, aspiring soccer player from a backwater town in Japan. His hopes of getting into a high school with a good soccer club are dashed when he causes an incident during a critical match for his team, which results in their loss and elimination from the tournament. Nevertheless, he catches the eye of someone important who happened to be visiting from Tokyo. How will things turn out for Ashito?",
+    "poster": "https://image.tmdb.org/t/p/w500/erwRgEPtUtyv3Vkmxt0MhjKi5kA.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/4ixh7PNNWd1VaohzKD7pcP33SiN.jpg",
+    "rating": 7.7,
+    "release_date": "2022-04-09",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "UdKoCImaUeQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADxAYAAjMrsEb8ataTf-PUPxYE"
+    ]
+  },
+  {
     "csv_id": "1429-attack-on-titan",
     "tmdb_id": 1429,
     "imdb_id": "",
