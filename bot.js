@@ -883,6 +883,110 @@ function setupBot(bot) {
     });
 }
 
+// Automatic Weekly Firestore Database Backup to CSV
+async function checkAndRunWeeklyBackup(bot) {
+    try {
+        const today = new Date();
+        const todayStr = today.toISOString().split("T")[0];
+        
+        const backupDoc = await db.collection("settings").doc("backup").get();
+        let lastBackupDateStr = "";
+        if (backupDoc.exists) {
+            lastBackupDateStr = backupDoc.data().lastBackupDate || "";
+        }
+        
+        let shouldBackup = false;
+        if (!lastBackupDateStr) {
+            shouldBackup = true;
+        } else {
+            const lastDate = new Date(lastBackupDateStr);
+            const diffTime = Math.abs(today - lastDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays >= 7) {
+                shouldBackup = true;
+            }
+        }
+        
+        if (shouldBackup) {
+            console.log("Running weekly database backup...");
+            const snapshot = await db.collection("movies").get();
+            if (snapshot.empty) {
+                console.log("Movies collection is empty. Skipping CSV backup.");
+                return;
+            }
+            
+            const fields = [
+                "csv_id", "tmdb_id", "imdb_id", "title", "type", 
+                "categories", "genres", "overview", "poster", 
+                "backdrop", "rating", "release_date", "language", 
+                "cast", "director", "trailer", "runtime", "links"
+            ];
+            
+            let csvRows = [];
+            csvRows.push(fields.join(",")); // CSV Header
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const row = fields.map(field => {
+                    let val = data[field];
+                    if (val === undefined || val === null) return "";
+                    let str = "";
+                    if (Array.isArray(val)) {
+                        str = val.join(", ");
+                    } else {
+                        str = String(val);
+                    }
+                    str = str.replace(/"/g, '""');
+                    if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+                        str = `"${str}"`;
+                    }
+                    return str;
+                });
+                csvRows.push(row.join(","));
+            });
+            
+            const csvContent = csvRows.join("\n");
+            
+            // Get Master Admin IDs
+            const adminDoc = await db.collection("settings").doc("admins").get();
+            const defaultAdmins = ["1329840839", "1175336733"];
+            let masters = [...defaultAdmins];
+            if (adminDoc.exists) {
+                const data = adminDoc.data();
+                if (data.masters) {
+                    masters = Array.from(new Set([...masters, ...data.masters.map(String)]));
+                }
+            }
+            
+            // Send CSV to all Master Admins
+            const csvBuffer = Buffer.from(csvContent, "utf-8");
+            for (const adminId of masters) {
+                try {
+                    await bot.telegram.sendDocument(adminId, {
+                        source: csvBuffer,
+                        filename: `filmhouse_catalog_backup_${todayStr}.csv`
+                    }, {
+                        caption: `📅 *Weekly Film House Catalog Backup*\n\nContains *${snapshot.size}* items. Keep this safe! 🍿`,
+                        parse_mode: "Markdown"
+                    });
+                } catch (e) {
+                    console.warn(`Failed to send weekly backup file to admin ${adminId}:`, e.message);
+                }
+            }
+            
+            // Save state in Firestore settings/backup
+            await db.collection("settings").doc("backup").set({
+                lastBackupDate: todayStr,
+                itemCount: snapshot.size,
+                updatedAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+            console.log("Weekly database backup complete.");
+        }
+    } catch (err) {
+        console.error("Weekly backup error:", err);
+    }
+}
+
 // Bot Initializer
 async function init() {
     let botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -923,6 +1027,13 @@ async function init() {
 
         bot.launch();
         console.log("Film House Bot successfully started! 🚀 Running command listener...");
+
+        // Start weekly movie catalog backup checker
+        setInterval(async () => {
+            await checkAndRunWeeklyBackup(bot);
+        }, 12 * 60 * 60 * 1000); // Check every 12 hours
+        // Check once immediately on startup
+        checkAndRunWeeklyBackup(bot);
 
         // Real-time listener for feedbacks additions (sends direct Telegram message to admins)
         db.collection("feedbacks").onSnapshot((snapshot) => {

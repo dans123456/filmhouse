@@ -6807,8 +6807,8 @@ function renderStreakCalendar() {
                 <span style="font-size: 8px; font-weight: 800;">Claim 🪙</span>
             `;
             
-            dayBox.addEventListener("click", () => {
-                claimStreakReward(d, reward);
+            dayBox.addEventListener("click", (e) => {
+                claimStreakReward(d, reward, e.currentTarget);
             });
         } else {
             dayBox.style.background = "rgba(255, 255, 255, 0.02)";
@@ -6826,7 +6826,7 @@ function renderStreakCalendar() {
     }
 }
 
-function claimStreakReward(dayNum, rewardAmount) {
+function claimStreakReward(dayNum, rewardAmount, sourceElement) {
     const today = new Date().toISOString().split("T")[0];
     
     let newStreak = state.user.checkInStreak || 0;
@@ -6840,6 +6840,12 @@ function claimStreakReward(dayNum, rewardAmount) {
     state.user.lastCheckInDate = today;
     
     triggerHaptic("success");
+    
+    // Trigger floating coins visual effect
+    if (sourceElement) {
+        triggerFloatingCoinsAnimation(sourceElement);
+    }
+    
     awardPoints(rewardAmount, "visit");
     saveProfileToLocalStorage();
     syncUserToFirestore();
@@ -7458,7 +7464,16 @@ function triggerOverlaySearch(query) {
     }
 }
 
+const searchCache = new Map();
+
 async function fetchGlobalTmdbSearchResults(query) {
+    const qKey = (query || "").toLowerCase().trim();
+    if (!qKey) return [];
+    
+    if (searchCache.has(qKey)) {
+        return searchCache.get(qKey);
+    }
+
     try {
         const apiKey = getTmdbApiKey();
         const url = `${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
@@ -7468,7 +7483,7 @@ async function fetchGlobalTmdbSearchResults(query) {
         const data = await res.json();
         if (data.results) {
             const results = data.results.filter(item => item.media_type === 'movie' || item.media_type === 'tv');
-            return results.map(item => {
+            const mapped = results.map(item => {
                 const title = item.title || item.name || "";
                 const releaseDate = item.release_date || item.first_air_date || "";
                 const mType = item.media_type === 'tv' ? 'Series' : 'Movie';
@@ -7494,6 +7509,14 @@ async function fetchGlobalTmdbSearchResults(query) {
                     links: []
                 };
             });
+            
+            // Set cache and limit size to 50 items
+            searchCache.set(qKey, mapped);
+            if (searchCache.size > 50) {
+                const firstKey = searchCache.keys().next().value;
+                searchCache.delete(firstKey);
+            }
+            return mapped;
         }
     } catch (err) {
         console.error("Error fetching TMDB search:", err);
@@ -7564,5 +7587,65 @@ function createSearchOverlayCard(m) {
     });
 
     return card;
+}
+
+function triggerFloatingCoinsAnimation(sourceElement) {
+    if (!sourceElement) return;
+    
+    // Find target points display element
+    let target = document.getElementById("rewards-points-display");
+    if (!target || target.getBoundingClientRect().width === 0) {
+        target = document.getElementById("stat-profile-points-drawer");
+    }
+    if (!target || target.getBoundingClientRect().width === 0) {
+        target = document.getElementById("profile-loyalty-points");
+    }
+    
+    const sourceRect = sourceElement.getBoundingClientRect();
+    
+    let targetX, targetY;
+    if (target && target.getBoundingClientRect().width > 0) {
+        const targetRect = target.getBoundingClientRect();
+        targetX = targetRect.left + targetRect.width / 2 - 8;
+        targetY = targetRect.top + targetRect.height / 2 - 8;
+    } else {
+        // Fallback to top right
+        targetX = window.innerWidth - 60;
+        targetY = 40;
+    }
+    
+    const startX = sourceRect.left + sourceRect.width / 2 - 8;
+    const startY = sourceRect.top + sourceRect.height / 2 - 8;
+    
+    const coinCount = 10;
+    
+    for (let i = 0; i < coinCount; i++) {
+        setTimeout(() => {
+            const coin = document.createElement("div");
+            coin.className = "floating-coin";
+            
+            // Random arching paths
+            const midX = (startX + targetX) / 2 + (Math.random() - 0.5) * 160;
+            const midY = Math.min(startY, targetY) - 80 - Math.random() * 80;
+            
+            coin.style.setProperty("--start-x", `${startX}px`);
+            coin.style.setProperty("--start-y", `${startY}px`);
+            coin.style.setProperty("--mid-x", `${midX}px`);
+            coin.style.setProperty("--mid-y", `${midY}px`);
+            coin.style.setProperty("--end-x", `${targetX}px`);
+            coin.style.setProperty("--end-y", `${targetY}px`);
+            
+            document.body.appendChild(coin);
+            
+            setTimeout(() => {
+                if (target) {
+                    target.classList.remove("pulse-bounce");
+                    void target.offsetWidth; // force reflow
+                    target.classList.add("pulse-bounce");
+                }
+                coin.remove();
+            }, 850);
+        }, i * 75);
+    }
 }
 

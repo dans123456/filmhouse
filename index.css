@@ -3749,5 +3749,51 @@ body.search-active .bottom-nav {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Premium Floating Gold Coin Animations */
+.floating-coin {
+    width: 16px;
+    height: 16px;
+    background: radial-gradient(circle, #ffe066 0%, #f5c518 70%, #d4a300 100%);
+    border: 1px solid #b38600;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    position: fixed;
+    z-index: 999999;
+    pointer-events: none;
+    animation: fly-coin 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
 
+@keyframes fly-coin {
+    0% {
+        transform: translate(var(--start-x), var(--start-y)) scale(0.6) rotate(0deg);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+        transform: translate(var(--mid-x), var(--mid-y)) scale(1.3) rotate(180deg);
+    }
+    85% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--end-x), var(--end-y)) scale(0.7) rotate(360deg);
+        opacity: 0.1;
+    }
+}
 
+.pulse-bounce {
+    animation: pulse-scale-bounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pulse-scale-bounce {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.18);
+        filter: brightness(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
