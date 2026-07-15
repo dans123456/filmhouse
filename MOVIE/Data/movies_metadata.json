@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "38867-lab-rats",
+    "tmdb_id": 38867,
+    "imdb_id": "",
+    "title": "Lab Rats",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Leo is an ordinary teenager who has moved into a high-tech \"smart'' house with his mother, inventor stepfather and Eddy, the computer that runs the house. Leo's life becomes less ordinary when, one day, he discovers a secret underground lab that houses three experiments: superhuman teenagers. The trio -- Adam, the strong one, Bree, the fast one and Chase, the smart one -- convinces Leo and his parents to let them leave their lab and join Leo at school, where they try to fit in while having to manage their unpredictable bionic strengths. As Leo figures out a way to keep his new pals' bionic abilities a secret, they help him build self-confidence.",
+    "poster": "https://image.tmdb.org/t/p/w500/lcQMvn9ZptPd3dxn0a17viRfi7Y.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qu7fEmeN0taTZj8R3L4MfbfoaHS.jpg",
+    "rating": 8.1,
+    "release_date": "2012-02-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ilIti4lhhXA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADQQYAAjMruEYtE8voXkrzjBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADQgYAAjMruEazPQZZ-OQ24hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "256128-the-best-thing",
     "tmdb_id": 256128,
     "imdb_id": "",
