@@ -7329,9 +7329,13 @@ function initPremiumSearchOverlay() {
         });
     }
 
-    // Input text listener
+    // Input text listener with 150ms debounce to prevent typing lag
     overlayInput.addEventListener("input", (e) => {
-        triggerOverlaySearch(e.target.value);
+        const query = e.target.value;
+        clearTimeout(overlaySearchDebounceTimer);
+        overlaySearchDebounceTimer = setTimeout(() => {
+            triggerOverlaySearch(query);
+        }, 150);
     });
 
     // Scope select change
@@ -7499,7 +7503,13 @@ async function fetchGlobalTmdbSearchResults(query) {
 
 function createSearchOverlayCard(m) {
     const badgePrefix = window.location.pathname.includes("/MOVIE/") ? "" : "MOVIE/";
-    const posterUrl = m.poster || (badgePrefix + "img/FilmHouse3_nobg.png");
+    let posterUrl = m.poster || (badgePrefix + "img/FilmHouse3_nobg.png");
+    
+    // Optimize TMDB poster size for small search results cards (uses small w92 thumbnail instead of w500)
+    if (posterUrl.includes("image.tmdb.org/t/p/w500")) {
+        posterUrl = posterUrl.replace("/t/p/w500", "/t/p/w92");
+    }
+    
     const genreStr = Array.isArray(m.genres) ? m.genres.join(", ") : (m.genre || "Media");
     
     const card = document.createElement("div");
