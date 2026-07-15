@@ -1182,6 +1182,42 @@
         </div>
     </div>
 
+    <!-- Premium Glassmorphic Search Overlay -->
+    <div id="premium-search-overlay" class="premium-search-overlay">
+        <div class="search-overlay-header">
+            <h2 class="search-overlay-title">Search</h2>
+            <div class="search-overlay-actions">
+                <select id="search-scope-select" class="search-scope-select">
+                    <option value="all">All</option>
+                    <option value="movies">Movies</option>
+                    <option value="series">Series</option>
+                    <option value="anime">Anime</option>
+                </select>
+                <button id="btn-close-search-overlay" class="close-overlay-btn" aria-label="Close search">
+                    <svg style="width: 20px; height: 20px; fill: currentColor;"><use href="#icon-close"></use></svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="search-overlay-input-wrapper">
+            <svg class="search-overlay-input-icon" style="width: 20px; height: 20px; fill: currentColor;"><use href="#icon-search"></use></svg>
+            <input type="text" id="overlay-search-input" placeholder="Type movie, series or anime title..." autofocus autocomplete="off">
+            <button id="overlay-search-clear" class="overlay-clear-btn" style="display: none; background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.6);">
+                <svg style="width: 14px; height: 14px; fill: currentColor;"><use href="#icon-close"></use></svg>
+            </button>
+        </div>
+
+        <div class="search-overlay-quick-filters">
+            <div id="search-overlay-results-count" class="search-results-count-text">Type to search...</div>
+        </div>
+
+        <div id="search-overlay-results" class="search-overlay-results-container">
+            <div style="padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.3); font-size: 14px;">
+                🍿 Start typing to search Film House catalog...
+            </div>
+        </div>
+    </div>
+
     <script src="app.js?v=43"></script>
 </body>
 </html>

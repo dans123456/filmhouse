@@ -2057,7 +2057,7 @@ function renderCategoriesBar() {
         "Bollywood": "🎶",
         "Korean Drama": "🫰",
         "African": "🌍",
-        "Anime": "🌸",
+        "Anime": "🥷",
         "Comic": "💥",
         "Animated Movies": "🎨",
         "Kids Shows and Movies (Nickelodeon and Disney)": "🧸",
@@ -2107,7 +2107,7 @@ function renderGenreChips() {
     if (!wrapper) return;
     wrapper.replaceChildren();
 
-    const genres = ["All", "Action", "Adventure", "Comedy", "Drama", "Sci-Fi", "Horror", "Thriller", "Romance", "Mystery", "Animation", "Family"];
+    const genres = ["All", "Action", "Adventure", "Action & Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", "Kids", "Music", "Mystery", "News", "Reality", "Romance", "Sci-Fi", "Science Fiction", "Sci-Fi & Fantasy", "Soap", "Talk", "Thriller", "TV Movie", "War", "War & Politics", "Western"];
     
     genres.forEach(genre => {
         const chip = document.createElement("div");
@@ -6277,6 +6277,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             loader.classList.add("fade-out");
             // Initialize tour guide overlay
             initWelcomeTourHandlers();
+            initPremiumSearchOverlay();
         }, 2500);
     }
     } catch (err) {
@@ -7196,7 +7197,26 @@ function closeWelcomeTour() {
     const searchWrapper = document.querySelector(".search-bar-wrapper");
     if (searchWrapper) searchWrapper.classList.remove("expanded");
 
+    // Reset search state and search text box to avoid getting stuck in search layout
+    const searchInput = document.getElementById("global-search-input");
+    if (searchInput) {
+        searchInput.value = "";
+    }
+    state.searchQuery = "";
+    state.externalSearchResults = [];
+    document.body.classList.remove("search-active");
+
+    const clearBtn = document.getElementById("search-clear-btn");
+    if (clearBtn) clearBtn.style.display = "none";
+
+    const dropdown = document.getElementById("search-autocomplete-dropdown");
+    if (dropdown) {
+        dropdown.style.display = "none";
+        dropdown.innerHTML = "";
+    }
+
     navigateToScreen("home");
+    renderFeaturedGrid();
 }
 
 function initWelcomeTourHandlers() {
@@ -7242,5 +7262,297 @@ function initWelcomeTourHandlers() {
             startWelcomeTour();
         }, 1200);
     }
+}
+
+// ==========================================
+// Premium Glassmorphic Search Overlay Code
+// ==========================================
+let overlaySearchDebounceTimer = null;
+
+function initPremiumSearchOverlay() {
+    const searchInput = document.getElementById("global-search-input");
+    const searchWrapper = document.querySelector(".search-bar-wrapper");
+    const searchIcon = document.querySelector(".search-icon");
+    const overlay = document.getElementById("premium-search-overlay");
+    const closeBtn = document.getElementById("btn-close-search-overlay");
+    const overlayInput = document.getElementById("overlay-search-input");
+    const clearBtn = document.getElementById("overlay-search-clear");
+    const scopeSelect = document.getElementById("search-scope-select");
+
+    if (!overlay || !overlayInput) return;
+
+    const openPremiumSearch = (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        overlay.classList.add("active");
+        document.body.style.overflow = "hidden"; // Prevent background scroll
+        overlayInput.value = searchInput?.value || "";
+        overlayInput.focus();
+        triggerOverlaySearch(overlayInput.value);
+    };
+
+    const closePremiumSearch = () => {
+        overlay.classList.remove("active");
+        document.body.style.overflow = ""; // Enable background scroll
+    };
+
+    // Event listeners to open overlay
+    if (searchInput) {
+        searchInput.addEventListener("focus", openPremiumSearch);
+        searchInput.addEventListener("click", openPremiumSearch);
+    }
+    if (searchWrapper) {
+        searchWrapper.addEventListener("click", openPremiumSearch);
+    }
+    if (searchIcon) {
+        searchIcon.addEventListener("click", openPremiumSearch);
+    }
+
+    // Close buttons
+    if (closeBtn) {
+        closeBtn.addEventListener("click", closePremiumSearch);
+    }
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && overlay.classList.contains("active")) {
+            closePremiumSearch();
+        }
+    });
+
+    // Clear input
+    if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+            overlayInput.value = "";
+            triggerOverlaySearch("");
+            overlayInput.focus();
+        });
+    }
+
+    // Input text listener
+    overlayInput.addEventListener("input", (e) => {
+        triggerOverlaySearch(e.target.value);
+    });
+
+    // Scope select change
+    if (scopeSelect) {
+        scopeSelect.addEventListener("change", () => {
+            triggerOverlaySearch(overlayInput.value);
+        });
+    }
+}
+
+function triggerOverlaySearch(query) {
+    const resultsContainer = document.getElementById("search-overlay-results");
+    const countText = document.getElementById("search-overlay-results-count");
+    const clearBtn = document.getElementById("overlay-search-clear");
+    const scope = document.getElementById("search-scope-select")?.value || "all";
+    
+    if (clearBtn) {
+        clearBtn.style.display = query ? "flex" : "none";
+    }
+
+    const q = (query || "").toLowerCase().trim();
+    if (!q) {
+        if (resultsContainer) resultsContainer.innerHTML = `
+            <div style="padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.3); font-size: 14px;">
+                🍿 Start typing to search Film House catalog...
+            </div>
+        `;
+        if (countText) countText.textContent = "Type to search...";
+        return;
+    }
+
+    // Filter local movies
+    let filtered = state.movies.filter(m => {
+        const titleMatch = (m.title || "").toLowerCase().includes(q);
+        const overviewMatch = (m.overview || "").toLowerCase().includes(q);
+        const castMatch = m.cast && m.cast.some(c => c && c.toLowerCase().includes(q));
+        const directorMatch = m.director && m.director.toLowerCase().includes(q);
+        const genresMatch = m.genres && m.genres.some(g => g && g.toLowerCase().includes(q));
+        return titleMatch || overviewMatch || castMatch || directorMatch || genresMatch;
+    });
+
+    // Apply scope filtering
+    if (scope === "movies") {
+        filtered = filtered.filter(m => m.type === "movie");
+    } else if (scope === "series") {
+        filtered = filtered.filter(m => m.type === "series" || m.type === "tv");
+    } else if (scope === "anime") {
+        filtered = filtered.filter(m => m.categories && m.categories.includes("Anime"));
+    }
+
+    // Render local results
+    if (resultsContainer) {
+        resultsContainer.innerHTML = "";
+        
+        if (filtered.length === 0) {
+            resultsContainer.innerHTML = `
+                <div style="padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 14px;">
+                    🔍 No matches found in your library.
+                </div>
+            `;
+        } else {
+            filtered.forEach(m => {
+                const card = createSearchOverlayCard(m);
+                resultsContainer.appendChild(card);
+            });
+        }
+    }
+    
+    if (countText) {
+        countText.textContent = `Found ${filtered.length} library titles`;
+    }
+
+    // If query is >= 3 chars, perform TMDB global search and append
+    if (q.length >= 3) {
+        const externalSectionId = "external-search-section";
+        let extSection = document.getElementById(externalSectionId);
+        if (!extSection) {
+            extSection = document.createElement("div");
+            extSection.id = externalSectionId;
+            extSection.style.cssText = "margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;";
+            resultsContainer?.appendChild(extSection);
+        }
+        
+        extSection.innerHTML = `
+            <div style="padding: 10px; text-align: center; color: var(--primary-color); font-size: 12px; font-weight: 600;">
+                ⏳ Querying TMDB Cloud Database...
+            </div>
+        `;
+
+        clearTimeout(overlaySearchDebounceTimer);
+        overlaySearchDebounceTimer = setTimeout(async () => {
+            try {
+                const extResults = await fetchGlobalTmdbSearchResults(query);
+                
+                // Exclude any TMDB IDs already in our local filtered results
+                const localTmdbIds = new Set(filtered.map(m => m.tmdb_id).filter(id => id));
+                const uniqueExt = extResults.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+                
+                if (uniqueExt.length === 0) {
+                    extSection.innerHTML = "";
+                } else {
+                    extSection.innerHTML = `
+                        <h4 style="margin: 0 0 12px 0; font-size: 11px; text-transform: uppercase; color: var(--primary-color); letter-spacing: 0.5px; font-weight: 700; padding-left: 8px;">🌐 Global Cloud Results</h4>
+                        <div class="external-results-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+                    `;
+                    const listDiv = extSection.querySelector(".external-results-list");
+                    uniqueExt.forEach(m => {
+                        const card = createSearchOverlayCard(m);
+                        listDiv?.appendChild(card);
+                    });
+                    if (countText) {
+                        countText.textContent = `Found ${filtered.length} library & ${uniqueExt.length} cloud titles`;
+                    }
+                }
+            } catch (err) {
+                console.error("External search failed:", err);
+                extSection.innerHTML = "";
+            }
+        }, 400);
+    }
+}
+
+async function fetchGlobalTmdbSearchResults(query) {
+    try {
+        const apiKey = getTmdbApiKey();
+        const url = `${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
+        const res = await fetch(url);
+        if (!res.ok) return [];
+        
+        const data = await res.json();
+        if (data.results) {
+            const results = data.results.filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+            return results.map(item => {
+                const title = item.title || item.name || "";
+                const releaseDate = item.release_date || item.first_air_date || "";
+                const mType = item.media_type === 'tv' ? 'Series' : 'Movie';
+                
+                return {
+                    csv_id: String(item.id),
+                    tmdb_id: item.id,
+                    imdb_id: "",
+                    title: title,
+                    type: mType,
+                    categories: [],
+                    genres: [],
+                    overview: item.overview || "No synopsis available.",
+                    poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
+                    backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
+                    rating: Math.round((item.vote_average || 0) * 10) / 10,
+                    release_date: releaseDate,
+                    language: item.original_language || "en",
+                    cast: [],
+                    director: "",
+                    trailer: "",
+                    runtime: "",
+                    links: []
+                };
+            });
+        }
+    } catch (err) {
+        console.error("Error fetching TMDB search:", err);
+    }
+    return [];
+}
+
+function createSearchOverlayCard(m) {
+    const badgePrefix = window.location.pathname.includes("/MOVIE/") ? "" : "MOVIE/";
+    const posterUrl = m.poster || (badgePrefix + "img/FilmHouse3_nobg.png");
+    const genreStr = Array.isArray(m.genres) ? m.genres.join(", ") : (m.genre || "Media");
+    
+    const card = document.createElement("div");
+    card.className = "search-result-card";
+    
+    card.innerHTML = `
+        <div class="result-card-main">
+            <img src="${posterUrl}" alt="Poster" class="result-card-poster" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
+            <div class="result-card-info">
+                <h4 class="result-card-title">${escapeHTML(m.title)}</h4>
+                <div class="result-card-meta">
+                    <span class="meta-tag genre-tag">${escapeHTML(genreStr)}</span>
+                    <span class="meta-item">${m.release_date ? m.release_date.substring(0, 4) : (m.year || 'N/A')}</span>
+                    <span class="meta-item rating-item">⭐ ${m.rating || 'N/A'}</span>
+                </div>
+            </div>
+            <button class="result-card-expand-btn" style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; color: rgba(255,255,255,0.4);" aria-label="Expand description">
+                <svg class="result-card-chevron" style="width: 16px; height: 16px; transition: transform 0.25s; fill: currentColor;" viewBox="0 0 24 24">
+                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                </svg>
+            </button>
+        </div>
+        <div class="result-card-description">
+            ${escapeHTML(m.overview || "No synopsis available.")}
+        </div>
+    `;
+    
+    const expandBtn = card.querySelector(".result-card-expand-btn");
+    const desc = card.querySelector(".result-card-description");
+    const chevron = card.querySelector(".result-card-chevron");
+    
+    expandBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isExpanded = card.classList.contains("expanded");
+        card.classList.toggle("expanded", !isExpanded);
+        if (isExpanded) {
+            desc.style.display = "none";
+            chevron.style.transform = "rotate(0deg)";
+        } else {
+            desc.style.display = "block";
+            chevron.style.transform = "rotate(180deg)";
+        }
+    });
+    
+    card.addEventListener("click", () => {
+        openDetailModal(m);
+        const overlay = document.getElementById("premium-search-overlay");
+        if (overlay) {
+            overlay.classList.remove("active");
+            document.body.style.overflow = "";
+        }
+    });
+
+    return card;
 }
 

@@ -3461,4 +3461,293 @@ body.search-active .bottom-nav {
     color: var(--primary-color);
 }
 
+/* ==========================================
+   Premium Glassmorphic Search Overlay Styles
+   ========================================== */
+.premium-search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(7, 8, 12, 0.7);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    z-index: 1000000;
+    display: none;
+    flex-direction: column;
+    padding: 20px 16px 80px 16px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-search-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.search-overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.search-overlay-title {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+}
+
+.search-overlay-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-scope-select {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    color: #fff;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.search-scope-select:focus,
+.search-scope-select:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary-color);
+}
+
+.close-overlay-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.close-overlay-btn:hover {
+    background: rgba(255, 59, 48, 0.2);
+    color: #ff3b30;
+    transform: scale(1.05);
+}
+
+.search-overlay-input-wrapper {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 25px;
+    padding: 0 16px;
+    box-sizing: border-box;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.search-overlay-input-wrapper:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(255, 188, 0, 0.2);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.search-overlay-input-icon {
+    width: 18px;
+    height: 18px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+#overlay-search-input {
+    flex-grow: 1;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    padding: 0;
+}
+
+#overlay-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.overlay-clear-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.overlay-clear-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.search-overlay-quick-filters {
+    margin-bottom: 14px;
+    flex-shrink: 0;
+    padding-left: 8px;
+}
+
+.search-results-count-text {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.search-overlay-results-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 40px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Result Cards styling */
+.search-result-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 14px;
+    padding: 10px 14px;
+    transition: background 0.25s, transform 0.2s, border-color 0.25s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.search-result-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.result-card-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.result-card-poster {
+    width: 46px;
+    height: 64px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+}
+
+.result-card-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+}
+
+.result-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.25;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.result-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.meta-tag {
+    font-size: 9px;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+
+.genre-tag {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.meta-item {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 550;
+}
+
+.rating-item {
+    color: #ffbc00;
+    font-weight: 700;
+}
+
+.result-card-chevron {
+    width: 16px;
+    height: 16px;
+    fill: rgba(255, 255, 255, 0.4);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.result-card-description {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.06);
+    display: none;
+    animation: fadeInResult 0.2s ease-out;
+}
+
+@keyframes fadeInResult {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
 
