@@ -28,10 +28,10 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
     
-    // Activity Logs: Create-only
+    // Activity Logs: Read and create allowed for admin panel rankings/analytics
     match /activity_logs/{logId} {
-      allow create: if true;
-      allow read, update, delete: if false;
+      allow create, read: if true;
+      allow update, delete: if false;
     }
     
     // Default fallback: Deny all other collections
