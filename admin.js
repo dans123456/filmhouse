@@ -468,6 +468,23 @@ function renderUsersList() {
         const joinedDateStr = u.joinedDate ? new Date(u.joinedDate.seconds * 1000).toLocaleDateString() : "Unknown";
         const bd = u.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
         
+        // Compute real-time mining status
+        const farmingStartedAt = u.farmingStartedAt || 0;
+        let miningStatusStr = "Idle 😴";
+        let statusColor = "var(--text-secondary)";
+        if (farmingStartedAt > 0) {
+            const elapsedMs = Date.now() - farmingStartedAt;
+            const hours = Math.floor(elapsedMs / (1000 * 60 * 60));
+            const mins = Math.floor((elapsedMs % (1000 * 60 * 60)) / (1000 * 60));
+            if (elapsedMs >= 8 * 60 * 60 * 1000) {
+                miningStatusStr = "Completed ⏰ (Ready to claim)";
+                statusColor = "#4caf50"; // Green
+            } else {
+                miningStatusStr = `Mining Now ⛏️ (${hours}h ${mins}m elapsed)`;
+                statusColor = "#ffbc00"; // Gold
+            }
+        }
+        
         row.innerHTML = `
             <div class="user-summary" style="display: flex; align-items: center; justify-content: space-between; width: 100%; cursor: pointer; user-select: none;">
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -484,7 +501,8 @@ function renderUsersList() {
             <div class="user-expanded-details" style="display: none; padding-top: 12px; margin-top: 10px; border-top: 1px dashed var(--border-color); width: 100%;">
                 <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Telegram Username:</strong> @${escapeHTML(u.username) || 'guest'}</p>
                 <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>User ID:</strong> ${escapeHTML(u.id)}</p>
-                <p style="margin: 0 0 12px 0; font-size: 13px; color: var(--text-secondary);"><strong>Joined Date:</strong> ${joinedDateStr}</p>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Joined Date:</strong> ${joinedDateStr}</p>
+                <p style="margin: 0 0 12px 0; font-size: 13px; color: var(--text-secondary);"><strong>Mining Status:</strong> <span style="color: ${statusColor}; font-weight: 700;">${miningStatusStr}</span></p>
                 
                 <h6 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Points Breakdown</h6>
                 <div class="breakdown-group" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
