@@ -60,6 +60,10 @@
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyBQAAjMruEaLTDTpaKI3fhYE",
         "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADOxUAAjMruEY1RZ2Y4R3X0hYE",
+        "quality": "720p"
       }
     ]
   },
