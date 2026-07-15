@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "99966-all-of-us-are-dead",
+    "tmdb_id": 99966,
+    "imdb_id": "",
+    "title": "All of Us Are Dead",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Korean Drama"
+    ],
+    "genres": [
+      "Korean Drama"
+    ],
+    "overview": "A high school becomes ground zero for a zombie virus outbreak. Trapped students must fight their way out — or turn into one of the rabid infected.",
+    "poster": "https://image.tmdb.org/t/p/w500/pTEFqAjLd5YTsMD6NSUxV6Dq7A6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/8hp2CuGnw1iP5dLBVMAPUv23swx.jpg",
+    "rating": 8.3,
+    "release_date": "2022-01-28",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "IN5TD4VRcSM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADRw8AAqd9wEYFGJ4sHlweEhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "130191-american-cartel",
     "tmdb_id": 130191,
     "imdb_id": "",
