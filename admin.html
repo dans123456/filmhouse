@@ -834,8 +834,11 @@
             <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;" id="users-count-badge">0 Registered</span>
         </div>
         
-        <div class="search-container">
-            <input type="text" id="user-search-input" placeholder="Search users by name, telegram tag, or ID...">
+        <div class="search-container" style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px;">
+            <input type="text" id="user-search-input" placeholder="Search users by name, telegram tag, or ID..." style="flex: 1; margin-bottom: 0;">
+            <button class="btn btn-primary" id="btn-remind-all-idle" style="background: rgba(255, 188, 0, 0.1); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.25); padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; height: 36px; transition: all 0.2s;">
+                <span>Remind All Idle 🪙</span>
+            </button>
         </div>
         
         <div class="table-container" id="users-list">

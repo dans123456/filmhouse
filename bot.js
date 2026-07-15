@@ -1050,23 +1050,63 @@ async function init() {
                     
                     if (type === "mine" && userId) {
                         const text = `👋 *Hey there!*\n\nOur team noticed your mining rig is idle! 🪙 Don't forget to launch the app, start your mining session, and complete your daily missions to earn *Loyalty Points*! \n\nYou can use your points to request new movies/series and unlock downloads! 🚀`;
-                        try {
-                            await bot.telegram.sendMessage(userId, text, {
-                                parse_mode: "Markdown",
-                                reply_markup: {
-                                    inline_keyboard: [
-                                        [
-                                            {
-                                                text: "Launch App & Start Mining 🪙",
-                                                url: "https://t.me/Filmhouseappbot/filmhouseapp?startapp=mining"
-                                            }
-                                        ]
-                                    ]
+                        
+                        if (userId === "all_idle") {
+                            console.log("Triggering bulk mine reminder to all idle users...");
+                            try {
+                                const usersSnapshot = await db.collection("users").get();
+                                let count = 0;
+                                for (const userDoc of usersSnapshot.docs) {
+                                    const userData = userDoc.data();
+                                    const farmingStartedAt = userData.farmingStartedAt || 0;
+                                    const uid = userDoc.id;
+                                    
+                                    if (farmingStartedAt === 0) {
+                                        try {
+                                            await bot.telegram.sendMessage(uid, text, {
+                                                parse_mode: "Markdown",
+                                                reply_markup: {
+                                                    inline_keyboard: [
+                                                        [
+                                                            {
+                                                                text: "Launch App & Start Mining 🪙",
+                                                                url: "https://t.me/Filmhouseappbot/filmhouseapp?startapp=mining"
+                                                            }
+                                                        ]
+                                                    ]
+                                                }
+                                            });
+                                            count++;
+                                            // Sleep 50ms to respect Telegram limits
+                                            await new Promise(resolve => setTimeout(resolve, 50));
+                                        } catch (e) {
+                                            console.warn(`Failed to send bulk reminder to user ${uid}:`, e.message);
+                                        }
+                                    }
                                 }
-                            });
-                            console.log(`Manual mine reminder successfully sent to user ${userId}`);
-                        } catch (e) {
-                            console.warn(`Failed to send manual mine reminder to ${userId}:`, e.message);
+                                console.log(`Bulk mine reminder completed. Reminded ${count} idle users.`);
+                            } catch (err) {
+                                console.error("Error executing bulk reminder database query:", err);
+                            }
+                        } else {
+                            try {
+                                await bot.telegram.sendMessage(userId, text, {
+                                    parse_mode: "Markdown",
+                                    reply_markup: {
+                                        inline_keyboard: [
+                                            [
+                                                {
+                                                    text: "Launch App & Start Mining 🪙",
+                                                    url: "https://t.me/Filmhouseappbot/filmhouseapp?startapp=mining"
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                });
+                                console.log(`Manual mine reminder successfully sent to user ${userId}`);
+                            } catch (e) {
+                                console.warn(`Failed to send manual mine reminder to ${userId}:`, e.message);
+                            }
                         }
                     }
                 }

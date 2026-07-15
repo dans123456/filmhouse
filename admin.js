@@ -4036,6 +4036,48 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
+
+    // Remind All Idle Users Listener
+    const btnRemindAll = document.getElementById("btn-remind-all-idle");
+    if (btnRemindAll) {
+        btnRemindAll.addEventListener("click", () => {
+            if (typeof firebase === "undefined" || !db) {
+                alert("Firebase is not loaded!");
+                return;
+            }
+            if (!allUsers || allUsers.length === 0) {
+                alert("No users loaded in the list yet.");
+                return;
+            }
+            
+            const idleUsers = allUsers.filter(u => {
+                const farmingStartedAt = u.farmingStartedAt || 0;
+                return farmingStartedAt === 0;
+            });
+            
+            if (idleUsers.length === 0) {
+                alert("Awesome! All registered users are currently mining. No idle users found.");
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to send a Telegram mining reminder to all ${idleUsers.length} currently idle users?`)) {
+                return;
+            }
+            
+            db.collection("admin_reminders").add({
+                userId: "all_idle",
+                type: "mine",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                alert(`Broadcast reminder successfully queued for all ${idleUsers.length} idle users! The bot will now deliver them in the background.`);
+            })
+            .catch(err => {
+                console.error("Failed to queue idle reminder:", err);
+                alert("Failed to queue reminders: " + err.message);
+            });
+        });
+    }
 });
 
 
