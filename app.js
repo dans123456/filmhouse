@@ -7383,13 +7383,20 @@ function triggerOverlaySearch(query) {
         return titleMatch || overviewMatch || castMatch || directorMatch || genresMatch;
     });
 
-    // Apply scope filtering
+    // Apply scope filtering (case-insensitive checks to support capitalized type schemas like "Series" and "Movie")
     if (scope === "movies") {
-        filtered = filtered.filter(m => m.type === "movie");
+        filtered = filtered.filter(m => (m.type || "").toLowerCase() === "movie");
     } else if (scope === "series") {
-        filtered = filtered.filter(m => m.type === "series" || m.type === "tv");
+        filtered = filtered.filter(m => {
+            const t = (m.type || "").toLowerCase();
+            return t === "series" || t === "tv";
+        });
     } else if (scope === "anime") {
-        filtered = filtered.filter(m => m.categories && m.categories.includes("Anime"));
+        filtered = filtered.filter(m => {
+            const hasAnimeCategory = m.categories && m.categories.some(cat => (cat || "").toLowerCase() === "anime");
+            const hasAnimeGenre = m.genres && m.genres.some(g => (g || "").toLowerCase() === "anime" || (g || "").toLowerCase() === "animation");
+            return hasAnimeCategory || hasAnimeGenre;
+        });
     }
 
     // Render local results
