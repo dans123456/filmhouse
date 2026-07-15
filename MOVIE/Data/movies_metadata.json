@@ -1027,7 +1027,34 @@
     "trailer": "GXEocd6WZog",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADXhsAAjMrsEZWIaaRKeFpzRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADXhsAAjMrsEZWIaaRKeFpzRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADZBEAAjMruEYcpxdbfUcqUBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADZhEAAjMruEZcddW9F4mCehYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADaREAAjMruEZp5QK6rfaX3xYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADahEAAjMruEbtV_Pg5LTmeRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADchEAAjMruEYEGi95WL59ZxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADcxEAAjMruEaw9omzdm90JBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
