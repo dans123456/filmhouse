@@ -34,6 +34,12 @@ service cloud.firestore {
       allow update, delete: if false;
     }
     
+    // Admin Reminders: Create-only for admin triggered reminders
+    match /admin_reminders/{reminderId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+    
     // Default fallback: Deny all other collections
     match /{document=**} {
       allow read, write: if false;

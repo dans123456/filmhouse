@@ -1035,6 +1035,44 @@ async function init() {
         // Check once immediately on startup
         checkAndRunWeeklyBackup(bot);
 
+        // Real-time listener for admin triggered manual reminders
+        db.collection("admin_reminders").onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (change.type === "added") {
+                    const data = change.doc.data();
+                    if (data.timestamp) {
+                        const docMs = data.timestamp.toMillis ? data.timestamp.toMillis() : new Date(data.timestamp).getTime();
+                        if (Date.now() - docMs > 15000) return; // Skip historical records on startup
+                    }
+                    
+                    const userId = data.userId;
+                    const type = data.type;
+                    
+                    if (type === "mine" && userId) {
+                        const text = `👋 *Hey there!*\n\nOur team noticed your mining rig is idle! 🪙 Don't forget to launch the app, start your mining session, and complete your daily missions to earn *Loyalty Points*! \n\nYou can use your points to request new movies/series and unlock downloads! 🚀`;
+                        try {
+                            await bot.telegram.sendMessage(userId, text, {
+                                parse_mode: "Markdown",
+                                reply_markup: {
+                                    inline_keyboard: [
+                                        [
+                                            {
+                                                text: "Launch App & Start Mining 🪙",
+                                                url: "https://t.me/Filmhouseappbot/filmhouseapp?startapp=mining"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            });
+                            console.log(`Manual mine reminder successfully sent to user ${userId}`);
+                        } catch (e) {
+                            console.warn(`Failed to send manual mine reminder to ${userId}:`, e.message);
+                        }
+                    }
+                }
+            });
+        }, (err) => console.error("Admin reminders listener error:", err));
+
         // Real-time listener for feedbacks additions (sends direct Telegram message to admins)
         db.collection("feedbacks").onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(async (change) => {

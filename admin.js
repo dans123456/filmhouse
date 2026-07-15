@@ -494,6 +494,7 @@ function renderUsersList() {
                     <span class="breakdown-tag" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 4px; font-size: 11px; color: var(--text-secondary);">🎬 Watched: ${bd.watched || 0}</span>
                 </div>
                 
+                <button class="btn btn-primary btn-sm remind-user-btn" style="color: #ffbc00; border-color: rgba(255, 188, 0, 0.25); background: rgba(255, 188, 0, 0.05); padding: 6px 12px; font-size: 12px; border-radius: 6px; width: 100%; cursor: pointer; margin-bottom: 8px; font-weight: 700;">Remind to Mine 🪙</button>
                 <button class="btn btn-secondary btn-sm delete-user-btn" style="color: #ff3b30; border-color: rgba(255, 59, 48, 0.25); background: rgba(255, 59, 48, 0.05); padding: 6px 12px; font-size: 12px; border-radius: 6px; width: 100%; cursor: pointer;">Delete User Profile</button>
             </div>
         `;
@@ -502,12 +503,20 @@ function renderUsersList() {
         const details = row.querySelector(".user-expanded-details");
         const chevron = row.querySelector(".chevron-icon");
         const deleteBtn = row.querySelector(".delete-user-btn");
+        const remindBtn = row.querySelector(".remind-user-btn");
 
         summary.addEventListener("click", () => {
             const isVisible = details.style.display === "block";
             details.style.display = isVisible ? "none" : "block";
             chevron.style.transform = isVisible ? "rotate(0deg)" : "rotate(90deg)";
         });
+
+        if (remindBtn) {
+            remindBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                triggerMineReminder(u.id, u.fullName);
+            });
+        }
 
         if (deleteBtn) {
             deleteBtn.addEventListener("click", (e) => {
@@ -519,6 +528,27 @@ function renderUsersList() {
         }
 
         listContainer.appendChild(row);
+    });
+}
+
+// Trigger Manual Mine Reminder via Firestore -> Bot Event
+function triggerMineReminder(userId, fullName) {
+    if (typeof firebase === "undefined" || !db) {
+        alert("Firebase is not loaded!");
+        return;
+    }
+    
+    db.collection("admin_reminders").add({
+        userId: String(userId),
+        type: "mine",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+        alert(`Reminder notification queued for user "${fullName || 'Guest'}" (ID: ${userId})! The Telegram bot will deliver it instantly.`);
+    })
+    .catch(err => {
+        console.error("Error creating mine reminder doc:", err);
+        alert("Error queuing reminder: " + err.message);
     });
 }
 
