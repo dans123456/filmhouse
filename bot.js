@@ -1156,7 +1156,12 @@ async function init() {
             snapshot.docChanges().forEach(async (change) => {
                 const data = change.doc.data();
                 const docId = change.doc.id;
-                const userId = data.userId || data.requestedById;
+                
+                let userId = data.userId || data.requestedById;
+                if (userId === "undefined" || !userId) {
+                    userId = data.requestedById;
+                }
+                
                 const title = data.title;
                 const type = data.type;
                 const year = data.year || "";
@@ -1164,7 +1169,7 @@ async function init() {
                 const downloadLink = data.downloadLink;
                 const timestamp = data.timestamp || data.requestedAt;
 
-                if (!userId) return;
+                if (userId === "undefined" || !userId) return;
 
                 const yearSuffix = year ? ` (${year})` : "";
 
