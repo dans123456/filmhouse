@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "241882-ride-or-die",
+    "tmdb_id": 241882,
+    "imdb_id": "",
+    "title": "Ride or Die",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Best friends, Judith and Debbie, know everything about each other … well, almost everything. Judith has been living a double life that Debbie knows nothing about: she is a highly trained assassin. When a hit goes horribly wrong, Judith and Debbie must go on the run together and work to repair their broken friendship—all while being targeted by a mysterious enemy who wants them dead. And only together, can they solve this layered mystery.",
+    "poster": "https://image.tmdb.org/t/p/w500/uWqEnvpwa2U28QheMdUdEcr4U0M.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jwCXxvbLno5GrGDA9KvQ22uLziM.jpg",
+    "rating": 3.9,
+    "release_date": "2026-07-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "QFGAxkTRAG8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADXBEAAqd9yEY7mycY9t3WVhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "579583-the-king-of-staten-island",
     "tmdb_id": 579583,
     "imdb_id": "",
