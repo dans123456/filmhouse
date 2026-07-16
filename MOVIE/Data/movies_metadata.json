@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "1263012-dead-man-s-wire",
+    "tmdb_id": 1263012,
+    "imdb_id": "",
+    "title": "Dead Man's Wire",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "In 1977, former real estate developer Tony Kiritsis puts a dead man's switch on himself and the mortgage banker who did him wrong, demanding $5 million and a personal apology.",
+    "poster": "https://image.tmdb.org/t/p/w500/dgSoeebklY0IGKWbp36r9FwRXlv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ulw8SrKbDeDrsSVNKPb5211AseI.jpg",
+    "rating": 6.6,
+    "release_date": "2026-01-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "aHAwgnJL78Y",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAEEgACp33IRoA9JS1g4V_5FgQ",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1646950-capture",
     "tmdb_id": 1646950,
     "imdb_id": "",
