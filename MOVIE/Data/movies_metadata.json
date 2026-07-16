@@ -1132,8 +1132,18 @@
     "trailer": "Jt77A_1ZW-g",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADmBUAAjMruEYqDT3Wq9begRYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD4A0AAqd9wEaylnNBBhEnBRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmBUAAjMruEYqDT3Wq9begRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD4A0AAqd9wEaylnNBBhEnBRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADkwkAAqd90EamhgzE7zT4MBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
