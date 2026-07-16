@@ -854,7 +854,7 @@ let originalCatalogCount = 0;
 let catalogChangesMade = false;
 let githubToken = ""; // Global cache for token
 let telegramBotToken = ""; // Global cache for Telegram Bot Token
-const TMDB_API_KEY = localStorage.getItem("filmhouse_tmdb_key") || "d638f7775bfa1b8d456dfd028ccbef19";
+let TMDB_API_KEY = localStorage.getItem("filmhouse_tmdb_key") || "d638f7775bfa1b8d456dfd028ccbef19";
 let pendingImportChanges = null;
 let newlyAddedIds = [];
 let newlyUpdatedIds = [];
@@ -879,6 +879,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const tgTokenInput = document.getElementById("telegram-bot-token");
         if (tgTokenInput) {
             tgTokenInput.value = telegramBotToken;
+        }
+    }
+
+    const localTmdbKey = localStorage.getItem("filmhouse_tmdb_key");
+    if (localTmdbKey) {
+        TMDB_API_KEY = localTmdbKey;
+        const tmdbKeyInput = document.getElementById("tmdb-api-key");
+        if (tmdbKeyInput) {
+            tmdbKeyInput.value = TMDB_API_KEY;
         }
     }
 
@@ -920,6 +929,23 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         } catch (e) {
             console.error("Error loading Telegram Token from Firestore:", e);
+        }
+
+        try {
+            const tmdbDoc = await db.collection("settings").doc("tmdb").get();
+            if (tmdbDoc.exists) {
+                const dbTmdbKey = tmdbDoc.data().apiKey || "";
+                if (dbTmdbKey && dbTmdbKey !== TMDB_API_KEY) {
+                    TMDB_API_KEY = dbTmdbKey;
+                    localStorage.setItem("filmhouse_tmdb_key", dbTmdbKey);
+                    const tmdbKeyInput = document.getElementById("tmdb-api-key");
+                    if (tmdbKeyInput) {
+                        tmdbKeyInput.value = TMDB_API_KEY;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Error loading TMDB key from Firestore:", e);
         }
     }
 
@@ -1356,6 +1382,69 @@ if (testConnBtn) {
         } finally {
             testConnBtn.disabled = false;
             testConnBtn.textContent = "Test Connection";
+        }
+    });
+}
+
+// Save TMDB API Key Event Listener
+const saveTmdbKeyBtn = document.getElementById("btn-save-tmdb-key");
+if (saveTmdbKeyBtn) {
+    saveTmdbKeyBtn.addEventListener("click", async () => {
+        const keyInput = document.getElementById("tmdb-api-key");
+        if (keyInput) {
+            const key = keyInput.value.trim();
+            // Save locally first for instant access
+            localStorage.setItem("filmhouse_tmdb_key", key);
+            TMDB_API_KEY = key;
+            
+            if (db) {
+                try {
+                    await db.collection("settings").doc("tmdb").set({
+                        apiKey: key,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast("TMDB API Key saved securely in Firestore! 🍿", "success");
+                } catch (e) {
+                    console.error("Error saving TMDB key to Firestore:", e);
+                    showToast("Key saved locally! (Note: Firestore database sync failed).", "warning");
+                }
+            } else {
+                showToast("TMDB API Key saved locally!", "info");
+            }
+        }
+    });
+}
+
+// Test Connection for TMDB API Key
+const testTmdbBtn = document.getElementById("btn-test-tmdb-conn");
+if (testTmdbBtn) {
+    testTmdbBtn.addEventListener("click", async () => {
+        const keyInput = document.getElementById("tmdb-api-key");
+        const key = keyInput ? keyInput.value.trim() : "";
+        if (!key) {
+            showToast("Please enter a TMDB API Key first!", "warning");
+            return;
+        }
+
+        testTmdbBtn.disabled = true;
+        testTmdbBtn.textContent = "Testing... ⏳";
+
+        try {
+            const url = `https://api.themoviedb.org/3/movie/550?api_key=${key}`;
+            const response = await fetch(url);
+            if (response.ok) {
+                const data = await response.json();
+                showToast(`Success! TMDB Connection OK. Test Title: "${data.title || data.name}" 🎬`, "success");
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                showToast(`Failed: ${errorData.status_message || response.statusText} (Status: ${response.status})`, "error");
+            }
+        } catch (err) {
+            console.error("TMDB connection test error:", err);
+            showToast(`Network error testing TMDB API: ${err.message}`, "error");
+        } finally {
+            testTmdbBtn.disabled = false;
+            testTmdbBtn.textContent = "Test Key";
         }
     });
 }

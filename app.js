@@ -93,10 +93,20 @@ const firebaseConfig = {
 
 let db = null;
 let globalAdminIds = ["1329840839", "1175336733"];
+let firestoreTmdbApiKey = null;
+
 if (typeof firebase !== "undefined") {
     try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
+        
+        // Load TMDB API Key from Firestore settings
+        db.collection("settings").doc("tmdb").get().then(doc => {
+            if (doc.exists && doc.data().apiKey) {
+                firestoreTmdbApiKey = doc.data().apiKey;
+                console.log("TMDB API Key loaded from Firestore settings.");
+            }
+        }).catch(err => console.warn("Failed to load TMDB API key from Firestore:", err));
     } catch (e) {
         console.error("Firebase initialization failed:", e);
     }
@@ -107,6 +117,7 @@ if (typeof firebase !== "undefined") {
 function getTmdbApiKey() {
     const userKey = localStorage.getItem("filmhouse_tmdb_key");
     if (userKey) return userKey;
+    if (firestoreTmdbApiKey) return firestoreTmdbApiKey;
     // Log a warning regarding demo key usage for horizontal scaling and security
     console.warn("Using fallback demo TMDB API key. Please set your own key in Profile settings!");
     return "d638f7775bfa1b8d456dfd028ccbef19";

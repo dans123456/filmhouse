@@ -1020,6 +1020,27 @@
                     <span style="font-size: 12px; font-weight: 600; display: block; opacity: 0.8;">Loyalty Points 🪙</span>
                 </div>
                 
+                <!-- My Requests Section -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; color: var(--text-primary); font-family: var(--font-heading);">My Movie Requests</h4>
+                    <span id="user-requests-count-badge" class="badge-count" style="font-size: 11px; background: var(--border-color); padding: 2px 8px; border-radius: 20px; font-weight: 700; color: var(--text-secondary);">0</span>
+                </div>
+                <div id="user-requests-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; background: rgba(255,255,255,0.01); border-radius: var(--border-radius-sm); border: 1px dashed var(--border-color);">
+                        No requests yet. Try requesting a movie that is not in the library!
+                    </div>
+                </div>
+
+                <!-- Request History (claimed requests) -->
+                <div id="user-requests-history-wrapper" style="display: none; margin-top: 16px; margin-bottom: 24px;">
+                    <div id="user-requests-history-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); user-select: none;">
+                        <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">📁 Request History <span id="history-count-badge" style="font-size: 10px; background: var(--border-color); padding: 1px 6px; border-radius: 12px; margin-left: 6px;">0</span></span>
+                        <span id="history-chevron" style="font-size: 14px; color: var(--text-secondary); transition: transform 0.3s ease;">▼</span>
+                    </div>
+                    <div id="user-requests-history" style="display: none; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); opacity: 0.6;">
+                    </div>
+                </div>
+
                 <!-- Daily Missions Section -->
                 <div id="daily-missions-section" style="margin-bottom: 24px;">
                     <!-- Streak Calendar Container -->
@@ -1060,27 +1081,6 @@
                             <p style="margin: 0; font-size: 11px; color: var(--text-secondary);">Stand out on the leaderboard with a gold VIP tag.</p>
                         </div>
                         <button class="btn btn-primary btn-sm redeem-btn" data-reward-id="vip-badge" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">2,500 pts</button>
-                    </div>
-                </div>
-                
-                <!-- My Requests Section -->
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                    <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; color: var(--text-primary); font-family: var(--font-heading);">My Movie Requests</h4>
-                    <span id="user-requests-count-badge" class="badge-count" style="font-size: 11px; background: var(--border-color); padding: 2px 8px; border-radius: 20px; font-weight: 700; color: var(--text-secondary);">0</span>
-                </div>
-                <div id="user-requests-list" style="display: flex; flex-direction: column; gap: 10px;">
-                    <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; background: rgba(255,255,255,0.01); border-radius: var(--border-radius-sm); border: 1px dashed var(--border-color);">
-                        No requests yet. Try requesting a movie that is not in the library!
-                    </div>
-                </div>
-
-                <!-- Request History (claimed requests) -->
-                <div id="user-requests-history-wrapper" style="display: none; margin-top: 16px;">
-                    <div id="user-requests-history-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); user-select: none;">
-                        <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">📁 Request History <span id="history-count-badge" style="font-size: 10px; background: var(--border-color); padding: 1px 6px; border-radius: 12px; margin-left: 6px;">0</span></span>
-                        <span id="history-chevron" style="font-size: 14px; color: var(--text-secondary); transition: transform 0.3s ease;">▼</span>
-                    </div>
-                    <div id="user-requests-history" style="display: none; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); opacity: 0.6;">
                     </div>
                 </div>
             </div>

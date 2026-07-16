@@ -1355,4 +1355,12 @@ async function init() {
     }
 }
 
+// Global process-level error handling to prevent the bot from crashing
+process.on("unhandledRejection", (reason, promise) => {
+    console.error("Unhandled Rejection at:", promise, "reason:", reason);
+});
+process.on("uncaughtException", (error) => {
+    console.error("Uncaught Exception thrown:", error);
+});
+
 init();
