@@ -7,8 +7,8 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Animated Movies",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Animated Movies"
     ],
     "genres": [
       "Animated Movies"
@@ -26,6 +26,10 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADNxwAAqd9yEbLZCjq0ok_PhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADyxwAAqd9yEb4bDx1vB9XCxYE",
         "quality": "720p"
       }
     ]
