@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "82452-avatar-the-last-airbender",
+    "tmdb_id": 82452,
+    "imdb_id": "",
+    "title": "Avatar: The Last Airbender",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "A young boy known as the Avatar must master the four elemental powers to save a world at war — and fight a ruthless enemy bent on stopping him.",
+    "poster": "https://image.tmdb.org/t/p/w500/lzZpWEaqzP0qVA5nkCc5ASbNcSy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xUB3xFMgsHgPmdWnUWkHTJ03vHa.jpg",
+    "rating": 7.8,
+    "release_date": "2024-02-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "xEmlE9Ianuo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADJRwAAqd9yEZSAzEaTVl_BxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADKRwAAqd9yEYa1HFDIckScRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "10196-the-last-airbender",
     "tmdb_id": 10196,
     "imdb_id": "",
