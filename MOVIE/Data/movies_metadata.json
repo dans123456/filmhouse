@@ -1,140 +1,28 @@
 [
   {
-    "csv_id": "1020047-in-the-hand-of-dante",
-    "tmdb_id": 1020047,
+    "csv_id": "1107166-psycho-killer",
+    "tmdb_id": 1107166,
     "imdb_id": "",
-    "title": "In the Hand of Dante",
+    "title": "Psycho Killer",
     "type": "Movie",
     "categories": [
       "Main",
       "Hollywood/British Movies"
     ],
     "genres": [],
-    "overview": "A Vatican priest discovers Dante's original Divine Comedy manuscript. When asked to authenticate it, writer Nick Tosches steals it, while a parallel story follows Dante's quest to create his masterpiece.",
-    "poster": "https://image.tmdb.org/t/p/w500/nPPIufTBnzEg0d7NoR5RLL1oPra.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/tJJ737CJujLXw1GlUYd7K4AH3eB.jpg",
-    "rating": 5.4,
-    "release_date": "2026-06-12",
+    "overview": "Following the brutal murder of her husband, a Kansas highway patrol officer sets out on a journey to track down the perpetrator. As the hunt progresses, she comes to realize the man responsible is a sadistic serial killer, and the depth of his mental depravity and his sinister agenda is more twisted than anyone could have imagined.",
+    "poster": "https://image.tmdb.org/t/p/w500/5xgxxmLivJXL8aF0HdZfpx8aAIo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gMC4KIdHsj37w3kPI7mRUJLC57Q.jpg",
+    "rating": 6.6,
+    "release_date": "2026-02-19",
     "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "cXA3Zgsky18",
+    "trailer": "pwq8gwdVxts",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADOhQAAqd9yEYWMuNUZTE55RYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1122573-in-the-grey",
-    "tmdb_id": 1122573,
-    "imdb_id": "",
-    "title": "In the Grey",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A covert team of elite operatives are living in the shadows. When a ruthless despot steals a billion-dollar fortune, they're sent to take it back—an impossible heist that erupts into a deadly game of strategy, deception and survival.",
-    "poster": "https://image.tmdb.org/t/p/w500/dQgIcW6Th08kMRf2HBoYWoFE6OD.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/qcIKxhqGMIj8uujsSoSMZWr8QqU.jpg",
-    "rating": 7.4,
-    "release_date": "2026-05-13",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "nufP15iN4GE",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADORQAAqd9yEb2s844XiYphxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1243006-h-is-for-hawk",
-    "tmdb_id": 1243006,
-    "imdb_id": "",
-    "title": "H Is for Hawk",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "After losing her beloved father, Helen finds herself saved by an unlikely friendship with a stubborn hawk named Mabel. Through the bond, Helen rediscovers the beauty of being alive.",
-    "poster": "https://image.tmdb.org/t/p/w500/eg301AEGyYX4gtc0A8DEXQ0VMhK.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/2nMCDgLekQA2mumJLXJvGY4RUx0.jpg",
-    "rating": 7.1,
-    "release_date": "2025-11-26",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "73V6kQfGyt0",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADNhQAAqd9yEacSLl7xuL4KhYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1078581-giant",
-    "tmdb_id": 1078581,
-    "imdb_id": "",
-    "title": "Giant",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Follows Prince Naseem Hamed from his humble beginnings on the tough working-class streets of Sheffield and his discovery by Ingle, himself a steel industry worker turned boxing trainer. Their unlikely partnership, Naz’s unorthodox style, cocky persona, and sheer dominance in the ring propelled them to the top of boxing’s elite and unprecedented levels of global superstardom, all in the face of the rampant Islamophobia and racism of ’80s and 90’s Britain.",
-    "poster": "https://image.tmdb.org/t/p/w500/kd2AEp0yK5b3gNZILMcSJyY5NI3.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/53Ey8CIdc9jeS7fB4TCyxQTCjm6.jpg",
-    "rating": 6.8,
-    "release_date": "2026-01-09",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "cqg5PtgeNRc",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADMxQAAqd9yEaIsZFFsaTCdhYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1339588-finding-emily",
-    "tmdb_id": 1339588,
-    "imdb_id": "",
-    "title": "Finding Emily",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "When a lovesick musician is given the wrong number for his dream girl, he teams up with a driven psychology student to find her. Together, they spark a hilarious campus-wide frenzy that tests their own hearts and ambitions along the way.",
-    "poster": "https://image.tmdb.org/t/p/w500/bfEQ6C702oPsN4kzIiY7n4JsrxF.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/7Ja28gO6OwncmCA94q2qPyeRrsA.jpg",
-    "rating": 6.9,
-    "release_date": "2026-05-21",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "-OGuJf70S0s",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADMRQAAqd9yEYddyUTzw3uohYE",
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADPxQAAqd9yEZMKIgzsIb20xYE",
         "quality": "720p"
       }
     ]
