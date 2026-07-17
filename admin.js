@@ -617,9 +617,14 @@ function renderRequestsList() {
             counts[key].isPriority = true;
         }
         
-        const inCatalog = allCatalogMovies && allCatalogMovies.some(m => 
-            m.title && m.title.toLowerCase().trim() === r.title.toLowerCase().trim()
-        );
+        const inCatalog = allCatalogMovies && allCatalogMovies.some(m => {
+            const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
+            const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
+            if (rId && mId) {
+                return rId === mId;
+            }
+            return m.title && m.title.toLowerCase().trim() === r.title.toLowerCase().trim();
+        });
         const fulfilled = r.status === "fulfilled" || r.status === "claimed" || inCatalog;
         
         if (!fulfilled) {
@@ -854,6 +859,7 @@ let originalCatalogCount = 0;
 let catalogChangesMade = false;
 let githubToken = ""; // Global cache for token
 let telegramBotToken = ""; // Global cache for Telegram Bot Token
+let telegramWebhookUrl = ""; // Global cache for Telegram Bot Webhook URL
 let TMDB_API_KEY = localStorage.getItem("filmhouse_tmdb_key") || "d638f7775bfa1b8d456dfd028ccbef19";
 let pendingImportChanges = null;
 let newlyAddedIds = [];
@@ -879,6 +885,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const tgTokenInput = document.getElementById("telegram-bot-token");
         if (tgTokenInput) {
             tgTokenInput.value = telegramBotToken;
+        }
+    }
+
+    const localTgWebhook = localStorage.getItem("filmhouse_telegram_webhook_url");
+    if (localTgWebhook) {
+        telegramWebhookUrl = localTgWebhook;
+        const tgWebhookInput = document.getElementById("telegram-webhook-url");
+        if (tgWebhookInput) {
+            tgWebhookInput.value = telegramWebhookUrl;
         }
     }
 
@@ -926,10 +941,71 @@ document.addEventListener("DOMContentLoaded", async () => {
                         tgTokenInput.value = telegramBotToken;
                     }
                 }
+                const dbTgWebhook = tgDoc.data().webhookUrl || "";
+                if (dbTgWebhook && dbTgWebhook !== telegramWebhookUrl) {
+                    telegramWebhookUrl = dbTgWebhook;
+                    localStorage.setItem("filmhouse_telegram_webhook_url", dbTgWebhook);
+                    const tgWebhookInput = document.getElementById("telegram-webhook-url");
+                    if (tgWebhookInput) {
+                        tgWebhookInput.value = telegramWebhookUrl;
+                    }
+                }
             }
         } catch (e) {
-            console.error("Error loading Telegram Token from Firestore:", e);
+            console.error("Error loading Telegram settings from Firestore:", e);
         }
+
+        // Setup real-time listener for Telegram Bot Status
+        db.collection("settings").doc("bot_status").onSnapshot((doc) => {
+            const badge = document.getElementById("bot-status-badge");
+            const details = document.getElementById("bot-status-details");
+            if (!badge || !details) return;
+
+            if (doc.exists) {
+                const data = doc.data();
+                const lastPing = data.lastPing;
+                const status = data.status || "offline";
+                const mode = data.mode || "polling";
+                
+                let lastPingMs = 0;
+                if (lastPing) {
+                    lastPingMs = lastPing.toMillis ? lastPing.toMillis() : new Date(lastPing).getTime();
+                }
+
+                const now = Date.now();
+                const isRecent = lastPingMs && (now - lastPingMs < 3 * 60 * 1000); // 3 minutes threshold
+
+                if (status === "online" && isRecent) {
+                    badge.textContent = "ONLINE";
+                    badge.style.background = "rgba(40, 167, 69, 0.15)";
+                    badge.style.color = "#28a745";
+                    badge.style.borderColor = "rgba(40, 167, 69, 0.3)";
+                    
+                    const timeStr = new Date(lastPingMs).toLocaleTimeString();
+                    details.textContent = `Mode: ${mode.toUpperCase()} | Last Active: ${timeStr}`;
+                } else {
+                    badge.textContent = "OFFLINE";
+                    badge.style.background = "rgba(220, 53, 69, 0.15)";
+                    badge.style.color = "#dc3545";
+                    badge.style.borderColor = "rgba(220, 53, 69, 0.3)";
+                    
+                    if (lastPingMs) {
+                        const timeStr = new Date(lastPingMs).toLocaleTimeString();
+                        details.textContent = `Offline since: ${timeStr}`;
+                    } else {
+                        details.textContent = "No status ping received yet.";
+                    }
+                }
+            } else {
+                badge.textContent = "OFFLINE";
+                badge.style.background = "rgba(220, 53, 69, 0.15)";
+                badge.style.color = "#dc3545";
+                badge.style.borderColor = "rgba(220, 53, 69, 0.3)";
+                details.textContent = "No bot status document found.";
+            }
+        }, (err) => {
+            console.error("Error listening to bot status:", err);
+        });
 
         try {
             const tmdbDoc = await db.collection("settings").doc("tmdb").get();
@@ -1236,7 +1312,7 @@ if (saveTelegramTokenBtn) {
                     await db.collection("settings").doc("telegram").set({
                         botToken: token,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    }, { merge: true });
                     showToast("Telegram Bot Token saved securely in Firestore! 🤖", "success");
                 } catch (e) {
                     console.error("Error saving Telegram token to Firestore:", e);
@@ -1244,6 +1320,35 @@ if (saveTelegramTokenBtn) {
                 }
             } else {
                 showToast("Telegram Bot Token saved locally!", "info");
+            }
+        }
+    });
+}
+
+// Save Telegram Webhook URL to Firestore & localStorage
+const saveTelegramWebhookBtn = document.getElementById("btn-save-telegram-webhook");
+if (saveTelegramWebhookBtn) {
+    saveTelegramWebhookBtn.addEventListener("click", async () => {
+        const webhookInput = document.getElementById("telegram-webhook-url");
+        if (webhookInput) {
+            const url = webhookInput.value.trim();
+            // Save locally first for instant access
+            localStorage.setItem("filmhouse_telegram_webhook_url", url);
+            telegramWebhookUrl = url;
+            
+            if (db) {
+                try {
+                    await db.collection("settings").doc("telegram").set({
+                        webhookUrl: url,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    showToast("Telegram Webhook URL saved securely in Firestore! 🌐", "success");
+                } catch (e) {
+                    console.error("Error saving Telegram webhook to Firestore:", e);
+                    showToast("Webhook URL saved locally! (Note: Firestore database sync failed).", "warning");
+                }
+            } else {
+                showToast("Telegram Webhook URL saved locally!", "info");
             }
         }
     });

@@ -5374,10 +5374,15 @@ function renderUserRequests(requests) {
     let hasNewFulfillment = false;
     
     requests.forEach(r => {
-        const matchingMovie = state.movies.find(m => 
-            (m.title && m.title.toLowerCase() === r.title.toLowerCase()) || 
-            (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
-        );
+        const matchingMovie = state.movies.find(m => {
+            const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
+            const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
+            if (rId && mId) {
+                return rId === mId;
+            }
+            return (m.title && m.title.toLowerCase() === r.title.toLowerCase()) || 
+                   (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
+        });
         const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
         const isExplicit = (r.status === "fulfilled" || r.status === "claimed") && r.downloadLink;
         const isFulfilled = isMatched || isExplicit;

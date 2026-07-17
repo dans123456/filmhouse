@@ -4,14 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const http = require("http");
 
-// Start a dummy HTTP server to bind to Render's PORT to pass healthchecks and prevent sleeping
-const PORT = process.env.PORT || 3000;
-http.createServer((req, res) => {
-    res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
-    res.end("Film House Bot is active and running! 🍿");
-}).listen(PORT, () => {
-    console.log(`Dummy health check HTTP server listening on port ${PORT}`);
-});
+// Server PORT will be initialized dynamically in the init() function based on Webhook/Polling mode.
 
 // Initialize Firebase Admin
 if (process.env.FIREBASE_CONFIG) {
@@ -103,7 +96,8 @@ function setupBot(bot) {
         try {
             const doc = await db.collection("settings").doc("admins").get();
             const adminList = doc.exists ? doc.data().ids || [] : [];
-            const allAdmins = [...defaultAdmins, ...adminList];
+            const masterList = doc.exists ? doc.data().masters || [] : [];
+            const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
             return allAdmins.includes(String(userId));
         } catch (err) {
             console.warn("Failed to read admin list from Firestore, falling back to default admins:", err);
@@ -1025,8 +1019,99 @@ async function init() {
             console.error("Failed to register bot commands menu:", err);
         });
 
-        bot.launch();
-        console.log("Film House Bot successfully started! 🚀 Running command listener...");
+        let webhookUrl = process.env.WEBHOOK_URL || process.env.RENDER_EXTERNAL_URL;
+        if (!webhookUrl) {
+            try {
+                const doc = await db.collection("settings").doc("telegram").get();
+                if (doc.exists) {
+                    webhookUrl = doc.data().webhookUrl;
+                }
+            } catch (err) {
+                console.error("Failed to fetch webhook URL from Firestore:", err);
+            }
+        }
+
+        const PORT = process.env.PORT || 3000;
+        let server;
+
+        if (webhookUrl) {
+            console.log(`Configuring Webhook mode with base URL: ${webhookUrl}`);
+            const secretPath = `/telegraf/${bot.secretPathComponent()}`;
+            const webhookCallback = bot.webhookCallback(secretPath);
+            
+            server = http.createServer((req, res) => {
+                if (req.url === secretPath) {
+                    webhookCallback(req, res);
+                } else if (req.url === '/' || req.url === '/healthz') {
+                    res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+                    res.end("Film House Bot is active and running! 🍿");
+                } else {
+                    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+                    res.end("Not Found");
+                }
+            });
+            
+            server.listen(PORT, () => {
+                console.log(`Bot HTTP server listening on port ${PORT} in Webhook mode.`);
+            });
+            
+            const webhookTargetUrl = webhookUrl.endsWith('/') ? `${webhookUrl}${secretPath.substring(1)}` : `${webhookUrl}${secretPath}`;
+            bot.telegram.setWebhook(webhookTargetUrl)
+                .then(() => {
+                    console.log(`Telegram Webhook set successfully to: ${webhookTargetUrl}`);
+                })
+                .catch(err => {
+                    console.error("Failed to set Telegram Webhook:", err);
+                });
+
+            // Start self-ping keep-alive loop (every 10 minutes)
+            setInterval(() => {
+                const pingUrl = webhookUrl.endsWith('/') ? `${webhookUrl}healthz` : `${webhookUrl}/healthz`;
+                const protocol = pingUrl.startsWith('https') ? require('https') : require('http');
+                protocol.get(pingUrl, (res) => {
+                    console.log(`Keep-alive self-ping sent to ${pingUrl}. Status: ${res.statusCode}`);
+                }).on('error', (err) => {
+                    console.warn(`Keep-alive self-ping failed: ${err.message}`);
+                });
+            }, 10 * 60 * 1000);
+        } else {
+            console.log("No Webhook URL configured. Defaulting to Polling mode.");
+            server = http.createServer((req, res) => {
+                if (req.url === '/' || req.url === '/healthz') {
+                    res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+                    res.end("Film House Bot is active and running (Polling)! 🍿");
+                } else {
+                    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+                    res.end("Not Found");
+                }
+            });
+            
+            server.listen(PORT, () => {
+                console.log(`Dummy health check HTTP server listening on port ${PORT} (Polling mode).`);
+            });
+            
+            bot.launch();
+            console.log("Film House Bot successfully started! 🚀 Running command listener (Polling)...");
+        }
+
+        // Real-time status synchronization to Firestore settings/bot_status
+        const updateBotStatus = async (statusStr = "online") => {
+            try {
+                await db.collection("settings").doc("bot_status").set({
+                    lastPing: admin.firestore.FieldValue.serverTimestamp(),
+                    mode: webhookUrl ? "webhook" : "polling",
+                    port: PORT,
+                    webhookUrl: webhookUrl || null,
+                    status: statusStr
+                });
+            } catch (e) {
+                console.error("Failed to update bot status in Firestore:", e);
+            }
+        };
+
+        // Initial sync and periodic sync (every 60 seconds)
+        updateBotStatus("online");
+        const statusInterval = setInterval(() => updateBotStatus("online"), 60 * 1000);
 
         // Start weekly movie catalog backup checker
         setInterval(async () => {
@@ -1135,7 +1220,8 @@ async function init() {
                     try {
                         const adminDoc = await db.collection("settings").doc("admins").get();
                         const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
-                        const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList]));
+                        const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
+                        const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
                         for (const adminId of allAdmins) {
                             try {
                                 await bot.telegram.sendMessage(adminId, adminText, { parse_mode: "Markdown" });
@@ -1212,7 +1298,8 @@ async function init() {
                     try {
                         const adminDoc = await db.collection("settings").doc("admins").get();
                         const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
-                        const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList]));
+                        const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
+                        const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
                         for (const adminId of allAdmins) {
                             try {
                                 await bot.telegram.sendMessage(adminId, adminText, { parse_mode: "Markdown" });
@@ -1242,7 +1329,8 @@ async function init() {
                         try {
                             const adminDoc = await db.collection("settings").doc("admins").get();
                             const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
-                            const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList]));
+                            const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
+                            const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
                             for (const adminId of allAdmins) {
                                 try {
                                     await bot.telegram.sendMessage(adminId, adminText, { parse_mode: "Markdown" });
@@ -1347,9 +1435,23 @@ async function init() {
             }
         }, 60 * 1000); // check every 60 seconds
 
-        // Graceful stop hooks
-        process.once('SIGINT', () => bot.stop('SIGINT'));
-        process.once('SIGTERM', () => bot.stop('SIGTERM'));
+        // Graceful shutdown hooks
+        const handleShutdown = async (signal) => {
+            console.log(`Received ${signal}. Shutting down gracefully...`);
+            clearInterval(statusInterval);
+            try {
+                await db.collection("settings").doc("bot_status").set({
+                    lastPing: admin.firestore.FieldValue.serverTimestamp(),
+                    mode: webhookUrl ? "webhook" : "polling",
+                    status: "offline"
+                });
+            } catch (e) {}
+            bot.stop(signal);
+            process.exit(0);
+        };
+        
+        process.once('SIGINT', () => handleShutdown('SIGINT'));
+        process.once('SIGTERM', () => handleShutdown('SIGTERM'));
     } catch (err) {
         console.error("Failed to launch Telegraf client:", err);
     }

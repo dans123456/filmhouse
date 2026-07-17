@@ -506,7 +506,7 @@
 
             <!-- Tab 2: Telegram Bot -->
             <div class="settings-tab-content" id="settings-telegram" style="display: none;">
-                <div class="form-row">
+                <div class="form-row" style="margin-bottom: 12px;">
                     <div class="form-group" style="flex: 2;">
                         <label for="telegram-bot-token">Telegram Bot Token</label>
                         <input type="password" id="telegram-bot-token" placeholder="e.g. 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
@@ -516,9 +516,25 @@
                         <button class="btn btn-secondary" id="btn-test-telegram-conn" style="height: 42px; margin-top: auto; flex: 1; border-color: rgba(0, 136, 204, 0.3); color: #0088cc;">Test Bot</button>
                     </div>
                 </div>
-                <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px; margin-bottom: 0;">
-                    * The bot token will be securely synchronized to your Firestore database so the dashboard and backend can send messages.
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="telegram-webhook-url">Bot Webhook URL / Domain (for webhook mode)</label>
+                        <input type="text" id="telegram-webhook-url" placeholder="e.g. https://your-app.onrender.com">
+                    </div>
+                    <div class="form-group" style="flex: 1; justify-content: flex-end; display: flex; gap: 8px; flex-direction: row;">
+                        <button class="btn btn-secondary" id="btn-save-telegram-webhook" style="height: 42px; margin-top: auto; flex: 1; border-color: rgba(0, 136, 204, 0.3); color: #0088cc;">Save Webhook</button>
+                    </div>
+                </div>
+                <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px; margin-bottom: 12px;">
+                    * The bot token and webhook URL will be securely synchronized to your Firestore database so the dashboard and backend can use them.
                 </p>
+                <div id="bot-status-container" style="padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Telegram Bot Health Status</span>
+                        <span id="bot-status-details" style="font-size: 10px; color: var(--text-muted);">Last status: Unknown</span>
+                    </div>
+                    <span id="bot-status-badge" style="font-size: 11px; padding: 4px 12px; border-radius: 12px; font-weight: 700; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--border-color);">UNKNOWN</span>
+                </div>
             </div>
 
             <!-- Tab 3: Admin Access -->
