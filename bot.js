@@ -1047,7 +1047,9 @@ async function init() {
                     res.end(JSON.stringify({
                         tokenPrefix: botToken ? botToken.substring(0, 12) : "missing",
                         secretPath: secretPath,
-                        webhookUrl: webhookUrl
+                        webhookUrl: webhookUrl,
+                        firebaseProjectId: admin.app().options.projectId || "unknown",
+                        firebaseCertProject: admin.app().options.credential && admin.app().options.credential.projectId ? admin.app().options.credential.projectId : "unknown"
                     }));
                 } else if (req.url === '/' || req.url === '/healthz') {
                     res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
@@ -1088,7 +1090,8 @@ async function init() {
                     res.writeHead(200, { "Content-Type": "application/json" });
                     res.end(JSON.stringify({
                         tokenPrefix: botToken ? botToken.substring(0, 12) : "missing",
-                        mode: "polling"
+                        mode: "polling",
+                        firebaseProjectId: admin.app().options.projectId || "unknown"
                     }));
                 } else if (req.url === '/' || req.url === '/healthz') {
                     res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
