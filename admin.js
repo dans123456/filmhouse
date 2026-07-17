@@ -982,6 +982,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (welcomeImgInput) welcomeImgInput.value = welcomeData.photoUrl || "";
                 const welcomeTextInput = document.getElementById("telegram-welcome-text");
                 if (welcomeTextInput) welcomeTextInput.value = welcomeData.text || "";
+                
+                const appTextInput = document.getElementById("telegram-welcome-app-text");
+                if (appTextInput) appTextInput.value = welcomeData.appButtonText || "";
+                const appUrlInput = document.getElementById("telegram-welcome-app-url");
+                if (appUrlInput) appUrlInput.value = welcomeData.appButtonUrl || "";
+                const chanTextInput = document.getElementById("telegram-welcome-channel-text");
+                if (chanTextInput) chanTextInput.value = welcomeData.channelButtonText || "";
+                const chanUrlInput = document.getElementById("telegram-welcome-channel-url");
+                if (chanUrlInput) chanUrlInput.value = welcomeData.channelButtonUrl || "";
             }
         } catch (e) {
             console.error("Error loading welcome settings from Firestore:", e);
@@ -1392,10 +1401,18 @@ if (saveWelcomeMessageBtn) {
     saveWelcomeMessageBtn.addEventListener("click", async () => {
         const welcomeImgInput = document.getElementById("telegram-welcome-image");
         const welcomeTextInput = document.getElementById("telegram-welcome-text");
+        const appTextInput = document.getElementById("telegram-welcome-app-text");
+        const appUrlInput = document.getElementById("telegram-welcome-app-url");
+        const chanTextInput = document.getElementById("telegram-welcome-channel-text");
+        const chanUrlInput = document.getElementById("telegram-welcome-channel-url");
         
-        if (welcomeImgInput && welcomeTextInput) {
+        if (welcomeImgInput && welcomeTextInput && appTextInput && appUrlInput && chanTextInput && chanUrlInput) {
             const photoUrl = welcomeImgInput.value.trim();
             const text = welcomeTextInput.value.trim();
+            const appButtonText = appTextInput.value.trim();
+            const appButtonUrl = appUrlInput.value.trim();
+            const channelButtonText = chanTextInput.value.trim();
+            const channelButtonUrl = chanUrlInput.value.trim();
             
             if (db) {
                 try {
@@ -1405,6 +1422,10 @@ if (saveWelcomeMessageBtn) {
                     await db.collection("settings").doc("welcome").set({
                         photoUrl: photoUrl,
                         text: text,
+                        appButtonText: appButtonText,
+                        appButtonUrl: appButtonUrl,
+                        channelButtonText: channelButtonText,
+                        channelButtonUrl: channelButtonUrl,
                         fileId: null, // Clear cached fileId so bot fetches the new URL
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });

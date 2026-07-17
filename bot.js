@@ -243,6 +243,12 @@ function setupBot(bot) {
         let welcomeText = null;
         let welcomePhotoFileId = null;
         let welcomePhotoUrl = null;
+        
+        let appButtonText = "Launch Film House 🚀";
+        let appButtonUrl = "https://t.me/Filmhouseappbot/filmhouseapp";
+        let channelButtonText = "Join Channel 📢";
+        let channelButtonUrl = "https://t.me/filmhouse_main";
+        
         try {
             const welcomeDoc = await db.collection("settings").doc("welcome").get();
             if (welcomeDoc.exists) {
@@ -250,6 +256,11 @@ function setupBot(bot) {
                 welcomeText = welcomeData.text || null;
                 welcomePhotoFileId = welcomeData.fileId || null;
                 welcomePhotoUrl = welcomeData.photoUrl || null;
+                
+                if (welcomeData.appButtonText) appButtonText = welcomeData.appButtonText;
+                if (welcomeData.appButtonUrl) appButtonUrl = welcomeData.appButtonUrl;
+                if (welcomeData.channelButtonText) channelButtonText = welcomeData.channelButtonText;
+                if (welcomeData.channelButtonUrl) channelButtonUrl = welcomeData.channelButtonUrl;
             }
         } catch (err) {
             console.warn("Failed to load custom welcome settings:", err);
@@ -269,8 +280,8 @@ function setupBot(bot) {
             inline_keyboard: [
                 [
                     {
-                        text: "Launch Film House 🚀",
-                        url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                        text: appButtonText,
+                        url: appButtonUrl
                     }
                 ],
                 [
@@ -278,7 +289,7 @@ function setupBot(bot) {
                     { text: "About ℹ️", callback_data: "bot_about" }
                 ],
                 [
-                    { text: "Join Channel 📢", url: "https://t.me/filmhouse_main" }
+                    { text: channelButtonText, url: channelButtonUrl }
                 ]
             ]
         };

@@ -550,6 +550,26 @@
                             <textarea id="telegram-welcome-text" rows="5" placeholder="Welcome to Film House! Use {name} for username." style="width: 100%; min-height: 120px; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-primary); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;"></textarea>
                         </div>
                     </div>
+                    <div class="form-row" style="margin-bottom: 12px; gap: 12px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="telegram-welcome-app-text">Mini App Button Text</label>
+                            <input type="text" id="telegram-welcome-app-text" placeholder="e.g. Launch Film House 🚀">
+                        </div>
+                        <div class="form-group" style="flex: 2;">
+                            <label for="telegram-welcome-app-url">Mini App Button URL (Link)</label>
+                            <input type="text" id="telegram-welcome-app-url" placeholder="e.g. https://t.me/Filmhouseappbot/filmhouseapp">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom: 12px; gap: 12px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="telegram-welcome-channel-text">Channel Button Text</label>
+                            <input type="text" id="telegram-welcome-channel-text" placeholder="e.g. Join Channel 📢">
+                        </div>
+                        <div class="form-group" style="flex: 2;">
+                            <label for="telegram-welcome-channel-url">Channel Button URL (Link)</label>
+                            <input type="text" id="telegram-welcome-channel-url" placeholder="e.g. https://t.me/filmhouse_main">
+                        </div>
+                    </div>
                     <div class="form-row">
                         <div class="form-group" style="flex: 1;">
                             <button class="btn btn-primary" id="btn-save-welcome-message" style="background: var(--primary-gradient); color: #000; border: none; font-weight: 700; height: 42px;">Save Welcome Message</button>
@@ -1109,6 +1129,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=72"></script>
+    <script src="admin.js?v=73"></script>
 </body>
 </html>
