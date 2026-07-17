@@ -1179,7 +1179,10 @@ async function init() {
                                     const farmingStartedAt = userData.farmingStartedAt || 0;
                                     const uid = userDoc.id;
                                     
-                                    if (farmingStartedAt === 0) {
+                                    const sessionDuration = 8 * 60 * 60 * 1000; // 8 hours
+                                    const isIdle = (farmingStartedAt === 0) || (Date.now() - farmingStartedAt > sessionDuration);
+                                    
+                                    if (isIdle) {
                                         try {
                                             await bot.telegram.sendMessage(uid, text, {
                                                 parse_mode: "Markdown",

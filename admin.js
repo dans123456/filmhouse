@@ -603,10 +603,8 @@ function renderRequestsList() {
 
     listContainer.replaceChildren();
 
-    const searchQuery = (document.getElementById("request-search-input")?.value || "").toLowerCase().trim();
-    
-    // Aggregate request counts and status
     const counts = {};
+    const searchQuery = document.getElementById("requests-search") ? document.getElementById("requests-search").value.toLowerCase().trim() : "";
     allRequests.forEach(r => {
         const key = r.title.toLowerCase().trim();
         if (!counts[key]) {
@@ -617,11 +615,17 @@ function renderRequestsList() {
                 count: 0, 
                 isPriority: false, 
                 isFulfilled: true,
-                docIds: [] 
+                docIds: [],
+                requesters: []
             };
         }
         counts[key].count++;
         counts[key].docIds.push(r.docId);
+        
+        const reqUser = r.requestedBy ? `@${r.requestedBy}` : "guest";
+        if (!counts[key].requesters.includes(reqUser)) {
+            counts[key].requesters.push(reqUser);
+        }
         
         if (r.status === "priority") {
             counts[key].isPriority = true;
@@ -719,13 +723,18 @@ function renderRequestsList() {
             </button>
         `;
 
+        const requestersList = req.requesters && req.requesters.length > 0 ? req.requesters.join(", ") : "guest";
+
         row.innerHTML = `
             <div class="user-details" style="flex: 1;">
                 <h5 style="margin: 0; display: flex; align-items: center;">
                     ${escapeHTML(req.title)}${req.year ? ` (${req.year})` : ""}
                     ${badgeMarkup}
                 </h5>
-                <p style="text-transform: uppercase; margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary);">${escapeHTML(req.type)}</p>
+                <p style="margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary);">
+                    <span style="text-transform: uppercase;">${escapeHTML(req.type)}</span>
+                    <span style="margin-left: 8px; color: var(--text-muted);">by ${escapeHTML(requestersList)}</span>
+                </p>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="req-count" style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">
