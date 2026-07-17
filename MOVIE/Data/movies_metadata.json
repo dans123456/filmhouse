@@ -1,5 +1,34 @@
 [
   {
+    "csv_id": "245842-wistoria-wand-and-sword",
+    "tmdb_id": 245842,
+    "imdb_id": "",
+    "title": "Wistoria: Wand and Sword",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "In a world where magic reigns, Will Serfort can’t cast a spell. Though hardworking, Will’s classmates think less of him for it. However, he has a secret strength: his sword. Can Will defy expectations with muscle over magic and blade over wand? Find out in this epic sword-and-sorcery adventure!",
+    "poster": "https://image.tmdb.org/t/p/w500/5n0IZQA9MiXn5JBKZibtNhhFSAZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/n4VljCX22hbw3RwfxaY8FX8eLzN.jpg",
+    "rating": 8,
+    "release_date": "2024-07-07",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "FNiBiXXeyb8",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFile2bot?start=BQADAQADpxEAAtgh2EaCD6d4cKEI3BYE"
+    ]
+  },
+  {
     "csv_id": "4574-x-men",
     "tmdb_id": 4574,
     "imdb_id": "",
@@ -82,10 +111,6 @@
       },
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADNhEAAtgh2EYCONWkljqg6hYE",
-        "quality": "720p"
-      },
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmxEAAtgh2EbY4D1O-MGMvxYE",
         "quality": "720p"
       }
     ]
