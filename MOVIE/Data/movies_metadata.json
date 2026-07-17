@@ -1,5 +1,366 @@
 [
   {
+    "csv_id": "26881-the-incredible-hulk-returns",
+    "tmdb_id": 26881,
+    "imdb_id": "",
+    "title": "The Incredible Hulk Returns",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Classic Movies",
+      "Comic"
+    ],
+    "overview": "Years after the end of the original series, David Banner continues his wandering search for a cure for the condition that turns him into the Hulk. He reunites with former colleague Don Blake, unaware of his mystical connection to Thor. When a criminal organization threatens their lives, Banner is forced to unleash the Hulk once again, marking the character’s return after the series finale.",
+    "poster": "https://image.tmdb.org/t/p/w500/dw7eBKL26HEkA89BKvNVsjx7gGL.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bRlsLlie6DXLAnHBg8IwfOAN87z.jpg",
+    "rating": 6.3,
+    "release_date": "1988-05-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "DHyGrsoAUVM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADxA8AAtgh0EbBNWBXkt8uYxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "13995-captain-america",
+    "tmdb_id": 13995,
+    "imdb_id": "",
+    "title": "Captain America",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Classic Movies",
+      "Comic"
+    ],
+    "overview": "During World War II, a brave, patriotic American Soldier undergoes experiments to become a new supersoldier, \"Captain America\". Racing to Germany to sabotage the rockets of Nazi baddie \"Red Skull\", Captain America winds up frozen until the 1990s. He reawakens to find that the Red Skull has changed identities and is now planning to kidnap the President of the United States.",
+    "poster": "https://image.tmdb.org/t/p/w500/vdHrLFfHcJX9nlvUfG3LK2a2hq4.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/a7nEljKws5sgtCndAkJtdpGz9pe.jpg",
+    "rating": 4.5,
+    "release_date": "1990-12-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "cs8rFsmhNTc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmw8AAtgh0EY-hXEZ3XxFWxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "19593-the-death-of-the-incredible-hulk",
+    "tmdb_id": 19593,
+    "imdb_id": "",
+    "title": "The Death of the Incredible Hulk",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Classic Movies",
+      "Comic"
+    ],
+    "overview": "In his final attempt to free himself from the curse of the Hulk, Dr. David Banner becomes involved in a dangerous international espionage mission that may finally lead to a cure. As forces close in and the stakes rise, Banner faces an ultimate sacrifice, bringing his tragic journey to a definitive and emotional conclusion.",
+    "poster": "https://image.tmdb.org/t/p/w500/6q6CviMLR97ssODmKhxgyxQuoYp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ytU25LDO2Mv1B6XWWf8FgAYfJmV.jpg",
+    "rating": 5.7,
+    "release_date": "1990-02-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "n3lc1ugqpbw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnA8AAtgh0EbOsqg9kEIBGxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "8867-the-punisher",
+    "tmdb_id": 8867,
+    "imdb_id": "",
+    "title": "The Punisher",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Classic Movies",
+      "Comic"
+    ],
+    "overview": "The avenging angel of Marvel Comics fame comes brilliantly to life in this searing action-adventure thriller! Dolph Lundgren stars as Frank Castle, a veteran cop who loses his entire family to a mafia car bomb. His ex-partner believes Castle survived the blast and became the Punisher, living in the sewers and exacting vigilante violence against mob bosses throughout the city. When the populace is caught in the midst of a gang war that he caused, Castle must again emerge from the shadows and save the innocent.",
+    "poster": "https://image.tmdb.org/t/p/w500/tA0O0hYyHX7Hl2Fl8VEtGtfBtjI.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tFmrdnfXM0p6ihMTFpptYOKEfSl.jpg",
+    "rating": 5.8,
+    "release_date": "1989-10-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "WvcieGlrp68",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmQ8AAtgh0EYAAZIvKsDbNVMWBA",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "26883-the-trial-of-the-incredible-hulk",
+    "tmdb_id": 26883,
+    "imdb_id": "",
+    "title": "The Trial of the Incredible Hulk",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Classic Movies",
+      "Comic"
+    ],
+    "overview": "Falsely accused of assault, Dr. David Banner is arrested and placed on trial, facing the possibility of a long prison sentence. Blind attorney Matt Murdock takes on his defence, while secretly operating as the vigilante Daredevil. As the courtroom battle unfolds, Banner’s struggle to control the Hulk leads to a dangerous confrontation with criminal mastermind Wilson Fisk.",
+    "poster": "https://image.tmdb.org/t/p/w500/jaaeLvonWry3TdTXaGSu2VveNEG.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/apshJk3Dp2WG4DO3ZzovyXlWwX6.jpg",
+    "rating": 6.4,
+    "release_date": "1989-05-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "MuNk8x9piIU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmA8AAtgh0EaKEMvvuo-qghYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "10658-howard-the-duck",
+    "tmdb_id": 10658,
+    "imdb_id": "",
+    "title": "Howard the Duck",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "A scientific experiment unknowingly brings extraterrestrial life forms to the Earth through a laser beam. First is the cigar-smoking drake, Howard, from the duck's planet. A few kids try to keep him from the greedy scientists and help him back to his planet, but then a much less friendly being arrives through the beam...",
+    "poster": "https://image.tmdb.org/t/p/w500/eU0dWo8PJgsSAZFbcyHiUpuLSyW.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/eWNKQuZI5yEVqz3ATgc0ezYWgJH.jpg",
+    "rating": 5.4,
+    "release_date": "1986-08-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "yeU4UlDWfKI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlg8AAtgh0Eb_gqf2ZXhnLhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "197481-captain-america-ii-death-too-soon",
+    "tmdb_id": 197481,
+    "imdb_id": "",
+    "title": "Captain America II: Death Too Soon",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Classic Movies",
+      "Comic"
+    ],
+    "overview": "Crimefighting Captain America rights more wrongs by doing battle with a fanatical terrorist who uses his deadly drug that causes accelerated aging to finance his world revolution.",
+    "poster": "https://image.tmdb.org/t/p/w500/pocmh0P8Ddf5w33pP3Vuqm0JRP9.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/911CxMNSN8EycQSnTcaIXC7DBx0.jpg",
+    "rating": 3.8,
+    "release_date": "1979-11-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "-CcCu-QWT-c",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlQ8AAtgh0EZb2DZwhFrhLhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "197467-captain-america",
+    "tmdb_id": 197467,
+    "imdb_id": "",
+    "title": "Captain America",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Classic Movies",
+      "Comic"
+    ],
+    "overview": "Artist Steve Rogers is nearly murdered by spies, seeking his late father's national secrets. He is saved during surgery via a secret formula; this serum not only heals him but also gives him fantastic strength and lightning reflexes.  To help solve the mystery behind his father’s murder and bring those guilty to justice, a government agency equips him with a special motorcycle loaded with gadgets and an indestructible shield. Now armed, he battles against the nation's enemies as the Sentinel of Liberty, Captain America.",
+    "poster": "https://image.tmdb.org/t/p/w500/gNGq4u0cymxZqGADZrx7AWrSB5m.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/l2vddRxLkQGLRXR8OLdC0M3oKQ6.jpg",
+    "rating": 4,
+    "release_date": "1979-01-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "LD6UJ6hdT7g",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlA8AAtgh0EahMc2Wb9ICkRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "225914-spider-man",
+    "tmdb_id": 225914,
+    "imdb_id": "",
+    "title": "Spider-Man",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Comic",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies",
+      "Comic"
+    ],
+    "overview": "When an extortionist threatens to force a multi-suicide unless a huge ransom is paid, only Peter Parker can stop him with his new powers as Spider-Man.",
+    "poster": "https://image.tmdb.org/t/p/w500/jNxRHZ2cxVkNRtxgHuCtv7GY4JP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zlpZzccypkAYFZIyYLQcchl90ZC.jpg",
+    "rating": 6.3,
+    "release_date": "1977-09-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Ryhn3m474DY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADSQ8AAtgh0EYhr_7LUGMQDhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1651-the-fantastic-four",
+    "tmdb_id": 1651,
+    "imdb_id": "",
+    "title": "The Fantastic Four",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Classic Movies"
+    ],
+    "overview": "The first animated series based on Marvel's comic book series Fantastic Four.",
+    "poster": "https://image.tmdb.org/t/p/w500/8zwysNUXr5z3mDZSFEv1fZ8qo08.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jMUPejkcMQdm3bygnm8q5uWJV6q.jpg",
+    "rating": 7.2,
+    "release_date": "1967-09-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADMQ8AAtgh0EZEnFdt90ma1hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "106355-captain-america",
+    "tmdb_id": 106355,
+    "imdb_id": "",
+    "title": "Captain America",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies",
+      "Comic"
+    ],
+    "genres": [
+      "Classic Movies",
+      "Comic"
+    ],
+    "overview": "Superhero Captain America battles the evil forces of the archvillain called The Scarab, who poisons his enemies and steals a secret device capable of destroying buildings by sound vibrations.",
+    "poster": "https://image.tmdb.org/t/p/w500/nBRcChS66NohR3x6KVYMp6Obutt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/hKVwvPUwMXcVqTJXOkPXUTQ7GMU.jpg",
+    "rating": 5.4,
+    "release_date": "1944-02-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Q7GtCsXn1yE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFg8AAtgh0EbOC7hJ2ruDPRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1449-mutant-x",
     "tmdb_id": 1449,
     "imdb_id": "",
