@@ -1042,6 +1042,13 @@ async function init() {
             server = http.createServer((req, res) => {
                 if (req.url === secretPath) {
                     webhookCallback(req, res);
+                } else if (req.url === '/debug-info') {
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({
+                        tokenPrefix: botToken ? botToken.substring(0, 12) : "missing",
+                        secretPath: secretPath,
+                        webhookUrl: webhookUrl
+                    }));
                 } else if (req.url === '/' || req.url === '/healthz') {
                     res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
                     res.end("Film House Bot is active and running! 🍿");
@@ -1077,7 +1084,13 @@ async function init() {
         } else {
             console.log("No Webhook URL configured. Defaulting to Polling mode.");
             server = http.createServer((req, res) => {
-                if (req.url === '/' || req.url === '/healthz') {
+                if (req.url === '/debug-info') {
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({
+                        tokenPrefix: botToken ? botToken.substring(0, 12) : "missing",
+                        mode: "polling"
+                    }));
+                } else if (req.url === '/' || req.url === '/healthz') {
                     res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
                     res.end("Film House Bot is active and running (Polling)! 🍿");
                 } else {
