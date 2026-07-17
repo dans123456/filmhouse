@@ -297,7 +297,17 @@ function updateStatsCounters() {
 
     // Completed requests fulfillment rate
     const totalReqCount = allRequests.length;
-    const fulfilledReqCount = allRequests.filter(r => r.status === "fulfilled" || r.status === "claimed" || r.claimed === true).length;
+    const fulfilledReqCount = allRequests.filter(r => {
+        const inCatalog = allCatalogMovies && allCatalogMovies.some(m => {
+            const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
+            const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
+            if (rId && mId) {
+                return rId === mId;
+            }
+            return m.title && m.title.toLowerCase().trim() === r.title.toLowerCase().trim();
+        });
+        return r.status === "fulfilled" || r.status === "claimed" || r.claimed === true || inCatalog;
+    }).length;
     const fulfillmentRate = totalReqCount > 0 ? Math.round((fulfilledReqCount / totalReqCount) * 100) : 100;
     const statFulfillmentRate = document.getElementById("stat-fulfillment-rate");
     if (statFulfillmentRate) {
