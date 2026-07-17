@@ -1104,6 +1104,23 @@ async function init() {
                     webhookUrl: webhookUrl || null,
                     status: statusStr
                 });
+
+                // Self-healing webhook check if in webhook mode
+                if (webhookUrl && statusStr === "online") {
+                    const secretPath = `/telegraf/${bot.secretPathComponent()}`;
+                    const webhookTargetUrl = webhookUrl.endsWith('/') ? `${webhookUrl}${secretPath.substring(1)}` : `${webhookUrl}${secretPath}`;
+                    
+                    try {
+                        const info = await bot.telegram.getWebhookInfo();
+                        if (info.url !== webhookTargetUrl) {
+                            console.log(`Webhook mismatch detected. Current: "${info.url}", Expected: "${webhookTargetUrl}". Re-registering...`);
+                            await bot.telegram.setWebhook(webhookTargetUrl);
+                            console.log(`Telegram Webhook self-healed and set successfully to: ${webhookTargetUrl}`);
+                        }
+                    } catch (err) {
+                        console.warn("Failed to check/set webhook during status update:", err.message);
+                    }
+                }
             } catch (e) {
                 console.error("Failed to update bot status in Firestore:", e);
             }
