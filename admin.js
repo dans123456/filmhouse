@@ -622,7 +622,7 @@ function renderRequestsList() {
         counts[key].count++;
         counts[key].docIds.push(r.docId);
         
-        const reqUser = r.requestedBy ? `@${r.requestedBy}` : "guest";
+        const reqUser = r.requestedById || "unknown";
         if (!counts[key].requesters.includes(reqUser)) {
             counts[key].requesters.push(reqUser);
         }
@@ -723,7 +723,7 @@ function renderRequestsList() {
             </button>
         `;
 
-        const requestersList = req.requesters && req.requesters.length > 0 ? req.requesters.join(", ") : "guest";
+        const requestersList = req.requesters && req.requesters.length > 0 ? req.requesters.join(", ") : "unknown";
 
         row.innerHTML = `
             <div class="user-details" style="flex: 1;">
@@ -733,7 +733,7 @@ function renderRequestsList() {
                 </h5>
                 <p style="margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary);">
                     <span style="text-transform: uppercase;">${escapeHTML(req.type)}</span>
-                    <span style="margin-left: 8px; color: var(--text-muted);">by ${escapeHTML(requestersList)}</span>
+                    <span style="margin-left: 8px; color: var(--text-muted);">by ID: ${escapeHTML(requestersList)}</span>
                 </p>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
