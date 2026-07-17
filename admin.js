@@ -3358,7 +3358,16 @@ if (fulfillForm && fulfillRequestModal) {
         
         // 1. Sync to local CSV catalog
         const matchTitle = currentFulfillTitle.toLowerCase().trim();
-        const existingMovie = allCatalogMovies.find(m => m.title.toLowerCase().trim() === matchTitle);
+        const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === matchTitle);
+        const reqTmdbId = matchedReq ? matchedReq.tmdb_id : null;
+        
+        const existingMovie = allCatalogMovies.find(m => {
+            if (m.title.toLowerCase().trim() !== matchTitle) return false;
+            if (reqTmdbId && m.tmdb_id) {
+                return String(reqTmdbId) === String(m.tmdb_id);
+            }
+            return true;
+        });
         let movieToSync = null;
         
         if (existingMovie) {
