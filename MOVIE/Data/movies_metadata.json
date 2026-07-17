@@ -29007,9 +29007,12 @@
     "csv_id": "1723707-rancor",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADzRoAArFaKUZmL4oY0AABxB8WBA"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADzRoAArFaKUZmL4oY0AABxB8WBA",
+        "quality": "720p"
+      }
     ],
-    "poster": "img/FilmHouse3_nobg.png",
+    "poster": "https://i.postimg.cc/GhbQ0XHc/photo-2026-07-17-17-22-16.jpg",
     "rating": 0,
     "release_date": "",
     "genres": [],
@@ -29019,9 +29022,10 @@
     ],
     "tmdb_id": 1723707,
     "overview": "Dasola hates her brother Murewa, a fact that breaks their mother's heart. When Dasola gets into a fight with her boyfriend that leads to a federal crime, the family must come together to make a sacrifice",
-    "backdrop": "img/FilmHouse.png",
+    "backdrop": "https://i.postimg.cc/GhbQ0XHc/photo-2026-07-17-17-22-16.jpg",
     "language": "en",
-    "cast": []
+    "cast": [],
+    "trailer": ""
   },
   {
     "title": "Rascal Does Not Dream of a Dreaming Girl",
