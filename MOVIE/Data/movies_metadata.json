@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "45858-medaka-box",
+    "tmdb_id": 45858,
+    "imdb_id": "",
+    "title": "Medaka Box",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "Kurokami Medaka is an exceptional first year student at Hanokiwa Academy who got elected as president of the student council with a smashing 98% of the votes. Extremely intelligent, strong, and rich; she wants to help anyone in need. To do that, she introduces a suggestion box that allows any student to contact her. Later known as the Medaka Box, it will bring forth incredible challenges to Kurokami and her friends of the student council.",
+    "poster": "https://image.tmdb.org/t/p/w500/7W0wmXZa8ZOgawGXvHD3Gv1vVQ6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wffBRriPGAmFkdHZtmpLq47r27y.jpg",
+    "rating": 7,
+    "release_date": "2012-04-04",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "QVDo3nESFls",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADJRMAAtgh0EZ8GaBR9bVQcBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADPBMAAtgh0EYT0m43z7CPVRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "26623-generation-x",
     "tmdb_id": 26623,
     "imdb_id": "",
