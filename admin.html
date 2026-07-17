@@ -535,6 +535,27 @@
                     </div>
                     <span id="bot-status-badge" style="font-size: 11px; padding: 4px 12px; border-radius: 12px; font-weight: 700; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--border-color);">UNKNOWN</span>
                 </div>
+                
+                <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 12px;">Telegram Bot Welcome Message (/start)</span>
+                    <div class="form-row" style="margin-bottom: 12px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="telegram-welcome-image">Welcome Image URL (Banner)</label>
+                            <input type="text" id="telegram-welcome-image" placeholder="e.g. https://example.com/banner.jpg">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom: 12px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="telegram-welcome-text">Welcome Message Text (HTML allowed)</label>
+                            <textarea id="telegram-welcome-text" rows="5" placeholder="Welcome to Film House! Use {name} for username." style="width: 100%; min-height: 120px; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-primary); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <button class="btn btn-primary" id="btn-save-welcome-message" style="background: var(--primary-gradient); color: #000; border: none; font-weight: 700; height: 42px;">Save Welcome Message</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Tab 3: Admin Access -->
@@ -1088,6 +1109,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=70"></script>
+    <script src="admin.js?v=71"></script>
 </body>
 </html>

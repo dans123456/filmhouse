@@ -974,6 +974,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error("Error loading Telegram settings from Firestore:", e);
         }
 
+        try {
+            const welcomeDoc = await db.collection("settings").doc("welcome").get();
+            if (welcomeDoc.exists) {
+                const welcomeData = welcomeDoc.data();
+                const welcomeImgInput = document.getElementById("telegram-welcome-image");
+                if (welcomeImgInput) welcomeImgInput.value = welcomeData.photoUrl || "";
+                const welcomeTextInput = document.getElementById("telegram-welcome-text");
+                if (welcomeTextInput) welcomeTextInput.value = welcomeData.text || "";
+            }
+        } catch (e) {
+            console.error("Error loading welcome settings from Firestore:", e);
+        }
+
         // Setup real-time listener for Telegram Bot Status
         db.collection("settings").doc("bot_status").onSnapshot((doc) => {
             const badge = document.getElementById("bot-status-badge");
@@ -1368,6 +1381,44 @@ if (saveTelegramWebhookBtn) {
                 }
             } else {
                 showToast("Telegram Webhook URL saved locally!", "info");
+            }
+        }
+    });
+}
+
+// Save Welcome Message configuration to Firestore
+const saveWelcomeMessageBtn = document.getElementById("btn-save-welcome-message");
+if (saveWelcomeMessageBtn) {
+    saveWelcomeMessageBtn.addEventListener("click", async () => {
+        const welcomeImgInput = document.getElementById("telegram-welcome-image");
+        const welcomeTextInput = document.getElementById("telegram-welcome-text");
+        
+        if (welcomeImgInput && welcomeTextInput) {
+            const photoUrl = welcomeImgInput.value.trim();
+            const text = welcomeTextInput.value.trim();
+            
+            if (db) {
+                try {
+                    saveWelcomeMessageBtn.disabled = true;
+                    saveWelcomeMessageBtn.textContent = "Saving... ⏳";
+                    
+                    await db.collection("settings").doc("welcome").set({
+                        photoUrl: photoUrl,
+                        text: text,
+                        fileId: null, // Clear cached fileId so bot fetches the new URL
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    
+                    showToast("Welcome Message configuration saved successfully! 📢", "success");
+                } catch (e) {
+                    console.error("Error saving welcome config to Firestore:", e);
+                    showToast("Failed to save welcome message to Firestore.", "error");
+                } finally {
+                    saveWelcomeMessageBtn.disabled = false;
+                    saveWelcomeMessageBtn.textContent = "Save Welcome Message";
+                }
+            } else {
+                showToast("Database connection not ready.", "error");
             }
         }
     });
