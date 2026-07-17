@@ -1,5 +1,34 @@
 [
   {
+    "csv_id": "328926-soso",
+    "tmdb_id": 328926,
+    "imdb_id": "",
+    "title": "SOSO",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "African"
+    ],
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/cH5xB9gx/photo-2026-07-17-18-52-12.jpg",
+    "backdrop": "https://i.postimg.cc/cH5xB9gx/photo-2026-07-17-18-52-12.jpg",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADwg8AAtgh2EYW-Sc8Yn9lqxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "110077-unmarried",
     "tmdb_id": 110077,
     "imdb_id": "",
