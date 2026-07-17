@@ -1,29 +1,28 @@
 [
   {
-    "csv_id": "328926-soso",
-    "tmdb_id": 328926,
+    "csv_id": "803104-sex-appeal",
+    "tmdb_id": 803104,
     "imdb_id": "",
-    "title": "SOSO",
-    "type": "Series",
+    "title": "Sex Appeal",
+    "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "African"
+      "Hollywood/British Movies"
     ],
     "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "https://i.postimg.cc/cH5xB9gx/photo-2026-07-17-18-52-12.jpg",
-    "backdrop": "https://i.postimg.cc/cH5xB9gx/photo-2026-07-17-18-52-12.jpg",
-    "rating": 0,
-    "release_date": "",
+    "overview": "Avery, a teenager with a tendency towards perfectionism, enlists her friend Larson to help her prepare for her first time with her long-distance boyfriend.",
+    "poster": "https://image.tmdb.org/t/p/w500/mpwXOeSSQdBjUpyQqf6YHYbSTFO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sqLNgWTMBhLBRY26SwwfWcSI5qq.jpg",
+    "rating": 6.6,
+    "release_date": "2022-01-14",
     "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "",
+    "trailer": "A207HN4bRJM",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADwg8AAtgh2EYW-Sc8Yn9lqxYE",
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADNxAAAtgh2Ea-YTLCC7U-PhYE",
         "quality": "720p"
       }
     ]
