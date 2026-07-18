@@ -9,11 +9,7 @@
       "Main",
       "Hollywood/British Movies"
     ],
-    "genres": [
-      "Drama",
-      "Romance",
-      "Thriller"
-    ],
+    "genres": [],
     "overview": "Noah must leave her city, boyfriend, and friends to move into William Leister's mansion, the flashy and wealthy husband of her mother Rafaela. As a proud and independent 17 year old, Noah resists living in a mansion surrounded by luxury. However, it is there where she meets Nick, her new stepbrother, and the clash of their strong personalities becomes evident from the very beginning.",
     "poster": "https://image.tmdb.org/t/p/w500/w46Vw536HwNnEzOa7J24YH9DPRS.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/oz4U9eA6ilYf1tyiVuGmkftdLac.jpg",
@@ -25,7 +21,10 @@
     "trailer": "xY-qRGC6Yu0",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADuQoAAtgh4Eb5yNFcCfm3xhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADuwoAAtgh4EZdqHbuRmEjNBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
