@@ -616,7 +616,8 @@ function renderRequestsList() {
                 isPriority: false, 
                 isFulfilled: true,
                 docIds: [],
-                requesters: []
+                requesters: [],
+                requesterDetails: []
             };
         }
         counts[key].count++;
@@ -626,6 +627,16 @@ function renderRequestsList() {
         if (!counts[key].requesters.includes(reqUser)) {
             counts[key].requesters.push(reqUser);
         }
+        
+        counts[key].requesterDetails.push({
+            userId: r.requestedById || "unknown",
+            username: r.requestedBy || r.user || "guest",
+            docId: r.docId,
+            status: r.status || "pending",
+            notificationStatus: r.notificationStatus || null,
+            notificationError: r.notificationError || null,
+            isBlockedUser: r.isBlockedUser || false
+        });
         
         if (r.status === "priority") {
             counts[key].isPriority = true;
@@ -693,7 +704,7 @@ function renderRequestsList() {
     filteredRequests.forEach(req => {
         const row = document.createElement("div");
         row.className = "list-row";
-        row.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border-color);";
+        row.style.cssText = "display: flex; flex-direction: column; padding: 12px 16px; border-bottom: 1px solid var(--border-color); gap: 8px;";
 
         let badgeMarkup = "";
         if (req.isPriority) {
@@ -723,25 +734,64 @@ function renderRequestsList() {
             </button>
         `;
 
-        const requestersList = req.requesters && req.requesters.length > 0 ? req.requesters.join(", ") : "unknown";
+        let detailsHtml = "";
+        if (req.requesterDetails && req.requesterDetails.length > 0) {
+            req.requesterDetails.forEach(detail => {
+                let statusBadge = "";
+                if (detail.status === "fulfilled" || detail.status === "claimed") {
+                    if (detail.notificationStatus === "delivered") {
+                        statusBadge = `<span style="color: #4caf50; font-weight: bold; background: rgba(76, 175, 80, 0.1); padding: 1px 6px; border-radius: 4px;">🟢 Delivered</span>`;
+                    } else if (detail.notificationStatus === "failed") {
+                        const errMsg = detail.notificationError || "Unknown error";
+                        statusBadge = `<span style="color: #ff3b30; font-weight: bold; background: rgba(255, 59, 48, 0.1); padding: 1px 6px; border-radius: 4px;" title="${escapeHTML(errMsg)}">🔴 Failed</span>`;
+                    } else {
+                        statusBadge = `<span style="color: #ffbc00; font-weight: bold; background: rgba(255, 188, 0, 0.1); padding: 1px 6px; border-radius: 4px;">⚪ Pending Send</span>`;
+                    }
+                } else if (detail.status === "priority") {
+                    statusBadge = `<span style="color: #ff3b30; font-weight: bold; background: rgba(255, 59, 48, 0.1); padding: 1px 6px; border-radius: 4px;">🔥 Priority</span>`;
+                } else {
+                    statusBadge = `<span style="color: #ffbc00; font-weight: bold; background: rgba(255, 188, 0, 0.1); padding: 1px 6px; border-radius: 4px;">🟠 Pending</span>`;
+                }
+                
+                detailsHtml += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 11px; padding: 4px 6px; background: rgba(255,255,255,0.01); border-radius: 4px;">
+                        <span>👤 @${escapeHTML(detail.username)} (ID: <code>${escapeHTML(detail.userId)}</code>)</span>
+                        <span>${statusBadge}</span>
+                    </div>
+                `;
+            });
+        }
+
+        const toggleId = `toggle-${req.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${req.docIds[0]}`;
 
         row.innerHTML = `
-            <div class="user-details" style="flex: 1;">
-                <h5 style="margin: 0; display: flex; align-items: center;">
-                    ${escapeHTML(req.title)}${req.year ? ` (${req.year})` : ""}
-                    ${badgeMarkup}
-                </h5>
-                <p style="margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary);">
-                    <span style="text-transform: uppercase;">${escapeHTML(req.type)}</span>
-                    <span style="margin-left: 8px; color: var(--text-muted);">by ID: ${escapeHTML(requestersList)}</span>
-                </p>
-            </div>
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="req-count" style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">
-                    ${req.count} ${req.count === 1 ? 'req' : 'reqs'}
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <div class="user-details" style="flex: 1;">
+                    <h5 style="margin: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                        ${escapeHTML(req.title)}${req.year ? ` (${req.year})` : ""}
+                        ${badgeMarkup}
+                    </h5>
+                    <p style="margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
+                        <span style="text-transform: uppercase; font-weight: bold;">${escapeHTML(req.type)}</span>
+                        <span style="color: var(--text-muted);">•</span>
+                        <span>
+                            <a href="#" class="toggle-requesters-link" data-target="${toggleId}" style="color: var(--text-muted); text-decoration: underline; cursor: pointer; font-weight: 600;">
+                                Show Requesters (${req.count}) 📁
+                            </a>
+                        </span>
+                    </p>
                 </div>
-                ${fulfillBtnMarkup}
-                ${deleteBtnMarkup}
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="req-count" style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">
+                        ${req.count} ${req.count === 1 ? 'req' : 'reqs'}
+                    </div>
+                    ${fulfillBtnMarkup}
+                    ${deleteBtnMarkup}
+                </div>
+            </div>
+            <div id="${toggleId}" class="requesters-details-pane" style="font-size: 11px; color: var(--text-secondary); background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; display: none; width: 100%; box-sizing: border-box;">
+                <div style="font-weight: bold; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px;">Requesters & Delivery Status:</div>
+                ${detailsHtml}
             </div>
         `;
 
@@ -756,6 +806,22 @@ function renderRequestsList() {
         if (deleteBtn) {
             deleteBtn.addEventListener("click", () => {
                 deleteMovieTitleRequests(req.title, req.docIds);
+            });
+        }
+
+        const toggleLink = row.querySelector(".toggle-requesters-link");
+        if (toggleLink) {
+            toggleLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                const targetId = toggleLink.getAttribute("data-target");
+                const targetPane = document.getElementById(targetId);
+                if (targetPane) {
+                    const isHidden = targetPane.style.display === "none";
+                    targetPane.style.display = isHidden ? "block" : "none";
+                    toggleLink.textContent = isHidden 
+                        ? `Hide Requesters (${req.count}) 📂` 
+                        : `Show Requesters (${req.count}) 📁`;
+                }
             });
         }
 
@@ -3841,10 +3907,12 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 // Get all users from Firestore or state
                 if (typeof allUsers !== 'undefined' && allUsers && allUsers.length > 0) {
-                    targetUsers = allUsers.map(u => ({
-                        id: String(u.id),
-                        username: u.username || ""
-                    }));
+                    targetUsers = allUsers
+                        .filter(u => u.blockedBot !== true)
+                        .map(u => ({
+                            id: String(u.id),
+                            username: u.username || ""
+                        }));
                 } else {
                     if (typeof firebase === 'undefined' || !db) {
                         alert("Firestore is not connected!");
@@ -3856,7 +3924,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const snapshot = await db.collection("users").get();
                         snapshot.forEach(doc => {
                             const u = doc.data();
-                            if (u.id) {
+                            if (u.id && u.blockedBot !== true) {
                                 targetUsers.push({
                                     id: String(u.id),
                                     username: u.username || ""
@@ -3939,7 +4007,36 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (response.ok && result.ok) {
                         successCount++;
                         if (successEl) successEl.textContent = successCount;
+                    } else if (response.status === 429 || result.error_code === 429) {
+                        const retryAfter = (result.parameters && result.parameters.retry_after) ? (result.parameters.retry_after * 1000) : 5000;
+                        console.warn(`Rate limited by Telegram. Waiting ${retryAfter}ms before retrying user ${user.id}...`);
+                        if (statusLabel) statusLabel.textContent = `Rate limited. Waiting ${Math.round(retryAfter / 1000)}s... ⏳`;
+                        await new Promise(r => setTimeout(r, retryAfter));
+                        if (statusLabel) statusLabel.textContent = "Broadcasting messages...";
+                        i--; // Decrement to retry this user
+                    } else if (result.description && result.description.includes("can't parse entities")) {
+                        console.warn(`Markdown parsing failed for user ${user.id}. Retrying with plain text.`);
+                        const retryRes = await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                chat_id: user.id.trim(),
+                                text: message
+                            })
+                        });
+                        const retryResult = await retryRes.json();
+                        if (retryRes.ok && retryResult.ok) {
+                            successCount++;
+                            if (successEl) successEl.textContent = successCount;
+                        } else {
+                            failedCount++;
+                            if (failedEl) failedEl.textContent = failedCount;
+                        }
                     } else {
+                        const isBlocked = result.description && (result.description.includes("blocked") || result.description.includes("chat not found") || result.description.includes("deactivated"));
+                        if (isBlocked && typeof firebase !== 'undefined' && db) {
+                            db.collection("users").doc(user.id).set({ blockedBot: true }, { merge: true }).catch(() => {});
+                        }
                         console.warn(`Failed to send to ${user.id}:`, result);
                         failedCount++;
                         if (failedEl) failedEl.textContent = failedCount;

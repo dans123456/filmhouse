@@ -119,6 +119,49 @@ function setupBot(bot) {
         }
     }
 
+    // Helper: Call Telegram API with 429 rate limit retries and markdown error fallbacks
+    async function callTelegramWithRetry(methodName, ...args) {
+        const maxAttempts = 3;
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                return await bot.telegram[methodName](...args);
+            } catch (err) {
+                // Check if rate limited (429)
+                const isRateLimited = err.code === 429 || (err.parameters && err.parameters.retry_after);
+                if (isRateLimited && attempt < maxAttempts) {
+                    const waitTime = (err.parameters && err.parameters.retry_after) ? (err.parameters.retry_after * 1000) : 5000;
+                    console.log(`Telegram API call ${methodName} rate limited. Waiting ${waitTime}ms before retry (attempt ${attempt}/${maxAttempts})...`);
+                    await new Promise(r => setTimeout(r, waitTime));
+                    continue;
+                }
+                
+                // Check if markdown entities parsing failed
+                if (methodName === 'sendMessage' && err.message && err.message.includes("can't parse entities")) {
+                    console.warn(`Markdown parse failed. Retrying plain text for sendMessage: ${err.message}`);
+                    try {
+                        const plainOptions = { ...(args[2] || {}) };
+                        delete plainOptions.parse_mode;
+                        return await bot.telegram.sendMessage(args[0], args[1], plainOptions);
+                    } catch (fallbackErr) {
+                        throw fallbackErr;
+                    }
+                }
+                
+                // Check if the bot was blocked or chat wasn't found
+                const isUserError = err.message && (err.message.includes("blocked") || err.message.includes("chat not found") || err.message.includes("deactivated"));
+                const targetUserId = String(args[0]);
+                if (isUserError && targetUserId && targetUserId !== "undefined" && !targetUserId.startsWith("-")) {
+                    console.log(`User ${targetUserId} has blocked the bot or chat was not found. Flagging in database.`);
+                    await db.collection("users").doc(targetUserId).set({ blockedBot: true }, { merge: true }).catch(dbErr => {
+                        console.error(`Error updating blockedBot status for ${targetUserId}:`, dbErr);
+                    });
+                }
+                
+                throw err;
+            }
+        }
+    }
+
     // Command: /start
     bot.command('start', async (ctx) => {
         const userId = String(ctx.from.id);
@@ -137,7 +180,8 @@ function setupBot(bot) {
                 id: userId,
                 username: username,
                 fullName: fullName,
-                lastSeen: admin.firestore.FieldValue.serverTimestamp()
+                lastSeen: admin.firestore.FieldValue.serverTimestamp(),
+                blockedBot: false
             };
             
             if (!userDoc.exists) {
@@ -463,14 +507,12 @@ function setupBot(bot) {
 
             for (const doc of snapshot.docs) {
                 const u = doc.data();
-                if (u.id) {
+                if (u.id && u.blockedBot !== true) {
                     try {
                         if (replyTo) {
-                            // Copy the replied-to message (copies photos, videos, files, captions, and inline buttons)
-                            await ctx.telegram.copyMessage(u.id, ctx.chat.id, replyTo.message_id);
+                            await callTelegramWithRetry('copyMessage', u.id, ctx.chat.id, replyTo.message_id);
                         } else {
-                            // Fallback to text message broadcast
-                            await ctx.telegram.sendMessage(u.id, messageText, { parse_mode: "Markdown" });
+                            await callTelegramWithRetry('sendMessage', u.id, messageText, { parse_mode: "Markdown" });
                         }
                         successCount++;
                     } catch (err) {
@@ -1187,6 +1229,8 @@ async function init() {
                                 let count = 0;
                                 for (const userDoc of usersSnapshot.docs) {
                                     const userData = userDoc.data();
+                                    if (userData.blockedBot === true) continue;
+                                    
                                     const farmingStartedAt = userData.farmingStartedAt || 0;
                                     const uid = userDoc.id;
                                     
@@ -1195,7 +1239,7 @@ async function init() {
                                     
                                     if (isIdle) {
                                         try {
-                                            await bot.telegram.sendMessage(uid, text, {
+                                            await callTelegramWithRetry('sendMessage', uid, text, {
                                                 parse_mode: "Markdown",
                                                 reply_markup: {
                                                     inline_keyboard: [
@@ -1212,6 +1256,9 @@ async function init() {
                                             // Sleep 50ms to respect Telegram limits
                                             await new Promise(resolve => setTimeout(resolve, 50));
                                         } catch (e) {
+                                            if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
+                                                await db.collection("users").doc(uid).update({ blockedBot: true });
+                                            }
                                             console.warn(`Failed to send bulk reminder to user ${uid}:`, e.message);
                                         }
                                     }
@@ -1222,7 +1269,7 @@ async function init() {
                             }
                         } else {
                             try {
-                                await bot.telegram.sendMessage(userId, text, {
+                                await callTelegramWithRetry('sendMessage', userId, text, {
                                     parse_mode: "Markdown",
                                     reply_markup: {
                                         inline_keyboard: [
@@ -1237,6 +1284,9 @@ async function init() {
                                 });
                                 console.log(`Manual mine reminder successfully sent to user ${userId}`);
                             } catch (e) {
+                                if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
+                                    await db.collection("users").doc(userId).update({ blockedBot: true });
+                                }
                                 console.warn(`Failed to send manual mine reminder to ${userId}:`, e.message);
                             }
                         }
@@ -1331,11 +1381,14 @@ async function init() {
                     } : undefined;
 
                     try {
-                        await bot.telegram.sendMessage(userId, text, {
+                        await callTelegramWithRetry('sendMessage', userId, text, {
                             parse_mode: "Markdown",
                             reply_markup: replyMarkup
                         });
                     } catch (e) {
+                        if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
+                            await db.collection("users").doc(userId).update({ blockedBot: true });
+                        }
                         console.warn(`Failed to send request confirmation to ${userId}:`, e.message);
                     }
 
@@ -1365,8 +1418,11 @@ async function init() {
 
                         const text = `🚀 *Request Boosted!*\n\nYour request for *${title}*${yearSuffix} has been successfully boosted to *High Priority*! Our team is on it! 🍿`;
                         try {
-                            await bot.telegram.sendMessage(userId, text, { parse_mode: "Markdown" });
+                            await callTelegramWithRetry('sendMessage', userId, text, { parse_mode: "Markdown" });
                         } catch (e) {
+                            if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
+                                await db.collection("users").doc(userId).update({ blockedBot: true });
+                            }
                             console.warn(`Failed to send boost confirmation to ${userId}:`, e.message);
                         }
 
@@ -1389,8 +1445,6 @@ async function init() {
                     }
 
                     if (data.status === "fulfilled" && data.notifiedFulfilled !== true && downloadLink) {
-                        await db.collection("requests").doc(docId).update({ notifiedFulfilled: true }).catch(() => {});
-
                         const isSeries = (data.type || "").toLowerCase() === "series" || (data.type || "").toLowerCase() === "tv";
                         let detailText = "";
                         let buttonText = "Download/Watch Now 🎬";
@@ -1407,7 +1461,7 @@ async function init() {
                                      `${detailText}\n\n` +
                                      `Thank you for using Film House!`;
                         try {
-                            await bot.telegram.sendMessage(userId, text, {
+                            await callTelegramWithRetry('sendMessage', userId, text, {
                                 parse_mode: "Markdown",
                                 reply_markup: {
                                     inline_keyboard: [
@@ -1420,12 +1474,25 @@ async function init() {
                                     ]
                                 }
                             });
+                            await db.collection("requests").doc(docId).update({ 
+                                notifiedFulfilled: true,
+                                notificationStatus: "delivered",
+                                notificationError: null,
+                                notifiedAt: admin.firestore.FieldValue.serverTimestamp()
+                            }).catch(() => {});
                         } catch (e) {
-                            console.warn(`Failed to send fulfillment notification to ${userId}:`, e.message);
+                            console.warn(`Failed to send request fulfillment to ${userId}:`, e.message);
+                            const isBlocked = e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"));
+                            if (isBlocked) await db.collection("users").doc(userId).update({ blockedBot: true });
+                            await db.collection("requests").doc(docId).update({ 
+                                notifiedFulfilled: true,
+                                notificationStatus: "failed",
+                                notificationError: e.message,
+                                isBlockedUser: isBlocked,
+                                notifiedAt: admin.firestore.FieldValue.serverTimestamp()
+                            }).catch(() => {});
                         }
                     }
-
-
                 }
             });
         }, (err) => console.error("Requests listener error:", err));
@@ -1445,10 +1512,12 @@ async function init() {
                 snapshot.forEach(async (doc) => {
                     const userData = doc.data();
                     if (userData.farmingReminded === true) return;
+                    if (userData.blockedBot === true) return;
 
                     const userId = doc.id;
                     try {
-                        await bot.telegram.sendMessage(
+                        await callTelegramWithRetry(
+                            'sendMessage',
                             userId,
                             `⚡ *Mining Session Complete!* ⚡\n\nYour 8-hour session has finished. Launch the app now to claim your *80 Loyalty Points* and start your next session! 🍿`,
                             {
