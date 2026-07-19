@@ -37,6 +37,7 @@ if (process.env.FIREBASE_CONFIG) {
     }
 }
 const db = admin.firestore();
+let callTelegramWithRetry;
 
 // Bot setup helper
 function setupBot(bot) {
@@ -120,7 +121,7 @@ function setupBot(bot) {
     }
 
     // Helper: Call Telegram API with 429 rate limit retries and markdown error fallbacks
-    async function callTelegramWithRetry(methodName, ...args) {
+    callTelegramWithRetry = async function(methodName, ...args) {
         const maxAttempts = 3;
         for (let attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
