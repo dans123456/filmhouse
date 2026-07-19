@@ -1211,6 +1211,40 @@ async function init() {
         // Check once immediately on startup
         checkAndRunWeeklyBackup(bot);
 
+        // Start keep-alive ping loop for external File Bots
+        const pingExternalFileBots = async () => {
+            try {
+                const doc = await db.collection("settings").doc("telegram").get();
+                if (!doc.exists) return;
+                
+                const pingUrlsStr = doc.data().pingUrls || "";
+                if (!pingUrlsStr) return;
+                
+                const urls = pingUrlsStr.split(",")
+                    .map(u => u.trim())
+                    .filter(u => u.length > 0 && (u.startsWith("http://") || u.startsWith("https://")));
+                
+                if (urls.length === 0) return;
+                
+                console.log(`Pinging ${urls.length} external File Bot(s) to keep active...`);
+                
+                urls.forEach(url => {
+                    const protocol = url.startsWith("https") ? require("https") : require("http");
+                    protocol.get(url, (res) => {
+                        console.log(`External keep-alive ping sent to ${url}. Status: ${res.statusCode}`);
+                    }).on("error", (err) => {
+                        console.warn(`External keep-alive ping to ${url} failed: ${err.message}`);
+                    });
+                });
+            } catch (err) {
+                console.error("Error running external File Bot keep-alive pinger:", err.message);
+            }
+        };
+
+        // Run keep-alive pings immediately on start and then every 5 minutes
+        pingExternalFileBots();
+        setInterval(pingExternalFileBots, 5 * 60 * 1000);
+
         // Real-time listener for admin triggered manual reminders
         db.collection("admin_reminders").onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(async (change) => {

@@ -525,6 +525,15 @@
                         <button class="btn btn-secondary" id="btn-save-telegram-webhook" style="height: 42px; margin-top: auto; flex: 1; border-color: rgba(0, 136, 204, 0.3); color: #0088cc;">Save Webhook</button>
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="telegram-ping-urls">File Bots / Keep-alive Ping URLs (comma separated)</label>
+                        <input type="text" id="telegram-ping-urls" placeholder="e.g. https://filebot1.onrender.com/health, https://filebot2.onrender.com/health">
+                    </div>
+                    <div class="form-group" style="flex: 1; justify-content: flex-end; display: flex; gap: 8px; flex-direction: row;">
+                        <button class="btn btn-secondary" id="btn-save-telegram-pings" style="height: 42px; margin-top: auto; flex: 1; border-color: rgba(0, 136, 204, 0.3); color: #0088cc;">Save URLs</button>
+                    </div>
+                </div>
                 <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px; margin-bottom: 12px;">
                     * The bot token and webhook URL will be securely synchronized to your Firestore database so the dashboard and backend can use them.
                 </p>

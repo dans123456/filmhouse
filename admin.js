@@ -982,6 +982,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    const localTgPings = localStorage.getItem("filmhouse_telegram_ping_urls");
+    if (localTgPings) {
+        const tgPingsInput = document.getElementById("telegram-ping-urls");
+        if (tgPingsInput) {
+            tgPingsInput.value = localTgPings;
+        }
+    }
+
     const localTmdbKey = localStorage.getItem("filmhouse_tmdb_key");
     if (localTmdbKey) {
         TMDB_API_KEY = localTmdbKey;
@@ -1033,6 +1041,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const tgWebhookInput = document.getElementById("telegram-webhook-url");
                     if (tgWebhookInput) {
                         tgWebhookInput.value = telegramWebhookUrl;
+                    }
+                }
+                const dbTgPings = tgDoc.data().pingUrls || "";
+                if (dbTgPings) {
+                    localStorage.setItem("filmhouse_telegram_ping_urls", dbTgPings);
+                    const tgPingsInput = document.getElementById("telegram-ping-urls");
+                    if (tgPingsInput) {
+                        tgPingsInput.value = dbTgPings;
                     }
                 }
             }
@@ -1456,6 +1472,34 @@ if (saveTelegramWebhookBtn) {
                 }
             } else {
                 showToast("Telegram Webhook URL saved locally!", "info");
+            }
+        }
+    });
+}
+
+// Save Telegram Ping URLs to Firestore & localStorage
+const saveTelegramPingsBtn = document.getElementById("btn-save-telegram-pings");
+if (saveTelegramPingsBtn) {
+    saveTelegramPingsBtn.addEventListener("click", async () => {
+        const pingsInput = document.getElementById("telegram-ping-urls");
+        if (pingsInput) {
+            const urlsStr = pingsInput.value.trim();
+            // Save locally first for instant access
+            localStorage.setItem("filmhouse_telegram_ping_urls", urlsStr);
+            
+            if (db) {
+                try {
+                    await db.collection("settings").doc("telegram").set({
+                        pingUrls: urlsStr,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    showToast("File Bot Keep-alive URLs saved successfully! 🤖📡", "success");
+                } catch (e) {
+                    console.error("Error saving Telegram ping URLs to Firestore:", e);
+                    showToast("URLs saved locally! (Note: Firestore database sync failed).", "warning");
+                }
+            } else {
+                showToast("Keep-alive URLs saved locally!", "info");
             }
         }
     });
