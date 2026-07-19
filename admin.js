@@ -3978,6 +3978,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             let successCount = 0;
             let failedCount = 0;
+            let lastErrorDescription = "";
             const total = targetUsers.length;
             
             for (let i = 0; i < total; i++) {
@@ -4029,10 +4030,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             successCount++;
                             if (successEl) successEl.textContent = successCount;
                         } else {
+                            lastErrorDescription = retryResult.description || "Plain text fallback retry failed";
                             failedCount++;
                             if (failedEl) failedEl.textContent = failedCount;
                         }
                     } else {
+                        lastErrorDescription = result.description || "Telegram API rejected message";
                         const isBlocked = result.description && (result.description.includes("blocked") || result.description.includes("chat not found") || result.description.includes("deactivated"));
                         if (isBlocked && typeof firebase !== 'undefined' && db) {
                             db.collection("users").doc(user.id).set({ blockedBot: true }, { merge: true }).catch(() => {});
@@ -4042,6 +4045,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (failedEl) failedEl.textContent = failedCount;
                     }
                 } catch (err) {
+                    lastErrorDescription = err.message || "Network request failed";
                     console.warn(`Network error sending to ${user.id}:`, err);
                     failedCount++;
                     if (failedEl) failedEl.textContent = failedCount;
@@ -4059,9 +4063,13 @@ document.addEventListener("DOMContentLoaded", () => {
             if (cancelBtn) cancelBtn.style.display = "none";
             
             if (statusLabel) {
-                statusLabel.textContent = shouldCancelBroadcast 
+                let statusText = shouldCancelBroadcast 
                     ? `Broadcast Cancelled. Sent to ${successCount}/${total} users successfully.` 
                     : `Completed! Sent to ${successCount}/${total} users successfully.`;
+                if (failedCount > 0 && lastErrorDescription) {
+                    statusText += `\n⚠️ Error details: ${lastErrorDescription}`;
+                }
+                statusLabel.innerText = statusText;
             }
         });
     }
