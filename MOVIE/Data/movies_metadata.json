@@ -1,5 +1,34 @@
 [
   {
+    "csv_id": "202282-rick-and-morty-the-anime",
+    "tmdb_id": 202282,
+    "imdb_id": "",
+    "title": "Rick and Morty: The Anime",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation",
+      "Sci-Fi & Fantasy",
+      "Action & Adventure"
+    ],
+    "overview": "It's life mostly as usual for the Smith family. Rick is in a pseudo-world, Summer helps Space Beth and Morty's in love. And they're all an anime.",
+    "poster": "https://image.tmdb.org/t/p/w500/kQFPw9W3EO6ZLhg3TI782edq9Fr.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vvXYIeSwRVm3nIsgGZ2xtGJCB9e.jpg",
+    "rating": 5.2,
+    "release_date": "2024-08-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "uFitwNQhRq4",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADFxQAApSw6EYuzueW6g31NhYE"
+    ]
+  },
+  {
     "csv_id": "244786-whiplash",
     "tmdb_id": 244786,
     "imdb_id": "",
