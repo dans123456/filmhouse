@@ -192,6 +192,11 @@ function setupBot(bot) {
                 data.pointsBreakdown = { downloads: 0, visits: 0, shares: 0, watched: 0 };
                 data.dailyStats = {};
                 data.joinedDate = admin.firestore.FieldValue.serverTimestamp();
+                data.notificationsEnabled = true;
+                data.subAnime = true;
+                data.subHollywood = true;
+                data.subRecs = true;
+                data.contactPreference = "telegram";
                 await userRef.set(data);
             } else {
                 await userRef.set(data, { merge: true });

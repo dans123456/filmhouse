@@ -1692,6 +1692,9 @@ function saveProfile(isFromPage = false) {
     // Reload user profile in UI
     loadUserProfile();
 
+    // Sync profile settings updates to Firestore
+    syncUserToFirestore();
+
     showToast("Profile updated successfully!", "success");
 
     // Close edit drawer collapsible form if open
@@ -5156,6 +5159,11 @@ function syncUserToFirestore(forceFetch = false) {
         lastCheckInDate: state.user.lastCheckInDate || "",
         pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
         dailyStats: state.user.dailyStats || {},
+        notificationsEnabled: state.user.notificationsEnabled !== undefined ? state.user.notificationsEnabled : true,
+        subAnime: state.user.subAnime !== undefined ? state.user.subAnime : true,
+        subHollywood: state.user.subHollywood !== undefined ? state.user.subHollywood : true,
+        subRecs: state.user.subRecs !== undefined ? state.user.subRecs : true,
+        contactPreference: state.user.contactPreference || "telegram",
         lastSeen: firebase.firestore.FieldValue.serverTimestamp()
     };
 
