@@ -7317,6 +7317,7 @@ function initPremiumSearchOverlay() {
             e.stopPropagation();
         }
         overlay.classList.add("active");
+        document.body.classList.add("search-active");
         document.body.style.overflow = "hidden"; // Prevent background scroll
         overlayInput.value = searchInput?.value || "";
         overlayInput.focus();
@@ -7325,6 +7326,7 @@ function initPremiumSearchOverlay() {
 
     const closePremiumSearch = () => {
         overlay.classList.remove("active");
+        document.body.classList.remove("search-active");
         document.body.style.overflow = ""; // Enable background scroll
     };
 
@@ -7423,20 +7425,18 @@ function triggerOverlaySearch(query) {
         });
     }
 
-    // Render local results
+    // Render local results container and global results container
     if (resultsContainer) {
-        resultsContainer.innerHTML = "";
+        resultsContainer.innerHTML = `
+            <div id="search-local-container"></div>
+            <div id="search-global-container"></div>
+        `;
         
-        if (filtered.length === 0) {
-            resultsContainer.innerHTML = `
-                <div style="padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 14px;">
-                    🔍 No matches found in your library.
-                </div>
-            `;
-        } else {
+        const localContainer = document.getElementById("search-local-container");
+        if (filtered.length > 0) {
             filtered.forEach(m => {
                 const card = createSearchOverlayCard(m);
-                resultsContainer.appendChild(card);
+                localContainer.appendChild(card);
             });
         }
     }
@@ -7447,23 +7447,21 @@ function triggerOverlaySearch(query) {
 
     // If query is >= 3 chars, perform TMDB global search and append
     if (q.length >= 3) {
-        const externalSectionId = "external-search-section";
-        let extSection = document.getElementById(externalSectionId);
-        if (!extSection) {
-            extSection = document.createElement("div");
-            extSection.id = externalSectionId;
-            extSection.style.cssText = "margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;";
-            resultsContainer?.appendChild(extSection);
+        const globalContainer = document.getElementById("search-global-container");
+        if (globalContainer) {
+            globalContainer.innerHTML = `
+                <div id="search-global-loading" style="padding: 20px; text-align: center; color: var(--primary-color); font-size: 12px; font-weight: 600;">
+                    ⏳ Querying TMDB Cloud Database...
+                </div>
+            `;
+            globalContainer.style.display = "block";
         }
-        
-        extSection.innerHTML = `
-            <div style="padding: 10px; text-align: center; color: var(--primary-color); font-size: 12px; font-weight: 600;">
-                ⏳ Querying TMDB Cloud Database...
-            </div>
-        `;
 
         clearTimeout(overlaySearchDebounceTimer);
         overlaySearchDebounceTimer = setTimeout(async () => {
+            const localContainer = document.getElementById("search-local-container");
+            const globalContainer = document.getElementById("search-global-container");
+            
             try {
                 const extResults = await fetchGlobalTmdbSearchResults(query);
                 
@@ -7471,27 +7469,72 @@ function triggerOverlaySearch(query) {
                 const localTmdbIds = new Set(filtered.map(m => m.tmdb_id).filter(id => id));
                 const uniqueExt = extResults.filter(ext => !localTmdbIds.has(ext.tmdb_id));
                 
-                if (uniqueExt.length === 0) {
-                    extSection.innerHTML = "";
-                } else {
-                    extSection.innerHTML = `
-                        <h4 style="margin: 0 0 12px 0; font-size: 11px; text-transform: uppercase; color: var(--primary-color); letter-spacing: 0.5px; font-weight: 700; padding-left: 8px;">🌐 Global Cloud Results</h4>
-                        <div class="external-results-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
-                    `;
-                    const listDiv = extSection.querySelector(".external-results-list");
-                    uniqueExt.forEach(m => {
-                        const card = createSearchOverlayCard(m);
-                        listDiv?.appendChild(card);
-                    });
+                if (globalContainer) {
+                    if (uniqueExt.length === 0) {
+                        globalContainer.innerHTML = "";
+                        globalContainer.style.display = "none";
+                        
+                        // Show "no matches" warning only if both are empty
+                        if (filtered.length === 0 && localContainer) {
+                            localContainer.innerHTML = `
+                                <div style="padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 14px;">
+                                    🔍 No matches found in library or cloud.
+                                </div>
+                            `;
+                        }
+                    } else {
+                        globalContainer.innerHTML = `
+                            <h4 style="margin: 20px 0 12px 0; font-size: 11px; text-transform: uppercase; color: var(--primary-color); letter-spacing: 0.5px; font-weight: 700; padding-left: 8px;">🌐 Global Cloud Results</h4>
+                            <div class="external-results-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+                        `;
+                        const listDiv = globalContainer.querySelector(".external-results-list");
+                        uniqueExt.forEach(m => {
+                            const card = createSearchOverlayCard(m);
+                            listDiv?.appendChild(card);
+                        });
+                        globalContainer.style.display = "block";
+                        
+                        // Clear the local "no matches" placeholder if we have cloud results
+                        if (filtered.length === 0 && localContainer) {
+                            localContainer.innerHTML = "";
+                        }
+                    }
+                    
                     if (countText) {
                         countText.textContent = `Found ${filtered.length} library & ${uniqueExt.length} cloud titles`;
                     }
                 }
             } catch (err) {
                 console.error("External search failed:", err);
-                extSection.innerHTML = "";
+                if (globalContainer) {
+                    globalContainer.innerHTML = "";
+                    globalContainer.style.display = "none";
+                }
+                if (filtered.length === 0 && localContainer) {
+                    localContainer.innerHTML = `
+                        <div style="padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 14px;">
+                            🔍 No matches found in library.
+                        </div>
+                    `;
+                }
             }
         }, 400);
+    } else {
+        const globalContainer = document.getElementById("search-global-container");
+        if (globalContainer) {
+            globalContainer.innerHTML = "";
+            globalContainer.style.display = "none";
+        }
+        if (filtered.length === 0) {
+            const localContainer = document.getElementById("search-local-container");
+            if (localContainer) {
+                localContainer.innerHTML = `
+                    <div style="padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 14px;">
+                        🔍 No matches found in your library.
+                    </div>
+                `;
+            }
+        }
     }
 }
 
