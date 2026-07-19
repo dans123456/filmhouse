@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "1061536-detective-chen",
+    "tmdb_id": 1061536,
+    "imdb_id": "",
+    "title": "Detective Chen",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Crime",
+      "Comedy",
+      "Mystery"
+    ],
+    "overview": "A rookie Shanghai police captain disguises himself as a student to investigate a murder at a local high school. However, he hates studying, Therefore he must juggle homework and solving the crime case.",
+    "poster": "https://image.tmdb.org/t/p/w500/rRFzMI88IqxojpTFieneCPiqglg.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tmOoETLwjrUnb1EhvZ4LktD4Y3j.jpg",
+    "rating": 3.5,
+    "release_date": "2022-12-15",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "K7f3elKZAuQ",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFile2bot?start=BQADAQADyxgAApSw6EZAt3kczIBy_BYE"
+    ]
+  },
+  {
     "csv_id": "202282-rick-and-morty-the-anime",
     "tmdb_id": 202282,
     "imdb_id": "",
