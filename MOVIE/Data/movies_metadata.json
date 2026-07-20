@@ -9,12 +9,7 @@
       "Main",
       "Hollywood/British Movies"
     ],
-    "genres": [
-      "Action",
-      "Crime",
-      "Comedy",
-      "Mystery"
-    ],
+    "genres": [],
     "overview": "A rookie Shanghai police captain disguises himself as a student to investigate a murder at a local high school. However, he hates studying, Therefore he must juggle homework and solving the crime case.",
     "poster": "https://image.tmdb.org/t/p/w500/rRFzMI88IqxojpTFieneCPiqglg.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/tmOoETLwjrUnb1EhvZ4LktD4Y3j.jpg",
@@ -25,7 +20,12 @@
     "director": "",
     "trailer": "K7f3elKZAuQ",
     "runtime": "",
-    "links": []
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADyxgAApSw6EZAt3kczIBy_BYE",
+        "quality": "1080p"
+      }
+    ]
   },
   {
     "csv_id": "202282-rick-and-morty-the-anime",
