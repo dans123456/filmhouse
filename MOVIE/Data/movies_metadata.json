@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "762975-purple-hearts",
+    "tmdb_id": 762975,
+    "imdb_id": "",
+    "title": "Purple Hearts",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Romance",
+      "Drama"
+    ],
+    "overview": "An aspiring musician agrees to a marriage of convenience with a soon-to-deploy Marine, but a tragedy soon turns their fake relationship all too real.",
+    "poster": "https://image.tmdb.org/t/p/w500/4JyNWkryifWbWXJyxcWh3pVya6N.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jdZM1Gs6DtRGvosgqaXRrIkvYX7.jpg",
+    "rating": 8,
+    "release_date": "2022-07-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "WTLgg8oRSBE",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADMwsAAvCw8UYU37Wr_RzosxYE"
+    ]
+  },
+  {
     "csv_id": "1061536-detective-chen",
     "tmdb_id": 1061536,
     "imdb_id": "",
@@ -9,7 +37,12 @@
       "Main",
       "Hollywood/British Movies"
     ],
-    "genres": [],
+    "genres": [
+      "Action",
+      "Crime",
+      "Comedy",
+      "Mystery"
+    ],
     "overview": "A rookie Shanghai police captain disguises himself as a student to investigate a murder at a local high school. However, he hates studying, Therefore he must juggle homework and solving the crime case.",
     "poster": "https://image.tmdb.org/t/p/w500/rRFzMI88IqxojpTFieneCPiqglg.jpg",
     "backdrop": "https://image.tmdb.org/t/p/w1280/tmOoETLwjrUnb1EhvZ4LktD4Y3j.jpg",
@@ -21,10 +54,7 @@
     "trailer": "K7f3elKZAuQ",
     "runtime": "",
     "links": [
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADyxgAApSw6EZAt3kczIBy_BYE",
-        "quality": "1080p"
-      }
+      "https://t.me/FilmHouseFile2bot?start=BQADAQADyxgAApSw6EZAt3kczIBy_BYE"
     ]
   },
   {
