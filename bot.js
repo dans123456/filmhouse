@@ -1260,7 +1260,7 @@ async function init() {
                     const type = data.type;
                     
                     if (type === "mine" && userId) {
-                        const text = `👋 *Hey there!*\n\nOur team noticed your mining rig is idle! 🪙 Don't forget to launch the app, start your mining session, and complete your daily missions to earn *Loyalty Points*! \n\n🎁 *Did you know?* You can use your points to redeem a **24-Hour Ad-Free VIP Pass** in the rewards center, allowing you to bypass all ads and get instant direct downloads for a whole day! 🎫🚀\n\n⚠️ *Crucial Step:* Please make sure you have run the /start command in this bot! Some users miss out on receiving their requested files because they haven't started the bot. Run /start now to make sure you get your files next time they are sent! 🎬`;
+                        const text = `👋 *Hey there!*\n\nOur team noticed your mining rig is idle! 🪙 Don't forget to launch the app, start your mining session, and complete your daily missions to earn *Loyalty Points*! \n\n🎁 *Did you know?* You can use your points to redeem a **24-Hour Ad-Free VIP Pass** in the rewards center, allowing you to bypass all ads and get instant direct downloads for a whole day! 🎫🚀`;
                         
                         if (userId === "all_idle") {
                             console.log("Triggering bulk mine reminder to all idle users...");
