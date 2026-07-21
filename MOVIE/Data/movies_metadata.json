@@ -1,5 +1,34 @@
 [
   {
+    "csv_id": "124364-from",
+    "tmdb_id": 124364,
+    "imdb_id": "",
+    "title": "FROM",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Mystery",
+      "Drama",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Unravel the mystery of a nightmarish town in middle America that traps all those who enter. As the unwilling residents fight to keep a sense of normalcy and search for a way out, they must also survive the threats of the surrounding forest – including the terrifying creatures that come out when the sun goes down.",
+    "poster": "https://image.tmdb.org/t/p/w500/pRtJagIxpfODzzb0T0NAvZSzErC.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xLdw1xdHocKYFFvx7w41NchXMfJ.jpg",
+    "rating": 8.5,
+    "release_date": "2022-02-20",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "pDHqAj4eJcM",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADqAYAAvCwAUdjYFLdtMW5yxYE"
+    ]
+  },
+  {
     "csv_id": "74204-big-mouth",
     "tmdb_id": 74204,
     "imdb_id": "",
