@@ -617,7 +617,9 @@ function renderRequestsList() {
                 isFulfilled: true,
                 docIds: [],
                 requesters: [],
-                requesterDetails: []
+                requesterDetails: [],
+                adminClaimId: null,
+                adminClaimName: null
             };
         }
         counts[key].count++;
@@ -642,13 +644,41 @@ function renderRequestsList() {
             counts[key].isPriority = true;
         }
         
+        // Track active claim lock
+        if (r.adminClaimId) {
+            const claimTime = r.adminClaimTime && typeof r.adminClaimTime.toDate === 'function' ? r.adminClaimTime.toDate() : null;
+            const isExpired = claimTime ? (Date.now() - claimTime.getTime() > 15 * 60 * 1000) : false;
+            if (!isExpired && r.status !== "fulfilled" && r.status !== "claimed") {
+                counts[key].adminClaimId = r.adminClaimId;
+                counts[key].adminClaimName = r.adminClaimName;
+            }
+        }
+        
         const inCatalog = allCatalogMovies && allCatalogMovies.some(m => {
             const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
             const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
             if (rId && mId) {
+                if (r.seasonOrPart) {
+                    const cleanReqSeason = r.seasonOrPart.toLowerCase().trim();
+                    return rId === mId && m.links && m.links.some(link => {
+                        const sLabel = typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "";
+                        return sLabel.toLowerCase().trim() === cleanReqSeason;
+                    });
+                }
                 return rId === mId;
             }
-            return m.title && m.title.toLowerCase().trim() === r.title.toLowerCase().trim();
+            
+            const cleanReqTitle = r.title.toLowerCase().trim().replace(/\s*\((season|part)\s*\d+\)\s*$/i, "").trim();
+            const cleanCatalogTitle = m.title.toLowerCase().trim().replace(/\s*\((season|part)\s*\d+\)\s*$/i, "").trim();
+            if (cleanCatalogTitle !== cleanReqTitle) return false;
+            if (r.seasonOrPart) {
+                const cleanReqSeason = r.seasonOrPart.toLowerCase().trim();
+                return m.links && m.links.some(link => {
+                    const sLabel = typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "";
+                    return sLabel.toLowerCase().trim() === cleanReqSeason;
+                });
+            }
+            return true;
         });
         const fulfilled = r.status === "fulfilled" || r.status === "claimed" || inCatalog;
         
@@ -706,7 +736,13 @@ function renderRequestsList() {
         row.className = "list-row";
         row.style.cssText = "display: flex; flex-direction: column; padding: 12px 16px; border-bottom: 1px solid var(--border-color); gap: 8px;";
 
+        const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
+        const currentAdminId = String(tgUser ? tgUser.id : (new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || "test-admin"));
+        
         let badgeMarkup = "";
+        let isLockedByOther = false;
+        let claimBadgeMarkup = "";
+
         if (req.isPriority) {
             badgeMarkup = `<span style="font-size: 10px; background: rgba(255, 59, 48, 0.15); border: 1px solid rgba(255, 59, 48, 0.3); color: #ff3b30; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🔥 High Priority</span>`;
         } else if (req.isFulfilled) {
@@ -715,13 +751,30 @@ function renderRequestsList() {
             badgeMarkup = `<span style="font-size: 10px; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🟠 Pending</span>`;
         }
 
+        if (req.adminClaimId && !req.isFulfilled) {
+            if (String(req.adminClaimId) === currentAdminId) {
+                claimBadgeMarkup = `<span style="font-size: 10px; background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🛠️ Claimed by You</span>`;
+            } else {
+                claimBadgeMarkup = `<span style="font-size: 10px; background: rgba(255, 152, 0, 0.15); border: 1px solid rgba(255, 152, 0, 0.3); color: #ff9800; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🛠️ Claimed by ${escapeHTML(req.adminClaimName)}</span>`;
+                isLockedByOther = true;
+            }
+        }
+
         let fulfillBtnMarkup = "";
         if (!req.isFulfilled) {
-            fulfillBtnMarkup = isCurrentUserSlaveAdmin ? "" : `
-                <button class="btn-fulfill-request" data-title="${escapeHTML(req.title)}" style="background: var(--primary-gradient); border: none; border-radius: 4px; padding: 6px 12px; color: #000; font-weight: 700; font-size: 11px; cursor: pointer; transition: opacity 0.2s;">
-                    Fulfill 📥
-                </button>
-            `;
+            if (isLockedByOther) {
+                fulfillBtnMarkup = isCurrentUserSlaveAdmin ? "" : `
+                    <button class="btn-fulfill-request disabled" disabled style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 4px; padding: 6px 12px; color: var(--text-muted); font-weight: 700; font-size: 11px; cursor: not-allowed; opacity: 0.6;">
+                        Locked 🔒
+                    </button>
+                `;
+            } else {
+                fulfillBtnMarkup = isCurrentUserSlaveAdmin ? "" : `
+                    <button class="btn-fulfill-request" data-title="${escapeHTML(req.title)}" style="background: var(--primary-gradient); border: none; border-radius: 4px; padding: 6px 12px; color: #000; font-weight: 700; font-size: 11px; cursor: pointer; transition: opacity 0.2s;">
+                        Fulfill 📥
+                    </button>
+                `;
+            }
         } else {
             fulfillBtnMarkup = `
                 <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Resolved</span>
@@ -770,6 +823,7 @@ function renderRequestsList() {
                     <h5 style="margin: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
                         ${escapeHTML(req.title)}${req.year ? ` (${req.year})` : ""}
                         ${badgeMarkup}
+                        ${claimBadgeMarkup}
                     </h5>
                     <p style="margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
                         <span style="text-transform: uppercase; font-weight: bold;">${escapeHTML(req.type)}</span>
@@ -862,19 +916,100 @@ function deleteMovieTitleRequests(title, docIds) {
 function fulfillMovieTitleRequests(title, docIds) {
     if (typeof firebase === "undefined" || !db) return;
     
-    const modal = document.getElementById("fulfill-request-modal");
-    const titleEl = document.getElementById("fulfill-modal-title");
-    const inputEl = document.getElementById("fulfill-download-link");
+    // Check if already claimed by another admin
+    const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
+    const currentAdminId = String(tgUser ? tgUser.id : (new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || "test-admin"));
+    const currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : "Admin";
+
+    // Query Firestore for these request documents to check for active claims by other admins
+    db.collection("requests").where("title", "==", title).get().then(snapshot => {
+        let alreadyClaimed = false;
+        let claimerName = "";
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const claimTime = data.adminClaimTime && typeof data.adminClaimTime.toDate === 'function' ? data.adminClaimTime.toDate() : null;
+            const isExpired = claimTime ? (Date.now() - claimTime.getTime() > 15 * 60 * 1000) : false;
+            // A claim is active if adminClaimId is present, not expired, status is not fulfilled, and it's not by current admin
+            if (data.adminClaimId && String(data.adminClaimId) !== currentAdminId && data.status !== "fulfilled" && data.status !== "claimed" && !isExpired) {
+                alreadyClaimed = true;
+                claimerName = data.adminClaimName || "another admin";
+            }
+        });
+
+        if (alreadyClaimed) {
+            showToast(`⚠️ Already being processed by ${claimerName}!`, "warning");
+            return;
+        }
+
+        // Set the lock claim for current admin in a batch update
+        const batch = db.batch();
+        let count = 0;
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.status !== "fulfilled" && data.status !== "claimed") {
+                batch.update(doc.ref, {
+                    adminClaimId: currentAdminId,
+                    adminClaimName: currentAdminName,
+                    adminClaimTime: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                count++;
+            }
+        });
+
+        if (count > 0) {
+            batch.commit().then(() => {
+                const modal = document.getElementById("fulfill-request-modal");
+                const titleEl = document.getElementById("fulfill-modal-title");
+                const inputEl = document.getElementById("fulfill-download-link");
+                
+                if (!modal || !titleEl || !inputEl) return;
+                
+                currentFulfillTitle = title;
+                currentFulfillDocIds = docIds;
+                
+                titleEl.textContent = `Fulfill Request: "${title}"`;
+                inputEl.value = "";
+                
+                modal.classList.add("active");
+            }).catch(err => {
+                console.error("Error setting claim lock batch:", err);
+                showToast("Failed to lock request for processing.", "error");
+            });
+        } else {
+            // Already fulfilled
+            showToast("This request has already been resolved.", "info");
+        }
+    }).catch(err => {
+        console.error("Error checking claim lock status:", err);
+        showToast("Error checking request status.", "error");
+    });
+}
+
+function releaseClaimLock(title) {
+    if (typeof firebase === "undefined" || !db || !title) return;
     
-    if (!modal || !titleEl || !inputEl) return;
+    const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
+    const currentAdminId = String(tgUser ? tgUser.id : (new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || "test-admin"));
     
-    currentFulfillTitle = title;
-    currentFulfillDocIds = docIds;
-    
-    titleEl.textContent = `Fulfill Request: "${title}"`;
-    inputEl.value = "";
-    
-    modal.classList.add("active");
+    db.collection("requests").where("title", "==", title).get().then(snapshot => {
+        const batch = db.batch();
+        let count = 0;
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.adminClaimId === currentAdminId && data.status !== "fulfilled" && data.status !== "claimed") {
+                batch.update(doc.ref, {
+                    adminClaimId: firebase.firestore.FieldValue.delete(),
+                    adminClaimName: firebase.firestore.FieldValue.delete(),
+                    adminClaimTime: firebase.firestore.FieldValue.delete()
+                });
+                count++;
+            }
+        });
+        if (count > 0) {
+            batch.commit().catch(err => console.error("Error releasing claim lock:", err));
+        }
+    }).catch(err => console.error("Error querying requests for release lock:", err));
 }
 
 // Bind search input typing events
@@ -3472,6 +3607,7 @@ const fulfillLinkInput = document.getElementById("fulfill-download-link");
 
 if (closeFulfillModalBtn && fulfillRequestModal) {
     closeFulfillModalBtn.addEventListener("click", () => {
+        releaseClaimLock(currentFulfillTitle);
         fulfillRequestModal.classList.remove("active");
     });
 }
@@ -3492,19 +3628,41 @@ if (fulfillForm && fulfillRequestModal) {
         const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === matchTitle);
         const reqTmdbId = matchedReq ? matchedReq.tmdb_id : null;
         
+        // Clean Title by stripping season/part suffix for TMDB / Catalog matching
+        const cleanTitle = currentFulfillTitle.replace(/\s*\((season|part)\s*\d+\)\s*$/i, "").trim();
+        const cleanMatchTitle = cleanTitle.toLowerCase();
+        
         const existingMovie = allCatalogMovies.find(m => {
-            if (m.title.toLowerCase().trim() !== matchTitle) return false;
+            const cleanCatalogTitle = m.title.toLowerCase().trim().replace(/\s*\((season|part)\s*\d+\)\s*$/i, "").trim();
+            if (cleanCatalogTitle !== cleanMatchTitle) return false;
             if (reqTmdbId && m.tmdb_id) {
                 return String(reqTmdbId) === String(m.tmdb_id);
             }
             return true;
         });
+        
+        const seasonOrPart = matchedReq ? matchedReq.seasonOrPart : "";
+        let formattedLink = downloadLink;
+        if (seasonOrPart) {
+            const isSeries = matchedReq && (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv');
+            if (isSeries) {
+                formattedLink = { url: downloadLink, season: seasonOrPart };
+            } else {
+                formattedLink = { url: downloadLink, quality: seasonOrPart };
+            }
+        }
+        
         let movieToSync = null;
         
         if (existingMovie) {
             if (!existingMovie.links) existingMovie.links = [];
-            if (!existingMovie.links.includes(downloadLink)) {
-                existingMovie.links.push(downloadLink);
+            // Check if link is already present
+            const linkExists = existingMovie.links.some(link => {
+                const url = typeof link === 'object' && link !== null ? link.url : link;
+                return url === downloadLink;
+            });
+            if (!linkExists) {
+                existingMovie.links.push(formattedLink);
                 catalogChangesMade = true;
                 if (!newlyUpdatedIds.includes(existingMovie.csv_id)) {
                     newlyUpdatedIds.push(existingMovie.csv_id);
@@ -3514,13 +3672,12 @@ if (fulfillForm && fulfillRequestModal) {
         } else {
             // Create a new catalog entry
             let isSeries = false;
-            const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === matchTitle);
             if (matchedReq && (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv')) {
                 isSeries = true;
             }
             
             const mediaType = isSeries ? 'tv' : 'movie';
-            const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(currentFulfillTitle)}`;
+            const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}`;
             
             let tmdbData = null;
             try {
@@ -3542,7 +3699,7 @@ if (fulfillForm && fulfillRequestModal) {
             
             if (tmdbData) {
                 const tmdbId = tmdbData.id;
-                const slug = currentFulfillTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const slug = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
                 const csvId = `${tmdbId}-${slug}`;
                 
                 let trailerId = "";
@@ -3559,7 +3716,7 @@ if (fulfillForm && fulfillRequestModal) {
                     csv_id: csvId,
                     tmdb_id: tmdbId,
                     imdb_id: "",
-                    title: tmdbData.title || tmdbData.name || currentFulfillTitle,
+                    title: tmdbData.title || tmdbData.name || cleanTitle,
                     type: isSeries ? 'Series' : 'Movie',
                     categories: isSeries ? ["Main", "Hollywood/British Series"] : ["Main", "Hollywood/British Movies"],
                     genres: tmdbData.genres ? tmdbData.genres.map(g => g.name) : [],
@@ -3573,21 +3730,21 @@ if (fulfillForm && fulfillRequestModal) {
                     director: "",
                     trailer: trailerId,
                     runtime: "",
-                    links: [downloadLink]
+                    links: [formattedLink]
                 };
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(csvId);
                 catalogChangesMade = true;
                 movieToSync = newMovie;
             } else {
-                const slug = currentFulfillTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const slug = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
                 const csvId = `manual-${Date.now()}-${slug}`;
                 
                 const newMovie = {
                     csv_id: csvId,
                     tmdb_id: null,
                     imdb_id: "",
-                    title: currentFulfillTitle,
+                    title: cleanTitle,
                     type: isSeries ? 'Series' : 'Movie',
                     categories: isSeries ? ["Main", "Hollywood/British Series"] : ["Main", "Hollywood/British Movies"],
                     genres: [],
@@ -3601,7 +3758,7 @@ if (fulfillForm && fulfillRequestModal) {
                     director: "",
                     trailer: "",
                     runtime: "",
-                    links: [downloadLink]
+                    links: [formattedLink]
                 };
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(csvId);
@@ -3622,7 +3779,10 @@ if (fulfillForm && fulfillRequestModal) {
                 const ref = db.collection("requests").doc(id);
                 batch.update(ref, {
                     status: "fulfilled",
-                    downloadLink: downloadLink
+                    downloadLink: downloadLink,
+                    adminClaimId: firebase.firestore.FieldValue.delete(),
+                    adminClaimName: firebase.firestore.FieldValue.delete(),
+                    adminClaimTime: firebase.firestore.FieldValue.delete()
                 });
             });
             if (chunkIdx === 0 && movieToSync) {

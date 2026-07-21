@@ -1532,6 +1532,33 @@ async function init() {
                                 notifiedAt: admin.firestore.FieldValue.serverTimestamp()
                             }).catch(() => {});
                         }
+
+                        // Notify admins of the fulfillment
+                        try {
+                            const defaultAdmins = ["1329840839", "1175336733"];
+                            const adminDoc = await db.collection("settings").doc("admins").get();
+                            const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
+                            const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
+                            const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
+
+                            const pendingSnapshot = await db.collection("requests").where("status", "==", "pending").get();
+                            const pendingCount = pendingSnapshot.size;
+
+                            const adminNotifyText = `📋 *Request Fulfilled!*\n\n` +
+                                                 `*Title:* ${title}${yearSuffix}\n` +
+                                                 `*Fulfilled for:* @${username} (ID: \`${userId}\`)\n\n` +
+                                                 `⚡ *Remaining Queue:* \`${pendingCount}\` pending requests left to tackle in our DMs.`;
+
+                            for (const adminId of allAdmins) {
+                                try {
+                                    await bot.telegram.sendMessage(adminId, adminNotifyText, { parse_mode: "Markdown" });
+                                } catch (err) {
+                                    console.warn(`Failed to notify admin ${adminId} of fulfillment:`, err.message);
+                                }
+                            }
+                        } catch (adminErr) {
+                            console.error("Error in admin notification:", adminErr);
+                        }
                     }
                 }
             });

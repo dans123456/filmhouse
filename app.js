@@ -3124,8 +3124,7 @@ function openDetailModal(movie) {
 
         requestBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            logMovieRequestToFirestore(movie);
-            showConnectionDrawer("https://t.me/+09ahNmGdB1U2MzFk", ADSGRAM_REQUEST_BLOCK_ID);
+            showRequestSpecsDrawer(movie);
         });
         
         actionsRow.appendChild(requestBtn);
@@ -3597,17 +3596,20 @@ function openDownloadModal(movie) {
 
             if (isTVShow) {
                 // --- TV SERIES: Season layout ---
-                const seasonNum = idx + 1;
+                const isObj = typeof link === 'object' && link !== null;
+                const seasonLabel = isObj && link.season ? link.season : `Season ${idx + 1}`;
+                const badgeText = isObj && link.shortLabel ? link.shortLabel : (isObj && link.season ? (link.season.replace(/[^0-9]/g, '') ? `S${link.season.replace(/[^0-9]/g, '')}` : link.season.substring(0, 4)) : `S${idx + 1}`);
+
                 const badge = document.createElement("span");
                 badge.className = "download-link-badge season-badge";
-                badge.textContent = `S${seasonNum}`;
+                badge.textContent = badgeText;
                 anchor.appendChild(badge);
 
                 const labelWrap = document.createElement("div");
                 labelWrap.className = "download-link-label-wrap";
                 const label = document.createElement("span");
                 label.className = "download-link-label";
-                label.textContent = `Season ${seasonNum}`;
+                label.textContent = seasonLabel;
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
                 if (matchingRequest) {
@@ -5533,24 +5535,7 @@ function renderUserRequests(requests) {
                         }).catch(err => console.error("Error updating claim in Firestore:", err));
                     }
 
-                    // Resolve the download link inside the event listener scope
-                    const rawLink = r._isExplicit ? r.downloadLink : (r._matchingMovie && r._matchingMovie.links ? r._matchingMovie.links[0] : "");
-                    const dlLink = typeof rawLink === 'object' && rawLink !== null ? rawLink.url : rawLink;
-
-                    // Open link directly in the app browser
-                    if (dlLink) {
-                        if (typeof Telegram !== "undefined" && Telegram.WebApp && Telegram.WebApp.openLink) {
-                            try {
-                                Telegram.WebApp.openLink(dlLink);
-                            } catch (e) {
-                                window.open(dlLink, "_blank");
-                            }
-                        } else {
-                            window.open(dlLink, "_blank");
-                        }
-                    }
-                    
-                    showToast("Claimed! Opening download link... 🍿", "success");
+                    showToast("Claimed! The download links have been sent to your Telegram DMs. 🍿", "success");
                     
                     // Re-render so claimed request moves to history immediately
                     renderUserRequests(currentUserRequests);
@@ -5745,10 +5730,14 @@ function updateHeaderNotificationDot() {
         }).catch(err => console.warn("Error checking header notifications:", err));
 }
 
-function logMovieRequestToFirestore(movie) {
+function logMovieRequestToFirestore(movie, specs = "") {
     if (typeof firebase === "undefined" || !db) return;
+    
+    const requestTitle = specs ? `${movie.title || "Unknown Title"} (${specs})` : (movie.title || "Unknown Title");
+    
     db.collection("requests").add({
-        title: movie.title || "Unknown Title",
+        title: requestTitle,
+        seasonOrPart: specs || "",
         tmdb_id: movie.tmdb_id || null,
         csv_id: movie.csv_id || "",
         type: movie.type || "Movie",
@@ -5762,6 +5751,96 @@ function logMovieRequestToFirestore(movie) {
     }).catch(err => {
         console.error("Error logging movie request:", err);
     });
+}
+
+function showRequestSpecsDrawer(movie) {
+    const drawer = document.getElementById("request-specs-drawer");
+    const subtitleEl = document.getElementById("request-specs-subtitle");
+    const formContainer = document.getElementById("request-specs-form-container");
+    const closeBtn = document.getElementById("btn-close-request-specs-drawer");
+    const submitBtn = document.getElementById("btn-submit-request-specs");
+    
+    if (!drawer || !subtitleEl || !formContainer || !submitBtn) {
+        // Fallback: log request immediately if specs drawer markup isn't found
+        logMovieRequestToFirestore(movie);
+        showConnectionDrawer("https://t.me/+09ahNmGdB1U2MzFk", ADSGRAM_REQUEST_BLOCK_ID);
+        return;
+    }
+    
+    subtitleEl.textContent = `Let us know which specific season or part of "${movie.title}" you would like to request.`;
+    formContainer.innerHTML = "";
+    
+    const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
+    
+    if (isTV) {
+        formContainer.innerHTML = `
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                <label for="request-season-select" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Select Season</label>
+                <select id="request-season-select" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; color: #fff; width: 100%; outline: none; font-size: 13px; font-family: var(--font-primary);">
+                    <option value="Season 1">Season 1</option>
+                    <option value="Season 2">Season 2</option>
+                    <option value="Season 3">Season 3</option>
+                    <option value="Season 4">Season 4</option>
+                    <option value="Season 5">Season 5</option>
+                    <option value="Season 6">Season 6</option>
+                    <option value="Season 7">Season 7</option>
+                    <option value="Season 8">Season 8</option>
+                    <option value="Season 9">Season 9</option>
+                    <option value="Season 10">Season 10</option>
+                    <option value="All Seasons">All Seasons</option>
+                </select>
+            </div>
+        `;
+    } else {
+        formContainer.innerHTML = `
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                <label for="request-part-input" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Part / Version (Optional)</label>
+                <input type="text" id="request-part-input" placeholder="e.g. Part 1, Part 2, Director's Cut" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; color: #fff; width: 100%; outline: none; font-size: 13px; font-family: var(--font-primary);">
+            </div>
+        `;
+    }
+    
+    // Slide up drawer
+    drawer.style.display = "flex";
+    setTimeout(() => {
+        drawer.classList.add("active");
+    }, 10);
+    
+    const closeDrawer = () => {
+        drawer.classList.remove("active");
+        setTimeout(() => {
+            drawer.style.display = "none";
+        }, 300);
+    };
+    
+    // Event listeners
+    closeBtn.onclick = (e) => {
+        e.preventDefault();
+        closeDrawer();
+    };
+    
+    drawer.onclick = (e) => {
+        if (e.target === drawer) {
+            closeDrawer();
+        }
+    };
+    
+    submitBtn.onclick = (e) => {
+        e.preventDefault();
+        
+        let specs = "";
+        if (isTV) {
+            const selectEl = document.getElementById("request-season-select");
+            if (selectEl) specs = selectEl.value;
+        } else {
+            const inputEl = document.getElementById("request-part-input");
+            if (inputEl) specs = inputEl.value.trim();
+        }
+        
+        closeDrawer();
+        logMovieRequestToFirestore(movie, specs);
+        showConnectionDrawer("https://t.me/+09ahNmGdB1U2MzFk", ADSGRAM_REQUEST_BLOCK_ID);
+    };
 }
 
 // Daily Missions / Quests System Helpers
