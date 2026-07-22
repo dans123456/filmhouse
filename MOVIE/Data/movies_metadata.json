@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "1318621-descendants-wicked-wonderland",
+    "tmdb_id": 1318621,
+    "imdb_id": "",
+    "title": "Descendants: Wicked Wonderland",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Now that the Queen of Hearts is nice and Cinderella is safe, things seem perfect for Red and Chloe… But little do they know that changing the past created a new villain — Maddox Hatter. When Maddox captures the Queen of Hearts, Red and Chloe must work alongside Red’s new sister Pink, Luisa Madrigal’s son Luis, and Maddox’s son Max to save her and Wonderland.",
+    "poster": "https://image.tmdb.org/t/p/w500/xdhLAADGSse8KCrsDLBuM5b68Cg.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/idRLKyu43mRhMWNjzd6FiEromNI.jpg",
+    "rating": 7.7,
+    "release_date": "2026-07-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "0Gg7x3xBqBU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADpx4AAqApCEd3J0lz3eidcRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "127585-x-men-days-of-future-past",
     "tmdb_id": 127585,
     "imdb_id": "",
