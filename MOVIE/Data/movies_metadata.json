@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "254993-embrace-in-the-dark-night",
+    "tmdb_id": 254993,
+    "imdb_id": "",
+    "title": "Embrace in the Dark Night",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Wen Xi is drawn into an underground fight club and becomes the prize for champion Xu Zheqing, who is secretly a security consultant tasked with saving her. Three years later, after her twin sister’s mysterious death, Wen Xi assumes her sister’s identity at a company, where she reunites with Xu. Now on opposite sides, can they reconcile their feelings and uncover the truth?",
+    "poster": "https://image.tmdb.org/t/p/w500/dGBg7KKsNRNzeVeKePrgwfKw1m5.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bKLWC6ppultOZk0qPyYGWRqoQNm.jpg",
+    "rating": 7.8,
+    "release_date": "2024-08-06",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "0q9kJZZ_a_Y",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHxEAAotZEUfpGJy5dBouwxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "manual-1784818186588-embrace-in-the-dark-night-all-seasons",
     "tmdb_id": null,
     "imdb_id": "",
