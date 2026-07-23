@@ -23348,7 +23348,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "In order to save his dying father, young stunt cyclist Johnny Blaze sells his soul to Mephistopheles and sadly parts from the pure-hearted Roxanne Simpson, the love of his life. Years later, Johnny's path crosses again with Roxanne, now a go-getting reporter, and also with Mephistopheles, who offers to release Johnny's soul if Johnny becomes the fabled, fiery 'Ghost Rider'.",
@@ -23362,7 +23363,10 @@
     "trailer": "nu6R7ypaz5g",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADqx8AAp4PgEYS2vH3Ne-CRhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqx8AAp4PgEYS2vH3Ne-CRhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -23420,14 +23424,18 @@
     "csv_id": "1022929-girl-friday",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADTxEAAq-EQEZ7uIJtmxGaUxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADTxEAAq-EQEZ7uIJtmxGaUxYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/7isaQ0kCpOPevBBpagahMNYU8oI.jpg",
     "rating": 4.8,
     "release_date": "",
     "overview": "A wife resorts to sexual explorations in order to save their marriage but when her plan backfires she devises an evil scheme.",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -23435,7 +23443,8 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 1022929
   },
   {
     "csv_id": "1297842-goat",
@@ -24226,7 +24235,8 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Korean Drama"
     ],
     "genres": [],
     "overview": "Since high school, Sang Zhi has had a crush on Duan Jiaxu. When fate brings them together again, they find a chance to embark on a sweet relationship.",
@@ -24240,7 +24250,10 @@
     "trailer": "zAjrImdpchA",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADgxsAAmjCeUbfX2fJ2M1sLxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADgxsAAmjCeUbfX2fJ2M1sLxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -24636,15 +24649,42 @@
     "csv_id": "1100-how-i-met-your-mother",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADtwQAAu61cETBMMrm2srXNRYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADuQQAAu61cERtR_iv3R3lBBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADvQQAAu61cETzXWZslK4tPBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADwAQAAu61cESBFlb-9XnrORYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADwQQAAu61cETNws0425_TKhYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADxAQAAu61cESXKP-a_8S-1BYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADxgQAAu61cEQO2gbnv-cfhBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADzwQAAu61cESG9_SkDBbqbhYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD1AQAAu61cESuSueCFwjAUxYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADtwQAAu61cETBMMrm2srXNRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADuQQAAu61cERtR_iv3R3lBBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADvQQAAu61cETzXWZslK4tPBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADwAQAAu61cESBFlb-9XnrORYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADwQQAAu61cETNws0425_TKhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADxAQAAu61cESXKP-a_8S-1BYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADxgQAAu61cEQO2gbnv-cfhBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADzwQAAu61cESG9_SkDBbqbhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD1AQAAu61cESuSueCFwjAUxYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/b34jPzmB0wZy7EjUZoleXOl2RRI.jpg",
     "rating": 8.1,
@@ -24654,7 +24694,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Classic Movies"
     ],
     "tmdb_id": 1100,
     "overview": "A father recounts to his children - through a series of flashbacks - the journey he and his four best friends took leading up to him meeting their mother.",
@@ -24815,8 +24856,14 @@
     "csv_id": "73698-i-am-frankie",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADYw4AAoywoEaerQyr10VLvBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADZQ4AAoywoEYGhD-O52-UqBYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADYw4AAoywoEaerQyr10VLvBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADZQ4AAoywoEYGhD-O52-UqBYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/71zzfzIzepAQxkn1fpKEFJKZlGU.jpg",
     "rating": 7.2,
@@ -24828,7 +24875,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 73698,
     "overview": "Frankie Gaines looks like a typical teenager, but she's actually a cutting edge, experimental android who must hide her true identity to avoid being tracked down by the evil tech company EGG Labs.",
@@ -24995,7 +25043,10 @@
     "csv_id": "1058491-ijakumo-the-born-again-stripper",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD0A8AAh50AAFGsS75AAF_iobqFgQ"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD0A8AAh50AAFGsS75AAF_iobqFgQ",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/91UZxu28BBEamhADXty0O6pK7kq.jpg",
     "rating": 0,
@@ -25006,7 +25057,7 @@
     "categories": [
       "Main",
       "Hollywood/British Movies",
-      "Comic"
+      "African"
     ],
     "tmdb_id": 1058491,
     "overview": "When a wealthy and flamboyant pastor discovers that his new favorite stripper is his church’s worship leader, he begins an affair with her that opens a Pandora’s Box of crisis beyond what he imagined.",
@@ -25456,7 +25507,8 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Korean Drama"
     ],
     "genres": [],
     "overview": "An author with severe antisocial tendencies learns to confront her deep emotional wounds when she meets a stranger who challenges her cold facade.",
@@ -25470,7 +25522,10 @@
     "trailer": "KwP3VzowPhE",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD5RAAAmjCgUbXupfjv2nlTBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD5RAAAmjCgUbXupfjv2nlTBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -25545,7 +25600,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "Ex-hitman John Wick comes out of retirement to track down the gangsters that took everything from him.",
@@ -25559,7 +25615,10 @@
     "trailer": "6r0s41Ju5XA",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADoiAAAh-4UEY3h47aIT1rYxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADoiAAAh-4UEY3h47aIT1rYxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -25776,14 +25835,18 @@
     "csv_id": "1127209-kabayo",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD3Q8AAq-EQEauN67-ks-PARYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD3Q8AAq-EQEauN67-ks-PARYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/uhBScHjoMlrWUhsm5vPIBNvksKY.jpg",
     "rating": 3.7,
     "release_date": "",
     "overview": "A story about Laurene who wants to elevate her seven-year relationship with Conrad. When Easton comes inito the picture, she believes she is the perfect addition to their sexual relationship.",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -25791,7 +25854,8 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 1127209
   },
   {
     "csv_id": "207468-8",
@@ -25939,14 +26003,18 @@
     "csv_id": "460229-kiss-and-kill",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADeQ8AAq-EQEYp7AcuKX6UTRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADeQ8AAq-EQEYp7AcuKX6UTRYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/5QdNwga65k5iCE7fsghSdBmyVld.jpg",
     "rating": 5.286,
     "release_date": "",
     "overview": "A reckless night of indiscretion and lust leads a woman into the dark world of blackmail and murder. When revealing photos of her sexual tryst unexpectedly surface, Katy is forced to submit to whatever her tormentors desire.",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -25954,7 +26022,8 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 460229
   },
   {
     "csv_id": "4964-knocked-up",
@@ -26381,7 +26450,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Erotic Movies"
     ],
     "genres": [],
     "overview": "A high school outcast pays a cheerleader to pose as his girlfriend so he can be considered cool.",
@@ -26395,7 +26465,10 @@
     "trailer": "qi83JMiIq1c",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADryAAAh-4UEYmxWtsx_DzZBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADryAAAh-4UEYmxWtsx_DzZBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -26403,7 +26476,10 @@
     "csv_id": "1084836-love-in-a-pandemic",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADlQ8AAh50AAFG0sfCq4GI7fcWBA"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADlQ8AAh50AAFG0sfCq4GI7fcWBA",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/zcGpLeWknGH6Wabg8cyZH4wsnvV.jpg",
     "rating": 5.2,
@@ -26414,7 +26490,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "African"
     ],
     "tmdb_id": 1084836,
     "overview": "Directed by Akay Mason and written by Abosi Ogba, the film captures a love story that happens amidst one of the most unforgettable moments in human history, the COVID-19 pandemic. It follows the story of Bolanle, who meets Alex, the man of her dreams, but how does their new flame survive the uncertain world of a pandemic?",
@@ -26439,12 +26516,13 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "African"
     ],
     "genres": [],
     "overview": "LOVE IN EVERY WORD written by Mfon- Abasi Micheal Inyang is a beautiful piece. In a fast-paced world where love often takes a backseat to ambition, two souls from different worlds cross paths in an unexpected encounter. As emotions spark and cultural differences collide, they must navigate personal fears, societal expectations, and the delicate balance between love and self-discovery. When destiny presents an opportunity for something real, will they take the leap, or will their differences keep them apart?",
-    "poster": "",
-    "backdrop": "",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
     "rating": 0,
     "release_date": "",
     "language": "en",
@@ -26453,7 +26531,10 @@
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADRBgAAmjCeUZ63bf_MiF8ChYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRBgAAmjCeUZ63bf_MiF8ChYE",
+        "quality": "720p"
+      }
     ]
   },
   {
