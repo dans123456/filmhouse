@@ -12592,7 +12592,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "genres": [],
     "overview": "Five disparate kids snowed in at the airport on Christmas Eve learn some lessons about friendship when they launch a bid to get back to their families and outsmart a disgruntled airport official who wants to keep them grounded.",
@@ -12606,7 +12607,10 @@
     "trailer": "9lMY2F8-iyc",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQADEA0AAnavkUYwnmPn4RMmaRYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADEA0AAnavkUYwnmPn4RMmaRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -13976,7 +13980,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Erotic Movies"
     ],
     "genres": [],
     "overview": "Three British teenage girls go on a rites-of-passage holiday—drinking, clubbing and hooking up, in what should be the best summer of their lives.",
@@ -13990,7 +13995,10 @@
     "trailer": "a3XV6Oi1YZI",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQAD7CEAAp4PiEaKTr3KIDZ09xYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD7CEAAp4PiEaKTr3KIDZ09xYE",
+        "quality": "720p"
+      }
     ]
   },
   {
