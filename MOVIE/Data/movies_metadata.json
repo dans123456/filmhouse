@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "251608-bad-thoughts",
+    "tmdb_id": 251608,
+    "imdb_id": "",
+    "title": "Bad Thoughts",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "A collection of hilariously disturbing stories that push the boundaries of decency in ways only Tom Segura could imagine.",
+    "poster": "https://image.tmdb.org/t/p/w500/fekkWALV563XGUaBiwYHdV4UBQ6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sbMfwVQ7HPDNtNtHXDEa0HfNvyf.jpg",
+    "rating": 5.8,
+    "release_date": "2025-05-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "rrCciU8nD98",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADvhUAAotZEUfsNvBwNinobxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADwhUAAotZEUcgokgDlAP-cBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "83533-avatar-fire-and-ash",
     "tmdb_id": 83533,
     "imdb_id": "",
