@@ -1,5 +1,61 @@
 [
   {
+    "csv_id": "14423-first-sunday",
+    "tmdb_id": 14423,
+    "imdb_id": "",
+    "title": "First Sunday",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Durell and LeeJohn are best friends and bumbling petty criminals. When told they have one week to pay a $17,000 debt or Durell will lose his son, they come up with a desperate scheme to rob their neighborhood church. Instead, they end up spending the night in the presence of the Lord and are forced to deal with much more than they bargained for.",
+    "poster": "https://image.tmdb.org/t/p/w500/9l0sdc7ohLe6TdFsYyCTBnVn1F8.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vWcJ4qWHNwxxXPs9NwTWoWEHlXo.jpg",
+    "rating": 5.6,
+    "release_date": "2008-01-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "mhrNZYA4Cyc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD_RAAAotZEUc8cnW9yqkRzBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1275779-disclosure-day",
+    "tmdb_id": 1275779,
+    "imdb_id": "",
+    "title": "Disclosure Day",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A cybersecurity expert becomes a whistleblower after uncovering secrets about aliens, putting him on the run from a corporation. Meanwhile, a meteorologist experiencing strange phenomena joins forces with him to prove there's life beyond our understanding.",
+    "poster": "https://image.tmdb.org/t/p/w500/AnJ8IQJI23hNpYXVNaythu061Ru.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/flxau5Iu7bChQHsESqvGZ3FQRaI.jpg",
+    "rating": 7.1,
+    "release_date": "2026-06-10",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "icDuEHSxE-w",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD_BAAAotZEUexbJ92jyg11xYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "213306-cross",
     "tmdb_id": 213306,
     "imdb_id": "",
