@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "83533-avatar-fire-and-ash",
+    "tmdb_id": 83533,
+    "imdb_id": "",
+    "title": "Avatar: Fire and Ash",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "In the wake of the devastating war against the RDA and the loss of their eldest son, Jake Sully and Neytiri face a new threat on Pandora: the Ash People, a violent and power-hungry Na'vi tribe led by the ruthless Varang. Jake's family must fight for their survival and the future of Pandora in a conflict that pushes them to their emotional and physical limits.",
+    "poster": "https://image.tmdb.org/t/p/w500/bRBeSHfGHwkEpImlhxPmOcUsaeg.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/u8DU5fkLoM5tTRukzPC31oGPxaQ.jpg",
+    "rating": 7.6,
+    "release_date": "2025-12-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Ma1x7ikpid8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADexUAAotZEUcWqfMxgvZFRxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1242419-roofman",
     "tmdb_id": 1242419,
     "imdb_id": "",
