@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "213306-cross",
+    "tmdb_id": 213306,
+    "imdb_id": "",
+    "title": "Cross",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Crime",
+      "Drama",
+      "Mystery"
+    ],
+    "overview": "Alex Cross is a brilliant but flawed homicide detective and full of contradictions. A doting father and family man, Cross is single-minded to the point of obsession when he hunts killers. He is desperate for love, but his wife’s murder has left him too damaged to receive it.",
+    "poster": "https://image.tmdb.org/t/p/w500/6hhKdavCEZi8d584ZtIrQIrBvZI.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/w4HqCpNojW3kbgtj4qHCnf5G7bf.jpg",
+    "rating": 7,
+    "release_date": "2024-11-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "GOupIB773tI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1g8AAotZEUfGLOFFLCb4GhYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "398818-call-me-by-your-name",
     "tmdb_id": 398818,
     "imdb_id": "",
