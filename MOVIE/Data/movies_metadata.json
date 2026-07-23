@@ -26540,14 +26540,18 @@
     "csv_id": "214080-lovely-ladies-dorm",
     "type": "Series",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADfw8AAq-EQEbtYBrJpTgjBhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADfw8AAq-EQEbtYBrJpTgjBhYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/slKiK8swApBMwq9LNI2tG7nXYAw.jpg",
     "rating": 5,
     "release_date": "",
     "overview": "Five modern women live together in one roof as they deal with their families, career, and men and explore their colorful sex lives.",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -26555,7 +26559,8 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 214080
   },
   {
     "title": "Lupin",
@@ -26621,7 +26626,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "African"
+      "African",
+      "Classic Movies"
     ],
     "genres": [
       "African"
@@ -26637,7 +26643,10 @@
     "trailer": "Iam7Xq1HbZ8",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADfR8AAh-4UEbINyMV7SgcPBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADfR8AAh-4UEbINyMV7SgcPBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -27945,7 +27954,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "A crew of miniature aliens operate a spaceship that has a human form. While trying to save their planet, the aliens encounter a new problem, as their ship becomes smitten with an Earth woman.",
@@ -27959,7 +27969,10 @@
     "trailer": "8GCeBhbo_W0",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADBhUAAp6faUaKRCB1uFan8hYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBhUAAp6faUaKRCB1uFan8hYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -28321,7 +28334,10 @@
     "csv_id": "1451853-momiwa",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADMxAAAh50AAFGoU3-YMGF8csWBA"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADMxAAAh50AAFGoU3-YMGF8csWBA",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/kVBEhjHWMaiGPEM3d12Ykq7JqEk.jpg",
     "rating": 0,
@@ -28333,6 +28349,7 @@
     "categories": [
       "Main",
       "Hollywood/British Movies",
+      "African",
       "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 1451853,
@@ -28347,7 +28364,8 @@
       "Michael Sani"
     ],
     "director": "Biodun Stephen",
-    "runtime": "110 min"
+    "runtime": "110 min",
+    "trailer": ""
   },
   {
     "title": "Money Heist",
@@ -28624,7 +28642,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "A husband and wife struggle to keep their marriage alive until they realize they are both secretly working as assassins. Now, their respective assignments require them to kill each other.",
@@ -28638,7 +28657,10 @@
     "trailer": "TWB_icm5M38",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADsx4AAh-4UEb4Sro4F5ZjThYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsx4AAh-4UEb4Sro4F5ZjThYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -28649,7 +28671,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "When Longfellow Deeds, a small-town pizzeria owner and poet, inherits $40 billion from his deceased uncle, he quickly begins rolling in a different kind of dough. Moving to the big city, Deeds finds himself besieged by opportunists all gunning for their piece of the pie. Babe, a television tabloid reporter, poses as an innocent small-town girl to do an exposé on Deeds.",
@@ -28663,7 +28686,10 @@
     "trailer": "ASw47FiEhes",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADrQ8AAmjCeUbAM3UXk7TethYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADrQ8AAmjCeUbAM3UXk7TethYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -29098,14 +29124,18 @@
     "csv_id": "10855",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADew8AAq-EQEba5saOLd2XnBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADew8AAq-EQEba5saOLd2XnBYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/bEkFMDlIosqroIO8yBBIKZWoGRh.jpg",
     "rating": 6.77,
     "release_date": "",
     "overview": "A mysterious woman, known as Madame M, kidnaps forty pre-teen girls and transports them to a remote island to train them as the most deadly assassins. CIA operative Jack Chen follows the case for 6 years with no leads, but when a series of assassinations begin to occur, Jack suspects that Madame M is back in business.",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -29113,7 +29143,8 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 10855
   },
   {
     "csv_id": "314996-nanny-cam",
