@@ -21949,7 +21949,6 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies",
       "African"
     ],
     "genres": [],
@@ -21964,7 +21963,10 @@
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADrwkAAq-EQEZP-kefUc3JHRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADrwkAAq-EQEZP-kefUc3JHRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -22058,7 +22060,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "When Scott learns that his longtime cyber-buddy from Berlin is a gorgeous young woman, he and his friends embark on a trip across Europe.",
@@ -22072,7 +22075,10 @@
     "trailer": "UhaoTcD60q4",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADtx4AAh-4UEZVmbLU_S1HARYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADtx4AAh-4UEZVmbLU_S1HARYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -22080,14 +22086,18 @@
     "csv_id": "893694-eva",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADUBEAAq-EQEYibQYp96mUhBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADUBEAAq-EQEYibQYp96mUhBYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/xADCcluh5TaqETZGO45RulKnYDy.jpg",
     "rating": 5.36,
     "release_date": "",
     "overview": "When Eva gets involved in a steamy threesome with a houseboy and her lady boss, she realizes she has to choose only one between them.",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -22095,14 +22105,18 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 893694
   },
   {
     "title": "Every Witch Way",
     "csv_id": "60998-every-witch-way",
     "type": "Series",
     "links": [
-      "https://t.me/+cJUgTGPMeXoyM2Nk"
+      {
+        "url": "https://t.me/+cJUgTGPMeXoyM2Nk",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/i7jSP3RCz5OFFBnTIWJ0DvkYxWV.jpg",
     "rating": 8.1,
@@ -22114,7 +22128,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 60998,
     "overview": "The series follows 14-year-old Emma Alonso, as she moves to Miami and her life turns upside-down. Not only does she discover that she is a witch, she also has a crush on the boy next door, Daniel. But Daniel’s ex-girlfriend Maddie, who is an 'evil witch' and leader of the school clique the 'Panthers', is still willing to fight for the boy she loves.",
@@ -22328,8 +22343,9 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Animated Movies",
       "Hollywood/British Series",
+      "Comic",
+      "Animated Movies",
       "Classic Movies"
     ],
     "genres": [
@@ -22347,8 +22363,14 @@
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADzB8AAp4PgEbBrWHZo6-Q_BYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADzR8AAp4PgEajufLAStxktxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADzB8AAp4PgEbBrWHZo6-Q_BYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADzR8AAp4PgEajufLAStxktxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -22359,7 +22381,9 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Comic",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "During a space voyage, four scientists are altered by cosmic rays: Reed Richards gains the ability to stretch his body; Sue Storm can become invisible; Johnny Storm controls fire; and Ben Grimm is turned into a super-strong … thing. Together, these \"Fantastic Four\" must now thwart the evil plans of Dr. Doom and save the world from certain destruction.",
@@ -22373,7 +22397,10 @@
     "trailer": "QIx2jkXYu34",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADyR8AAp4PgEZA3PXlAAHKwAYWBA"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyR8AAp4PgEZA3PXlAAHKwAYWBA",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -22384,7 +22411,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Comic"
     ],
     "genres": [],
     "overview": "Four young outsiders teleport to a dangerous universe, which alters their physical form in shocking ways. Their lives irrevocably upended, the team must learn to harness their daunting new abilities and work together to save Earth from a former friend turned enemy.",
@@ -22398,7 +22426,10 @@
     "trailer": "AAgnQdiZFsQ",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADNhMAAmjCeUahRb1UZB03URYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADNhMAAmjCeUahRb1UZB03URYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -22409,7 +22440,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Comic"
     ],
     "genres": [],
     "overview": "The Fantastic Four return to the big screen as a new and all powerful enemy threatens the Earth. The seemingly unstoppable 'Silver Surfer', but all is not what it seems and there are old and new enemies that pose a greater threat than the intrepid superheroes realize.",
@@ -22423,7 +22455,10 @@
     "trailer": "7whodtti908",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADjxQAAmjCeUYtCqxNC7LmPxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjxQAAmjCeUYtCqxNC7LmPxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -22434,8 +22469,9 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Animated Movies",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Comic",
+      "Animated Movies"
     ],
     "genres": [
       "Animated Movies"
@@ -22451,7 +22487,10 @@
     "trailer": "220329277",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADsB8AAp4PgEbnbd1-aQ4dChYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsB8AAp4PgEbnbd1-aQ4dChYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -22462,7 +22501,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "When a crime brings them back to L.A., fugitive ex-con Dom Toretto reignites his feud with agent Brian O'Conner. But as they are forced to confront a shared enemy, Dom and Brian must give in to an uncertain new trust if they hope to outmaneuver him. And the two men will find the best way to get revenge: push the limits of what's possible behind the wheel.",
@@ -22476,7 +22516,10 @@
     "trailer": "ne5E7hOQqn0",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADEwkAAh-4SEZQjs8JbX4lxRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADEwkAAh-4SEZQjs8JbX4lxRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -22879,14 +22922,18 @@
     "csv_id": "434967-forbidden-lust",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADkhAAAq-EQEaPzWgkn_9R2xYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADkhAAAq-EQEaPzWgkn_9R2xYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/325jOMDPI6UQcUFzDPkB1b2mfHI.jpg",
     "rating": 6.125,
     "release_date": "",
     "overview": "Rebecca is a gorgeous and sensitive woman who's looking for love ... or is she?",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -22894,21 +22941,26 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 434967
   },
   {
     "title": "Foursome",
     "csv_id": "1205025-foursome",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADVBEAAq-EQEaoi-UjRC-AeBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADVBEAAq-EQEaoi-UjRC-AeBYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/dkA8wIttLWPHXvFTx5xstQgUvag.jpg",
     "rating": 5.455,
     "release_date": "",
     "overview": "A married couple having troubles in bed, finding their sexual satisfaction outside their marriage.",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -22916,7 +22968,8 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 1205025
   },
   {
     "csv_id": "1125257-freakier-friday",
@@ -22969,15 +23022,18 @@
     ]
   },
   {
-    "title": "Freedom.And.Justice.2021",
+    "title": "Freedom And Justice",
     "csv_id": "1724402-freedom-and--2021",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADUx8AArFaKUZJgKctjqSEmhYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADUx8AArFaKUZJgKctjqSEmhYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://postimg.cc/w1xMYcrp",
     "rating": 0,
-    "release_date": "",
+    "release_date": "2021",
     "genres": [
       "Drama"
     ],
@@ -23271,14 +23327,18 @@
     "csv_id": "343674-gerald-s-game",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADhhAAAq-EQEbFTSgOSZuozxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhhAAAq-EQEbFTSgOSZuozxYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/32dippiypDdaKv7XFEfUlQ7kPup.jpg",
     "rating": 6.397,
     "release_date": "",
     "overview": "When her husband's sex game goes wrong, Jessie (who is handcuffed to a bed in a remote lake house) faces warped visions, dark secrets and a dire choice.",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -23286,7 +23346,8 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 343674
   },
   {
     "csv_id": "32823-get-him-to-the-greek",
@@ -23296,7 +23357,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "Pinnacle records has the perfect plan to get their sinking company back on track: a comeback concert in LA featuring Aldous Snow, a fading rockstar who has dropped off the radar in recent years. Record company intern Aaron Green is faced with the monumental task of bringing his idol, out of control rock star Aldous Snow, back to LA for his comeback show.",
@@ -23310,7 +23372,10 @@
     "trailer": "N6ixkr0-qvo",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADBxUAAp6faUZeI2eP_uAenhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBxUAAp6faUZeI2eP_uAenhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
