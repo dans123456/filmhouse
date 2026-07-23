@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "manual-1784818186588-embrace-in-the-dark-night-all-seasons",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Embrace in the Dark Night (All Seasons)",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHxEAAotZEUfpGJy5dBouwxYE",
+        "season": "All Seasons"
+      }
+    ]
+  },
+  {
     "csv_id": "1727780-borderline",
     "tmdb_id": 1727780,
     "imdb_id": "",
