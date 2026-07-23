@@ -32669,14 +32669,18 @@
     "csv_id": "66389-submission",
     "type": "Series",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD2Q8AAq-EQEZyZXzn6ES0vRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD2Q8AAq-EQEZyZXzn6ES0vRYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/uD2J4giOBcTRUOwcoN33WYCDuKF.jpg",
     "rating": 5.973,
     "release_date": "",
     "overview": "Beautiful but unfulfilled Ashley has her eyes opened to the tantalizing possibilities of BDSM when she discovers the popular erotic novel SLAVE by Nolan Keats. But her fascination with the mysterious Mr. Keats leads her into a sexy but dangerous love triangle, and tests the boundaries of her own sexual limitations.",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -32684,21 +32688,26 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 66389
   },
   {
     "title": "Suga Babies",
     "csv_id": "896227-suga-babies",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADNRAAAq-EQEbsSKnLkYaBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADNRAAAq-EQEbsSKnLkYaBYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/yqaomTC5eP1eFvazHGFXBgxTVl7.jpg",
     "rating": 0,
     "release_date": "",
     "overview": "Follow a gang of femme fatales in the dangerous world of drugs and money in this urban tale of power and wealth.",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -32706,21 +32715,26 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 896227
   },
   {
     "title": "Sugar Baby",
     "csv_id": "1196656-sugar-baby",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADPBEAAq-EQEYRtodl6_QRWhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADPBEAAq-EQEYRtodl6_QRWhYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/96MiE78ur3CQyDVNHTHT4RqBboI.jpg",
     "rating": 5.2,
     "release_date": "",
     "overview": "Two high school friends turned sugar babies, who sacrifice everything for each other. Until love gets in the way",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -32728,7 +32742,8 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 1196656
   },
   {
     "csv_id": "297761-suicide-squad",
@@ -32851,7 +32866,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "Two co-dependent high school seniors are forced to deal with separation anxiety after their plan to stage a booze-soaked party goes awry.",
@@ -32865,7 +32881,10 @@
     "trailer": "MuhWxdD0qno",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADVwkAAh-4SEZTkypO_ZI6mhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADVwkAAh-4SEZTkypO_ZI6mhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -32958,14 +32977,18 @@
     "csv_id": "1722860-tavvai",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD4w4AAq-EQEb2A0irLUE8SBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD4w4AAq-EQEb2A0irLUE8SBYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/pZAbPoVTMYrxFUSGG9hwaOUsZnW.jpg",
     "rating": 0,
     "release_date": "",
     "overview": "In 1880, A Maharaj through his atrocities invited Tavvai. The village is terrified for generations until a chosen one sets things right.",
     "categories": [
-      "Main"
+      "Main",
+      "Bollywood"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -32973,7 +32996,8 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 1722860
   },
   {
     "csv_id": "737396-tazmanian-devil",
@@ -33185,7 +33209,10 @@
     "csv_id": "1240212-terminus",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADnw8AAh50AAFGoM27c3Ns9PoWBA"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADnw8AAh50AAFGoM27c3Ns9PoWBA",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/u2SFoo3ZCxbu5GHMsmg79PSYwn6.jpg",
     "rating": 0,
@@ -33196,7 +33223,8 @@
     ],
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "African"
     ],
     "tmdb_id": 1240212,
     "overview": "A Ghanaian chemist, who in a bid to vindicate his company in a lawsuit stumbles on something even more dangerous in the process - a hidden chemical formula altered for testing and profit gains by a pharmaceutical giant.",
@@ -33210,7 +33238,8 @@
       "Joseph Otsiman"
     ],
     "director": "Abu Iddris",
-    "runtime": "83 min"
+    "runtime": "83 min",
+    "trailer": ""
   },
   {
     "csv_id": "225565-that-awkward-moment",
@@ -33440,7 +33469,9 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies",
+      "Erotic Movies"
     ],
     "genres": [],
     "overview": "A recently cheated on married woman falls for a younger man who has moved in next door, but their torrid affair soon takes a dangerous turn.",
@@ -33454,7 +33485,10 @@
     "trailer": "MgbBwovOOoc",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADGSAAAh-4UEbxlRwv0niOYBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADGSAAAh-4UEbxlRwv0niOYBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -33607,7 +33641,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "Paranormal investigators Ed and Lorraine Warren work to help a family terrorized by a dark presence in their farmhouse. Forced to confront a powerful entity, the Warrens find themselves caught in the most terrifying case of their lives.",
@@ -33621,7 +33656,10 @@
     "trailer": "k10ETZ41q5o",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD0yAAAh-4UEamU0nEApCmzBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD0yAAAh-4UEamU0nEApCmzBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -33707,7 +33745,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "Young sailor Edmond Dantès is wrongfully imprisoned, escapes, finds treasure, and reinvents himself as the wealthy Count of Monte Cristo to exact revenge on those who betrayed him.",
@@ -33721,7 +33760,10 @@
     "trailer": "TsQnK5_5VSk",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD_RoAAq-ESEaYVM2lw6y_DhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_RoAAq-ESEaYVM2lw6y_DhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -33979,8 +34021,9 @@
     "type": "Series",
     "categories": [
       "Main",
+      "Hollywood/British Series",
       "Animated Movies",
-      "Hollywood/British Series"
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "genres": [
       "Animated Movies"
@@ -33996,7 +34039,10 @@
     "trailer": "Hao6oA6Vq9A",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADNxsAAq-ESEbQKtfOrfATpRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADNxsAAq-ESEbQKtfOrfATpRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -34004,14 +34050,18 @@
     "csv_id": "1015333-the-escort-wife",
     "type": "Movie",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADeA8AAq-EQEYXHoaTGcip5BYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADeA8AAq-EQEYXHoaTGcip5BYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w200/9cAFsL9dMWrqbfNMomSkkLBJsBS.jpg",
     "rating": 4.7,
     "release_date": "",
     "overview": "A wife who just had a miscarriage finds out that her husband is having an affair with a high-end escort. She turns into prostitution and will take her revenge on her...",
     "categories": [
-      "Main"
+      "Main",
+      "Erotic Movies"
     ],
     "genres": [],
     "backdrop": "img/FilmHouse.png",
@@ -34019,7 +34069,8 @@
     "cast": [],
     "director": "",
     "trailer": "",
-    "runtime": ""
+    "runtime": "",
+    "tmdb_id": 1015333
   },
   {
     "csv_id": "836225-the-exorcism-of-god",
@@ -34174,7 +34225,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "Dominic Toretto is a Los Angeles street racer suspected of masterminding a series of big-rig hijackings. When undercover cop Brian O'Conner infiltrates Toretto's iconoclastic crew, he falls for Toretto's sister and must choose a side: the gang or the LAPD.",
@@ -34188,7 +34240,10 @@
     "trailer": "iIU1xlDbbQk",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADJAkAAh-4SEZcJFpw765bHBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADJAkAAh-4SEZcJFpw765bHBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -34369,7 +34424,9 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies",
+      "Erotic Movies"
     ],
     "genres": [],
     "overview": "Exceptionally ambitious high schooler Matthew has aspirations for a career in politics when he falls in love with his gorgeous 19-year-old neighbor, Danielle. But Matthew's bright future is jeopardized when he finds Danielle was once a porn star. As Danielle's past catches up with her, Matthew's love for her forces him to re-evaluate his goals.",
@@ -34383,7 +34440,10 @@
     "trailer": "0rD3Qkh-238",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD3h8AAh-4UEbOHsQdCbrrrxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD3h8AAh-4UEbOHsQdCbrrrxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -34394,7 +34454,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "An adaptation of F. Scott Fitzgerald's Long Island-set novel, where Midwesterner Nick Carraway is lured into the lavish world of his neighbor, Jay Gatsby. Soon enough, however, Carraway will see through the cracks of Gatsby's nouveau riche existence, where obsession, madness, and tragedy await.",
@@ -34408,7 +34469,10 @@
     "trailer": "l6yANES3TMM",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADNA4AAmjCeUYkqDeJhaPDPRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADNA4AAmjCeUYkqDeJhaPDPRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -34419,7 +34483,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "The story of American showman P.T. Barnum, founder of the circus that became the famous traveling Ringling Bros. and Barnum & Bailey Circus.",
@@ -34433,7 +34498,10 @@
     "trailer": "KTNtpYQPlhE",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADDRUAAp6faUaveAXXYUOvZBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADDRUAAp6faUaveAXXYUOvZBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -34470,7 +34538,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "An inventor and his mom hit the road together so he can sell his latest invention.",
@@ -34484,7 +34553,10 @@
     "trailer": "UAwiiGUCeLE",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADdgkAAh-4SEak1LkZfQoMuxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADdgkAAh-4SEak1LkZfQoMuxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -34495,7 +34567,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "When three friends finally come to after a raucous night of bachelor-party revelry, they find a baby in the closet and a tiger in the bathroom. But they can't seem to locate their best friend, Doug – who's supposed to be tying the knot. Launching a frantic search for Doug, the trio perseveres through a nasty hangover to try to make it to the church on time.",
@@ -34509,7 +34582,10 @@
     "trailer": "tlize92ffnY",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD8R8AAh-4UEYjJNVrAAGNOdEWBA"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD8R8AAh-4UEYjJNVrAAGNOdEWBA",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -34570,7 +34646,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "Not only is Jessica Spencer the most popular girl in school -- she is also the meanest. But things change for the attractive teen when a freak accident involving a cursed pair of earrings and a chance encounter at a gas station causes her to switch bodies with Clive, a sleazy crook. Jessica, in the form of the repulsive Clive, struggles to adjust to this radical alteration and sets out to get her own body back before the upcoming prom.",
@@ -34584,7 +34661,10 @@
     "trailer": "6z5zbY-0QCA",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD1h0AAq-ESEb_AxdnfdQLdhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1h0AAq-ESEb_AxdnfdQLdhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -34680,7 +34760,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "70-year-old widower Ben Whittaker has discovered that retirement isn't all it's cracked up to be. Seizing an opportunity to get back in the game, he becomes a senior intern at an online fashion site, founded and run by Jules Ostin.",
@@ -34694,7 +34775,10 @@
     "trailer": "f6dKhzYgksc",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADsR4AAh-4UEZZVRcq9_gK1xYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsR4AAh-4UEZZVRcq9_gK1xYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -34705,7 +34789,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "Dave Skylark and his producer Aaron Rapaport run the celebrity tabloid show \"Skylark Tonight\". When they land an interview with a surprise fan, North Korean dictator Kim Jong-un, they are recruited by the CIA to turn their trip to Pyongyang into an assassination mission.",
@@ -34719,7 +34804,10 @@
     "trailer": "BJu0KYd5-_M",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADdQkAAh-4SEaO-9Fp5BY-PRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADdQkAAh-4SEaO-9Fp5BY-PRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -34730,7 +34818,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "Set in a world where the concept of lying doesn't exist, a loser changes his lot when he invents lying and uses it to get ahead.",
@@ -34744,7 +34833,10 @@
     "trailer": "RhRnmyBjOLs",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADkgkAAh-4SEbCKkJgIVsiAhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADkgkAAh-4SEbCKkJgIVsiAhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
