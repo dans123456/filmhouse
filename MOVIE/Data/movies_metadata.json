@@ -38209,7 +38209,22 @@
     "csv_id": "58981-the-thundermans",
     "type": "Series",
     "links": [
-      "https://t.me/+cJUgTGPMeXoyM2Nk"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADSBAAAjO-KUc_YezIGYkrDRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADTRAAAjO-KUe5a3EjzWp1HxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADThAAAjO-KUfBT1_SaHDSphYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADUxAAAjO-KUeyXx3EQbab4RYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/1tIYEyjK1LLcX0jYK3ZouT7601o.jpg",
     "rating": 8,
