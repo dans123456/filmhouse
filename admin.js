@@ -668,8 +668,8 @@ function renderRequestsList() {
                 return rId === mId;
             }
             
-            const cleanReqTitle = r.title.toLowerCase().trim().replace(/\s*\((season|part)\s*\d+\)\s*$/i, "").trim();
-            const cleanCatalogTitle = m.title.toLowerCase().trim().replace(/\s*\((season|part)\s*\d+\)\s*$/i, "").trim();
+            const cleanReqTitle = r.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+            const cleanCatalogTitle = m.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
             if (cleanCatalogTitle !== cleanReqTitle) return false;
             if (r.seasonOrPart) {
                 const cleanReqSeason = r.seasonOrPart.toLowerCase().trim();
@@ -3629,16 +3629,15 @@ if (fulfillForm && fulfillRequestModal) {
         const reqTmdbId = matchedReq ? matchedReq.tmdb_id : null;
         
         // Clean Title by stripping season/part suffix for TMDB / Catalog matching
-        const cleanTitle = currentFulfillTitle.replace(/\s*\((season|part)\s*\d+\)\s*$/i, "").trim();
+        const cleanTitle = currentFulfillTitle.replace(/\s*\([^)]+\)\s*$/g, "").trim();
         const cleanMatchTitle = cleanTitle.toLowerCase();
         
         const existingMovie = allCatalogMovies.find(m => {
-            const cleanCatalogTitle = m.title.toLowerCase().trim().replace(/\s*\((season|part)\s*\d+\)\s*$/i, "").trim();
-            if (cleanCatalogTitle !== cleanMatchTitle) return false;
-            if (reqTmdbId && m.tmdb_id) {
-                return String(reqTmdbId) === String(m.tmdb_id);
+            if (reqTmdbId && m.tmdb_id && String(reqTmdbId) === String(m.tmdb_id)) {
+                return true;
             }
-            return true;
+            const cleanCatalogTitle = m.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+            return cleanCatalogTitle === cleanMatchTitle;
         });
         
         const seasonOrPart = matchedReq ? matchedReq.seasonOrPart : "";

@@ -26,6 +26,12 @@ function triggerHaptic(type = "light") {
     }
 }
 
+// Clean request/catalog titles by stripping trailing parenthesis groups (e.g. season or custom version suffixes)
+function getCleanRequestTitle(title) {
+    if (!title) return "";
+    return title.replace(/\s*\([^)]+\)\s*$/g, "").trim();
+}
+
 // Load Eruda In-App Mobile Console if ?debug=true is passed in URL
 (function() {
     try {
@@ -3577,7 +3583,7 @@ function openDownloadModal(movie) {
             const linkUrl = typeof link === 'object' && link !== null ? link.url : link;
             
             const matchingRequest = currentUserRequests && currentUserRequests.find(r => 
-                r.title && r.title.toLowerCase().trim() === movie.title.toLowerCase().trim() &&
+                r.title && getCleanRequestTitle(r.title).toLowerCase() === getCleanRequestTitle(movie.title).toLowerCase() &&
                 r.status === "fulfilled"
             );
 
@@ -5390,7 +5396,7 @@ function renderUserRequests(requests) {
             if (rId && mId) {
                 return rId === mId;
             }
-            return (m.title && m.title.toLowerCase() === r.title.toLowerCase()) || 
+            return (m.title && getCleanRequestTitle(m.title).toLowerCase() === getCleanRequestTitle(r.title).toLowerCase()) || 
                    (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
         });
         const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
@@ -5605,7 +5611,7 @@ function updateHomeFulfillmentBanner() {
     
     const unacknowledgedFulfilled = currentUserRequests.filter(r => {
         const matchingMovie = state.movies.find(m => 
-            (m.title && m.title.toLowerCase() === r.title.toLowerCase()) || 
+            (m.title && getCleanRequestTitle(m.title).toLowerCase() === getCleanRequestTitle(r.title).toLowerCase()) || 
             (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
         );
         const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
@@ -5713,7 +5719,7 @@ function updateHeaderNotificationDot() {
                 const docId = doc.id;
                 
                 const matchingMovie = state.movies.find(m => 
-                    (m.title && m.title.toLowerCase() === r.title.toLowerCase()) || 
+                    (m.title && getCleanRequestTitle(m.title).toLowerCase() === getCleanRequestTitle(r.title).toLowerCase()) || 
                     (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
                 );
                 
@@ -5754,6 +5760,13 @@ function logMovieRequestToFirestore(movie, specs = "") {
 }
 
 function showRequestSpecsDrawer(movie) {
+    const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
+    if (!isTV) {
+        logMovieRequestToFirestore(movie);
+        showConnectionDrawer("https://t.me/+09ahNmGdB1U2MzFk", ADSGRAM_REQUEST_BLOCK_ID);
+        return;
+    }
+
     const drawer = document.getElementById("request-specs-drawer");
     const subtitleEl = document.getElementById("request-specs-subtitle");
     const formContainer = document.getElementById("request-specs-form-container");
@@ -5769,8 +5782,6 @@ function showRequestSpecsDrawer(movie) {
     
     subtitleEl.textContent = `Let us know which specific season or part of "${movie.title}" you would like to request.`;
     formContainer.innerHTML = "";
-    
-    const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
     
     if (isTV) {
         formContainer.innerHTML = `
