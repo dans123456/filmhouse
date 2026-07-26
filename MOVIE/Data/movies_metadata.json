@@ -44,34 +44,6 @@
     ]
   },
   {
-    "csv_id": "manual-1785060221881-the-chosen-all-seasons",
-    "tmdb_id": null,
-    "imdb_id": "",
-    "title": "The Chosen (All Seasons)",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series"
-    ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "img/FilmHouse3_nobg.png",
-    "backdrop": "img/FilmHouse.png",
-    "rating": 0,
-    "release_date": "",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADIA8AAoFSMUeR2_socy6IxhYE",
-        "season": "All Seasons"
-      }
-    ]
-  },
-  {
     "csv_id": "59965-abduction",
     "tmdb_id": 59965,
     "imdb_id": "",
