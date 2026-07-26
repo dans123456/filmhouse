@@ -1,5 +1,208 @@
 [
   {
+    "csv_id": "961203-mr-bones-3-son-of-bones",
+    "tmdb_id": 961203,
+    "imdb_id": "",
+    "title": "Mr. Bones 3: Son of Bones",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Sixty years ago, in an obscure corner of Africa, the only survivor of a light aircraft crash was a baby boy. Perhaps it was the miracle of his survival that gave him the gift of “sight,” and he became a Sangoma, the seer of the Kuvuki tribe, interpreting the wishes of The Great One through the throwing of the bones. Hence his name, “Bones.” Today, at an advanced age but still fit in mind and body, his mission is to pass on his wisdom to his son, Mathambo, and guide him into manhood – a mission doomed to fail because of both of their obsessive personalities.",
+    "poster": "https://image.tmdb.org/t/p/w500/9QpdGpGNTKLNm7aOYx2mJM7hI4L.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jcFmrcbsoMUWpsmDLjC8eF1XBHx.jpg",
+    "rating": 6.4,
+    "release_date": "2022-04-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "1LEsILmgbLk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRQgAAoFSOUfs3j7ErA2BdxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "30245-mr-bones-2-back-from-the-past",
+    "tmdb_id": 30245,
+    "imdb_id": "",
+    "title": "Mr. Bones 2: Back from the Past",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Hekule, the King of Kuvukiland, is given a gemstone by the dying Kunji Balanadin. The stone is cursed and causes Hekule to become possessed by the spirit of the mischievous Kunji. It is up Mr. Bones, the royal witch doctor to cure his King and get rid of this cursed stone by returning the gem to its home in an Indian fishing village.",
+    "poster": "https://image.tmdb.org/t/p/w500/esGxe0UYjK0ziKuhIQX7SlejAvc.jpg",
+    "backdrop": "",
+    "rating": 6.2,
+    "release_date": "2008-11-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "bzvPiVoQcek",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADQwgAAoFSOUd8LK4Y9yKYjxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "36267-mr-bones",
+    "tmdb_id": 36267,
+    "imdb_id": "",
+    "title": "Mr. Bones",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "A medicine man is sent looking for the son of his tribal king, and brings back an American golfer and a host of goons intent on keeping him in the golf tournament.",
+    "poster": "https://image.tmdb.org/t/p/w500/tE7YBzz8qigI3MSemIQu2fglLWZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/X3rrtCJmwPthjRnFobBAMrosjJ.jpg",
+    "rating": 6,
+    "release_date": "2001-10-30",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "br0cyOHUi4A",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRAgAAoFSOUec95shULOuIRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "8960-hancock",
+    "tmdb_id": 8960,
+    "imdb_id": "",
+    "title": "Hancock",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Hancock is a down-and-out superhero who's forced to employ a PR expert to help repair his image when the public grows weary of all the damage he's inflicted during his lifesaving heroics. The agent's idea of imprisoning the antihero to make the world miss him proves successful, but will Hancock stick to his new sense of purpose or slip back into old habits?",
+    "poster": "https://image.tmdb.org/t/p/w500/7DyuV2G0hLEqHeueDfOqhZ2DVut.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xh0ZRdnL4pSqfW73HBf97xiNEFP.jpg",
+    "rating": 6.4,
+    "release_date": "2008-07-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "vexi9xLS-bQ",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFwgAAoFSOUei_gamI2_d_hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "12538-senseless",
+    "tmdb_id": 12538,
+    "imdb_id": "",
+    "title": "Senseless",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Classic Movies"
+    ],
+    "overview": "A student gets his senses enhanced by an experimental drug. But abuse is not an option.",
+    "poster": "https://image.tmdb.org/t/p/w500/rqy7OFHWy1NMjmgjyI8XYcl0VU5.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vZHao0jyNzTY29sr4TLR2tSDTUV.jpg",
+    "rating": 6.2,
+    "release_date": "1998-02-20",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "A6pM-4m7xQ0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFggAAoFSOUeisGtR6I_8mRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "187017-22-jump-street",
+    "tmdb_id": 187017,
+    "imdb_id": "",
+    "title": "22 Jump Street",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "After making their way through high school (twice), big changes are in store for officers Schmidt and Jenko when they go deep undercover at a local college. But when Jenko meets a kindred spirit on the football team, and Schmidt infiltrates the bohemian art major scene, they begin to question their partnership. Now they don't have to just crack the case - they have to figure out if they can have a mature relationship. If these two overgrown adolescents can grow from freshmen into real men, college might be the best thing that ever happened to them.",
+    "poster": "https://image.tmdb.org/t/p/w500/850chzYHYbT3IISl6Q7dbBuFP2B.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kdyYOwpKvvD2fSbwfnMM2YPAzfq.jpg",
+    "rating": 6.8,
+    "release_date": "2014-06-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "qP755JkDxyM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADEwgAAoFSOUeOf2kZ_XS7EhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "64688-21-jump-street",
+    "tmdb_id": 64688,
+    "imdb_id": "",
+    "title": "21 Jump Street",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "When cops Schmidt and Jenko join the secret Jump Street unit, they use their youthful appearances to go undercover as high school students. They trade in their guns and badges for backpacks, and set out to shut down a dangerous drug ring. But, as time goes on, Schmidt and Jenko discover that high school is nothing like it was just a few years earlier -- and, what's more, they must again confront the teenage terror and anxiety they thought they had left behind.",
+    "poster": "https://image.tmdb.org/t/p/w500/8v3Sqv9UcIUC4ebmpKWROqPBINZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rXrpYOveFl76ivMmyb2612T7Q8w.jpg",
+    "rating": 6.9,
+    "release_date": "2012-03-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "BjRs18rV1FI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADEggAAoFSOUfPJpCL9r72hxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "597-titanic",
     "tmdb_id": 597,
     "imdb_id": "",
