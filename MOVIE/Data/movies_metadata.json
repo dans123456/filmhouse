@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "85077-the-chosen",
+    "tmdb_id": 85077,
+    "imdb_id": "",
+    "title": "The Chosen",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "The life of Christ through the eyes of those who encountered him.",
+    "poster": "https://image.tmdb.org/t/p/w500/dqVUFuNrMFWt7uGNWlpo91VKYOI.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3siv3RaQrdr2tQiv9jHq71sLlzo.jpg",
+    "rating": 8.8,
+    "release_date": "2019-04-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "5CVj41dtkIA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADIA8AAoFSMUeR2_socy6IxhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADJg8AAoFSMUc2tPEP_CddnBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "manual-1785060221881-the-chosen-all-seasons",
     "tmdb_id": null,
     "imdb_id": "",
