@@ -1583,7 +1583,7 @@ function renderFavoriteCategoriesChecklist() {
         "Hollywood/British Movies", "Hollywood/British Series", 
         "Bollywood", "Korean Drama", "African", "Anime", "Comic", 
         "Animated Movies", "Kids Shows and Movies (Nickelodeon and Disney)", 
-        "Classic Movies", "Erotic Movies"
+        "Classic Movies", "Erotic Movies", "Teen/High-School", "Christian Movies"
     ];
 
     const categoryLabels = {
@@ -1597,7 +1597,9 @@ function renderFavoriteCategoriesChecklist() {
         "Animated Movies": "Animated",
         "Kids Shows and Movies (Nickelodeon and Disney)": "Kids / Family",
         "Classic Movies": "Classics",
-        "Erotic Movies": "Romance / Erotic"
+        "Erotic Movies": "Romance / Erotic",
+        "Teen/High-School": "Teen / High-School",
+        "Christian Movies": "Christian"
     };
 
     listContainers.forEach(container => {
@@ -2052,7 +2054,7 @@ function renderCategoriesBar() {
         "Main", "Hollywood/British Movies", "Hollywood/British Series", 
         "Bollywood", "Korean Drama", "African", "Anime", "Comic", 
         "Animated Movies", "Kids Shows and Movies (Nickelodeon and Disney)", 
-        "Classic Movies", "Erotic Movies"
+        "Classic Movies", "Erotic Movies", "Teen/High-School", "Christian Movies"
     ];
 
     const categoryLabels = {
@@ -2067,7 +2069,9 @@ function renderCategoriesBar() {
         "Animated Movies": "Animated",
         "Kids Shows and Movies (Nickelodeon and Disney)": "Kids",
         "Classic Movies": "Classics",
-        "Erotic Movies": "Erotic"
+        "Erotic Movies": "Erotic",
+        "Teen/High-School": "Teen / High-School",
+        "Christian Movies": "Christian"
     };
 
     const categoryEmojis = {
@@ -2082,7 +2086,9 @@ function renderCategoriesBar() {
         "Animated Movies": "🎨",
         "Kids Shows and Movies (Nickelodeon and Disney)": "🧸",
         "Classic Movies": "🎞️",
-        "Erotic Movies": "💋"
+        "Erotic Movies": "💋",
+        "Teen/High-School": "🏫",
+        "Christian Movies": "⛪"
     };
 
     categoryList.forEach(cat => {
@@ -2213,7 +2219,9 @@ function renderFeaturedGrid(fromDiscover = false) {
                 "Animated Movies": "Animated",
                 "Kids Shows and Movies (Nickelodeon and Disney)": "Kids",
                 "Classic Movies": "Classics",
-                "Erotic Movies": "Erotic"
+                "Erotic Movies": "Erotic",
+                "Teen/High-School": "Teen / High-School",
+                "Christian Movies": "Christian"
             };
             heading.textContent = categoryLabels[state.activeCategory] || state.activeCategory;
         }

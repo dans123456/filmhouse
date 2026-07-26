@@ -346,7 +346,9 @@ function updateStatsCounters() {
                 "Korean Drama": "Korean Drama (K-Drama) 🇰🇷",
                 "African": "African Cinema 🌍",
                 "Anime": "Anime Series & Movies 🎌",
-                "Bollywood": "Bollywood Cinema 🇮🇳"
+                "Bollywood": "Bollywood Cinema 🇮🇳",
+                "Teen/High-School": "Teen / High-School 🏫",
+                "Christian Movies": "Christian Movies ⛪"
             };
 
             Object.entries(categoryCounts).forEach(([cat, count]) => {
@@ -2064,7 +2066,9 @@ function showMovieDetails(movie) {
                         { key: "Animated Movies", label: "Animated" },
                         { key: "Kids Shows and Movies (Nickelodeon and Disney)", label: "Kids" },
                         { key: "Classic Movies", label: "Classics" },
-                        { key: "Erotic Movies", label: "Erotic" }
+                        { key: "Erotic Movies", label: "Erotic" },
+                        { key: "Teen/High-School", label: "Teen / High-School" },
+                        { key: "Christian Movies", label: "Christian" }
                     ].map(cat => {
                         const checked = movie.categories && movie.categories.includes(cat.key) ? 'checked' : '';
                         return `
@@ -2929,6 +2933,44 @@ if (addMovieForm) {
                 const isComicMatch = comicKeywords.some(keyword => titleLower.includes(keyword));
                 if (isComicMatch && !isToAllTheBoys) {
                     if (!categories.includes("Comic")) categories.push("Comic");
+                }
+
+                // Teen / High-School auto-matching
+                const teenKeywords = [
+                    "high school", "teenager", "teen", "college", "coming of age", "prom", 
+                    "student", "classmate", "graduation", "to all the boys", "kissing booth", 
+                    "euphoria", "sex education", "outer banks", "elite", "riverdale", "gossip girl", 
+                    "mean girls", "clueless", "superbad", "booksmart", "lady bird", "the edge of seventeen", 
+                    "perks of being a wallflower", "twilight", "heartstopper", "13 reasons why", 
+                    "cruel summer", "one of us is lying", "pretty little liars"
+                ];
+                const isTeenMatch = teenKeywords.some(keyword => titleLower.includes(keyword) || (overview && overview.toLowerCase().includes(keyword)));
+                if (isTeenMatch) {
+                    if (!categories.includes("Teen/High-School")) categories.push("Teen/High-School");
+                }
+
+                // Christian auto-matching
+                const christianKeywords = [
+                    "jesus", "god", "bible", "christian", "christ", "church", "faith", "faith-based", 
+                    "the chosen", "heaven", "prayer", "pray", "gospel", "saint", "angel", "redemption",
+                    "god's not dead", "i can only imagine", "fireproof", "courageous", "war room", 
+                    "overcomer", "lifemark", "the shack", "left behind", "passion of the christ", 
+                    "noah", "exodus"
+                ];
+                let isChristianMatch = christianKeywords.some(keyword => {
+                    if (keyword.includes(" ") || keyword.includes("'") || keyword.includes("-")) {
+                        return titleLower.includes(keyword) || (overview && overview.toLowerCase().includes(keyword));
+                    }
+                    const wordRegex = new RegExp(`\\b${keyword}s?\\b`, "i");
+                    return wordRegex.test(titleLower) || (overview && wordRegex.test(overview.toLowerCase()));
+                });
+                
+                // Exclude comics and mythology
+                if (titleLower.includes("thor") || titleLower.includes("marvel") || titleLower.includes("greek god") || titleLower.includes("god of war")) {
+                    isChristianMatch = false;
+                }
+                if (isChristianMatch) {
+                    if (!categories.includes("Christian Movies")) categories.push("Christian Movies");
                 }
             } catch (err) {
                 console.warn("Could not enrich movie metadata on form submit:", err);
