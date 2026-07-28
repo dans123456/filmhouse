@@ -171,6 +171,46 @@ def classify_categories(details, row_title, row_type):
     if any(ck in title_lower for ck in comic_keywords):
         categories.append("Comics and Manga")
         
+    # 11. Teen / High-School
+    teen_keywords = [
+        "high school", "teenager", "teen", "college", "coming of age", "prom", 
+        "student", "classmate", "graduation", "to all the boys", "kissing booth", 
+        "euphoria", "sex education", "outer banks", "elite", "riverdale", "gossip girl", 
+        "mean girls", "clueless", "superbad", "booksmart", "lady bird", "the edge of seventeen", 
+        "perks of being a wallflower", "twilight", "heartstopper", "13 reasons why", 
+        "cruel summer", "one of us is lying", "pretty little liars"
+    ]
+    overview = (details.get('overview') or "").lower() if details else ""
+    is_teen = any(tk in title_lower for tk in teen_keywords) or any(tk in overview for tk in teen_keywords)
+    if is_teen:
+        categories.append("Teen/High-School")
+
+    # 12. Christian Movies
+    christian_keywords = [
+        "jesus", "god", "bible", "christian", "christ", "church", "faith", "faith-based", 
+        "the chosen", "heaven", "prayer", "pray", "gospel", "saint", "angel", "redemption",
+        "god's not dead", "i can only imagine", "fireproof", "courageous", "war room", 
+        "overcomer", "lifemark", "the shack", "left behind", "passion of the christ", 
+        "noah", "exodus"
+    ]
+    import re
+    is_christian = False
+    text_to_check = f"{title_lower} {overview}"
+    for ck in christian_keywords:
+        if " " in ck or "'" in ck or "-" in ck:
+            if ck in text_to_check:
+                is_christian = True
+                break
+        else:
+            word_regex = re.compile(rf"\b{ck}s?\b", re.IGNORECASE)
+            if word_regex.search(text_to_check):
+                is_christian = True
+                break
+    if "thor" in title_lower or "marvel" in title_lower or "greek god" in title_lower or "god of war" in title_lower:
+        is_christian = False
+    if is_christian:
+        categories.append("Christian Movies")
+        
     # 10. Default Hollywood/British Movies & Series
     # If not already in major regional categories
     is_regional = any(cat in categories for cat in ["Korean Drama", "Bollywood", "African", "Anime"])
