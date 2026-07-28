@@ -1,5 +1,126 @@
 [
   {
+    "csv_id": "98566-teenage-mutant-ninja-turtles",
+    "tmdb_id": 98566,
+    "imdb_id": "",
+    "title": "Teenage Mutant Ninja Turtles",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Teen/High-School"
+    ],
+    "overview": "When a kingpin threatens New York City, a group of mutated turtle warriors must emerge from the shadows to protect their home.",
+    "poster": "https://image.tmdb.org/t/p/w500/azL2ThbJMIkts3ZMt3j1YgBUeDB.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/eezsbzYPbYKjjh6E1XHDBNlLynh.jpg",
+    "rating": 5.9,
+    "release_date": "2014-08-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "dwXFsrp6WBs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADkQwAAgjCSUd6ZoVSS_NzHRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "831815-saving-bikini-bottom-the-sandy-cheeks-movie",
+    "tmdb_id": 831815,
+    "imdb_id": "",
+    "title": "Saving Bikini Bottom: The Sandy Cheeks Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "When Bikini Bottom is scooped from the ocean, scientific squirrel Sandy Cheeks and her pal SpongeBob SquarePants saddle up for Texas to save their town.",
+    "poster": "https://image.tmdb.org/t/p/w500/30YnfZdMNIV7noWLdvmcJS0cbnQ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gcW8rMiA9OKbetpjAVAAdbGrDd8.jpg",
+    "rating": 6.1,
+    "release_date": "2024-10-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Ud6-SGnzH3k",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADigwAAgjCSUf_ywABF5D_0fEWBA",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "554241-playing-with-fire",
+    "tmdb_id": 554241,
+    "imdb_id": "",
+    "title": "Playing with Fire",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A crew of rugged firefighters meet their match when attempting to rescue three rambunctious kids.",
+    "poster": "https://image.tmdb.org/t/p/w500/nBLPIpReSatt1zcgVzSVzq5e581.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/5ukCAyXdRYmQEZ3CbSD695Y70Zz.jpg",
+    "rating": 6.6,
+    "release_date": "2019-11-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "fd5GlZUpfaM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADegwAAgjCSUcm9j9subqFjRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "675445-paw-patrol-the-movie",
+    "tmdb_id": 675445,
+    "imdb_id": "",
+    "title": "PAW Patrol: The Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "Ryder and the pups are called to Adventure City to stop Mayor Humdinger from turning the bustling metropolis into a state of chaos.",
+    "poster": "https://image.tmdb.org/t/p/w500/ic0intvXZSfBlYPIvWXpU1ivUCO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/a17F3zXnmuwqxfiDa46mtlosjrv.jpg",
+    "rating": 7.3,
+    "release_date": "2021-08-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "LRMTr2VZcr8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADbAwAAgjCSUf4W9wtmPHepxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "893723-paw-patrol-the-mighty-movie",
     "tmdb_id": 893723,
     "imdb_id": "",
