@@ -1,5 +1,96 @@
 [
   {
+    "csv_id": "362585-kizumonogatari-part-3-reiketsu",
+    "tmdb_id": 362585,
+    "imdb_id": "",
+    "title": "Kizumonogatari Part 3: Reiketsu",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "With help from Meme Oshino, the apparition specialist, Koyomi defeats the three powerful vampire hunters: Dramaturgy, Episode and Guillotinecutter. Koyomi takes back all the limbs of Kiss-shot Acerola-orion Heart-under-blade in order to become a human again.",
+    "poster": "https://image.tmdb.org/t/p/w500/rfKHhHvSwyCv59Ow6wuGX67RkXR.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/1Cs5jJDVpyBsp3NDPTGRwftFym.jpg",
+    "rating": 8,
+    "release_date": "2017-01-06",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "4nTLr6Uf9Ug",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADphAAAgjCSUc9Oq4TwOlCrBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "362584-kizumonogatari-part-2-nekketsu",
+    "tmdb_id": 362584,
+    "imdb_id": "",
+    "title": "Kizumonogatari Part 2: Nekketsu",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "Koyomi Araragi was turned into a vampire by the legendary vampire, Kiss-shot Acerola-orion Heart-under-blade, and he needs to revive the weakened vampire back to her complete form to return to being human again. The only way for Koyomi to achieve his goal is to fight the three vampire hunters – Dramaturgy, Episode and Guillotinecutter.",
+    "poster": "https://image.tmdb.org/t/p/w500/fv9AALP1dofQUvKAkxnkz105MOv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/41XzkXiiDZGSYF2uBegeS2qQ3NC.jpg",
+    "rating": 8,
+    "release_date": "2016-08-19",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "nOiEjQy-J7U",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADnhAAAgjCSUeyzz9AXipAARYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "357786-kizumonogatari-part-1-tekketsu",
+    "tmdb_id": 357786,
+    "imdb_id": "",
+    "title": "Kizumonogatari Part 1: Tekketsu",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Fantasy",
+      "Drama",
+      "Mystery",
+      "Action"
+    ],
+    "overview": "One day, Koyomi Araragi encounters the horrifying vampire, Kiss-shot Acerola-orion Heart-under-blade A.K.A. the \"King of Apparitions.\" He saves the fatally wounded Kiss-shot by offering his blood at the expense of his own life as a human. Now Koyomi has to face the vampire hunters to retrieve Kiss-shot’s limbs which were taken by these hunters...",
+    "poster": "https://image.tmdb.org/t/p/w500/vftYhVOdvMCmb0dQIRIKmUYG9TU.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tDM4UAaHxMrvODGIUj9ZixmyVmw.jpg",
+    "rating": 7.7,
+    "release_date": "2016-01-08",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "4lt0rT_nmvg",
+    "runtime": "",
+    "links": [
+      "https://t.me/FilmHouseFilebot?start=BQADAQADkxAAAgjCSUfAk6HP2RJUNBYE"
+    ]
+  },
+  {
     "csv_id": "98566-teenage-mutant-ninja-turtles",
     "tmdb_id": 98566,
     "imdb_id": "",
