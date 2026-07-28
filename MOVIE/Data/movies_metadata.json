@@ -1,5 +1,126 @@
 [
   {
+    "csv_id": "893723-paw-patrol-the-mighty-movie",
+    "tmdb_id": 893723,
+    "imdb_id": "",
+    "title": "PAW Patrol: The Mighty Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "A magical meteor crash lands in Adventure City and gives the PAW Patrol pups superpowers, transforming them into The Mighty Pups.",
+    "poster": "https://image.tmdb.org/t/p/w500/aTvePCU7exLepwg5hWySjwxojQK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zgQQF04u3OgNBJqClRNby1FPz9s.jpg",
+    "rating": 6.9,
+    "release_date": "2023-09-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "UDgjJ9XzgHk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADVwwAAgjCSUdjVUP1d8HQrhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "879513-fantasy-football",
+    "tmdb_id": 879513,
+    "imdb_id": "",
+    "title": "Fantasy Football",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Callie Coleman discovers she can magically control her father Bobby’s performance on the football field. When Callie plays as her dad, Bobby is transformed from a fumblitis-plagued journeyman to a star running back bound for superstardom.",
+    "poster": "https://image.tmdb.org/t/p/w500/lC99lme4UplMUICswlA4mfe5GNx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jS2nuLRpZ5MvSQ6bJUIAoxnRCV5.jpg",
+    "rating": 6.5,
+    "release_date": "2022-11-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "YBYL63SKwUA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADVAwAAgjCSUcuW2JIEcaYGBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "939210-blue-s-big-city-adventure",
+    "tmdb_id": 939210,
+    "imdb_id": "",
+    "title": "Blue's Big City Adventure",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "overview": "When Josh gets the opportunity of a lifetime to audition for Rainbow Puppy’s Broadway musical, Josh and Blue skidoo to NYC for the very first time where they meet new friends and discover the magic of music, dance, and following one’s dreams.",
+    "poster": "https://image.tmdb.org/t/p/w500/sAYBC3WhhiX25629HLpCvkpGk9q.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/17sIiv4LGapYnyvdpKxA1vozBqY.jpg",
+    "rating": 7.2,
+    "release_date": "2022-11-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "2mWIeF3cZ2I",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADUwwAAgjCSUcVNIkn9OdLRRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "499701-dora-and-the-lost-city-of-gold",
+    "tmdb_id": 499701,
+    "imdb_id": "",
+    "title": "Dora and the Lost City of Gold",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Teen/High-School"
+    ],
+    "overview": "Dora, a girl who has spent most of her life exploring the jungle with her parents, now must navigate her most dangerous adventure yet: high school. Always the explorer, Dora quickly finds herself leading Boots (her best friend, a monkey), Diego, and a rag tag group of teens on an adventure to save her parents and solve the impossible mystery behind a lost Inca civilization.",
+    "poster": "https://image.tmdb.org/t/p/w500/xvYCZ740XvngXK0FNeSNVTJJJ5v.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ltt9yiCGmCQZunmxtkhtPxzmDzx.jpg",
+    "rating": 6.6,
+    "release_date": "2019-08-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ksj69JaBrAo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADUQwAAgjCSUc_uN9cHbRwpBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1081003-supergirl",
     "tmdb_id": 1081003,
     "imdb_id": "",
