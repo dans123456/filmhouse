@@ -1,203 +1,29 @@
 [
   {
-    "csv_id": "1564614-leviticus",
-    "tmdb_id": 1564614,
+    "csv_id": "manual-1785586904343-euphoria-special-episodes",
+    "tmdb_id": null,
     "imdb_id": "",
-    "title": "Leviticus",
-    "type": "Movie",
+    "title": "Euphoria Special Episodes",
+    "type": "Series",
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Teen/High-School"
-    ],
-    "genres": [
-      "Teen/High-School"
-    ],
-    "overview": "Two teenage boys must escape a violent entity that takes the form of the person they desire most — each other.",
-    "poster": "https://image.tmdb.org/t/p/w500/gnAsZvBygplNpp8PtjoTEYv3VPB.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/7y8zWGEjs7tresw4Hzkkf4TdkcL.jpg",
-    "rating": 6.3,
-    "release_date": "2026-06-17",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "WXuK0vlFxII",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADGw8AAv_ccEcVO7pADKgVRxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1637862-my-dead-summer",
-    "tmdb_id": 1637862,
-    "imdb_id": "",
-    "title": "My Dead Summer",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Series"
     ],
     "genres": [],
-    "overview": "A wanna-be blogger embarks on a wild summer road trip as a psychedelic concert-goer along with his dog, step-dad, and a small film crew.",
-    "poster": "https://image.tmdb.org/t/p/w500/6Id8hwqmNBEI3Q5rmcMoGd1NTi8.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/gYIOremVkXgrNrWblRHDYu5m4MK.jpg",
+    "overview": "No synopsis available.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
     "rating": 0,
-    "release_date": "2026-03-03",
+    "release_date": "",
     "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "1KQzFK5LJ8c",
+    "trailer": "",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHA8AAv_ccEfQFSPHKao6ARYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1430698-the-bay",
-    "tmdb_id": 1430698,
-    "imdb_id": "",
-    "title": "The Bay",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Best friends Emma and Lani, attending a destination wedding in Thailand, find themselves trapped on a sinking tour boat in the heart of a tiger shark sanctuary.",
-    "poster": "https://image.tmdb.org/t/p/w500/6F1UlF8YCtSDAoTpPY7WIkpm9sw.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/qaMQOtAZ6K4RneNDa1yDlJv1V6J.jpg",
-    "rating": 6.7,
-    "release_date": "2026-07-02",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "aqRoxJdq1i4",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHQ8AAv_ccEd5qlzh7nGysRYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1550197-edgar-allan-poe-s-the-oval-portrait",
-    "tmdb_id": 1550197,
-    "imdb_id": "",
-    "title": "Edgar Allan Poe's The Oval Portrait",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "A wounded narrator finds refuge in an abandoned Italian chateau and discovers a lifelike portrait of a young woman.",
-    "poster": "https://image.tmdb.org/t/p/w500/4ptaoJluiDxWuwMn7bzQhB2nthy.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/ax4JaMHhWYNsPZ5UK8wgWLTkaGY.jpg",
-    "rating": 0,
-    "release_date": "2025-10-10",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "zqVyXhcoi4o",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHg8AAv_ccEdEZxykg9yg5BYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1488110-the-theft-of-the-caravaggio",
-    "tmdb_id": 1488110,
-    "imdb_id": "",
-    "title": "The Theft of the Caravaggio",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Orpheus wakes to discover a priceless Caravaggio painting stolen from St. John's Cathedral in Valletta while under his watch. With the city on edge, a detective is brought in from Washington to aid the local police in solving the case.",
-    "poster": "https://image.tmdb.org/t/p/w500/bHwDYCon7650Pqsv3qstL8xABMu.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/48RkcluVm3Spy3xguUeF9qYwniW.jpg",
-    "rating": 0,
-    "release_date": "2025-12-04",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "BmkYJhXoD08",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHw8AAv_ccEdoPW8M-K-hIxYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1587964-they-fight",
-    "tmdb_id": 1587964,
-    "imdb_id": "",
-    "title": "They Fight",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies"
-    ],
-    "genres": [],
-    "overview": "Reformed ex-convict Walt Manigan returns home to rebuild his family with the love of his life, Ketta. His path leads him to a boxing gym inside a D.C. youth recreation center about to be closed. There, he works under the wise coach Slim to mentor a group of boys to train for the junior national boxing tournament, all leading to a showdown between best friends Quincey and Peanut as they battle for a spot on the U.S. Junior Olympic Team.",
-    "poster": "https://image.tmdb.org/t/p/w500/46X9sBM0L4z2y6AkFKxpH4X8O77.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/h6BWd6mU6o1KqZDrVaAldmvboCX.jpg",
-    "rating": 3.8,
-    "release_date": "2026-06-08",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "o9r5xmGthFY",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADIA8AAv_ccEcpulJkJbAU_hYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
-    "csv_id": "1626675-voidance",
-    "tmdb_id": 1626675,
-    "imdb_id": "",
-    "title": "Voidance",
-    "type": "Movie",
-    "categories": [
-      "Main",
-      "Hollywood/British Movies",
-      "Teen/High-School"
-    ],
-    "genres": [
-      "Teen/High-School"
-    ],
-    "overview": "To join the elite ATIC Guard, Alana Toro must pass one final test: enter a simulation, prevent a terrorist attack, and prove her loyalty. Every mistake resets the clock. Every death disappears - except in her memory, where the weight keeps building. The more Alana learns, the more she begins to question the organisation she fought so hard to join.",
-    "poster": "https://image.tmdb.org/t/p/w500/Asyz5nXgLX3mg5C10RAd5Oo2PYc.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/tHb7XxWolYjgkvnRLXQWHauTGqK.jpg",
-    "rating": 4.5,
-    "release_date": "2026-05-17",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "JiMv9M64QhM",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADIQ8AAv_ccEceuh4eYT93DRYE",
-        "quality": "720p"
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADtw8AAv_ccEeE-QlGv_ERVRYE",
+        "season": "Season 1"
       }
     ]
   },
