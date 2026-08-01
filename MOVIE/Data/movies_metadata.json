@@ -1,29 +1,32 @@
 [
   {
-    "csv_id": "215092-alpha",
-    "tmdb_id": 215092,
+    "csv_id": "1122030-alpha",
+    "tmdb_id": 1122030,
     "imdb_id": "",
-    "title": "Alpha Males",
+    "title": "Alpha",
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Bollywood"
     ],
     "genres": [
-      "Comedy"
+      "Bollywood"
     ],
-    "overview": "Pedro, Luis, Raúl and Santi are four friends who feel a bit lost in the new world of empowered women, each trying to adjust in their own haphazard way.",
-    "poster": "https://image.tmdb.org/t/p/w500/NqID21yImku6B7kq0oCQTxX2rm.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/judTMRynbo4oiBCHeS7bXrsTitJ.jpg",
-    "rating": 7.6,
-    "release_date": "2022-12-30",
-    "language": "es",
+    "overview": "When Sita, a highly trained assassin raised in isolation as a super-soldier by a rogue commander, discovers the dark truth about her family and her stolen childhood, she teams up with her long lost sister to take down her creator and his illicit military program.",
+    "poster": "https://image.tmdb.org/t/p/w500/bPtRt3ajQ0EkyeQ1O6iJwAIi9Py.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/b4WXm5ahmtubYXy3wqHUG2nUKoM.jpg",
+    "rating": 5.6,
+    "release_date": "2026-07-02",
+    "language": "hi",
     "cast": [],
     "director": "",
-    "trailer": "NpimczviUHA",
+    "trailer": "0-Vgg04M3m0",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADJA8AAv_ccEfYkhPaFsjGbRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADJA8AAv_ccEfYkhPaFsjGbRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
