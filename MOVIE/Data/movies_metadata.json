@@ -166,7 +166,19 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADxg8AAv_ccEfmoLQUb57RaBYE",
-        "season": "Season 1"
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADERAAAv_ccEfnCKkDW-yjpBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADEhAAAv_ccEeavSz3z22LUxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADExAAAv_ccEczOeD55J0JLRYE",
+        "quality": "720p"
       }
     ]
   },
