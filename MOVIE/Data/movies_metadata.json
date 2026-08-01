@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "71715-good-girls",
+    "tmdb_id": 71715,
+    "imdb_id": "",
+    "title": "Good Girls",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama",
+      "Crime"
+    ],
+    "overview": "Three \"good girl\" suburban wives and mothers suddenly find themselves in desperate circumstances and decide to stop playing it safe and risk everything to take their power back.",
+    "poster": "https://image.tmdb.org/t/p/w500/wpgg6G3UHXepH2Zgpt4W60d6gxR.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/csOIulXwQxsuCFp3ZZ9cYkJmCwH.jpg",
+    "rating": 7.8,
+    "release_date": "2018-02-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "EXJdwEtqaSs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADxg8AAv_ccEfmoLQUb57RaBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "manual-1785586904343-euphoria-special-episodes",
     "tmdb_id": null,
     "imdb_id": "",
