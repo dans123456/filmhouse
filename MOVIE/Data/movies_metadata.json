@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "4327-mr-bean",
+    "tmdb_id": 4327,
+    "imdb_id": "",
+    "title": "Mr. Bean",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Comedy"
+    ],
+    "overview": "Mr Bean turns simple everyday tasks into chaotic situations and will leave you in stitches as he creates havoc wherever he goes.",
+    "poster": "https://image.tmdb.org/t/p/w500/pUNQV35kDaKuejnXGNiUeEBurNE.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lHSLW9lihnuRMs1yYarmMJX4phK.jpg",
+    "rating": 8,
+    "release_date": "1990-01-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "1a7CzFpZtUo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADfRQAAkrdiEdOdVspUrebthYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "11066-boomerang",
     "tmdb_id": 11066,
     "imdb_id": "",
