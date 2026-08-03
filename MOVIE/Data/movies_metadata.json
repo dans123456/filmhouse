@@ -7,8 +7,8 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Animated Movies",
       "Hollywood/British Series",
+      "Animated Movies",
       "Teen/High-School"
     ],
     "genres": [
@@ -28,6 +28,10 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADmhQAAkrdiEePv8lgxsnJAxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADnRQAAkrdiEeqEUajlXYQbhYE",
         "quality": "720p"
       }
     ]
