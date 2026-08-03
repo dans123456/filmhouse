@@ -26480,7 +26480,18 @@
     "csv_id": "227975-fatal-seduction",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD8QsAAgiQKETeucjWw3FwfxYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADvRQAAkrdiEe5pFg9u9GmGBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADvxQAAkrdiEcUTg2t03QFWhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADwRQAAkrdiEet8KwAAVeBaOMWBA",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/qV9DjDIMUu7ieCQTQkEe9R83Ooa.jpg",
     "rating": 6.6,
