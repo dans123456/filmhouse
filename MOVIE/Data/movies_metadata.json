@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "2530-mr-bean-the-animated-series",
+    "tmdb_id": 2530,
+    "imdb_id": "",
+    "title": "Mr. Bean: The Animated Series",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Teen/High-School"
+    ],
+    "overview": "The animated daily trials and tribulations of clueless yet clever loner Mr Bean (aided by his best friend Teddy of course!) as he stumbles from one mishap to the next, always finding complex solutions to the simplest of problems.",
+    "poster": "https://image.tmdb.org/t/p/w500/1V2PSez4pNZ9a4Bbomm7KZiQJ44.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/b5c4ZWXOTcXD8RV7OoZb8HjIJ1i.jpg",
+    "rating": 6.9,
+    "release_date": "2002-01-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "SxsmBqnflNw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADmhQAAkrdiEePv8lgxsnJAxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "4327-mr-bean",
     "tmdb_id": 4327,
     "imdb_id": "",
