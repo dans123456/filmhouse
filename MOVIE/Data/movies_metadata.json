@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "79744-the-rookie",
+    "tmdb_id": 79744,
+    "imdb_id": "",
+    "title": "The Rookie",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Crime",
+      "Drama",
+      "Comedy"
+    ],
+    "overview": "Starting over isn't easy, especially for small-town guy John Nolan who, after a life-altering incident, is pursuing his dream of being an LAPD officer. As the force's oldest rookie, he's met with skepticism from some higher-ups who see him as just a walking midlife crisis.",
+    "poster": "https://image.tmdb.org/t/p/w500/70kTz0OmjjZe7zHvIDrq2iKW7PJ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6iNWfGVCEfASDdlNb05TP5nG0ll.jpg",
+    "rating": 8.6,
+    "release_date": "2018-10-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "8BPlx6eK1vc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADWQ0AAuWMkUfcC3cGDdhTPhYE",
+        "season": "All Seasons"
+      }
+    ]
+  },
+  {
     "csv_id": "680287-freshman-year",
     "tmdb_id": 680287,
     "imdb_id": "",
