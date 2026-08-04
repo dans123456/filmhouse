@@ -1,5 +1,53 @@
 [
   {
+    "csv_id": "54650-power",
+    "tmdb_id": 54650,
+    "imdb_id": "",
+    "title": "Power",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "A successful New York entrepreneur lives a double life as the head of a drug empire that serves only the rich and influential, all while wanting to escape the underworld and keep his family safe.",
+    "poster": "https://image.tmdb.org/t/p/w500/ctftzvyj8b0odco7EoS9VfJhf7K.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gG1UDKgnATgTPwoZzqIDlGvnBe1.jpg",
+    "rating": 7.7,
+    "release_date": "2014-06-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "w7fuOkF74Zw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHBkAAuWMkUfAi0aIHAKW7RYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHRkAAuWMkUenMynZmJHFGBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHhkAAuWMkUeZz1vAMVIwmhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHxkAAuWMkUfyFaLEXE8hYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADIRkAAuWMkUekbfbBy0lOXRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADIhkAAuWMkUchQp-rmqdTuBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "67133-macgyver",
     "tmdb_id": 67133,
     "imdb_id": "",
