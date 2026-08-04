@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "1594914-lucky-strike",
+    "tmdb_id": 1594914,
+    "imdb_id": "",
+    "title": "Lucky Strike",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A wounded American soldier fights to survive behind enemy lines during WWII's Battle of the Bulge against the Germans, relying on his instinct, spy craft and a hand-radio to evade capture and find his way back to his unit.",
+    "poster": "https://image.tmdb.org/t/p/w500/fBniztkLes0lA2CD50j4iWAwX5y.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7FivR6OVr56calRq8UyZjmPsVE2.jpg",
+    "rating": 6.7,
+    "release_date": "2026-06-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "vtEnjikCXyA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFAwAAuWMkUdoG0DSPwSkRBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFgwAAuWMkUeZNINGk4ChURYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1212763-evil-dead-burn",
     "tmdb_id": 1212763,
     "imdb_id": "",
