@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "1212763-evil-dead-burn",
+    "tmdb_id": 1212763,
+    "imdb_id": "",
+    "title": "Evil Dead Burn",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror"
+    ],
+    "overview": "After her husband's abrupt death, Alice seeks solace with his remaining family — descendants of a leading researcher on demonic possession. As her in-laws transform one by one into creatures that feed on fear, she comes to discover that the vows she took in life survive even in death.",
+    "poster": "https://image.tmdb.org/t/p/w500/ztadKzIIR0ERYqpHteaPFtk7inP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/biwEwIkjZhMUfXzz59bpeDzwYB6.jpg",
+    "rating": 6.8,
+    "release_date": "2026-07-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "RddZObTlmA8",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADEQwAAuWMkUc1r9066gABWGYWBA"
+    ]
+  },
+  {
     "csv_id": "582350-sprinter",
     "tmdb_id": 582350,
     "imdb_id": "",
