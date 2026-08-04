@@ -27,7 +27,35 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADWQ0AAuWMkUfcC3cGDdhTPhYE",
-        "season": "All Seasons"
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADXA0AAuWMkUcGXv3QaE961RYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADXg0AAuWMkUdxqMmTnDg64xYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADYA0AAuWMkUcohqHwcuNmpxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADYw0AAuWMkUc7VL9aWc_olRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbA0AAuWMkUcrMdRn2HsF8xYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbg0AAuWMkUf3rXwDb64r5xYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADURMAAuWMkUfhOk12Bo9IYRYE",
+        "quality": "720p"
       }
     ]
   },
