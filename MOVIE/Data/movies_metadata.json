@@ -1,5 +1,121 @@
 [
   {
+    "csv_id": "90812-industry",
+    "tmdb_id": 90812,
+    "imdb_id": "",
+    "title": "Industry",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "In the cutthroat world of international finance, a group of young graduates compete for a limited set of permanent positions at a top investment bank in London. The boundaries between colleague, friend, lover, and enemy soon blur as they immerse themselves in a company culture defined as much by sex, drugs and ego as it is by deals and dividends.",
+    "poster": "https://image.tmdb.org/t/p/w500/mZ7YFEOxAKfjXJKWm0sYFXQ8n8A.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qcV7ebwtZcoRxBufUmXQl0KKdht.jpg",
+    "rating": 6.8,
+    "release_date": "2020-11-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Wj9KrM0JskA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADahAAAuWMmUdok_nZYoFdsRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbBAAAuWMmUdTd_jX8Dt7rhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbxAAAuWMmUckr_zuTtx5IxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADchAAAuWMmUfBOwQzBMjiMRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "119845-power-book-iv-force",
+    "tmdb_id": 119845,
+    "imdb_id": "",
+    "title": "Power Book IV: Force",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Tommy Egan leaves New York behind and plans to take on Chicago, using his outsider status to break all the local rules and rewrite them on his quest to become the biggest drug dealer in the city.",
+    "poster": "https://image.tmdb.org/t/p/w500/yzL4Tqbw2JA9MCsHJWFC4xV1IYU.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jzjmaQViwuzl82lTniqMQch9jk1.jpg",
+    "rating": 8.3,
+    "release_date": "2022-02-06",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "eWHjxxdGz6Q",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADURAAAuWMmUcZQwlyTWNclhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADVhAAAuWMmUcugJp3q7Kg-RYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADWxAAAuWMmUenFZi_qWCBYRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "97890-power-book-ii-ghost",
+    "tmdb_id": 97890,
+    "imdb_id": "",
+    "title": "Power Book II: Ghost",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Picking up just days after the “Power” finale, this sequel series follows Tariq navigating his new life, in which his desire to shed his father’s legacy comes up against the mounting pressure to save his family.",
+    "poster": "https://image.tmdb.org/t/p/w500/8rbxvwGpPd9MWjdhAoSBj016cns.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wEWHx6ybjGihzx7e9pammt0BUXW.jpg",
+    "rating": 8.2,
+    "release_date": "2020-09-06",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "XkTP1QTRWDA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADQRAAAuWMmUePuuWRT1Yx4RYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRBAAAuWMmUeVoI2aPvfgCBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRhAAAuWMmUfRSjt4cr1FJBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADShAAAuWMmUeF1GD9DILhiRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "930094-red-white-royal-blue",
     "tmdb_id": 930094,
     "imdb_id": "",
