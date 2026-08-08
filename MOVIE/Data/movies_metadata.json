@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "219760-the-terminal-list-dark-wolf",
+    "tmdb_id": 219760,
+    "imdb_id": "",
+    "title": "The Terminal List: Dark Wolf",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Action & Adventure",
+      "Drama"
+    ],
+    "overview": "Before The Terminal List, Navy SEAL Ben Edwards finds himself entangled in the black operations side of the CIA. The deeper Ben goes into the 'gray', the harder it will become to not give himself over to his darker impulses. Every man has two wolves inside him – light and dark – fighting for control. Which wolf will Ben Edwards feed?",
+    "poster": "https://image.tmdb.org/t/p/w500/9mYeRoWguq5etbwJRdF8BXFKiF.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/yQw23xxmVBFVHPCF6V68TAIIfno.jpg",
+    "rating": 7.6,
+    "release_date": "2025-08-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "pelvo5TBD-M",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADbQ0AArOsuEcDzTXEpcOIuRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "120911-the-terminal-list",
     "tmdb_id": 120911,
     "imdb_id": "",
