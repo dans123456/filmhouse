@@ -40170,10 +40170,22 @@
     "csv_id": "33880-the-legend-of-korra",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADTQsAAgiQKETImQLfi3TjrhYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADUAsAAgiQKEQ1-X2UVOZ5pxYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADUQsAAgiQKERmU6O_focegBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADUgsAAgiQKERKUHWN_5TJPhYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADTx0AArOsuEcvpFTmLlutKxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADXx4AArOsuEeDtGtguadxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADkB4AArOsuEe7XQwFPwVCgBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADzB4AArOsuEfMrLJ8Mq5RchYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/dZgYvSfuh1YHDrJuILlVQ5oA2hF.jpg",
     "rating": 8.2,
@@ -40186,8 +40198,8 @@
     ],
     "categories": [
       "Main",
-      "Animated Movies",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Animated Movies"
     ],
     "tmdb_id": 33880,
     "overview": "Avatar Korra, a headstrong, rebellious, feisty young woman who continually challenges and breaks with tradition, is on her quest to become a fully realized Avatar. In this story, the Avatar struggles to find balance within herself.",
