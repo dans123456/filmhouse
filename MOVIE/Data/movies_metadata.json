@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "10030-good-luck-chuck",
+    "tmdb_id": 10030,
+    "imdb_id": "",
+    "title": "Good Luck Chuck",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Cursed since childhood, dentist Charlie Logan cannot find the right woman. Even worse, he learns that each of his ex-girlfriends finds true love with the man she meets after her relationship with him ends. Hearing of Charlie's reputation as a good-luck charm, women from all over line up for a quick tryst. But when Charlie meets the woman of his dreams, he must find a way to break the curse or risk losing her to the next man she meets.",
+    "poster": "https://image.tmdb.org/t/p/w500/b2VgUoXR9iAtAf8nA0mvdTr7cOt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/5R4kLw5lxeiwX5hZfspK3YLg6wp.jpg",
+    "rating": 5.9,
+    "release_date": "2007-09-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "8VoPV8_s9Ec",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADBAADwg0AAoW7MVIejlCPWj3X6RYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "46105-the-fixies",
     "tmdb_id": 46105,
     "imdb_id": "",
