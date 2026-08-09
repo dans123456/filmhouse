@@ -44335,7 +44335,11 @@
     "csv_id": "138502-x-men-97",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADAhMAArFaIUYsrsdPbDy26RYE"
+      "https://t.me/FilmHouseFilebot?start=BQADAQADAhMAArFaIUYsrsdPbDy26RYE",
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADUQsAAsFEyUfapMJz7rCxsBYE",
+        "season": "Season 2"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/9Ycz7yYRf9V4jk3YXwcZhFtbNcF.jpg",
     "rating": 8.5,
