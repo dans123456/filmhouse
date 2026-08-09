@@ -1,5 +1,52 @@
 [
   {
+    "csv_id": "124394-power-book-iii-raising-kanan",
+    "tmdb_id": 124394,
+    "imdb_id": "",
+    "title": "Power Book III: Raising Kanan",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Teen/High-School"
+    ],
+    "overview": "Set in South Jamaica, Queens, in 1991, this prequel to \"Power\" revolves around the coming of age of Kanan Stark.",
+    "poster": "https://image.tmdb.org/t/p/w500/pZ7IaHON9hnu8C0g3zdoWwIsJ9t.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3GW1N2ShwffnCG7EV0UQEWehNFJ.jpg",
+    "rating": 8,
+    "release_date": "2021-07-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "huwZi90poSI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD1g8AAsFEyUeg0o4LmlmWjRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD2Q8AAsFEyUfTsiz7V6CCoRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD3Q8AAsFEyUeLicbeRyt-qxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD3w8AAsFEyUdrL14VefGGcRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD4A8AAsFEyUeIEyZSRzn4hRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "11814-weird-science",
     "tmdb_id": 11814,
     "imdb_id": "",
