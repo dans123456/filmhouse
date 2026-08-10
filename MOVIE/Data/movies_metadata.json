@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "102085-too-hot-to-handle",
+    "tmdb_id": 102085,
+    "imdb_id": "",
+    "title": "Too Hot to Handle",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Reality"
+    ],
+    "overview": "On the shores of paradise, gorgeous singles meet and mingle. But there’s a twist. To win a $100,000 grand prize, they’ll have to give up sex.",
+    "poster": "https://image.tmdb.org/t/p/w500/jr21CagMMfglh7YVgcyov3Cj833.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wV6YSaRbA1RNI7ge71yZn3CJGzN.jpg",
+    "rating": 6.6,
+    "release_date": "2020-04-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "2JgPJpgnut4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADchUAAgyN0Ee_TWCT-5bW9xYE",
+        "season": "Season 8"
+      }
+    ]
+  },
+  {
     "csv_id": "124394-power-book-iii-raising-kanan",
     "tmdb_id": 124394,
     "imdb_id": "",
