@@ -25,7 +25,11 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADchUAAgyN0Ee_TWCT-5bW9xYE",
-        "season": "Season 8"
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADcxUAAgyN0Eey6ghEHh0V_xYE",
+        "quality": "720p"
       }
     ]
   },
