@@ -1,5 +1,34 @@
 [
   {
+    "csv_id": "1630423-my-dearest-assassin",
+    "tmdb_id": 1630423,
+    "imdb_id": "",
+    "title": "My Dearest Assassin",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Drama",
+      "Romance"
+    ],
+    "overview": "Hunted for her rare blood type, a caged woman vows to fight alongside the assassin she loves to protect their future when an old enemy resurfaces.",
+    "poster": "https://image.tmdb.org/t/p/w500/ul4dQcA68mtSx8J56N5gEcaCCtP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xA6AM5MvEkieZKlv1Tn3sN23I7i.jpg",
+    "rating": 8.6,
+    "release_date": "2026-05-06",
+    "language": "th",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADogkAAoXz4Ed_nk22-zzAexYE"
+    ]
+  },
+  {
     "csv_id": "102085-too-hot-to-handle",
     "tmdb_id": 102085,
     "imdb_id": "",
