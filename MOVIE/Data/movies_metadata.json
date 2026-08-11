@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "1315772-minions-monsters",
+    "tmdb_id": 1315772,
+    "imdb_id": "",
+    "title": "Minions & Monsters",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Adventure",
+      "Animation",
+      "Comedy",
+      "Family",
+      "Fantasy"
+    ],
+    "overview": "This is the rambunctious, ridiculous and totally true story of how the Minions conquered Hollywood, became movie stars, lost everything, unleashed monsters onto the world and then banded together to try and save the planet from the mayhem they had just created.",
+    "poster": "https://image.tmdb.org/t/p/w500/nz7i42yhLIJ4ve9JKgM6NthoLHO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kkcwhgSFd81QDlXo8ytrpHPQjhy.jpg",
+    "rating": 6.7,
+    "release_date": "2026-06-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "V-O-uBaHk3c",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADnwkAAoXz4Ee9loN_-E4MJBYE"
+    ]
+  },
+  {
     "csv_id": "1630423-my-dearest-assassin",
     "tmdb_id": 1630423,
     "imdb_id": "",
