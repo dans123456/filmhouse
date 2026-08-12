@@ -1,5 +1,66 @@
 [
   {
+    "csv_id": "1458215-the-gentleman-thief",
+    "tmdb_id": 1458215,
+    "imdb_id": "",
+    "title": "The Gentleman Thief",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A retired master thief must protect his impulsive brother from disaster when a 100 million dollar yacht heist spirals into a dangerous web of deception. Old foes emerge as the stakes rise, forcing him to use every trick he knows to stay alive.",
+    "poster": "https://image.tmdb.org/t/p/w500/oMutDMODnbCZf46w0dK4wncQmDB.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/aayQcCebqLmkTZdILp9JVcFiIRL.jpg",
+    "rating": 5.8,
+    "release_date": "2026-07-31",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "0LB3yWX1R8Y",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADvgsAAoXz6EfGVeoUJ_8k8BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1064307-spermageddon",
+    "tmdb_id": 1064307,
+    "imdb_id": "",
+    "title": "Spermageddon",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Teen/High-School"
+    ],
+    "overview": "Two narrative threads: one is an emerging love story between awkward teens Jens and Lisa, who are having sex for the first time; the other, an eventful quest of Simon the Semen and his friends to reach the golden goal, the Egg.",
+    "poster": "https://image.tmdb.org/t/p/w500/n7SFxle8CVzMXzfV8GNCXqdg78m.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/g0hBL9OnEuRs1hm3JypNS9eP8r4.jpg",
+    "rating": 6.5,
+    "release_date": "2024-12-28",
+    "language": "no",
+    "cast": [],
+    "director": "",
+    "trailer": "q5PUJLN141A",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADCQwAAoXz6EfNh7SWIZxDlRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "300168-dragon-blade",
     "tmdb_id": 300168,
     "imdb_id": "",
