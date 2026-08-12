@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "46041-my-little-monster",
+    "tmdb_id": 46041,
+    "imdb_id": "",
+    "title": "My Little Monster",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime"
+    ],
+    "genres": [
+      "Anime"
+    ],
+    "overview": "Mizutani Shizuku finds peace in her studies.  Working hard to stay at the top of the class, alone but focused.  When she is tasked with delivering class materials to Yoshida Haru, her world starts to rapidly expand.  With some new friends and feelings, will she be able to stay focused on her studies?",
+    "poster": "https://image.tmdb.org/t/p/w500/qKCY7dUsEDdWvdftQJQoWkV3lFT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zHQ2ntgjx2xHMkyXFgI1tjcoHST.jpg",
+    "rating": 8.2,
+    "release_date": "2012-10-02",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "SlD-8h96pDw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADyRMAAoXz6EcrTeW-Jm8BnxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "manual-1786558439838-my-little-monster",
     "tmdb_id": null,
     "imdb_id": "",
