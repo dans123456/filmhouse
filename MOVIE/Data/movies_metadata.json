@@ -1,5 +1,150 @@
 [
   {
+    "csv_id": "1443961-rao-bahadur",
+    "tmdb_id": 1443961,
+    "imdb_id": "",
+    "title": "Rao Bahadur",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "In 1970s India, an eccentric aristocrat—labeled a 'man of miracles'—miraculously survives a terminal illness. Plagued by guilt and fear, he retreats into his palatial mansion, creating an alternate world that deeply blurs reality and imagination.",
+    "poster": "https://image.tmdb.org/t/p/w500/9hzKAJImKEHBz0vnF5EazPMA8D4.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zGbfaJpIFoUBYJJMm0ypQWPlKP5.jpg",
+    "rating": 7.2,
+    "release_date": "2026-07-02",
+    "language": "te",
+    "cast": [],
+    "director": "",
+    "trailer": "aevbXGQKlw8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADTBkAAjoxCET-k46HwQ6MvhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1465557-our-hero-balthazar",
+    "tmdb_id": 1465557,
+    "imdb_id": "",
+    "title": "Our Hero, Balthazar",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Teen/High-School"
+    ],
+    "overview": "Eager to impress his activist crush, a wealthy New York teenager follows an online connection to Texas, where he's convinced he can stop an act of extreme violence.",
+    "poster": "https://image.tmdb.org/t/p/w500/mxVTarvl5OLoU9YWIYygby6R0KI.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wcXcAI1S9N9DG7SvjNTGGCxVlsF.jpg",
+    "rating": 6.5,
+    "release_date": "2026-03-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "vL4AuYMtr9c",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADSBkAAjoxCEQCjNijE6JbsBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1433117-kara",
+    "tmdb_id": 1433117,
+    "imdb_id": "",
+    "title": "Kara",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A thief tries to go straight, but when predatory banks trap his father in debt, he returns to crime — with a determined cop closing in on his trail.",
+    "poster": "https://image.tmdb.org/t/p/w500/uIrFdMWlJFdc1jPBP9bxeaISCDj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/e5IdZ1OEWMYxTeu51tI67gXvfpn.jpg",
+    "rating": 5.8,
+    "release_date": "2026-04-30",
+    "language": "ta",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRhkAAjoxCERSdFTC8m1QkhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1475803-governor",
+    "tmdb_id": 1475803,
+    "imdb_id": "",
+    "title": "Governor",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Bollywood"
+    ],
+    "genres": [
+      "Bollywood"
+    ],
+    "overview": "Set against Indias 1990 economic crisis, Governor follows Raman, a reluctant bureaucrat unexpectedly appointed as the Governor of the RBI when the nation stands on the brink of bankruptcy. As inflation rises, fuel runs low, and panic spreads, Raman must navigate political pressure and a collapsing system to prevent the country from falling apart.",
+    "poster": "https://image.tmdb.org/t/p/w500/Anukm4NH6MM025vUQ9ykpWQXnFn.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lvqxVKCUbhH83skNczVK9xWb5t4.jpg",
+    "rating": 5.6,
+    "release_date": "2026-06-12",
+    "language": "hi",
+    "cast": [],
+    "director": "",
+    "trailer": "Mvm0bRY0Qyg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRRkAAjoxCESpRYrrSRTApxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1479860-blind-spot",
+    "tmdb_id": 1479860,
+    "imdb_id": "",
+    "title": "Blind Spot",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "When 24-year-old Divya is found dead, what initially appears to be a suicide soon unravels into a gripping murder mystery. Officer Vikram, known for his sharp instincts, delves into a maze of hidden motives involving Divya's husband, stepchild, and maid. As buried secrets come to light and tensions rise, Vikram must investigate a house full of suspects and uncover the truth before time runs out.",
+    "poster": "https://image.tmdb.org/t/p/w500/n9SaFZccB7pZdEf5HzmaUZEhPCT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fkrhrS3BcOUhzdJeGo0NHBRXkA5.jpg",
+    "rating": 4.3,
+    "release_date": "2025-05-09",
+    "language": "te",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRBkAAjoxCEQQGaeD6CYMHBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "104359-the-mysterious-benedict-society",
     "tmdb_id": 104359,
     "imdb_id": "",
