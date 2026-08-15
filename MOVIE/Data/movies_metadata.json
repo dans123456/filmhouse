@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "Landlady2026",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Landlady",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "THE WHOLE GHETTO FEARS HER… UNTIL ONE MAN MOVED INTO HER COMPOUND.\n\nMeet ADESUWA — the most feared and troublesome landlady in Ajah.\nShe insults everybody, fights everybody, and chases tenants like a full-time job. But when a broken 43-year-old man named AFAM moves into her compound, chaos turns into...",
+    "poster": "https://www.nollymeter.com/uploads/poster/poster_1779317164.jpg",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADHiAAAjoxCET1XtYgOpV9KBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "manual-11",
     "tmdb_id": null,
     "imdb_id": "",
