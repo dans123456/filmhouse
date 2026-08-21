@@ -1,9 +1,9 @@
 [
   {
-    "csv_id": "Where-is-Chioma-Kalu",
-    "tmdb_id": null,
+    "csv_id": "1329139-the-man-died",
+    "tmdb_id": 1329139,
     "imdb_id": "",
-    "title": "Where is Chioma Kalu",
+    "title": "The Man Died",
     "type": "Movie",
     "categories": [
       "Main",
@@ -12,19 +12,49 @@
     "genres": [
       "African"
     ],
-    "overview": "The suspense drama follows a billionaire's wife who is kidnapped by her ex-lover and his jealous partner. As the situation escalates, she is forced into a psychological battle where she must rely on emotional  intelligence and strategy to regain control.",
-    "poster": "https://i.postimg.cc/VN4Cnsj5/images.jpg",
-    "backdrop": "https://i.postimg.cc/VN4Cnsj5/images.jpg",
+    "overview": "When an idealistic writer is jailed by the military after his mediation to stop a civil war is misconstrued as support for the rebels, his ideals are put to the ultimate test as he battles for his sanity and his life.",
+    "poster": "https://image.tmdb.org/t/p/w500/tbNrhvCY72ggRpWPCBrUcTWcPjK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rL6MHH1mKkoW3K62dnRNVH0GsCx.jpg",
+    "rating": 0,
+    "release_date": "2024-11-04",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Y2ELo19SR3s",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADuAYAApHcSERneAE-18v4bxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "Fragile-Comfort",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Fragile Comfort",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "For years, Dolapo and Jojo have enjoyed living large on money they never truly earned. But when their luck begins to run out, they devise a daring new plan that promises to solve all their problems.\n\nFRAGILE COMFORT is a blend of romance, comedy, betrayal, heartbreak, shocking twists, and life changing consequences.",
+    "poster": "https://i.postimg.cc/QCmwrT5x/Fragile-Comfort.jpg",
+    "backdrop": "https://i.postimg.cc/QCmwrT5x/Fragile-Comfort.jpg",
     "rating": 0,
     "release_date": "2026",
     "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "6AhoauiTTgU",
+    "trailer": "4FCDk5fwdJU",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADGSAAAjoxCESV06UigdKwmxYE",
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADEyAAAjoxCETB0rvcEcSl-hYE",
         "quality": "720p"
       }
     ]
@@ -2194,8 +2224,7 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Christian Movies"
+      "Hollywood/British Movies"
     ],
     "genres": [
       "Christian Movies"
@@ -5288,8 +5317,7 @@
     "categories": [
       "Main",
       "Hollywood/British Movies",
-      "Teen/High-School",
-      "Christian Movies"
+      "Teen/High-School"
     ],
     "genres": [],
     "overview": "The film tells futurist, architect, and inventor R. Buckminster Fuller's incredible story through two teens hoping to get laid, become punk gods, and survive high school.",
@@ -8175,8 +8203,7 @@
     "categories": [
       "Main",
       "Hollywood/British Series",
-      "African",
-      "Christian Movies"
+      "African"
     ],
     "genres": [],
     "overview": "An ancient goddess awakens in modern-day Ghana and struggles to adapt to a world that has forgotten the gods",
@@ -8452,9 +8479,8 @@
     "categories": [
       "Main",
       "Hollywood/British Movies",
-      "Classic Movies",
       "Comic",
-      "Christian Movies"
+      "Classic Movies"
     ],
     "genres": [
       "Classic Movies",
@@ -12956,8 +12982,7 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Christian Movies"
+      "Hollywood/British Movies"
     ],
     "genres": [],
     "overview": "After total humiliation at her thirteenth birthday party, Jenna Rink wants to just hide until she's thirty. Thanks to some magic wishing dust, Jenna's prayer has been answered. With a knockout body, a fabulous wardrobe, an athlete boyfriend, a dream job, and superstar friends, this can't be a better life. But soon Jenna realizes that adult life isn’t as easy as she hoped for.",
@@ -12971,7 +12996,10 @@
     "trailer": "_pmFp2W65Fs",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD6BIAAhoLoUYYZZnoEMfuOxYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD6BIAAhoLoUYYZZnoEMfuOxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -16673,8 +16701,7 @@
     "categories": [
       "Main",
       "Hollywood/British Movies",
-      "Classic Movies",
-      "Christian Movies"
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "Barney Ross leads a band of highly skilled mercenaries including knife enthusiast Lee Christmas, a martial arts expert Yin Yang, heavy weapons specialist Hale Caesar, demolitionist Toll Road, and a loose-cannon sniper Gunner Jensen. When the group is commissioned by the mysterious Mr. Church to assassinate the dictator of a small South American island, Barney and Lee visit the remote locale to scout out their opposition and discover the true nature of the conflict engulfing the city.",
@@ -16727,8 +16754,7 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Christian Movies"
+      "Hollywood/British Movies"
     ],
     "genres": [],
     "overview": "Mr. Church reunites the Expendables for what should be an easy paycheck, but when one of their men is murdered on the job, their quest for revenge puts them deep in enemy territory and up against an unexpected threat.",
@@ -16742,7 +16768,10 @@
     "trailer": "ip_CYHdyUBs",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQADfRoAAnavkUZQtt4l0snQWhYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADfRoAAnavkUZQtt4l0snQWhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -19649,8 +19678,7 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Christian Movies"
+      "Hollywood/British Movies"
     ],
     "genres": [],
     "overview": "When a team of mercenaries breaks into a wealthy family compound on Christmas Eve, taking everyone inside hostage, the team isn’t prepared for a surprise combatant: Santa Claus is on the grounds, and he’s about to show why this Nick is no saint.",
@@ -19664,7 +19692,10 @@
     "trailer": "a53e4HHnx_s",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQAD5gwAAnavkUazArHEJ1LwmxYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD5gwAAnavkUazArHEJ1LwmxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -21494,8 +21525,7 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Christian Movies"
+      "Hollywood/British Movies"
     ],
     "genres": [],
     "overview": "When Alita awakens with no memory of who she is in a future world she does not recognize, she is taken in by Ido, a compassionate doctor who realizes that somewhere in this abandoned cyborg shell is the heart and soul of a young woman with an extraordinary past.",
@@ -21509,7 +21539,10 @@
     "trailer": "puKWa8hrvA8",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD7hoAAp4PiEb7sKqAVaYxUhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD7hoAAp4PiEb7sKqAVaYxUhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -21604,6 +21637,7 @@
     "categories": [
       "Main",
       "Hollywood/British Series",
+      "Teen/High-School",
       "Christian Movies"
     ],
     "genres": [],
@@ -21618,7 +21652,10 @@
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADIRoAAp4PiEb0yc5Yl5v5TRYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADIRoAAp4PiEb0yc5Yl5v5TRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -21865,8 +21902,7 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Hollywood/British Series",
-      "Christian Movies"
+      "Hollywood/British Series"
     ],
     "genres": [],
     "overview": "It's a tale of reinvention, betrayal, redemption, and love with a twist. Jack Dawkins is The Artful Dodger, whose pickpocketing fingers have become the skilled hands of a surgeon. He is torn between an impossible love and the criminal underworld he secretly craves. This will require Artfulness.",
@@ -21880,8 +21916,14 @@
     "trailer": "kKkqiSZv8D8",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQADNRAAAnavkUY60ZRbKbD4XxYE",
-      "https://t.me/FilmHouseFile2bot?start=BQADAQADVRAAAnavkUb6BhwaWZBjFBYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADNRAAAnavkUY60ZRbKbD4XxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADVRAAAnavkUb6BhwaWZBjFBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -23488,8 +23530,7 @@
       "Main",
       "Hollywood/British Series",
       "Korean Drama",
-      "Teen/High-School",
-      "Christian Movies"
+      "Teen/High-School"
     ],
     "genres": [],
     "overview": "Average teenager Jin Wang juggles his high school social life with his immigrant home life. When he meets a new foreign student on the first day of the school year, even more worlds collide as Jin is unwittingly entangled in a battle of Chinese mythological gods.",
@@ -23503,7 +23544,10 @@
     "trailer": "YrV3pOo3ycU",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADBhsAAmjCeUZUchrfeuo-EBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBhsAAmjCeUZUchrfeuo-EBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -23716,8 +23760,7 @@
       "Main",
       "Hollywood/British Movies",
       "Classic Movies",
-      "Erotic Movies",
-      "Christian Movies"
+      "Erotic Movies"
     ],
     "tmdb_id": 26123,
     "overview": "Ten years after the first American Pie movie, three new hapless virgins discover the Bible hidden in the school library at East Great Falls High. Unfortunately for them, the book is ruined, and with incomplete advice, the Bible leads them on a hilarious journey to lose their virginity.",
@@ -23978,7 +24021,10 @@
     "csv_id": "196867-annie",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADgxgAAkKtqEXXYCvuSH9B3xYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADgxgAAkKtqEXXYCvuSH9B3xYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/aKAM9V0izx4VhsdyAdBvAB26UCZ.jpg",
     "rating": 6.2,
@@ -23991,8 +24037,7 @@
     "categories": [
       "Main",
       "Hollywood/British Movies",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Christian Movies"
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "tmdb_id": 196867,
     "overview": "Annie is a young, happy foster kid who's also tough enough to make her way on the streets of New York in 2014. Originally left by her parents as a baby with the promise that they'd be back for her someday, it's been a hard knock life ever since with her mean foster mom Miss Hannigan. But everything's about to change when the hard-nosed tycoon and New York mayoral candidate Will Stacks—advised by his brilliant VP and his shrewd and scheming campaign advisor—makes a thinly-veiled campaign move and takes her in. Stacks believes he's her guardian angel, but Annie's self-assured nature and bright, sun-will-come-out-tomorrow outlook on life just might mean it's the other way around.",
@@ -25804,8 +25849,7 @@
     "categories": [
       "Main",
       "Anime",
-      "Teen/High-School",
-      "Christian Movies"
+      "Teen/High-School"
     ],
     "genres": [
       "Animation",
@@ -25823,7 +25867,10 @@
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADVBMAAghnMUZHE1aqtz_EUhYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADVBMAAghnMUZHE1aqtz_EUhYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -26309,8 +26356,7 @@
     ],
     "categories": [
       "Main",
-      "African",
-      "Christian Movies"
+      "African"
     ],
     "tmdb_id": 1723743,
     "overview": "On the eve of Mothers’ Day, 5 women confronting loss, love and life, in a series of connected events, journey towards redemption as they re-build their lives in the wake of a day where motherhood is celebrated and the childless are forgotten.",
@@ -26808,8 +26854,7 @@
     "categories": [
       "Main",
       "Hollywood/British Movies",
-      "Classic Movies",
-      "Christian Movies"
+      "Classic Movies"
     ],
     "genres": [],
     "overview": "A married workaholic, Michael Newman doesn't have time for his wife and children, not if he's to impress his ungrateful boss and earn a well-deserved promotion. So when he meets Morty, a loopy sales clerk, he gets the answer to his prayers: a magical remote that allows him to bypass life's little distractions with increasingly hysterical results.",
@@ -27083,8 +27128,7 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Christian Movies"
+      "Hollywood/British Movies"
     ],
     "genres": [],
     "overview": "A woman who is struggling with the conflict between her faith and her personal life must defend herself against the spirit of a demonic nun who is bent on destroying her.",
@@ -27098,7 +27142,10 @@
     "trailer": "8B9_hZ6qsew",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADkyAAAh-4UEYx4sYTSrvO4xYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADkyAAAh-4UEYx4sYTSrvO4xYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -27794,8 +27841,7 @@
     "categories": [
       "Main",
       "Anime",
-      "Teen/High-School",
-      "Christian Movies"
+      "Teen/High-School"
     ],
     "genres": [
       "Anime"
@@ -27811,7 +27857,10 @@
     "trailer": "NlJZ-YgAt-c",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADURAAAq-ESEaoZMDME5U8AxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADURAAAq-ESEaoZMDME5U8AxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -27823,8 +27872,7 @@
     "categories": [
       "Main",
       "Anime",
-      "Teen/High-School",
-      "Christian Movies"
+      "Teen/High-School"
     ],
     "genres": [
       "Anime"
@@ -27840,7 +27888,10 @@
     "trailer": "Dx39acQ9h3w",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADlxAAAq-ESEZXx81EBx7bGBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADlxAAAq-ESEZXx81EBx7bGBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -27878,8 +27929,7 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Anime",
-      "Christian Movies"
+      "Anime"
     ],
     "genres": [
       "Anime"
@@ -27895,7 +27945,10 @@
     "trailer": "8ziUXV6t0ow",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADRhIAAq-ESEb4nsmeSbMgvBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRhIAAq-ESEb4nsmeSbMgvBYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -29807,7 +29860,10 @@
     "csv_id": "341174-fifty-shades-darker",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADWw4AAoywoEYOlFzIwvvS4hYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADWw4AAoywoEYOlFzIwvvS4hYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/w3qa274gvca9t8pkUoG8nfQgTU3.jpg",
     "rating": 6.5,
@@ -29819,8 +29875,7 @@
     "categories": [
       "Main",
       "Hollywood/British Movies",
-      "Erotic Movies",
-      "Christian Movies"
+      "Erotic Movies"
     ],
     "tmdb_id": 341174,
     "overview": "When a wounded Christian Grey tries to entice a cautious Ana Steele back into his life, she demands a new arrangement before she will give him another chance. As the two begin to build trust and find stability, shadowy figures from Christian’s past start to circle the couple, determined to destroy their hopes for a future together.",
@@ -29842,7 +29897,10 @@
     "csv_id": "337167-fifty-shades-freed",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADXA4AAoywoEYmuqFuaVnp1xYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADXA4AAoywoEYmuqFuaVnp1xYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/jjPJ4s3DWZZvI4vw8Xfi4Vqa1Q8.jpg",
     "rating": 6.7,
@@ -29854,8 +29912,7 @@
     "categories": [
       "Main",
       "Hollywood/British Movies",
-      "Erotic Movies",
-      "Christian Movies"
+      "Erotic Movies"
     ],
     "tmdb_id": 337167,
     "overview": "Believing they have left behind shadowy figures from their past, newlyweds Christian and Ana fully embrace an inextricable connection and shared life of luxury. But just as she steps into her role as Mrs. Grey and he relaxes into an unfamiliar stability, new threats could jeopardize their happy ending before it even begins.",
@@ -29877,7 +29934,10 @@
     "csv_id": "216015-fifty-shades-of-grey",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADWQ4AAoywoEajoU0_XxGNdRYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADWQ4AAoywoEajoU0_XxGNdRYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/63kGofUkt1Mx0SIL4XI4Z5AoSgt.jpg",
     "rating": 5.9,
@@ -29891,8 +29951,7 @@
       "Main",
       "Hollywood/British Movies",
       "Erotic Movies",
-      "Teen/High-School",
-      "Christian Movies"
+      "Teen/High-School"
     ],
     "tmdb_id": 216015,
     "overview": "When college senior Anastasia Steele steps in for her sick roommate to interview prominent businessman Christian Grey for their campus paper, little does she realize the path her life will take. Christian, as enigmatic as he is rich and powerful, finds himself strangely drawn to Ana, and she to him. Though sexually inexperienced, Ana plunges headlong into an affair -- and learns that Christian's true sexual proclivities push the boundaries of pain and pleasure.",
@@ -31959,10 +32018,9 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Animated Movies",
       "Hollywood/British Movies",
       "Comic",
-      "Christian Movies"
+      "Animated Movies"
     ],
     "genres": [
       "Animated Movies",
@@ -31979,7 +32037,10 @@
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADjh8AAp4PgEZXk6DCZwZ_7BYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjh8AAp4PgEZXk6DCZwZ_7BYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -32320,8 +32381,7 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies",
-      "Christian Movies"
+      "Hollywood/British Movies"
     ],
     "genres": [],
     "overview": "After hearing a child screaming for help from the green depths of a vast field of tall grass, Becky, a pregnant woman, and Cal, her brother, park their car near a mysterious abandoned church and enter the field, discovering that they are not alone and, for some reason, they are unable to escape a completely inextricable vegetable labyrinth.",
@@ -32335,7 +32395,10 @@
     "trailer": "7afc9gTbVFI",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADVB8AAh-4UEYtgma-YOdLQxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADVB8AAh-4UEYtgma-YOdLQxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -32730,8 +32793,7 @@
     "categories": [
       "Main",
       "Hollywood/British Movies",
-      "Teen/High-School",
-      "Christian Movies"
+      "Teen/High-School"
     ],
     "genres": [],
     "overview": "A gritty coming of age thriller about a young girl sent to juvenile prison for the murder of her abusive step father. The film follows Anna Nix's journey into the dark world of an all girls jail where she discovers complex relationships, drugs, mental illness and her eventual search for redemption.",
@@ -32745,7 +32807,10 @@
     "trailer": "WR-ouRYzlm8",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADWx8AAh-4UEb8-8EicpVDwxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADWx8AAh-4UEb8-8EicpVDwxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -35723,7 +35788,10 @@
     "csv_id": "92749-moon-knight",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADiRYAArFaIUYeBE8fPZwG1hYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADiRYAArFaIUYeBE8fPZwG1hYE",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/x6FsYvt33846IQnDSFxla9j0RX8.jpg",
     "rating": 7.6,
@@ -35736,14 +35804,14 @@
     "categories": [
       "Main",
       "Hollywood/British Series",
-      "Comic",
-      "Christian Movies"
+      "Comic"
     ],
     "tmdb_id": 92749,
     "overview": "When Steven Grant, a mild-mannered gift-shop employee, becomes plagued with blackouts and memories of another life, he discovers he has dissociative identity disorder and shares a body with mercenary Marc Spector. As Steven/Marc’s enemies converge upon them, they must navigate their complex identities while thrust into a deadly mystery among the powerful gods of Egypt.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/iux1vKPT7Vw1AzetZb4Jz6wfYsm.jpg",
     "language": "en",
-    "cast": []
+    "cast": [],
+    "trailer": ""
   },
   {
     "title": "Moon Maidens",
@@ -36672,9 +36740,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Animated Movies",
       "Hollywood/British Movies",
-      "Christian Movies"
+      "Animated Movies"
     ],
     "genres": [
       "Animated Movies"
@@ -36690,7 +36757,10 @@
     "trailer": "IaELO-4rPnE",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADcR8AAh-4UEbtFR2FV04OchYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADcR8AAh-4UEbtFR2FV04OchYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -39981,7 +40051,10 @@
     "csv_id": "317953-spud-3-learning-to-fly",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADMBAAAh50AAFGAAEKTh5zlw8-FgQ"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADMBAAAh50AAFGAAEKTh5zlw8-FgQ",
+        "quality": "720p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/fUweNM8bDoY5MpMRQCQMGDPYb7Q.jpg",
     "rating": 6,
@@ -39992,7 +40065,7 @@
     "categories": [
       "Main",
       "African",
-      "Christian Movies"
+      "Teen/High-School"
     ],
     "tmdb_id": 317953,
     "overview": "As Spud Milton continues his awkward stagger through adolescence, he learns one of life's most important lessons: When dealing with women and cretins, nothing is ever quite as it seems. \"I'm practically a man in most areas,\" writes Spud confidently on his sixteenth birthday. The year is 1992 and, in South Africa, radical change is in the air. The country may be on the bumpy road to an uncertain future, but Spud Milton is hoping for a smooth ride as he returns to boarding school as a senior. Instead, he discovers that his vindictive arch enemy is back to taunt him and that a garrulous Malawian has taken residence in his dormitory, along with the regular inmates and misfits he calls friends. Spud's world has never seemed less certain; he attempts to master Shakespeare, wrestles constantly with his God, and the power of negative thinking, and develops an aversion to fried fish after a shocking discovery about his grandmother, Wombat.",
