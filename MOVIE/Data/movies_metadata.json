@@ -1,5 +1,33 @@
 [
   {
+    "csv_id": "37835-trouble-man",
+    "tmdb_id": 37835,
+    "imdb_id": "",
+    "title": "Trouble Man",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "One day all of a sudden, a trouble befalls one man. That trouble snowballs into bigger troubles, one by one, pulling everyone around him in. A yakuza being chased by another yakuza, a mysterious woman who is being attacked, an otaku man with some sort of \"power\", a hit man who has lost his memory, and an old landlord. You can't miss even a second of the shocking confessions made by the residents of the apartment. A mystery upon another mystery, this is an intricately woven story. When all the pieces of the puzzles are put together, you will experience something you have never experienced before. A new experience will be felt through this fast-paced story. This is a serious comedy that will draw you in.",
+    "poster": "https://image.tmdb.org/t/p/w500/exfjtsS6KtU4dgQ5bkqJD7GyqFk.jpg",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0,
+    "release_date": "2010-04-09",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      "https://t.me/filmHouseFile1bot?start=BQADAQADQgcAApHcSEQVj06M_zGoGBYE"
+    ]
+  },
+  {
     "csv_id": "1329139-the-man-died",
     "tmdb_id": 1329139,
     "imdb_id": "",
