@@ -1,27 +1,60 @@
 [
   {
-    "csv_id": "Just_Before_Forever",
+    "csv_id": "rock-paper-scissors",
     "tmdb_id": null,
     "imdb_id": "",
-    "title": "Just Before Forever",
+    "title": "Rock, Paper, Scissors",
     "type": "Movie",
     "categories": [
-      "Main"
+      "Main",
+      "African"
     ],
-    "genres": [],
-    "overview": "JUST BEFORE FOREVER is a romantic Nollywood drama filled with love, emotions, difficult choices, and unexpected moments that will keep you watching until the end.",
-    "poster": "https://nollymeter.com/uploads/poster/poster_1786575565.jpg",
-    "backdrop": "https://nollymeter.com/uploads/poster/poster_1786575565.jpg",
+    "genres": [
+      "African"
+    ],
+    "overview": "Love can be a beautiful game... until someone decides to play dirty. ROCK, PAPER, SCISSORS is a gripping drama packed with romance, suspense, deception, and unexpected twists that will keep you guessing until the very end.",
+    "poster": "https://nollywire.com/wp-content/uploads/2026/06/Rock-Paper-Scissors-official-poster-2026-Nollywire.jpeg?ver=1786131592",
+    "backdrop": "https://nollywire.com/wp-content/uploads/2026/06/Rock-Paper-Scissors-official-poster-2026-Nollywire.jpeg?ver=1786131592",
     "rating": 0,
     "release_date": "2026",
     "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "WIQUH0YSZAs",
+    "trailer": "rvWarwS-BRU",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFSAAAjoxCEQXuMaZ7tDR4hYE",
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFyAAAjoxCESz3yqE2N1cAAEWBA",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "Im_Still_Here",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "I'm Still Here",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Damilola thought she had found the kind of love people spend a lifetime praying for. A marriage built on unwavering devotion, quiet faith, and a future that seemed destined for forever. But when one devastating moment shatters their perfect world, the couple is forced into a battle no one prepares...",
+    "poster": "https://www.nollymeter.com/uploads/poster/poster_1785422867.jpg",
+    "backdrop": "https://www.nollymeter.com/uploads/poster/poster_1785422867.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "5zVbEyAF7SI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFCAAAjoxCESMISRjsMTHwBYE",
         "quality": "720p"
       }
     ]
