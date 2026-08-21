@@ -1,5 +1,117 @@
 [
   {
+    "csv_id": "1470031-the-boy-from-below",
+    "tmdb_id": 1470031,
+    "imdb_id": "",
+    "title": "The Boy from Below",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "On Halloween night, 1997, a masked killer brings slasher films to life in Carpenter Falls. A video store clerk and her friends must survive his deadly game before they’re picked off one by one.",
+    "poster": "https://image.tmdb.org/t/p/w500/6boCGBq6PYULSraA6PRUt9nuA93.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6RZaargoD2M9J3w5D9lZ20LJATI.jpg",
+    "rating": 3,
+    "release_date": "2025-09-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "6_OO9xZcZL0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD2xYAApHcQESmsQT9wTW1rxYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
+    "csv_id": "950028-the-invite",
+    "tmdb_id": 950028,
+    "imdb_id": "",
+    "title": "The Invite",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Joe and Angela's marriage is on thin ice. When they invite their enigmatic upstairs neighbors for a dinner party, the night spirals into unexpected places. Have they reignited the spark or lit the match that burns it all down?",
+    "poster": "https://image.tmdb.org/t/p/w500/b7Dr8Chzse8VagexAporUu2RtLx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lEwqBGNR65KZv6Ej5ufcmhZu2y2.jpg",
+    "rating": 7.4,
+    "release_date": "2026-06-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "nelkiuezJxg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD3hYAApHcQERvukZx68RMjRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1404304-the-isolate-thief",
+    "tmdb_id": 1404304,
+    "imdb_id": "",
+    "title": "The Isolate Thief",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "A young woman struggles to conceal the gold she stole from a group of violent outlaws who have seized control of her remote outpost.",
+    "poster": "https://image.tmdb.org/t/p/w500/gmmCh2BvTKp0YGT2FYG0eOQJELi.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mwqxKmbW6ssqa5CKHrgocqbkL0C.jpg",
+    "rating": 7.3,
+    "release_date": "2026-07-10",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "jSwHRzmEhBI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD4BYAApHcQES9375BBU0_ZhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1587964-they-fight",
+    "tmdb_id": 1587964,
+    "imdb_id": "",
+    "title": "They Fight",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Reformed ex-convict Walt Manigan returns home to rebuild his family with the love of his life, Ketta. His path leads him to a boxing gym inside a D.C. youth recreation center about to be closed. There, he works under the wise coach Slim to mentor a group of boys to train for the junior national boxing tournament, all leading to a showdown between best friends Quincey and Peanut as they battle for a spot on the U.S. Junior Olympic Team.",
+    "poster": "https://image.tmdb.org/t/p/w500/46X9sBM0L4z2y6AkFKxpH4X8O77.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/h6BWd6mU6o1KqZDrVaAldmvboCX.jpg",
+    "rating": 3.8,
+    "release_date": "2026-06-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "o9r5xmGthFY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD4RYAApHcQEQlrZKWB-VbURYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1680072-the-narcissist-s-playbook",
     "tmdb_id": 1680072,
     "imdb_id": "",
