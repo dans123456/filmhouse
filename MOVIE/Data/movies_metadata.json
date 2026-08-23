@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "5024-veggietales",
+    "tmdb_id": 5024,
+    "imdb_id": "",
+    "title": "VeggieTales",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Animated Movies",
+      "Classic Movies",
+      "Christian Movies"
+    ],
+    "genres": [
+      "Animated Movies",
+      "Classic Movies"
+    ],
+    "overview": "American series of children's computer-animated episodes featuring anthropomorphic vegetables in stories conveying moral themes based on Christianity. They frequently retell Biblical stories, sometimes anachronistically reframed, and include humorous references to pop culture in many different eras by putting Veggie spins on them.",
+    "poster": "https://image.tmdb.org/t/p/w500/NCQdGCorybrM7YjaxXIA6CEovi.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gHSNBXUoEde5nYC6q4EA3e4y53j.jpg",
+    "rating": 7.4,
+    "release_date": "1993-12-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "vBMNCnULcts",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADaRUAAiAXWET7k_EkONXqqxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "62046-scream-queens",
     "tmdb_id": 62046,
     "imdb_id": "",
