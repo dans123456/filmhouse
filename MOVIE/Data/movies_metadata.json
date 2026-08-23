@@ -7,8 +7,8 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Animated Movies",
       "Hollywood/British Series",
+      "Animated Movies",
       "Christian Movies"
     ],
     "genres": [
@@ -32,6 +32,10 @@
       },
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADoBcAApHcSERjmxp-Mab6dxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADSAsAAiAXWERETdCF8E7fpRYE",
         "quality": "720p"
       }
     ]
