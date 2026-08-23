@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "249551-n-ro-the-assassin",
+    "tmdb_id": 249551,
+    "imdb_id": "",
+    "title": "Néro the Assassin",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama",
+      "Action & Adventure"
+    ],
+    "overview": "France, 1504. A ruthless assassin goes on the run with his estranged daughter in his quest to protect her from deadly enemies and evil forces.",
+    "poster": "https://image.tmdb.org/t/p/w500/cgzHLXOEILDwvj19tggt3ZLsfTF.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lMdOqInVxIvEapJjxAvOoHc7tl5.jpg",
+    "rating": 6.6,
+    "release_date": "2025-10-08",
+    "language": "fr",
+    "cast": [],
+    "director": "",
+    "trailer": "B5Na9Ehd0QU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyxAAAiAXWETQkCkf8NaziBYE",
+        "season": "All Seasons"
+      }
+    ]
+  },
+  {
     "csv_id": "44931-superbook",
     "tmdb_id": 44931,
     "imdb_id": "",
