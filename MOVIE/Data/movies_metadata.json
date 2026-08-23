@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "62046-scream-queens",
+    "tmdb_id": 62046,
+    "imdb_id": "",
+    "title": "Scream Queens",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "The super-charged comedy-horror series is a modern take on the classic whodunit with a killer cast. ",
+    "poster": "https://image.tmdb.org/t/p/w500/yeayXZYSU8xdmC8i5g5jTdxeggp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3wssj86c6b2WQLWGF8BTF2oRG02.jpg",
+    "rating": 7.8,
+    "release_date": "2015-09-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "i6_LwI-hUms",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD1BQAAiAXWESEc_uJD1C5bRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD1xQAAiAXWES9OrPXawX5FxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "44931-superbook",
     "tmdb_id": 44931,
     "imdb_id": "",
