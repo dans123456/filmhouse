@@ -38,8 +38,9 @@
     "type": "Movie",
     "categories": [
       "Main",
+      "Hollywood/British Movies",
       "Animated Movies",
-      "Hollywood/British Movies"
+      "Christian Movies"
     ],
     "genres": [
       "Animated Movies"
@@ -69,8 +70,9 @@
     "type": "Movie",
     "categories": [
       "Main",
+      "Hollywood/British Movies",
       "Animated Movies",
-      "Hollywood/British Movies"
+      "Christian Movies"
     ],
     "genres": [
       "Animated Movies"
