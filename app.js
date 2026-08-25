@@ -3623,6 +3623,50 @@ function openTrailerModal(videoKey) {
     modal.classList.add("active");
 }
 
+// Helper to fetch total season count for a TV Series from TMDB
+async function fetchTvSeriesTotalSeasons(movie) {
+    if (!movie) return 0;
+    if (movie.number_of_seasons && typeof movie.number_of_seasons === "number") {
+        return movie.number_of_seasons;
+    }
+    const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
+    const tmdbId = movie.tmdb_id || (typeof movie.id === "number" ? movie.id : null);
+    
+    if (tmdbId) {
+        try {
+            const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.number_of_seasons) {
+                    movie.number_of_seasons = data.number_of_seasons;
+                    return data.number_of_seasons;
+                }
+            }
+        } catch (e) {}
+    }
+    
+    if (movie.title) {
+        try {
+            const res = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${apiKey}&query=${encodeURIComponent(movie.title)}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.results && data.results.length > 0) {
+                    const tvId = data.results[0].id;
+                    const detailRes = await fetch(`https://api.themoviedb.org/3/tv/${tvId}?api_key=${apiKey}`);
+                    if (detailRes.ok) {
+                        const detailData = await detailRes.json();
+                        if (detailData && detailData.number_of_seasons) {
+                            movie.number_of_seasons = detailData.number_of_seasons;
+                            return detailData.number_of_seasons;
+                        }
+                    }
+                }
+            }
+        } catch (e) {}
+    }
+    return 0;
+}
+
 // Open Download Modal listing links
 function openDownloadModal(movie) {
     const modal = document.getElementById("download-modal");
@@ -3633,7 +3677,10 @@ function openDownloadModal(movie) {
     
     if (!modal || !title || !grid) return;
 
-    const isTVShow = movie.type === "Series";
+    const isTVShow = (movie.type || "").toLowerCase() === "series" || 
+                     (movie.type || "").toLowerCase() === "tv" || 
+                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+
     title.textContent = movie.title;
     grid.replaceChildren();
 
@@ -3645,20 +3692,25 @@ function openDownloadModal(movie) {
         sectionHeading.textContent = isTVShow ? "Available Seasons" : "Available Quality";
     }
 
+    // Track uploaded season numbers for series
+    const uploadedSeasonNums = new Set();
+
     // Quality labels for movies
     const qualityLabels = ["720p", "1080p", "4K UHD", "480p", "WEBDL", "BluRay"];
     const qualityIcons = ["🎬", "🎥", "✨", "📱", "🌐", "💿"];
 
     if (!movie.links || movie.links.length === 0) {
-        const fallbackMsg = document.createElement("div");
-        fallbackMsg.className = "download-empty-state";
-        fallbackMsg.innerHTML = `
-            <svg style="width:40px;height:40px;color:var(--text-muted);margin-bottom:10px;"><use href="#icon-download"></use></svg>
-            <p style="color:var(--text-muted);font-size:13px;">No links available for this title yet.</p>
-            <p style="color:var(--text-secondary);font-size:11px;margin-top:4px;">Check back soon!</p>
-        `;
-        fallbackMsg.style.cssText = "display:flex;flex-direction:column;align-items:center;padding:24px 0;";
-        grid.appendChild(fallbackMsg);
+        if (!isTVShow) {
+            const fallbackMsg = document.createElement("div");
+            fallbackMsg.className = "download-empty-state";
+            fallbackMsg.innerHTML = `
+                <svg style="width:40px;height:40px;color:var(--text-muted);margin-bottom:10px;"><use href="#icon-download"></use></svg>
+                <p style="color:var(--text-muted);font-size:13px;">No links available for this title yet.</p>
+                <p style="color:var(--text-secondary);font-size:11px;margin-top:4px;">Check back soon!</p>
+            `;
+            fallbackMsg.style.cssText = "display:flex;flex-direction:column;align-items:center;padding:24px 0;";
+            grid.appendChild(fallbackMsg);
+        }
     } else {
         movie.links.forEach((link, idx) => {
             const anchor = document.createElement("div");
@@ -3689,6 +3741,13 @@ function openDownloadModal(movie) {
                 const isObj = typeof link === 'object' && link !== null;
                 const seasonLabel = isObj && link.season ? link.season : `Season ${idx + 1}`;
                 const badgeText = isObj && link.shortLabel ? link.shortLabel : (isObj && link.season ? (link.season.replace(/[^0-9]/g, '') ? `S${link.season.replace(/[^0-9]/g, '')}` : link.season.substring(0, 4)) : `S${idx + 1}`);
+
+                const sMatch = seasonLabel.match(/\d+/);
+                if (sMatch) {
+                    uploadedSeasonNums.add(parseInt(sMatch[0], 10));
+                } else {
+                    uploadedSeasonNums.add(idx + 1);
+                }
 
                 const badge = document.createElement("span");
                 badge.className = "download-link-badge season-badge";
@@ -3763,6 +3822,110 @@ function openDownloadModal(movie) {
             anchor.appendChild(actionLabel);
 
             grid.appendChild(anchor);
+        });
+    }
+
+    // Missing Seasons Dynamic Renderer for TV Series
+    if (isTVShow) {
+        const renderMissingSeasons = (totalSeasons) => {
+            // Remove existing missing season items if re-rendering
+            grid.querySelectorAll(".missing-season-wrapper").forEach(el => el.remove());
+
+            const maxUploaded = uploadedSeasonNums.size > 0 ? Math.max(...Array.from(uploadedSeasonNums)) : 0;
+            let targetCount = totalSeasons > maxUploaded ? totalSeasons : maxUploaded + 1;
+            
+            const missingSeasonNums = [];
+            for (let s = 1; s <= targetCount; s++) {
+                if (!uploadedSeasonNums.has(s)) {
+                    missingSeasonNums.push(s);
+                }
+            }
+            
+            if (missingSeasonNums.length === 0) return;
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "missing-season-wrapper";
+
+            // Section divider for missing seasons
+            const divider = document.createElement("div");
+            divider.style.cssText = "margin: 16px 0 10px 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; font-weight: 800; text-transform: uppercase; color: #ffbc00; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;";
+            divider.innerHTML = `<span>⚡</span><span>Request Missing Seasons</span>`;
+            wrapper.appendChild(divider);
+
+            missingSeasonNums.forEach(seasonNum => {
+                const missingItem = document.createElement("div");
+                missingItem.className = "download-link-item missing-season-item";
+                missingItem.style.cssText = "border: 1px dashed rgba(255, 188, 0, 0.4); background: rgba(255, 188, 0, 0.05); display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: var(--border-radius-sm); margin-bottom: 8px;";
+
+                const badge = document.createElement("span");
+                badge.className = "download-link-badge season-badge";
+                badge.style.cssText = "background: rgba(255, 188, 0, 0.2); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.4); font-weight: 800; font-size: 11px; padding: 4px 8px; border-radius: 4px;";
+                badge.textContent = `S${seasonNum}`;
+                missingItem.appendChild(badge);
+
+                const labelWrap = document.createElement("div");
+                labelWrap.className = "download-link-label-wrap";
+                labelWrap.style.cssText = "flex: 1; margin-left: 12px; display: flex; flex-direction: column; gap: 2px;";
+                
+                const label = document.createElement("span");
+                label.className = "download-link-label";
+                label.style.cssText = "font-weight: 700; color: #ffffff; font-size: 14px;";
+                label.textContent = `Season ${seasonNum}`;
+                
+                const sublabel = document.createElement("span");
+                sublabel.className = "download-link-sublabel";
+                sublabel.style.cssText = "font-size: 11px; color: var(--text-secondary);";
+                sublabel.textContent = "Not Uploaded Yet • Tap to Request";
+
+                labelWrap.appendChild(label);
+                labelWrap.appendChild(sublabel);
+                missingItem.appendChild(labelWrap);
+
+                const reqActionBtn = document.createElement("button");
+                reqActionBtn.className = "btn-request-season-action";
+                
+                const reqSeasonStr = `Season ${seasonNum}`;
+                const cleanMovieTitle = getCleanRequestTitle(movie.title).toLowerCase();
+                
+                const isAlreadyReq = currentUserRequests && currentUserRequests.some(r => {
+                    const rClean = getCleanRequestTitle(r.title).toLowerCase();
+                    const matchesTitle = rClean === cleanMovieTitle;
+                    const matchesSeason = (r.seasonOrPart && r.seasonOrPart.toLowerCase() === reqSeasonStr.toLowerCase()) || 
+                                          (r.title && r.title.toLowerCase().includes(`season ${seasonNum}`));
+                    return matchesTitle && matchesSeason && r.status !== "fulfilled";
+                });
+
+                if (isAlreadyReq) {
+                    reqActionBtn.textContent = `Requested S${seasonNum} ⏳`;
+                    reqActionBtn.style.cssText = "background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
+                    sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
+                } else {
+                    reqActionBtn.textContent = `REQUEST S${seasonNum} ⚡`;
+                    reqActionBtn.style.cssText = "background: linear-gradient(135deg, #ffbc00, #ff8c00); color: #000000; border: none; font-size: 11px; font-weight: 800; padding: 7px 13px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(255,188,0,0.3); transition: transform 0.15s ease;";
+                    
+                    reqActionBtn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        logMovieRequestToFirestore(movie, `Season ${seasonNum}`);
+                        reqActionBtn.textContent = `Requested S${seasonNum} ⏳`;
+                        reqActionBtn.style.cssText = "background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
+                        sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
+                    });
+                }
+
+                missingItem.appendChild(reqActionBtn);
+                wrapper.appendChild(missingItem);
+            });
+
+            grid.appendChild(wrapper);
+        };
+
+        const initialTotal = movie.number_of_seasons || 0;
+        renderMissingSeasons(initialTotal);
+
+        fetchTvSeriesTotalSeasons(movie).then(totalSeasons => {
+            if (totalSeasons > initialTotal) {
+                renderMissingSeasons(totalSeasons);
+            }
         });
     }
 
