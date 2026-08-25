@@ -36,12 +36,11 @@ function getCleanRequestTitle(title) {
 function isMovieOngoing(movie) {
     if (!movie) return false;
     if (movie.isOngoing === true) return true;
-    if (movie.status && (movie.status === "Returning Series" || movie.status === "In Production" || movie.status === "Ongoing")) return true;
-    if (movie.in_production === true || movie.next_episode_to_air) return true;
     if (movie.categories && Array.isArray(movie.categories) && movie.categories.some(c => c.toLowerCase().includes("ongoing"))) return true;
     const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
     if (isTV && (movie.links && movie.links.some(l => (typeof l === 'object' && l !== null && l.type === "weekly")))) return true;
-    if (isTV && (movie.release_date && movie.release_date >= "2023")) return true;
+    if (movie.next_episode_to_air) return true;
+    if (movie.status === "Ongoing") return true;
     return false;
 }
 
@@ -3922,7 +3921,7 @@ function openDownloadModal(movie) {
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
                 sublabel.style.cssText = "font-size: 11px; color: var(--text-secondary);";
-                sublabel.textContent = "Ongoing TVShows 📡 • Tap to Open";
+                sublabel.textContent = isMovieOngoing(movie) ? "Airing Season • Tap to Request Link" : "Unreleased Season • Tap to Request";
 
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
@@ -3947,8 +3946,8 @@ function openDownloadModal(movie) {
                     reqActionBtn.style.cssText = "background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
                     sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
                 } else {
-                    reqActionBtn.textContent = `Ongoing TVShows 📡`;
-                    reqActionBtn.style.cssText = "background: linear-gradient(135deg, #ff0055, #ff2a2a); color: #ffffff; border: none; font-size: 11px; font-weight: 800; padding: 7px 13px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(255,0,85,0.4); transition: transform 0.15s ease;";
+                    reqActionBtn.textContent = `REQUEST S${seasonNum} ⚡`;
+                    reqActionBtn.style.cssText = "background: linear-gradient(135deg, #ffbc00, #ff8c00); color: #000000; border: none; font-size: 11px; font-weight: 800; padding: 7px 13px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(255,188,0,0.3); transition: transform 0.15s ease;";
                     
                     reqActionBtn.addEventListener("click", (e) => {
                         e.stopPropagation();
