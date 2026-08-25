@@ -1014,15 +1014,24 @@ function releaseClaimLock(title) {
     }).catch(err => console.error("Error querying requests for release lock:", err));
 }
 
+// Helper utility for debouncing search input events
+function createAdminDebounce(fn, delay = 200) {
+    let timer = null;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
 // Bind search input typing events
 const userSearchInput = document.getElementById("user-search-input");
 if (userSearchInput) {
-    userSearchInput.addEventListener("input", renderUsersList);
+    userSearchInput.addEventListener("input", createAdminDebounce(renderUsersList, 200));
 }
 
 const requestSearchInput = document.getElementById("request-search-input");
 if (requestSearchInput) {
-    requestSearchInput.addEventListener("input", renderRequestsList);
+    requestSearchInput.addEventListener("input", createAdminDebounce(renderRequestsList, 200));
 }
 
 // Bind filter tab click listeners
@@ -2471,7 +2480,7 @@ function updatePublishButtonState() {
 // Search Catalog Input
 const catalogSearchInput = document.getElementById("catalog-search-input");
 if (catalogSearchInput) {
-    catalogSearchInput.addEventListener("input", renderCatalogList);
+    catalogSearchInput.addEventListener("input", createAdminDebounce(renderCatalogList, 200));
 }
 
 let addMovieLinksState = [{ url: "", quality: "720p" }];
@@ -2540,6 +2549,39 @@ function renderAddMovieLinks() {
     });
 }
 
+// Modal Reset Logic for Add Movie Form
+function resetAddMovieModalState() {
+    addMovieLinksState = [{ url: "", quality: "720p" }];
+    renderAddMovieLinks();
+
+    const customSection = document.getElementById("add-movie-custom-fields");
+    const toggleBtn = document.getElementById("btn-toggle-custom-fields");
+    const toggleContainer = toggleBtn ? toggleBtn.parentElement : null;
+
+    if (toggleContainer) toggleContainer.style.display = "flex";
+    if (toggleBtn) {
+        toggleBtn.style.display = "block";
+        toggleBtn.textContent = "Show Custom Fields ▾";
+    }
+    if (customSection) customSection.style.display = "none";
+
+    const customPoster = document.getElementById("movie-poster");
+    const customBackdrop = document.getElementById("movie-backdrop");
+    const customOverview = document.getElementById("movie-overview");
+    const customTrailer = document.getElementById("movie-trailer");
+    const customReleaseDate = document.getElementById("movie-release-date");
+
+    if (customPoster) customPoster.value = "";
+    if (customBackdrop) customBackdrop.value = "";
+    if (customOverview) customOverview.value = "";
+    if (customTrailer) customTrailer.value = "";
+    if (customReleaseDate) customReleaseDate.value = "";
+
+    document.querySelectorAll(".add-cat-checkbox").forEach(cb => {
+        cb.checked = false;
+    });
+}
+
 // Modal Toggle Logic
 const addMovieModal = document.getElementById("add-movie-modal");
 const openModalBtn = document.getElementById("btn-add-movie-modal");
@@ -2547,14 +2589,10 @@ const closeModalBtn = document.getElementById("btn-close-movie-modal");
 
 if (openModalBtn && addMovieModal) {
     openModalBtn.addEventListener("click", () => {
-        addMovieLinksState = [{ url: "", quality: "720p" }]; // reset links list
+        resetAddMovieModalState();
+        const addMovieForm = document.getElementById("add-movie-form");
+        if (addMovieForm) addMovieForm.reset();
         addMovieModal.classList.add("active");
-        renderAddMovieLinks();
-        
-        const customSection = document.getElementById("add-movie-custom-fields");
-        const toggleBtn = document.getElementById("btn-toggle-custom-fields");
-        if (customSection) customSection.style.display = "none";
-        if (toggleBtn) toggleBtn.textContent = "Show Custom Fields ▾";
     });
 }
 
@@ -3039,6 +3077,7 @@ if (addMovieForm) {
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
         }
+        resetAddMovieModalState();
         addMovieForm.reset();
         addMovieModal.classList.remove("active");
         alert(`"${title}" added locally with rich TMDB details! Click "Publish Changes 🚀" inside the header to make it live.`);
@@ -3995,7 +4034,7 @@ if (closeCatMoviesBtn && catMoviesModal) {
 // Bind Category Search filter input typing
 const catMoviesSearchInput = document.getElementById("cat-movies-search");
 if (catMoviesSearchInput) {
-    catMoviesSearchInput.addEventListener("input", renderCategoryMovies);
+    catMoviesSearchInput.addEventListener("input", createAdminDebounce(renderCategoryMovies, 200));
 }
 
 function openCategoryMoviesModal(catKey, displayName) {
@@ -4225,6 +4264,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let failedCount = 0;
             let lastErrorDescription = "";
             const total = targetUsers.length;
+            const blockedUserIds = [];
             
             for (let i = 0; i < total; i++) {
                 if (shouldCancelBroadcast) {
@@ -4282,8 +4322,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     } else {
                         lastErrorDescription = result.description || "Telegram API rejected message";
                         const isBlocked = result.description && (result.description.includes("blocked") || result.description.includes("chat not found") || result.description.includes("deactivated"));
-                        if (isBlocked && typeof firebase !== 'undefined' && db) {
-                            db.collection("users").doc(user.id).set({ blockedBot: true }, { merge: true }).catch(() => {});
+                        if (isBlocked) {
+                            blockedUserIds.push(user.id);
                         }
                         console.warn(`Failed to send to ${user.id}:`, result);
                         failedCount++;
@@ -4298,6 +4338,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 // Delay 50ms to respect Telegram rate limit (max 30 msgs/sec)
                 await new Promise(r => setTimeout(r, 50));
+            }
+            
+            // Batch update blocked users in Firestore
+            if (blockedUserIds.length > 0 && typeof firebase !== 'undefined' && db) {
+                if (statusLabel) statusLabel.textContent = `Saving ${blockedUserIds.length} blocked status updates... ⏳`;
+                try {
+                    const batchSize = 400;
+                    const chunks = [];
+                    for (let j = 0; j < blockedUserIds.length; j += batchSize) {
+                        chunks.push(blockedUserIds.slice(j, j + batchSize));
+                    }
+                    const batchPromises = chunks.map(chunk => {
+                        const batch = db.batch();
+                        chunk.forEach(uid => {
+                            batch.set(db.collection("users").doc(String(uid).trim()), { blockedBot: true }, { merge: true });
+                        });
+                        return batch.commit();
+                    });
+                    await Promise.all(batchPromises);
+                    console.log(`Successfully batch updated ${blockedUserIds.length} blocked users.`);
+                } catch (batchErr) {
+                    console.error("Failed to commit blocked users batch:", batchErr);
+                }
             }
             
             // Broadcast completed

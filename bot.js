@@ -38,6 +38,7 @@ if (process.env.FIREBASE_CONFIG) {
 }
 const db = admin.firestore();
 let callTelegramWithRetry;
+let disableImmediateBlockedBotWrite = false;
 
 // Bot setup helper
 function setupBot(bot) {
@@ -151,7 +152,7 @@ function setupBot(bot) {
                 // Check if the bot was blocked or chat wasn't found
                 const isUserError = err.message && (err.message.includes("blocked") || err.message.includes("chat not found") || err.message.includes("deactivated"));
                 const targetUserId = String(args[0]);
-                if (isUserError && targetUserId && targetUserId !== "undefined" && !targetUserId.startsWith("-")) {
+                if (isUserError && targetUserId && targetUserId !== "undefined" && !targetUserId.startsWith("-") && !disableImmediateBlockedBotWrite) {
                     console.log(`User ${targetUserId} has blocked the bot or chat was not found. Flagging in database.`);
                     await db.collection("users").doc(targetUserId).set({ blockedBot: true }, { merge: true }).catch(dbErr => {
                         console.error(`Error updating blockedBot status for ${targetUserId}:`, dbErr);
@@ -165,11 +166,10 @@ function setupBot(bot) {
 
     // Command: /start
     bot.command('start', async (ctx) => {
-        const userId = String(ctx.from.id);
-        const username = ctx.from.username || "guest";
+        const username = ctx.from.username || "";
         const fullName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" ") || "Guest User";
         
-        console.log(`User /start: ${fullName} (@${username}, ID: ${userId})`);
+        console.log(`User /start: ${fullName} (${username ? '@' + username : 'No handle'}, ID: ${userId})`);
 
         // Register user in Firestore
         let isNewUser = false;
@@ -453,7 +453,7 @@ function setupBot(bot) {
             return ctx.reply(
                 `👤 *Your Profile Status*\n\n` +
                 `• *Telegram ID:* \`${userId}\`\n` +
-                `• *Username:* @${u.username || "None"}\n` +
+                `• *Username:* ${u.username && u.username !== "guest" && u.username !== "None" ? '@' + u.username.replace(/^@/, '') : "None"}\n` +
                 `• *Loyalty Points:* 🪙 \`${points.toLocaleString()}\` pts\n` +
                 `• *VIP Badge:* 🏆 \`${badge}\``,
                 { 
@@ -507,9 +507,11 @@ function setupBot(bot) {
         });
 
         try {
+            disableImmediateBlockedBotWrite = true;
             const snapshot = await db.collection("users").get();
             let successCount = 0;
             let failedCount = 0;
+            const blockedUserIds = [];
 
             for (const doc of snapshot.docs) {
                 const u = doc.data();
@@ -523,9 +525,27 @@ function setupBot(bot) {
                         successCount++;
                     } catch (err) {
                         failedCount++;
+                        const isUserError = err.message && (err.message.includes("blocked") || err.message.includes("chat not found") || err.message.includes("deactivated"));
+                        if (isUserError) {
+                            blockedUserIds.push(u.id);
+                        }
                     }
                     // Rate limiting delay
                     await new Promise(r => setTimeout(r, 50));
+                }
+            }
+
+            // Batch update blocked users
+            if (blockedUserIds.length > 0) {
+                console.log(`[Broadcast] Batch updating ${blockedUserIds.length} blocked users...`);
+                const batchSize = 500;
+                for (let i = 0; i < blockedUserIds.length; i += batchSize) {
+                    const chunk = blockedUserIds.slice(i, i + batchSize);
+                    const batch = db.batch();
+                    chunk.forEach(uid => {
+                        batch.set(db.collection("users").doc(String(uid)), { blockedBot: true }, { merge: true });
+                    });
+                    await batch.commit().catch(err => console.error("Failed to commit blocked users batch:", err));
                 }
             }
 
@@ -538,6 +558,8 @@ function setupBot(bot) {
             return ctx.reply(`❌ Broadcast failed: ${err.message}`, {
                 reply_to_message_id: ctx.message.message_id
             });
+        } finally {
+            disableImmediateBlockedBotWrite = false;
         }
     });
 
@@ -917,7 +939,7 @@ function setupBot(bot) {
                         await editMessageInPlace(
                             `👤 *Your Profile Status*\n\n` +
                             `• *Telegram ID:* \`${userId}\`\n` +
-                            `• *Username:* @${u.username || "None"}\n` +
+                            `• *Username:* ${u.username && u.username !== "guest" && u.username !== "None" ? '@' + u.username.replace(/^@/, '') : "None"}\n` +
                             `• *Loyalty Points:* 🪙 \`${points.toLocaleString()}\` pts\n` +
                             `• *VIP Badge:* 🏆 \`${badge}\``,
                             { 
@@ -1388,7 +1410,8 @@ async function init() {
                 const title = data.title;
                 const type = data.type;
                 const year = data.year || "";
-                const username = data.user || data.requestedBy || "guest";
+                const rawUser = data.user || data.requestedBy || "guest";
+                const username = (rawUser && rawUser !== "guest" && rawUser !== "None" && !rawUser.includes(" ")) ? `@${rawUser.replace(/^@/, '')}` : rawUser;
                 const downloadLink = data.downloadLink;
                 const timestamp = data.timestamp || data.requestedAt;
 
@@ -1433,7 +1456,7 @@ async function init() {
                     }
 
                     // 2. Notify admins
-                    const adminText = `🍿 *New Movie Request!*\n\n*User:* @${username} (ID: \`${userId}\`)\n*Title:* ${title}${yearSuffix} (${type})`;
+                    const adminText = `🍿 *New Movie Request!*\n\n*User:* ${username} (ID: \`${userId}\`)\n*Title:* ${title}${yearSuffix} (${type})`;
                     const defaultAdmins = ["1329840839", "1175336733"];
                     try {
                         const adminDoc = await db.collection("settings").doc("admins").get();
@@ -1467,7 +1490,7 @@ async function init() {
                         }
 
                         // Notify admins of the boost
-                        const adminText = `⚡ *Movie Request Boosted to Priority!*\n\n*User:* @${username} (ID: \`${userId}\`)\n*Title:* ${title}${yearSuffix} (${type})`;
+                        const adminText = `⚡ *Movie Request Boosted to Priority!*\n\n*User:* ${username} (ID: \`${userId}\`)\n*Title:* ${title}${yearSuffix} (${type})`;
                         const defaultAdmins = ["1329840839", "1175336733"];
                         try {
                             const adminDoc = await db.collection("settings").doc("admins").get();

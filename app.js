@@ -754,7 +754,7 @@ function handleTelegramAuth() {
         const tgUser = tg.initDataUnsafe?.user;
         if (tgUser) {
             state.user.id = tgUser.id ? String(tgUser.id) : state.user.id;
-            state.user.username = tgUser.username || (tgUser.first_name ? tgUser.first_name.replace(/\s+/g, '') : "User_" + state.user.id);
+            state.user.username = tgUser.username || "";
             state.user.fullName = [tgUser.first_name, tgUser.last_name].filter(n => n).join(" ") || state.user.fullName || "Telegram User";
             if (tgUser.photo_url) {
                 state.user.avatar = tgUser.photo_url;
@@ -771,10 +771,10 @@ function handleTelegramAuth() {
     const profileTelegramId = document.getElementById("profile-telegram-id");
 
     if (headerAvatar) headerAvatar.src = state.user.avatar;
-    if (headerName) headerName.textContent = state.user.username;
+    if (headerName) headerName.textContent = state.user.fullName || state.user.username || "Guest";
     if (profileAvatarImg) profileAvatarImg.src = state.user.avatar;
     if (profileFullName) profileFullName.textContent = state.user.fullName;
-    if (profileTelegramTag) profileTelegramTag.textContent = `@${state.user.username}`;
+    if (profileTelegramTag) profileTelegramTag.textContent = state.user.username ? `@${state.user.username}` : "No handle";
     if (profileTelegramId) profileTelegramId.textContent = `ID: ${state.user.id}`;
 }
 // User Profile Management & Loaders
@@ -892,13 +892,13 @@ function loadUserProfile() {
     if (displayFullName) displayFullName.textContent = state.user.fullName || "Guest User";
     
     const displayUsername = document.getElementById("profile-display-username");
-    if (displayUsername) displayUsername.textContent = state.user.username ? `@${state.user.username}` : "@guest";
+    if (displayUsername) displayUsername.textContent = state.user.username ? `@${state.user.username}` : "No handle";
 
     const pageAvatar = document.getElementById("profile-page-avatar");
     if (pageAvatar) pageAvatar.src = state.user.avatar;
 
     const pageTgTag = document.getElementById("profile-page-telegram-tag");
-    if (pageTgTag) pageTgTag.value = state.user.username ? `@${state.user.username}` : "@guest";
+    if (pageTgTag) pageTgTag.value = state.user.username ? `@${state.user.username}` : "No handle";
 
     const pageTgId = document.getElementById("profile-page-telegram-id");
     if (pageTgId) pageTgId.value = state.user.id;
@@ -911,7 +911,7 @@ function loadUserProfile() {
     if (headerAvatar) headerAvatar.src = state.user.avatar;
 
     const headerName = document.getElementById("header-user-name");
-    if (headerName) headerName.textContent = state.user.username;
+    if (headerName) headerName.textContent = state.user.fullName || state.user.username || "Guest";
 
     const profileAvatarImg = document.getElementById("profile-avatar-img");
     if (profileAvatarImg) profileAvatarImg.src = state.user.avatar;

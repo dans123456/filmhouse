@@ -556,7 +556,7 @@
                     <div class="form-row" style="margin-bottom: 12px;">
                         <div class="form-group" style="flex: 1;">
                             <label for="telegram-welcome-text">Welcome Message Text (HTML allowed)</label>
-                            <textarea id="telegram-welcome-text" rows="5" placeholder="Welcome to Film House! Use {name} for username." style="width: 100%; min-height: 120px; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-primary); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;"></textarea>
+                            <textarea id="telegram-welcome-text" rows="5" placeholder="Welcome to Film House! Use {name} for Full Name, {username} for @username handle." style="width: 100%; min-height: 120px; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-primary); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;"></textarea>
                         </div>
                     </div>
                     <div class="form-row" style="margin-bottom: 12px; gap: 12px;">
@@ -996,52 +996,52 @@
                             <input type="text" id="movie-release-date" placeholder="e.g. 2023-07-13 or 2023">
                         </div>
                     </div>
-                    <div class="form-group" style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Categories (Select all that apply)</label>
-                        <div id="add-movie-categories-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; max-height: 110px; overflow-y: auto; box-sizing: border-box;">
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Main" checked> Main (Home)
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Hollywood/British Movies"> Hollywood Movies
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Hollywood/British Series"> Hollywood Series
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Bollywood"> Bollywood
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Korean Drama"> Korean Drama
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="African"> African
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Anime"> Anime
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Comic"> Comic
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Animated Movies"> Animated
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Kids Shows and Movies (Nickelodeon and Disney)"> Kids
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Classic Movies"> Classics
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Erotic Movies"> Erotic
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Teen/High-School"> Teen / High-School
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="add-cat-checkbox" value="Christian Movies"> Christian
-                            </label>
-                        </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Categories (Select all that apply)</label>
+                    <div id="add-movie-categories-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; max-height: 110px; overflow-y: auto; box-sizing: border-box;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Main" checked> Main (Home)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Hollywood/British Movies"> Hollywood Movies
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Hollywood/British Series"> Hollywood Series
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Bollywood"> Bollywood
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Korean Drama"> Korean Drama
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="African"> African
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Anime"> Anime
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Comic"> Comic
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Animated Movies"> Animated
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Kids Shows and Movies (Nickelodeon and Disney)"> Kids
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Classic Movies"> Classics
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Erotic Movies"> Erotic
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Teen/High-School"> Teen / High-School
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
+                            <input type="checkbox" class="add-cat-checkbox" value="Christian Movies"> Christian
+                        </label>
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom: 20px;">
