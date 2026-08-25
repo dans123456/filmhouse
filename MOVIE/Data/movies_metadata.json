@@ -7,7 +7,8 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Korean Drama"
     ],
     "genres": [
       "Action & Adventure",
@@ -26,8 +27,16 @@
     "runtime": "",
     "links": [
       {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADSBcAAmFlcUTleZnmF5P_kxYE",
+        "quality": "720p"
+      },
+      {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADSRcAAmFlcUSMGw8F0vzW4RYE",
-        "season": "Season 2"
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADSxcAAmFlcUTJIYAQdW7CwRYE",
+        "quality": "720p"
       }
     ]
   },
