@@ -3,6 +3,7 @@ const admin = require("firebase-admin");
 const fs = require("fs");
 const path = require("path");
 const http = require("http");
+const crypto = require("crypto");
 
 // Server PORT will be initialized dynamically in the init() function based on Webhook/Polling mode.
 
@@ -1121,9 +1122,10 @@ async function init() {
         const PORT = process.env.PORT || 3000;
         let server;
 
+        const secretPath = `/telegraf/${crypto.createHash('sha256').update(botToken || "filmhouse_bot_token").digest('hex')}`;
+
         if (webhookUrl) {
             console.log(`Configuring Webhook mode with base URL: ${webhookUrl}`);
-            const secretPath = `/telegraf/${bot.secretPathComponent()}`;
             const webhookCallback = bot.webhookCallback(secretPath);
             
             server = http.createServer((req, res) => {
@@ -1217,7 +1219,6 @@ async function init() {
 
                 // Self-healing webhook check if in webhook mode
                 if (webhookUrl && statusStr === "online") {
-                    const secretPath = `/telegraf/${bot.secretPathComponent()}`;
                     const webhookTargetUrl = webhookUrl.endsWith('/') ? `${webhookUrl}${secretPath.substring(1)}` : `${webhookUrl}${secretPath}`;
                     
                     try {
