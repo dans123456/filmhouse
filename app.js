@@ -235,6 +235,7 @@ const state = {
     externalSearchResults: [],
     upcomingMovies: [],
     ongoingMovies: [],
+    categoryTmdbMovies: {},
     isLoadingTmdbCategory: false,
     lastDiscoverQuery: null
 };
@@ -2192,11 +2193,8 @@ function renderCategoriesBar() {
             if (heading) heading.textContent = categoryLabels[cat] || cat;
 
             renderFeaturedGrid();
-
-            if (cat === "Upcoming Movies") {
-                fetchTmdbUpcomingMovies();
-            } else if (cat === "Ongoing Series") {
-                fetchTmdbOngoingSeries();
+            if (cat !== "Main") {
+                fetchTmdbCategoryMovies(cat);
             }
         });
 
@@ -2313,25 +2311,23 @@ function renderFeaturedGrid(fromDiscover = false) {
     let list = state.movies;
     if (!state.searchQuery) {
         if (state.activeCategory === "Ongoing Series") {
-            const localOngoing = list.filter(m => isMovieOngoing(m));
-            const localTmdbIds = new Set(localOngoing.map(m => m.tmdb_id).filter(id => id));
-            const extOngoing = (state.ongoingMovies || []).filter(ext => !localTmdbIds.has(ext.tmdb_id));
-            list = [...localOngoing, ...extOngoing];
-
-            if (state.ongoingMovies.length === 0 && !state.isLoadingTmdbCategory) {
-                fetchTmdbOngoingSeries();
-            }
+            list = list.filter(m => isMovieOngoing(m));
         } else if (state.activeCategory === "Upcoming Movies") {
-            const localUpcoming = list.filter(m => isMovieUpcoming(m));
-            const localTmdbIds = new Set(localUpcoming.map(m => m.tmdb_id).filter(id => id));
-            const extUpcoming = (state.upcomingMovies || []).filter(ext => !localTmdbIds.has(ext.tmdb_id));
-            list = [...localUpcoming, ...extUpcoming];
-
-            if (state.upcomingMovies.length === 0 && !state.isLoadingTmdbCategory) {
-                fetchTmdbUpcomingMovies();
-            }
+            list = list.filter(m => isMovieUpcoming(m));
         } else {
             list = list.filter(m => m.categories && m.categories.includes(state.activeCategory));
+        }
+
+        if (state.activeCategory !== "Main") {
+            if (!state.categoryTmdbMovies) state.categoryTmdbMovies = {};
+            const catExt = state.categoryTmdbMovies[state.activeCategory] || [];
+            if (catExt.length > 0) {
+                const localTmdbIds = new Set(list.map(m => m.tmdb_id).filter(id => id));
+                const filteredExt = catExt.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+                list = [...list, ...filteredExt];
+            } else if (!state.isLoadingTmdbCategory) {
+                fetchTmdbCategoryMovies(state.activeCategory);
+            }
         }
     }
 
@@ -4512,15 +4508,47 @@ async function performGlobalTmdbDiscover() {
     }
 }
 
-// Fetch live upcoming movies from TMDB API (/movie/upcoming)
-async function fetchTmdbUpcomingMovies() {
+// Universal live TMDB Category Fetcher for Anime, K-Drama, Bollywood, African, Comic, Animated, etc.
+async function fetchTmdbCategoryMovies(category) {
+    if (!category || category === "Main") return;
     if (state.isLoadingTmdbCategory) return;
     state.isLoadingTmdbCategory = true;
     renderFeaturedGrid();
 
     try {
         const apiKey = getTmdbApiKey();
-        const url = `${TMDB_BASE_URL}/movie/upcoming?api_key=${apiKey}&language=en-US&page=1`;
+        let url = "";
+
+        if (category === "Upcoming Movies") {
+            url = `${TMDB_BASE_URL}/movie/upcoming?api_key=${apiKey}&language=en-US&page=1`;
+        } else if (category === "Ongoing Series") {
+            url = `${TMDB_BASE_URL}/tv/on_the_air?api_key=${apiKey}&language=en-US&page=1`;
+        } else if (category === "Anime") {
+            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=16&with_original_language=ja&sort_by=popularity.desc&page=1`;
+        } else if (category === "Korean Drama") {
+            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko&sort_by=popularity.desc&page=1`;
+        } else if (category === "Bollywood") {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi&sort_by=popularity.desc&page=1`;
+        } else if (category === "African") {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_origin_country=NG|ZA|GH|KE&sort_by=popularity.desc&page=1`;
+        } else if (category === "Comic") {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_keywords=180547|9715|8828&sort_by=popularity.desc&page=1`;
+        } else if (category === "Animated Movies") {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&sort_by=popularity.desc&page=1`;
+        } else if (category === "Kids Shows and Movies (Nickelodeon and Disney)") {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=10751,16&sort_by=popularity.desc&page=1`;
+        } else if (category === "Hollywood/British Movies") {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=en&sort_by=popularity.desc&page=1`;
+        } else if (category === "Hollywood/British Series") {
+            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=en&sort_by=popularity.desc&page=1`;
+        } else if (category === "Classic Movies") {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&primary_release_date.lte=1999-12-31&sort_by=popularity.desc&page=1`;
+        } else if (category === "Teen/High-School") {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=35,18&sort_by=popularity.desc&page=1`;
+        } else {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&sort_by=popularity.desc&page=1`;
+        }
+
         const res = await fetch(url);
         if (!res.ok) {
             state.isLoadingTmdbCategory = false;
@@ -4529,87 +4557,54 @@ async function fetchTmdbUpcomingMovies() {
         const data = await res.json();
         if (data.results) {
             const formatted = data.results.map(item => {
+                const isTV = item.first_air_date || item.name || url.includes("/tv") || url.includes("/discover/tv");
                 return {
                     csv_id: String(item.id),
                     tmdb_id: item.id,
                     imdb_id: "",
-                    title: item.title || item.name || "Upcoming Movie",
-                    type: "Movie",
-                    categories: ["Upcoming Movies", "Main"],
-                    genres: ["Upcoming", "Cinema"],
-                    overview: item.overview || "Coming soon to theaters and streaming platforms.",
+                    title: item.title || item.name || category,
+                    type: isTV ? "Series" : "Movie",
+                    categories: [category, "Main"],
+                    genres: [category],
+                    overview: item.overview || "Popular title available on Film House.",
                     poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
                     backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
-                    rating: item.vote_average || 0,
-                    release_date: item.release_date || "",
+                    rating: Math.round((item.vote_average || 0) * 10) / 10,
+                    release_date: item.release_date || item.first_air_date || "",
                     language: item.original_language || "en",
                     cast: [],
                     director: "",
                     trailer: "",
                     runtime: "",
-                    isUpcoming: true,
+                    isUpcoming: category === "Upcoming Movies",
+                    isOngoing: category === "Ongoing Series",
                     links: []
                 };
             });
+
+            if (!state.categoryTmdbMovies) state.categoryTmdbMovies = {};
             const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
-            state.upcomingMovies = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+            state.categoryTmdbMovies[category] = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+
+            if (category === "Upcoming Movies") state.upcomingMovies = state.categoryTmdbMovies[category];
+            if (category === "Ongoing Series") state.ongoingMovies = state.categoryTmdbMovies[category];
         }
     } catch (err) {
-        console.error("Error fetching TMDB upcoming movies:", err);
+        console.error(`Error fetching TMDB live category movies for ${category}:`, err);
     } finally {
         state.isLoadingTmdbCategory = false;
         renderFeaturedGrid(true);
     }
 }
 
+// Fetch live upcoming movies from TMDB API (/movie/upcoming)
+async function fetchTmdbUpcomingMovies() {
+    return fetchTmdbCategoryMovies("Upcoming Movies");
+}
+
 // Fetch live currently airing TV series from TMDB API (/tv/on_the_air)
 async function fetchTmdbOngoingSeries() {
-    if (state.isLoadingTmdbCategory) return;
-    state.isLoadingTmdbCategory = true;
-    renderFeaturedGrid();
-
-    try {
-        const apiKey = getTmdbApiKey();
-        const url = `${TMDB_BASE_URL}/tv/on_the_air?api_key=${apiKey}&language=en-US&page=1`;
-        const res = await fetch(url);
-        if (!res.ok) {
-            state.isLoadingTmdbCategory = false;
-            return;
-        }
-        const data = await res.json();
-        if (data.results) {
-            const formatted = data.results.map(item => {
-                return {
-                    csv_id: String(item.id),
-                    tmdb_id: item.id,
-                    imdb_id: "",
-                    title: item.name || item.title || "Ongoing Series",
-                    type: "Series",
-                    categories: ["Ongoing Series", "Main"],
-                    genres: ["Series", "Drama"],
-                    overview: item.overview || "Currently airing new episodes weekly.",
-                    poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
-                    backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
-                    rating: item.vote_average || 0,
-                    release_date: item.first_air_date || "",
-                    language: item.original_language || "en",
-                    cast: [],
-                    director: "",
-                    trailer: "",
-                    runtime: "",
-                    isOngoing: true,
-                    links: []
-                };
-            });
-            const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
-            state.ongoingMovies = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
-        }
-    } catch (err) {
-        console.error("Error fetching TMDB ongoing series:", err);
-    } finally {
-        state.isLoadingTmdbCategory = false;
-        renderFeaturedGrid(true);
-    }
+    return fetchTmdbCategoryMovies("Ongoing Series");
 }
 
 // Global TMDB Multi-Search for global search support
