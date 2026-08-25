@@ -3849,3 +3849,31 @@ select option {
     animation: fadeIn 0.3s ease-out;
 }
 
+.movie-card-upcoming-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    z-index: 4;
+    box-shadow: 0 2px 8px rgba(0, 198, 255, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    letter-spacing: 0.5px;
+    animation: upcoming-pulse-glow 2s infinite alternate;
+}
+
+@keyframes upcoming-pulse-glow {
+    0% {
+        box-shadow: 0 2px 6px rgba(0, 198, 255, 0.4);
+    }
+    100% {
+        box-shadow: 0 2px 12px rgba(0, 198, 255, 0.85);
+    }
+}
+

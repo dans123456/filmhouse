@@ -3049,6 +3049,11 @@ if (addMovieForm) {
             categories.push("Ongoing Series");
         }
 
+        const isUpcoming = document.getElementById("add-movie-upcoming-check")?.checked || false;
+        if (isUpcoming && !categories.includes("Upcoming Movies")) {
+            categories.push("Upcoming Movies");
+        }
+
         // Add to local state
         const newMovie = {
             csv_id: id,
@@ -3059,6 +3064,7 @@ if (addMovieForm) {
             categories: categories,
             genres: genres,
             isOngoing: isOngoing,
+            isUpcoming: isUpcoming,
             overview: overview,
             poster: poster,
             backdrop: backdrop,

@@ -54,6 +54,30 @@ function getOngoingBadgeElement(movie) {
     return badge;
 }
 
+// Helper to determine if a movie is upcoming / coming soon
+function isMovieUpcoming(movie) {
+    if (!movie) return false;
+    if (movie.isUpcoming === true) return true;
+    if (movie.categories && Array.isArray(movie.categories) && movie.categories.some(c => c.toLowerCase().includes("upcoming") || c.toLowerCase().includes("coming soon"))) return true;
+    if (movie.status && (movie.status === "In Production" || movie.status === "Post Production" || movie.status === "Planned" || movie.status === "Upcoming")) return true;
+    if (movie.release_date) {
+        const relYear = parseInt(movie.release_date.substring(0, 4), 10);
+        const currentYear = new Date().getFullYear();
+        if (relYear > currentYear) return true;
+    }
+    return false;
+}
+
+// Helper to generate floating UPCOMING badge element for movie posters
+function getUpcomingBadgeElement(movie) {
+    if (!movie || !isMovieUpcoming(movie)) return null;
+    const badge = document.createElement("div");
+    badge.className = "movie-card-upcoming-badge";
+    badge.style.cssText = "position: absolute; top: 6px; right: 6px; background: linear-gradient(135deg, #00c6ff, #0072ff); color: #ffffff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(0,198,255,0.5); display: flex; align-items: center; gap: 3px; letter-spacing: 0.5px;";
+    badge.innerHTML = "<span>✨</span><span>COMING SOON</span>";
+    return badge;
+}
+
 // Load Eruda In-App Mobile Console if ?debug=true is passed in URL
 (function() {
     try {
@@ -2093,7 +2117,7 @@ function renderCategoriesBar() {
     bar.replaceChildren();
 
     const categoryList = [
-        "Main", "Ongoing Series", "Hollywood/British Movies", "Hollywood/British Series",
+        "Main", "Ongoing Series", "Upcoming Movies", "Hollywood/British Movies", "Hollywood/British Series",
         "Bollywood", "Korean Drama", "African", "Anime", "Comic", 
         "Animated Movies", "Kids Shows and Movies (Nickelodeon and Disney)", 
         "Classic Movies", "Erotic Movies", "Teen/High-School", "Christian Movies"
@@ -2101,9 +2125,10 @@ function renderCategoriesBar() {
 
     const categoryLabels = {
         "Main": "Featured",
+        "Ongoing Series": "Ongoing 🔴",
+        "Upcoming Movies": "Upcoming ✨",
         "Hollywood/British Movies": "Hollywood",
         "Hollywood/British Series": "Series",
-        "Ongoing Series": "Ongoing 🔴",
         "Bollywood": "Bollywood",
         "Korean Drama": "K-Drama",
         "African": "African",
@@ -2119,9 +2144,10 @@ function renderCategoriesBar() {
 
     const categoryEmojis = {
         "Main": "🍿",
+        "Ongoing Series": "🔴",
+        "Upcoming Movies": "✨",
         "Hollywood/British Movies": "🎬",
         "Hollywood/British Series": "📺",
-        "Ongoing Series": "🔴",
         "Bollywood": "🎶",
         "Korean Drama": "🫰",
         "African": "🌍",
@@ -2278,6 +2304,8 @@ function renderFeaturedGrid(fromDiscover = false) {
     if (!state.searchQuery) {
         if (state.activeCategory === "Ongoing Series") {
             list = list.filter(m => isMovieOngoing(m));
+        } else if (state.activeCategory === "Upcoming Movies") {
+            list = list.filter(m => isMovieUpcoming(m));
         } else {
             list = list.filter(m => m.categories && m.categories.includes(state.activeCategory));
         }
@@ -2388,6 +2416,9 @@ function renderFeaturedGrid(fromDiscover = false) {
 
         const ongoingBadge = getOngoingBadgeElement(movie);
         if (ongoingBadge) imgWrapper.appendChild(ongoingBadge);
+
+        const upcomingBadge = getUpcomingBadgeElement(movie);
+        if (upcomingBadge) imgWrapper.appendChild(upcomingBadge);
 
         // Dynamic NEW Badge Overlay for top additions
         if (state.newMovieIds && state.newMovieIds.includes(movie.csv_id)) {
@@ -3869,6 +3900,96 @@ function openDownloadModal(movie) {
 
             grid.appendChild(anchor);
         });
+
+        // Missing Quality Request Cards for Movies
+        if (!isTVShow) {
+            const uploadedQualities = (movie.links || []).map(l => {
+                const q = typeof l === 'object' && l !== null ? (l.quality || "") : "";
+                return q.toLowerCase();
+            });
+
+            const has1080p = uploadedQualities.some(q => q.includes("1080p"));
+            const has4K = uploadedQualities.some(q => q.includes("4k") || q.includes("2160p"));
+
+            const missingQualities = [];
+            if (!has1080p) missingQualities.push({ label: "1080p Full HD", badge: "🎥 1080p", code: "1080p" });
+            if (!has4K) missingQualities.push({ label: "4K Ultra HD", badge: "✨ 4K UHD", code: "4K" });
+
+            if (missingQualities.length > 0) {
+                const qWrapper = document.createElement("div");
+                qWrapper.className = "missing-quality-wrapper";
+
+                const divider = document.createElement("div");
+                divider.style.cssText = "margin: 16px 0 10px 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; font-weight: 800; text-transform: uppercase; color: #00c6ff; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;";
+                divider.innerHTML = `<span>⚡</span><span>Request Higher Quality Version</span>`;
+                qWrapper.appendChild(divider);
+
+                missingQualities.forEach(qItem => {
+                    const qItemEl = document.createElement("div");
+                    qItemEl.className = "download-link-item missing-quality-item";
+                    qItemEl.style.cssText = "border: 1px dashed rgba(0, 198, 255, 0.4); background: rgba(0, 198, 255, 0.05); display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: var(--border-radius-sm); margin-bottom: 8px;";
+
+                    const badge = document.createElement("span");
+                    badge.className = "download-link-badge quality-badge";
+                    badge.style.cssText = "background: rgba(0, 198, 255, 0.2); color: #00c6ff; border: 1px solid rgba(0, 198, 255, 0.4); font-weight: 800; font-size: 11px; padding: 4px 8px; border-radius: 4px;";
+                    badge.textContent = qItem.badge;
+                    qItemEl.appendChild(badge);
+
+                    const labelWrap = document.createElement("div");
+                    labelWrap.className = "download-link-label-wrap";
+                    labelWrap.style.cssText = "flex: 1; margin-left: 12px; display: flex; flex-direction: column; gap: 2px;";
+                    
+                    const label = document.createElement("span");
+                    label.className = "download-link-label";
+                    label.style.cssText = "font-weight: 700; color: #ffffff; font-size: 14px;";
+                    label.textContent = qItem.label;
+                    
+                    const sublabel = document.createElement("span");
+                    sublabel.className = "download-link-sublabel";
+                    sublabel.style.cssText = "font-size: 11px; color: var(--text-secondary);";
+                    sublabel.textContent = "Not Uploaded Yet • Tap to Request HD";
+
+                    labelWrap.appendChild(label);
+                    labelWrap.appendChild(sublabel);
+                    qItemEl.appendChild(labelWrap);
+
+                    const reqActionBtn = document.createElement("button");
+                    reqActionBtn.className = "btn-request-quality-action";
+                    
+                    const reqQualityStr = `${qItem.code} Quality`;
+                    const cleanMovieTitle = getCleanRequestTitle(movie.title).toLowerCase();
+                    
+                    const isAlreadyReq = currentUserRequests && currentUserRequests.some(r => {
+                        const rClean = getCleanRequestTitle(r.title).toLowerCase();
+                        const matchesTitle = rClean === cleanMovieTitle;
+                        const matchesQuality = r.title && r.title.toLowerCase().includes(qItem.code.toLowerCase());
+                        return matchesTitle && matchesQuality && r.status !== "fulfilled";
+                    });
+
+                    if (isAlreadyReq) {
+                        reqActionBtn.textContent = `Requested ${qItem.code} ⏳`;
+                        reqActionBtn.style.cssText = "background: rgba(0, 198, 255, 0.15); color: #00c6ff; border: 1px solid rgba(0, 198, 255, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
+                        sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
+                    } else {
+                        reqActionBtn.textContent = `REQUEST ${qItem.code} ⚡`;
+                        reqActionBtn.style.cssText = "background: linear-gradient(135deg, #00c6ff, #0072ff); color: #ffffff; border: none; font-size: 11px; font-weight: 800; padding: 7px 13px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,198,255,0.3); transition: transform 0.15s ease;";
+                        
+                        reqActionBtn.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            logMovieRequestToFirestore(movie, reqQualityStr);
+                            reqActionBtn.textContent = `Requested ${qItem.code} ⏳`;
+                            reqActionBtn.style.cssText = "background: rgba(0, 198, 255, 0.15); color: #00c6ff; border: 1px solid rgba(0, 198, 255, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
+                            sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
+                        });
+                    }
+
+                    qItemEl.appendChild(reqActionBtn);
+                    qWrapper.appendChild(qItemEl);
+                });
+
+                grid.appendChild(qWrapper);
+            }
+        }
     }
 
     // Missing Seasons Dynamic Renderer for TV Series
