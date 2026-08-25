@@ -7,7 +7,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Anime"
     ],
     "genres": [
       "Animation",
@@ -26,7 +27,10 @@
     "trailer": "1gGt1Mg_zSo",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD2QcAAvh5cERt7ybAoJWZ2hYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD2QcAAvh5cERt7ybAoJWZ2hYE",
+        "quality": "720p"
+      }
     ]
   },
   {
