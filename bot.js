@@ -1100,15 +1100,21 @@ async function init() {
             console.error("Failed to register bot commands menu:", err);
         });
 
-        let webhookUrl = process.env.WEBHOOK_URL || process.env.RENDER_EXTERNAL_URL;
-        if (!webhookUrl) {
-            try {
-                const doc = await db.collection("settings").doc("telegram").get();
-                if (doc.exists) {
-                    webhookUrl = doc.data().webhookUrl;
+        const isLocalEnvironment = !process.env.RENDER_EXTERNAL_URL && !process.env.RENDER;
+        const forcePolling = process.env.POLLING === "true" || process.argv.includes("--polling") || isLocalEnvironment;
+        
+        let webhookUrl = null;
+        if (!forcePolling) {
+            webhookUrl = process.env.WEBHOOK_URL || process.env.RENDER_EXTERNAL_URL;
+            if (!webhookUrl) {
+                try {
+                    const doc = await db.collection("settings").doc("telegram").get();
+                    if (doc.exists) {
+                        webhookUrl = doc.data().webhookUrl;
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch webhook URL from Firestore:", err);
                 }
-            } catch (err) {
-                console.error("Failed to fetch webhook URL from Firestore:", err);
             }
         }
 
@@ -1165,7 +1171,14 @@ async function init() {
                 });
             }, 10 * 60 * 1000);
         } else {
-            console.log("No Webhook URL configured. Defaulting to Polling mode.");
+            console.log("Polling mode enabled. Clearing existing Telegram Webhook...");
+            try {
+                await bot.telegram.deleteWebhook({ drop_pending_updates: false });
+                console.log("Telegram Webhook cleared. Ready for polling updates.");
+            } catch (e) {
+                console.warn("Could not delete Telegram webhook:", e.message);
+            }
+
             server = http.createServer((req, res) => {
                 if (req.url === '/debug-info') {
                     res.writeHead(200, { "Content-Type": "application/json" });
