@@ -2122,9 +2122,10 @@ function renderCategoriesBar() {
     bar.replaceChildren();
 
     const categoryList = [
-        "Main", "Ongoing Series", "Upcoming Movies", "Hollywood/British Movies", "Hollywood/British Series",
-        "Bollywood", "Korean Drama", "African", "Anime", "Comic", 
-        "Animated Movies", "Kids Shows and Movies (Nickelodeon and Disney)", 
+        "Main", "Ongoing Series", "Upcoming Movies", "Hollywood/British Movies", "Hollywood/British Series", 
+        "Korean Drama", "Korean Movies", "Anime Series", "Anime Movies", 
+        "Bollywood", "African", "Comic", "Animated Movies", 
+        "Kids Shows and Movies (Nickelodeon and Disney)", 
         "Classic Movies", "Erotic Movies", "Teen/High-School", "Christian Movies"
     ];
 
@@ -2134,8 +2135,11 @@ function renderCategoriesBar() {
         "Upcoming Movies": "Upcoming ✨",
         "Hollywood/British Movies": "Hollywood",
         "Hollywood/British Series": "Series",
+        "Korean Drama": "K-Drama 🫰",
+        "Korean Movies": "K-Movies 🎬",
+        "Anime Series": "Anime 🥷",
+        "Anime Movies": "Anime Movies 🎨",
         "Bollywood": "Bollywood",
-        "Korean Drama": "K-Drama",
         "African": "African",
         "Anime": "Anime",
         "Comic": "Comic",
@@ -2153,8 +2157,11 @@ function renderCategoriesBar() {
         "Upcoming Movies": "✨",
         "Hollywood/British Movies": "🎬",
         "Hollywood/British Series": "📺",
-        "Bollywood": "🎶",
         "Korean Drama": "🫰",
+        "Korean Movies": "🎬",
+        "Anime Series": "🥷",
+        "Anime Movies": "🎨",
+        "Bollywood": "🎶",
         "African": "🌍",
         "Anime": "🥷",
         "Comic": "💥",
@@ -4523,10 +4530,14 @@ async function fetchTmdbCategoryMovies(category) {
             url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&primary_release_date.gte=2025-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Ongoing Series") {
             url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&air_date.gte=2024-01-01&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
-        } else if (category === "Anime") {
+        } else if (category === "Anime" || category === "Anime Series") {
             url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=16&with_original_language=ja&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
+        } else if (category === "Anime Movies") {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&with_original_language=ja&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Korean Drama") {
             url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
+        } else if (category === "Korean Movies") {
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Bollywood") {
             url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "African") {
