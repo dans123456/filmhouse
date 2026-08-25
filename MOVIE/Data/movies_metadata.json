@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "95350-lanterns",
+    "tmdb_id": 95350,
+    "imdb_id": "",
+    "title": "Lanterns",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series",
+      "Comic"
+    ],
+    "genres": [
+      "Comic"
+    ],
+    "isOngoing": false,
+    "isUpcoming": false,
+    "overview": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
+    "poster": "https://image.tmdb.org/t/p/w500/gpC7h43xPMEV3goYMQShfJbTtLq.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mdbWfpbWhvxgG3k5MHpo90UgAUe.jpg",
+    "rating": 8.2,
+    "release_date": "2026-08-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "7UIBOsuUwc4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADXxcAAmFlcUS_oLLXty9DtBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "119769-taxi-driver",
     "tmdb_id": 119769,
     "imdb_id": "",
