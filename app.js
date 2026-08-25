@@ -232,6 +232,9 @@ const state = {
     adsgramControllers: {},
     activeWatchlistTab: "watchlist",
     externalSearchResults: [],
+    upcomingMovies: [],
+    ongoingMovies: [],
+    isLoadingTmdbCategory: false,
     lastDiscoverQuery: null
 };
 
@@ -2309,9 +2312,23 @@ function renderFeaturedGrid(fromDiscover = false) {
     let list = state.movies;
     if (!state.searchQuery) {
         if (state.activeCategory === "Ongoing Series") {
-            list = list.filter(m => isMovieOngoing(m));
+            const localOngoing = list.filter(m => isMovieOngoing(m));
+            const localTmdbIds = new Set(localOngoing.map(m => m.tmdb_id).filter(id => id));
+            const extOngoing = (state.ongoingMovies || []).filter(ext => !localTmdbIds.has(ext.tmdb_id));
+            list = [...localOngoing, ...extOngoing];
+
+            if (state.ongoingMovies.length === 0 && !state.isLoadingTmdbCategory) {
+                fetchTmdbOngoingSeries();
+            }
         } else if (state.activeCategory === "Upcoming Movies") {
-            list = list.filter(m => isMovieUpcoming(m));
+            const localUpcoming = list.filter(m => isMovieUpcoming(m));
+            const localTmdbIds = new Set(localUpcoming.map(m => m.tmdb_id).filter(id => id));
+            const extUpcoming = (state.upcomingMovies || []).filter(ext => !localTmdbIds.has(ext.tmdb_id));
+            list = [...localUpcoming, ...extUpcoming];
+
+            if (state.upcomingMovies.length === 0 && !state.isLoadingTmdbCategory) {
+                fetchTmdbUpcomingMovies();
+            }
         } else {
             list = list.filter(m => m.categories && m.categories.includes(state.activeCategory));
         }
@@ -2388,8 +2405,14 @@ function renderFeaturedGrid(fromDiscover = false) {
         noResults.style.padding = "40px 0";
 
         const text = document.createElement("p");
-        text.textContent = "No movies match your filters/criteria.";
-        text.style.color = "var(--text-secondary)";
+        if (state.isLoadingTmdbCategory) {
+            text.textContent = "Loading live titles from TMDB... ⏳🍿";
+            text.style.color = "var(--primary-color)";
+            text.style.fontWeight = "600";
+        } else {
+            text.textContent = "No titles match your criteria currently.";
+            text.style.color = "var(--text-secondary)";
+        }
         noResults.appendChild(text);
 
         grid.appendChild(noResults);
@@ -4490,11 +4513,18 @@ async function performGlobalTmdbDiscover() {
 
 // Fetch live upcoming movies from TMDB API (/movie/upcoming)
 async function fetchTmdbUpcomingMovies() {
+    if (state.isLoadingTmdbCategory) return;
+    state.isLoadingTmdbCategory = true;
+    renderFeaturedGrid();
+
     try {
         const apiKey = getTmdbApiKey();
         const url = `${TMDB_BASE_URL}/movie/upcoming?api_key=${apiKey}&language=en-US&page=1`;
         const res = await fetch(url);
-        if (!res.ok) return;
+        if (!res.ok) {
+            state.isLoadingTmdbCategory = false;
+            return;
+        }
         const data = await res.json();
         if (data.results) {
             const formatted = data.results.map(item => {
@@ -4521,21 +4551,30 @@ async function fetchTmdbUpcomingMovies() {
                 };
             });
             const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
-            state.externalSearchResults = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
-            renderFeaturedGrid(true);
+            state.upcomingMovies = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
         }
     } catch (err) {
         console.error("Error fetching TMDB upcoming movies:", err);
+    } finally {
+        state.isLoadingTmdbCategory = false;
+        renderFeaturedGrid(true);
     }
 }
 
 // Fetch live currently airing TV series from TMDB API (/tv/on_the_air)
 async function fetchTmdbOngoingSeries() {
+    if (state.isLoadingTmdbCategory) return;
+    state.isLoadingTmdbCategory = true;
+    renderFeaturedGrid();
+
     try {
         const apiKey = getTmdbApiKey();
         const url = `${TMDB_BASE_URL}/tv/on_the_air?api_key=${apiKey}&language=en-US&page=1`;
         const res = await fetch(url);
-        if (!res.ok) return;
+        if (!res.ok) {
+            state.isLoadingTmdbCategory = false;
+            return;
+        }
         const data = await res.json();
         if (data.results) {
             const formatted = data.results.map(item => {
@@ -4562,11 +4601,13 @@ async function fetchTmdbOngoingSeries() {
                 };
             });
             const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
-            state.externalSearchResults = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
-            renderFeaturedGrid(true);
+            state.ongoingMovies = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
         }
     } catch (err) {
         console.error("Error fetching TMDB ongoing series:", err);
+    } finally {
+        state.isLoadingTmdbCategory = false;
+        renderFeaturedGrid(true);
     }
 }
 
