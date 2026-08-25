@@ -1885,6 +1885,23 @@ function renderNotificationsList() {
     });
 }
 
+// Requested Badge Generator Helper
+function getRequestedBadgeElement(movie) {
+    if (!movie || typeof currentUserRequests === 'undefined' || !currentUserRequests || currentUserRequests.length === 0) return null;
+    const cleanTitle = getCleanRequestTitle(movie.title).toLowerCase();
+    const userReq = currentUserRequests.find(r => 
+        r.title && getCleanRequestTitle(r.title).toLowerCase() === cleanTitle &&
+        r.status !== "fulfilled"
+    );
+    if (!userReq) return null;
+    
+    const reqBadge = document.createElement("div");
+    reqBadge.className = "movie-card-req-badge";
+    reqBadge.style.cssText = "position: absolute; top: 6px; left: 6px; background: linear-gradient(135deg, #ffbc00, #ff8c00); color: #000; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 3px;";
+    reqBadge.innerHTML = userReq.status === "priority" ? "<span>⚡</span><span>PRIORITY</span>" : "<span>⏳</span><span>REQUESTED</span>";
+    return reqBadge;
+}
+
 // Watch History Render Modal Helpers
 function renderHistoryGrid() {
     const container = document.getElementById("history-grid-container");
@@ -1904,22 +1921,6 @@ function renderHistoryGrid() {
     clearBtn.style.display = "block";
 
     const historyMovies = state.movies.filter(m => state.history.includes(m.csv_id));
-
-function getRequestedBadgeElement(movie) {
-    if (!movie || typeof currentUserRequests === 'undefined' || !currentUserRequests || currentUserRequests.length === 0) return null;
-    const cleanTitle = getCleanRequestTitle(movie.title).toLowerCase();
-    const userReq = currentUserRequests.find(r => 
-        r.title && getCleanRequestTitle(r.title).toLowerCase() === cleanTitle &&
-        r.status !== "fulfilled"
-    );
-    if (!userReq) return null;
-    
-    const reqBadge = document.createElement("div");
-    reqBadge.className = "movie-card-req-badge";
-    reqBadge.style.cssText = "position: absolute; top: 6px; left: 6px; background: linear-gradient(135deg, #ffbc00, #ff8c00); color: #000; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 3px;";
-    reqBadge.innerHTML = userReq.status === "priority" ? "<span>⚡</span><span>PRIORITY</span>" : "<span>⏳</span><span>REQUESTED</span>";
-    return reqBadge;
-}
 
     historyMovies.forEach(movie => {
         const card = document.createElement("div");
