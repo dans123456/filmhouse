@@ -1905,6 +1905,22 @@ function renderHistoryGrid() {
 
     const historyMovies = state.movies.filter(m => state.history.includes(m.csv_id));
 
+function getRequestedBadgeElement(movie) {
+    if (!movie || typeof currentUserRequests === 'undefined' || !currentUserRequests || currentUserRequests.length === 0) return null;
+    const cleanTitle = getCleanRequestTitle(movie.title).toLowerCase();
+    const userReq = currentUserRequests.find(r => 
+        r.title && getCleanRequestTitle(r.title).toLowerCase() === cleanTitle &&
+        r.status !== "fulfilled"
+    );
+    if (!userReq) return null;
+    
+    const reqBadge = document.createElement("div");
+    reqBadge.className = "movie-card-req-badge";
+    reqBadge.style.cssText = "position: absolute; top: 6px; left: 6px; background: linear-gradient(135deg, #ffbc00, #ff8c00); color: #000; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 3px;";
+    reqBadge.innerHTML = userReq.status === "priority" ? "<span>⚡</span><span>PRIORITY</span>" : "<span>⏳</span><span>REQUESTED</span>";
+    return reqBadge;
+}
+
     historyMovies.forEach(movie => {
         const card = document.createElement("div");
         card.className = "movie-card";
@@ -1919,6 +1935,9 @@ function renderHistoryGrid() {
         img.alt = movie.title;
         img.loading = "lazy";
         imgWrapper.appendChild(img);
+
+        const reqBadge = getRequestedBadgeElement(movie);
+        if (reqBadge) imgWrapper.appendChild(reqBadge);
 
         if (movie.rating > 0) {
             const rating = document.createElement("div");
@@ -2334,6 +2353,9 @@ function renderFeaturedGrid(fromDiscover = false) {
         img.alt = movie.title;
         img.loading = "lazy";
         imgWrapper.appendChild(img);
+
+        const reqBadge = getRequestedBadgeElement(movie);
+        if (reqBadge) imgWrapper.appendChild(reqBadge);
 
         // Dynamic NEW Badge Overlay for top additions
         if (state.newMovieIds && state.newMovieIds.includes(movie.csv_id)) {
@@ -3046,7 +3068,7 @@ function openDetailModal(movie) {
             watchedBtn.className = "btn btn-primary";
             watchedText.textContent = "Mark Watched";
         } else {
-            // Add to history
+            // Add to history (automatically removes from watchlist)
             addWatchHistory(movie);
             
             // Award points (+5)
@@ -3055,6 +3077,15 @@ function openDetailModal(movie) {
             // Update UI
             watchedBtn.className = "btn btn-secondary";
             watchedText.textContent = "Watched";
+
+            // Update Watchlist button UI if in watchlist previously
+            wText.textContent = "Watchlist";
+            watchlistBtn.className = "btn btn-primary";
+            const newIcon = createSvgIcon("icon-bookmark");
+            const oldSvg = watchlistBtn.querySelector("svg");
+            if (oldSvg) watchlistBtn.replaceChild(newIcon, oldSvg);
+
+            showToast("Moved to Watched list! 🍿", "success");
         }
         
         // Update stats Viewed count
@@ -3123,6 +3154,11 @@ function openDetailModal(movie) {
 
     // Download or Request Button
     if (!movie.links || movie.links.length === 0) {
+        const existingReq = currentUserRequests && currentUserRequests.find(r => 
+            r.title && getCleanRequestTitle(r.title).toLowerCase() === getCleanRequestTitle(movie.title).toLowerCase() &&
+            r.status !== "fulfilled"
+        );
+
         const requestBtn = document.createElement("a");
         requestBtn.className = "btn btn-request-premium";
         requestBtn.href = "https://t.me/+09ahNmGdB1U2MzFk";
@@ -3130,11 +3166,22 @@ function openDetailModal(movie) {
         requestBtn.rel = "noopener noreferrer";
         requestBtn.style.textDecoration = "none";
         
-        requestBtn.appendChild(createSvgIcon("icon-share"));
-        
-        const rText = document.createElement("span");
-        rText.textContent = movie.type === "Series" ? "Request Series" : "Request Movie";
-        requestBtn.appendChild(rText);
+        if (existingReq) {
+            const isPriority = existingReq.status === "priority";
+            requestBtn.appendChild(createSvgIcon("icon-check"));
+            const rText = document.createElement("span");
+            rText.textContent = isPriority ? "Priority Request ⚡" : "Requested ⏳";
+            requestBtn.appendChild(rText);
+            requestBtn.style.background = isPriority 
+                ? "linear-gradient(135deg, rgba(255, 188, 0, 0.25), rgba(255, 120, 0, 0.3))" 
+                : "rgba(255, 188, 0, 0.15)";
+            requestBtn.style.borderColor = "var(--primary-color)";
+        } else {
+            requestBtn.appendChild(createSvgIcon("icon-share"));
+            const rText = document.createElement("span");
+            rText.textContent = movie.type === "Series" ? "Request Series" : "Request Movie";
+            requestBtn.appendChild(rText);
+        }
 
         requestBtn.addEventListener("click", (e) => {
             e.preventDefault();
@@ -3142,6 +3189,21 @@ function openDetailModal(movie) {
         });
         
         actionsRow.appendChild(requestBtn);
+
+        if (existingReq) {
+            const reqBanner = document.createElement("div");
+            reqBanner.className = "requested-status-banner";
+            reqBanner.style.cssText = "margin-top: 12px; padding: 10px 14px; background: rgba(255, 188, 0, 0.1); border: 1px solid rgba(255, 188, 0, 0.3); border-radius: var(--border-radius-sm); color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;";
+            const isPriority = existingReq.status === "priority";
+            reqBanner.innerHTML = `
+                <span style="display: flex; align-items: center; gap: 6px;">
+                    <span>${isPriority ? '⚡' : '📌'}</span>
+                    <strong>Request Status:</strong> ${isPriority ? 'High Priority Processing' : 'Pending Admin Fulfillment'}
+                </span>
+                <span style="font-size: 10px; opacity: 0.8; background: rgba(255,188,0,0.2); padding: 2px 8px; border-radius: 10px;">${isPriority ? 'Priority' : 'In Queue'}</span>
+            `;
+            infoColumn.appendChild(reqBanner);
+        }
     } else {
         const downloadBtn = document.createElement("button");
         downloadBtn.className = "btn btn-secondary";
@@ -3499,6 +3561,16 @@ function loadWatchlist() {
 // Watch History persistence helper
 function addWatchHistory(movie) {
     const movieId = typeof movie === 'object' ? movie.csv_id : movie;
+
+    // Automatically remove from watchlist if present so it transitions cleanly to watched
+    const watchlistIndex = state.watchlist.indexOf(movieId);
+    if (watchlistIndex !== -1) {
+        state.watchlist.splice(watchlistIndex, 1);
+        localStorage.setItem("filmhouse_watchlist", JSON.stringify(state.watchlist));
+        const wCountLabel = document.getElementById("stat-watchlist-count");
+        if (wCountLabel) wCountLabel.textContent = state.watchlist.length;
+    }
+
     if (!state.history.includes(movieId)) {
         state.history.unshift(movieId);
         if (state.history.length > 20) state.history.pop();
@@ -3510,8 +3582,11 @@ function addWatchHistory(movie) {
     const countLabel = document.getElementById("stat-history-count");
     if (countLabel) countLabel.textContent = state.history.length;
 
-    // Refresh recommendations list dynamically
+    // Refresh recommendations list & profile summary
     renderEditorsChoice();
+    if (typeof renderProfileWatchlistSummaries === 'function') {
+        renderProfileWatchlistSummaries();
+    }
 }
 
 function loadWatchHistory() {
