@@ -26,7 +26,19 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD6hYAAmFlcUT8aMvtsGloxRYE",
-        "season": "All Seasons"
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD7RYAAmFlcURghFLVcTYs8hYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD7hYAAmFlcURQz5mXSYC9dBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADBxcAAmFlcUR0IZcuKvb_OxYE",
+        "quality": "720p"
       }
     ]
   },
