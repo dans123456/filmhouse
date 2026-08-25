@@ -49,7 +49,7 @@ function getOngoingBadgeElement(movie) {
     if (!movie || !isMovieOngoing(movie)) return null;
     const badge = document.createElement("div");
     badge.className = "movie-card-ongoing-badge";
-    badge.style.cssText = "position: absolute; top: 6px; right: 6px; background: linear-gradient(135deg, #ff0055, #ff2a2a); color: #ffffff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(255,0,85,0.5); display: flex; align-items: center; gap: 3px; letter-spacing: 0.5px;";
+    badge.style.cssText = "position: absolute; bottom: 8px; right: 8px; background: linear-gradient(135deg, #ff0055, #ff2a2a); color: #ffffff; font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(255,0,85,0.5); display: flex; align-items: center; gap: 3px; letter-spacing: 0.5px;";
     badge.innerHTML = "<span>🔴</span><span>ONGOING</span>";
     return badge;
 }
@@ -73,7 +73,7 @@ function getUpcomingBadgeElement(movie) {
     if (!movie || !isMovieUpcoming(movie)) return null;
     const badge = document.createElement("div");
     badge.className = "movie-card-upcoming-badge";
-    badge.style.cssText = "position: absolute; top: 6px; right: 6px; background: linear-gradient(135deg, #00c6ff, #0072ff); color: #ffffff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(0,198,255,0.5); display: flex; align-items: center; gap: 3px; letter-spacing: 0.5px;";
+    badge.style.cssText = "position: absolute; bottom: 8px; right: 8px; background: linear-gradient(135deg, #00c6ff, #0072ff); color: #ffffff; font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(0,198,255,0.5); display: flex; align-items: center; gap: 3px; letter-spacing: 0.5px;";
     badge.innerHTML = "<span>✨</span><span>COMING SOON</span>";
     return badge;
 }
