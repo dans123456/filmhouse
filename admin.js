@@ -3044,6 +3044,11 @@ if (addMovieForm) {
             genres = categories.filter(c => c !== "Main" && c !== "Hollywood/British Movies" && c !== "Hollywood/British Series");
         }
 
+        const isOngoing = document.getElementById("add-movie-ongoing-check")?.checked || false;
+        if (isOngoing && !categories.includes("Ongoing Series")) {
+            categories.push("Ongoing Series");
+        }
+
         // Add to local state
         const newMovie = {
             csv_id: id,
@@ -3053,6 +3058,7 @@ if (addMovieForm) {
             type: (finalType.toLowerCase() === 'series' || finalType.toLowerCase() === 'tv') ? 'Series' : 'Movie',
             categories: categories,
             genres: genres,
+            isOngoing: isOngoing,
             overview: overview,
             poster: poster,
             backdrop: backdrop,

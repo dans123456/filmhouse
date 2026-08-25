@@ -32,6 +32,26 @@ function getCleanRequestTitle(title) {
     return title.replace(/\s*\([^)]+\)\s*$/g, "").trim();
 }
 
+// Helper to determine if a movie/series is currently ongoing / releasing weekly episodes
+function isMovieOngoing(movie) {
+    if (!movie) return false;
+    if (movie.isOngoing === true) return true;
+    if (movie.status && (movie.status === "Returning Series" || movie.status === "In Production" || movie.status === "Ongoing")) return true;
+    if (movie.in_production === true || movie.next_episode_to_air) return true;
+    if (movie.categories && Array.isArray(movie.categories) && movie.categories.some(c => c.toLowerCase().includes("ongoing"))) return true;
+    return false;
+}
+
+// Helper to generate floating ONGOING badge element for movie posters
+function getOngoingBadgeElement(movie) {
+    if (!movie || !isMovieOngoing(movie)) return null;
+    const badge = document.createElement("div");
+    badge.className = "movie-card-ongoing-badge";
+    badge.style.cssText = "position: absolute; top: 6px; right: 6px; background: linear-gradient(135deg, #ff0055, #ff2a2a); color: #ffffff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(255,0,85,0.5); display: flex; align-items: center; gap: 3px; letter-spacing: 0.5px;";
+    badge.innerHTML = "<span>🔴</span><span>ONGOING</span>";
+    return badge;
+}
+
 // Load Eruda In-App Mobile Console if ?debug=true is passed in URL
 (function() {
     try {
@@ -2071,7 +2091,7 @@ function renderCategoriesBar() {
     bar.replaceChildren();
 
     const categoryList = [
-        "Main", "Hollywood/British Movies", "Hollywood/British Series", 
+        "Main", "Hollywood/British Movies", "Hollywood/British Series", "Ongoing Series",
         "Bollywood", "Korean Drama", "African", "Anime", "Comic", 
         "Animated Movies", "Kids Shows and Movies (Nickelodeon and Disney)", 
         "Classic Movies", "Erotic Movies", "Teen/High-School", "Christian Movies"
@@ -2081,6 +2101,7 @@ function renderCategoriesBar() {
         "Main": "Featured",
         "Hollywood/British Movies": "Hollywood",
         "Hollywood/British Series": "Series",
+        "Ongoing Series": "Ongoing 🔴",
         "Bollywood": "Bollywood",
         "Korean Drama": "K-Drama",
         "African": "African",
@@ -2098,6 +2119,7 @@ function renderCategoriesBar() {
         "Main": "🍿",
         "Hollywood/British Movies": "🎬",
         "Hollywood/British Series": "📺",
+        "Ongoing Series": "🔴",
         "Bollywood": "🎶",
         "Korean Drama": "🫰",
         "African": "🌍",
@@ -2252,7 +2274,11 @@ function renderFeaturedGrid(fromDiscover = false) {
     // Filter by active category (or search globally if search term is active)
     let list = state.movies;
     if (!state.searchQuery) {
-        list = list.filter(m => m.categories.includes(state.activeCategory));
+        if (state.activeCategory === "Ongoing Series") {
+            list = list.filter(m => isMovieOngoing(m));
+        } else {
+            list = list.filter(m => m.categories && m.categories.includes(state.activeCategory));
+        }
     }
 
     // Apply Search Term
@@ -2357,6 +2383,9 @@ function renderFeaturedGrid(fromDiscover = false) {
 
         const reqBadge = getRequestedBadgeElement(movie);
         if (reqBadge) imgWrapper.appendChild(reqBadge);
+
+        const ongoingBadge = getOngoingBadgeElement(movie);
+        if (ongoingBadge) imgWrapper.appendChild(ongoingBadge);
 
         // Dynamic NEW Badge Overlay for top additions
         if (state.newMovieIds && state.newMovieIds.includes(movie.csv_id)) {
@@ -3014,6 +3043,21 @@ function openDetailModal(movie) {
     }
 
     infoColumn.appendChild(metaList);
+
+    // Live Ongoing Series Banner
+    if (isMovieOngoing(movie)) {
+        const ongoingBanner = document.createElement("div");
+        ongoingBanner.className = "ongoing-status-banner";
+        ongoingBanner.style.cssText = "margin-top: 10px; margin-bottom: 6px; padding: 8px 12px; background: rgba(255, 0, 85, 0.12); border: 1px solid rgba(255, 0, 85, 0.35); border-radius: var(--border-radius-sm); color: #ffffff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 8px;";
+        ongoingBanner.innerHTML = `
+            <span style="display: flex; align-items: center; gap: 6px;">
+                <span>🔴</span>
+                <strong>ONGOING SERIES:</strong> New episodes are updated weekly as they air!
+            </span>
+            <span style="font-size: 10px; opacity: 0.85; background: rgba(255, 0, 85, 0.25); padding: 2px 7px; border-radius: 10px; font-weight: 800;">Airing 📡</span>
+        `;
+        infoColumn.appendChild(ongoingBanner);
+    }
 
     // Action buttons row
     const actionsRow = document.createElement("div");
