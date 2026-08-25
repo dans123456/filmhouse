@@ -3125,6 +3125,21 @@ function openDetailModal(movie) {
         infoColumn.appendChild(ongoingBanner);
     }
 
+    // Live Upcoming / Coming Soon Banner
+    if (isMovieUpcoming(movie)) {
+        const upcomingBanner = document.createElement("div");
+        upcomingBanner.className = "upcoming-status-banner";
+        upcomingBanner.style.cssText = "margin-top: 10px; margin-bottom: 6px; padding: 8px 12px; background: rgba(0, 198, 255, 0.12); border: 1px solid rgba(0, 198, 255, 0.35); border-radius: var(--border-radius-sm); color: #ffffff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 8px;";
+        upcomingBanner.innerHTML = `
+            <span style="display: flex; align-items: center; gap: 6px;">
+                <span>✨</span>
+                <strong>UPCOMING RELEASE:</strong> Live feed from TMDB API! Tap Request to get notified when downloads drop!
+            </span>
+            <span style="font-size: 10px; opacity: 0.85; background: rgba(0, 198, 255, 0.25); padding: 2px 7px; border-radius: 10px; font-weight: 800;">Coming Soon 🍿</span>
+        `;
+        infoColumn.appendChild(upcomingBanner);
+    }
+
     // Action buttons row
     const actionsRow = document.createElement("div");
     actionsRow.className = "detail-actions-row";
