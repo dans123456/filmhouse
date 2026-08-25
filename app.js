@@ -175,6 +175,7 @@ function getTmdbApiKey() {
     return "d638f7775bfa1b8d456dfd028ccbef19";
 }
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
+const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p";
 const CSV_FILE_PATH = "./MOVIE/Data/datafile.csv";
 const JSON_FILE_PATH = "./MOVIE/Data/movies_metadata.json";
 
@@ -4537,8 +4538,8 @@ async function fetchTmdbUpcomingMovies() {
                     categories: ["Upcoming Movies", "Main"],
                     genres: ["Upcoming", "Cinema"],
                     overview: item.overview || "Coming soon to theaters and streaming platforms.",
-                    poster: item.poster_path ? `${TMDB_IMAGE_BASE_URL}/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
-                    backdrop: item.backdrop_path ? `${TMDB_IMAGE_BASE_URL}/w780${item.backdrop_path}` : "img/FilmHouse.png",
+                    poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
+                    backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
                     rating: item.vote_average || 0,
                     release_date: item.release_date || "",
                     language: item.original_language || "en",
@@ -4587,8 +4588,8 @@ async function fetchTmdbOngoingSeries() {
                     categories: ["Ongoing Series", "Main"],
                     genres: ["Series", "Drama"],
                     overview: item.overview || "Currently airing new episodes weekly.",
-                    poster: item.poster_path ? `${TMDB_IMAGE_BASE_URL}/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
-                    backdrop: item.backdrop_path ? `${TMDB_IMAGE_BASE_URL}/w780${item.backdrop_path}` : "img/FilmHouse.png",
+                    poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
+                    backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
                     rating: item.vote_average || 0,
                     release_date: item.first_air_date || "",
                     language: item.original_language || "en",
