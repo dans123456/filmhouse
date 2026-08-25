@@ -4510,7 +4510,7 @@ async function performGlobalTmdbDiscover() {
 
 // Universal live TMDB Category Fetcher for Anime, K-Drama, Bollywood, African, Comic, Animated, etc.
 async function fetchTmdbCategoryMovies(category) {
-    if (!category || category === "Main") return;
+    if (!category) return;
     if (state.isLoadingTmdbCategory) return;
     state.isLoadingTmdbCategory = true;
     renderFeaturedGrid();
@@ -4522,31 +4522,31 @@ async function fetchTmdbCategoryMovies(category) {
         if (category === "Upcoming Movies") {
             url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&primary_release_date.gte=2025-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Ongoing Series") {
-            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&air_date.gte=2024-01-01&first_air_date.gte=2020-01-01&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&air_date.gte=2024-01-01&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Anime") {
-            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=16&with_original_language=ja&first_air_date.gte=2018-01-01&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=16&with_original_language=ja&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Korean Drama") {
-            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko&first_air_date.gte=2018-01-01&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Bollywood") {
-            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi&primary_release_date.gte=2018-01-01&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "African") {
             url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_origin_country=NG|ZA|GH|KE&sort_by=popularity.desc&page=1`;
         } else if (category === "Comic") {
-            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=28,878&primary_release_date.gte=2018-01-01&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=28,878&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Animated Movies") {
-            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&primary_release_date.gte=2018-01-01&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Kids Shows and Movies (Nickelodeon and Disney)") {
-            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=10751,16&primary_release_date.gte=2018-01-01&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=10751,16&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Hollywood/British Movies") {
-            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=en&primary_release_date.gte=2020-01-01&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=en&primary_release_date.gte=2024-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Hollywood/British Series") {
-            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=en&first_air_date.gte=2020-01-01&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=en&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else if (category === "Classic Movies") {
             url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&primary_release_date.lte=1999-12-31&sort_by=popularity.desc&page=1`;
         } else if (category === "Teen/High-School") {
-            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=35,18&primary_release_date.gte=2018-01-01&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=35,18&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`;
         } else {
-            url = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&sort_by=popularity.desc&page=1`;
+            url = `${TMDB_BASE_URL}/trending/all/week?api_key=${apiKey}&page=1`;
         }
 
         const res = await fetch(url);
@@ -4562,8 +4562,9 @@ async function fetchTmdbCategoryMovies(category) {
                     if (category === "Classic Movies") return true;
                     if (!releaseDate) return false;
                     const year = parseInt(releaseDate.substring(0, 4), 10);
-                    if (category === "Ongoing Series" && year < 2020) return false;
-                    if (category === "Upcoming Movies" && year < 2024) return false;
+                    if (category === "Ongoing Series" && year < 2023) return false;
+                    if (category === "Upcoming Movies" && year < 2025) return false;
+                    if (category !== "Classic Movies" && year < 2022) return false;
                     return true;
                 })
                 .map(item => {
@@ -4576,7 +4577,7 @@ async function fetchTmdbCategoryMovies(category) {
                         type: isTV ? "Series" : "Movie",
                         categories: [category, "Main"],
                         genres: [category],
-                        overview: item.overview || "Popular title available on Film House.",
+                        overview: item.overview || "Popular recent release on Film House.",
                         poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
                         backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
                         rating: Math.round((item.vote_average || 0) * 10) / 10,
