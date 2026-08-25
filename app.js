@@ -5415,6 +5415,15 @@ let userRequestsUnsubscribe = null;
 let currentUserRequests = [];
 
 function startUserRequestsListener() {
+    // Load locally stored requests first for instant response
+    try {
+        const savedReqs = localStorage.getItem("filmhouse_my_requests");
+        if (savedReqs) {
+            currentUserRequests = JSON.parse(savedReqs);
+            renderUserRequests(currentUserRequests);
+        }
+    } catch (e) {}
+
     if (typeof firebase === "undefined" || !db || !state.user.id) return;
     
     if (userRequestsUnsubscribe) {
@@ -5436,7 +5445,19 @@ function startUserRequestsListener() {
                 const tB = b.requestedAt ? (b.requestedAt.seconds || 0) : 0;
                 return tB - tA;
             });
+
+            // Merge local unsaved requests with remote snapshot
+            currentUserRequests.forEach(localReq => {
+                const localClean = getCleanRequestTitle(localReq.title).toLowerCase();
+                if (!requests.some(r => r.title && getCleanRequestTitle(r.title).toLowerCase() === localClean)) {
+                    requests.push(localReq);
+                }
+            });
+
             currentUserRequests = requests;
+            try {
+                localStorage.setItem("filmhouse_my_requests", JSON.stringify(currentUserRequests));
+            } catch (e) {}
             renderUserRequests(requests);
         }, err => {
             console.error("User requests sync issue:", err);
@@ -5821,26 +5842,90 @@ function updateHeaderNotificationDot() {
 }
 
 function logMovieRequestToFirestore(movie, specs = "") {
-    if (typeof firebase === "undefined" || !db) return;
-    
+    if (!movie) return;
     const requestTitle = specs ? `${movie.title || "Unknown Title"} (${specs})` : (movie.title || "Unknown Title");
     
-    db.collection("requests").add({
+    // 1. Immediately store in local currentUserRequests array and persist to localStorage
+    const reqObj = {
         title: requestTitle,
         seasonOrPart: specs || "",
+        status: "pending",
         tmdb_id: movie.tmdb_id || null,
         csv_id: movie.csv_id || "",
         type: movie.type || "Movie",
         year: movie.release_date ? movie.release_date.substring(0, 4) : "",
         requestedBy: state.user.username || "guest",
-        requestedById: state.user.id || "",
-        requestedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then((docRef) => {
-        showToast("Movie request registered in database!", "success");
-        // Telegram confirmation and admin notification are handled on the backend bot via Firestore collection listener
-    }).catch(err => {
-        console.error("Error logging movie request:", err);
-    });
+        requestedById: state.user.id || ""
+    };
+
+    if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
+        const cleanT = getCleanRequestTitle(movie.title).toLowerCase();
+        const exists = currentUserRequests.some(r => 
+            r.title && getCleanRequestTitle(r.title).toLowerCase() === cleanT
+        );
+        if (!exists) {
+            currentUserRequests.unshift(reqObj);
+        }
+    }
+    
+    try {
+        localStorage.setItem("filmhouse_my_requests", JSON.stringify(currentUserRequests));
+    } catch (e) {}
+
+    // 2. Instantly update active detail modal UI if open on screen for this movie
+    const modal = document.getElementById("detail-modal");
+    if (modal && modal.classList.contains("active")) {
+        const reqBtn = modal.querySelector(".btn-request-premium");
+        if (reqBtn) {
+            reqBtn.replaceChildren();
+            reqBtn.appendChild(createSvgIcon("icon-check"));
+            const rText = document.createElement("span");
+            rText.textContent = "Requested ⏳";
+            reqBtn.appendChild(rText);
+            reqBtn.style.background = "rgba(255, 188, 0, 0.15)";
+            reqBtn.style.borderColor = "var(--primary-color)";
+        }
+        
+        const infoColumn = modal.querySelector(".detail-info-column");
+        if (infoColumn && !infoColumn.querySelector(".requested-status-banner")) {
+            const reqBanner = document.createElement("div");
+            reqBanner.className = "requested-status-banner";
+            reqBanner.style.cssText = "margin-top: 12px; padding: 10px 14px; background: rgba(255, 188, 0, 0.1); border: 1px solid rgba(255, 188, 0, 0.3); border-radius: var(--border-radius-sm); color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;";
+            reqBanner.innerHTML = `
+                <span style="display: flex; align-items: center; gap: 6px;">
+                    <span>📌</span>
+                    <strong>Request Status:</strong> Pending Admin Fulfillment
+                </span>
+                <span style="font-size: 10px; opacity: 0.8; background: rgba(255,188,0,0.2); padding: 2px 8px; border-radius: 10px;">In Queue</span>
+            `;
+            infoColumn.appendChild(reqBanner);
+        }
+    }
+
+    // 3. Refresh grids so card badges display on posters immediately
+    renderFeaturedGrid();
+    if (typeof renderUserRequests === "function") {
+        renderUserRequests(currentUserRequests);
+    }
+
+    // 4. Save to Firestore if available
+    if (typeof firebase !== "undefined" && db) {
+        db.collection("requests").add({
+            title: requestTitle,
+            seasonOrPart: specs || "",
+            tmdb_id: movie.tmdb_id || null,
+            csv_id: movie.csv_id || "",
+            type: movie.type || "Movie",
+            year: movie.release_date ? movie.release_date.substring(0, 4) : "",
+            requestedBy: state.user.username || "guest",
+            requestedById: state.user.id || "",
+            requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then((docRef) => {
+            showToast("Movie request registered in database!", "success");
+        }).catch(err => {
+            console.error("Error logging movie request:", err);
+        });
+    }
 }
 
 function showRequestSpecsDrawer(movie) {
