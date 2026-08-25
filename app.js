@@ -2188,6 +2188,12 @@ function renderCategoriesBar() {
             if (heading) heading.textContent = categoryLabels[cat] || cat;
 
             renderFeaturedGrid();
+
+            if (cat === "Upcoming Movies") {
+                fetchTmdbUpcomingMovies();
+            } else if (cat === "Ongoing Series") {
+                fetchTmdbOngoingSeries();
+            }
         });
 
         bar.appendChild(button);
@@ -2364,8 +2370,8 @@ function renderFeaturedGrid(fromDiscover = false) {
         });
     }
 
-    // Merge external discover results if filters are active and search query is empty
-    if (filtersActive && !state.searchQuery && state.activeCategory === "Main" && state.externalSearchResults && state.externalSearchResults.length > 0) {
+    // Merge external discover / TMDB live API results if filters/categories are active and search query is empty
+    if (!state.searchQuery && (state.activeCategory === "Main" || state.activeCategory === "Upcoming Movies" || state.activeCategory === "Ongoing Series") && state.externalSearchResults && state.externalSearchResults.length > 0) {
         const localTmdbIds = new Set(list.map(m => m.tmdb_id).filter(id => id));
         const filteredExternal = state.externalSearchResults.filter(ext => !localTmdbIds.has(ext.tmdb_id));
         list = [...list, ...filteredExternal];
@@ -4479,6 +4485,88 @@ async function performGlobalTmdbDiscover() {
         } else {
             console.error("[Discover Debug] Error executing discover search: ", err);
         }
+    }
+}
+
+// Fetch live upcoming movies from TMDB API (/movie/upcoming)
+async function fetchTmdbUpcomingMovies() {
+    try {
+        const apiKey = getTmdbApiKey();
+        const url = `${TMDB_BASE_URL}/movie/upcoming?api_key=${apiKey}&language=en-US&page=1`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.results) {
+            const formatted = data.results.map(item => {
+                return {
+                    csv_id: String(item.id),
+                    tmdb_id: item.id,
+                    imdb_id: "",
+                    title: item.title || item.name || "Upcoming Movie",
+                    type: "Movie",
+                    categories: ["Upcoming Movies", "Main"],
+                    genres: ["Upcoming", "Cinema"],
+                    overview: item.overview || "Coming soon to theaters and streaming platforms.",
+                    poster: item.poster_path ? `${TMDB_IMAGE_BASE_URL}/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
+                    backdrop: item.backdrop_path ? `${TMDB_IMAGE_BASE_URL}/w780${item.backdrop_path}` : "img/FilmHouse.png",
+                    rating: item.vote_average || 0,
+                    release_date: item.release_date || "",
+                    language: item.original_language || "en",
+                    cast: [],
+                    director: "",
+                    trailer: "",
+                    runtime: "",
+                    isUpcoming: true,
+                    links: []
+                };
+            });
+            const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
+            state.externalSearchResults = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+            renderFeaturedGrid(true);
+        }
+    } catch (err) {
+        console.error("Error fetching TMDB upcoming movies:", err);
+    }
+}
+
+// Fetch live currently airing TV series from TMDB API (/tv/on_the_air)
+async function fetchTmdbOngoingSeries() {
+    try {
+        const apiKey = getTmdbApiKey();
+        const url = `${TMDB_BASE_URL}/tv/on_the_air?api_key=${apiKey}&language=en-US&page=1`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.results) {
+            const formatted = data.results.map(item => {
+                return {
+                    csv_id: String(item.id),
+                    tmdb_id: item.id,
+                    imdb_id: "",
+                    title: item.name || item.title || "Ongoing Series",
+                    type: "Series",
+                    categories: ["Ongoing Series", "Main"],
+                    genres: ["Series", "Drama"],
+                    overview: item.overview || "Currently airing new episodes weekly.",
+                    poster: item.poster_path ? `${TMDB_IMAGE_BASE_URL}/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
+                    backdrop: item.backdrop_path ? `${TMDB_IMAGE_BASE_URL}/w780${item.backdrop_path}` : "img/FilmHouse.png",
+                    rating: item.vote_average || 0,
+                    release_date: item.first_air_date || "",
+                    language: item.original_language || "en",
+                    cast: [],
+                    director: "",
+                    trailer: "",
+                    runtime: "",
+                    isOngoing: true,
+                    links: []
+                };
+            });
+            const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
+            state.externalSearchResults = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+            renderFeaturedGrid(true);
+        }
+    } catch (err) {
+        console.error("Error fetching TMDB ongoing series:", err);
     }
 }
 
