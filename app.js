@@ -6479,14 +6479,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         }, 2500);
     }
     } catch (err) {
-        console.error("Critical initialization error:", err);
+        console.error("Initialization error:", err);
         const loader = document.getElementById("preloader");
         if (loader) {
             loader.classList.add("fade-out");
         }
-        try {
-            showToast("Initialization warning: some features may be loaded offline.", "info");
-        } catch (e) {}
     }
 });
 
