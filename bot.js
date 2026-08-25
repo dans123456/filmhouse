@@ -1658,6 +1658,84 @@ async function init() {
             }
         }, 60 * 1000); // check every 60 seconds
 
+        // Automated TMDB New Episode Release Alerts for Admins (Runs every 30 minutes)
+        const checkNewEpisodeReleasesForAdmins = async () => {
+            try {
+                const defaultAdmins = ["1329840839", "1175336733"];
+                const adminDoc = await db.collection("settings").doc("admins").get();
+                const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
+                const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
+                const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
+
+                const notifiedDoc = await db.collection("settings").doc("new_episodes_notified").get();
+                const notifiedMap = notifiedDoc.exists ? (notifiedDoc.data().episodes || {}) : {};
+
+                const catalogSnapshot = await db.collection("catalog").get();
+                let tvSeriesList = [];
+                catalogSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if ((data.type || "").toLowerCase() === "series" || (data.type || "").toLowerCase() === "tv") {
+                        tvSeriesList.push(data);
+                    }
+                });
+
+                if (tvSeriesList.length === 0) {
+                    try {
+                        const localMeta = JSON.parse(fs.readFileSync("./MOVIE/Data/movies_metadata.json", "utf8"));
+                        tvSeriesList = localMeta.filter(m => (m.type || "").toLowerCase() === "series" || (m.type || "").toLowerCase() === "tv");
+                    } catch (e) {}
+                }
+
+                for (const show of tvSeriesList) {
+                    const tmdbId = show.tmdb_id;
+                    if (!tmdbId) continue;
+
+                    const fetchModule = await import('node-fetch').catch(() => null);
+                    const fetch = fetchModule ? fetchModule.default : require('http');
+                    if (typeof fetch !== 'function') continue;
+
+                    const tmdbRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${botToken || "d638f7775bfa1b8d456dfd028ccbef19"}`);
+                    if (!tmdbRes.ok) continue;
+
+                    const tmdbData = await tmdbRes.json();
+                    const lastEp = tmdbData.last_episode_to_air;
+                    if (!lastEp) continue;
+
+                    const epKey = `${tmdbId}_S${lastEp.season_number}E${lastEp.episode_number}`;
+                    if (notifiedMap[epKey] === true) continue;
+
+                    const showTitle = show.title || tmdbData.name || "Published Series";
+                    const epName = lastEp.name ? `("${lastEp.name}")` : "";
+                    const airDate = lastEp.air_date || "Recently";
+
+                    const adminMsg = `📡 *NEW EPISODE RELEASED ALERT!* 🎬\n\n` +
+                                     `*Show:* ${showTitle}\n` +
+                                     `*New Episode:* Season ${lastEp.season_number}, Episode ${lastEp.episode_number} ${epName}\n` +
+                                     `*Air Date:* ${airDate}\n\n` +
+                                     `💡 *Action Required:* Open Film House Admin App to upload/update the link for this show!`;
+
+                    for (const adminId of allAdmins) {
+                        try {
+                            await bot.telegram.sendMessage(adminId, adminMsg, { parse_mode: "Markdown" });
+                        } catch (err) {
+                            console.warn(`Failed to send new episode alert to admin ${adminId}:`, err.message);
+                        }
+                    }
+
+                    notifiedMap[epKey] = true;
+                    await db.collection("settings").doc("new_episodes_notified").set({
+                        episodes: notifiedMap,
+                        lastCheckedAt: admin.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                }
+            } catch (err) {
+                console.error("Error in checkNewEpisodeReleasesForAdmins:", err);
+            }
+        };
+
+        setTimeout(checkNewEpisodeReleasesForAdmins, 30 * 1000);
+        setInterval(checkNewEpisodeReleasesForAdmins, 30 * 60 * 1000);
+
         // Graceful shutdown hooks
         const handleShutdown = async (signal) => {
             console.log(`Received ${signal}. Shutting down gracefully...`);
