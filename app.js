@@ -2336,23 +2336,29 @@ function renderFeaturedGrid(fromDiscover = false) {
     if (!state.searchQuery) {
         if (state.activeCategory === "Ongoing Series") {
             list = list.filter(m => isMovieOngoing(m));
-        } else if (state.activeCategory === "Upcoming Movies") {
-            list = list.filter(m => isMovieUpcoming(m));
-        } else {
-            list = list.filter(m => m.categories && m.categories.includes(state.activeCategory));
-        if (state.activeCategory !== "Main" && state.activeCategory !== "Upcoming Movies" && state.activeCategory !== "Latest Movies") {
-            // Category feeds ONLY show published titles that have active download links uploaded!
-            list = list.filter(m => m.categories && m.categories.includes(state.activeCategory) && m.links && m.links.length > 0);
-        }
             if (!state.categoryTmdbMovies) state.categoryTmdbMovies = {};
-            const catExt = state.categoryTmdbMovies[state.activeCategory] || [];
+            const catExt = state.categoryTmdbMovies["Ongoing Series"] || [];
             if (catExt.length > 0) {
                 const localTmdbIds = new Set(list.map(m => m.tmdb_id).filter(id => id));
                 const filteredExt = catExt.filter(ext => !localTmdbIds.has(ext.tmdb_id));
                 list = [...list, ...filteredExt];
             } else if (!state.isLoadingTmdbCategory) {
-                fetchTmdbCategoryMovies(state.activeCategory);
+                fetchTmdbCategoryMovies("Ongoing Series");
             }
+        } else if (state.activeCategory === "Upcoming Movies" || state.activeCategory === "Latest Movies") {
+            list = list.filter(m => isMovieUpcoming(m));
+            if (!state.categoryTmdbMovies) state.categoryTmdbMovies = {};
+            const catExt = state.categoryTmdbMovies["Upcoming Movies"] || state.categoryTmdbMovies["Latest Movies"] || [];
+            if (catExt.length > 0) {
+                const localTmdbIds = new Set(list.map(m => m.tmdb_id).filter(id => id));
+                const filteredExt = catExt.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+                list = [...list, ...filteredExt];
+            } else if (!state.isLoadingTmdbCategory) {
+                fetchTmdbCategoryMovies("Upcoming Movies");
+            }
+        } else if (state.activeCategory !== "Main") {
+            // Regional & Genre category tabs ONLY show published titles with active download links!
+            list = list.filter(m => m.categories && m.categories.includes(state.activeCategory) && m.links && m.links.length > 0);
         }
     }
 
