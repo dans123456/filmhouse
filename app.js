@@ -2149,11 +2149,14 @@ function renderCategoriesBar() {
     const categoryLabels = {
         "Main": "Featured",
         "Ongoing Series": "Ongoing 🔴",
-        "Upcoming Movies": "Upcoming ✨",
+        "Upcoming Movies": "Latest ⚡",
+        "Latest Movies": "Latest ⚡",
         "Hollywood/British Movies": "Hollywood",
         "Hollywood/British Series": "Series",
-        "Korean Drama": "K-Drama 🫰",
-        "Korean Movies": "K-Movies 🎬",
+        "Korean Drama": "Asian Drama 🫰",
+        "Asian Drama": "Asian Drama 🫰",
+        "Korean Movies": "Asian Movies 🎬",
+        "Asian Movies": "Asian Movies 🎬",
         "Anime Series": "Anime 🥷",
         "Anime Movies": "Anime Movies 🎨",
         "Bollywood": "Bollywood",
@@ -4466,12 +4469,11 @@ async function fetchTmdbCategoryMovies(category) {
         const apiKey = getTmdbApiKey();
         let urls = [];
 
-        if (category === "Upcoming Movies") {
+        if (category === "Upcoming Movies" || category === "Latest Movies") {
             urls = [
-                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&primary_release_date.gte=2025-01-01&with_original_language=en&sort_by=popularity.desc&page=1`,
-                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&with_original_language=ja&primary_release_date.gte=2025-01-01&sort_by=popularity.desc&page=1`,
-                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko&primary_release_date.gte=2025-01-01&sort_by=popularity.desc&page=1`,
-                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi&primary_release_date.gte=2025-01-01&sort_by=popularity.desc&page=1`
+                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&primary_release_date.gte=2024-01-01&with_original_language=en&sort_by=popularity.desc&page=1`,
+                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko&primary_release_date.gte=2024-01-01&sort_by=popularity.desc&page=1`,
+                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi&primary_release_date.gte=2024-01-01&sort_by=popularity.desc&page=1`
             ];
         } else if (category === "Ongoing Series") {
             urls = [
@@ -4483,10 +4485,10 @@ async function fetchTmdbCategoryMovies(category) {
             urls = [`${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=16&with_original_language=ja&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
         } else if (category === "Anime Movies") {
             urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&with_original_language=ja&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
-        } else if (category === "Korean Drama") {
-            urls = [`${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
-        } else if (category === "Korean Movies") {
-            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+        } else if (category === "Korean Drama" || category === "Asian Drama") {
+            urls = [`${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko|zh|ja|tr&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+        } else if (category === "Korean Movies" || category === "Asian Movies") {
+            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko|zh|ja|tr&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
         } else if (category === "Bollywood") {
             urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
         } else if (category === "African") {
