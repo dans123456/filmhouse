@@ -1526,8 +1526,16 @@ async function init() {
                         let detailText = "";
                         let buttonText = "Download/Watch Now 🎬";
                         if (isSeries) {
-                            detailText = "💡 *Note:* This is a Series request. The button below contains *Season 1 only*. To download or watch the remaining seasons, please open the Film House App! 📺";
-                            buttonText = "Get Season 1 🍿";
+                            let requestedSeason = data.seasonOrPart || "";
+                            if (!requestedSeason && title) {
+                                const sMatch = title.match(/Season\s*\d+/i) || title.match(/\(Season\s*\d+\)/i) || title.match(/S\d+/i);
+                                if (sMatch) {
+                                    requestedSeason = sMatch[0].replace(/[()]/g, '').trim();
+                                }
+                            }
+                            const sLabel = requestedSeason ? requestedSeason : "Series";
+                            detailText = `💡 *Note:* This is a Series request. The button below contains *${sLabel}*. To download or watch the remaining seasons, please open the Film House App! 📺`;
+                            buttonText = `Get ${sLabel} 🍿`;
                         } else {
                             detailText = "💡 *Note:* This is a single movie request, so this contains the full film. Enjoy! 🍿";
                             buttonText = "Get Movie 🎬";
