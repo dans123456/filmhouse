@@ -3888,6 +3888,8 @@ function openDownloadModal(movie) {
                 sublabel.className = "download-link-sublabel";
                 if (matchingRequest) {
                     sublabel.textContent = "Unlock Season • Free Fulfillment (No Ads)";
+                } else if (isMovieOngoing(movie)) {
+                    sublabel.textContent = "🔴 Ongoing Season • New Episodes Added Weekly";
                 } else {
                     sublabel.textContent = "Unlock & Download Season • Ad";
                 }
@@ -6370,24 +6372,35 @@ function showRequestSpecsDrawer(movie) {
     formContainer.innerHTML = "";
     
     if (isTV) {
+        let maxSeason = movie.number_of_seasons || 1;
+        let seasonOptions = "";
+        for (let s = 1; s <= maxSeason; s++) {
+            seasonOptions += `<option value="Season ${s}">Season ${s}</option>`;
+        }
+        seasonOptions += `<option value="All Seasons">All Seasons</option>`;
+
         formContainer.innerHTML = `
             <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
                 <label for="request-season-select" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Select Season</label>
                 <select id="request-season-select" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; color: #fff; width: 100%; outline: none; font-size: 13px; font-family: var(--font-primary);">
-                    <option value="Season 1">Season 1</option>
-                    <option value="Season 2">Season 2</option>
-                    <option value="Season 3">Season 3</option>
-                    <option value="Season 4">Season 4</option>
-                    <option value="Season 5">Season 5</option>
-                    <option value="Season 6">Season 6</option>
-                    <option value="Season 7">Season 7</option>
-                    <option value="Season 8">Season 8</option>
-                    <option value="Season 9">Season 9</option>
-                    <option value="Season 10">Season 10</option>
-                    <option value="All Seasons">All Seasons</option>
+                    ${seasonOptions}
                 </select>
             </div>
         `;
+
+        fetchTvSeriesTotalSeasons(movie).then(totalSeasons => {
+            if (totalSeasons && totalSeasons > maxSeason) {
+                const selectEl = document.getElementById("request-season-select");
+                if (selectEl) {
+                    let updatedOptions = "";
+                    for (let s = 1; s <= totalSeasons; s++) {
+                        updatedOptions += `<option value="Season ${s}">Season ${s}</option>`;
+                    }
+                    updatedOptions += `<option value="All Seasons">All Seasons</option>`;
+                    selectEl.innerHTML = updatedOptions;
+                }
+            }
+        });
     } else {
         formContainer.innerHTML = `
             <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
