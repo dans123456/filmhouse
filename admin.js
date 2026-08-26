@@ -2207,12 +2207,12 @@ function showMovieDetails(movie) {
             select.style.width = "85px";
             select.style.cursor = "pointer";
             
-            const options = ["720p", "1080p", "4K UHD", "480p", "WEBDL", "BluRay"];
+            const options = ["480p", "720p", "1080p", "2160p (4K)", "Cinema Cut / HDCam", "WEBDL", "BluRay"];
             options.forEach(opt => {
                 const o = document.createElement("option");
                 o.value = opt;
                 o.textContent = opt;
-                if (opt === qualityVal) o.selected = true;
+                if (opt === qualityVal || (opt === "Cinema Cut / HDCam" && (qualityVal === "Cinema Cut" || qualityVal === "HDCam"))) o.selected = true;
                 select.appendChild(o);
             });
             
@@ -2500,10 +2500,11 @@ function renderAddMovieLinks() {
                 <input type="text" class="add-movie-link-url-input" data-index="${idx}" value="${escaped}" placeholder="Paste Telegram download URL" style="flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px;">
                 
                 <select class="add-movie-link-quality-select" data-index="${idx}" style="padding: 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; width: 90px; cursor: pointer;">
+                    <option value="480p" ${qualityVal === '480p' ? 'selected' : ''}>480p</option>
                     <option value="720p" ${qualityVal === '720p' ? 'selected' : ''}>720p</option>
                     <option value="1080p" ${qualityVal === '1080p' ? 'selected' : ''}>1080p</option>
-                    <option value="4K UHD" ${qualityVal === '4K UHD' ? 'selected' : ''}>4K UHD</option>
-                    <option value="480p" ${qualityVal === '480p' ? 'selected' : ''}>480p</option>
+                    <option value="2160p (4K)" ${qualityVal === '2160p (4K)' || qualityVal === '4K UHD' ? 'selected' : ''}>2160p (4K)</option>
+                    <option value="Cinema Cut / HDCam" ${qualityVal === 'Cinema Cut / HDCam' || qualityVal === 'Cinema Cut' || qualityVal === 'HDCam' ? 'selected' : ''}>Cinema Cut / HDCam</option>
                     <option value="WEBDL" ${qualityVal === 'WEBDL' ? 'selected' : ''}>WEBDL</option>
                     <option value="BluRay" ${qualityVal === 'BluRay' ? 'selected' : ''}>BluRay</option>
                 </select>

@@ -35,12 +35,13 @@ function getCleanRequestTitle(title) {
 // Helper to determine if a movie/series is currently ongoing / releasing weekly episodes
 function isMovieOngoing(movie) {
     if (!movie) return false;
+    if (movie.status === "Ended" || movie.status === "Canceled") return false;
     if (movie.isOngoing === true) return true;
     if (movie.categories && Array.isArray(movie.categories) && movie.categories.some(c => c.toLowerCase().includes("ongoing"))) return true;
     const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
     if (isTV && (movie.links && movie.links.some(l => (typeof l === 'object' && l !== null && l.type === "weekly")))) return true;
     if (movie.next_episode_to_air) return true;
-    if (movie.status === "Ongoing") return true;
+    if (movie.status === "Ongoing" || movie.status === "Returning Series") return true;
     return false;
 }
 
@@ -75,6 +76,22 @@ function getUpcomingBadgeElement(movie) {
     badge.className = "movie-card-upcoming-badge";
     badge.style.cssText = "position: absolute; bottom: 8px; right: 8px; background: linear-gradient(135deg, #00c6ff, #0072ff); color: #ffffff; font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(0,198,255,0.5); display: flex; align-items: center; gap: 3px; letter-spacing: 0.5px;";
     badge.innerHTML = "<span>✨</span><span>COMING SOON</span>";
+    return badge;
+}
+
+// Helper to generate floating CINEMA CUT / HDCAM badge element for movie posters
+function getCinemaCutBadgeElement(movie) {
+    if (!movie || !movie.links || !Array.isArray(movie.links)) return null;
+    const hasCinemaCut = movie.links.some(l => {
+        const q = (typeof l === 'object' && l !== null ? (l.quality || "") : "").toLowerCase();
+        return q.includes("cinema cut") || q.includes("hdcam") || q.includes("cam");
+    });
+    if (!hasCinemaCut) return null;
+
+    const badge = document.createElement("div");
+    badge.className = "movie-card-cinemacut-badge";
+    badge.style.cssText = "position: absolute; bottom: 8px; left: 8px; background: linear-gradient(135deg, #ff9800, #ff5722); color: #ffffff; font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(255,152,0,0.5); display: flex; align-items: center; gap: 3px; letter-spacing: 0.5px;";
+    badge.innerHTML = "<span>📽️</span><span>CINEMA CUT</span>";
     return badge;
 }
 
@@ -2323,9 +2340,10 @@ function renderFeaturedGrid(fromDiscover = false) {
             list = list.filter(m => isMovieUpcoming(m));
         } else {
             list = list.filter(m => m.categories && m.categories.includes(state.activeCategory));
+        if (state.activeCategory !== "Main" && state.activeCategory !== "Upcoming Movies" && state.activeCategory !== "Latest Movies") {
+            // Category feeds ONLY show published titles that have active download links uploaded!
+            list = list.filter(m => m.categories && m.categories.includes(state.activeCategory) && m.links && m.links.length > 0);
         }
-
-        if (state.activeCategory !== "Main") {
             if (!state.categoryTmdbMovies) state.categoryTmdbMovies = {};
             const catExt = state.categoryTmdbMovies[state.activeCategory] || [];
             if (catExt.length > 0) {
@@ -2452,6 +2470,9 @@ function renderFeaturedGrid(fromDiscover = false) {
 
         const upcomingBadge = getUpcomingBadgeElement(movie);
         if (upcomingBadge) imgWrapper.appendChild(upcomingBadge);
+
+        const cinemaCutBadge = getCinemaCutBadgeElement(movie);
+        if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
 
         // Dynamic NEW Badge Overlay for top additions
         if (state.newMovieIds && state.newMovieIds.includes(movie.csv_id)) {
