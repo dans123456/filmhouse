@@ -4040,110 +4040,6 @@ function openDownloadModal(movie) {
         }
     }
 
-    // Missing Seasons Dynamic Renderer for TV Series
-    if (isTVShow) {
-        const renderMissingSeasons = (totalSeasons) => {
-            // Remove existing missing season items if re-rendering
-            grid.querySelectorAll(".missing-season-wrapper").forEach(el => el.remove());
-
-            const maxUploaded = uploadedSeasonNums.size > 0 ? Math.max(...Array.from(uploadedSeasonNums)) : 0;
-            let targetCount = totalSeasons > maxUploaded ? totalSeasons : maxUploaded + 1;
-            
-            const missingSeasonNums = [];
-            for (let s = 1; s <= targetCount; s++) {
-                if (!uploadedSeasonNums.has(s)) {
-                    missingSeasonNums.push(s);
-                }
-            }
-            
-            if (missingSeasonNums.length === 0) return;
-
-            const wrapper = document.createElement("div");
-            wrapper.className = "missing-season-wrapper";
-
-            // Section divider for missing seasons
-            const divider = document.createElement("div");
-            divider.style.cssText = "margin: 16px 0 10px 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; font-weight: 800; text-transform: uppercase; color: #ffbc00; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;";
-            divider.innerHTML = `<span>⚡</span><span>Request Missing Seasons</span>`;
-            wrapper.appendChild(divider);
-
-            missingSeasonNums.forEach(seasonNum => {
-                const missingItem = document.createElement("div");
-                missingItem.className = "download-link-item missing-season-item";
-                missingItem.style.cssText = "border: 1px dashed rgba(255, 188, 0, 0.4); background: rgba(255, 188, 0, 0.05); display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: var(--border-radius-sm); margin-bottom: 8px;";
-
-                const badge = document.createElement("span");
-                badge.className = "download-link-badge season-badge";
-                badge.style.cssText = "background: rgba(255, 188, 0, 0.2); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.4); font-weight: 800; font-size: 11px; padding: 4px 8px; border-radius: 4px;";
-                badge.textContent = `S${seasonNum}`;
-                missingItem.appendChild(badge);
-
-                const labelWrap = document.createElement("div");
-                labelWrap.className = "download-link-label-wrap";
-                labelWrap.style.cssText = "flex: 1; margin-left: 12px; display: flex; flex-direction: column; gap: 2px;";
-                
-                const label = document.createElement("span");
-                label.className = "download-link-label";
-                label.style.cssText = "font-weight: 700; color: #ffffff; font-size: 14px;";
-                label.textContent = `Season ${seasonNum}`;
-                
-                const sublabel = document.createElement("span");
-                sublabel.className = "download-link-sublabel";
-                sublabel.style.cssText = "font-size: 11px; color: var(--text-secondary);";
-                sublabel.textContent = isMovieOngoing(movie) ? "Airing Season • Tap to Request Link" : "Unreleased Season • Tap to Request";
-
-                labelWrap.appendChild(label);
-                labelWrap.appendChild(sublabel);
-                missingItem.appendChild(labelWrap);
-
-                const reqActionBtn = document.createElement("button");
-                reqActionBtn.className = "btn-request-season-action";
-                
-                const reqSeasonStr = `Season ${seasonNum}`;
-                const cleanMovieTitle = getCleanRequestTitle(movie.title).toLowerCase();
-                
-                const isAlreadyReq = currentUserRequests && currentUserRequests.some(r => {
-                    const rClean = getCleanRequestTitle(r.title).toLowerCase();
-                    const matchesTitle = rClean === cleanMovieTitle;
-                    const matchesSeason = (r.seasonOrPart && r.seasonOrPart.toLowerCase() === reqSeasonStr.toLowerCase()) || 
-                                          (r.title && r.title.toLowerCase().includes(`season ${seasonNum}`));
-                    return matchesTitle && matchesSeason && r.status !== "fulfilled";
-                });
-
-                if (isAlreadyReq) {
-                    reqActionBtn.textContent = `Requested S${seasonNum} ⏳`;
-                    reqActionBtn.style.cssText = "background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
-                    sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
-                } else {
-                    reqActionBtn.textContent = `REQUEST S${seasonNum} ⚡`;
-                    reqActionBtn.style.cssText = "background: linear-gradient(135deg, #ffbc00, #ff8c00); color: #000000; border: none; font-size: 11px; font-weight: 800; padding: 7px 13px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(255,188,0,0.3); transition: transform 0.15s ease;";
-                    
-                    reqActionBtn.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        logMovieRequestToFirestore(movie, `Season ${seasonNum}`);
-                        reqActionBtn.textContent = `Requested S${seasonNum} ⏳`;
-                        reqActionBtn.style.cssText = "background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
-                        sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
-                    });
-                }
-
-                missingItem.appendChild(reqActionBtn);
-                wrapper.appendChild(missingItem);
-            });
-
-            grid.appendChild(wrapper);
-        };
-
-        const initialTotal = movie.number_of_seasons || 0;
-        renderMissingSeasons(initialTotal);
-
-        fetchTvSeriesTotalSeasons(movie).then(totalSeasons => {
-            if (totalSeasons > initialTotal) {
-                renderMissingSeasons(totalSeasons);
-            }
-        });
-    }
-
     modal.classList.add("active");
 }
 
@@ -6373,8 +6269,9 @@ function logMovieRequestToFirestore(movie, specs = "") {
         csv_id: movie.csv_id || "",
         type: movie.type || "Movie",
         year: movie.release_date ? movie.release_date.substring(0, 4) : "",
-        requestedBy: state.user.username || "guest",
-        requestedById: state.user.id || ""
+        requestedBy: state.user.username || state.user.fullName || state.user.firstName || `User ${state.user.id || 'Guest'}`,
+        requestedById: state.user.id || "",
+        fullName: state.user.fullName || state.user.firstName || ""
     };
 
     if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
@@ -6436,8 +6333,9 @@ function logMovieRequestToFirestore(movie, specs = "") {
             csv_id: movie.csv_id || "",
             type: movie.type || "Movie",
             year: movie.release_date ? movie.release_date.substring(0, 4) : "",
-            requestedBy: state.user.username || "guest",
+            requestedBy: state.user.username || state.user.fullName || state.user.firstName || `User ${state.user.id || 'Guest'}`,
             requestedById: state.user.id || "",
+            fullName: state.user.fullName || state.user.firstName || "",
             requestedAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then((docRef) => {
             showToast("Movie request registered in database!", "success");

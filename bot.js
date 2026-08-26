@@ -1424,8 +1424,8 @@ async function init() {
                 const title = data.title;
                 const type = data.type;
                 const year = data.year || "";
-                const rawUser = data.user || data.requestedBy || "guest";
-                const username = (rawUser && rawUser !== "guest" && rawUser !== "None" && !rawUser.includes(" ")) ? `@${rawUser.replace(/^@/, '')}` : rawUser;
+                const rawUser = (data.requestedBy && data.requestedBy !== "guest") ? data.requestedBy : (data.fullName || data.user || `User ${userId}`);
+                const username = (rawUser && rawUser !== "guest" && rawUser !== "None" && !rawUser.includes(" ") && !rawUser.startsWith("User ")) ? `@${rawUser.replace(/^@/, '')}` : rawUser;
                 const downloadLink = data.downloadLink;
                 const timestamp = data.timestamp || data.requestedAt;
 
