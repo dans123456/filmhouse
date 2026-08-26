@@ -1,5 +1,54 @@
 [
   {
+    "csv_id": "74440-harley-quinn",
+    "tmdb_id": 74440,
+    "imdb_id": "",
+    "title": "Harley Quinn",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animated Movies"
+    ],
+    "isOngoing": false,
+    "isUpcoming": false,
+    "overview": "Harley Quinn has finally broken things off once and for all with the Joker. Now, she's trying to make it on her own as the criminal Queenpin of Gotham City, with help from Poison Ivy and a ragtag crew of DC castoffs.",
+    "poster": "https://image.tmdb.org/t/p/w500/9Dm1SEh8Wxt8LNNg02exHQ595zg.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sNHoOagykUU0WpVBa162w1NP0mP.jpg",
+    "rating": 8.3,
+    "release_date": "2019-11-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "0FrB7mJoesg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRQ0AAmFleURjTqlFsCJaxhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRw0AAmFleUQM8E7y6ms9QRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADTA0AAmFleUTgROr6sAZt2hYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADTw0AAmFleUREg0XrRbTocBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADUw0AAmFleUQHOr7ElEdeUBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "18165-the-vampire-diaries",
     "tmdb_id": 18165,
     "imdb_id": "",
@@ -38,7 +87,9 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "genres": [
       "Animation",
@@ -59,7 +110,10 @@
     "trailer": "uWIRyU5fuzU",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQADOQ0AAmFleURqUocv7o34iRYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADOQ0AAmFleURqUocv7o34iRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -112,7 +166,7 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Classic Movies"
     ],
     "genres": [
       "Comedy",
@@ -129,7 +183,10 @@
     "trailer": "xo3XEQxbaEk",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQADugwAAmFleUSxogn09GqoeRYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADugwAAmFleUSxogn09GqoeRYE",
+        "quality": "720p"
+      }
     ]
   },
   {
@@ -140,7 +197,7 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Movies"
+      "Bollywood"
     ],
     "genres": [
       "Action",
@@ -157,7 +214,10 @@
     "trailer": "DBcTNSBD4EI",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQADtQwAAmFleUSp7yP_foPonxYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADtQwAAmFleUSp7yP_foPonxYE",
+        "quality": "720p"
+      }
     ]
   },
   {
