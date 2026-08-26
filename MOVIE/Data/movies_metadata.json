@@ -27,7 +27,11 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD0x0AAmFleUQpdxvchfqKcxYE",
-        "season": "Season 1"
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1B0AAmFleURUdHpbkoOQfRYE",
+        "quality": "720p"
       }
     ]
   },
