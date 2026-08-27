@@ -87,7 +87,9 @@ async function checkTvSeriesOngoingStatus(movie) {
 
         if (tvData.status === "Ended" || tvData.status === "Canceled") {
             movie.isOngoing = false;
-        } else if (tvData.status === "Returning Series" || tvData.in_production === true || tvData.next_episode_to_air !== null) {
+        } else if (tvData.status === "Returning Series" || tvData.status === "In Production" || tvData.status === "In Development" || tvData.in_production === true || tvData.next_episode_to_air !== null) {
+            movie.isOngoing = true;
+        } else if (tvData.first_air_date && new Date(tvData.first_air_date).getFullYear() >= 2025) {
             movie.isOngoing = true;
         } else if (tvData.last_episode_to_air && tvData.last_episode_to_air.air_date) {
             const lastAir = new Date(tvData.last_episode_to_air.air_date);
@@ -3227,6 +3229,29 @@ function openDetailModal(movie) {
     typeBadge.textContent = movie.type;
     metaList.appendChild(typeBadge);
     metaList.appendChild(createMetaDivider());
+
+    if (isMovieOngoing(movie)) {
+        const ongoingPill = document.createElement("span");
+        ongoingPill.className = "detail-ongoing-badge-pill";
+        ongoingPill.style.cssText = "background: rgba(255, 0, 85, 0.15); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.4); font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; letter-spacing: 0.5px;";
+        ongoingPill.innerHTML = "<span>🔴</span><span>ONGOING</span>";
+        metaList.appendChild(ongoingPill);
+        metaList.appendChild(createMetaDivider());
+    } else {
+        const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv" || (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+        if (isTV) {
+            checkTvSeriesOngoingStatus(movie).then(isOngoing => {
+                if (isOngoing && !metaList.querySelector(".detail-ongoing-badge-pill")) {
+                    const ongoingPill = document.createElement("span");
+                    ongoingPill.className = "detail-ongoing-badge-pill";
+                    ongoingPill.style.cssText = "background: rgba(255, 0, 85, 0.15); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.4); font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; letter-spacing: 0.5px;";
+                    ongoingPill.innerHTML = "<span>🔴</span><span>ONGOING</span>";
+                    metaList.appendChild(ongoingPill);
+                    metaList.appendChild(createMetaDivider());
+                }
+            });
+        }
+    }
 
     const yearLabel = document.createElement("span");
     yearLabel.className = "detail-year-label";
