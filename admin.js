@@ -964,16 +964,20 @@ function fulfillMovieTitleRequests(title, docIds) {
             batch.commit().then(() => {
                 const modal = document.getElementById("fulfill-request-modal");
                 const titleEl = document.getElementById("fulfill-modal-title");
-                const inputEl = document.getElementById("fulfill-download-link");
                 
-                if (!modal || !titleEl || !inputEl) return;
+                if (!modal || !titleEl) return;
                 
                 currentFulfillTitle = title;
                 currentFulfillDocIds = docIds;
                 
                 titleEl.textContent = `Fulfill Request: "${title}"`;
-                inputEl.value = "";
                 
+                const cleanTitle = title.replace(/\s*\([^)]+\)\s*$/g, "").trim().toLowerCase();
+                const existingMovie = allCatalogMovies.find(m => m.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim() === cleanTitle);
+                const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === title.toLowerCase().trim());
+                const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+
+                renderFulfillLinksInputs(existingMovie, isSeries);
                 modal.classList.add("active");
             }).catch(err => {
                 console.error("Error setting claim lock batch:", err);
@@ -3829,11 +3833,101 @@ if (closeFulfillModalBtn && fulfillRequestModal) {
     });
 }
 
+function renderFulfillLinksInputs(existingMovie, isSeries = true) {
+    const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
+    if (!wrapper) return;
+    wrapper.replaceChildren();
+
+    const existingLinks = existingMovie && existingMovie.links && Array.isArray(existingMovie.links) ? existingMovie.links : [];
+
+    if (existingLinks.length > 0) {
+        existingLinks.forEach((link, idx) => {
+            const isObj = typeof link === 'object' && link !== null;
+            const label = isObj ? (link.season || link.quality || `Season ${idx + 1}`) : `Season ${idx + 1}`;
+            const url = isObj ? link.url : link;
+            addFulfillLinkInputRow(label, url);
+        });
+    } else {
+        const defaultLabel = isSeries ? "Season 1" : "HD Quality";
+        addFulfillLinkInputRow(defaultLabel, "");
+    }
+}
+
+function addFulfillLinkInputRow(defaultLabel = "", defaultUrl = "") {
+    const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
+    if (!wrapper) return;
+
+    const rowIdx = wrapper.querySelectorAll(".fulfill-link-row").length + 1;
+    const labelVal = defaultLabel || `Season ${rowIdx}`;
+
+    const row = document.createElement("div");
+    row.className = "fulfill-link-row";
+    row.style.cssText = "display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.02); padding: 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);";
+
+    const labelInput = document.createElement("input");
+    labelInput.type = "text";
+    labelInput.className = "fulfill-link-label";
+    labelInput.value = labelVal;
+    labelInput.placeholder = "e.g. Season 1";
+    labelInput.style.cssText = "width: 110px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #ffbc00; font-weight: 700; font-size: 11px; padding: 6px 8px; border-radius: 4px; outline: none;";
+
+    const urlInput = document.createElement("input");
+    urlInput.type = "text";
+    urlInput.className = "fulfill-link-url";
+    urlInput.value = defaultUrl;
+    urlInput.placeholder = `Paste URL for ${labelVal}...`;
+    urlInput.style.cssText = "flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #ffffff; font-size: 12px; padding: 6px 8px; border-radius: 4px; outline: none;";
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "✕";
+    removeBtn.title = "Remove Link";
+    removeBtn.style.cssText = "background: rgba(255, 59, 48, 0.2); color: #ff3b30; border: none; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;";
+    removeBtn.onclick = () => row.remove();
+
+    row.appendChild(labelInput);
+    row.appendChild(urlInput);
+    row.appendChild(removeBtn);
+    wrapper.appendChild(row);
+}
+
+const btnAddFulfillLinkInput = document.getElementById("btn-add-fulfill-link-input");
+if (btnAddFulfillLinkInput) {
+    btnAddFulfillLinkInput.addEventListener("click", () => {
+        const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
+        const nextIdx = wrapper ? wrapper.querySelectorAll(".fulfill-link-row").length + 1 : 1;
+        addFulfillLinkInputRow(`Season ${nextIdx}`, "");
+    });
+}
+
 if (fulfillForm && fulfillRequestModal) {
     fulfillForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const downloadLink = fulfillLinkInput.value.trim();
-        if (!downloadLink) return;
+        
+        const linkRows = Array.from(document.querySelectorAll("#fulfill-links-inputs-wrapper .fulfill-link-row"));
+        const linksToSave = [];
+        let primaryNotificationLink = "";
+
+        linkRows.forEach((row, idx) => {
+            const labelInput = row.querySelector(".fulfill-link-label");
+            const urlInput = row.querySelector(".fulfill-link-url");
+            const label = labelInput ? labelInput.value.trim() : `Season ${idx + 1}`;
+            const url = urlInput ? urlInput.value.trim() : "";
+            if (url) {
+                linksToSave.push({ label, url, index: idx });
+                if (!primaryNotificationLink || label.toLowerCase().includes("season 1") || label.toLowerCase() === "s1") {
+                    primaryNotificationLink = url;
+                }
+            }
+        });
+
+        if (linksToSave.length === 0) {
+            showToast("Please enter at least one download link!", "warning");
+            return;
+        }
+
+        if (!primaryNotificationLink) primaryNotificationLink = linksToSave[0].url;
+        const downloadLink = primaryNotificationLink;
         
         // Disable form buttons during async operations
         const submitBtn = fulfillForm.querySelector("button[type='submit']");
@@ -3844,8 +3938,8 @@ if (fulfillForm && fulfillRequestModal) {
         const matchTitle = currentFulfillTitle.toLowerCase().trim();
         const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === matchTitle);
         const reqTmdbId = matchedReq ? matchedReq.tmdb_id : null;
-        
-        // Clean Title by stripping season/part suffix for TMDB / Catalog matching
+        const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+
         const cleanTitle = currentFulfillTitle.replace(/\s*\([^)]+\)\s*$/g, "").trim();
         const cleanMatchTitle = cleanTitle.toLowerCase();
         
@@ -3856,64 +3950,50 @@ if (fulfillForm && fulfillRequestModal) {
             const cleanCatalogTitle = m.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
             return cleanCatalogTitle === cleanMatchTitle;
         });
-        
-        const seasonOrPart = matchedReq ? matchedReq.seasonOrPart : "";
-        let formattedLink = downloadLink;
-        if (seasonOrPart) {
-            const isSeries = matchedReq && (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv');
-            if (isSeries) {
-                formattedLink = { url: downloadLink, season: seasonOrPart };
-            } else {
-                formattedLink = { url: downloadLink, quality: seasonOrPart };
-            }
-        }
-        
+
         let movieToSync = null;
-        
+
         if (existingMovie) {
             if (!existingMovie.links) existingMovie.links = [];
-            // Check if link is already present
-            const linkExists = existingMovie.links.some(link => {
-                const url = typeof link === 'object' && link !== null ? link.url : link;
-                return url === downloadLink;
+            
+            linksToSave.forEach(item => {
+                const formattedLink = isSeries ? { url: item.url, season: item.label } : { url: item.url, quality: item.label };
+                const sMatch = item.label.match(/\d+/);
+                let targetIdx = item.index;
+                if (isSeries && sMatch) {
+                    const sNum = parseInt(sMatch[0], 10);
+                    if (sNum > 0) targetIdx = sNum - 1;
+                }
+                while (existingMovie.links.length < targetIdx + 1) {
+                    const currentIdx = existingMovie.links.length;
+                    existingMovie.links.push({ season: `Season ${currentIdx + 1}`, url: "" });
+                }
+                existingMovie.links[targetIdx] = formattedLink;
             });
-            if (!linkExists) {
-                if (isSeries && formattedLink && formattedLink.season) {
-                    const sMatch = formattedLink.season.match(/\d+/);
-                    if (sMatch) {
-                        const seasonNum = parseInt(sMatch[0], 10);
-                        if (seasonNum > 0) {
-                            const targetIdx = seasonNum - 1;
-                            while (existingMovie.links.length < targetIdx + 1) {
-                                const currentIdx = existingMovie.links.length;
-                                existingMovie.links.push({
-                                    season: `Season ${currentIdx + 1}`,
-                                    url: ""
-                                });
-                            }
-                            existingMovie.links[targetIdx] = formattedLink;
-                        } else {
-                            existingMovie.links.push(formattedLink);
-                        }
-                    } else {
-                        existingMovie.links.push(formattedLink);
-                    }
-                } else {
-                    existingMovie.links.push(formattedLink);
-                }
-                catalogChangesMade = true;
-                if (!newlyUpdatedIds.includes(existingMovie.csv_id)) {
-                    newlyUpdatedIds.push(existingMovie.csv_id);
-                }
+
+            catalogChangesMade = true;
+            if (!newlyUpdatedIds.includes(existingMovie.csv_id)) {
+                newlyUpdatedIds.push(existingMovie.csv_id);
             }
             movieToSync = existingMovie;
         } else {
             // Create a new catalog entry
-            let isSeries = false;
-            if (matchedReq && (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv')) {
-                isSeries = true;
-            }
-            
+            const formattedLinksArray = [];
+            linksToSave.forEach(item => {
+                const formattedLink = isSeries ? { url: item.url, season: item.label } : { url: item.url, quality: item.label };
+                const sMatch = item.label.match(/\d+/);
+                let targetIdx = item.index;
+                if (isSeries && sMatch) {
+                    const sNum = parseInt(sMatch[0], 10);
+                    if (sNum > 0) targetIdx = sNum - 1;
+                }
+                while (formattedLinksArray.length < targetIdx + 1) {
+                    const currentIdx = formattedLinksArray.length;
+                    formattedLinksArray.push({ season: `Season ${currentIdx + 1}`, url: "" });
+                }
+                formattedLinksArray[targetIdx] = formattedLink;
+            });
+
             const mediaType = isSeries ? 'tv' : 'movie';
             const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}`;
             
@@ -3968,7 +4048,7 @@ if (fulfillForm && fulfillRequestModal) {
                     director: "",
                     trailer: trailerId,
                     runtime: "",
-                    links: [formattedLink]
+                    links: formattedLinksArray
                 };
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(csvId);
@@ -3996,7 +4076,7 @@ if (fulfillForm && fulfillRequestModal) {
                     director: "",
                     trailer: "",
                     runtime: "",
-                    links: [formattedLink]
+                    links: formattedLinksArray
                 };
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(csvId);
