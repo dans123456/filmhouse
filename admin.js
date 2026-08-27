@@ -677,7 +677,8 @@ function renderRequestsList() {
                 const cleanReqSeason = r.seasonOrPart.toLowerCase().trim();
                 return m.links && m.links.some(link => {
                     const sLabel = typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "";
-                    return sLabel.toLowerCase().trim() === cleanReqSeason;
+                    const lUrl = typeof link === 'object' && link !== null ? link.url : link;
+                    return sLabel.toLowerCase().trim() === cleanReqSeason && lUrl && String(lUrl).trim() !== "";
                 });
             }
             return true;
@@ -3877,7 +3878,29 @@ if (fulfillForm && fulfillRequestModal) {
                 return url === downloadLink;
             });
             if (!linkExists) {
-                existingMovie.links.push(formattedLink);
+                if (isSeries && formattedLink && formattedLink.season) {
+                    const sMatch = formattedLink.season.match(/\d+/);
+                    if (sMatch) {
+                        const seasonNum = parseInt(sMatch[0], 10);
+                        if (seasonNum > 0) {
+                            const targetIdx = seasonNum - 1;
+                            while (existingMovie.links.length < targetIdx + 1) {
+                                const currentIdx = existingMovie.links.length;
+                                existingMovie.links.push({
+                                    season: `Season ${currentIdx + 1}`,
+                                    url: ""
+                                });
+                            }
+                            existingMovie.links[targetIdx] = formattedLink;
+                        } else {
+                            existingMovie.links.push(formattedLink);
+                        }
+                    } else {
+                        existingMovie.links.push(formattedLink);
+                    }
+                } else {
+                    existingMovie.links.push(formattedLink);
+                }
                 catalogChangesMade = true;
                 if (!newlyUpdatedIds.includes(existingMovie.csv_id)) {
                     newlyUpdatedIds.push(existingMovie.csv_id);
