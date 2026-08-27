@@ -698,6 +698,27 @@
         </div>
     </div>
 
+    <!-- ONGOING SHOWS MANAGER PANEL -->
+    <div class="glass-panel" id="ongoing-shows-panel" style="border: 1px solid rgba(255, 59, 48, 0.25); margin-bottom: 24px;">
+        <div class="section-header collapsible-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePanel('ongoing-shows-content', 'ongoing-shows-chevron')">
+            <h4 class="section-title" style="color: #ff3b30; display: flex; align-items: center; gap: 8px; margin: 0;">🔴 Ongoing Shows Manager</h4>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="ongoing-shows-counter" style="font-size: 11px; font-weight: 700; color: #ff3b30; background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.3); padding: 2px 8px; border-radius: 20px;">0 Airing Shows</span>
+                <span id="ongoing-shows-chevron" style="color: var(--text-secondary); transition: transform 0.2s;">▼</span>
+            </div>
+        </div>
+
+        <div id="ongoing-shows-content" style="margin-top: 16px; display: none;">
+            <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
+                Manage published series currently airing weekly. Quick-update download links when new episodes drop, or mark seasons complete!
+            </div>
+
+            <div id="ongoing-shows-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+                <div style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 12px;">Loading ongoing shows...</div>
+            </div>
+        </div>
+    </div>
+
     <!-- EDITOR'S CHOICE SPOTLIGHT MANAGER -->
     <div class="glass-panel" id="editors-choice-panel" style="border: 1px solid rgba(255, 188, 0, 0.15); margin-bottom: 24px;">
         <div class="section-header collapsible-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePanel('editors-choice-content', 'editors-choice-chevron')">
