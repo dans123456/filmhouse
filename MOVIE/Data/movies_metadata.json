@@ -257,11 +257,7 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD6wwAAmFleUT0yg2TrWHylhYE",
-        "season": "Season 1"
-      },
-      {
-        "url": "https://t.me/Filmhousebetabot",
-        "season": "Season 3"
+        "quality": "720p"
       }
     ]
   },
