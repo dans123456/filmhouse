@@ -37,12 +37,68 @@ function isMovieOngoing(movie) {
     if (!movie) return false;
     if (movie.status === "Ended" || movie.status === "Canceled") return false;
     if (movie.isOngoing === true) return true;
+    if (movie.isOngoing === false) return false;
+    if (movie.status === "Ongoing" || movie.status === "Returning Series" || movie.status === "In Production" || movie.in_production === true) return true;
+    if (movie.next_episode_to_air) return true;
     if (movie.categories && Array.isArray(movie.categories) && movie.categories.some(c => c.toLowerCase().includes("ongoing"))) return true;
     const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
-    if (isTV && (movie.links && movie.links.some(l => (typeof l === 'object' && l !== null && l.type === "weekly")))) return true;
-    if (movie.next_episode_to_air) return true;
-    if (movie.status === "Ongoing" || movie.status === "Returning Series") return true;
+    if (isTV && (movie.links && movie.links.some(l => (typeof l === 'object' && l !== null && (l.type === "weekly" || (l.season && l.season.toLowerCase().includes("ongoing"))))))) return true;
     return false;
+}
+
+// Async helper to dynamically query TMDB for series airing status and update isOngoing in real-time
+async function checkTvSeriesOngoingStatus(movie) {
+    if (!movie) return false;
+    const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv" || (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+    if (!isTV) return false;
+
+    if (typeof movie.isOngoing === "boolean") return movie.isOngoing;
+
+    const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
+    const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
+
+    let tvData = null;
+    if (tmdbId) {
+        try {
+            const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}`);
+            if (res.ok) tvData = await res.json();
+        } catch (e) {}
+    }
+
+    const searchTitle = typeof getCleanRequestTitle === "function" ? getCleanRequestTitle(movie.title || "") : (movie.title || "");
+    if (!tvData && searchTitle) {
+        try {
+            const res = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${apiKey}&query=${encodeURIComponent(searchTitle)}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.results && data.results.length > 0) {
+                    const tvId = data.results[0].id;
+                    const detailRes = await fetch(`https://api.themoviedb.org/3/tv/${tvId}?api_key=${apiKey}`);
+                    if (detailRes.ok) tvData = await detailRes.json();
+                }
+            }
+        } catch (e) {}
+    }
+
+    if (tvData) {
+        movie.status = tvData.status || movie.status;
+        movie.in_production = tvData.in_production;
+        movie.next_episode_to_air = tvData.next_episode_to_air;
+
+        if (tvData.status === "Ended" || tvData.status === "Canceled") {
+            movie.isOngoing = false;
+        } else if (tvData.status === "Returning Series" || tvData.in_production === true || tvData.next_episode_to_air !== null) {
+            movie.isOngoing = true;
+        } else if (tvData.last_episode_to_air && tvData.last_episode_to_air.air_date) {
+            const lastAir = new Date(tvData.last_episode_to_air.air_date);
+            const daysDiff = (new Date() - lastAir) / (1000 * 60 * 60 * 24);
+            if (daysDiff <= 45) {
+                movie.isOngoing = true;
+            }
+        }
+    }
+
+    return isMovieOngoing(movie);
 }
 
 // Helper to generate floating ONGOING badge element for movie posters
@@ -2506,7 +2562,19 @@ function renderFeaturedGrid(fromDiscover = false) {
         if (reqBadge) imgWrapper.appendChild(reqBadge);
 
         const ongoingBadge = getOngoingBadgeElement(movie);
-        if (ongoingBadge) imgWrapper.appendChild(ongoingBadge);
+        if (ongoingBadge) {
+            imgWrapper.appendChild(ongoingBadge);
+        } else {
+            const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv" || (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+            if (isTV && typeof movie.isOngoing === "undefined") {
+                checkTvSeriesOngoingStatus(movie).then(isOngoing => {
+                    if (isOngoing && !imgWrapper.querySelector(".movie-card-ongoing-badge")) {
+                        const bg = getOngoingBadgeElement(movie);
+                        if (bg) imgWrapper.appendChild(bg);
+                    }
+                });
+            }
+        }
 
         const upcomingBadge = getUpcomingBadgeElement(movie);
         if (upcomingBadge) imgWrapper.appendChild(upcomingBadge);
