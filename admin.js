@@ -976,8 +976,14 @@ function fulfillMovieTitleRequests(title, docIds) {
                 const existingMovie = allCatalogMovies.find(m => m.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim() === cleanTitle);
                 const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === title.toLowerCase().trim());
                 const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+                
+                let reqSeasonNum = 0;
+                if (matchedReq && matchedReq.seasonOrPart) {
+                    const sMatch = matchedReq.seasonOrPart.match(/\d+/);
+                    if (sMatch) reqSeasonNum = parseInt(sMatch[0], 10);
+                }
 
-                renderFulfillLinksInputs(existingMovie, isSeries);
+                renderFulfillLinksInputs(existingMovie, isSeries, reqSeasonNum);
                 modal.classList.add("active");
             }).catch(err => {
                 console.error("Error setting claim lock batch:", err);
@@ -3833,61 +3839,85 @@ if (closeFulfillModalBtn && fulfillRequestModal) {
     });
 }
 
-function renderFulfillLinksInputs(existingMovie, isSeries = true) {
+function renderFulfillLinksInputs(existingMovie, isSeries = true, reqSeasonNum = 0) {
     const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
     if (!wrapper) return;
     wrapper.replaceChildren();
 
     const existingLinks = existingMovie && existingMovie.links && Array.isArray(existingMovie.links) ? existingMovie.links : [];
 
-    if (existingLinks.length > 0) {
-        existingLinks.forEach((link, idx) => {
-            const isObj = typeof link === 'object' && link !== null;
-            const label = isObj ? (link.season || link.quality || `Season ${idx + 1}`) : `Season ${idx + 1}`;
-            const url = isObj ? link.url : link;
-            addFulfillLinkInputRow(label, url);
-        });
-    } else {
-        const defaultLabel = isSeries ? "Season 1" : "HD Quality";
-        addFulfillLinkInputRow(defaultLabel, "");
+    let count = Math.max(existingLinks.length, reqSeasonNum > 0 ? reqSeasonNum : 1);
+    if (count < 1) count = 1;
+
+    for (let idx = 0; idx < count; idx++) {
+        const linkObj = existingLinks[idx] || null;
+        const isObj = typeof linkObj === 'object' && linkObj !== null;
+        const urlVal = isObj ? linkObj.url : (typeof linkObj === 'string' ? linkObj : "");
+        const qualityVal = isObj && linkObj.quality ? linkObj.quality : "720p";
+        const seasonNum = idx + 1;
+        const isRequested = reqSeasonNum > 0 && seasonNum === reqSeasonNum;
+
+        addFulfillLinkInputRow(idx, urlVal, qualityVal, isSeries, isRequested);
     }
 }
 
-function addFulfillLinkInputRow(defaultLabel = "", defaultUrl = "") {
+function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", isSeries = true, isRequested = false) {
     const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
     if (!wrapper) return;
 
-    const rowIdx = wrapper.querySelectorAll(".fulfill-link-row").length + 1;
-    const labelVal = defaultLabel || `Season ${rowIdx}`;
-
+    const seasonNum = idx + 1;
     const row = document.createElement("div");
     row.className = "fulfill-link-row";
-    row.style.cssText = "display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.02); padding: 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);";
+    row.dataset.index = idx;
+    row.style.cssText = `display: flex; gap: 8px; align-items: center; background: ${isRequested ? 'rgba(255, 188, 0, 0.08)' : 'rgba(255,255,255,0.02)'}; padding: 8px; border-radius: 6px; border: 1px solid ${isRequested ? 'rgba(255, 188, 0, 0.4)' : 'rgba(255,255,255,0.05)'}; margin-bottom: 6px;`;
 
-    const labelInput = document.createElement("input");
-    labelInput.type = "text";
-    labelInput.className = "fulfill-link-label";
-    labelInput.value = labelVal;
-    labelInput.placeholder = "e.g. Season 1";
-    labelInput.style.cssText = "width: 110px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #ffbc00; font-weight: 700; font-size: 11px; padding: 6px 8px; border-radius: 4px; outline: none;";
+    const labelBadge = document.createElement("span");
+    labelBadge.style.cssText = "font-size: 11px; color: #ffbc00; font-weight: 800; min-width: 110px; flex-shrink: 0; display: flex; align-items: center; gap: 4px;";
+    
+    if (isSeries) {
+        labelBadge.innerHTML = `<span>Link ${seasonNum} (Season ${seasonNum})</span>${isRequested ? '<span style="font-size:9px; background:#ffbc00; color:#000; padding:1px 4px; border-radius:3px;">⚡ REQUESTED</span>' : ''}`;
+    } else {
+        labelBadge.innerHTML = `<span>Link ${seasonNum}:</span>${isRequested ? '<span style="font-size:9px; background:#ffbc00; color:#000; padding:1px 4px; border-radius:3px;">⚡ REQUESTED</span>' : ''}`;
+    }
 
     const urlInput = document.createElement("input");
     urlInput.type = "text";
-    urlInput.className = "fulfill-link-url";
+    urlInput.className = "fulfill-link-url-input";
     urlInput.value = defaultUrl;
-    urlInput.placeholder = `Paste URL for ${labelVal}...`;
-    urlInput.style.cssText = "flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #ffffff; font-size: 12px; padding: 6px 8px; border-radius: 4px; outline: none;";
+    urlInput.placeholder = isSeries ? `Paste Telegram download URL for Season ${seasonNum}...` : `Paste Telegram download URL for Link ${seasonNum}...`;
+    urlInput.style.cssText = "flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; outline: none;";
+
+    if (isRequested) {
+        setTimeout(() => urlInput.focus(), 100);
+    }
+
+    row.appendChild(labelBadge);
+    row.appendChild(urlInput);
+
+    if (!isSeries) {
+        const qualitySelect = document.createElement("select");
+        qualitySelect.className = "fulfill-link-quality-select";
+        qualitySelect.style.cssText = "padding: 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; width: 95px; cursor: pointer; outline: none;";
+        
+        const qualities = ["480p", "720p", "1080p", "2160p (4K)", "Cinema Cut / HDCam", "WEBDL", "BluRay"];
+        qualities.forEach(q => {
+            const opt = document.createElement("option");
+            opt.value = q;
+            opt.textContent = q;
+            if (q === defaultQuality || (q === "2160p (4K)" && defaultQuality === "4K UHD")) opt.selected = true;
+            qualitySelect.appendChild(opt);
+        });
+        row.appendChild(qualitySelect);
+    }
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.textContent = "✕";
     removeBtn.title = "Remove Link";
-    removeBtn.style.cssText = "background: rgba(255, 59, 48, 0.2); color: #ff3b30; border: none; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;";
+    removeBtn.style.cssText = "background: rgba(255, 59, 48, 0.2); color: #ff3b30; border: none; width: 26px; height: 26px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;";
     removeBtn.onclick = () => row.remove();
-
-    row.appendChild(labelInput);
-    row.appendChild(urlInput);
     row.appendChild(removeBtn);
+
     wrapper.appendChild(row);
 }
 
@@ -3895,8 +3925,10 @@ const btnAddFulfillLinkInput = document.getElementById("btn-add-fulfill-link-inp
 if (btnAddFulfillLinkInput) {
     btnAddFulfillLinkInput.addEventListener("click", () => {
         const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
-        const nextIdx = wrapper ? wrapper.querySelectorAll(".fulfill-link-row").length + 1 : 1;
-        addFulfillLinkInputRow(`Season ${nextIdx}`, "");
+        const nextIdx = wrapper ? wrapper.querySelectorAll(".fulfill-link-row").length : 0;
+        const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === currentFulfillTitle.toLowerCase().trim());
+        const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+        addFulfillLinkInputRow(nextIdx, "", "720p", isSeries, false);
     });
 }
 
@@ -3909,24 +3941,24 @@ if (fulfillForm && fulfillRequestModal) {
         let primaryNotificationLink = "";
 
         linkRows.forEach((row, idx) => {
-            const labelInput = row.querySelector(".fulfill-link-label");
-            const urlInput = row.querySelector(".fulfill-link-url");
-            const label = labelInput ? labelInput.value.trim() : `Season ${idx + 1}`;
+            const urlInput = row.querySelector(".fulfill-link-url-input");
+            const qualitySelect = row.querySelector(".fulfill-link-quality-select");
             const url = urlInput ? urlInput.value.trim() : "";
-            if (url) {
-                linksToSave.push({ label, url, index: idx });
-                if (!primaryNotificationLink || label.toLowerCase().includes("season 1") || label.toLowerCase() === "s1") {
-                    primaryNotificationLink = url;
-                }
+            const quality = qualitySelect ? qualitySelect.value : "720p";
+            const seasonLabel = `Season ${idx + 1}`;
+
+            linksToSave.push({ seasonLabel, quality, url, index: idx });
+            if (url && (!primaryNotificationLink || idx === 0)) {
+                primaryNotificationLink = url;
             }
         });
 
-        if (linksToSave.length === 0) {
+        const hasAnyUrl = linksToSave.some(l => l.url !== "");
+        if (!hasAnyUrl) {
             showToast("Please enter at least one download link!", "warning");
             return;
         }
 
-        if (!primaryNotificationLink) primaryNotificationLink = linksToSave[0].url;
         const downloadLink = primaryNotificationLink;
         
         // Disable form buttons during async operations
@@ -3957,13 +3989,8 @@ if (fulfillForm && fulfillRequestModal) {
             if (!existingMovie.links) existingMovie.links = [];
             
             linksToSave.forEach(item => {
-                const formattedLink = isSeries ? { url: item.url, season: item.label } : { url: item.url, quality: item.label };
-                const sMatch = item.label.match(/\d+/);
-                let targetIdx = item.index;
-                if (isSeries && sMatch) {
-                    const sNum = parseInt(sMatch[0], 10);
-                    if (sNum > 0) targetIdx = sNum - 1;
-                }
+                const formattedLink = isSeries ? { url: item.url, season: item.seasonLabel } : { url: item.url, quality: item.quality };
+                const targetIdx = item.index;
                 while (existingMovie.links.length < targetIdx + 1) {
                     const currentIdx = existingMovie.links.length;
                     existingMovie.links.push({ season: `Season ${currentIdx + 1}`, url: "" });
