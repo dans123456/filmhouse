@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=58">
+    <link rel="stylesheet" href="index.css?v=59">
 </head>
 <body>
 
@@ -116,26 +116,6 @@
             </div>
             <h3 class="connection-title" style="margin-bottom: 8px;">Securing Premium Connection...</h3>
             <p class="connection-status" id="connection-status-text">Initializing...</p>
-        </div>
-    </div>
-
-    <!-- SPECIFIC REQUEST SPECS DRAWER -->
-    <div class="connection-drawer-overlay" id="request-specs-drawer" style="display: none;">
-        <div class="connection-drawer-container" style="max-height: 80vh; display: flex; flex-direction: column;">
-            <button class="drawer-close-btn" id="btn-close-request-specs-drawer" aria-label="Close request specs drawer" style="position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; z-index: 10;">
-                <svg style="width: 18px; height: 18px; fill: currentColor;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
-            </button>
-            <div class="drawer-header-line"></div>
-            <h3 id="request-specs-title" style="margin-bottom: 8px; font-family: var(--font-heading); color: #fff; text-align: center;">Request Details</h3>
-            <p id="request-specs-subtitle" style="font-size: 11px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.4; text-align: center;"></p>
-            
-            <div id="request-specs-form-container" style="display: flex; flex-direction: column; gap: 16px; width: 100%; text-align: left;">
-                <!-- Selection inputs dynamically appended here -->
-            </div>
-            
-            <button id="btn-submit-request-specs" class="btn btn-primary" style="margin-top: 24px; width: 100%; height: 42px; font-weight: 700; border-radius: var(--border-radius-md); box-shadow: 0 4px 15px var(--primary-glow);">
-                Confirm Request 🚀
-            </button>
         </div>
     </div>
 
@@ -1246,6 +1226,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=77"></script>
+    <script src="app.js?v=78"></script>
 </body>
 </html>

@@ -1156,7 +1156,7 @@
 
     <!-- FULFILL REQUEST MODAL -->
     <div class="admin-modal-overlay" id="fulfill-request-modal">
-        <div class="admin-modal-container" style="max-width: 480px; width: 95%;">
+        <div class="admin-modal-container" style="max-width: 520px; width: 95%;">
             <div class="modal-header">
                 <h3 id="fulfill-modal-title">Fulfill Request</h3>
                 <button class="close-modal-btn" id="btn-close-fulfill-modal">
@@ -1164,12 +1164,17 @@
                 </button>
             </div>
             <form id="fulfill-request-form" onsubmit="event.preventDefault();">
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="fulfill-download-link" style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Telegram Direct Download Link</label>
-                    <input type="text" id="fulfill-download-link" placeholder="e.g. https://t.me/c/..." required style="background-color: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; font-size: 13px; color: #ffffff; outline: none; width: 100%; box-sizing: border-box; margin-top: 6px;">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Telegram Download Links (Seasons / Qualities)</label>
+                    <div id="fulfill-links-container" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-top: 6px;">
+                        <div id="fulfill-links-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
+                            <!-- Dynamic inputs loaded here -->
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-add-fulfill-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">+ Add Another Season / Link</button>
+                    </div>
                 </div>
-                <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 20px;">
-                    This link will be sent directly to all users who requested this title.
+                <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 16px;">
+                    💡 Season 1 link will be sent directly to Telegram users. All published seasons will be saved into their exact slots in the Film House App!
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px; font-weight: 700; border-radius: var(--border-radius-md);">Submit Fulfillment 📥</button>
             </form>
