@@ -1534,8 +1534,18 @@ async function init() {
                                 }
                             }
                             const sLabel = requestedSeason ? requestedSeason : "Series";
-                            detailText = `💡 *Note:* This is a Series request. The button below contains *${sLabel}*. To download or watch the remaining seasons, please open the Film House App! 📺`;
-                            buttonText = `Get ${sLabel} 🍿`;
+                            const isComplete = data.isSeriesComplete === true || data.status === "completed" || sLabel.toLowerCase() === "all seasons";
+
+                            if (isComplete) {
+                                detailText = `🎉 *All Seasons Completed!*\n\nAll seasons of *${title}* have been fully uploaded to Film House! Enjoy the full series! 📺`;
+                                buttonText = "Open Film House App 🍿";
+                            } else if (sLabel.toLowerCase().includes("season 1") || sLabel.toLowerCase() === "s1") {
+                                detailText = `🍿 *Good news!*\n\n*Season 1* of *${title}* is now ready! We are currently uploading the remaining seasons... 🚀`;
+                                buttonText = "Get Season 1 🍿";
+                            } else {
+                                detailText = `🚀 *Season Update!*\n\n*${sLabel}* of *${title}* has just been added! To download or watch remaining seasons, open Film House App! 🍿`;
+                                buttonText = `Get ${sLabel} 🍿`;
+                            }
                         } else {
                             detailText = "💡 *Note:* This is a single movie request, so this contains the full film. Enjoy! 🍿";
                             buttonText = "Get Movie 🎬";
