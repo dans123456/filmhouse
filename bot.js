@@ -1065,7 +1065,7 @@ async function checkAndRunWeeklyBackup(bot) {
 
 // Bot Initializer
 async function init() {
-    let botToken = process.env.TELEGRAM_BOT_TOKEN;
+    let botToken = process.env.BETA_TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || "8629284780:AAHnUxCjv_S3yzZCgtVrLvw_bfNSATLVCeY";
 
     if (!botToken) {
         console.log("No TELEGRAM_BOT_TOKEN env variable found. Fetching from Firestore 'settings/telegram'...");
