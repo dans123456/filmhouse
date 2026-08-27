@@ -3816,7 +3816,7 @@ async function fetchTvSeriesTotalSeasons(movie) {
         return movie.number_of_seasons;
     }
     const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
-    const tmdbId = movie.tmdb_id || (typeof movie.id === "number" ? movie.id : null);
+    const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
     
     if (tmdbId) {
         try {
@@ -3831,9 +3831,10 @@ async function fetchTvSeriesTotalSeasons(movie) {
         } catch (e) {}
     }
     
-    if (movie.title) {
+    const searchTitle = typeof getCleanRequestTitle === "function" ? getCleanRequestTitle(movie.title || "") : (movie.title || "");
+    if (searchTitle) {
         try {
-            const res = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${apiKey}&query=${encodeURIComponent(movie.title)}`);
+            const res = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${apiKey}&query=${encodeURIComponent(searchTitle)}`);
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.results && data.results.length > 0) {
@@ -3857,7 +3858,7 @@ async function fetchTvSeriesTotalSeasons(movie) {
 async function fetchTvSeriesAiredSeasons(movie) {
     if (!movie) return [];
     const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
-    const tmdbId = movie.tmdb_id || (typeof movie.id === "number" ? movie.id : null);
+    const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
     
     let tvData = null;
     if (tmdbId) {
@@ -3867,9 +3868,10 @@ async function fetchTvSeriesAiredSeasons(movie) {
         } catch (e) {}
     }
     
-    if (!tvData && movie.title) {
+    const searchTitle = typeof getCleanRequestTitle === "function" ? getCleanRequestTitle(movie.title || "") : (movie.title || "");
+    if (!tvData && searchTitle) {
         try {
-            const res = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${apiKey}&query=${encodeURIComponent(movie.title)}`);
+            const res = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${apiKey}&query=${encodeURIComponent(searchTitle)}`);
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.results && data.results.length > 0) {
