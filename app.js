@@ -3956,10 +3956,13 @@ function openDownloadModal(movie) {
         }
     } else {
         movie.links.forEach((link, idx) => {
+            const linkUrl = typeof link === 'object' && link !== null ? link.url : link;
+            if (isTVShow && (!linkUrl || !String(linkUrl).trim())) {
+                return; // Skip blank season link slot
+            }
+
             const anchor = document.createElement("div");
             anchor.className = "download-link-item";
-
-            const linkUrl = typeof link === 'object' && link !== null ? link.url : link;
             
             const matchingRequest = currentUserRequests && currentUserRequests.find(r => 
                 r.title && getCleanRequestTitle(r.title).toLowerCase() === getCleanRequestTitle(movie.title).toLowerCase() &&
