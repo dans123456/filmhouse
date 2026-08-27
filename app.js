@@ -113,6 +113,33 @@ function getCinemaCutBadgeElement(movie) {
     }
 })();
 
+// Helper to detect if app is running in Beta Environment mode (?env=beta or ?beta=true)
+function isBetaEnvironment() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('env') === 'beta' || params.get('beta') === 'true') return true;
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
+            const startParam = window.Telegram.WebApp.initDataUnsafe.start_param || "";
+            if (startParam.includes("beta")) return true;
+        }
+    } catch (e) {}
+    return false;
+}
+
+// Dynamically render BETA STAGING badge if ?env=beta is present
+document.addEventListener("DOMContentLoaded", () => {
+    if (isBetaEnvironment()) {
+        const brandTitle = document.querySelector(".brand-title");
+        if (brandTitle && !brandTitle.querySelector(".beta-staging-tag")) {
+            const badge = document.createElement("span");
+            badge.className = "beta-staging-tag";
+            badge.style.cssText = "font-size: 9px; background: linear-gradient(135deg, #00c6ff, #0072ff); color: #fff; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 4px; font-weight: 800; letter-spacing: 0.5px;";
+            badge.textContent = "🧪 BETA STAGING";
+            brandTitle.appendChild(badge);
+        }
+    }
+});
+
 // Safe localStorage wrapper to prevent crashes when third-party cookies/storage are blocked inside webview sandboxes
 const safeStorage = (() => {
     let available = false;
