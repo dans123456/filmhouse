@@ -131,10 +131,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isBetaEnvironment()) {
         const brandTitle = document.querySelector(".brand-title");
         if (brandTitle && !brandTitle.querySelector(".beta-staging-tag")) {
+            brandTitle.style.display = "inline-flex";
+            brandTitle.style.alignItems = "center";
+            brandTitle.style.gap = "6px";
+            
             const badge = document.createElement("span");
             badge.className = "beta-staging-tag";
-            badge.style.cssText = "font-size: 9px; background: linear-gradient(135deg, #00c6ff, #0072ff); color: #fff; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 4px; font-weight: 800; letter-spacing: 0.5px;";
-            badge.textContent = "🧪 BETA STAGING";
+            badge.style.cssText = "font-size: 9px; line-height: 1; background: rgba(0, 198, 255, 0.15); color: #00c6ff; border: 1px solid rgba(0, 198, 255, 0.4); padding: 3px 7px; border-radius: 4px; font-weight: 800; letter-spacing: 0.5px; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;";
+            badge.innerHTML = "<span>🧪</span><span>BETA STAGING</span>";
             brandTitle.appendChild(badge);
         }
     }
