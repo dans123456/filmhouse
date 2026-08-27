@@ -1,5 +1,41 @@
 [
   {
+    "csv_id": "71790-s-w-a-t",
+    "tmdb_id": 71790,
+    "imdb_id": "",
+    "title": "S.W.A.T.",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Crime",
+      "Action & Adventure",
+      "Drama"
+    ],
+    "overview": "A Los Angeles S.W.A.T. sergeant is assigned to lead a highly skilled unit in the community where he grew up. Torn between loyalty to the streets, where the cops are sometimes the enemy, and allegiance to his brothers in blue, he strategically straddles the two worlds.",
+    "poster": "https://image.tmdb.org/t/p/w500/1l7vsAIkqOzrqiPwjO27Cb5QdfJ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7j4ug9B6JXVeh5HhQjjPScrdj4Z.jpg",
+    "rating": 8,
+    "release_date": "2017-11-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Zopy34r5lTY",
+    "runtime": "",
+    "links": [
+      {
+        "season": "Season 1",
+        "url": ""
+      },
+      {
+        "url": "Fzid6di6zi5s",
+        "season": "Season 2"
+      }
+    ]
+  },
+  {
     "csv_id": "46896-the-originals",
     "tmdb_id": 46896,
     "imdb_id": "",
