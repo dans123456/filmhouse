@@ -3171,11 +3171,28 @@ function openDetailModal(movie) {
     
     const posterCard = document.createElement("div");
     posterCard.className = "detail-poster-card";
+    posterCard.style.position = "relative";
     
     const posterImg = document.createElement("img");
     posterImg.src = movie.poster;
     posterImg.alt = movie.title;
     posterCard.appendChild(posterImg);
+
+    const ongoingBadge = getOngoingBadgeElement(movie);
+    if (ongoingBadge) {
+        posterCard.appendChild(ongoingBadge);
+    } else {
+        const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv" || (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+        if (isTV && typeof movie.isOngoing === "undefined") {
+            checkTvSeriesOngoingStatus(movie).then(isOngoing => {
+                if (isOngoing && !posterCard.querySelector(".movie-card-ongoing-badge")) {
+                    const bg = getOngoingBadgeElement(movie);
+                    if (bg) posterCard.appendChild(bg);
+                }
+            });
+        }
+    }
+
     posterColumn.appendChild(posterCard);
     mainLayout.appendChild(posterColumn);
 
@@ -3965,12 +3982,13 @@ async function fetchTvSeriesAiredSeasons(movie) {
             if (airDate <= now) hasAired = true;
         }
         
-        if (hasAired && (s.episode_count > 0 || typeof s.episode_count === 'undefined')) {
+        const epCount = typeof s.episode_count === 'number' ? s.episode_count : 0;
+        if (hasAired && epCount > 0) {
             releasedSeasons.push({
                 season_number: s.season_number,
                 air_date: s.air_date,
                 name: s.name || `Season ${s.season_number}`,
-                episode_count: s.episode_count || 0
+                episode_count: epCount
             });
         }
     });
@@ -4073,14 +4091,15 @@ function openDownloadModal(movie) {
                 const label = document.createElement("span");
                 label.className = "download-link-label";
                 label.textContent = seasonLabel;
-                const sublabel = document.createElement("span");
-                sublabel.className = "download-link-sublabel";
+                const isLatestSeason = idx === movie.links.length - 1;
+                const isExplicitlyOngoingSeason = isObj && (link.type === "weekly" || (link.season && link.season.toLowerCase().includes("ongoing")));
+
                 if (matchingRequest) {
                     sublabel.textContent = "Unlock Season • Free Fulfillment (No Ads)";
-                } else if (isMovieOngoing(movie)) {
+                } else if (isExplicitlyOngoingSeason || (isMovieOngoing(movie) && isLatestSeason)) {
                     sublabel.textContent = "🔴 Ongoing Season • New Episodes Added Weekly";
                 } else {
-                    sublabel.textContent = "Unlock & Download Season • Ad";
+                    sublabel.textContent = "Complete Season (All Episodes)";
                 }
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
