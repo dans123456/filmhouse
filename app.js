@@ -161,8 +161,10 @@ function getCinemaCutBadgeElement(movie) {
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/eruda';
             script.onload = function() {
-                eruda.init();
-                console.log("Eruda Mobile Debugger successfully initialized!");
+                if (typeof window.eruda !== 'undefined' && window.eruda.init) {
+                    window.eruda.init();
+                    console.log("Eruda Mobile Debugger successfully initialized!");
+                }
             };
             document.head.appendChild(script);
         }
@@ -3881,8 +3883,8 @@ function addWatchHistory(movie) {
 
     // Refresh recommendations list & profile summary
     renderEditorsChoice();
-    if (typeof renderProfileWatchlistSummaries === 'function') {
-        renderProfileWatchlistSummaries();
+    if (typeof renderProfileMovieSummaries === 'function') {
+        renderProfileMovieSummaries();
     }
 }
 
@@ -4118,6 +4120,9 @@ function openDownloadModal(movie) {
                 label.textContent = seasonLabel;
                 const isLatestSeason = idx === movie.links.length - 1;
                 const isExplicitlyOngoingSeason = isObj && (link.type === "weekly" || (link.season && link.season.toLowerCase().includes("ongoing")));
+
+                const sublabel = document.createElement("span");
+                sublabel.className = "download-link-sublabel";
 
                 if (matchingRequest) {
                     sublabel.textContent = "Unlock Season • Free Fulfillment (No Ads)";
@@ -8029,19 +8034,18 @@ function showTourStep(stepNum) {
             searchInput.value = "";
             state.searchQuery = "";
             
-            const typeLetter = () => {
+            function typeLetter() {
                 if (currentTourStep !== 2) return; // cancel if user navigated away
                 if (letterIdx < term.length) {
                     searchVal += term[letterIdx];
                     searchInput.value = searchVal;
-                    state.searchQuery = searchVal;
-                    renderAutocomplete(searchVal);
+                    searchInput.dispatchEvent(new Event("input"));
                     letterIdx++;
                     setTimeout(typeLetter, 120);
                 } else {
                     renderFeaturedGrid();
                 }
-            };
+            }
             setTimeout(typeLetter, 300);
         }
     } else if (stepNum === 3) {

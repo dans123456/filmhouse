@@ -167,6 +167,7 @@ function setupBot(bot) {
 
     // Command: /start
     bot.command('start', async (ctx) => {
+        const userId = String(ctx.from.id);
         const username = ctx.from.username || "";
         const fullName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" ") || "Guest User";
         
