@@ -3331,7 +3331,7 @@ if (publishBtn) {
                         console.log(`Auto-merged ${mergedCount} remote movies into local list to prevent overwrite deletion!`);
                         // Ensure lists are sorted consistently
                         allCatalogMovies.sort((a, b) => a.title.localeCompare(b.title));
-                        renderMoviesList(allCatalogMovies);
+                        renderCatalogList();
                     }
                 } catch (err) {
                     console.warn("Auto-merge remote verification check failed:", err);
@@ -3823,6 +3823,8 @@ let currentFulfillTitle = "";
 let currentFulfillDocIds = [];
 
 const fulfillForm = document.getElementById("fulfill-request-form");
+const fulfillRequestModal = document.getElementById("fulfill-request-modal");
+const closeFulfillModalBtn = document.getElementById("btn-close-fulfill-modal");
 
 if (closeFulfillModalBtn && fulfillRequestModal) {
     closeFulfillModalBtn.addEventListener("click", () => {
