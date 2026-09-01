@@ -1,38 +1,5 @@
 [
   {
-    "csv_id": "1668-friends",
-    "tmdb_id": 1668,
-    "imdb_id": "",
-    "title": "Friends",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series",
-      "Classic Movies"
-    ],
-    "genres": [
-      "Classic Movies"
-    ],
-    "isOngoing": false,
-    "isUpcoming": false,
-    "overview": "Six young people from New York City, on their own and struggling to survive in the real world, find the companionship, comfort and support they get from each other to be the perfect antidote to the pressures of life.",
-    "poster": "https://image.tmdb.org/t/p/w500/2koX1xLkpTQM4IZebYvKysFW1Nh.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/m3Jev59mJLyUp5bXhY5SVfIBZI0.jpg",
-    "rating": 8.4,
-    "release_date": "1994-09-22",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "H29XSxoKp80",
-    "runtime": "",
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjxoAAtGwuETyZzAIOsY7ehYE",
-        "quality": "720p"
-      }
-    ]
-  },
-  {
     "csv_id": "46896-the-originals",
     "tmdb_id": 46896,
     "imdb_id": "",
