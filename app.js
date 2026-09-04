@@ -48,6 +48,79 @@ function getCinemaCutBadgeElement(movie) {
     return badge;
 }
 
+// Helper to generate floating Asian country/origin flag badge element for movie posters
+function getAsianOriginBadgeElement(movie) {
+    if (!movie) return null;
+
+    const lang = (movie.language || movie.original_language || "").toLowerCase();
+    const isSeries = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
+    const titleLower = (movie.title || "").toLowerCase();
+    const overviewLower = (movie.overview || "").toLowerCase();
+    const cats = (movie.categories || []).map(c => String(c).toLowerCase());
+    const genres = (movie.genres || []).map(g => (typeof g === 'string' ? g : (g.name || "")).toLowerCase());
+
+    // Do not show for anime / animated content
+    const isAnimation = genres.includes("animation") || cats.includes("anime") || cats.includes("anime series") || cats.includes("anime movies") || cats.includes("animated movies");
+    if (isAnimation) return null;
+
+    let flag = "";
+    let label = "";
+
+    // 1. South Korea (KR / ko / K-Drama / Korean)
+    if (lang === "ko" || cats.includes("korean drama") || cats.includes("korean movies") || titleLower.includes("korean") || titleLower.includes("kdrama") || overviewLower.includes("korea") || overviewLower.includes("korean")) {
+        flag = "🇰🇷";
+        label = isSeries ? "K-DRAMA" : "KOREA";
+    }
+    // 2. China / Hong Kong / Taiwan (zh / cn / hk / tw / C-Drama)
+    else if (lang === "zh" || lang === "cn" || lang === "hk" || lang === "tw" || titleLower.includes("cdrama") || titleLower.includes("c-drama") || overviewLower.includes("china") || overviewLower.includes("chinese")) {
+        flag = "🇨🇳";
+        label = isSeries ? "C-DRAMA" : "CHINA";
+    }
+    // 3. Thailand (th / Thai)
+    else if (lang === "th" || titleLower.includes("thai") || overviewLower.includes("thailand") || overviewLower.includes("thai")) {
+        flag = "🇹🇭";
+        label = isSeries ? "THAI DRAMA" : "THAILAND";
+    }
+    // 4. Japan live-action (ja / J-Drama)
+    else if (lang === "ja" && !isAnimation) {
+        flag = "🇯🇵";
+        label = isSeries ? "J-DRAMA" : "JAPAN";
+    }
+    // 5. Turkey (tr / Dizi / Turkish)
+    else if (lang === "tr" || titleLower.includes("turkish") || overviewLower.includes("turkish") || overviewLower.includes("turkey")) {
+        flag = "🇹🇷";
+        label = isSeries ? "TURKISH" : "TURKEY";
+    }
+    // 6. Philippines (tl / ph / filipino)
+    else if (lang === "tl" || lang === "ph" || titleLower.includes("filipino") || titleLower.includes("pinoy")) {
+        flag = "🇵🇭";
+        label = "PHILIPPINES";
+    }
+    // 7. Indonesia (id)
+    else if (lang === "id" || overviewLower.includes("indonesia")) {
+        flag = "🇮🇩";
+        label = "INDONESIA";
+    }
+    // 8. Vietnam (vi)
+    else if (lang === "vi" || overviewLower.includes("vietnam")) {
+        flag = "🇻🇳";
+        label = "VIETNAM";
+    }
+    // 9. If viewing Asian Drama or Asian Movies category tabs
+    else if (state.activeCategory === "Korean Drama" || state.activeCategory === "Asian Drama" || state.activeCategory === "Korean Movies" || state.activeCategory === "Asian Movies" || cats.includes("asian drama") || cats.includes("asian movies")) {
+        flag = "🫰";
+        label = isSeries ? "ASIAN DRAMA" : "ASIAN";
+    }
+
+    if (!flag || !label) return null;
+
+    const badge = document.createElement("div");
+    badge.className = "movie-card-asian-origin-badge";
+    badge.style.cssText = "position: absolute; bottom: 8px; left: 8px; background: rgba(15, 17, 26, 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); color: #ffffff; font-size: 8.5px; font-weight: 800; padding: 2px 5.5px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 6px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 3.5px; letter-spacing: 0.3px; line-height: 1.1; pointer-events: none;";
+    badge.innerHTML = `<span style="font-size: 10.5px;">${flag}</span><span>${label}</span>`;
+    return badge;
+}
+
 // Load Eruda In-App Mobile Console if ?debug=true is passed in URL
 (function() {
     try {
@@ -1962,7 +2035,12 @@ function renderHistoryGrid() {
         if (reqBadge) imgWrapper.appendChild(reqBadge);
 
         const cinemaCutBadge = getCinemaCutBadgeElement(movie);
+        const asianOriginBadge = getAsianOriginBadgeElement(movie);
+        if (cinemaCutBadge && asianOriginBadge) {
+            asianOriginBadge.style.bottom = "28px";
+        }
         if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
+        if (asianOriginBadge) imgWrapper.appendChild(asianOriginBadge);
 
         if (movie.rating > 0) {
             const rating = document.createElement("div");
@@ -2507,7 +2585,12 @@ function renderFeaturedGrid(preservePagination = false) {
         if (reqBadge) imgWrapper.appendChild(reqBadge);
 
         const cinemaCutBadge = getCinemaCutBadgeElement(movie);
+        const asianOriginBadge = getAsianOriginBadgeElement(movie);
+        if (cinemaCutBadge && asianOriginBadge) {
+            asianOriginBadge.style.bottom = "28px";
+        }
         if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
+        if (asianOriginBadge) imgWrapper.appendChild(asianOriginBadge);
 
         // Dynamic NEW Badge Overlay for top additions
         if (state.newMovieIds && state.newMovieIds.includes(movie.csv_id)) {
@@ -2661,7 +2744,12 @@ function renderEditorsChoice() {
         imgWrapper.appendChild(img);
 
         const cinemaCutBadge = getCinemaCutBadgeElement(movie);
+        const asianOriginBadge = getAsianOriginBadgeElement(movie);
+        if (cinemaCutBadge && asianOriginBadge) {
+            asianOriginBadge.style.bottom = "28px";
+        }
         if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
+        if (asianOriginBadge) imgWrapper.appendChild(asianOriginBadge);
 
         if (movie.rating > 0) {
             const rating = document.createElement("div");
@@ -2766,7 +2854,12 @@ function renderWatchlistGrid() {
         imgWrapper.appendChild(img);
 
         const cinemaCutBadge = getCinemaCutBadgeElement(movie);
+        const asianOriginBadge = getAsianOriginBadgeElement(movie);
+        if (cinemaCutBadge && asianOriginBadge) {
+            asianOriginBadge.style.bottom = "28px";
+        }
         if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
+        if (asianOriginBadge) imgWrapper.appendChild(asianOriginBadge);
 
         // Rating Badge
         if (movie.rating > 0) {
