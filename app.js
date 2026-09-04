@@ -3801,8 +3801,8 @@ function openDownloadModal(movie) {
     const uploadedSeasonNums = new Set();
 
     // Quality labels for movies
-    const qualityLabels = ["720p", "1080p", "4K UHD", "480p", "WEBDL", "BluRay"];
-    const qualityIcons = ["🎬", "🎥", "✨", "📱", "🌐", "💿"];
+    const qualityLabels = ["720p", "1080p", "4K UHD", "480p", "Cinema Cut / HDCam"];
+    const qualityIcons = ["🎬", "🎥", "✨", "📱", "📽️"];
 
     if (!movie.links || movie.links.length === 0) {
         if (!isTVShow) {
@@ -3888,8 +3888,7 @@ function openDownloadModal(movie) {
                 else if (qLabel.includes("1080p")) qIcon = "🎥";
                 else if (qLabel.includes("4K") || qLabel.includes("2160p")) qIcon = "✨";
                 else if (qLabel.includes("480p")) qIcon = "📱";
-                else if (qLabel.includes("WEBDL")) qIcon = "🌐";
-                else if (qLabel.includes("BluRay")) qIcon = "💿";
+                else if (qLabel.includes("Cinema Cut") || qLabel.includes("HDCam") || qLabel.includes("Cam")) qIcon = "📽️";
                 else {
                     qIcon = qualityIcons[idx] || "📥";
                 }

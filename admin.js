@@ -2157,24 +2157,17 @@ function showMovieDetails(movie) {
 
     // Auto-extract TMDB ID and Type on pasting in Edit modal
     const editMovieIdInput = document.getElementById("edit-movie-id");
-    if (editMovieIdInput) {
-        editMovieIdInput.addEventListener("input", () => {
-            const parsed = extractTmdbIdAndType(editMovieIdInput.value);
-            if (parsed) {
-                editMovieIdInput.value = parsed.id;
-                const editTypeSelect = document.getElementById("edit-movie-type");
-                if (editTypeSelect) {
-                    editTypeSelect.value = parsed.type === "tv" ? "Series" : "Movie";
-                }
-            }
         });
     }
 
     function renderLinkInputs() {
         inputsWrapper.innerHTML = "";
+        const isSeriesMovie = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+
         currentLinks.forEach((link, idx) => {
             const urlVal = typeof link === 'object' && link !== null ? link.url : link;
             const qualityVal = typeof link === 'object' && link !== null && link.quality ? link.quality : "720p";
+            const seasonLabel = `Season ${idx + 1}`;
             
             const wrapper = document.createElement("div");
             wrapper.style.display = "flex";
@@ -2182,6 +2175,11 @@ function showMovieDetails(movie) {
             wrapper.style.alignItems = "center";
             wrapper.style.marginBottom = "8px";
             
+            const labelSpan = document.createElement("span");
+            labelSpan.style.cssText = isSeriesMovie ? "font-size: 11px; color: #ffbc00; font-weight: 700; width: 120px; flex-shrink: 0;" : "font-size: 11px; color: var(--text-secondary); font-weight: 700; width: 45px; flex-shrink: 0;";
+            labelSpan.textContent = isSeriesMovie ? `Link ${idx + 1} (${seasonLabel}):` : `Link ${idx + 1}:`;
+            wrapper.appendChild(labelSpan);
+
             const input = document.createElement("input");
             input.type = "text";
             input.className = "form-control";
@@ -2193,41 +2191,46 @@ function showMovieDetails(movie) {
             input.style.color = "#fff";
             input.style.borderRadius = "4px";
             input.value = urlVal || "";
-            input.placeholder = `Telegram Link ${idx + 1}...`;
+            input.placeholder = isSeriesMovie ? `Telegram URL for ${seasonLabel}...` : `Telegram Link ${idx + 1}...`;
             input.addEventListener("input", (e) => {
                 if (typeof currentLinks[idx] !== 'object' || currentLinks[idx] === null) {
-                    currentLinks[idx] = { url: e.target.value.trim(), quality: "720p" };
+                    currentLinks[idx] = isSeriesMovie ? { url: e.target.value.trim(), season: seasonLabel } : { url: e.target.value.trim(), quality: "720p" };
                 } else {
                     currentLinks[idx].url = e.target.value.trim();
+                    if (isSeriesMovie) currentLinks[idx].season = seasonLabel;
                 }
             });
+            wrapper.appendChild(input);
 
-            const select = document.createElement("select");
-            select.style.padding = "6px";
-            select.style.background = "var(--input-bg)";
-            select.style.border = "1px solid var(--border-color)";
-            select.style.color = "#fff";
-            select.style.borderRadius = "4px";
-            select.style.fontSize = "11px";
-            select.style.width = "85px";
-            select.style.cursor = "pointer";
-            
-            const options = ["480p", "720p", "1080p", "2160p (4K)", "Cinema Cut / HDCam", "WEBDL", "BluRay"];
-            options.forEach(opt => {
-                const o = document.createElement("option");
-                o.value = opt;
-                o.textContent = opt;
-                if (opt === qualityVal || (opt === "Cinema Cut / HDCam" && (qualityVal === "Cinema Cut" || qualityVal === "HDCam"))) o.selected = true;
-                select.appendChild(o);
-            });
-            
-            select.addEventListener("change", (e) => {
-                if (typeof currentLinks[idx] !== 'object' || currentLinks[idx] === null) {
-                    currentLinks[idx] = { url: "", quality: e.target.value };
-                } else {
-                    currentLinks[idx].quality = e.target.value;
-                }
-            });
+            if (!isSeriesMovie) {
+                const select = document.createElement("select");
+                select.style.padding = "6px";
+                select.style.background = "var(--input-bg)";
+                select.style.border = "1px solid var(--border-color)";
+                select.style.color = "#fff";
+                select.style.borderRadius = "4px";
+                select.style.fontSize = "11px";
+                select.style.width = "95px";
+                select.style.cursor = "pointer";
+                
+                const options = ["480p", "720p", "1080p", "2160p (4K)", "Cinema Cut / HDCam"];
+                options.forEach(opt => {
+                    const o = document.createElement("option");
+                    o.value = opt;
+                    o.textContent = opt;
+                    if (opt === qualityVal || (opt === "Cinema Cut / HDCam" && (qualityVal === "Cinema Cut" || qualityVal === "HDCam"))) o.selected = true;
+                    select.appendChild(o);
+                });
+                
+                select.addEventListener("change", (e) => {
+                    if (typeof currentLinks[idx] !== 'object' || currentLinks[idx] === null) {
+                        currentLinks[idx] = { url: "", quality: e.target.value };
+                    } else {
+                        currentLinks[idx].quality = e.target.value;
+                    }
+                });
+                wrapper.appendChild(select);
+            }
             
             const removeBtn = document.createElement("button");
             removeBtn.className = "btn btn-secondary";
@@ -2242,8 +2245,6 @@ function showMovieDetails(movie) {
                 renderLinkInputs();
             });
             
-            wrapper.appendChild(input);
-            wrapper.appendChild(select);
             wrapper.appendChild(removeBtn);
             inputsWrapper.appendChild(wrapper);
         });
@@ -2270,23 +2271,37 @@ function showMovieDetails(movie) {
         });
     }
 
-    if (addLinkBtn) {
-        addLinkBtn.addEventListener("click", () => {
-            currentLinks.push("");
+    const btnAddLink = document.getElementById("btn-add-link");
+    if (btnAddLink) {
+        btnAddLink.addEventListener("click", () => {
+            const isSeriesMovie = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            const nextSeason = `Season ${currentLinks.length + 1}`;
+            currentLinks.push(isSeriesMovie ? { url: "", season: nextSeason } : { url: "", quality: "720p" });
             renderLinkInputs();
         });
     }
 
+    const editTypeSelect = document.getElementById("edit-movie-type");
+    if (editTypeSelect) {
+        editTypeSelect.addEventListener("change", () => {
+            renderLinkInputs();
+        });
+    }
+
+    const saveLinksBtn = document.getElementById("btn-save-links");
     if (saveLinksBtn) {
         saveLinksBtn.addEventListener("click", () => {
+            const isSeriesType = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
             const finalLinks = currentLinks.filter(l => {
                 const urlVal = typeof l === 'object' && l !== null ? l.url : l;
                 return urlVal && urlVal.trim() !== "";
-            }).map(l => {
-                if (typeof l === 'object' && l !== null) {
-                    return { url: l.url, quality: l.quality || "720p" };
+            }).map((l, idx) => {
+                const urlVal = typeof l === 'object' && l !== null ? l.url : l;
+                if (isSeriesType) {
+                    return { url: urlVal, season: `Season ${idx + 1}` };
                 }
-                return { url: l, quality: "720p" };
+                const qualityVal = typeof l === 'object' && l !== null && l.quality ? l.quality : "720p";
+                return { url: urlVal, quality: qualityVal };
             });
             
             const newTitle = document.getElementById("edit-movie-title")?.value.trim();
@@ -2494,25 +2509,29 @@ function renderAddMovieLinks() {
     const wrapper = document.getElementById("add-movie-links-inputs-wrapper");
     if (!wrapper) return;
     
+    const movieTypeSelect = document.getElementById("movie-type");
+    const isSeries = movieTypeSelect && (movieTypeSelect.value.toLowerCase() === 'tv' || movieTypeSelect.value.toLowerCase() === 'series');
+    
     wrapper.innerHTML = addMovieLinksState.map((linkObj, idx) => {
         const urlVal = typeof linkObj === 'object' && linkObj !== null ? linkObj.url : linkObj;
         const qualityVal = typeof linkObj === 'object' && linkObj !== null && linkObj.quality ? linkObj.quality : "720p";
+        const seasonLabel = `Season ${idx + 1}`;
         const escaped = escapeHTML(urlVal || "");
         
         return `
             <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
-                <span style="font-size: 11px; color: var(--text-secondary); font-weight: 700; width: 45px; flex-shrink: 0;">Link ${idx + 1}:</span>
-                <input type="text" class="add-movie-link-url-input" data-index="${idx}" value="${escaped}" placeholder="Paste Telegram download URL" style="flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px;">
+                <span style="font-size: 11px; color: ${isSeries ? '#ffbc00' : 'var(--text-secondary)'}; font-weight: 700; width: ${isSeries ? '120px' : '45px'}; flex-shrink: 0;">${isSeries ? `Link ${idx + 1} (${seasonLabel}):` : `Link ${idx + 1}:`}</span>
+                <input type="text" class="add-movie-link-url-input" data-index="${idx}" value="${escaped}" placeholder="${isSeries ? `Telegram URL for ${seasonLabel}...` : `Paste Telegram download URL`}" style="flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px;">
                 
-                <select class="add-movie-link-quality-select" data-index="${idx}" style="padding: 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; width: 90px; cursor: pointer;">
+                ${!isSeries ? `
+                <select class="add-movie-link-quality-select" data-index="${idx}" style="padding: 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; width: 95px; cursor: pointer;">
                     <option value="480p" ${qualityVal === '480p' ? 'selected' : ''}>480p</option>
                     <option value="720p" ${qualityVal === '720p' ? 'selected' : ''}>720p</option>
                     <option value="1080p" ${qualityVal === '1080p' ? 'selected' : ''}>1080p</option>
                     <option value="2160p (4K)" ${qualityVal === '2160p (4K)' || qualityVal === '4K UHD' ? 'selected' : ''}>2160p (4K)</option>
                     <option value="Cinema Cut / HDCam" ${qualityVal === 'Cinema Cut / HDCam' || qualityVal === 'Cinema Cut' || qualityVal === 'HDCam' ? 'selected' : ''}>Cinema Cut / HDCam</option>
-                    <option value="WEBDL" ${qualityVal === 'WEBDL' ? 'selected' : ''}>WEBDL</option>
-                    <option value="BluRay" ${qualityVal === 'BluRay' ? 'selected' : ''}>BluRay</option>
                 </select>
+                ` : ''}
 
                 <button type="button" class="btn-remove-add-movie-link" data-index="${idx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 6px; display: ${addMovieLinksState.length > 1 ? 'block' : 'none'};">
                     <svg style="width: 14px; height: 14px; fill: currentColor;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
@@ -2525,10 +2544,13 @@ function renderAddMovieLinks() {
     wrapper.querySelectorAll(".add-movie-link-url-input").forEach(input => {
         input.addEventListener("input", (e) => {
             const idx = parseInt(e.target.dataset.index);
+            const isSeriesNow = movieTypeSelect && (movieTypeSelect.value.toLowerCase() === 'tv' || movieTypeSelect.value.toLowerCase() === 'series');
+            const seasonLabel = `Season ${idx + 1}`;
             if (typeof addMovieLinksState[idx] !== 'object' || addMovieLinksState[idx] === null) {
-                addMovieLinksState[idx] = { url: e.target.value.trim(), quality: "720p" };
+                addMovieLinksState[idx] = isSeriesNow ? { url: e.target.value.trim(), season: seasonLabel } : { url: e.target.value.trim(), quality: "720p" };
             } else {
                 addMovieLinksState[idx].url = e.target.value.trim();
+                if (isSeriesNow) addMovieLinksState[idx].season = seasonLabel;
             }
         });
     });
@@ -2552,6 +2574,13 @@ function renderAddMovieLinks() {
             addMovieLinksState.splice(idx, 1);
             renderAddMovieLinks();
         });
+    });
+}
+
+const addMovieTypeSelect = document.getElementById("movie-type");
+if (addMovieTypeSelect) {
+    addMovieTypeSelect.addEventListener("change", () => {
+        renderAddMovieLinks();
     });
 }
 
@@ -2827,14 +2856,17 @@ if (addMovieForm) {
         // Get selected categories
         const checkedCategories = Array.from(document.querySelectorAll(".add-cat-checkbox:checked")).map(cb => cb.value);
         
+        const isInitialSeries = (type.toLowerCase() === 'tv' || type.toLowerCase() === 'series');
         const linksList = addMovieLinksState.filter(l => {
             const urlVal = typeof l === 'object' && l !== null ? l.url : l;
             return urlVal && urlVal.trim() !== "";
-        }).map(l => {
-            if (typeof l === 'object' && l !== null) {
-                return { url: l.url, quality: l.quality || "720p" };
+        }).map((l, idx) => {
+            const urlVal = (typeof l === 'object' && l !== null ? l.url : l).trim();
+            if (isInitialSeries) {
+                return { url: urlVal, season: `Season ${idx + 1}` };
             }
-            return { url: l, quality: "720p" };
+            const qualityVal = (typeof l === 'object' && l !== null && l.quality) ? l.quality : "720p";
+            return { url: urlVal, quality: qualityVal };
         });
         if (linksList.length === 0) {
             alert("Error: Please add at least one Telegram download link!");
@@ -3790,7 +3822,7 @@ function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", i
         qualitySelect.className = "fulfill-link-quality-select";
         qualitySelect.style.cssText = "padding: 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; width: 105px; cursor: pointer; outline: none; flex-shrink: 0;";
         
-        const qualities = ["480p", "720p", "1080p", "2160p (4K)", "Cinema Cut / HDCam", "WEBDL", "BluRay"];
+        const qualities = ["480p", "720p", "1080p", "2160p (4K)", "Cinema Cut / HDCam"];
         qualities.forEach(q => {
             const opt = document.createElement("option");
             opt.value = q;
@@ -3898,13 +3930,8 @@ if (fulfillForm && fulfillRequestModal) {
             // Create a new catalog entry
             const formattedLinksArray = [];
             linksToSave.forEach(item => {
-                const formattedLink = isSeries ? { url: item.url, season: item.label } : { url: item.url, quality: item.label };
-                const sMatch = item.label.match(/\d+/);
-                let targetIdx = item.index;
-                if (isSeries && sMatch) {
-                    const sNum = parseInt(sMatch[0], 10);
-                    if (sNum > 0) targetIdx = sNum - 1;
-                }
+                const formattedLink = isSeries ? { url: item.url, season: item.seasonLabel } : { url: item.url, quality: item.quality };
+                const targetIdx = item.index;
                 while (formattedLinksArray.length < targetIdx + 1) {
                     const currentIdx = formattedLinksArray.length;
                     formattedLinksArray.push({ season: `Season ${currentIdx + 1}`, url: "" });
