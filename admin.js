@@ -2956,107 +2956,133 @@ if (addMovieForm) {
                     }
                 }
                 
-                // Categorize title automatically
-                const titleLower = title.toLowerCase();
-                const africanCountries = ["NG", "ZA", "GH", "KE", "EG", "TZ", "UG", "MA", "DZ"];
-                const isAfrican = data.origin_country && data.origin_country.some(c => africanCountries.includes(c));
-                
-                if (isAfrican) {
-                    categories.push("African");
-                } else {
-                    const isAnimation = data.genres && data.genres.some(g => g.name.toLowerCase() === "animation");
-                    if (isAnimation) {
-                        if (original_language === 'ja') {
-                            categories.push("Anime");
-                        } else {
-                            categories.push("Animated Movies");
-                        }
-                    }
-                    
-                    if (original_language === 'ko') {
-                        categories.push("Korean Drama");
-                    } else if (original_language === 'hi') {
-                        categories.push("Bollywood");
-                    }
-                    
-                    const isRegional = categories.some(cat => ["Korean Drama", "Bollywood", "African", "Anime"].includes(cat));
-                    if (!isRegional) {
-                        if (finalType.toLowerCase() === 'series' || finalType.toLowerCase() === 'tv') {
-                            categories.push("Hollywood/British Series");
-                        } else {
-                            categories.push("Hollywood/British Movies");
-                        }
-                    }
-                }
+// Helper to accurately auto-categorize titles for Movies & Series (Christian category is manual-only)
+function determineAutoCategories(data, title, type) {
+    const isSeries = (type || "").toLowerCase() === 'series' || (type || "").toLowerCase() === 'tv';
+    const categories = ["Main"];
+    const titleLower = (title || "").toLowerCase();
+    const overviewLower = (data && data.overview ? data.overview : "").toLowerCase();
+    const origLang = (data && data.original_language ? data.original_language : "en").toLowerCase();
+    const tmdbGenres = data && data.genres ? data.genres.map(g => (typeof g === 'string' ? g : g.name || "").toLowerCase()) : [];
+    
+    // 1. African
+    const africanCountries = ["NG", "ZA", "GH", "KE", "EG", "TZ", "UG", "MA", "DZ", "ET", "RW"];
+    const isAfricanCountry = data && ((data.origin_country && data.origin_country.some(c => africanCountries.includes(c))) ||
+                             (data.production_countries && data.production_countries.some(c => africanCountries.includes(c.iso_3166_1))));
+    const africanKeywords = ["yolo", "blood and water", "blood & water", "supacell", "nollywood", "ghallywood", "anikulapo", "king of boys", "jagun jagun", "african"];
+    if (isAfricanCountry || africanKeywords.some(k => titleLower.includes(k))) {
+        categories.push("African");
+    }
 
-                // Classics franchise auto-matching
-                const classicKeywords = [
-                    "chucky", "child's play", "bride of chucky", "seed of chucky", "curse of chucky", 
-                    "cult of chucky", "american pie", "american wedding", "american reunion", 
-                    "naked mile", "beta house", "girls' rules", "band camp", "hole in one"
-                ];
-                let releaseYear = 0;
-                if (releaseDate && releaseDate.length >= 4) {
-                    releaseYear = parseInt(releaseDate.substring(0, 4)) || 0;
-                }
-                const isClassicMatch = (releaseYear > 0 && releaseYear < 2000) || classicKeywords.some(keyword => titleLower.includes(keyword));
-                if (isClassicMatch) {
-                    if (!categories.includes("Classic Movies")) categories.push("Classic Movies");
-                }
+    // 2. Korean (Korean Drama for Series, Korean Movies for Movies)
+    if (origLang === 'ko' || titleLower.includes("korean") || titleLower.includes("squid game") || titleLower.includes("boys over flowers")) {
+        if (isSeries) {
+            categories.push("Korean Drama");
+        } else {
+            categories.push("Korean Movies");
+        }
+    }
 
-                // Comics auto-matching
-                const comicKeywords = [
-                    "marvel", "avengers", "spider-man", "spidey", "iron man", "captain america", "thor", 
-                    "guardians of the galaxy", "loki", "wandavision", "hulk", "deadpool", "wolverine", 
-                    "venom", "shang-chi", "eternals", "black widow", "hawkeye", "ms. marvel", "moon knight", 
-                    "she-hulk", "werewolf by night", "black panther", "echo", "madame web", "x-men", "kraven", 
-                    "daredevil", "born again", "ironheart", "fantastic 4", "wonder man", "gen v", "the boys", 
-                    "invincible", "punisher", "batman", "superman", "shazam", "black adam", "dc comics", 
-                    "blue beetle", "kakegurui", "hit-monkey", "m.o.d.o.k.", "what if...?"
-                ];
-                const isToAllTheBoys = titleLower.includes("to all the boys");
-                const isComicMatch = comicKeywords.some(keyword => titleLower.includes(keyword));
-                if (isComicMatch && !isToAllTheBoys) {
-                    if (!categories.includes("Comic")) categories.push("Comic");
-                }
+    // 3. Bollywood (Indian)
+    const isIndianCountry = data && ((data.origin_country && data.origin_country.includes("IN")) ||
+                            (data.production_countries && data.production_countries.some(c => c.iso_3166_1 === "IN")));
+    if (origLang === 'hi' || origLang === 'te' || origLang === 'ta' || isIndianCountry || titleLower.includes("bollywood")) {
+        categories.push("Bollywood");
+    }
 
-                // Teen / High-School auto-matching
-                const teenKeywords = [
-                    "high school", "teenager", "teen", "college", "coming of age", "prom", 
-                    "student", "classmate", "graduation", "to all the boys", "kissing booth", 
-                    "euphoria", "sex education", "outer banks", "elite", "riverdale", "gossip girl", 
-                    "mean girls", "clueless", "superbad", "booksmart", "lady bird", "the edge of seventeen", 
-                    "perks of being a wallflower", "twilight", "heartstopper", "13 reasons why", 
-                    "cruel summer", "one of us is lying", "pretty little liars"
-                ];
-                const isTeenMatch = teenKeywords.some(keyword => titleLower.includes(keyword) || (overview && overview.toLowerCase().includes(keyword)));
-                if (isTeenMatch) {
-                    if (!categories.includes("Teen/High-School")) categories.push("Teen/High-School");
-                }
+    // 4. Anime & Animated Movies
+    const isJP = (origLang === 'ja') || (data && ((data.origin_country && data.origin_country.includes('JP')) ||
+                 (data.production_countries && data.production_countries.some(c => c.iso_3166_1 === 'JP'))));
+    const isAnimation = tmdbGenres.includes("animation") || titleLower.includes("anime") || titleLower.includes("animated");
 
-                // Christian auto-matching
-                const christianKeywords = [
-                    "jesus", "god", "bible", "christian", "christ", "church", "faith", "faith-based", 
-                    "the chosen", "heaven", "prayer", "pray", "gospel", "saint", "angel", "redemption",
-                    "god's not dead", "i can only imagine", "fireproof", "courageous", "war room", 
-                    "overcomer", "lifemark", "the shack", "left behind", "passion of the christ", 
-                    "noah", "exodus"
-                ];
-                let isChristianMatch = christianKeywords.some(keyword => {
-                    if (keyword.includes(" ") || keyword.includes("'") || keyword.includes("-")) {
-                        return titleLower.includes(keyword) || (overview && overview.toLowerCase().includes(keyword));
-                    }
-                    const wordRegex = new RegExp(`\\b${keyword}s?\\b`, "i");
-                    return wordRegex.test(titleLower) || (overview && wordRegex.test(overview.toLowerCase()));
-                });
-                
-                // Exclude comics and mythology
-                if (titleLower.includes("thor") || titleLower.includes("marvel") || titleLower.includes("greek god") || titleLower.includes("god of war")) {
-                    isChristianMatch = false;
-                }
-                if (isChristianMatch) {
-                    if (!categories.includes("Christian Movies")) categories.push("Christian Movies");
-                }
+    if ((isJP && isAnimation) || titleLower.includes("anime")) {
+        if (isSeries) {
+            categories.push("Anime Series");
+            categories.push("Anime");
+        } else {
+            categories.push("Anime Movies");
+            categories.push("Anime");
+        }
+    } else if (isAnimation) {
+        categories.push("Animated Movies");
+    }
+
+    // 5. Kids Shows and Movies (Disney & Nickelodeon)
+    const kidsKeywords = [
+        "drake and josh", "henry danger", "sam and cat", "thundermans", 
+        "victorious", "zoey 101", "nicky ricky", "gravity falls", 
+        "baymax", "casagrandes", "carrossel", "loud house", 
+        "phineas and ferb", "nickelodeon", "disney", "icarly", "matilda", "jessie", "peppa pig", "cocomelon"
+    ];
+    if (tmdbGenres.includes("family") || tmdbGenres.includes("kids") || kidsKeywords.some(k => titleLower.includes(k))) {
+        categories.push("Kids Shows and Movies (Nickelodeon and Disney)");
+    }
+
+    // 6. Classic Movies
+    let releaseYear = 0;
+    const releaseDate = data && (data.release_date || data.first_air_date) ? (data.release_date || data.first_air_date) : "";
+    if (releaseDate && releaseDate.length >= 4) {
+        releaseYear = parseInt(releaseDate.substring(0, 4)) || 0;
+    }
+    const classicKeywords = [
+        "chucky", "child's play", "bride of chucky", "seed of chucky", "curse of chucky", 
+        "cult of chucky", "american pie", "american wedding", "american reunion", 
+        "naked mile", "beta house", "girls' rules", "band camp", "hole in one"
+    ];
+    if ((releaseYear > 0 && releaseYear < 2000) || classicKeywords.some(k => titleLower.includes(k))) {
+        categories.push("Classic Movies");
+    }
+
+    // 7. Comics
+    const comicKeywords = [
+        "marvel", "avengers", "spider-man", "spidey", "iron man", "captain america", "thor", 
+        "guardians of the galaxy", "loki", "wandavision", "hulk", "deadpool", "wolverine", 
+        "venom", "shang-chi", "eternals", "black widow", "hawkeye", "ms. marvel", "moon knight", 
+        "she-hulk", "werewolf by night", "black panther", "echo", "madame web", "x-men", "kraven", 
+        "daredevil", "born again", "ironheart", "fantastic 4", "wonder man", "gen v", "the boys", 
+        "invincible", "punisher", "batman", "superman", "shazam", "black adam", "dc comics", 
+        "blue beetle", "kakegurui", "hit-monkey", "m.o.d.o.k.", "what if...?"
+    ];
+    const isToAllTheBoys = titleLower.includes("to all the boys");
+    if (comicKeywords.some(k => titleLower.includes(k)) && !isToAllTheBoys) {
+        categories.push("Comic");
+    }
+
+    // 8. Teen / High-School
+    const teenKeywords = [
+        "high school", "teenager", "teen", "college", "coming of age", "prom", 
+        "student", "classmate", "graduation", "to all the boys", "kissing booth", 
+        "euphoria", "sex education", "outer banks", "elite", "riverdale", "gossip girl", 
+        "mean girls", "clueless", "superbad", "booksmart", "lady bird", "the edge of seventeen", 
+        "perks of being a wallflower", "twilight", "heartstopper", "13 reasons why", 
+        "cruel summer", "one of us is lying", "pretty little liars"
+    ];
+    if (teenKeywords.some(k => titleLower.includes(k) || overviewLower.includes(k))) {
+        categories.push("Teen/High-School");
+    }
+
+    // 9. Erotic Movies
+    const eroticKeywords = ["365 days", "fifty shades", "fatal seduction", "erotic"];
+    if (eroticKeywords.some(k => titleLower.includes(k))) {
+        categories.push("Erotic Movies");
+    }
+
+    // 10. Regional fallback to Hollywood/British
+    const isRegional = categories.some(cat => ["Korean Drama", "Korean Movies", "Bollywood", "African", "Anime", "Anime Series", "Anime Movies"].includes(cat));
+    if (!isRegional) {
+        if (isSeries) {
+            categories.push("Hollywood/British Series");
+        } else {
+            categories.push("Hollywood/British Movies");
+        }
+    }
+
+    // NOTE: Christian Movies category is NEVER auto-assigned; it is manual only upon admin selection.
+    return Array.from(new Set(categories));
+}
+
+                // Categorize title automatically using the centralized classifier
+                categories = determineAutoCategories(data, title, finalType);
             } catch (err) {
                 console.warn("Could not enrich movie metadata on form submit:", err);
                 alert("Error: Failed to fetch TMDB details. Please check the TMDB ID or your internet connection.");
@@ -3087,8 +3113,10 @@ if (addMovieForm) {
                     categories.push(cat);
                 }
             });
-            // Update genres mapping after merge
-            genres = categories.filter(c => c !== "Main" && c !== "Hollywood/British Movies" && c !== "Hollywood/British Series");
+            // Update genres mapping after merge if TMDB genres were missing
+            if (genres.length === 0) {
+                genres = categories.filter(c => c !== "Main" && c !== "Hollywood/British Movies" && c !== "Hollywood/British Series");
+            }
         }
 
         // Add to local state
@@ -3984,14 +4012,20 @@ if (fulfillForm && fulfillRequestModal) {
                     }
                 }
                 
+                const autoCategories = determineAutoCategories(tmdbData, tmdbData.title || tmdbData.name || cleanTitle, isSeries ? 'Series' : 'Movie');
+                let autoGenres = tmdbData.genres ? tmdbData.genres.map(g => g.name) : [];
+                if (autoGenres.length === 0) {
+                    autoGenres = autoCategories.filter(c => c !== "Main" && c !== "Hollywood/British Movies" && c !== "Hollywood/British Series");
+                }
+                
                 const newMovie = {
                     csv_id: csvId,
                     tmdb_id: tmdbId,
                     imdb_id: "",
                     title: tmdbData.title || tmdbData.name || cleanTitle,
                     type: isSeries ? 'Series' : 'Movie',
-                    categories: isSeries ? ["Main", "Hollywood/British Series"] : ["Main", "Hollywood/British Movies"],
-                    genres: tmdbData.genres ? tmdbData.genres.map(g => g.name) : [],
+                    categories: autoCategories,
+                    genres: autoGenres,
                     overview: tmdbData.overview || "No synopsis available.",
                     poster: tmdbData.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbData.poster_path}` : "img/FilmHouse3_nobg.png",
                     backdrop: tmdbData.backdrop_path ? `https://image.tmdb.org/t/p/w1280${tmdbData.backdrop_path}` : "img/FilmHouse.png",
