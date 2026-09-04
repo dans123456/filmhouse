@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "860508-the-whisper-man",
+    "tmdb_id": 860508,
+    "imdb_id": "",
+    "title": "The Whisper Man",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "overview": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
+    "poster": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xSJJQeAp9GBFmiKusysTRG6jQjt.jpg",
+    "rating": 6.6,
+    "release_date": "2026-08-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ZHRR-1CKYIQ",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBh4AAgX02UQm4l0CuRlVaRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "969681-spider-man-brand-new-day",
     "tmdb_id": 969681,
     "imdb_id": "",
