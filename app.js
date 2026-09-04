@@ -1961,6 +1961,9 @@ function renderHistoryGrid() {
         const reqBadge = getRequestedBadgeElement(movie);
         if (reqBadge) imgWrapper.appendChild(reqBadge);
 
+        const cinemaCutBadge = getCinemaCutBadgeElement(movie);
+        if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
+
         if (movie.rating > 0) {
             const rating = document.createElement("div");
             rating.className = "movie-card-rating";
@@ -2554,6 +2557,9 @@ function renderEditorsChoice() {
         img.loading = "lazy";
         imgWrapper.appendChild(img);
 
+        const cinemaCutBadge = getCinemaCutBadgeElement(movie);
+        if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
+
         if (movie.rating > 0) {
             const rating = document.createElement("div");
             rating.className = "movie-card-rating";
@@ -2655,6 +2661,9 @@ function renderWatchlistGrid() {
         img.alt = movie.title;
         img.loading = "lazy";
         imgWrapper.appendChild(img);
+
+        const cinemaCutBadge = getCinemaCutBadgeElement(movie);
+        if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
 
         // Rating Badge
         if (movie.rating > 0) {
@@ -2794,6 +2803,20 @@ function renderCarouselBanner() {
         badge.className = "carousel-slide-badge";
         badge.textContent = movie.type;
         overlay.appendChild(badge);
+
+        const hasCinemaCut = movie.links && Array.isArray(movie.links) && movie.links.some(l => {
+            const q = (typeof l === 'object' && l !== null ? (l.quality || "") : "").toLowerCase();
+            return q.includes("cinema cut") || q.includes("hdcam") || q.includes("cam");
+        });
+        if (hasCinemaCut) {
+            const cinemaBadge = document.createElement("span");
+            cinemaBadge.className = "carousel-slide-badge";
+            cinemaBadge.style.background = "linear-gradient(135deg, #ff9800, #ff5722)";
+            cinemaBadge.style.color = "#ffffff";
+            cinemaBadge.style.marginLeft = "6px";
+            cinemaBadge.textContent = "📽️ CINEMA CUT";
+            overlay.appendChild(cinemaBadge);
+        }
 
         const title = document.createElement("h2");
         title.className = "carousel-slide-title";
@@ -2999,6 +3022,9 @@ function openDetailModal(movie) {
     posterImg.alt = movie.title;
     posterCard.appendChild(posterImg);
 
+    const cinemaCutBadge = getCinemaCutBadgeElement(movie);
+    if (cinemaCutBadge) posterCard.appendChild(cinemaCutBadge);
+
     posterColumn.appendChild(posterCard);
     mainLayout.appendChild(posterColumn);
 
@@ -3061,6 +3087,19 @@ function openDetailModal(movie) {
     }
 
     infoColumn.appendChild(metaList);
+
+    // Cinema Cut Notice Banner
+    const hasCinemaCut = movie.links && Array.isArray(movie.links) && movie.links.some(l => {
+        const q = (typeof l === 'object' && l !== null ? (l.quality || "") : "").toLowerCase();
+        return q.includes("cinema cut") || q.includes("hdcam") || q.includes("cam");
+    });
+    if (hasCinemaCut) {
+        const cinemaNotice = document.createElement("div");
+        cinemaNotice.className = "detail-cinemacut-notice";
+        cinemaNotice.style.cssText = "margin-top: 10px; margin-bottom: 12px; padding: 10px 14px; background: linear-gradient(135deg, rgba(255, 152, 0, 0.15), rgba(255, 87, 34, 0.15)); border: 1px solid rgba(255, 152, 0, 0.4); border-radius: var(--border-radius-sm); color: #fff; font-size: 12px; line-height: 1.4; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(255, 152, 0, 0.1);";
+        cinemaNotice.innerHTML = `<span style="font-size: 18px; flex-shrink: 0;">📽️</span><div><strong style="color: #ff9800; display: block; margin-bottom: 2px;">CINEMA CUT RECORDING</strong>This title is currently an early theater recording. Full official HD will replace this once released!</div>`;
+        infoColumn.appendChild(cinemaNotice);
+    }
 
     // Action buttons row
     const actionsRow = document.createElement("div");
@@ -3882,19 +3921,24 @@ function openDownloadModal(movie) {
                 // --- MOVIE: Quality layout ---
                 const isObj = typeof link === 'object' && link !== null;
                 const qLabel = isObj && link.quality ? link.quality : (qualityLabels[idx] || `Link ${idx + 1}`);
+                const isCinemaCutLink = qLabel.toLowerCase().includes("cinema cut") || qLabel.toLowerCase().includes("hdcam") || qLabel.toLowerCase().includes("cam");
                 
                 let qIcon = "📥";
-                if (qLabel.includes("720p")) qIcon = "🎬";
+                if (isCinemaCutLink) qIcon = "📽️";
+                else if (qLabel.includes("720p")) qIcon = "🎬";
                 else if (qLabel.includes("1080p")) qIcon = "🎥";
                 else if (qLabel.includes("4K") || qLabel.includes("2160p")) qIcon = "✨";
                 else if (qLabel.includes("480p")) qIcon = "📱";
-                else if (qLabel.includes("Cinema Cut") || qLabel.includes("HDCam") || qLabel.includes("Cam")) qIcon = "📽️";
                 else {
                     qIcon = qualityIcons[idx] || "📥";
                 }
 
                 const badge = document.createElement("span");
-                badge.className = "download-link-badge quality-badge";
+                badge.className = `download-link-badge quality-badge ${isCinemaCutLink ? 'cinemacut-badge' : ''}`;
+                if (isCinemaCutLink) {
+                    badge.style.background = "linear-gradient(135deg, #ff9800, #ff5722)";
+                    badge.style.color = "#ffffff";
+                }
                 badge.textContent = qIcon;
                 anchor.appendChild(badge);
 
@@ -3903,20 +3947,33 @@ function openDownloadModal(movie) {
                 const label = document.createElement("span");
                 label.className = "download-link-label";
                 label.textContent = qLabel;
+
+                if (isCinemaCutLink) {
+                    const tag = document.createElement("span");
+                    tag.style.cssText = "font-size: 9px; font-weight: 800; background: linear-gradient(135deg, #ff9800, #ff5722); color: #fff; padding: 2px 6px; border-radius: 4px; margin-left: 6px; letter-spacing: 0.5px;";
+                    tag.textContent = "CINEMA CUT";
+                    label.appendChild(tag);
+                    anchor.style.borderColor = "rgba(255, 152, 0, 0.4)";
+                    anchor.style.background = "linear-gradient(135deg, rgba(255, 152, 0, 0.08), rgba(22, 24, 35, 0.4))";
+                }
                 
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
                 
                 let qualityText = "Direct Download";
-                if (qLabel.includes("1080p")) qualityText = "High Quality (1080p)";
+                if (isCinemaCutLink) {
+                    qualityText = "⚠️ Theater Recording (Not Real HD Quality)";
+                    sublabel.style.color = "#ff9800";
+                    sublabel.style.fontWeight = "600";
+                } else if (qLabel.includes("1080p")) qualityText = "High Quality (1080p)";
                 else if (qLabel.includes("720p")) qualityText = "Standard Quality (720p)";
                 else if (qLabel.includes("4K")) qualityText = "Ultra HD Quality (4K)";
                 else if (qLabel.includes("480p")) qualityText = "Mobile Quality (480p)";
                 
                 if (matchingRequest) {
-                    sublabel.textContent = `${qualityText} • Free Fulfillment (No Ads)`;
+                    sublabel.textContent = isCinemaCutLink ? `⚠️ Cinema Cut Recording • Free Fulfillment (No Ads)` : `${qualityText} • Free Fulfillment (No Ads)`;
                 } else {
-                    sublabel.textContent = `${qualityText} • Watch Ad to Get Link`;
+                    sublabel.textContent = isCinemaCutLink ? `⚠️ Cinema Cut Recording • Watch Ad to Get Link` : `${qualityText} • Watch Ad to Get Link`;
                 }
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);

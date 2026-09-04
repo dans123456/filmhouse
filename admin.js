@@ -2029,13 +2029,19 @@ function showMovieDetails(movie) {
     const badgeColor = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv' ? 'var(--primary-color)' : '#00bcd4';
     const posterUrl = getPosterUrl(movie.poster);
     const linksList = movie.links || [];
+
+    const hasCinemaCut = linksList.some(l => {
+        const q = (typeof l === 'object' && l !== null ? (l.quality || "") : "").toLowerCase();
+        return q.includes("cinema cut") || q.includes("hdcam") || q.includes("cam");
+    });
+    const cinemaCutBadge = hasCinemaCut ? `<span style="font-size: 10px; background: linear-gradient(135deg, rgba(255, 152, 0, 0.2), rgba(255, 87, 34, 0.2)); border: 1px solid rgba(255, 152, 0, 0.4); color: #ff9800; padding: 2px 8px; border-radius: 4px; margin-left: 8px; font-weight: 800;">📽️ Cinema Cut</span>` : "";
     
     detailsBody.innerHTML = `
         <!-- Read-Only Title Info View -->
         <div id="details-title-info-view" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
             <img src="${posterUrl}" style="width: 130px; height: 180px; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
             <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; justify-content: center;">
-                <h4 style="margin: 0 0 10px 0; font-size: 18px; font-family: var(--font-heading); color: #fff; line-height: 1.3;">${movie.title}</h4>
+                <h4 style="margin: 0 0 10px 0; font-size: 18px; font-family: var(--font-heading); color: #fff; line-height: 1.3;">${movie.title} ${cinemaCutBadge}</h4>
                 <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>ID:</strong> ${movie.csv_id}</p>
                 <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Type:</strong> <span style="text-transform: uppercase; font-weight: 600; color: ${badgeColor};">${movie.type}</span></p>
                 ${movie.release_date ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Release Date:</strong> ${movie.release_date}</p>` : ''}
@@ -2463,11 +2469,17 @@ function renderCatalogList() {
             diffBadge = `<span style="font-size: 9px; background: rgba(33, 150, 243, 0.15); border: 1px solid rgba(33, 150, 243, 0.3); color: #2196f3; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 700;">UPDATED Links</span>`;
         }
 
+        const hasCinemaCut = m.links && Array.isArray(m.links) && m.links.some(l => {
+            const q = (typeof l === 'object' && l !== null ? (l.quality || "") : "").toLowerCase();
+            return q.includes("cinema cut") || q.includes("hdcam") || q.includes("cam");
+        });
+        const cinemaCutBadge = hasCinemaCut ? `<span style="font-size: 9px; background: linear-gradient(135deg, rgba(255, 152, 0, 0.2), rgba(255, 87, 34, 0.2)); border: 1px solid rgba(255, 152, 0, 0.4); color: #ff9800; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 800;">📽️ Cinema Cut</span>` : "";
+
         row.innerHTML = `
             <div class="user-info" style="pointer-events: none;">
                 <img src="${escapeHTML(posterUrl)}" alt="Poster" class="user-avatar" style="border-radius: 4px; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
                 <div class="user-details">
-                    <h5>${escapeHTML(m.title)} ${diffBadge}</h5>
+                    <h5>${escapeHTML(m.title)} ${diffBadge} ${cinemaCutBadge}</h5>
                     <p>ID: ${escapeHTML(m.csv_id)} | Type: <span style="text-transform: uppercase; font-weight: 600; color: ${badgeColor};">${escapeHTML(m.type)}</span></p>
                     <div class="breakdown-group">
                         <span class="breakdown-tag">🔗 Links: ${m.links ? m.links.length : 0}</span>
