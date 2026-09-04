@@ -3041,38 +3041,44 @@ img {
 
 /* Genre Chips Filter styling */
 .genre-chips-container {
-    width: 100%;
+    display: flex;
     overflow-x: auto;
-    white-space: nowrap;
-    padding: 8px 0 16px 0;
-    margin-bottom: 12px;
+    gap: 12px;
+    padding: 10px 4px 16px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    margin-bottom: 0;
 }
 .genre-chips-container::-webkit-scrollbar {
     display: none;
-    width: 0;
-    height: 0;
 }
 .genre-chips-wrapper {
     display: flex;
     flex-wrap: nowrap;
-    gap: 8px;
-    padding: 0 4px;
+    gap: 10px;
+    align-items: center;
     width: max-content;
 }
 .genre-chip {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
+    flex-shrink: 0;
+    scroll-snap-align: start;
     padding: 6px 14px;
+    height: 32px;
+    background-color: var(--bg-dark-card);
+    border: 1px solid var(--border-color);
     border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 12px;
     font-weight: 600;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+    white-space: nowrap;
 }
 .genre-chip:hover {
     border-color: rgba(255, 255, 255, 0.2);
