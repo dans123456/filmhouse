@@ -35777,7 +35777,14 @@
     "csv_id": "539972-kraven-the-hunter",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADHRIAArFaIUbqtF48vq6ZqRYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADHRIAArFaIUbqtF48vq6ZqRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADwBYAAtGwuESkh5oSkoBo2hYE",
+        "quality": "480p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/1GvBhRxY6MELDfxFrete6BNhBB5.jpg",
     "rating": 6.4,
