@@ -2592,11 +2592,13 @@ function determineAutoCategories(data, title, type) {
         categories.push("Animated Movies");
     }
 
-    // 2. Korean (Korean Drama for Series, Korean Movies for Movies - live action only, never anime)
-    const isKoreanCountry = data && ((data.origin_country && data.origin_country.includes("KR")) ||
-                            (data.production_countries && data.production_countries.some(c => c.iso_3166_1 === "KR")));
-    const koreanKeywords = ["korean", "kdrama", "squid game", "boys over flowers", "queen of tears", "all of us are dead", "glory", "vincenzo", "crash landing on you"];
-    if (!isAnimeMatch && !isAnimation && (origLang === 'ko' || isKoreanCountry || koreanKeywords.some(k => titleLower.includes(k) || overviewLower.includes(k)))) {
+    // 2. Asian / Korean (Korean Drama for Series, Korean Movies for Movies - live action only, never anime)
+    const asianCountryCodes = ["KR", "CN", "HK", "TW", "TR", "TH", "ID", "VN", "JP", "PH"];
+    const isAsianCountry = data && ((data.origin_country && data.origin_country.some(c => asianCountryCodes.includes(c))) ||
+                           (data.production_countries && data.production_countries.some(c => asianCountryCodes.includes(c.iso_3166_1))));
+    const asianLangs = ['ko', 'zh', 'tr', 'th', 'id', 'vi', 'ja', 'tl'];
+    const asianKeywords = ["korean", "kdrama", "k-drama", "cdrama", "c-drama", "j-drama", "jdrama", "thai drama", "turkish drama", "squid game", "boys over flowers", "queen of tears", "all of us are dead", "glory", "vincenzo", "crash landing on you", "the untamed", "hidden love", "meteor garden"];
+    if (!isAnimeMatch && !isAnimation && (asianLangs.includes(origLang) || isAsianCountry || asianKeywords.some(k => titleLower.includes(k) || overviewLower.includes(k)))) {
         if (isSeries) {
             categories.push("Korean Drama");
         } else {

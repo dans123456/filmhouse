@@ -124,9 +124,16 @@ def classify_categories(details, row_title, row_type):
     if any(et in title_lower for et in erotic_titles):
         categories.append("Erotic Movies")
         
-    # 2. Korean Drama
-    if orig_lang == "ko" or "korean" in title_lower or any(k in title_lower for k in ["boys over flowers", "squid game"]):
-        categories.append("Korean Drama")
+    # 2. Asian / Korean Drama (Series only) & Korean Movies (Movies only)
+    is_asian_lang = orig_lang in ["ko", "zh", "tr", "th", "id", "vi", "tl"]
+    is_asian_country = any(c in countries for c in ["KR", "CN", "HK", "TW", "TR", "TH", "ID", "VN", "PH"])
+    asian_keywords = ["korean", "kdrama", "k-drama", "cdrama", "c-drama", "squid game", "boys over flowers", "queen of tears", "the untamed"]
+    is_animation = "Animation" in genres or "anime" in title_lower
+    if not is_animation and (is_asian_lang or is_asian_country or any(k in title_lower for k in asian_keywords)):
+        if media_type == 'tv':
+            categories.append("Korean Drama")
+        else:
+            categories.append("Korean Movies")
         
     # 3. Bollywood
     if orig_lang in ["hi", "te", "ta", "ml", "kn"] or "IN" in countries or "bollywood" in title_lower:
@@ -140,9 +147,9 @@ def classify_categories(details, row_title, row_type):
         
     # 5. Anime
     if "JP" in countries and "Animation" in genres:
-        categories.append("Anime")
+        categories.append("Anime Series" if media_type == 'tv' else "Anime Movies")
     elif "anime" in title_lower:
-        categories.append("Anime")
+        categories.append("Anime Series" if media_type == 'tv' else "Anime Movies")
         
     # 6. Animated Movies
     if "Animation" in genres and media_type == 'movie':

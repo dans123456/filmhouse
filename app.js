@@ -2307,15 +2307,13 @@ function renderGenreChips() {
 }
 
 // Helper to match catalog movies accurately against category tabs
+// Helper to match catalog movies accurately against category tabs
 function matchesMovieCategory(m, category) {
     if (!m) return false;
     if (category === "Main") return true;
     
     const cats = (m.categories || []).map(c => String(c).toLowerCase());
     const targetCat = String(category).toLowerCase();
-    
-    // Direct match
-    if (cats.includes(targetCat)) return true;
     
     const isSeries = (m.type || "").toLowerCase() === "series" || (m.type || "").toLowerCase() === "tv";
     const genres = (m.genres || []).map(g => (typeof g === 'string' ? g : (g.name || "")).toLowerCase());
@@ -2324,75 +2322,115 @@ function matchesMovieCategory(m, category) {
 
     const isAnimeOrAnimation = cats.includes("anime") || cats.includes("anime series") || cats.includes("anime movies") || cats.includes("animated movies") || genres.includes("animation") || (lang === "ja" && titleLower.includes("anime"));
 
-    if (category === "Anime Series" || category === "Anime") {
-        if (cats.includes("anime series") || cats.includes("anime")) return isSeries || cats.includes("anime series");
-        if (genres.includes("animation") && isSeries && (lang === "ja" || titleLower.includes("anime") || titleLower.includes("castlevania") || titleLower.includes("arcane"))) return true;
-    }
-
-    if (category === "Anime Movies") {
-        if (cats.includes("anime movies")) return true;
-        if (cats.includes("anime") && !isSeries) return true;
-        if (genres.includes("animation") && !isSeries && (lang === "ja" || titleLower.includes("anime"))) return true;
-    }
-
+    // 1. Asian Movies (Movies ONLY, live-action only, strictly NO series and NO anime)
     if (category === "Korean Movies" || category === "Asian Movies") {
-        if (isAnimeOrAnimation) return false;
+        if (isSeries || isAnimeOrAnimation) return false;
         if (cats.includes("korean movies") || cats.includes("asian movies")) return true;
-        if (['ko', 'zh', 'tr', 'th', 'id', 'vi', 'ja'].includes(lang) && !isSeries) return true;
+        if (['ko', 'zh', 'tr', 'th', 'id', 'vi', 'ja', 'tl'].includes(lang)) return true;
+        return false;
     }
 
+    // 2. Asian Drama (Series ONLY, live-action only, strictly NO movies and NO anime)
     if (category === "Korean Drama" || category === "Asian Drama") {
-        if (isAnimeOrAnimation) return false;
+        if (!isSeries || isAnimeOrAnimation) return false;
         if (cats.includes("korean drama") || cats.includes("asian drama")) return true;
-        if (['ko', 'zh', 'tr', 'th', 'id', 'vi', 'ja'].includes(lang) && isSeries) return true;
+        if (['ko', 'zh', 'tr', 'th', 'id', 'vi', 'ja', 'tl'].includes(lang)) return true;
+        return false;
     }
 
-    if (category === "Bollywood") {
-        if (cats.includes("bollywood") || ['hi', 'te', 'ta', 'ml', 'kn', 'mr', 'bn', 'pa'].includes(lang)) return true;
+    // 3. Anime Series (Series ONLY)
+    if (category === "Anime Series" || category === "Anime") {
+        if (!isSeries) return false;
+        if (cats.includes("anime series") || cats.includes("anime")) return true;
+        if (genres.includes("animation") && (lang === "ja" || titleLower.includes("anime") || titleLower.includes("castlevania") || titleLower.includes("arcane"))) return true;
+        return false;
     }
 
-    if (category === "African") {
-        if (cats.includes("african")) return true;
+    // 4. Anime Movies (Movies ONLY)
+    if (category === "Anime Movies") {
+        if (isSeries) return false;
+        if (cats.includes("anime movies")) return true;
+        if (cats.includes("anime")) return true;
+        if (genres.includes("animation") && (lang === "ja" || titleLower.includes("anime"))) return true;
+        return false;
     }
 
-    if (category === "Comic") {
-        if (cats.includes("comic")) return true;
-    }
-
+    // 5. Animated Movies (Movies ONLY)
     if (category === "Animated Movies") {
-        if (cats.includes("animated movies") || (genres.includes("animation") && !isSeries)) return true;
+        if (isSeries) return false;
+        if (cats.includes("animated movies") || genres.includes("animation")) return true;
+        return false;
     }
 
-    if (category === "Kids Shows and Movies (Nickelodeon and Disney)") {
-        if (cats.includes("kids shows and movies (nickelodeon and disney)") || genres.includes("family") || genres.includes("kids")) return true;
-    }
-
+    // 6. Hollywood/British Movies (Movies ONLY)
     if (category === "Hollywood/British Movies") {
-        if (cats.includes("hollywood/british movies") || (!isSeries && lang === "en")) return true;
+        if (isSeries) return false;
+        if (cats.includes("hollywood/british movies") || lang === "en") return true;
+        return false;
     }
 
+    // 7. Hollywood/British Series (Series ONLY)
     if (category === "Hollywood/British Series") {
-        if (cats.includes("hollywood/british series") || (isSeries && lang === "en")) return true;
+        if (!isSeries) return false;
+        if (cats.includes("hollywood/british series") || lang === "en") return true;
+        return false;
     }
 
+    // 8. Classic Movies (Movies ONLY)
     if (category === "Classic Movies") {
+        if (isSeries) return false;
         if (cats.includes("classic movies")) return true;
         let releaseYear = 0;
         if (m.release_date && m.release_date.length >= 4) releaseYear = parseInt(m.release_date.substring(0, 4)) || 0;
         if (releaseYear > 0 && releaseYear < 2000) return true;
+        return false;
     }
 
+    // 9. Erotic Movies (Movies ONLY)
     if (category === "Erotic Movies") {
+        if (isSeries) return false;
         if (cats.includes("erotic movies")) return true;
+        return false;
     }
 
+    // 10. Bollywood
+    if (category === "Bollywood") {
+        if (cats.includes("bollywood") || ['hi', 'te', 'ta', 'ml', 'kn', 'mr', 'bn', 'pa'].includes(lang)) return true;
+        return false;
+    }
+
+    // 11. African
+    if (category === "African") {
+        if (cats.includes("african")) return true;
+        return false;
+    }
+
+    // 12. Comic
+    if (category === "Comic") {
+        if (cats.includes("comic")) return true;
+        return false;
+    }
+
+    // 13. Kids Shows and Movies (Nickelodeon and Disney)
+    if (category === "Kids Shows and Movies (Nickelodeon and Disney)") {
+        if (cats.includes("kids shows and movies (nickelodeon and disney)") || genres.includes("family") || genres.includes("kids")) return true;
+        return false;
+    }
+
+    // 14. Teen/High-School
     if (category === "Teen/High-School") {
         if (cats.includes("teen/high-school")) return true;
+        return false;
     }
 
+    // 15. Christian Movies
     if (category === "Christian Movies") {
-        if (cats.includes("christian movies")) return true;
+        if (cats.includes("christian movies") || cats.includes("christian")) return true;
+        return false;
     }
+
+    // Direct match fallback for any custom categories
+    if (cats.includes(targetCat)) return true;
 
     return false;
 }
