@@ -191,6 +191,17 @@ function extractTmdbIdAndType(inputVal) {
     return null;
 }
 
+function normalizeQualityName(str) {
+    if (!str) return "720p";
+    const s = String(str).toLowerCase().trim();
+    if (s.includes("2160") || s.includes("4k") || s.includes("uhd")) return "2160p (4K)";
+    if (s.includes("1080")) return "1080p";
+    if (s.includes("720")) return "720p";
+    if (s.includes("480")) return "480p";
+    if (s.includes("cam") || s.includes("cinema") || s.includes("cut")) return "Cinema Cut / HDCam";
+    return "720p";
+}
+
 // Global Datasets for local search filter matching (saves Firestore quota reads)
 let allUsers = [];
 let adminIdsList = ["1329840839", "1175336733"];
@@ -974,10 +985,18 @@ function fulfillMovieTitleRequests(title, docIds) {
                 
                 const cleanTitle = title.replace(/\s*\([^)]+\)\s*$/g, "").trim().toLowerCase();
                 const existingMovie = allCatalogMovies.find(m => m.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim() === cleanTitle);
-                const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === title.toLowerCase().trim());
-                const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+                const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === title.toLowerCase().trim()) ||
+                                   allRequests.find(r => docIds.includes(r.docId)) ||
+                                   allRequests.find(r => r.title.toLowerCase().trim().startsWith(cleanTitle));
+                const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : (existingMovie ? (existingMovie.type || "").toLowerCase() === 'series' : false);
                 
                 let reqSpec = matchedReq ? (matchedReq.seasonOrPart || "") : "";
+                if (!reqSpec && title) {
+                    const qMatch = title.match(/\(([^)]+)\)$/);
+                    if (qMatch) {
+                        reqSpec = qMatch[1].trim();
+                    }
+                }
                 renderFulfillLinksInputs(existingMovie, isSeries, reqSpec);
                 modal.classList.add("active");
             }).catch(err => {
@@ -3779,11 +3798,11 @@ function renderFulfillLinksInputs(existingMovie, isSeries = true, reqSpec = "") 
     if (typeof reqSpec === "number") {
         reqSeasonNum = reqSpec;
     } else if (typeof reqSpec === "string" && reqSpec) {
-        const sMatch = reqSpec.match(/\d+/);
+        const sMatch = reqSpec.match(/Season\s*(\d+)/i) || reqSpec.match(/S(\d+)/i) || reqSpec.match(/\d+/);
         if (isSeries && sMatch) {
-            reqSeasonNum = parseInt(sMatch[0], 10);
+            reqSeasonNum = parseInt(sMatch[1] || sMatch[0], 10);
         } else {
-            reqQuality = reqSpec;
+            reqQuality = normalizeQualityName(reqSpec);
         }
     }
 
@@ -3802,20 +3821,27 @@ function renderFulfillLinksInputs(existingMovie, isSeries = true, reqSpec = "") 
             addFulfillLinkInputRow(idx, urlVal, qualityVal, true, isRequested);
         }
     } else {
-        // FOR MOVIES: Render existing links first
+        // FOR MOVIES: Render existing links and pre-select the requested quality automatically
+        const targetQual = reqQuality ? normalizeQualityName(reqQuality) : "1080p";
+
         if (existingLinks.length > 0) {
+            let foundRequestedSlot = false;
             existingLinks.forEach((linkObj, idx) => {
                 const isObj = typeof linkObj === 'object' && linkObj !== null;
                 const urlVal = isObj ? linkObj.url : (typeof linkObj === 'string' ? linkObj : "");
-                const qualityVal = isObj && linkObj.quality ? linkObj.quality : "720p";
-                addFulfillLinkInputRow(idx, urlVal, qualityVal, false, false);
+                const qualityVal = isObj && linkObj.quality ? normalizeQualityName(linkObj.quality) : "720p";
+                const isThisSlotRequested = !foundRequestedSlot && (qualityVal === targetQual);
+                if (isThisSlotRequested) foundRequestedSlot = true;
+
+                addFulfillLinkInputRow(idx, urlVal, qualityVal, false, isThisSlotRequested);
             });
-            // Appending NEW higher quality requested link as the next slot (Link N)
-            const newIdx = existingLinks.length;
-            const targetQual = reqQuality || "1080p";
-            addFulfillLinkInputRow(newIdx, "", targetQual, false, true);
+
+            // Appending NEW link slot with the requested quality pre-selected if not present in existing links
+            if (!foundRequestedSlot) {
+                const newIdx = existingLinks.length;
+                addFulfillLinkInputRow(newIdx, "", targetQual, false, true);
+            }
         } else {
-            const targetQual = reqQuality || "720p";
             addFulfillLinkInputRow(0, "", targetQual, false, true);
         }
     }
@@ -3834,17 +3860,19 @@ function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", i
     const labelBadge = document.createElement("span");
     labelBadge.style.cssText = "font-size: 11px; color: #ffbc00; font-weight: 800; flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;";
     
+    const normQuality = normalizeQualityName(defaultQuality);
+
     if (isSeries) {
         labelBadge.innerHTML = `<span>Link ${seasonNum} (Season ${seasonNum})</span>${isRequested ? '<span style="font-size:9px; background:#ffbc00; color:#000; padding:1px 4px; border-radius:3px;">⚡ REQUESTED</span>' : ''}`;
     } else {
-        labelBadge.innerHTML = `<span>Link ${seasonNum}:</span>${isRequested ? `<span style="font-size:9px; background:#ffbc00; color:#000; padding:1px 4px; border-radius:3px;">⚡ REQUESTED (${escapeHTML(defaultQuality)})</span>` : ''}`;
+        labelBadge.innerHTML = `<span>Link ${seasonNum}:</span>${isRequested ? `<span style="font-size:9px; background:#ffbc00; color:#000; padding:1px 4px; border-radius:3px;">⚡ REQUESTED (${escapeHTML(normQuality)})</span>` : ''}`;
     }
 
     const urlInput = document.createElement("input");
     urlInput.type = "text";
     urlInput.className = "fulfill-link-url-input";
     urlInput.value = defaultUrl;
-    urlInput.placeholder = isSeries ? `Paste download URL for Season ${seasonNum}...` : `Paste download URL for Link ${seasonNum}...`;
+    urlInput.placeholder = isSeries ? `Paste download URL for Season ${seasonNum}...` : `Paste download URL for ${normQuality}...`;
     urlInput.style.cssText = "flex: 1; min-width: 140px; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; outline: none; box-sizing: border-box;";
 
     if (isRequested && !defaultUrl) {
@@ -3857,14 +3885,14 @@ function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", i
     if (!isSeries) {
         const qualitySelect = document.createElement("select");
         qualitySelect.className = "fulfill-link-quality-select";
-        qualitySelect.style.cssText = "padding: 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; width: 105px; cursor: pointer; outline: none; flex-shrink: 0;";
+        qualitySelect.style.cssText = "padding: 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; width: 115px; cursor: pointer; outline: none; flex-shrink: 0;";
         
         const qualities = ["480p", "720p", "1080p", "2160p (4K)", "Cinema Cut / HDCam"];
         qualities.forEach(q => {
             const opt = document.createElement("option");
             opt.value = q;
             opt.textContent = q;
-            if (q === defaultQuality || (q.includes("4K") && defaultQuality.includes("4K"))) opt.selected = true;
+            if (q === normQuality) opt.selected = true;
             qualitySelect.appendChild(opt);
         });
         row.appendChild(qualitySelect);
