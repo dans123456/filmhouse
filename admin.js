@@ -2150,13 +2150,22 @@ function showMovieDetails(movie) {
     const viewContainer = document.getElementById("links-view-container");
     const editContainer = document.getElementById("links-edit-container");
     const inputsWrapper = document.getElementById("links-inputs-wrapper");
-    const addLinkBtn = document.getElementById("btn-add-link-input");
-    const saveLinksBtn = document.getElementById("btn-save-links-changes");
     
     let currentLinks = [...linksList];
 
     // Auto-extract TMDB ID and Type on pasting in Edit modal
     const editMovieIdInput = document.getElementById("edit-movie-id");
+    if (editMovieIdInput) {
+        editMovieIdInput.addEventListener("input", () => {
+            const parsed = extractTmdbIdAndType(editMovieIdInput.value);
+            if (parsed) {
+                editMovieIdInput.value = parsed.id;
+                const typeSelect = document.getElementById("edit-movie-type");
+                if (typeSelect) {
+                    typeSelect.value = parsed.type;
+                    renderLinkInputs();
+                }
+            }
         });
     }
 
@@ -2271,7 +2280,7 @@ function showMovieDetails(movie) {
         });
     }
 
-    const btnAddLink = document.getElementById("btn-add-link");
+    const btnAddLink = document.getElementById("btn-add-link-input");
     if (btnAddLink) {
         btnAddLink.addEventListener("click", () => {
             const isSeriesMovie = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
@@ -2288,7 +2297,7 @@ function showMovieDetails(movie) {
         });
     }
 
-    const saveLinksBtn = document.getElementById("btn-save-links");
+    const saveLinksBtn = document.getElementById("btn-save-links-changes");
     if (saveLinksBtn) {
         saveLinksBtn.addEventListener("click", () => {
             const isSeriesType = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
