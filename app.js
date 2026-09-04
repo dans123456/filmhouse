@@ -2244,6 +2244,8 @@ function matchesMovieCategory(m, category) {
     const lang = (m.language || "").toLowerCase();
     const titleLower = (m.title || "").toLowerCase();
 
+    const isAnimeOrAnimation = cats.includes("anime") || cats.includes("anime series") || cats.includes("anime movies") || cats.includes("animated movies") || genres.includes("animation") || (lang === "ja" && titleLower.includes("anime"));
+
     if (category === "Anime Series" || category === "Anime") {
         if (cats.includes("anime series") || cats.includes("anime")) return isSeries || cats.includes("anime series");
         if (genres.includes("animation") && isSeries && (lang === "ja" || titleLower.includes("anime") || titleLower.includes("castlevania") || titleLower.includes("arcane"))) return true;
@@ -2256,13 +2258,15 @@ function matchesMovieCategory(m, category) {
     }
 
     if (category === "Korean Movies" || category === "Asian Movies") {
+        if (isAnimeOrAnimation) return false;
         if (cats.includes("korean movies") || cats.includes("asian movies")) return true;
-        if (['ko', 'ja', 'zh', 'tr', 'th', 'id', 'vi'].includes(lang) && !isSeries) return true;
+        if (['ko', 'zh', 'tr', 'th', 'id', 'vi', 'ja'].includes(lang) && !isSeries) return true;
     }
 
     if (category === "Korean Drama" || category === "Asian Drama") {
+        if (isAnimeOrAnimation) return false;
         if (cats.includes("korean drama") || cats.includes("asian drama")) return true;
-        if (['ko', 'ja', 'zh', 'tr', 'th', 'id', 'vi'].includes(lang) && isSeries) return true;
+        if (['ko', 'zh', 'tr', 'th', 'id', 'vi', 'ja'].includes(lang) && isSeries) return true;
     }
 
     if (category === "Bollywood") {
@@ -4677,16 +4681,16 @@ async function fetchTmdbCategoryMovies(category) {
             ];
         } else if (category === "Korean Drama" || category === "Asian Drama") {
             urls = [
-                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko|zh|ja|th|tr&sort_by=popularity.desc&page=1`,
-                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko&sort_by=popularity.desc&page=1`
+                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko|zh|th|tr&without_genres=16&sort_by=popularity.desc&page=1`,
+                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko&without_genres=16&sort_by=vote_count.desc&page=1`
             ];
         } else if (category === "Korean Movies" || category === "Asian Movies") {
             urls = [
-                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko|zh|ja|th|tr&sort_by=popularity.desc&page=1`,
-                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko&sort_by=popularity.desc&page=1`
+                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko|zh|th|tr&without_genres=16&sort_by=popularity.desc&page=1`,
+                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko&without_genres=16&sort_by=vote_count.desc&page=1`
             ];
         } else if (category === "Bollywood") {
-            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi|te|ta&sort_by=popularity.desc&page=1`];
+            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi|te|ta&without_genres=16&sort_by=popularity.desc&page=1`];
         } else if (category === "African") {
             urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_origin_country=NG|ZA|GH|KE&sort_by=popularity.desc&page=1`];
         } else if (category === "Comic") {
@@ -4727,8 +4731,15 @@ async function fetchTmdbCategoryMovies(category) {
         });
 
         if (allResults.length > 0) {
+            const isAsianCategory = ["Korean Drama", "Asian Drama", "Korean Movies", "Asian Movies"].includes(category);
+
             const formatted = allResults
                 .filter(item => {
+                    // Strictly exclude any animation from Asian Drama and Asian Movies
+                    if (isAsianCategory) {
+                        if (item.genre_ids && item.genre_ids.includes(16)) return false;
+                        if (item.genres && item.genres.some(g => (g.id === 16 || (g.name || "").toLowerCase() === "animation"))) return false;
+                    }
                     const releaseDate = item.release_date || item.first_air_date || "";
                     if (category === "Classic Movies") {
                         if (!releaseDate) return true;

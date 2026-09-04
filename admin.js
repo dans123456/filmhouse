@@ -2561,28 +2561,7 @@ function determineAutoCategories(data, title, type) {
         categories.push("African");
     }
 
-    // 2. Korean (Korean Drama for Series, Korean Movies for Movies)
-    const isKoreanCountry = data && ((data.origin_country && data.origin_country.includes("KR")) ||
-                            (data.production_countries && data.production_countries.some(c => c.iso_3166_1 === "KR")));
-    const koreanKeywords = ["korean", "kdrama", "squid game", "boys over flowers", "queen of tears", "all of us are dead", "glory", "vincenzo", "crash landing on you"];
-    if (origLang === 'ko' || isKoreanCountry || koreanKeywords.some(k => titleLower.includes(k) || overviewLower.includes(k))) {
-        if (isSeries) {
-            categories.push("Korean Drama");
-        } else {
-            categories.push("Korean Movies");
-        }
-    }
-
-    // 3. Bollywood (Indian)
-    const isIndianCountry = data && ((data.origin_country && data.origin_country.includes("IN")) ||
-                            (data.production_countries && data.production_countries.some(c => c.iso_3166_1 === "IN")));
-    const indianLangs = ['hi', 'te', 'ta', 'ml', 'kn', 'mr', 'bn', 'pa'];
-    const bollywoodKeywords = ["bollywood", "tollywood", "kollywood", "hindi", "telugu", "tamil", "indian"];
-    if (indianLangs.includes(origLang) || isIndianCountry || bollywoodKeywords.some(k => titleLower.includes(k) || overviewLower.includes(k))) {
-        categories.push("Bollywood");
-    }
-
-    // 4. Anime & Animated Movies
+    // Anime & Animated Movies Detection (Evaluated first to strictly exclude from live-action regional categories)
     const isJP = (origLang === 'ja') || (data && ((data.origin_country && data.origin_country.includes('JP')) ||
                  (data.production_countries && data.production_countries.some(c => c.iso_3166_1 === 'JP'))));
     const isAnimation = tmdbGenres.includes("animation") || titleLower.includes("anime") || titleLower.includes("animated") || overviewLower.includes("anime");
@@ -2611,6 +2590,27 @@ function determineAutoCategories(data, title, type) {
         }
     } else if (isAnimation) {
         categories.push("Animated Movies");
+    }
+
+    // 2. Korean (Korean Drama for Series, Korean Movies for Movies - live action only, never anime)
+    const isKoreanCountry = data && ((data.origin_country && data.origin_country.includes("KR")) ||
+                            (data.production_countries && data.production_countries.some(c => c.iso_3166_1 === "KR")));
+    const koreanKeywords = ["korean", "kdrama", "squid game", "boys over flowers", "queen of tears", "all of us are dead", "glory", "vincenzo", "crash landing on you"];
+    if (!isAnimeMatch && !isAnimation && (origLang === 'ko' || isKoreanCountry || koreanKeywords.some(k => titleLower.includes(k) || overviewLower.includes(k)))) {
+        if (isSeries) {
+            categories.push("Korean Drama");
+        } else {
+            categories.push("Korean Movies");
+        }
+    }
+
+    // 3. Bollywood (Indian)
+    const isIndianCountry = data && ((data.origin_country && data.origin_country.includes("IN")) ||
+                            (data.production_countries && data.production_countries.some(c => c.iso_3166_1 === "IN")));
+    const indianLangs = ['hi', 'te', 'ta', 'ml', 'kn', 'mr', 'bn', 'pa'];
+    const bollywoodKeywords = ["bollywood", "tollywood", "kollywood", "hindi", "telugu", "tamil", "indian"];
+    if (indianLangs.includes(origLang) || isIndianCountry || bollywoodKeywords.some(k => titleLower.includes(k) || overviewLower.includes(k))) {
+        categories.push("Bollywood");
     }
 
     // 5. Kids Shows and Movies (Disney & Nickelodeon)
