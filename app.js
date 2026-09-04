@@ -32,111 +32,6 @@ function getCleanRequestTitle(title) {
     return title.replace(/\s*\([^)]+\)\s*$/g, "").trim();
 }
 
-// Helper to determine if a movie/series is currently ongoing / releasing weekly episodes
-function isMovieOngoing(movie) {
-    if (!movie) return false;
-    if (movie.status === "Ended" || movie.status === "Canceled") return false;
-    if (movie.isOngoing === true) return true;
-    if (movie.isOngoing === false) return false;
-    if (movie.status === "Ongoing" || movie.status === "Returning Series" || movie.status === "In Production" || movie.in_production === true) return true;
-    if (movie.next_episode_to_air) return true;
-    if (movie.categories && Array.isArray(movie.categories) && movie.categories.some(c => c.toLowerCase().includes("ongoing"))) return true;
-    const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
-    if (isTV && (movie.links && movie.links.some(l => (typeof l === 'object' && l !== null && (l.type === "weekly" || (l.season && l.season.toLowerCase().includes("ongoing"))))))) return true;
-    return false;
-}
-
-// Async helper to dynamically query TMDB for series airing status and update isOngoing in real-time
-async function checkTvSeriesOngoingStatus(movie) {
-    if (!movie) return false;
-    const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv" || (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
-    if (!isTV) return false;
-
-    if (typeof movie.isOngoing === "boolean") return movie.isOngoing;
-
-    const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
-    const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
-
-    let tvData = null;
-    if (tmdbId) {
-        try {
-            const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}`);
-            if (res.ok) tvData = await res.json();
-        } catch (e) {}
-    }
-
-    const searchTitle = typeof getCleanRequestTitle === "function" ? getCleanRequestTitle(movie.title || "") : (movie.title || "");
-    if (!tvData && searchTitle) {
-        try {
-            const res = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${apiKey}&query=${encodeURIComponent(searchTitle)}`);
-            if (res.ok) {
-                const data = await res.json();
-                if (data && data.results && data.results.length > 0) {
-                    const tvId = data.results[0].id;
-                    const detailRes = await fetch(`https://api.themoviedb.org/3/tv/${tvId}?api_key=${apiKey}`);
-                    if (detailRes.ok) tvData = await detailRes.json();
-                }
-            }
-        } catch (e) {}
-    }
-
-    if (tvData) {
-        movie.status = tvData.status || movie.status;
-        movie.in_production = tvData.in_production;
-        movie.next_episode_to_air = tvData.next_episode_to_air;
-
-        if (tvData.status === "Ended" || tvData.status === "Canceled") {
-            movie.isOngoing = false;
-        } else if (tvData.status === "Returning Series" || tvData.status === "In Production" || tvData.status === "In Development" || tvData.in_production === true || tvData.next_episode_to_air !== null) {
-            movie.isOngoing = true;
-        } else if (tvData.first_air_date && new Date(tvData.first_air_date).getFullYear() >= 2025) {
-            movie.isOngoing = true;
-        } else if (tvData.last_episode_to_air && tvData.last_episode_to_air.air_date) {
-            const lastAir = new Date(tvData.last_episode_to_air.air_date);
-            const daysDiff = (new Date() - lastAir) / (1000 * 60 * 60 * 24);
-            if (daysDiff <= 45) {
-                movie.isOngoing = true;
-            }
-        }
-    }
-
-    return isMovieOngoing(movie);
-}
-
-// Helper to generate floating ONGOING badge element for movie posters
-function getOngoingBadgeElement(movie) {
-    if (!movie || !isMovieOngoing(movie)) return null;
-    const badge = document.createElement("div");
-    badge.className = "movie-card-ongoing-badge";
-    badge.style.cssText = "position: absolute; bottom: 8px; right: 8px; background: linear-gradient(135deg, #ff0055, #ff2a2a); color: #ffffff; font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(255,0,85,0.5); display: flex; align-items: center; gap: 3px; letter-spacing: 0.5px;";
-    badge.innerHTML = "<span>🔴</span><span>ONGOING</span>";
-    return badge;
-}
-
-// Helper to determine if a movie is upcoming / coming soon
-function isMovieUpcoming(movie) {
-    if (!movie) return false;
-    if (movie.isUpcoming === true) return true;
-    if (movie.categories && Array.isArray(movie.categories) && movie.categories.some(c => c.toLowerCase().includes("upcoming") || c.toLowerCase().includes("coming soon"))) return true;
-    if (movie.status && (movie.status === "In Production" || movie.status === "Post Production" || movie.status === "Planned" || movie.status === "Upcoming")) return true;
-    if (movie.release_date) {
-        const relYear = parseInt(movie.release_date.substring(0, 4), 10);
-        const currentYear = new Date().getFullYear();
-        if (relYear > currentYear) return true;
-    }
-    return false;
-}
-
-// Helper to generate floating UPCOMING badge element for movie posters
-function getUpcomingBadgeElement(movie) {
-    if (!movie || !isMovieUpcoming(movie)) return null;
-    const badge = document.createElement("div");
-    badge.className = "movie-card-upcoming-badge";
-    badge.style.cssText = "position: absolute; bottom: 8px; right: 8px; background: linear-gradient(135deg, #00c6ff, #0072ff); color: #ffffff; font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(0,198,255,0.5); display: flex; align-items: center; gap: 3px; letter-spacing: 0.5px;";
-    badge.innerHTML = "<span>✨</span><span>COMING SOON</span>";
-    return badge;
-}
-
 // Helper to generate floating CINEMA CUT / HDCAM badge element for movie posters
 function getCinemaCutBadgeElement(movie) {
     if (!movie || !movie.links || !Array.isArray(movie.links)) return null;
@@ -172,37 +67,6 @@ function getCinemaCutBadgeElement(movie) {
         console.warn("Could not load Eruda debugger:", e);
     }
 })();
-
-// Helper to detect if app is running in Beta Environment mode (?env=beta or ?beta=true)
-function isBetaEnvironment() {
-    try {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('env') === 'beta' || params.get('beta') === 'true') return true;
-        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
-            const startParam = window.Telegram.WebApp.initDataUnsafe.start_param || "";
-            if (startParam.includes("beta")) return true;
-        }
-    } catch (e) {}
-    return false;
-}
-
-// Dynamically render BETA STAGING badge if ?env=beta is present
-document.addEventListener("DOMContentLoaded", () => {
-    if (isBetaEnvironment()) {
-        const brandTitle = document.querySelector(".brand-title");
-        if (brandTitle && !brandTitle.querySelector(".beta-staging-tag")) {
-            brandTitle.style.display = "inline-flex";
-            brandTitle.style.alignItems = "center";
-            brandTitle.style.gap = "6px";
-            
-            const badge = document.createElement("span");
-            badge.className = "beta-staging-tag";
-            badge.style.cssText = "font-size: 9px; line-height: 1; background: rgba(0, 198, 255, 0.15); color: #00c6ff; border: 1px solid rgba(0, 198, 255, 0.4); padding: 3px 7px; border-radius: 4px; font-weight: 800; letter-spacing: 0.5px; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;";
-            badge.innerHTML = "<span>🧪</span><span>BETA STAGING</span>";
-            brandTitle.appendChild(badge);
-        }
-    }
-});
 
 // Safe localStorage wrapper to prevent crashes when third-party cookies/storage are blocked inside webview sandboxes
 const safeStorage = (() => {
@@ -341,8 +205,6 @@ const state = {
     adsgramControllers: {},
     activeWatchlistTab: "watchlist",
     externalSearchResults: [],
-    upcomingMovies: [],
-    ongoingMovies: [],
     categoryTmdbMovies: {},
     isLoadingTmdbCategory: false,
     lastDiscoverQuery: null
@@ -2230,7 +2092,7 @@ function renderCategoriesBar() {
     bar.replaceChildren();
 
     const categoryList = [
-        "Main", "Ongoing Series", "Upcoming Movies", "Hollywood/British Movies", "Hollywood/British Series", 
+        "Main", "Hollywood/British Movies", "Hollywood/British Series", 
         "Korean Drama", "Korean Movies", "Anime Series", "Anime Movies", 
         "Bollywood", "African", "Comic", "Animated Movies", 
         "Kids Shows and Movies (Nickelodeon and Disney)", 
@@ -2239,9 +2101,6 @@ function renderCategoriesBar() {
 
     const categoryLabels = {
         "Main": "Featured",
-        "Ongoing Series": "Ongoing 🔴",
-        "Upcoming Movies": "Latest ⚡",
-        "Latest Movies": "Latest ⚡",
         "Hollywood/British Movies": "Hollywood",
         "Hollywood/British Series": "Series",
         "Korean Drama": "Asian Drama 🫰",
@@ -2264,8 +2123,6 @@ function renderCategoriesBar() {
 
     const categoryEmojis = {
         "Main": "🍿",
-        "Ongoing Series": "🔴",
-        "Upcoming Movies": "✨",
         "Hollywood/British Movies": "🎬",
         "Hollywood/British Series": "📺",
         "Korean Drama": "🫰",
@@ -2428,29 +2285,7 @@ function renderFeaturedGrid(fromDiscover = false) {
     // Filter by active category (or search globally if search term is active)
     let list = state.movies;
     if (!state.searchQuery) {
-        if (state.activeCategory === "Ongoing Series") {
-            list = list.filter(m => isMovieOngoing(m));
-            if (!state.categoryTmdbMovies) state.categoryTmdbMovies = {};
-            const catExt = state.categoryTmdbMovies["Ongoing Series"] || [];
-            if (catExt.length > 0) {
-                const localTmdbIds = new Set(list.map(m => m.tmdb_id).filter(id => id));
-                const filteredExt = catExt.filter(ext => !localTmdbIds.has(ext.tmdb_id));
-                list = [...list, ...filteredExt];
-            } else if (!state.isLoadingTmdbCategory) {
-                fetchTmdbCategoryMovies("Ongoing Series");
-            }
-        } else if (state.activeCategory === "Upcoming Movies" || state.activeCategory === "Latest Movies") {
-            list = list.filter(m => isMovieUpcoming(m));
-            if (!state.categoryTmdbMovies) state.categoryTmdbMovies = {};
-            const catExt = state.categoryTmdbMovies["Upcoming Movies"] || state.categoryTmdbMovies["Latest Movies"] || [];
-            if (catExt.length > 0) {
-                const localTmdbIds = new Set(list.map(m => m.tmdb_id).filter(id => id));
-                const filteredExt = catExt.filter(ext => !localTmdbIds.has(ext.tmdb_id));
-                list = [...list, ...filteredExt];
-            } else if (!state.isLoadingTmdbCategory) {
-                fetchTmdbCategoryMovies("Upcoming Movies");
-            }
-        } else if (state.activeCategory !== "Main") {
+        if (state.activeCategory !== "Main") {
             // Regional & Genre category tabs ONLY show published titles with active download links!
             list = list.filter(m => m.categories && m.categories.includes(state.activeCategory) && m.links && m.links.length > 0);
         }
@@ -2510,7 +2345,7 @@ function renderFeaturedGrid(fromDiscover = false) {
     }
 
     // Merge external discover / TMDB live API results if filters/categories are active and search query is empty
-    if (!state.searchQuery && (state.activeCategory === "Main" || state.activeCategory === "Upcoming Movies" || state.activeCategory === "Ongoing Series") && state.externalSearchResults && state.externalSearchResults.length > 0) {
+    if (!state.searchQuery && state.activeCategory === "Main" && state.externalSearchResults && state.externalSearchResults.length > 0) {
         const localTmdbIds = new Set(list.map(m => m.tmdb_id).filter(id => id));
         const filteredExternal = state.externalSearchResults.filter(ext => !localTmdbIds.has(ext.tmdb_id));
         list = [...list, ...filteredExternal];
@@ -2564,24 +2399,6 @@ function renderFeaturedGrid(fromDiscover = false) {
 
         const reqBadge = getRequestedBadgeElement(movie);
         if (reqBadge) imgWrapper.appendChild(reqBadge);
-
-        const ongoingBadge = getOngoingBadgeElement(movie);
-        if (ongoingBadge) {
-            imgWrapper.appendChild(ongoingBadge);
-        } else {
-            const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv" || (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
-            if (isTV && typeof movie.isOngoing === "undefined") {
-                checkTvSeriesOngoingStatus(movie).then(isOngoing => {
-                    if (isOngoing && !imgWrapper.querySelector(".movie-card-ongoing-badge")) {
-                        const bg = getOngoingBadgeElement(movie);
-                        if (bg) imgWrapper.appendChild(bg);
-                    }
-                });
-            }
-        }
-
-        const upcomingBadge = getUpcomingBadgeElement(movie);
-        if (upcomingBadge) imgWrapper.appendChild(upcomingBadge);
 
         const cinemaCutBadge = getCinemaCutBadgeElement(movie);
         if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
@@ -3182,21 +2999,6 @@ function openDetailModal(movie) {
     posterImg.alt = movie.title;
     posterCard.appendChild(posterImg);
 
-    const ongoingBadge = getOngoingBadgeElement(movie);
-    if (ongoingBadge) {
-        posterCard.appendChild(ongoingBadge);
-    } else {
-        const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv" || (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
-        if (isTV && typeof movie.isOngoing === "undefined") {
-            checkTvSeriesOngoingStatus(movie).then(isOngoing => {
-                if (isOngoing && !posterCard.querySelector(".movie-card-ongoing-badge")) {
-                    const bg = getOngoingBadgeElement(movie);
-                    if (bg) posterCard.appendChild(bg);
-                }
-            });
-        }
-    }
-
     posterColumn.appendChild(posterCard);
     mainLayout.appendChild(posterColumn);
 
@@ -3232,29 +3034,6 @@ function openDetailModal(movie) {
     metaList.appendChild(typeBadge);
     metaList.appendChild(createMetaDivider());
 
-    if (isMovieOngoing(movie)) {
-        const ongoingPill = document.createElement("span");
-        ongoingPill.className = "detail-ongoing-badge-pill";
-        ongoingPill.style.cssText = "background: rgba(255, 0, 85, 0.15); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.4); font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; letter-spacing: 0.5px;";
-        ongoingPill.innerHTML = "<span>🔴</span><span>ONGOING</span>";
-        metaList.appendChild(ongoingPill);
-        metaList.appendChild(createMetaDivider());
-    } else {
-        const isTV = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv" || (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
-        if (isTV) {
-            checkTvSeriesOngoingStatus(movie).then(isOngoing => {
-                if (isOngoing && !metaList.querySelector(".detail-ongoing-badge-pill")) {
-                    const ongoingPill = document.createElement("span");
-                    ongoingPill.className = "detail-ongoing-badge-pill";
-                    ongoingPill.style.cssText = "background: rgba(255, 0, 85, 0.15); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.4); font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; letter-spacing: 0.5px;";
-                    ongoingPill.innerHTML = "<span>🔴</span><span>ONGOING</span>";
-                    metaList.appendChild(ongoingPill);
-                    metaList.appendChild(createMetaDivider());
-                }
-            });
-        }
-    }
-
     const yearLabel = document.createElement("span");
     yearLabel.className = "detail-year-label";
     yearLabel.textContent = movie.release_date ? movie.release_date.substring(0, 4) : "N/A";
@@ -3282,36 +3061,6 @@ function openDetailModal(movie) {
     }
 
     infoColumn.appendChild(metaList);
-
-    // Live Ongoing Series Banner
-    if (isMovieOngoing(movie)) {
-        const ongoingBanner = document.createElement("div");
-        ongoingBanner.className = "ongoing-status-banner";
-        ongoingBanner.style.cssText = "margin-top: 10px; margin-bottom: 6px; padding: 8px 12px; background: rgba(255, 0, 85, 0.12); border: 1px solid rgba(255, 0, 85, 0.35); border-radius: var(--border-radius-sm); color: #ffffff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 8px;";
-        ongoingBanner.innerHTML = `
-            <span style="display: flex; align-items: center; gap: 6px;">
-                <span>🔴</span>
-                <strong>ONGOING SERIES:</strong> New episodes are updated weekly as they air!
-            </span>
-            <span style="font-size: 10px; opacity: 0.85; background: rgba(255, 0, 85, 0.25); padding: 2px 7px; border-radius: 10px; font-weight: 800;">Airing 📡</span>
-        `;
-        infoColumn.appendChild(ongoingBanner);
-    }
-
-    // Live Upcoming / Coming Soon Banner
-    if (isMovieUpcoming(movie)) {
-        const upcomingBanner = document.createElement("div");
-        upcomingBanner.className = "upcoming-status-banner";
-        upcomingBanner.style.cssText = "margin-top: 10px; margin-bottom: 6px; padding: 8px 12px; background: rgba(0, 198, 255, 0.12); border: 1px solid rgba(0, 198, 255, 0.35); border-radius: var(--border-radius-sm); color: #ffffff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 8px;";
-        upcomingBanner.innerHTML = `
-            <span style="display: flex; align-items: center; gap: 6px;">
-                <span>✨</span>
-                <strong>UPCOMING RELEASE:</strong> Live feed from TMDB API! Tap Request to get notified when downloads drop!
-            </span>
-            <span style="font-size: 10px; opacity: 0.85; background: rgba(0, 198, 255, 0.25); padding: 2px 7px; border-radius: 10px; font-weight: 800;">Coming Soon 🍿</span>
-        `;
-        infoColumn.appendChild(upcomingBanner);
-    }
 
     // Action buttons row
     const actionsRow = document.createElement("div");
@@ -4118,16 +3867,11 @@ function openDownloadModal(movie) {
                 const label = document.createElement("span");
                 label.className = "download-link-label";
                 label.textContent = seasonLabel;
-                const isLatestSeason = idx === movie.links.length - 1;
-                const isExplicitlyOngoingSeason = isObj && (link.type === "weekly" || (link.season && link.season.toLowerCase().includes("ongoing")));
-
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
 
                 if (matchingRequest) {
                     sublabel.textContent = "Unlock Season • Free Fulfillment (No Ads)";
-                } else if (isExplicitlyOngoingSeason || (isMovieOngoing(movie) && isLatestSeason)) {
-                    sublabel.textContent = "🔴 Ongoing Season • New Episodes Added Weekly";
                 } else {
                     sublabel.textContent = "Complete Season (All Episodes)";
                 }
@@ -4322,7 +4066,7 @@ function openDownloadModal(movie) {
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
                 sublabel.style.cssText = "font-size: 11px; color: var(--text-secondary);";
-                sublabel.textContent = isMovieOngoing(movie) ? "🔴 Currently Airing • Tap to Request Episodes" : "Full Season Aired • Tap to Request Upload";
+                sublabel.textContent = "Tap to Request Season Upload";
 
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
@@ -4764,19 +4508,7 @@ async function fetchTmdbCategoryMovies(category) {
         const apiKey = getTmdbApiKey();
         let urls = [];
 
-        if (category === "Upcoming Movies" || category === "Latest Movies") {
-            urls = [
-                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&primary_release_date.gte=2024-01-01&with_original_language=en&sort_by=popularity.desc&page=1`,
-                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko&primary_release_date.gte=2024-01-01&sort_by=popularity.desc&page=1`,
-                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi&primary_release_date.gte=2024-01-01&sort_by=popularity.desc&page=1`
-            ];
-        } else if (category === "Ongoing Series") {
-            urls = [
-                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&air_date.gte=2024-01-01&first_air_date.gte=2023-01-01&with_original_language=en&sort_by=popularity.desc&page=1`,
-                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=16&with_original_language=ja&air_date.gte=2024-01-01&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`,
-                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko&air_date.gte=2024-01-01&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`
-            ];
-        } else if (category === "Anime" || category === "Anime Series") {
+        if (category === "Anime" || category === "Anime Series") {
             urls = [`${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=16&with_original_language=ja&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
         } else if (category === "Anime Movies") {
             urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&with_original_language=ja&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
@@ -4829,8 +4561,6 @@ async function fetchTmdbCategoryMovies(category) {
                     if (category === "Classic Movies") return true;
                     if (!releaseDate) return false;
                     const year = parseInt(releaseDate.substring(0, 4), 10);
-                    if (category === "Ongoing Series" && year < 2023) return false;
-                    if (category === "Upcoming Movies" && year < 2025) return false;
                     if (category !== "Classic Movies" && year < 2022) return false;
                     return true;
                 })
@@ -4862,8 +4592,6 @@ async function fetchTmdbCategoryMovies(category) {
                         director: "",
                         trailer: "",
                         runtime: "",
-                        isUpcoming: category === "Upcoming Movies",
-                        isOngoing: category === "Ongoing Series",
                         links: []
                     };
                 });
@@ -4871,9 +4599,6 @@ async function fetchTmdbCategoryMovies(category) {
             if (!state.categoryTmdbMovies) state.categoryTmdbMovies = {};
             const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
             state.categoryTmdbMovies[category] = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
-
-            if (category === "Upcoming Movies") state.upcomingMovies = state.categoryTmdbMovies[category];
-            if (category === "Ongoing Series") state.ongoingMovies = state.categoryTmdbMovies[category];
         }
     } catch (err) {
         console.error(`Error fetching TMDB live category movies for ${category}:`, err);
@@ -4881,16 +4606,6 @@ async function fetchTmdbCategoryMovies(category) {
         state.isLoadingTmdbCategory = false;
         renderFeaturedGrid(true);
     }
-}
-
-// Fetch live upcoming movies from TMDB API (/movie/upcoming)
-async function fetchTmdbUpcomingMovies() {
-    return fetchTmdbCategoryMovies("Upcoming Movies");
-}
-
-// Fetch live currently airing TV series from TMDB API (/tv/on_the_air)
-async function fetchTmdbOngoingSeries() {
-    return fetchTmdbCategoryMovies("Ongoing Series");
 }
 
 // Global TMDB Multi-Search for global search support

@@ -1380,129 +1380,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // Admin Access Control Verification
-// Render Ongoing Shows Manager in Admin Panel
-function renderOngoingShowsManager() {
-    const grid = document.getElementById("ongoing-shows-grid");
-    const counter = document.getElementById("ongoing-shows-counter");
-    if (!grid) return;
-
-    const catalogMovies = typeof movies !== 'undefined' && Array.isArray(movies) ? movies : [];
-    const ongoingSeries = catalogMovies.filter(m => {
-        if (!m) return false;
-        const isTV = (m.type || "").toLowerCase() === "series" || (m.type || "").toLowerCase() === "tv" || (m.categories && m.categories.some(c => c.toLowerCase().includes("series")));
-        if (!isTV) return false;
-        if (typeof isMovieOngoing === "function") return isMovieOngoing(m);
-        return m.isOngoing === true;
-    });
-
-    if (counter) {
-        counter.textContent = `${ongoingSeries.length} Airing Shows`;
-    }
-
-    if (ongoingSeries.length === 0) {
-        grid.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-secondary); grid-column: 1 / -1; font-size: 13px;">No published ongoing series currently active.</div>`;
-        return;
-    }
-
-    grid.replaceChildren();
-
-    ongoingSeries.forEach(movie => {
-        const card = document.createElement("div");
-        card.style.cssText = "background: rgba(22, 24, 35, 0.6); border: 1px solid rgba(255, 59, 48, 0.3); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px;";
-
-        const titleHeader = document.createElement("div");
-        titleHeader.style.cssText = "display: flex; align-items: center; justify-content: space-between;";
-        
-        const titleText = document.createElement("span");
-        titleText.style.cssText = "font-weight: 700; color: #ffffff; font-size: 14px;";
-        titleText.textContent = movie.title;
-
-        const badge = document.createElement("span");
-        badge.style.cssText = "font-size: 10px; font-weight: 800; color: #ff3b30; background: rgba(255, 59, 48, 0.15); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255, 59, 48, 0.4);";
-        badge.textContent = "🔴 AIRING WEEKLY";
-
-        titleHeader.appendChild(titleText);
-        titleHeader.appendChild(badge);
-        card.appendChild(titleHeader);
-
-        const currentLinks = movie.links || [];
-        const activeLinkObj = currentLinks[currentLinks.length - 1] || {};
-        const activeUrl = typeof activeLinkObj === 'object' && activeLinkObj !== null ? (activeLinkObj.url || "") : String(activeLinkObj || "");
-        const activeSeasonLabel = typeof activeLinkObj === 'object' && activeLinkObj !== null ? (activeLinkObj.season || `Season ${currentLinks.length}`) : `Season ${currentLinks.length || 1}`;
-
-        const inputGroup = document.createElement("div");
-        inputGroup.style.cssText = "display: flex; flex-direction: column; gap: 4px;";
-
-        const inputLabel = document.createElement("label");
-        inputLabel.style.cssText = "font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;";
-        inputLabel.textContent = `Update Weekly Link for ${activeSeasonLabel}:`;
-
-        const linkInput = document.createElement("input");
-        linkInput.type = "text";
-        linkInput.value = activeUrl;
-        linkInput.placeholder = "Paste new episode drive/mega link...";
-        linkInput.style.cssText = "background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 12px;";
-
-        inputGroup.appendChild(inputLabel);
-        inputGroup.appendChild(linkInput);
-        card.appendChild(inputGroup);
-
-        const btnRow = document.createElement("div");
-        btnRow.style.cssText = "display: flex; gap: 8px; margin-top: 4px;";
-
-        const updateBtn = document.createElement("button");
-        updateBtn.style.cssText = "flex: 1; background: linear-gradient(135deg, #00c6ff, #0072ff); color: #fff; border: none; font-size: 11px; font-weight: 800; padding: 7px; border-radius: 6px; cursor: pointer;";
-        updateBtn.textContent = "Update Link 🚀";
-        updateBtn.addEventListener("click", async () => {
-            const newUrl = linkInput.value.trim();
-            if (!newUrl) {
-                alert("Please enter a valid link.");
-                return;
-            }
-            updateBtn.disabled = true;
-            updateBtn.textContent = "Saving... ⏳";
-            
-            if (!movie.links) movie.links = [];
-            if (movie.links.length === 0) {
-                movie.links.push({ season: "Season 1", url: newUrl });
-            } else {
-                const lastIdx = movie.links.length - 1;
-                if (typeof movie.links[lastIdx] === 'object' && movie.links[lastIdx] !== null) {
-                    movie.links[lastIdx].url = newUrl;
-                } else {
-                    movie.links[lastIdx] = { season: `Season ${lastIdx + 1}`, url: newUrl };
-                }
-            }
-            if (typeof saveCatalogChanges === "function") saveCatalogChanges();
-            showToast(`Updated weekly link for ${movie.title}!`, "success");
-            updateBtn.disabled = false;
-            updateBtn.textContent = "Update Link 🚀";
-        });
-
-        const completeBtn = document.createElement("button");
-        completeBtn.style.cssText = "background: rgba(76, 217, 100, 0.15); color: #4cd964; border: 1px solid rgba(76, 217, 100, 0.3); font-size: 11px; font-weight: 800; padding: 7px 10px; border-radius: 6px; cursor: pointer;";
-        completeBtn.textContent = "Mark Completed ✅";
-        completeBtn.addEventListener("click", () => {
-            if (confirm(`Mark "${movie.title}" season as fully completed? This will untag ONGOING status.`)) {
-                movie.isOngoing = false;
-                if (movie.categories) {
-                    movie.categories = movie.categories.filter(c => !c.toLowerCase().includes("ongoing"));
-                }
-                if (typeof saveCatalogChanges === "function") saveCatalogChanges();
-                showToast(`Marked ${movie.title} as completed series!`, "success");
-                renderOngoingShowsManager();
-            }
-        });
-
-        btnRow.appendChild(updateBtn);
-        btnRow.appendChild(completeBtn);
-        card.appendChild(btnRow);
-
-        grid.appendChild(card);
-    });
-}
-
-// Admin Access Control Verification
 async function verifyAdminAccess() {
     const defaultAdmins = ["1329840839", "1175336733"];
     let authorizedIds = [...defaultAdmins];
@@ -3173,16 +3050,6 @@ if (addMovieForm) {
             genres = categories.filter(c => c !== "Main" && c !== "Hollywood/British Movies" && c !== "Hollywood/British Series");
         }
 
-        const isOngoing = document.getElementById("add-movie-ongoing-check")?.checked || false;
-        if (isOngoing && !categories.includes("Ongoing Series")) {
-            categories.push("Ongoing Series");
-        }
-
-        const isUpcoming = document.getElementById("add-movie-upcoming-check")?.checked || false;
-        if (isUpcoming && !categories.includes("Upcoming Movies")) {
-            categories.push("Upcoming Movies");
-        }
-
         // Add to local state
         const newMovie = {
             csv_id: id,
@@ -3192,8 +3059,6 @@ if (addMovieForm) {
             type: (finalType.toLowerCase() === 'series' || finalType.toLowerCase() === 'tv') ? 'Series' : 'Movie',
             categories: categories,
             genres: genres,
-            isOngoing: isOngoing,
-            isUpcoming: isUpcoming,
             overview: overview,
             poster: poster,
             backdrop: backdrop,
