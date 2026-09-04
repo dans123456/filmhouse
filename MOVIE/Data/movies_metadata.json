@@ -35783,7 +35783,7 @@
       },
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADwBYAAtGwuESkh5oSkoBo2hYE",
-        "quality": "480p"
+        "quality": "1080p"
       }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/1GvBhRxY6MELDfxFrete6BNhBB5.jpg",
@@ -35803,7 +35803,8 @@
     "overview": "Kraven Kravinoff's complex relationship with his ruthless gangster father, Nikolai, starts him down a path of vengeance with brutal consequences, motivating him to become not only the greatest hunter in the world, but also one of its most feared.",
     "backdrop": "https://image.tmdb.org/t/p/w1280/bGGjyPqtNc8hhGkPo8W8D8t90bW.jpg",
     "language": "en",
-    "cast": []
+    "cast": [],
+    "trailer": ""
   },
   {
     "title": "Kung Fu Panda: The Dragon Knight",
