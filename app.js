@@ -4095,12 +4095,14 @@ function openDownloadModal(movie) {
                 return q.toLowerCase();
             });
 
-            const has1080p = uploadedQualities.some(q => q.includes("1080p"));
-            const has4K = uploadedQualities.some(q => q.includes("4k") || q.includes("2160p"));
+            const has720p = uploadedQualities.some(q => q.includes("720") && !q.includes("cinema") && !q.includes("cam"));
+            const has1080p = uploadedQualities.some(q => q.includes("1080"));
+            const has4K = uploadedQualities.some(q => q.includes("4k") || q.includes("2160"));
 
             const missingQualities = [];
+            if (!has720p) missingQualities.push({ label: "720p HD", badge: "🎬 720p", code: "720p" });
             if (!has1080p) missingQualities.push({ label: "1080p Full HD", badge: "🎥 1080p", code: "1080p" });
-            if (!has4K) missingQualities.push({ label: "4K Ultra HD", badge: "✨ 4K UHD", code: "4K" });
+            if (!has4K) missingQualities.push({ label: "4K Ultra HD", badge: "✨ 2160p", code: "2160p" });
 
             if (missingQualities.length > 0) {
                 const qWrapper = document.createElement("div");
@@ -4108,7 +4110,7 @@ function openDownloadModal(movie) {
 
                 const divider = document.createElement("div");
                 divider.style.cssText = "margin: 16px 0 10px 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; font-weight: 800; text-transform: uppercase; color: #00c6ff; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;";
-                divider.innerHTML = `<span>⚡</span><span>Request Higher Quality Version</span>`;
+                divider.innerHTML = `<span>⚡</span><span>Request Other Qualities</span>`;
                 qWrapper.appendChild(divider);
 
                 missingQualities.forEach(qItem => {
@@ -4134,7 +4136,7 @@ function openDownloadModal(movie) {
                     const sublabel = document.createElement("span");
                     sublabel.className = "download-link-sublabel";
                     sublabel.style.cssText = "font-size: 11px; color: var(--text-secondary);";
-                    sublabel.textContent = "Not Uploaded Yet • Tap to Request HD";
+                    sublabel.textContent = `Not Uploaded Yet • Tap to Request ${qItem.code}`;
 
                     labelWrap.appendChild(label);
                     labelWrap.appendChild(sublabel);
@@ -6479,6 +6481,13 @@ function updateHeaderNotificationDot() {
 
 function logMovieRequestToFirestore(movie, specs = "") {
     if (!movie) return;
+    const isTVShow = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
+    
+    // Default quality for requested movies is 720p unless a specific quality was chosen
+    if (!isTVShow && !specs) {
+        specs = "720p Quality";
+    }
+
     const requestTitle = specs ? `${movie.title || "Unknown Title"} (${specs})` : (movie.title || "Unknown Title");
     
     // 1. Immediately store in local currentUserRequests array and persist to localStorage

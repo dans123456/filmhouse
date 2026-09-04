@@ -3942,8 +3942,8 @@ function renderFulfillLinksInputs(existingMovie, isSeries = true, reqSpec = "") 
             addFulfillLinkInputRow(idx, urlVal, qualityVal, true, isRequested);
         }
     } else {
-        // FOR MOVIES: Render existing links and pre-select the requested quality automatically
-        const targetQual = reqQuality ? normalizeQualityName(reqQuality) : "1080p";
+        // FOR MOVIES: Render existing links and pre-select the requested quality automatically (defaulting to 720p if not specified)
+        const targetQual = reqQuality ? normalizeQualityName(reqQuality) : "720p";
 
         if (existingLinks.length > 0) {
             let foundRequestedSlot = false;
