@@ -2228,8 +2228,95 @@ function renderGenreChips() {
     });
 }
 
-// Render Movie Grid
-function renderFeaturedGrid(fromDiscover = false) {
+// Helper to match catalog movies accurately against category tabs
+function matchesMovieCategory(m, category) {
+    if (!m) return false;
+    if (category === "Main") return true;
+    
+    const cats = (m.categories || []).map(c => String(c).toLowerCase());
+    const targetCat = String(category).toLowerCase();
+    
+    // Direct match
+    if (cats.includes(targetCat)) return true;
+    
+    const isSeries = (m.type || "").toLowerCase() === "series" || (m.type || "").toLowerCase() === "tv";
+    const genres = (m.genres || []).map(g => (typeof g === 'string' ? g : (g.name || "")).toLowerCase());
+    const lang = (m.language || "").toLowerCase();
+    const titleLower = (m.title || "").toLowerCase();
+
+    if (category === "Anime Series" || category === "Anime") {
+        if (cats.includes("anime series") || cats.includes("anime")) return isSeries || cats.includes("anime series");
+        if (genres.includes("animation") && isSeries && (lang === "ja" || titleLower.includes("anime") || titleLower.includes("castlevania") || titleLower.includes("arcane"))) return true;
+    }
+
+    if (category === "Anime Movies") {
+        if (cats.includes("anime movies")) return true;
+        if (cats.includes("anime") && !isSeries) return true;
+        if (genres.includes("animation") && !isSeries && (lang === "ja" || titleLower.includes("anime"))) return true;
+    }
+
+    if (category === "Korean Movies" || category === "Asian Movies") {
+        if (cats.includes("korean movies") || cats.includes("asian movies")) return true;
+        if (['ko', 'ja', 'zh', 'tr', 'th', 'id', 'vi'].includes(lang) && !isSeries) return true;
+    }
+
+    if (category === "Korean Drama" || category === "Asian Drama") {
+        if (cats.includes("korean drama") || cats.includes("asian drama")) return true;
+        if (['ko', 'ja', 'zh', 'tr', 'th', 'id', 'vi'].includes(lang) && isSeries) return true;
+    }
+
+    if (category === "Bollywood") {
+        if (cats.includes("bollywood") || ['hi', 'te', 'ta', 'ml', 'kn', 'mr', 'bn', 'pa'].includes(lang)) return true;
+    }
+
+    if (category === "African") {
+        if (cats.includes("african")) return true;
+    }
+
+    if (category === "Comic") {
+        if (cats.includes("comic")) return true;
+    }
+
+    if (category === "Animated Movies") {
+        if (cats.includes("animated movies") || (genres.includes("animation") && !isSeries)) return true;
+    }
+
+    if (category === "Kids Shows and Movies (Nickelodeon and Disney)") {
+        if (cats.includes("kids shows and movies (nickelodeon and disney)") || genres.includes("family") || genres.includes("kids")) return true;
+    }
+
+    if (category === "Hollywood/British Movies") {
+        if (cats.includes("hollywood/british movies") || (!isSeries && lang === "en")) return true;
+    }
+
+    if (category === "Hollywood/British Series") {
+        if (cats.includes("hollywood/british series") || (isSeries && lang === "en")) return true;
+    }
+
+    if (category === "Classic Movies") {
+        if (cats.includes("classic movies")) return true;
+        let releaseYear = 0;
+        if (m.release_date && m.release_date.length >= 4) releaseYear = parseInt(m.release_date.substring(0, 4)) || 0;
+        if (releaseYear > 0 && releaseYear < 2000) return true;
+    }
+
+    if (category === "Erotic Movies") {
+        if (cats.includes("erotic movies")) return true;
+    }
+
+    if (category === "Teen/High-School") {
+        if (cats.includes("teen/high-school")) return true;
+    }
+
+    if (category === "Christian Movies") {
+        if (cats.includes("christian movies")) return true;
+    }
+
+    return false;
+}
+
+// Render Featured Movie Grid with Filters & Category Switching
+function renderFeaturedGrid(preservePagination = false) {
     const grid = document.getElementById("movies-grid-container");
     if (!grid) return;
     grid.replaceChildren();
@@ -2268,7 +2355,12 @@ function renderFeaturedGrid(fromDiscover = false) {
                 "Hollywood/British Movies": "Hollywood",
                 "Hollywood/British Series": "Series",
                 "Bollywood": "Bollywood",
-                "Korean Drama": "K-Drama",
+                "Korean Drama": "Asian Drama 🫰",
+                "Asian Drama": "Asian Drama 🫰",
+                "Korean Movies": "Asian Movies 🎬",
+                "Asian Movies": "Asian Movies 🎬",
+                "Anime Series": "Anime 🥷",
+                "Anime Movies": "Anime Movies 🎨",
                 "African": "African",
                 "Anime": "Anime",
                 "Comic": "Comic",
@@ -2289,8 +2381,15 @@ function renderFeaturedGrid(fromDiscover = false) {
     let list = state.movies;
     if (!state.searchQuery) {
         if (state.activeCategory !== "Main") {
-            // Regional & Genre category tabs ONLY show published titles with active download links!
-            list = list.filter(m => m.categories && m.categories.includes(state.activeCategory) && m.links && m.links.length > 0);
+            // Local matching titles with links
+            list = list.filter(m => matchesMovieCategory(m, state.activeCategory) && m.links && m.links.length > 0);
+
+            // ALSO merge TMDB live category movies for this active category if available!
+            if (state.categoryTmdbMovies && state.categoryTmdbMovies[state.activeCategory] && state.categoryTmdbMovies[state.activeCategory].length > 0) {
+                const localTmdbIds = new Set(list.map(m => m.tmdb_id).filter(id => id));
+                const categoryTmdbList = state.categoryTmdbMovies[state.activeCategory].filter(ext => !localTmdbIds.has(ext.tmdb_id));
+                list = [...list, ...categoryTmdbList];
+            }
         }
     }
 
@@ -4565,31 +4664,46 @@ async function fetchTmdbCategoryMovies(category) {
         let urls = [];
 
         if (category === "Anime" || category === "Anime Series") {
-            urls = [`${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=16&with_original_language=ja&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+            urls = [
+                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=16&with_original_language=ja&sort_by=popularity.desc&page=1`,
+                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=16&with_original_language=ja&sort_by=vote_count.desc&page=1`
+            ];
         } else if (category === "Anime Movies") {
-            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&with_original_language=ja&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+            urls = [
+                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&with_original_language=ja&sort_by=popularity.desc&page=1`,
+                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&with_original_language=ja&sort_by=vote_count.desc&page=1`
+            ];
         } else if (category === "Korean Drama" || category === "Asian Drama") {
-            urls = [`${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko|zh|ja|tr&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+            urls = [
+                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko|zh|ja|th|tr&sort_by=popularity.desc&page=1`,
+                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=ko&sort_by=popularity.desc&page=1`
+            ];
         } else if (category === "Korean Movies" || category === "Asian Movies") {
-            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko|zh|ja|tr&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+            urls = [
+                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko|zh|ja|th|tr&sort_by=popularity.desc&page=1`,
+                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=ko&sort_by=popularity.desc&page=1`
+            ];
         } else if (category === "Bollywood") {
-            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=hi|te|ta&sort_by=popularity.desc&page=1`];
         } else if (category === "African") {
             urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_origin_country=NG|ZA|GH|KE&sort_by=popularity.desc&page=1`];
         } else if (category === "Comic") {
-            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=28,878&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=28,878&sort_by=popularity.desc&page=1`];
         } else if (category === "Animated Movies") {
-            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=16&sort_by=popularity.desc&page=1`];
         } else if (category === "Kids Shows and Movies (Nickelodeon and Disney)") {
-            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=10751,16&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+            urls = [
+                `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=10751,16&sort_by=popularity.desc&page=1`,
+                `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_genres=10751,16,10762&sort_by=popularity.desc&page=1`
+            ];
         } else if (category === "Hollywood/British Movies") {
-            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=en&primary_release_date.gte=2024-01-01&sort_by=popularity.desc&page=1`];
+            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_original_language=en&sort_by=popularity.desc&page=1`];
         } else if (category === "Hollywood/British Series") {
-            urls = [`${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=en&first_air_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+            urls = [`${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&with_original_language=en&sort_by=popularity.desc&page=1`];
         } else if (category === "Classic Movies") {
             urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&primary_release_date.lte=1999-12-31&sort_by=popularity.desc&page=1`];
         } else if (category === "Teen/High-School") {
-            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=35,18&primary_release_date.gte=2023-01-01&sort_by=popularity.desc&page=1`];
+            urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=35,18&sort_by=popularity.desc&page=1`];
         } else {
             urls = [`${TMDB_BASE_URL}/trending/all/week?api_key=${apiKey}&page=1`];
         }
@@ -4614,10 +4728,11 @@ async function fetchTmdbCategoryMovies(category) {
             const formatted = allResults
                 .filter(item => {
                     const releaseDate = item.release_date || item.first_air_date || "";
-                    if (category === "Classic Movies") return true;
-                    if (!releaseDate) return false;
-                    const year = parseInt(releaseDate.substring(0, 4), 10);
-                    if (category !== "Classic Movies" && year < 2022) return false;
+                    if (category === "Classic Movies") {
+                        if (!releaseDate) return true;
+                        const year = parseInt(releaseDate.substring(0, 4), 10);
+                        return isNaN(year) || year <= 1999;
+                    }
                     return true;
                 })
                 .map(item => {
@@ -4627,7 +4742,8 @@ async function fetchTmdbCategoryMovies(category) {
                     const genresList = [category];
                     if (origLang === "ja") genresList.push("Anime");
                     if (origLang === "ko") genresList.push("Korean", "Korean Drama");
-                    if (origLang === "hi") genresList.push("Bollywood");
+                    if (origLang === "zh" || origLang === "ja" || origLang === "th") genresList.push("Asian");
+                    if (origLang === "hi" || origLang === "te" || origLang === "ta") genresList.push("Bollywood");
                     if (origLang === "en") genresList.push("Hollywood");
 
                     return {
@@ -4638,7 +4754,7 @@ async function fetchTmdbCategoryMovies(category) {
                         type: isTV ? "Series" : "Movie",
                         categories: [category, "Main"],
                         genres: genresList,
-                        overview: item.overview || "Popular recent release on Film House.",
+                        overview: item.overview || "Popular release on Film House.",
                         poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
                         backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
                         rating: Math.round((item.vote_average || 0) * 10) / 10,
@@ -4654,7 +4770,15 @@ async function fetchTmdbCategoryMovies(category) {
 
             if (!state.categoryTmdbMovies) state.categoryTmdbMovies = {};
             const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
-            state.categoryTmdbMovies[category] = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+            const filteredTmdb = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+            
+            state.categoryTmdbMovies[category] = filteredTmdb;
+            if (category === "Korean Movies") state.categoryTmdbMovies["Asian Movies"] = filteredTmdb;
+            if (category === "Asian Movies") state.categoryTmdbMovies["Korean Movies"] = filteredTmdb;
+            if (category === "Korean Drama") state.categoryTmdbMovies["Asian Drama"] = filteredTmdb;
+            if (category === "Asian Drama") state.categoryTmdbMovies["Korean Drama"] = filteredTmdb;
+            if (category === "Anime Series") state.categoryTmdbMovies["Anime"] = filteredTmdb;
+            if (category === "Anime") state.categoryTmdbMovies["Anime Series"] = filteredTmdb;
         }
     } catch (err) {
         console.error(`Error fetching TMDB live category movies for ${category}:`, err);
