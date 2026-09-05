@@ -1,5 +1,45 @@
 [
   {
+    "csv_id": "1506560-clash-of-the-thundermans",
+    "tmdb_id": 1506560,
+    "imdb_id": "",
+    "title": "Clash of the Thundermans",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Teen/High-School",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "TV Movie",
+      "Family",
+      "Science Fiction",
+      "Action",
+      "Comedy"
+    ],
+    "overview": "When Chloe develops a destructive new superpower, the Hero League orders her to an elite boarding school for superheroes to learn control of her abilities. Faced with the prospect of sending Chloe away for years, the Thundermans split apart, with Phoebe, Barb and Billy taking her into hiding. Max, Hank, and Nora track their rogue family members, until the two factions face off against each other in a full-on battle for the Thundermans’ future.",
+    "poster": "https://image.tmdb.org/t/p/w500/16oqRrWVzQm6qdGfBxvziZ2UiMT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tBZMwg5oCJn8P0pStfuOMhhSQD3.jpg",
+    "rating": 6.9,
+    "release_date": "2026-09-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Tui9Jpmyb6Q",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD5wwAAuOS6ESLw0CyaHLhfBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD6AwAAuOS6ETkRVx4m_XcrBYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
     "csv_id": "67744-mindhunter",
     "tmdb_id": 67744,
     "imdb_id": "",
