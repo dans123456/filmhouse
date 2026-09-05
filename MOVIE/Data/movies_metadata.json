@@ -1,5 +1,88 @@
 [
   {
+    "csv_id": "95557-invincible",
+    "tmdb_id": 95557,
+    "imdb_id": "",
+    "title": "INVINCIBLE",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Comic",
+      "Teen/High-School",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation",
+      "Drama",
+      "Sci-Fi & Fantasy",
+      "Action & Adventure"
+    ],
+    "overview": "Mark Grayson is a normal teenager except for the fact that his father is the most powerful superhero on the planet. Shortly after his seventeenth birthday, Mark begins to develop powers of his own and enters into his father's tutelage.",
+    "poster": "https://image.tmdb.org/t/p/w500/4tblBrslcKSifMVZ3TmtT2ukMor.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/9qrroces8C6R9aKr08hACNPVXdZ.jpg",
+    "rating": 8.6,
+    "release_date": "2021-03-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "-bfAVpuko5o",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADpgwAAuOS4ERtAWj0ongM9xYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqQwAAuOS4EQgjLXpcG-P5hYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADrAwAAuOS4ETlgf1Ni0tq4xYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsQwAAuOS4ER9nAzmsAuUsBYE",
+        "season": "Season 4"
+      }
+    ]
+  },
+  {
+    "csv_id": "79460-legacies",
+    "tmdb_id": 79460,
+    "imdb_id": "",
+    "title": "Legacies",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Drama"
+    ],
+    "overview": "In a place where young witches, vampires, and werewolves are nurtured to be their best selves in spite of their worst impulses, Klaus Mikaelson’s daughter, 17-year-old Hope Mikaelson, Alaric Saltzman’s twins, Lizzie and Josie Saltzman, among others, come of age into heroes and villains at The Salvatore School for the Young and Gifted.",
+    "poster": "https://image.tmdb.org/t/p/w500/qTZIgXrBKURBK1KrsT7fe3qwtl9.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fRYwdeNjMqC30EhofPx5PlDpdun.jpg",
+    "rating": 8.4,
+    "release_date": "2018-10-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "xHHM5VTATJo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmAwAAuOS4ERyZAIJAvec7BYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmwwAAuOS4ERjjbVsw1HFzxYE",
+        "season": "Season 2"
+      }
+    ]
+  },
+  {
     "csv_id": "1514682-above-below",
     "tmdb_id": 1514682,
     "imdb_id": "",
@@ -415,19 +498,23 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD0x0AAmFleUQpdxvchfqKcxYE",
-        "quality": "720p"
+        "season": "Season 1"
       },
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD1B0AAmFleURUdHpbkoOQfRYE",
-        "quality": "720p"
+        "season": "Season 2"
       },
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD-B0AAmFleUQyHUtRA0rCCRYE",
-        "quality": "720p"
+        "season": "Season 3"
       },
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD-R0AAmFleUTpeQUZkUsxbxYE",
-        "quality": "720p"
+        "season": "Season 4"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhQwAAuOS4ESaaPq6Lo4p4xYE",
+        "season": "Season 5"
       }
     ]
   },
