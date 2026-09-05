@@ -1,5 +1,195 @@
 [
   {
+    "csv_id": "1742458-confinement",
+    "tmdb_id": 1742458,
+    "imdb_id": "",
+    "title": "Confinement",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Thriller",
+      "Horror"
+    ],
+    "overview": "Pregnant and recently widowed, Stella is taken in by her late husband’s estranged family. But beneath their generosity lies something deeply unsettling, leaving Stella fighting for her life as their obsession with her unborn child turns deadly.",
+    "poster": "https://image.tmdb.org/t/p/w500/i92X6pBSqZgHAvIX28p0AZJU8xz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xQbHmeJdT95pSDMzP92CrvjceBh.jpg",
+    "rating": 6,
+    "release_date": "2026-09-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "pKD5M0JAH3w",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_RAAAuOS4ETP3lrblHXc6hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1729196-dread",
+    "tmdb_id": 1729196,
+    "imdb_id": "",
+    "title": "Dread",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror"
+    ],
+    "overview": "Terror takes many forms. In five chilling tales, the mundane becomes monstrous and no one gets out clean.",
+    "poster": "https://image.tmdb.org/t/p/w500/2GtykQnr2L0fmI3zxEsaTEaunXF.jpg",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2026-07-10",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "B15luzQM8Ls",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_xAAAuOS4ERQPRRzcNJ2QhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1074074-the-beloved",
+    "tmdb_id": 1074074,
+    "imdb_id": "",
+    "title": "The Beloved",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "The acclaimed film director Esteban Martínez is a legend both for his films and for his past marked by violence and excess. For his new project, he offers his daughter Emilia a role under the pretext of helping her with her stalled acting career. Living together on set will foster a closeness they haven’t shared for years, but it will also reopen old wounds that never healed.",
+    "poster": "https://image.tmdb.org/t/p/w500/whk02IOeEHz8KCYZGm3fF92zg0v.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/pXtbTukWUFdkQmYydHihDceDFcU.jpg",
+    "rating": 6.9,
+    "release_date": "2026-05-16",
+    "language": "es",
+    "cast": [],
+    "director": "",
+    "trailer": "2I5LLG2XBco",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAEEQAC45LgRHszvETurjWCFgQ",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1744462-grand-theft-auto-vi-an-extended-look",
+    "tmdb_id": 1744462,
+    "imdb_id": "",
+    "title": "Grand Theft Auto VI: An Extended Look",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Action",
+      "Adventure",
+      "Crime"
+    ],
+    "overview": "Captured entirely from in-game footage on PlayStation 5, this extended look at the next Grand Theft Auto showcases the biggest, most immersive evolution of the series yet.",
+    "poster": "https://image.tmdb.org/t/p/w500/xTZuh9ziUjIyHBWO9OvqNIPqVWe.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/po0uFYwWNByHQzHLCVJ6FetkN4M.jpg",
+    "rating": 8.9,
+    "release_date": "2026-08-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "uphThaa97ig",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADDBEAAuOS4ES347JwRBmZIxYE",
+        "quality": "2160p (4K)"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBxEAAuOS4ER0grkCq9GGvBYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1288059-i-want-your-sex",
+    "tmdb_id": 1288059,
+    "imdb_id": "",
+    "title": "I Want Your Sex",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy"
+    ],
+    "overview": "When fresh-faced Elliot lands an exciting job for renowned artist, icon and provocateur Erika Tracy, his fantasies come true as Erika taps him to become her sexual muse. But Elliot soon finds himself out of his depth as Erika takes him on a journey more profound than he ever could have imagined, into a world of sex, obsession, power, betrayal and murder.",
+    "poster": "https://image.tmdb.org/t/p/w500/pR7SIX3AwqdoD96OI44oLG98e7g.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/34z9eBtEBv6QoroLuUA55cU3e8Q.jpg",
+    "rating": 6.2,
+    "release_date": "2026-07-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "q5oWCPS3akw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADEREAAuOS4ESMaAi4t2jWRRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1480574-just-play-dead",
+    "tmdb_id": 1480574,
+    "imdb_id": "",
+    "title": "Just Play Dead",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Thriller",
+      "Crime"
+    ],
+    "overview": "A criminal mastermind plans to fake his death for insurance money while framing his wife's lover. His wife plots to kill him for real and take it all. Both race to outmanoeuvre each other in a deadly battle of wits.",
+    "poster": "https://image.tmdb.org/t/p/w500/glALx6QaIgw1u4joXsnfHTjWi6D.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lBWfbmUj9Jw0EM1OYtDXr0B5FPW.jpg",
+    "rating": 6.7,
+    "release_date": "2026-08-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "LlAajeOoFBo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADEhEAAuOS4ESoZqxzA2xXehYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "194766-the-summer-i-turned-pretty",
     "tmdb_id": 194766,
     "imdb_id": "",
@@ -353,6 +543,10 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADcB8AAgX02URAakZtHDwDzBYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADAxEAAuOS4EQLy1wLl9ppWhYE",
         "quality": "720p"
       }
     ]
