@@ -1,5 +1,44 @@
 [
   {
+    "csv_id": "194766-the-summer-i-turned-pretty",
+    "tmdb_id": 194766,
+    "imdb_id": "",
+    "title": "The Summer I Turned Pretty",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "Every summer, Belly and her family head to the Fishers’ beach house in Cousins. Every summer is the same ... until Belly turns sixteen. Relationships will be tested, painful truths will be revealed, and Belly will be forever changed. It’s a summer of first love, first heartbreak and growing up — it's the summer she turns pretty.",
+    "poster": "https://image.tmdb.org/t/p/w500/xBIz53wYWsKfFpN0TaizVAjKJ0z.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jCQV3rHNbgHKo3N4G6CARbVEjPV.jpg",
+    "rating": 8.1,
+    "release_date": "2022-06-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "faL_S-7z4_I",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADrQ0AAuOS4ERcDh32R8_J7hYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADsg0AAuOS4ESZAAFwqi3DlUQWBA",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADtg0AAuOS4ESDoSD7iJA9zxYE",
+        "season": "Season 3"
+      }
+    ]
+  },
+  {
     "csv_id": "980431-avatar-aang-the-last-airbender",
     "tmdb_id": 980431,
     "imdb_id": "",
