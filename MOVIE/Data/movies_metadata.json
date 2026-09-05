@@ -1,5 +1,41 @@
 [
   {
+    "csv_id": "67744-mindhunter",
+    "tmdb_id": 67744,
+    "imdb_id": "",
+    "title": "MINDHUNTER",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama",
+      "Crime"
+    ],
+    "overview": "An agent in the FBI's Elite Serial Crime Unit develops profiling techniques as he pursues notorious serial killers and rapists.",
+    "poster": "https://image.tmdb.org/t/p/w500/fbKE87mojpIETWepSbD5Qt741fp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lpDVJuIro21gtMj9iXMFKHuroZN.jpg",
+    "rating": 8.1,
+    "release_date": "2017-10-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "evdxH50J3rs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADQBIAAuOS4ERmCh25JFDz-xYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADRRIAAuOS4ES0ipvtXNGaSRYE",
+        "season": "Season 2"
+      }
+    ]
+  },
+  {
     "csv_id": "14171-home-of-the-brave",
     "tmdb_id": 14171,
     "imdb_id": "",
