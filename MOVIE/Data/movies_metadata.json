@@ -1,5 +1,42 @@
 [
   {
+    "csv_id": "67075-mob-psycho-100",
+    "tmdb_id": 67075,
+    "imdb_id": "",
+    "title": "Mob Psycho 100",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Comedy",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Shigeo Kageyama, a.k.a. \"Mob,\" is a boy who has trouble expressing himself, but who happens to be a powerful esper. Mob is determined to live a normal life and keeps his ESP suppressed, but when his emotions surge to a level of 100%, something terrible happens to him! As he's surrounded by false espers, evil spirits, and mysterious organizations, what will Mob think? What choices will he make?",
+    "poster": "https://image.tmdb.org/t/p/w500/vR7hwaGQ0ySRoq1WobiNRaPs4WO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kP5duNJEbTfXpBs6CITsaZ88pQi.jpg",
+    "rating": 8.5,
+    "release_date": "2016-07-12",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "YIezct4JGNs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADkRYAAuOS6EREhrCYDZX8iRYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADnhYAAuOS6ESPPXC15XH0xBYE",
+        "season": "Season 2"
+      }
+    ]
+  },
+  {
     "csv_id": "1506560-clash-of-the-thundermans",
     "tmdb_id": 1506560,
     "imdb_id": "",
