@@ -1,5 +1,320 @@
 [
   {
+    "csv_id": "14069-the-girl-who-leapt-through-time",
+    "tmdb_id": 14069,
+    "imdb_id": "",
+    "title": "The Girl Who Leapt Through Time",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime Movies",
+      "Animated Movies"
+    ],
+    "genres": [
+      "Fantasy",
+      "Animation",
+      "Drama",
+      "Science Fiction"
+    ],
+    "overview": "When 17-year-old Makoto Konno gains the ability to 'leap' backwards through time, she immediately sets about improving her grades and preventing personal mishaps. However, she soon realises that changing the past isn't as simple as it seems, and eventually, will have to rely on her new powers to shape the future of herself and her friends.",
+    "poster": "https://image.tmdb.org/t/p/w500/fmK92C7HGu6sK0axItlQ0YsO9qR.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6m2qbAqSMJTX4HUwRvVEQI6ioiO.jpg",
+    "rating": 7.8,
+    "release_date": "2006-07-15",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "boZINHGDxMw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADjxoAAkDh-ERL0HqQUbjTQBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "378064-a-silent-voice-the-movie",
+    "tmdb_id": 378064,
+    "imdb_id": "",
+    "title": "A Silent Voice: The Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime Movies",
+      "Animated Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Drama",
+      "Romance"
+    ],
+    "overview": "Shouya Ishida starts bullying the new girl in class, Shouko Nishimiya, because she is deaf. But as the teasing continues, the rest of the class starts to turn on Shouya for his lack of compassion. When they leave elementary school, Shouko and Shouya do not speak to each other again... until an older, wiser Shouya, tormented by his past behaviour, decides he must see Shouko once more. He wants to atone for his sins, but is it already too late...?",
+    "poster": "https://image.tmdb.org/t/p/w500/tuFaWiqX0TXoWu7DGNcmX3UW7sT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/5lAMQMWpXMsirvtLLvW7cJgEPkU.jpg",
+    "rating": 8.4,
+    "release_date": "2016-09-17",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "TQK9By9qQiw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADjRoAAkDh-ESCf_3T8eSDlhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "372058-your-name",
+    "tmdb_id": 372058,
+    "imdb_id": "",
+    "title": "Your Name.",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime Movies",
+      "Animated Movies",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Animation",
+      "Romance",
+      "Drama"
+    ],
+    "overview": "High schoolers Mitsuha and Taki are complete strangers living separate lives. But one night, they suddenly switch places. Mitsuha wakes up in Taki’s body, and he in hers. This bizarre occurrence continues to happen randomly, and the two must adjust their lives around each other.",
+    "poster": "https://image.tmdb.org/t/p/w500/vfJFJPepRKapMd5G2ro7klIRysq.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mMtUybQ6hL24FXo0F3Z4j2KG7kZ.jpg",
+    "rating": 8.5,
+    "release_date": "2016-07-01",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "TYku4P7MHdo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADjBoAAkDh-ESuDMPRUY0FFBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "26867-mushi-shi",
+    "tmdb_id": 26867,
+    "imdb_id": "",
+    "title": "Mushi-Shi",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Drama",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Ginko, a Mushi master, travels from place to place researching the Mushi and helping people who are suffering because of it.",
+    "poster": "https://image.tmdb.org/t/p/w500/1EdA21TRBXJU5aBP4EHkOMF2tNx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/8ysRHGV3URjOJT7u7NkZiFjvObk.jpg",
+    "rating": 8.1,
+    "release_date": "2005-10-23",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "W-CMthGUhvY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADbRoAAkDh-ET14BoWUPqy4hYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADcRoAAkDh-EQTY2PVoahLAAEWBA",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADdRoAAkDh-EQ5-0WFNVWaBRYE",
+        "season": "Season 3"
+      }
+    ]
+  },
+  {
+    "csv_id": "42509-steins-gate",
+    "tmdb_id": 42509,
+    "imdb_id": "",
+    "title": "Steins;Gate",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Sci-Fi & Fantasy",
+      "Mystery",
+      "Comedy"
+    ],
+    "overview": "A group of friends have customized their microwave so that it can send text messages to the past. As they perform different experiments, an organization named SERN who has been doing their own research on time travel tracks them down and now the characters have to find a way to avoid being captured by them.",
+    "poster": "https://image.tmdb.org/t/p/w500/ce0kVdxBGdXBrWmQgawkHwdqFX9.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gDvxT2z6TNxervG97WfpePRZ3aR.jpg",
+    "rating": 8.5,
+    "release_date": "2011-04-06",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "uMYhjVwp0Fk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADZxoAAkDh-ESPQWiFCCMkARYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
+    "csv_id": "43865-psycho-pass",
+    "tmdb_id": 43865,
+    "imdb_id": "",
+    "title": "Psycho-Pass",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Crime",
+      "Sci-Fi & Fantasy",
+      "Action & Adventure"
+    ],
+    "overview": "In the year 2113, people are given brain scans to determine how likely they are to commit a crime. Those who fail are apprehended, or even killed.",
+    "poster": "https://image.tmdb.org/t/p/w500/uWnP6qTcc4imPJ9ZHaXlPQlcYnB.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2HtnTJLs3CDUTu6ug8rib5vNnU2.jpg",
+    "rating": 7.7,
+    "release_date": "2012-10-12",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "YzuJnyebc40",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADWRoAAkDh-EQXkKKDdqG91RYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADXhoAAkDh-ESb27AFZ8ldtBYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADYBoAAkDh-EQG0qZMujDOxxYE",
+        "season": "Season 3"
+      }
+    ]
+  },
+  {
+    "csv_id": "1218925-chainsaw-man-the-movie-reze-arc",
+    "tmdb_id": 1218925,
+    "imdb_id": "",
+    "title": "Chainsaw Man - The Movie: Reze Arc",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime Movies",
+      "Animated Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Action",
+      "Romance",
+      "Fantasy"
+    ],
+    "overview": "In a brutal war between devils, hunters, and secret enemies, a mysterious girl named Reze has stepped into Denji's world, and he faces his deadliest battle yet, fueled by love in a world where survival knows no rules.",
+    "poster": "https://image.tmdb.org/t/p/w500/pHyxb2RV5wLlboAwm9ZJ9qTVEDw.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gqTz24ZRsCP6AKjARmEivY7m0cK.jpg",
+    "rating": 8.5,
+    "release_date": "2025-09-19",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "GJ1jrCnm-t8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADNBoAAkDh-EQFaQVH2KtH1BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "114410-chainsaw-man",
+    "tmdb_id": 114410,
+    "imdb_id": "",
+    "title": "Chainsaw Man",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy",
+      "Comedy"
+    ],
+    "overview": "Denji has a simple dream—to live a happy and peaceful life, spending time with a girl he likes. This is a far cry from reality, however, as Denji is forced by the yakuza into killing devils in order to pay off his crushing debts. Using his pet devil Pochita as a weapon, he is ready to do anything for a bit of cash.",
+    "poster": "https://image.tmdb.org/t/p/w500/iFM1dyFi0rByvEomEkmm7NpQeeb.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/5DUMPBSnHOZsbBv81GFXZXvDpo6.jpg",
+    "rating": 8.5,
+    "release_date": "2022-10-12",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "j9sSzNmB5po",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADMBoAAkDh-ET9kE9BIrafjhYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
+    "csv_id": "28136-rurouni-kenshin",
+    "tmdb_id": 28136,
+    "imdb_id": "",
+    "title": "Rurouni Kenshin",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Action & Adventure",
+      "Animation",
+      "Comedy"
+    ],
+    "overview": "The Meiji Era was one of great renewal for Japan, where swords and killing were outlawed. However, many survivors from the time of Revolution still live, lurking in the shadows and waiting for a chance to use their killing blades again. Only Kenshin Himura, formerly one of the most brutal of killers, hopes to keep his swordsman's honor and still live in the new era.",
+    "poster": "https://image.tmdb.org/t/p/w500/lQ4p6OF9KjagTfs8otZt0VTe3Al.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/AwhfYDJHEsgUzEkd7Dp3fKaeHHU.jpg",
+    "rating": 8.5,
+    "release_date": "1996-01-10",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "4aVeFBVtpjs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADEhoAAkDh-ET0qy7H3rg5oRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "239523-hunter-x-hunter-the-last-mission",
     "tmdb_id": 239523,
     "imdb_id": "",
@@ -44579,7 +44894,7 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Anime"
+      "Anime Series"
     ],
     "genres": [
       "Anime"
@@ -44595,8 +44910,18 @@
     "trailer": "JP6vBnazpWI",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD3BAAAh-4UEb_RhG7pPijuBYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD3hAAAh-4UEZn8MhO5Z1GJBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD3BAAAh-4UEb_RhG7pPijuBYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD3hAAAh-4UEZn8MhO5Z1GJBYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADPhoAAkDh-ERSgfqz-E9kHhYE",
+        "season": "Season 3"
+      }
     ]
   },
   {
