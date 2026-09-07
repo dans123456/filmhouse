@@ -1,5 +1,49 @@
 [
   {
+    "csv_id": "46260-naruto",
+    "tmdb_id": 46260,
+    "imdb_id": "",
+    "title": "Naruto",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Naruto Uzumaki, a mischievous adolescent ninja, struggles as he searches for recognition and dreams of becoming the Hokage, the village's leader and strongest ninja.",
+    "poster": "https://image.tmdb.org/t/p/w500/xppeysfvDKVx775MFuH8Z9BlpMk.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/5F0HVEgkgP99fEWDjPyikGt9jQi.jpg",
+    "rating": 8.4,
+    "release_date": "2002-10-03",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "-G9BqkgZXRA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADQxkAAkDh-ESNxwmXN1OqYRYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADWRkAAkDh-ETiHyDPkJCTSBYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADdBkAAkDh-ERRy2VKaXYqjBYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADdxkAAkDh-ESMoDHmAAGSF7cWBA",
+        "season": "Season 4"
+      }
+    ]
+  },
+  {
     "csv_id": "37863-fullmetal-alchemist",
     "tmdb_id": 37863,
     "imdb_id": "",
