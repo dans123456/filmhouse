@@ -4225,8 +4225,10 @@ function openDownloadModal(movie) {
 
         // Missing Quality Request Cards for Movies
         if (!isTVShow) {
-            const uploadedQualities = (movie.links || []).map(l => {
-                const q = typeof l === 'object' && l !== null ? (l.quality || "") : "";
+            const uploadedQualities = (movie.links || []).map((l, idx) => {
+                const linkUrl = typeof l === 'object' && l !== null ? l.url : l;
+                if (!linkUrl || !String(linkUrl).trim()) return "";
+                const q = typeof l === 'object' && l !== null && l.quality ? l.quality : (qualityLabels[idx] || "");
                 return q.toLowerCase();
             });
 
