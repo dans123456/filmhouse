@@ -1675,7 +1675,7 @@ function renderFavoriteCategoriesChecklist() {
 
     const categoryList = [
         "Hollywood/British Movies", "Hollywood/British Series", 
-        "Bollywood", "Korean Drama", "African", "Anime", "Comic", 
+        "Bollywood", "Asian Drama", "Asian Movies", "African", "Anime", "Comic", 
         "Animated Movies", "Kids Shows and Movies (Nickelodeon and Disney)", 
         "Classic Movies", "Erotic Movies", "Teen/High-School", "Christian Movies"
     ];
@@ -1684,7 +1684,10 @@ function renderFavoriteCategoriesChecklist() {
         "Hollywood/British Movies": "Hollywood Movies",
         "Hollywood/British Series": "Hollywood Series",
         "Bollywood": "Bollywood",
-        "Korean Drama": "K-Drama",
+        "Asian Drama": "Asian Drama (K-Drama)",
+        "Asian Movies": "Asian Movies",
+        "Korean Drama": "Asian Drama (K-Drama)",
+        "Korean Movies": "Asian Movies",
         "African": "African",
         "Anime": "Anime",
         "Comic": "Comic",
@@ -1712,7 +1715,7 @@ function renderFavoriteCategoriesChecklist() {
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             checkbox.value = cat;
-            checkbox.checked = state.user.favoriteCategories.includes(cat);
+            checkbox.checked = state.user.favoriteCategories.includes(cat) || (cat === "Asian Drama" && state.user.favoriteCategories.includes("Korean Drama")) || (cat === "Asian Movies" && state.user.favoriteCategories.includes("Korean Movies"));
             checkbox.style.cursor = "pointer";
 
             label.appendChild(checkbox);
@@ -2174,7 +2177,7 @@ function renderCategoriesBar() {
 
     const categoryList = [
         "Main", "Hollywood/British Movies", "Hollywood/British Series", 
-        "Korean Drama", "Korean Movies", "Anime Series", "Anime Movies", 
+        "Asian Drama", "Asian Movies", "Anime Series", "Anime Movies", 
         "Bollywood", "African", "Comic", "Animated Movies", 
         "Kids Shows and Movies (Nickelodeon and Disney)", 
         "Classic Movies", "Erotic Movies", "Teen/High-School", "Christian Movies"

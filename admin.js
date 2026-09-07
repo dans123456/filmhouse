@@ -354,7 +354,10 @@ function updateStatsCounters() {
                 "Animated Movies": "Animated Movies 🎨",
                 "Comic": "Comic & Superhero 🦸",
                 "Erotic Movies": "Erotic Movies 🔞",
-                "Korean Drama": "Korean Drama (K-Drama) 🇰🇷",
+                "Asian Drama": "Asian Drama (K/C/J-Drama) 🫰",
+                "Asian Movies": "Asian Movies (Asian Cinema) 🎬",
+                "Korean Drama": "Asian Drama (K-Drama) 🫰",
+                "Korean Movies": "Asian Movies 🎬",
                 "African": "African Cinema 🌍",
                 "Anime": "Anime Series & Movies 🎌",
                 "Bollywood": "Bollywood Cinema 🇮🇳",
@@ -2098,9 +2101,11 @@ function showMovieDetails(movie) {
                         { key: "Hollywood/British Movies", label: "Hollywood Movies" },
                         { key: "Hollywood/British Series", label: "Hollywood Series" },
                         { key: "Bollywood", label: "Bollywood" },
-                        { key: "Korean Drama", label: "Korean Drama" },
+                        { key: "Asian Drama", label: "Asian Drama" },
+                        { key: "Asian Movies", label: "Asian Movies" },
                         { key: "African", label: "African" },
-                        { key: "Anime", label: "Anime" },
+                        { key: "Anime Series", label: "Anime Series" },
+                        { key: "Anime Movies", label: "Anime Movies" },
                         { key: "Comic", label: "Comic" },
                         { key: "Animated Movies", label: "Animated" },
                         { key: "Kids Shows and Movies (Nickelodeon and Disney)", label: "Kids" },
@@ -2109,10 +2114,15 @@ function showMovieDetails(movie) {
                         { key: "Teen/High-School", label: "Teen / High-School" },
                         { key: "Christian Movies", label: "Christian" }
                     ].map(cat => {
-                        const checked = movie.categories && movie.categories.includes(cat.key) ? 'checked' : '';
+                        const isChecked = (movie.categories && (
+                            movie.categories.includes(cat.key) ||
+                            (cat.key === "Asian Drama" && movie.categories.includes("Korean Drama")) ||
+                            (cat.key === "Asian Movies" && movie.categories.includes("Korean Movies")) ||
+                            (cat.key === "Anime Series" && movie.categories.includes("Anime"))
+                        )) ? 'checked' : '';
                         return `
                             <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
-                                <input type="checkbox" class="edit-cat-checkbox" value="${cat.key}" ${checked}> ${cat.label}
+                                <input type="checkbox" class="edit-cat-checkbox" value="${cat.key}" ${isChecked}> ${cat.label}
                             </label>
                         `;
                     }).join('')}
@@ -2600,9 +2610,9 @@ function determineAutoCategories(data, title, type) {
     const asianKeywords = ["korean", "kdrama", "k-drama", "cdrama", "c-drama", "j-drama", "jdrama", "thai drama", "turkish drama", "squid game", "boys over flowers", "queen of tears", "all of us are dead", "glory", "vincenzo", "crash landing on you", "the untamed", "hidden love", "meteor garden"];
     if (!isAnimeMatch && !isAnimation && (asianLangs.includes(origLang) || isAsianCountry || asianKeywords.some(k => titleLower.includes(k) || overviewLower.includes(k)))) {
         if (isSeries) {
-            categories.push("Korean Drama");
+            categories.push("Asian Drama");
         } else {
-            categories.push("Korean Movies");
+            categories.push("Asian Movies");
         }
     }
 
@@ -2679,7 +2689,7 @@ function determineAutoCategories(data, title, type) {
     }
 
     // 10. Regional fallback to Hollywood/British
-    const isRegional = categories.some(cat => ["Korean Drama", "Korean Movies", "Bollywood", "African", "Anime Series", "Anime Movies"].includes(cat));
+    const isRegional = categories.some(cat => ["Asian Drama", "Asian Movies", "Korean Drama", "Korean Movies", "Bollywood", "African", "Anime Series", "Anime Movies"].includes(cat));
     if (!isRegional) {
         if (isSeries) {
             categories.push("Hollywood/British Series");
@@ -2699,6 +2709,15 @@ function autoCheckCategoriesUI(selectedCategories) {
     
     const catSet = new Set(selectedCategories || ["Main"]);
     catSet.add("Main"); // Always ensure Main is included
+    
+    if (catSet.has("Asian Drama") || catSet.has("Korean Drama")) {
+        catSet.add("Asian Drama");
+        catSet.add("Korean Drama");
+    }
+    if (catSet.has("Asian Movies") || catSet.has("Korean Movies")) {
+        catSet.add("Asian Movies");
+        catSet.add("Korean Movies");
+    }
     
     checkboxes.forEach(cb => {
         // Keep Christian Movies checked ONLY if user manually checked it
