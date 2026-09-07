@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "154743-the-angel-next-door-spoils-me-rotten",
+    "tmdb_id": 154743,
+    "imdb_id": "",
+    "title": "The Angel Next Door Spoils Me Rotten",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Comedy"
+    ],
+    "overview": "Amane lives alone in an apartment, and the most beautiful girl in school, Mahiru, lives just next door. They've almost never spoken—until the day he sees her in distress on a rainy day and lends her his umbrella. To return the favour, she offers him help around the house, and a relationship slowly begins to blossom as the distance between them closes…",
+    "poster": "https://image.tmdb.org/t/p/w500/pjNFTabj2mXUGquE8Oj3buPeKvQ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xT61K3zhGTix0O3H5BEcDLGDkk9.jpg",
+    "rating": 7.7,
+    "release_date": "2023-01-07",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "b5EJ9ZkK6kE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADVxQAAkDh-ERU96duhH6oARYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "257790-i-m-getting-married-to-a-girl-i-hate-in-my-class",
     "tmdb_id": 257790,
     "imdb_id": "",
