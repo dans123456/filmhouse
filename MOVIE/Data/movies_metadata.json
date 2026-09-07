@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "271607-the-fragrant-flower-blooms-with-dignity",
+    "tmdb_id": 271607,
+    "imdb_id": "",
+    "title": "The Fragrant Flower Blooms with Dignity",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Animation",
+      "Drama"
+    ],
+    "overview": "When the intimidating Rintaro meets the open-minded Kaoruko, the unlikely duo grows closer. The issue? Their neighboring high schools hate each other.",
+    "poster": "https://image.tmdb.org/t/p/w500/g1sYAQt0OeCxzyfagSEqxUlsLnt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dl3pdT1NZiqRM4aDBwsD2TtO8x9.jpg",
+    "rating": 8.7,
+    "release_date": "2025-07-06",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "1FcVJxxPWh4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADahMAAkDh-ETeJCoOQ9ygAhYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "67075-mob-psycho-100",
     "tmdb_id": 67075,
     "imdb_id": "",
