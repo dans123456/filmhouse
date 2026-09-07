@@ -1,5 +1,244 @@
 [
   {
+    "csv_id": "34121-baccano",
+    "tmdb_id": 34121,
+    "imdb_id": "",
+    "title": "Baccano!",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Comedy",
+      "Action & Adventure",
+      "Animation",
+      "Crime",
+      "Mystery"
+    ],
+    "overview": "Alchemists, swindlers, thieves, and gangsters cross paths on The Flying Pussyfoot, a 1930s American transcontinental train, as it embarks on a legendary voyage that leaves a trail of blood all over the country.",
+    "poster": "https://image.tmdb.org/t/p/w500/jC4xEYiaGbgZkQSy1hOHbXhKh5D.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/1KQYzDvPhe6XDycqmL4jb7QO51d.jpg",
+    "rating": 7.8,
+    "release_date": "2007-07-27",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "MtuNdtfMlJ0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADHBsAAkDh-ET0vvM-CJSAbBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
+    "csv_id": "62602-blue-spring-ride",
+    "tmdb_id": 62602,
+    "imdb_id": "",
+    "title": "Blue Spring Ride",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Animation",
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "At the end of her first year of high school, Futaba Yoshioka suddenly has a chance encounter with her first love, Kou Tanaka. Three years ago, he transferred schools before she was able to say how she felt about him. After meeting each other again, Futaba realizes that he has gone through many changes. He acts more cool and even had his last name changed to Mabuchi. Gradually the two rekindle their love while piecing together what had happened in the time that they were apart.",
+    "poster": "https://image.tmdb.org/t/p/w500/dJbG3paFR4TeCENN7ognYyZ2Xhy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/r2oitpwUihLdHQncsL7kmvIZnBS.jpg",
+    "rating": 8.4,
+    "release_date": "2014-07-08",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "lgGUEEaIMaQ",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADGxsAAkDh-EQFfE4LDsrJBBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
+    "csv_id": "42942-angel-beats",
+    "tmdb_id": 42942,
+    "imdb_id": "",
+    "title": "Angel Beats!",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Animation",
+      "Comedy",
+      "Drama",
+      "Sci-Fi & Fantasy",
+      "Action & Adventure"
+    ],
+    "overview": "Angel Beats takes place in the afterlife and focuses on Otonashi, a boy who lost his memories of his life after dying. He is enrolled into the afterlife school and meets a girl named Yuri who invites him to join the Afterlife Battlefront — an organization she leads which fights against God. The Battlefront fight against the student council president Angel, a girl with supernatural powers.",
+    "poster": "https://image.tmdb.org/t/p/w500/ld5fQq1PltjjLbWVww6KBV79DLt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/4zeG5WpY0vp62OyRZMOoPouGuME.jpg",
+    "rating": 7.9,
+    "release_date": "2010-04-03",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "mpl9Gtk8MOc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADGBsAAkDh-ESaYniCZDIAAZIWBA",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
+    "csv_id": "42557-kids-on-the-slope",
+    "tmdb_id": 42557,
+    "imdb_id": "",
+    "title": "Kids on the Slope",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Animation",
+      "Drama"
+    ],
+    "overview": "Two different students - a successful but aloof academic and a rebellious but kindhearted delinquent - form a friendship through their love for music.",
+    "poster": "https://image.tmdb.org/t/p/w500/e2shFe5YRvzvUrjHpZgAxLNpIT7.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/daG1YyVv7rOFWMeOGgi2BW9lCVl.jpg",
+    "rating": 7.7,
+    "release_date": "2012-04-13",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "p35RcZ8bk7w",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADERsAAkDh-ESDCXd_wkASjhYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
+    "csv_id": "65249-erased",
+    "tmdb_id": 65249,
+    "imdb_id": "",
+    "title": "ERASED",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Animation",
+      "Drama",
+      "Mystery"
+    ],
+    "overview": "Satoru Fujinuma is a struggling manga artist who has the ability to turn back time and prevent deaths. When his mother is killed he turns back time to solve the mystery, but ends up back in elementary school, just before the disappearance of his classmate Kayo.",
+    "poster": "https://image.tmdb.org/t/p/w500/EljUwZJhpuYfVuSfqY8Pt1xxpH.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rRGnjRCHdDl3m3oCVSvo5z2E5c5.jpg",
+    "rating": 8.5,
+    "release_date": "2016-01-08",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "TZzMOC-4k6M",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADCxsAAkDh-EQJMS2ilhUGIhYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
+    "csv_id": "8392-my-neighbor-totoro",
+    "tmdb_id": 8392,
+    "imdb_id": "",
+    "title": "My Neighbor Totoro",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime Movies",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Fantasy",
+      "Animation",
+      "Family"
+    ],
+    "overview": "Two sisters move to the country with their father in order to be closer to their hospitalized mother, and discover the surrounding trees are inhabited by Totoros, magical spirits of the forest. When the youngest runs away from home, the older sister seeks help from the spirits to find her.",
+    "poster": "https://image.tmdb.org/t/p/w500/rtGDOeG9LzoerkDGZF9dnVeLppL.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zkThiZAaAie8Lw7RAc5yPTOewBV.jpg",
+    "rating": 8.1,
+    "release_date": "1988-04-16",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "_nv94fL_IA8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD-hoAAkDh-ES6nbyzgZQpgRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "315465-the-boy-and-the-beast",
+    "tmdb_id": 315465,
+    "imdb_id": "",
+    "title": "The Boy and the Beast",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Anime Movies",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
+    ],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Animation",
+      "Drama",
+      "Family",
+      "Fantasy"
+    ],
+    "overview": "Kyuta, a boy living in Shibuya, and Kumatetsu, a lonesome beast from Jutengai, an imaginary world. One day, Kyuta forays into the imaginary world and, as he's looking for his way back, meets Kumatetsu who becomes his spirit guide. That encounter leads them to many adventures.",
+    "poster": "https://image.tmdb.org/t/p/w500/kRofx67xkbnJ6pAVcHdeMyBm4OM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/5qNBH6tY6Jihzo9SqzvrJFHMPgz.jpg",
+    "rating": 7.9,
+    "release_date": "2015-07-11",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "a1oM-9ND3WA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD9RoAAkDh-ETwbjlcyVmWnRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "14282-ninja-scroll",
     "tmdb_id": 14282,
     "imdb_id": "",
