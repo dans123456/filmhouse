@@ -2874,6 +2874,91 @@ img {
     transform: translateY(0);
 }
 
+/* ==========================================================================
+   DEDICATED REWARD CENTER DRAWER ALIGNMENT & RESPONSIVE STYLES
+   ========================================================================== */
+#rewards-drawer .connection-drawer-container {
+    align-items: stretch !important;
+    text-align: left;
+    padding: 22px 18px 36px 18px;
+    width: 100%;
+    max-width: 480px;
+    box-sizing: border-box;
+}
+
+#rewards-drawer .connection-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+}
+
+#rewards-drawer .rewards-scrollable-content {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    box-sizing: border-box;
+}
+
+#rewards-drawer .rewards-points-card {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#rewards-drawer #daily-missions-section,
+#rewards-drawer #daily-streak-container,
+#rewards-drawer #user-requests-list,
+#rewards-drawer #user-requests-history-wrapper,
+#rewards-drawer .rewards-items-grid {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#rewards-drawer #streak-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+#rewards-drawer .daily-mission-card,
+#rewards-drawer .reward-item-card,
+#rewards-drawer .user-request-item {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#rewards-drawer .drawer-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+#rewards-drawer .drawer-close-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
+}
+
 .drawer-header-line {
     width: 36px;
     height: 4px;

@@ -1009,57 +1009,57 @@
 
     <!-- PREMIUM REWARD CENTER DRAWER -->
     <div class="connection-drawer-overlay" id="rewards-drawer">
-        <div class="connection-drawer-container" style="max-height: 85vh; display: flex; flex-direction: column;">
-            <div class="connection-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
-                <h3 class="connection-title" style="display: flex; align-items: center; gap: 8px; color: #ffbc00;">
+        <div class="connection-drawer-container" style="max-height: 85vh; display: flex; flex-direction: column; align-items: stretch; width: 100%; box-sizing: border-box;">
+            <div class="connection-header" style="width: 100%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px; box-sizing: border-box;">
+                <h3 class="connection-title" style="display: flex; align-items: center; gap: 8px; color: #ffbc00; margin: 0; font-size: 16px; font-family: var(--font-heading);">
                     <svg style="width: 24px; height: 24px; fill: currentColor;"><use href="#icon-coin"></use></svg>
                     Reward Center
                 </h3>
-                <button class="drawer-close-btn" id="rewards-drawer-close" aria-label="Close rewards drawer" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px;">
-                    <svg style="width: 20px; height: 20px; fill: currentColor;"><use href="#icon-close"></use></svg>
+                <button class="drawer-close-btn" id="rewards-drawer-close" aria-label="Close rewards drawer" style="background: rgba(255, 255, 255, 0.06); border: none; color: var(--text-secondary); cursor: pointer; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
+                    <svg style="width: 18px; height: 18px; fill: currentColor;"><use href="#icon-close"></use></svg>
                 </button>
             </div>
             
-            <div class="rewards-scrollable-content" style="flex: 1; overflow-y: auto; padding-right: 4px;">
+            <div class="rewards-scrollable-content" style="width: 100%; flex: 1; overflow-y: auto; overflow-x: hidden; padding-right: 4px; box-sizing: border-box;">
                 <!-- Points Card -->
-                <div class="rewards-points-card" style="background: var(--primary-gradient); padding: 20px; border-radius: var(--border-radius-md); text-align: center; color: #000; font-family: var(--font-heading); margin-bottom: 20px; box-shadow: 0 4px 20px var(--primary-glow);">
+                <div class="rewards-points-card" style="width: 100%; box-sizing: border-box; background: var(--primary-gradient); padding: 20px; border-radius: var(--border-radius-md); text-align: center; color: #000; font-family: var(--font-heading); margin-bottom: 20px; box-shadow: 0 4px 20px var(--primary-glow); display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <span style="font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; opacity: 0.8; display: block;">Your Balance</span>
-                    <span id="rewards-points-display" style="font-size: 32px; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; margin: 4px 0;">
+                    <span id="rewards-points-display" style="font-size: 32px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 4px 0;">
                         0
                     </span>
                     <span style="font-size: 12px; font-weight: 600; display: block; opacity: 0.8;">Loyalty Points 🪙</span>
                 </div>
                 
                 <!-- My Requests Section -->
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; width: 100%;">
                     <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; color: var(--text-primary); font-family: var(--font-heading);">My Movie Requests</h4>
                     <span id="user-requests-count-badge" class="badge-count" style="font-size: 11px; background: var(--border-color); padding: 2px 8px; border-radius: 20px; font-weight: 700; color: var(--text-secondary);">0</span>
                 </div>
-                <div id="user-requests-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+                <div id="user-requests-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; width: 100%;">
                     <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; background: rgba(255,255,255,0.01); border-radius: var(--border-radius-sm); border: 1px dashed var(--border-color);">
                         No requests yet. Try requesting a movie that is not in the library!
                     </div>
                 </div>
 
                 <!-- Request History (claimed requests) -->
-                <div id="user-requests-history-wrapper" style="display: none; margin-top: 16px; margin-bottom: 24px;">
-                    <div id="user-requests-history-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); user-select: none;">
+                <div id="user-requests-history-wrapper" style="display: none; margin-top: 16px; margin-bottom: 24px; width: 100%;">
+                    <div id="user-requests-history-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); user-select: none; width: 100%; box-sizing: border-box;">
                         <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">📁 Request History <span id="history-count-badge" style="font-size: 10px; background: var(--border-color); padding: 1px 6px; border-radius: 12px; margin-left: 6px;">0</span></span>
                         <span id="history-chevron" style="font-size: 14px; color: var(--text-secondary); transition: transform 0.3s ease;">▼</span>
                     </div>
-                    <div id="user-requests-history" style="display: none; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); opacity: 0.6;">
+                    <div id="user-requests-history" style="display: none; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); opacity: 0.6; width: 100%;">
                     </div>
                 </div>
 
                 <!-- Daily Missions Section -->
-                <div id="daily-missions-section" style="margin-bottom: 24px;">
+                <div id="daily-missions-section" style="margin-bottom: 24px; width: 100%;">
                     <!-- Streak Calendar Container -->
-                    <div id="daily-streak-container" style="background: rgba(255, 188, 0, 0.03); border: 1px solid rgba(255, 188, 0, 0.1); border-radius: var(--border-radius-sm); padding: 12px; margin-bottom: 16px;">
+                    <div id="daily-streak-container" style="background: rgba(255, 188, 0, 0.03); border: 1px solid rgba(255, 188, 0, 0.1); border-radius: var(--border-radius-sm); padding: 12px; margin-bottom: 16px; width: 100%; box-sizing: border-box;">
                         <h5 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #ffbc00; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-heading);">
                             <span>🗓️ Daily Check-in Streak</span>
                             <span id="streak-count-text" style="color: var(--text-primary); font-weight: 800;">0 Day Streak</span>
                         </h5>
-                        <div id="streak-days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">
+                        <div id="streak-days-grid" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; width: 100%; box-sizing: border-box; overflow-x: hidden;">
                             <!-- Days 1 to 7 generated by JS -->
                         </div>
                     </div>

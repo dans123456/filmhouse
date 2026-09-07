@@ -6357,12 +6357,13 @@ function renderUserRequests(requests) {
                 `;
             }
             
+            const stepperLineWidth = progressPct === 100 ? 'calc(100% - 48px)' : (progressPct === 50 ? 'calc(50% - 24px)' : '0px');
             const stepperHTML = `
                 <div class="request-stepper" style="display: flex; align-items: center; justify-content: space-between; padding: 4px 14px 0 14px; position: relative; width: 100%; box-sizing: border-box; margin-top: 2px;">
                     <!-- Line track background -->
-                    <div style="position: absolute; top: 10px; left: 30px; right: 30px; height: 2px; background: rgba(255,255,255,0.06); z-index: 1;"></div>
+                    <div style="position: absolute; top: 14px; left: 24px; right: 24px; height: 2px; background: rgba(255,255,255,0.06); z-index: 1;"></div>
                     <!-- Active line progress -->
-                    <div style="position: absolute; top: 10px; left: 30px; width: calc(${progressPct}% - ${progressPct === 100 ? '0px' : '30px'}); height: 2px; background: ${activeLineColor}; z-index: 2; transition: all 0.3s ease;"></div>
+                    <div style="position: absolute; top: 14px; left: 24px; width: ${stepperLineWidth}; height: 2px; background: ${activeLineColor}; z-index: 2; transition: all 0.3s ease;"></div>
                     
                     <!-- Step 1: Requested -->
                     <div style="z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 4px;">
@@ -7758,13 +7759,16 @@ function renderStreakCalendar() {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px 4px;
+            padding: 6px 2px;
             border-radius: 8px;
             font-size: 10px;
             font-weight: 700;
             transition: all 0.2s ease;
             position: relative;
-            min-height: 54px;
+            min-height: 52px;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-align: center;
         `;
 
         const isClaimed = d <= streak;
@@ -7777,9 +7781,9 @@ function renderStreakCalendar() {
             dayBox.style.border = "1px solid rgba(76, 175, 80, 0.3)";
             dayBox.style.color = "#4caf50";
             dayBox.innerHTML = `
-                <span style="opacity: 0.8; font-size: 8px; margin-bottom: 2px;">Day ${d}</span>
-                <span style="font-size: 12px; margin: 2px 0;">✓</span>
-                <span style="font-size: 8px;">Claimed</span>
+                <span style="opacity: 0.8; font-size: 8px; line-height: 1.1; margin-bottom: 2px;">Day ${d}</span>
+                <span style="font-size: 11px; line-height: 1.1; margin: 2px 0;">✓</span>
+                <span style="font-size: 7.5px; line-height: 1.1; white-space: nowrap;">Claimed</span>
             `;
         } else if (isActiveClaim) {
             dayBox.style.background = "linear-gradient(135deg, #ff9f00 0%, #ffbc00 100%)";
@@ -7787,9 +7791,9 @@ function renderStreakCalendar() {
             dayBox.style.boxShadow = "0 0 10px rgba(255, 188, 0, 0.4)";
             dayBox.style.cursor = "pointer";
             dayBox.innerHTML = `
-                <span style="font-weight: 800; font-size: 8px; margin-bottom: 2px;">Day ${d}</span>
-                <span style="font-size: 11px; font-weight: 900; margin: 1px 0;">+${reward}</span>
-                <span style="font-size: 8px; font-weight: 800;">Claim 🪙</span>
+                <span style="font-weight: 800; font-size: 8px; line-height: 1.1; margin-bottom: 2px;">Day ${d}</span>
+                <span style="font-size: 11px; font-weight: 900; line-height: 1.1; margin: 1px 0;">+${reward}</span>
+                <span style="font-size: 7.5px; font-weight: 800; line-height: 1.1; white-space: nowrap;">Claim 🪙</span>
             `;
             
             dayBox.addEventListener("click", (e) => {
@@ -7801,9 +7805,9 @@ function renderStreakCalendar() {
             dayBox.style.color = "var(--text-secondary)";
             dayBox.style.opacity = "0.6";
             dayBox.innerHTML = `
-                <span style="font-size: 8px; margin-bottom: 2px;">Day ${d}</span>
-                <span style="font-size: 10px; font-weight: 800; margin: 2px 0;">+${reward}</span>
-                <span style="font-size: 8px; opacity: 0.6;">${d === 7 ? "🎁 VIP" : "Locked"}</span>
+                <span style="font-size: 8px; line-height: 1.1; margin-bottom: 2px;">Day ${d}</span>
+                <span style="font-size: 10px; font-weight: 800; line-height: 1.1; margin: 2px 0;">+${reward}</span>
+                <span style="font-size: 7.5px; opacity: 0.6; line-height: 1.1; white-space: nowrap;">${d === 7 ? "🎁 VIP" : "Locked"}</span>
             `;
         }
 
