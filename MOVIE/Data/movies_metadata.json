@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "257790-i-m-getting-married-to-a-girl-i-hate-in-my-class",
+    "tmdb_id": 257790,
+    "imdb_id": "",
+    "title": "I'm Getting Married to a Girl I Hate in My Class",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Animation",
+      "Comedy"
+    ],
+    "overview": "High school student Saito Hojo is set to inherit his grandfather’s major corporation. First, he must marry Akane Sakuramori, the girl he despises the most, and who hates him just as much. The two are determined to keep their unexpected marriage a secret from their classmates. But as they begin their newlywed life, the distance between them starts to close.",
+    "poster": "https://image.tmdb.org/t/p/w500/k0Yb8KjspVjNlmvHNgqRRbhZ6LA.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rn9aAeJQSXRK0FG14bFmQrktQtY.jpg",
+    "rating": 6.9,
+    "release_date": "2025-01-03",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "ss7htgZZw8Y",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADMxQAAkDh-ET_ghPI2hwOqRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "271607-the-fragrant-flower-blooms-with-dignity",
     "tmdb_id": 271607,
     "imdb_id": "",
