@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "1284120-the-ugly-stepsister",
+    "tmdb_id": 1284120,
+    "imdb_id": "",
+    "title": "The Ugly Stepsister",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror",
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "In a fairy-tale kingdom where beauty is a brutal business, Elvira battles to compete with her incredibly beautiful stepsister, Agnes, and she will go to any length to catch the Prince’s eye.",
+    "poster": "https://image.tmdb.org/t/p/w500/rayAREIKtSinuov10GvrZHyXfXH.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kG8bBajeSTUxJGmS47WujcraZUk.jpg",
+    "rating": 7.3,
+    "release_date": "2025-03-07",
+    "language": "no",
+    "cast": [],
+    "director": "",
+    "trailer": "5vZ1_Yxjwzs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADhBgAAkDh-ESw1EBqVGQP6BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "630004-the-vault",
     "tmdb_id": 630004,
     "imdb_id": "",
