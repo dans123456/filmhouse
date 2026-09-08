@@ -1,5 +1,68 @@
 [
   {
+    "csv_id": "1479832-dc",
+    "tmdb_id": 1479832,
+    "imdb_id": "",
+    "title": "DC",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Bollywood"
+    ],
+    "genres": [
+      "Romance",
+      "Action",
+      "Drama"
+    ],
+    "overview": "Rebel Devadas joins forces with Chandra in a dangerous world where passion and peril collide. Their turbulent alliance demands bloodshed and tests loyalties as survival becomes the ultimate stake in their fight.",
+    "poster": "https://image.tmdb.org/t/p/w500/cB6ZAWK70cR5HVnGK6BaCr8W4FH.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/9GmAODqkVdRvSgg5C4Vfeomi5Nj.jpg",
+    "rating": 7.8,
+    "release_date": "2026-08-07",
+    "language": "ta",
+    "cast": [],
+    "director": "",
+    "trailer": "4WuvS-w3J10",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_wwAAsohAUU0USdtgFqtEBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1248230-splash-city",
+    "tmdb_id": 1248230,
+    "imdb_id": "",
+    "title": "Splash City",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Crime",
+      "Thriller"
+    ],
+    "overview": "Two brothers on diverging paths struggle to survive amidst the pressures of their community.",
+    "poster": "https://image.tmdb.org/t/p/w500/pOdwaXV1w3vvTn1s7FTvqBQIDp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ujGHkDGzZLS9PL3GFa2v3BW7tIP.jpg",
+    "rating": 6,
+    "release_date": "2026-07-20",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Vrze2vx3avI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAEDQACyiEBRfTsuZ98lk3LFgQ",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1764193-echo-point",
     "tmdb_id": 1764193,
     "imdb_id": "",
