@@ -1,28 +1,28 @@
 [
   {
-    "csv_id": "4607-lost",
-    "tmdb_id": 4607,
+    "csv_id": "287591-in-the-clear-moonlit-dusk",
+    "tmdb_id": 287591,
     "imdb_id": "",
-    "title": "Lost",
+    "title": "In the Clear Moonlit Dusk",
     "type": "Series",
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Anime Series",
+      "Teen/High-School"
     ],
     "genres": [
-      "Mystery",
-      "Action & Adventure",
+      "Animation",
       "Drama"
     ],
-    "overview": "Stripped of everything, the survivors of a horrific plane crash must work together to stay alive. But the island holds many secrets.",
-    "poster": "https://image.tmdb.org/t/p/w500/og6S0aTZU6YUJAbqxeKjCa3kY1E.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/yUOFocKDW7MCC5isx4FK8A68QFp.jpg",
-    "rating": 8,
-    "release_date": "2004-09-22",
-    "language": "en",
+    "overview": "Yoi Takiguchi is a first-year high school student, admired for her handsome looks and honest heart, which earned her the nickname “Prince.” One day, she bumps into Kohaku Ichimura, an upperclassman and another “Prince.” As the two grow closer, is what blossoms between them friendship or love? A youthful love story about a boy and a girl who are both called “Princes” begins.",
+    "poster": "https://image.tmdb.org/t/p/w500/qetD01amQRFX5ibXQ7rWLe6togE.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6Eg3t2KdtqiF29G7a7S1Npl93g8.jpg",
+    "rating": 8.1,
+    "release_date": "2026-01-11",
+    "language": "ja",
     "cast": [],
     "director": "",
-    "trailer": "KTu8iDynwNc",
+    "trailer": "p3PByW3BErQ",
     "runtime": "",
     "links": [
       {
