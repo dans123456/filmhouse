@@ -1,5 +1,101 @@
 [
   {
+    "csv_id": "1405742-portal-to-hell",
+    "tmdb_id": 1405742,
+    "imdb_id": "",
+    "title": "Portal to Hell",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Horror"
+    ],
+    "overview": "After a debt-collector finds a portal to hell in a washing machine at his local laundromat, he’s propositioned into feeding it sinners to save his neighbor’s soul, maybe even at the expense of his own.",
+    "poster": "https://image.tmdb.org/t/p/w500/xuXCPJZjmP2FuGG3U16sI1TYEdR.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/eTuPNfCR3hSUnDKm2zBATP4lJym.jpg",
+    "rating": 4.7,
+    "release_date": "2025-02-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "NiZ6Vyk7lBY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADUhgAAjGnIUUpY9x5QFcx5hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "587370-tales-from-the-magic-garden",
+    "tmdb_id": 587370,
+    "imdb_id": "",
+    "title": "Tales from the Magic Garden",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Family",
+      "Fantasy",
+      "Comedy"
+    ],
+    "overview": "Tom (4 years old), Suzanne (8) and Derek (10) spend the weekend with their grandparents. But nothing is as usual: Grandpa seems to be elsewhere; Tom wonders where Grandma has gone, she who always tells him incredible stories; Derek is hard at work renovating the old apple tree hut. So following in the footsteps of her ancestor, Suzanne improvises herself as a storyteller to illuminate the house with imaginary and wonderful stories and try to fill the absence of Grandmother. The movie is an adaptation of three tales written by Arnost Goldflam.",
+    "poster": "https://image.tmdb.org/t/p/w500/6LZJKktqh9jTL27vMU6oxzdvB3W.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/AupBUhnJEFedxF4vQ82LU9rOXDC.jpg",
+    "rating": 5.5,
+    "release_date": "2025-05-18",
+    "language": "cs",
+    "cast": [],
+    "director": "",
+    "trailer": "v1XKnHM9JZw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADURgAAjGnIUWcRCSPc8IWmhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1512010-parasomnia",
+    "tmdb_id": 1512010,
+    "imdb_id": "",
+    "title": "Parasomnia",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror"
+    ],
+    "overview": "After her friend vanishes, Riley must confront the demon from her night terrors that may have crossed into reality, while facing her own tragic past.",
+    "poster": "https://image.tmdb.org/t/p/w500/hXbKeuO6yIvVpt385E2OLUikKWj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/yJKZ7MpvFKRtnusAxNMdweMZK6J.jpg",
+    "rating": 8,
+    "release_date": "2025-08-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "-tYE5KY0dk4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADUBgAAjGnIUUnAAHAENnJ7k0WBA",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
     "csv_id": "1433367-one-night-only",
     "tmdb_id": 1433367,
     "imdb_id": "",
