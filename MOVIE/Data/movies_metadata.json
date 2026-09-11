@@ -1,5 +1,99 @@
 [
   {
+    "csv_id": "1507796-on-the-sea",
+    "tmdb_id": 1507796,
+    "imdb_id": "",
+    "title": "On the Sea",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "overview": "In a rural town in North Wales, mussel harvester Jack has been married to his wife Maggie for over half of his life. He is troubled by his son Tom, who has little interest in the family trade. When Jack crosses paths with Daniel, an itinerant deckhand, their attraction poses an impossible dilemma.",
+    "poster": "https://image.tmdb.org/t/p/w500/9dZj1TDR2TlSdWjnzGI87jbZSts.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wdy7TUJom58vwIFpx0h5Z8pix3l.jpg",
+    "rating": 7.1,
+    "release_date": "2026-07-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "od_S8t86F0M",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADDxgAAjGnIUVMEs5zM4nAURYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1592032-furious-attack",
+    "tmdb_id": 1592032,
+    "imdb_id": "",
+    "title": "Furious Attack",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies"
+    ],
+    "genres": [
+      "Action",
+      "Crime",
+      "Thriller"
+    ],
+    "overview": "A former special forces soldier infiltrates northern Myanmar to rescue his missing daughter, fighting against scam gangs and organ traffickers in a final showdown with the crime boss.",
+    "poster": "https://image.tmdb.org/t/p/w500/hjGJ9vWT9taYxxSziFAA1ZZVODx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zBMXbCIeRRflY4BjiKOrfF1phTH.jpg",
+    "rating": 6,
+    "release_date": "2026-02-12",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "qz2cJRV176o",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADDRgAAjGnIUUyp_nLN5zMyxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1753461-my-husband-s-sister",
+    "tmdb_id": 1753461,
+    "imdb_id": "",
+    "title": "My Husband's Sister",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [
+      "Thriller"
+    ],
+    "overview": "A reformed con artist's second chance at love is threatened when a murderous caregiver from his past resurfaces.",
+    "poster": "https://image.tmdb.org/t/p/w500/dAPwcHCmG89ZJlI5rorIYjEOCUM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kDPJWRSSsNAldGqJXiPMzOOg3VK.jpg",
+    "rating": 9,
+    "release_date": "2026-08-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADCxgAAjGnIUXHLhra0Cu6OBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1135582-dao",
     "tmdb_id": 1135582,
     "imdb_id": "",
