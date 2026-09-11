@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "1739639-ragebait",
+    "tmdb_id": 1739639,
+    "imdb_id": "",
+    "title": "RAGEBAIT",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror",
+      "Comedy"
+    ],
+    "overview": "On Halloween night, a socially parasitic live streamer becomes the target of a malevolent entity after a mysterious viewer curses his stream and forces him to watch a collection of cursed videos from missing content creators.",
+    "poster": "https://image.tmdb.org/t/p/w500/lcUufwF6o3n6VF6PMLt0uUZLTOM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/4D7rf8XqGsKXebUKgT2jidGstKp.jpg",
+    "rating": 7,
+    "release_date": "2026-08-04",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "9MD_BY_TfOs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD0xgAAjGnIUVG_XhTS6RbcxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1602830-maharaja-hostel",
     "tmdb_id": 1602830,
     "imdb_id": "",
