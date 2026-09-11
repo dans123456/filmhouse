@@ -1,5 +1,104 @@
 [
   {
+    "csv_id": "1602830-maharaja-hostel",
+    "tmdb_id": 1602830,
+    "imdb_id": "",
+    "title": "Maharaja Hostel",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Bollywood",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Horror",
+      "Comedy"
+    ],
+    "overview": "A group of college students settle into what seems like an ordinary hostel, but things soon take a strange turn when a series of unexplained incidents begin to unfold. As their fun-filled hostel life descends into chaos, the students and their warden are forced to face the mysterious presence lurking within Maharaja Hostel.",
+    "poster": "https://image.tmdb.org/t/p/w500/b7k2NhmlnMMRup94QbbCfBuct05.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/AjUhJH18YIUdnJqoU2SC54k0pv2.jpg",
+    "rating": 0,
+    "release_date": "2026-07-24",
+    "language": "ml",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADwBgAAjGnIUWWNJzSgg09txYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1435506-the-river-of-fury",
+    "tmdb_id": 1435506,
+    "imdb_id": "",
+    "title": "The River of Fury",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies"
+    ],
+    "genres": [
+      "Crime",
+      "Mystery"
+    ],
+    "overview": "A veterinarian vanishes from a pig farm, possibly linked to an evil ghost killer who terrorized the area 20 years ago. As new victims emerge, a police officer investigates the farm family's suspicious behavior, uncovering darker secrets.",
+    "poster": "https://image.tmdb.org/t/p/w500/iqOo9dyHJjBGMD4G0MafsvPEGmn.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jw1LaTUO1Z8fStbDbky8iYm5P2K.jpg",
+    "rating": 6.7,
+    "release_date": "2025-03-22",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADwRgAAjGnIUVfaxbRidCH0BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1185806-paw-patrol-the-dino-movie",
+    "tmdb_id": 1185806,
+    "imdb_id": "",
+    "title": "PAW Patrol: The Dino Movie",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Adventure",
+      "Family",
+      "Fantasy",
+      "Comedy"
+    ],
+    "overview": "The Paw Patrol lands on a mysterious dinosaur island after a storm, where they meet Rex, a stranded pup. When Humdinger's reckless mining triggers a volcano, the team faces their biggest rescue mission yet to save the island.",
+    "poster": "https://image.tmdb.org/t/p/w500/qnin56Syy5rbG7KCaxWY7SPuy6p.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6TSxLmwT7j1ugtKi8NyMmdzWAGj.jpg",
+    "rating": 7,
+    "release_date": "2026-07-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "xgI5iYmOf5Q",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADwxgAAjGnIUUXGvRXxnfk4hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1767447-god-of-this-age",
     "tmdb_id": 1767447,
     "imdb_id": "",
