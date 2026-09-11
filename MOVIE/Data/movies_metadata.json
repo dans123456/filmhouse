@@ -1,5 +1,73 @@
 [
   {
+    "csv_id": "1701297-cain",
+    "tmdb_id": 1701297,
+    "imdb_id": "",
+    "title": "Cain",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror",
+      "Drama",
+      "Fantasy",
+      "Science Fiction"
+    ],
+    "overview": "A family barricades themselves in their Tokyo home during a global crisis, but buried secrets soon resurface, threatening to tear them apart.",
+    "poster": "https://image.tmdb.org/t/p/w500/kWrS9WIBJiQUqVOTaWuRXHRIzOW.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/41Jn3LpQRSlhBloXaAL5bGOv7mv.jpg",
+    "rating": 0,
+    "release_date": "2025-12-10",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADaBcAAjGnIUX67Ae30QL_PRYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADaxcAAjGnIUUvJg5HCQkpChYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1762506-band-of-brothers-legacy",
+    "tmdb_id": 1762506,
+    "imdb_id": "",
+    "title": "Band of Brothers: Legacy",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Documentary",
+      "War"
+    ],
+    "overview": "This tribute to the groundbreaking series that helped preserve the story of Easy Company and deepened public appreciation for the sacrifices of the Greatest Generation features new interviews with cast members Damian Lewis, Ron Livingston, Michael Cudlitz, Capt. Dale Dye, USMC (Ret.), David Schwimmer, and more. Through personal reflections and behind-the-scenes stories, participants revisit the experience of making the series and explore its lasting cultural resonance, and also includes never-before-seen archival footage and photographs of Easy Company and World War II.",
+    "poster": "https://image.tmdb.org/t/p/w500/n29MsV1m2OCbDp6PLeHxziOVOLG.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mMLVXM8UOKSxVSxnXcmuBPMiHsC.jpg",
+    "rating": 9.2,
+    "release_date": "2026-09-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "IjLg0X59fMA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADZxcAAjGnIUVaA2iu0SxCYRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1089-point-break",
     "tmdb_id": 1089,
     "imdb_id": "",
