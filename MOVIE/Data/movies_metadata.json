@@ -1,5 +1,41 @@
 [
   {
+    "csv_id": "1084242-zootopia-2",
+    "tmdb_id": 1084242,
+    "imdb_id": "",
+    "title": "Zootopia 2",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Adventure",
+      "Comedy",
+      "Mystery",
+      "Family"
+    ],
+    "overview": "After cracking the biggest case in Zootopia's history, rookie cops Judy Hopps and Nick Wilde find themselves on the twisting trail of a great mystery when Gary De'Snake arrives and turns the animal metropolis upside down. To crack the case, Judy and Nick must go undercover to unexpected new parts of town, where their growing partnership is tested like never before.",
+    "poster": "https://image.tmdb.org/t/p/w500/oJ7g2CifqpStmoYQyaLQgEU32qO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lgotja3xMoJZbynwHfcQcJAEMWH.jpg",
+    "rating": 7.7,
+    "release_date": "2025-11-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "sEgPQ7HKoBA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADmAkAAqvMUUVK3lVKo0vKLhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "302401-snowden",
     "tmdb_id": 302401,
     "imdb_id": "",
