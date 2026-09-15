@@ -133,9 +133,9 @@
     "type": "Movie",
     "categories": [
       "Main",
+      "Hollywood/British Movies",
       "Animated Movies",
-      "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Hollywood/British Movies"
+      "Kids Shows and Movies (Nickelodeon and Disney)"
     ],
     "genres": [
       "Animation",
@@ -156,8 +156,16 @@
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADmAkAAqvMUUVK3lVKo0vKLhYE",
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADtwkAAqvMUUVSCt9beN-4pxYE",
         "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADoQkAAqvMUUXPSrC2QSg-RBYE",
+        "quality": "1080p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADogkAAqvMUUWZrvGBPu7_lxYE",
+        "quality": "2160p (4K)"
       }
     ]
   },
