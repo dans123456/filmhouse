@@ -46356,7 +46356,14 @@
     "csv_id": "634649-spider-man-no-way-home",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADARsAArFaKUbat1njP-f12hYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADARsAArFaKUbat1njP-f12hYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADzAkAAqvMUUWtUO6TlTjKThYE",
+        "quality": "1080p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
     "rating": 7.9,
