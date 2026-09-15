@@ -1,5 +1,70 @@
 [
   {
+    "csv_id": "268896-pacific-rim-uprising",
+    "tmdb_id": 268896,
+    "imdb_id": "",
+    "title": "Pacific Rim: Uprising",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Fantasy",
+      "Science Fiction",
+      "Adventure"
+    ],
+    "overview": "It has been ten years since The Battle of the Breach and the oceans are still, but restless. Vindicated by the victory at the Breach, the Jaeger program has evolved into the most powerful global defense force in human history. The PPDC now calls upon the best and brightest to rise up and become the next generation of heroes when the Kaiju threat returns.",
+    "poster": "https://image.tmdb.org/t/p/w500/nFWhttU8PM50t25NPdy7PE7rv3G.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/oMaj75G2WFw66xI1TREg1hrToSg.jpg",
+    "rating": 6.1,
+    "release_date": "2018-03-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "8BAhwgjMvnM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADuwkAAqvMUUWAskrmcCBWeBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "68726-pacific-rim",
+    "tmdb_id": 68726,
+    "imdb_id": "",
+    "title": "Pacific Rim",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Science Fiction",
+      "Adventure"
+    ],
+    "overview": "Using massive piloted robots to combat the alien threat, Earth's survivors take the fight to the invading alien force lurking in the depths of the Pacific Ocean. Nearly defenseless in the face of the relentless enemy, the forces of mankind have no choice but to turn to two unlikely heroes who now stand as Earth's final hope against the mounting apocalypse.",
+    "poster": "https://image.tmdb.org/t/p/w500/8wo4eN8dWKaKlxhSvBz19uvj8gA.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/9X7Im1YuBhyHYVD8r7CAONPJR5k.jpg",
+    "rating": 6.9,
+    "release_date": "2013-07-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "hQAQxQop6Io",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADvAkAAqvMUUXTs0r28NYxVRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "236235-the-gentlemen",
     "tmdb_id": 236235,
     "imdb_id": "",
