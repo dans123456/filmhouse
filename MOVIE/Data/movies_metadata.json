@@ -1,5 +1,95 @@
 [
   {
+    "csv_id": "Mole_in_My_Heart",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Mole in My Heart",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/hvMP4x1h/photo-2026-09-16-13-56-13.jpg",
+    "backdrop": "https://i.postimg.cc/hvMP4x1h/photo-2026-09-16-13-56-13.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADtwcAAqvMWUV6x6ZQAvImuRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "Nemesis_Next_Door",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Nemesis Next Door",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/vmLRdyzH/photo-2026-09-16-13-58-50.jpg",
+    "backdrop": "https://i.postimg.cc/vmLRdyzH/photo-2026-09-16-13-58-50.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD0wcAAqvMWUWkF2RUrFSWZxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "The_Price_of_Love",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "The Price of Love",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/XvvPt5p1/photo-2026-09-16-14-01-26.jpg",
+    "backdrop": "https://i.postimg.cc/XvvPt5p1/photo-2026-09-16-14-01-26.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD5AcAAqvMWUXkS8CkJX35XhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "Friendly_Foe",
     "tmdb_id": null,
     "imdb_id": "",
