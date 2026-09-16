@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "Friendly_Foe",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Friendly Foe",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/CxhL2vYD/photo-2026-09-16-13-50-07.jpg",
+    "backdrop": "https://i.postimg.cc/CxhL2vYD/photo-2026-09-16-13-50-07.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADKRgAAqvMUUXgSNfAQAn1_xYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "Alarinjo",
     "tmdb_id": null,
     "imdb_id": "",
