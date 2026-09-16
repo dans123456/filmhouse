@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "Child_of_Thunder",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Child of Thunder",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "No synopsis available.",
+    "poster": "https://i.postimg.cc/SjbkVRsQ/photo-2026-09-16-13-22-54.jpg",
+    "backdrop": "https://i.postimg.cc/SjbkVRsQ/photo-2026-09-16-13-22-54.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADeBcAAqvMUUUq6JQxVO2WnxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "Groomed_For_Love",
     "tmdb_id": null,
     "imdb_id": "",
