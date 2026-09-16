@@ -27,8 +27,12 @@
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADDRIAAqvMWUVSETsc3An0exYE",
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADCxIAAqvMWUVJt04zoC0buhYE",
         "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADDBIAAqvMWUVFhzaePlfMoRYE",
+        "quality": "1080p"
       }
     ]
   },
