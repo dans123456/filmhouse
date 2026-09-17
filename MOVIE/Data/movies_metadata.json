@@ -1,7 +1,7 @@
 [
   {
-    "csv_id": "manual-1789631382220-beauty-in-black",
-    "tmdb_id": null,
+    "csv_id": "246246-beauty-in-black",
+    "tmdb_id": 246246,
     "imdb_id": "",
     "title": "Beauty in Black",
     "type": "Series",
@@ -9,16 +9,18 @@
       "Main",
       "Hollywood/British Series"
     ],
-    "genres": [],
-    "overview": "No synopsis available.",
-    "poster": "img/FilmHouse3_nobg.png",
-    "backdrop": "img/FilmHouse.png",
-    "rating": 0,
-    "release_date": "",
+    "genres": [
+      "Drama"
+    ],
+    "overview": "A stripper's fate takes a turn when she crosses paths with the wealthy, dysfunctional family behind a cosmetics dynasty and a devious trafficking scheme.",
+    "poster": "https://image.tmdb.org/t/p/w500/xKk4bFCCpZ9tvjUykvvMYLSBnjo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ywJcUIMTCjstPLvvyIiPWP3G3m3.jpg",
+    "rating": 8.4,
+    "release_date": "2024-10-24",
     "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "",
+    "trailer": "0dclNQV71-k",
     "runtime": "",
     "links": [
       {
