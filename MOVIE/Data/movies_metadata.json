@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "manual-1789631382220-beauty-in-black",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Beauty in Black",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "No synopsis available.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD_QgAAhkFWEUHJQmAJrHzMBYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD_ggAAhkFWEUSfPveMsUQuhYE",
+        "season": "Season 2"
+      }
+    ]
+  },
+  {
     "csv_id": "27205-inception",
     "tmdb_id": 27205,
     "imdb_id": "",
