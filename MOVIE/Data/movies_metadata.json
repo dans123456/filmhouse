@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "301507-heated-rivalry",
+    "tmdb_id": 301507,
+    "imdb_id": "",
+    "title": "Heated Rivalry",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "Two of the biggest stars in Major League Hockey are bound by ambition, rivalry, and a magnetic pull neither of them fully understands. What begins as a secret fling between two fresh faced rookies evolves into a years-long journey of love, denial, and self-discovery. Over the next eight years, as they chase glory on the ice, they struggle to navigate their feelings for each other. Torn between the sport they live for and the love they can’t ignore, they must decide if there’s room in their fiercely competitive world for something as fragile – and powerful – as real love.",
+    "poster": "https://image.tmdb.org/t/p/w500/3YCKbtAkYWCMDLHvkUjGhG7eWoS.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3vuBfAuAltIR6UdANUQ1lLXOeia.jpg",
+    "rating": 8.7,
+    "release_date": "2025-11-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ADi1iextoUM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD9AwAAunleEWSp-xOGFIa6RYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1769438-a-modest-killing",
     "tmdb_id": 1769438,
     "imdb_id": "",
