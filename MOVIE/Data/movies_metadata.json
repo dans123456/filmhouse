@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "1290417-thrash",
+    "tmdb_id": 1290417,
+    "imdb_id": "",
+    "title": "Thrash",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror",
+      "Thriller"
+    ],
+    "overview": "When a catastrophic hurricane slams a coastal town, stranded residents must survive rapidly rising waters swarming with ravenous sharks.",
+    "poster": "https://image.tmdb.org/t/p/w500/adk8weka3O5648g3de4z3y4aE7G.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jlkvoHXKQHsgf15wp1AV1CTk4e7.jpg",
+    "rating": 6.2,
+    "release_date": "2026-04-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "hzyOsNyDkbM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD1goAAo5qgEV7OagwkBJzQBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "126552-wound",
     "tmdb_id": 126552,
     "imdb_id": "",
