@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "507241-the-killer-s-game",
+    "tmdb_id": 507241,
+    "imdb_id": "",
+    "title": "The Killer's Game",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Comedy",
+      "Thriller"
+    ],
+    "overview": "When top hitman Joe Flood is diagnosed with a terminal illness, he decides to take matters into his own hands – by taking a hit out on himself. But when the very hitmen he hired also target his ex-girlfriend, he must fend off an army of assassin colleagues and win back the love of his life before it's too late.",
+    "poster": "https://image.tmdb.org/t/p/w500/4bKlTeOUr5AKrLky8mwWvlQqyVd.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zGLQmrmIB56kMZPnzqReIOBay1B.jpg",
+    "rating": 6.4,
+    "release_date": "2024-09-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "reQVL41DRmM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD1QoAAo5qgEX9KbMMJ9L3nRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1290417-thrash",
     "tmdb_id": 1290417,
     "imdb_id": "",
