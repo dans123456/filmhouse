@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "257994-half-man",
+    "tmdb_id": 257994,
+    "imdb_id": "",
+    "title": "Half Man",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "When Niall's estranged 'brother' Ruben shows up at his wedding, it leads to an explosion of violence that catapults us back through their lives.",
+    "poster": "https://image.tmdb.org/t/p/w500/fV1XBxZSl0nxiMIhDuorIbfW8kG.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/loZCtN8s1yjSBD75rbHsRisWfUc.jpg",
+    "rating": 8,
+    "release_date": "2026-04-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "egkRy1U94tA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADTAsAAo5qgEWsLJWCu1TyhBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1463785-a-lagos-love-story",
     "tmdb_id": 1463785,
     "imdb_id": "",
