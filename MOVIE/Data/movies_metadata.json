@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "273207-neagley",
+    "tmdb_id": 273207,
+    "imdb_id": "",
+    "title": "Neagley",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama",
+      "Mystery",
+      "Crime"
+    ],
+    "overview": "Frances Neagley is a private investigator in Chicago and former military colleague of Jack Reacher in the Army's 110th Special Investigations Unit. When she learns that a beloved friend from her past has been killed in a suspicious accident, she becomes hell-bent on justice.",
+    "poster": "https://image.tmdb.org/t/p/w500/lKOPmO0ah17ogQ9hWg7lSd40kIr.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/uYOYLFQ4q7asuhdiKXCqGaeAQUH.jpg",
+    "rating": 7.9,
+    "release_date": "2026-09-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "BOzNaa_o9_g",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADqAsAAo5qgEX9jzB0_odHEBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "257994-half-man",
     "tmdb_id": 257994,
     "imdb_id": "",
