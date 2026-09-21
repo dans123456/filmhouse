@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "1641629-you-me-against-the-world",
+    "tmdb_id": 1641629,
+    "imdb_id": "",
+    "title": "You+Me - Against the World",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Romance",
+      "Drama"
+    ],
+    "overview": "Alma Lancaster, 18, appears to lead a perfect life within a wealthy family who believes she is studying law. In secret, she pursues her true dream: filmmaking. On campus, she meets Vadim Arcadi, 20, a magnetic and solitary rebel with a troubled past. Forced to collaborate on a student film, they clash, grow closer and fall in love — despite themselves. But someone is watching them, determined to tear them apart and expose secrets that could destroy both Alma and Vadim.",
+    "poster": "https://image.tmdb.org/t/p/w500/bAbBNVplg7h79sm94OyHeKk8Phz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nkEhDomjmPHJSA4Tx8pxv0NlKEy.jpg",
+    "rating": 5.7,
+    "release_date": "2026-09-18",
+    "language": "fr",
+    "cast": [],
+    "director": "",
+    "trailer": "z2Bw_nTXjG4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADxhAAAo5qiEWMgF84QoWzAxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "281401-finding-her-edge",
     "tmdb_id": 281401,
     "imdb_id": "",
