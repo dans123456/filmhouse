@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "275102-the-scandal",
+    "tmdb_id": 275102,
+    "imdb_id": "",
+    "title": "The Scandal",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "In Joseon, a secret proposal ignites hidden desires in a gifted noblewoman, a famed lover and an unsuspecting lady caught in their dangerous game.",
+    "poster": "https://image.tmdb.org/t/p/w500/4TU0PcHBIl0wPW5B6aVRGExOnHE.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/uc1p1PEbEMpdIHqnU9TESNC6Jhp.jpg",
+    "rating": 6.3,
+    "release_date": "2026-09-18",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "FeISX5E1uJc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqgcAAo5qkEV-AqkVmqE9cxYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "224372-a-knight-of-the-seven-kingdoms",
     "tmdb_id": 224372,
     "imdb_id": "",
