@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "39483-major-crimes",
+    "tmdb_id": 39483,
+    "imdb_id": "",
+    "title": "Major Crimes",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Crime",
+      "Drama"
+    ],
+    "overview": "Major Crimes explores how the American justice system approaches the art of the deals as law enforcement officers and prosecutors work together to score a conviction. Los Angeles Police Captain Sharon Raydor heads up a special squad within the LAPD that deals with high-profile or particularly sensitive crimes.",
+    "poster": "https://image.tmdb.org/t/p/w500/fZ502JXujnxVtprmigTO2jA205P.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/8AkvTlCLmGipNEGL9wYVfWMiPLd.jpg",
+    "rating": 7.4,
+    "release_date": "2012-08-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "2vZXEi_Lb-c",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADfw8AAo5qiEW8KtTKDeql_BYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "123528-skeleton-knight-in-another-world",
     "tmdb_id": 123528,
     "imdb_id": "",
