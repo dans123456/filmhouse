@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "299939-monster-the-lizzie-borden-story",
+    "tmdb_id": 299939,
+    "imdb_id": "",
+    "title": "Monster: The Lizzie Borden Story",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama",
+      "Crime"
+    ],
+    "overview": "Trapped in a cruel Victorian-era household, Lizzie Borden kills her parents in a gory ax murder that shocks the nation.",
+    "poster": "https://image.tmdb.org/t/p/w500/57XScX1aYtKi1LvHYFQLPUxVhTG.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/gaew60NXUxok3Vmls7gkAT7lYW0.jpg",
+    "rating": 7.1,
+    "release_date": "2026-09-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "gYTzF1vna40",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADswcAAo5qkEUhO9l8W6OS7RYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "275102-the-scandal",
     "tmdb_id": 275102,
     "imdb_id": "",
