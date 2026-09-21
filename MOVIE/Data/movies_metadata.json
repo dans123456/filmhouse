@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "283297-sterling-point",
+    "tmdb_id": 283297,
+    "imdb_id": "",
+    "title": "Sterling Point",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Mystery",
+      "Drama"
+    ],
+    "overview": "After discovering she's inherited a remote island in Canada from the estranged grandfather she was never allowed to meet, 17-year-old Annie Jacobson decides to investigate, pulling her into a world of buried secrets, unexpected sisterhood, and the complicated family history she was never meant to find.",
+    "poster": "https://image.tmdb.org/t/p/w500/cThLWEGs6BEqY0QZMbU4FAeWwPT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nOWU1NSYQEOXRXcdfZbtJshwRGK.jpg",
+    "rating": 8.2,
+    "release_date": "2026-08-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "bwwF3TuJQME",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADNA4AAo5qiEUzxXaS1XYyghYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1399-game-of-thrones",
     "tmdb_id": 1399,
     "imdb_id": "",
@@ -44,6 +75,10 @@
       {
         "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADMQ4AAo5qiEUsqPiYM2ASVxYE",
         "season": "Season 5"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADRA4AAo5qiEV2b93YdDMPhxYE",
+        "season": "Season 6"
       }
     ]
   },
