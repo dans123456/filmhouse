@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "281401-finding-her-edge",
+    "tmdb_id": 281401,
+    "imdb_id": "",
+    "title": "Finding Her Edge",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "A former ice dancer returns to the rink with an exciting new partner while holding onto feelings for her old one — her first love.",
+    "poster": "https://image.tmdb.org/t/p/w500/7t6iXlbfoBSfVyINLRHms5kqfze.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3aeYYriPQN7886in9bIGKnbC5eQ.jpg",
+    "rating": 7.6,
+    "release_date": "2026-01-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ppZ3qgtFOME",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADOBAAAo5qiEXN5GVxl_sBWhYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1136867-materialists",
     "tmdb_id": 1136867,
     "imdb_id": "",
