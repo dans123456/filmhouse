@@ -86,49 +86,49 @@ function setupBot(bot) {
         return next();
     });
 
-    // Middleware to check if user is banned
+    // In-memory cache for banned users and admin lists to eliminate per-update Firestore latency
+    const bannedUsersCache = new Set();
+    let cachedAdmins = ["1329840839", "1175336733"];
+    let cachedMasters = ["1329840839", "1175336733"];
+    let lastAdminFetchTime = 0;
+
+    async function refreshAdminCache() {
+        const now = Date.now();
+        if (now - lastAdminFetchTime < 15 * 60 * 1000) return;
+        lastAdminFetchTime = now;
+        try {
+            const adminPromise = db.collection("settings").doc("admins").get();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1500));
+            const doc = await Promise.race([adminPromise, timeoutPromise]);
+            if (doc.exists) {
+                const adminList = doc.data().ids || [];
+                const masterList = doc.data().masters || [];
+                cachedAdmins = Array.from(new Set(["1329840839", "1175336733", ...adminList, ...masterList]));
+                cachedMasters = Array.from(new Set(["1329840839", "1175336733", ...masterList]));
+            }
+        } catch (e) {}
+    }
+
+    // Middleware to check if user is banned (Instant in-memory lookup - zero Firestore reads)
     bot.use(async (ctx, next) => {
         if (!ctx.from) return next();
         const userId = String(ctx.from.id);
-        
-        try {
-            const userDoc = await db.collection("users").doc(userId).get();
-            if (userDoc.exists && userDoc.data().banned === true) {
-                return ctx.reply("❌ Your access to Film House has been restricted.");
-            }
-        } catch (err) {
-            console.error("Error checking ban status:", err);
+        if (bannedUsersCache.has(userId)) {
+            return ctx.reply("❌ Your access to Film House has been restricted.");
         }
         return next();
     });
 
-    // Helper: Check if user is an authorized admin
+    // Helper: Check if user is an authorized admin (Instant in-memory check)
     async function isAdmin(userId) {
-        const defaultAdmins = ["1329840839", "1175336733"];
-        try {
-            const doc = await db.collection("settings").doc("admins").get();
-            const adminList = doc.exists ? doc.data().ids || [] : [];
-            const masterList = doc.exists ? doc.data().masters || [] : [];
-            const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
-            return allAdmins.includes(String(userId));
-        } catch (err) {
-            console.warn("Failed to read admin list from Firestore, falling back to default admins:", err);
-            return defaultAdmins.includes(String(userId));
-        }
+        refreshAdminCache().catch(() => {});
+        return cachedAdmins.includes(String(userId));
     }
 
-    // Helper: Check if user is an authorized master admin
+    // Helper: Check if user is an authorized master admin (Instant in-memory check)
     async function isMasterAdmin(userId) {
-        const defaultAdmins = ["1329840839", "1175336733"];
-        try {
-            const doc = await db.collection("settings").doc("admins").get();
-            const masters = doc.exists ? doc.data().masters || [] : [];
-            const allMasters = [...defaultAdmins, ...masters];
-            return allMasters.includes(String(userId));
-        } catch (err) {
-            console.warn("Failed to read master admin list from Firestore, falling back to default admins:", err);
-            return defaultAdmins.includes(String(userId));
-        }
+        refreshAdminCache().catch(() => {});
+        return cachedMasters.includes(String(userId));
     }
 
     // Helper: Call Telegram API with 429 rate limit retries and markdown error fallbacks
@@ -175,25 +175,25 @@ function setupBot(bot) {
     }
 
     // In-memory cache for welcome settings and photo to eliminate delay and unnecessary Firestore reads
-    let cachedWelcomeSettings = null;
+    let cachedWelcomeSettings = {};
     let lastWelcomeFetchTime = 0;
     let cachedWelcomePhotoFileId = null;
 
     async function getCachedWelcomeSettings() {
         const now = Date.now();
-        if (cachedWelcomeSettings && (now - lastWelcomeFetchTime < 10 * 60 * 1000)) {
+        if (now - lastWelcomeFetchTime < 15 * 60 * 1000) {
             return cachedWelcomeSettings;
         }
+        lastWelcomeFetchTime = now; // Update timestamp immediately so failures do not trigger repetitive blocking attempts
         try {
-            const welcomeDoc = await db.collection("settings").doc("welcome").get();
+            const welcomePromise = db.collection("settings").doc("welcome").get();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1500));
+            const welcomeDoc = await Promise.race([welcomePromise, timeoutPromise]);
             if (welcomeDoc.exists) {
                 cachedWelcomeSettings = welcomeDoc.data() || {};
-            } else {
-                cachedWelcomeSettings = {};
             }
-            lastWelcomeFetchTime = now;
         } catch (e) {
-            cachedWelcomeSettings = cachedWelcomeSettings || {};
+            // Keep default / existing cache on error or timeout with zero delay
         }
         return cachedWelcomeSettings;
     }
@@ -637,6 +637,7 @@ function setupBot(bot) {
             await db.collection("users").doc(targetId).set({ banned: true }, { merge: true });
             
             // Notify banned user (if possible)
+            bannedUsersCache.add(targetId);
             try {
                 await ctx.telegram.sendMessage(targetId, "❌ Your access to Film House has been restricted.");
             } catch (notifyErr) {}
@@ -661,6 +662,7 @@ function setupBot(bot) {
         }
 
         try {
+            bannedUsersCache.delete(targetId);
             await db.collection("users").doc(targetId).set({ banned: false }, { merge: true });
             
             // Notify user
