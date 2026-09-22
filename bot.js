@@ -56,6 +56,7 @@ function escapeHtml(str) {
 function setupBot(bot, adminBot) {
     let callTelegramWithRetry;
     let disableImmediateBlockedBotWrite = false;
+    let cachedPendingRequests = [];
 
     // Middleware to automatically make all context replies direct thread replies to the triggering message
     bot.use(async (ctx, next) => {
@@ -215,9 +216,17 @@ function setupBot(bot, adminBot) {
             { command: 'stats', description: '📊 Detailed server metrics' }
         ]).catch(err => console.warn('Could not set admin bot commands:', err.message));
 
-        // Direct reply middleware for admin bot
+        // Instant answer for all admin callbacks to eliminate UI lag/spinner
         adminBot.use(async (ctx, next) => {
-            const messageId = ctx.message ? ctx.message.message_id : (ctx.callbackQuery && ctx.callbackQuery.message ? ctx.callbackQuery.message.message_id : undefined);
+            if (ctx.callbackQuery) {
+                ctx.answerCbQuery().catch(() => {});
+            }
+            return next();
+        });
+
+        // Direct reply middleware for admin bot messages
+        adminBot.use(async (ctx, next) => {
+            const messageId = ctx.message ? ctx.message.message_id : undefined;
             if (messageId) {
                 const originalReply = ctx.reply;
                 ctx.reply = function (text, extra) {
@@ -259,24 +268,54 @@ function setupBot(bot, adminBot) {
             }
         };
 
-        // Command: /start and /menu
-        adminBot.command(['start', 'menu'], async (ctx) => {
+        // Helper: Fetch pending requests fast with in-memory fallback
+        const getPendingRequestsList = async () => {
+            if (cachedPendingRequests.length > 0) return cachedPendingRequests;
+            try {
+                const fetchPromise = db.collection("requests").where("status", "in", ["pending", "priority"]).limit(15).get();
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1200));
+                const snap = await Promise.race([fetchPromise, timeoutPromise]);
+                if (snap && snap.docs) {
+                    cachedPendingRequests = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                }
+            } catch (e) {}
+            return cachedPendingRequests;
+        };
+
+        // Render helper: edits existing message if callback query, otherwise replies with new message
+        const renderOrEdit = async (ctx, payload) => {
+            const options = {
+                parse_mode: "Markdown",
+                reply_markup: {
+                    inline_keyboard: payload.keyboard
+                }
+            };
+
+            if (ctx.callbackQuery && ctx.callbackQuery.message) {
+                try {
+                    return await ctx.editMessageText(payload.text, options);
+                } catch (err) {
+                    if (err.message && err.message.includes("message is not modified")) {
+                        return;
+                    }
+                    return await ctx.reply(payload.text, options);
+                }
+            } else {
+                return await ctx.reply(payload.text, options);
+            }
+        };
+
+        // View 1: Main Admin Menu / Command Center
+        const getAdminMenuPayload = (adminName = 'Admin') => {
             const subCount = localStore.getCount();
             const mem = process.memoryUsage();
             const memoryMB = (mem.heapUsed / 1024 / 1024).toFixed(1);
             const uptimeHours = (process.uptime() / 3600).toFixed(1);
+            const pendingCount = cachedPendingRequests.length;
 
-            let pendingCount = "Checking...";
-            try {
-                const snap = await db.collection("requests").where("status", "in", ["pending", "priority"]).get();
-                pendingCount = snap.size;
-            } catch (e) {
-                pendingCount = "Active";
-            }
-
-            return ctx.reply(
+            const text = 
                 `👑 *Film House Admin Command Center*\n\n` +
-                `👋 Welcome, *${ctx.from.first_name || 'Admin'}*!\n\n` +
+                `👋 Welcome, *${adminName}*!\n\n` +
                 `📊 *Live System Overview:*\n` +
                 `• 👥 *Subscribers (Ubuntu DB):* \`${subCount}\`\n` +
                 `• ⏳ *Pending Requests:* \`${pendingCount}\`\n` +
@@ -287,77 +326,83 @@ function setupBot(bot, adminBot) {
                 `• /logs — View live server & bot logs\n` +
                 `• /pending — View pending movie requests\n` +
                 `• /backup — Download weekly CSV catalog backup\n` +
-                `• /stats — Detailed server & subscriber metrics`,
-                {
-                    parse_mode: 'Markdown',
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: "📋 Pending Requests", callback_data: "admin_pending" },
-                                { text: "📜 Server Logs", callback_data: "admin_logs" }
-                            ],
-                            [
-                                { text: "💾 Download Backup", callback_data: "admin_backup" },
-                                { text: "📊 System Stats", callback_data: "admin_stats" }
-                            ]
-                        ]
-                    }
-                }
-            );
-        });
+                `• /stats — Detailed server & subscriber metrics`;
 
-        // Command: /logs [out|error]
-        adminBot.command('logs', async (ctx) => {
-            const text = (ctx.message.text || "").toLowerCase();
-            const type = text.includes("error") ? "error" : "out";
-            const logs = getRecentLogs(type);
-            return ctx.reply(
-                `📜 *Live Film House Logs (${type.toUpperCase()} - Last 25 lines)*:\n\n` +
-                `\`\`\`\n${logs || 'No log entries found.'}\n\`\`\``,
-                {
-                    parse_mode: "Markdown",
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: "🔄 Refresh Out Logs", callback_data: "admin_logs_out" },
-                                { text: "⚠️ View Error Logs", callback_data: "admin_logs_error" }
-                            ]
-                        ]
-                    }
-                }
-            );
-        });
+            const keyboard = [
+                [
+                    { text: "📋 Pending Requests", callback_data: "admin_pending" },
+                    { text: "📜 Server Logs", callback_data: "admin_logs" }
+                ],
+                [
+                    { text: "💾 Download Backup", callback_data: "admin_backup" },
+                    { text: "📊 System Stats", callback_data: "admin_stats" }
+                ],
+                [
+                    { text: "🔄 Refresh Overview", callback_data: "admin_menu" }
+                ]
+            ];
 
-        // Command: /pending
-        adminBot.command('pending', async (ctx) => {
-            try {
-                const snap = await db.collection("requests").where("status", "in", ["pending", "priority"]).limit(10).get();
-                if (snap.empty) {
-                    return ctx.reply("🎉 *All caught up!* There are no pending requests right now.", { parse_mode: "Markdown" });
-                }
-                let msg = `📋 *Pending Movie Requests (${snap.size}):*\n\n`;
-                snap.docs.forEach((doc, idx) => {
-                    const r = doc.data();
+            return { text, keyboard };
+        };
+
+        // View 2: Pending Requests
+        const getPendingRequestsPayload = (requests = []) => {
+            const list = requests.slice(0, 10);
+            let msg = `📋 *Pending Movie Requests (${requests.length}):*\n\n`;
+            if (list.length === 0) {
+                msg += `🎉 *All caught up!* There are no pending requests right now.\n\n`;
+            } else {
+                list.forEach((r, idx) => {
                     const prio = (r.status === "priority" || r.boosted) ? "🔥 *[PRIORITY]*" : "";
                     const year = r.year ? ` (${r.year})` : "";
-                    msg += `${idx + 1}. *${r.title}*${year} ${prio}\n   • Type: \`${r.type || 'Movie'}\` | User: @${r.requestedBy || r.userId}\n\n`;
+                    msg += `${idx + 1}. *${r.title}*${year} ${prio}\n   • Type: \`${r.type || 'Movie'}\` | User: @${r.requestedBy || r.userId || 'guest'}\n\n`;
                 });
-                msg += `💡 Open the Admin Web App to fulfill these requests with download links!`;
-                return ctx.reply(msg, { parse_mode: "Markdown" });
-            } catch (err) {
-                return ctx.reply(`❌ Could not fetch pending requests: ${err.message}`);
+                msg += `💡 Open the Admin Web App to fulfill these requests with download links!\n`;
             }
-        });
 
-        // Command: /stats
-        adminBot.command('stats', async (ctx) => {
+            const keyboard = [
+                [
+                    { text: "🔄 Refresh Requests", callback_data: "admin_pending" },
+                    { text: "« Back to Menu", callback_data: "admin_menu" }
+                ]
+            ];
+
+            return { text: msg, keyboard };
+        };
+
+        // View 3: Server Logs
+        const getLogsPayload = (type = "out") => {
+            const logs = getRecentLogs(type);
+            const msg = `📜 *Live Film House Logs (${type.toUpperCase()} - Last 25 lines)*:\n\n` +
+                        `\`\`\`\n${logs || 'No log entries found.'}\n\`\`\``;
+
+            const keyboard = [
+                type === "out"
+                    ? [
+                        { text: "🔄 Refresh Out", callback_data: "admin_logs_out" },
+                        { text: "⚠️ Error Logs", callback_data: "admin_logs_error" }
+                      ]
+                    : [
+                        { text: "📜 Out Logs", callback_data: "admin_logs_out" },
+                        { text: "🔄 Refresh Errors", callback_data: "admin_logs_error" }
+                      ],
+                [
+                    { text: "« Back to Menu", callback_data: "admin_menu" }
+                ]
+            ];
+
+            return { text: msg, keyboard };
+        };
+
+        // View 4: System Stats
+        const getStatsPayload = () => {
             const mem = process.memoryUsage();
             const heapUsedMB = (mem.heapUsed / 1024 / 1024).toFixed(1);
             const rssMB = (mem.rss / 1024 / 1024).toFixed(1);
             const uptime = (process.uptime() / 3600).toFixed(2);
             const subscribers = localStore.getCount();
 
-            return ctx.reply(
+            const msg = 
                 `📊 *Film House Server & Bot Statistics*\n\n` +
                 `🖥 *Server Environment:* Oracle Cloud Always Free (Ubuntu 24.04 LTS)\n` +
                 `⏱ *Process Uptime:* \`${uptime} hours\`\n` +
@@ -365,101 +410,127 @@ function setupBot(bot, adminBot) {
                 `👥 *Local Subscribers:* \`${subscribers}\` users on disk\n` +
                 `📁 *Local Database:* \`./data/bot_users.json\`\n` +
                 `🛡 *Public Bot:* Polling mode active\n` +
-                `👑 *Admin Bot:* Polling mode active`,
-                { parse_mode: "Markdown" }
-            );
+                `👑 *Admin Bot:* Polling mode active`;
+
+            const keyboard = [
+                [
+                    { text: "🔄 Refresh Stats", callback_data: "admin_stats" },
+                    { text: "« Back to Menu", callback_data: "admin_menu" }
+                ]
+            ];
+
+            return { text: msg, keyboard };
+        };
+
+        // Command: /start and /menu
+        adminBot.command(['start', 'menu'], async (ctx) => {
+            const adminName = ctx.from && ctx.from.first_name ? ctx.from.first_name : 'Admin';
+            await getPendingRequestsList();
+            return renderOrEdit(ctx, getAdminMenuPayload(adminName));
+        });
+
+        // Command: /logs [out|error]
+        adminBot.command('logs', async (ctx) => {
+            const text = (ctx.message && ctx.message.text ? ctx.message.text : "").toLowerCase();
+            const type = text.includes("error") ? "error" : "out";
+            return renderOrEdit(ctx, getLogsPayload(type));
+        });
+
+        // Command: /pending
+        adminBot.command('pending', async (ctx) => {
+            const list = await getPendingRequestsList();
+            return renderOrEdit(ctx, getPendingRequestsPayload(list));
+        });
+
+        // Command: /stats
+        adminBot.command('stats', async (ctx) => {
+            return renderOrEdit(ctx, getStatsPayload());
         });
 
         // Command: /backup
         adminBot.command('backup', async (ctx) => {
-            await ctx.reply("⏳ *Generating catalog backup CSV...*", { parse_mode: "Markdown" });
+            const generatingMsg = await ctx.reply("⏳ *Generating catalog backup CSV and sending document...*", {
+                parse_mode: "Markdown",
+                reply_markup: {
+                    inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                }
+            });
             try {
                 await checkAndRunWeeklyBackup(adminBot, true);
-                return ctx.reply("✅ *Backup generation complete and sent to Master Admins!*", { parse_mode: "Markdown" });
+                return ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    generatingMsg.message_id,
+                    undefined,
+                    "✅ *Backup generation complete and sent to Master Admins above!*",
+                    {
+                        parse_mode: "Markdown",
+                        reply_markup: {
+                            inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                        }
+                    }
+                ).catch(() => {});
             } catch (err) {
-                return ctx.reply(`❌ Backup failed: ${err.message}`);
+                return ctx.reply(`❌ Backup failed: ${err.message}`, {
+                    reply_markup: {
+                        inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                    }
+                });
             }
         });
 
-        // Action Handlers for Inline Buttons
+        // Action Handlers for Inline Navigation Buttons (All edit seamlessly in-place)
+        adminBot.action('admin_menu', async (ctx) => {
+            const adminName = ctx.from && ctx.from.first_name ? ctx.from.first_name : 'Admin';
+            return renderOrEdit(ctx, getAdminMenuPayload(adminName));
+        });
+
         adminBot.action('admin_logs', async (ctx) => {
-            await ctx.answerCbQuery();
-            const logs = getRecentLogs("out");
-            return ctx.reply(`📜 *Live Out Logs:*\n\`\`\`\n${logs}\n\`\`\``, {
-                parse_mode: "Markdown",
-                reply_markup: {
-                    inline_keyboard: [
-                        [{ text: "⚠️ Error Logs", callback_data: "admin_logs_error" }]
-                    ]
-                }
-            });
+            return renderOrEdit(ctx, getLogsPayload("out"));
         });
 
         adminBot.action('admin_logs_out', async (ctx) => {
-            await ctx.answerCbQuery("Refreshing...");
-            const logs = getRecentLogs("out");
-            return ctx.editMessageText(`📜 *Live Out Logs (Refreshed):*\n\`\`\`\n${logs}\n\`\`\``, {
-                parse_mode: "Markdown",
-                reply_markup: {
-                    inline_keyboard: [
-                        [{ text: "🔄 Refresh", callback_data: "admin_logs_out" }, { text: "⚠️ Error Logs", callback_data: "admin_logs_error" }]
-                    ]
-                }
-            }).catch(() => {});
+            return renderOrEdit(ctx, getLogsPayload("out"));
         });
 
         adminBot.action('admin_logs_error', async (ctx) => {
-            await ctx.answerCbQuery("Loading errors...");
-            const logs = getRecentLogs("error");
-            return ctx.editMessageText(`⚠️ *Live Error Logs:*\n\`\`\`\n${logs || 'No errors logged!'}\n\`\`\``, {
-                parse_mode: "Markdown",
-                reply_markup: {
-                    inline_keyboard: [
-                        [{ text: "📜 Out Logs", callback_data: "admin_logs_out" }, { text: "🔄 Refresh Errors", callback_data: "admin_logs_error" }]
-                    ]
-                }
-            }).catch(() => {});
+            return renderOrEdit(ctx, getLogsPayload("error"));
         });
 
         adminBot.action('admin_pending', async (ctx) => {
-            await ctx.answerCbQuery();
-            try {
-                const snap = await db.collection("requests").where("status", "in", ["pending", "priority"]).limit(10).get();
-                if (snap.empty) {
-                    return ctx.reply("🎉 *No pending requests!* All caught up.", { parse_mode: "Markdown" });
-                }
-                let msg = `📋 *Pending Movie Requests (${snap.size}):*\n\n`;
-                snap.docs.forEach((doc, idx) => {
-                    const r = doc.data();
-                    const prio = (r.status === "priority" || r.boosted) ? "🔥 [PRIORITY]" : "";
-                    const year = r.year ? ` (${r.year})` : "";
-                    msg += `${idx + 1}. *${r.title}*${year} ${prio}\n   • Type: \`${r.type || 'Movie'}\` | User: @${r.requestedBy || r.userId}\n\n`;
-                });
-                return ctx.reply(msg, { parse_mode: "Markdown" });
-            } catch (err) {
-                return ctx.reply(`❌ Could not fetch pending requests: ${err.message}`);
-            }
+            const list = await getPendingRequestsList();
+            return renderOrEdit(ctx, getPendingRequestsPayload(list));
         });
 
         adminBot.action('admin_stats', async (ctx) => {
-            await ctx.answerCbQuery();
-            const mem = process.memoryUsage();
-            const heapUsedMB = (mem.heapUsed / 1024 / 1024).toFixed(1);
-            const uptime = (process.uptime() / 3600).toFixed(2);
-            const subscribers = localStore.getCount();
-            return ctx.reply(
-                `📊 *Quick System Stats:*\n` +
-                `• Uptime: \`${uptime} hrs\`\n` +
-                `• RAM: \`${heapUsedMB} MB\`\n` +
-                `• Subscribers: \`${subscribers}\` in Ubuntu DB`,
-                { parse_mode: "Markdown" }
-            );
+            return renderOrEdit(ctx, getStatsPayload());
         });
 
         adminBot.action('admin_backup', async (ctx) => {
-            await ctx.answerCbQuery("Triggering backup...");
-            await checkAndRunWeeklyBackup(adminBot, true);
-            return ctx.reply("✅ *Backup sent! Check chat above.*", { parse_mode: "Markdown" });
+            try {
+                await ctx.editMessageText("⏳ *Generating catalog backup CSV and sending document...*", {
+                    parse_mode: "Markdown",
+                    reply_markup: {
+                        inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                    }
+                });
+            } catch (e) {}
+
+            try {
+                await checkAndRunWeeklyBackup(adminBot, true);
+                return await ctx.editMessageText("✅ *Catalog backup generated and sent below!*", {
+                    parse_mode: "Markdown",
+                    reply_markup: {
+                        inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                    }
+                });
+            } catch (err) {
+                return await ctx.editMessageText(`❌ Backup failed: ${err.message}`, {
+                    parse_mode: "Markdown",
+                    reply_markup: {
+                        inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                    }
+                });
+            }
         });
     }
 
@@ -1748,10 +1819,14 @@ async function init() {
                 console.log(`Dummy health check HTTP server listening on port ${PORT} (Polling mode).`);
             });
             
-            bot.launch().catch(err => console.error("Public Bot launch error:", err.message));
+            bot.launch({
+                allowedUpdates: ['message', 'callback_query']
+            }).catch(err => console.error("Public Bot launch error:", err.message));
             console.log("Film House Public Bot successfully started! 🚀 Running command listener (Polling)...");
 
-            adminBot.launch().then(() => {
+            adminBot.launch({
+                allowedUpdates: ['message', 'callback_query']
+            }).then(() => {
                 console.log("Film House Admin Bot successfully started! 👑 Running listener (@Fiimhouse_adminBot)...");
             }).catch(err => {
                 console.error("Admin Bot launch error:", err.message);
@@ -1976,6 +2051,12 @@ async function init() {
 
         // Real-time listener for requests additions and status changes (boosted, claimed, fulfilled)
         db.collection("requests").onSnapshot((snapshot) => {
+            try {
+                cachedPendingRequests = snapshot.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .filter(r => r.status === "pending" || r.status === "priority" || (!r.status && !r.fulfilled && !r.claimed));
+            } catch (e) {}
+
             snapshot.docChanges().forEach(async (change) => {
                 const data = change.doc.data();
                 const docId = change.doc.id;
