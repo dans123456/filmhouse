@@ -4,6 +4,8 @@ const fs = require("fs");
 const path = require("path");
 const http = require("http");
 const crypto = require("crypto");
+const LocalUserStore = require("./localStore");
+const localStore = new LocalUserStore();
 
 // Server PORT will be initialized dynamically in the init() function based on Webhook/Polling mode.
 
@@ -83,6 +85,13 @@ function setupBot(bot) {
         }
         
         commandCooldowns.set(userId, now);
+        if (ctx.from) {
+            localStore.upsertUser({
+                id: userId,
+                username: ctx.from.username || "",
+                fullName: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" ") || "Telegram User"
+            });
+        }
         return next();
     });
 
@@ -206,6 +215,15 @@ function setupBot(bot) {
         
         console.log(`User /start: ${fullName} (${username ? '@' + username : 'No handle'}, ID: ${userId})`);
 
+        // Update local user store immediately on Ubuntu
+        localStore.upsertUser({
+            id: userId,
+            username: username,
+            fullName: fullName,
+            lastSeen: Date.now(),
+            blockedBot: false
+        });
+
         // Check for deep-link payload (start=claim_docId, start=boost_docId, start=ref_userId)
         const payload = ctx.startPayload || (ctx.message && ctx.message.text ? ctx.message.text.split(" ")[1] : "");
 
@@ -213,8 +231,18 @@ function setupBot(bot) {
         (async () => {
             try {
                 const userRef = db.collection("users").doc(userId);
-                const userDoc = await userRef.get();
-                const isNewUser = !userDoc.exists;
+                const existingLocal = localStore.getUser(userId);
+                let isNewUser = !existingLocal;
+                if (isNewUser) {
+                    try {
+                        const userDoc = await userRef.get();
+                        if (userDoc.exists) isNewUser = false;
+                    } catch (e) {
+                        // If quota is exhausted, assume existing to prevent duplicate initializations
+                        isNewUser = false;
+                    }
+                }
+
                 const data = {
                     id: userId,
                     username: username,
@@ -481,67 +509,60 @@ function setupBot(bot) {
         });
     });
 
-    // Command: /settings
+    // Command: /settings (Powered by Ubuntu Local Store with optional Firestore sync)
     bot.command('settings', async (ctx) => {
         const userId = String(ctx.from.id);
+        const localUser = localStore.getUser(userId);
+
+        let points = localUser ? (localUser.points || 0) : 0;
+        let badge = localUser ? (localUser.badge || "No Active Badge") : "No Active Badge";
+        let username = (localUser && localUser.username) ? localUser.username : (ctx.from.username || "");
+
+        // Try getting fresh points from Firestore if online (with 1.5s timeout)
         try {
-            const userDoc = await db.collection("users").doc(userId).get();
-            if (!userDoc.exists) {
-                return ctx.reply("❌ User profile not found. Please type /start to initialize your account.");
+            const userPromise = db.collection("users").doc(userId).get();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1500));
+            const userDoc = await Promise.race([userPromise, timeoutPromise]);
+            if (userDoc.exists) {
+                const u = userDoc.data();
+                points = u.points || points;
+                badge = u.badge || badge;
+                username = u.username || username;
+                localStore.upsertUser({ id: userId, points, badge, username });
             }
-            const u = userDoc.data();
-            const points = u.points || 0;
-            const badge = u.badge || "No Active Badge";
-            
-            const replyMarkup = {
-                inline_keyboard: [
-                    [
-                        {
-                            text: "Open Web App 🚀",
-                            url: "https://t.me/Filmhouseappbot/filmhouseapp"
-                        }
-                    ],
-                    [
-                        { text: "Help 📖", callback_data: "settings_help" },
-                        { text: "About ℹ️", callback_data: "settings_about" }
-                    ]
-                ]
-            };
-            
-            return ctx.reply(
-                `👤 *Your Profile Status*\n\n` +
-                `• *Telegram ID:* \`${userId}\`\n` +
-                `• *Username:* ${u.username && u.username !== "guest" && u.username !== "None" ? '@' + u.username.replace(/^@/, '') : "None"}\n` +
-                `• *Loyalty Points:* 🪙 \`${points.toLocaleString()}\` pts\n` +
-                `• *VIP Badge:* 🏆 \`${badge}\``,
-                { 
-                    parse_mode: 'Markdown',
-                    reply_markup: replyMarkup,
-                    reply_to_message_id: ctx.message.message_id
-                }
-            );
-        } catch (err) {
-            console.error("Error loading settings:", err);
-            const username = ctx.from.username ? `@${ctx.from.username}` : "None";
-            const replyMarkup = {
-                inline_keyboard: [
-                    [{ text: "Open Web App 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }],
-                    [{ text: "Help 📖", callback_data: "settings_help" }, { text: "About ℹ️", callback_data: "settings_about" }]
-                ]
-            };
-            return ctx.reply(
-                `👤 *Your Profile Status*\n\n` +
-                `• *Telegram ID:* \`${userId}\`\n` +
-                `• *Username:* ${username}\n` +
-                `• *Status:* Active 🍿\n\n` +
-                `ℹ️ *Note:* Daily database sync resets at 00:00 PST (07:00 UTC). Open the app below to view your balance!`,
-                { 
-                    parse_mode: 'Markdown',
-                    reply_markup: replyMarkup,
-                    reply_to_message_id: ctx.message.message_id
-                }
-            );
+        } catch (e) {
+            // Uses local storage seamlessly without error!
         }
+
+        const replyMarkup = {
+            inline_keyboard: [
+                [
+                    {
+                        text: "Open Web App 🚀",
+                        url: "https://t.me/Filmhouseappbot/filmhouseapp"
+                    }
+                ],
+                [
+                    { text: "Help 📖", callback_data: "settings_help" },
+                    { text: "About ℹ️", callback_data: "settings_about" }
+                ]
+            ]
+        };
+
+        const usernameDisplay = username && username !== "guest" && username !== "None" ? '@' + username.replace(/^@/, '') : "None";
+
+        return ctx.reply(
+            `👤 *Your Profile Status*\n\n` +
+            `• *Telegram ID:* \`${userId}\`\n` +
+            `• *Username:* ${usernameDisplay}\n` +
+            `• *Loyalty Points:* 🪙 \`${points.toLocaleString()}\` pts\n` +
+            `• *VIP Badge:* 🏆 \`${badge}\``,
+            { 
+                parse_mode: 'Markdown',
+                reply_markup: replyMarkup,
+                reply_to_message_id: ctx.message.message_id
+            }
+        );
     });
 
     // Command: /ping
@@ -580,66 +601,59 @@ function setupBot(bot) {
             reply_to_message_id: ctx.message.message_id
         });
 
-        try {
-            disableImmediateBlockedBotWrite = true;
-            const snapshot = await db.collection("users").get();
-            let successCount = 0;
-            let failedCount = 0;
-            const blockedUserIds = [];
-
-            for (const doc of snapshot.docs) {
-                const u = doc.data();
-                if (u.id && u.blockedBot !== true) {
-                    try {
-                        if (replyTo) {
-                            await callTelegramWithRetry('copyMessage', u.id, ctx.chat.id, replyTo.message_id);
-                        } else {
-                            await callTelegramWithRetry('sendMessage', u.id, messageText, { parse_mode: "Markdown" });
-                        }
-                        successCount++;
-                    } catch (err) {
-                        failedCount++;
-                        const isUserError = err.message && (err.message.includes("blocked") || err.message.includes("chat not found") || err.message.includes("deactivated"));
-                        if (isUserError) {
-                            blockedUserIds.push(u.id);
-                        }
-                    }
-                    // Rate limiting delay
-                    await new Promise(r => setTimeout(r, 50));
-                }
+        // Retrieve subscribers from Ubuntu local store (ZERO Firestore reads, immune to quotas!)
+        let subscribers = localStore.getActiveSubscribers();
+        
+        // If local store is empty, attempt a Firestore fallback
+        if (subscribers.length === 0) {
+            try {
+                const snapshot = await db.collection("users").get();
+                snapshot.forEach(doc => {
+                    const u = doc.data();
+                    if (u.id) localStore.upsertUser({ id: String(u.id), ...u });
+                });
+                subscribers = localStore.getActiveSubscribers();
+            } catch (fsErr) {
+                console.warn("[Broadcast] Firestore fallback failed:", fsErr.message);
             }
-
-            // Batch update blocked users
-            if (blockedUserIds.length > 0) {
-                console.log(`[Broadcast] Batch updating ${blockedUserIds.length} blocked users...`);
-                const batchSize = 500;
-                for (let i = 0; i < blockedUserIds.length; i += batchSize) {
-                    const chunk = blockedUserIds.slice(i, i + batchSize);
-                    const batch = db.batch();
-                    chunk.forEach(uid => {
-                        batch.set(db.collection("users").doc(String(uid)), { blockedBot: true }, { merge: true });
-                    });
-                    await batch.commit().catch(err => console.error("Failed to commit blocked users batch:", err));
-                }
-            }
-
-            return ctx.reply(`📢 *Broadcast Finished*\n\n🟢 Success: \`${successCount}\`\n🔴 Failed: \`${failedCount}\``, { 
-                parse_mode: 'Markdown',
-                reply_to_message_id: ctx.message.message_id
-            });
-        } catch (err) {
-            console.error("Broadcast failed:", err);
-            const isQuota = err.message && (err.message.includes("RESOURCE_EXHAUSTED") || err.message.includes("Quota exceeded"));
-            const errorMsg = isQuota
-                ? "⚠️ *Broadcast Paused:* Today's Firestore 50,000 free read limit was reached earlier today. Google resets the free quota tonight at **00:00 PST (07:00 UTC)**, after which broadcasts will run smoothly!"
-                : `❌ Broadcast failed: ${err.message}`;
-            return ctx.reply(errorMsg, {
-                parse_mode: 'Markdown',
-                reply_to_message_id: ctx.message.message_id
-            });
-        } finally {
-            disableImmediateBlockedBotWrite = false;
         }
+
+        if (subscribers.length === 0) {
+            return ctx.reply("⚠️ No bot subscribers found in local database yet. Users who message or /start the bot will appear here automatically.");
+        }
+
+        ctx.reply(`✈️ *Starting broadcast to ${subscribers.length} subscriber(s)...*`, { 
+            parse_mode: 'Markdown',
+            reply_to_message_id: ctx.message.message_id
+        });
+
+        let successCount = 0;
+        let failedCount = 0;
+
+        for (const u of subscribers) {
+            try {
+                if (replyTo) {
+                    await callTelegramWithRetry('copyMessage', u.id, ctx.chat.id, replyTo.message_id);
+                } else {
+                    await callTelegramWithRetry('sendMessage', u.id, messageText, { parse_mode: "Markdown" });
+                }
+                successCount++;
+            } catch (err) {
+                failedCount++;
+                const isUserError = err.message && (err.message.includes("blocked") || err.message.includes("chat not found") || err.message.includes("deactivated"));
+                if (isUserError) {
+                    localStore.setBlocked(u.id, true);
+                    db.collection("users").doc(String(u.id)).set({ blockedBot: true }, { merge: true }).catch(() => {});
+                }
+            }
+            // Rate limiting delay (35ms between Telegram sends = ~30 msgs/sec safely under Telegram limit)
+            await new Promise(r => setTimeout(r, 35));
+        }
+
+        return ctx.reply(`📢 *Broadcast Finished*\n\n🟢 Success: \`${successCount}\`\n🔴 Failed: \`${failedCount}\`\n👥 Total Subscribers in Ubuntu DB: \`${subscribers.length}\``, { 
+            parse_mode: 'Markdown',
+            reply_to_message_id: ctx.message.message_id
+        });
     });
 
     // Command: /ban <user_id> (Admin Only)
@@ -659,6 +673,7 @@ function setupBot(bot) {
             
             // Notify banned user (if possible)
             bannedUsersCache.add(targetId);
+            localStore.setBanned(targetId, true);
             try {
                 await ctx.telegram.sendMessage(targetId, "❌ Your access to Film House has been restricted.");
             } catch (notifyErr) {}
@@ -684,6 +699,7 @@ function setupBot(bot) {
 
         try {
             bannedUsersCache.delete(targetId);
+            localStore.setBanned(targetId, false);
             await db.collection("users").doc(targetId).set({ banned: false }, { merge: true });
             
             // Notify user
@@ -1480,19 +1496,33 @@ async function init() {
             await checkAndRunWeeklyBackup(bot);
         }, 12 * 60 * 60 * 1000); // Check every 12 hours
 
+        // Start background synchronization from Firestore to Ubuntu local user store
+        setTimeout(() => localStore.syncFromFirestore(db), 10 * 1000);
+        setInterval(() => localStore.syncFromFirestore(db), 6 * 60 * 60 * 1000);
+
         // Start keep-alive ping loop for external File Bots
+        let cachedPingUrls = [];
+        let lastPingUrlsFetch = 0;
+
         const pingExternalFileBots = async () => {
             try {
-                const doc = await db.collection("settings").doc("telegram").get();
-                if (!doc.exists) return;
+                const now = Date.now();
+                if (now - lastPingUrlsFetch > 60 * 60 * 1000 || cachedPingUrls.length === 0) {
+                    try {
+                        const doc = await db.collection("settings").doc("telegram").get();
+                        if (doc.exists) {
+                            const pingUrlsStr = doc.data().pingUrls || "";
+                            cachedPingUrls = pingUrlsStr.split(",")
+                                .map(u => u.trim())
+                                .filter(u => u.length > 0 && (u.startsWith("http://") || u.startsWith("https://")));
+                            lastPingUrlsFetch = now;
+                        }
+                    } catch (e) {
+                        // Keep previous cached URLs if Firestore is temporarily unavailable
+                    }
+                }
                 
-                const pingUrlsStr = doc.data().pingUrls || "";
-                if (!pingUrlsStr) return;
-                
-                const urls = pingUrlsStr.split(",")
-                    .map(u => u.trim())
-                    .filter(u => u.length > 0 && (u.startsWith("http://") || u.startsWith("https://")));
-                
+                const urls = cachedPingUrls;
                 if (urls.length === 0) return;
                 
                 console.log(`Pinging ${urls.length} external File Bot(s) to keep active...`);
