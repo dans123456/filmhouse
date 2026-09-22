@@ -522,9 +522,25 @@ function setupBot(bot) {
             );
         } catch (err) {
             console.error("Error loading settings:", err);
-            return ctx.reply("❌ Error loading your profile settings.", {
-                reply_to_message_id: ctx.message.message_id
-            });
+            const username = ctx.from.username ? `@${ctx.from.username}` : "None";
+            const replyMarkup = {
+                inline_keyboard: [
+                    [{ text: "Open Web App 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }],
+                    [{ text: "Help 📖", callback_data: "settings_help" }, { text: "About ℹ️", callback_data: "settings_about" }]
+                ]
+            };
+            return ctx.reply(
+                `👤 *Your Profile Status*\n\n` +
+                `• *Telegram ID:* \`${userId}\`\n` +
+                `• *Username:* ${username}\n` +
+                `• *Status:* Active 🍿\n\n` +
+                `ℹ️ *Note:* Daily database sync resets at 00:00 PST (07:00 UTC). Open the app below to view your balance!`,
+                { 
+                    parse_mode: 'Markdown',
+                    reply_markup: replyMarkup,
+                    reply_to_message_id: ctx.message.message_id
+                }
+            );
         }
     });
 
@@ -613,7 +629,12 @@ function setupBot(bot) {
             });
         } catch (err) {
             console.error("Broadcast failed:", err);
-            return ctx.reply(`❌ Broadcast failed: ${err.message}`, {
+            const isQuota = err.message && (err.message.includes("RESOURCE_EXHAUSTED") || err.message.includes("Quota exceeded"));
+            const errorMsg = isQuota
+                ? "⚠️ *Broadcast Paused:* Today's Firestore 50,000 free read limit was reached earlier today. Google resets the free quota tonight at **00:00 PST (07:00 UTC)**, after which broadcasts will run smoothly!"
+                : `❌ Broadcast failed: ${err.message}`;
+            return ctx.reply(errorMsg, {
+                parse_mode: 'Markdown',
                 reply_to_message_id: ctx.message.message_id
             });
         } finally {
