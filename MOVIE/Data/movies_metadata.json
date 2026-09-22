@@ -1,5 +1,41 @@
 [
   {
+    "csv_id": "207332-sakamoto-days",
+    "tmdb_id": 207332,
+    "imdb_id": "",
+    "title": "SAKAMOTO DAYS",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Comedy",
+      "Action & Adventure"
+    ],
+    "overview": "Once the greatest hitman of all, Taro Sakamoto retired in the name of love. But when his past catches up, he must fight to protect his beloved family.",
+    "poster": "https://image.tmdb.org/t/p/w500/wRpCqsJFyKNuh5FMegNPrhzp2NF.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/blSthAPRbEOJBowdxppeQqNPRh9.jpg",
+    "rating": 8.1,
+    "release_date": "2025-01-11",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "fPopd3ZOGUY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADRw0AAsDqmEUL13cBpZAAAb8WBA",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADSg0AAsDqmEW3FyaMEGRmORYE",
+        "season": "Season 2"
+      }
+    ]
+  },
+  {
     "csv_id": "62104-the-seven-deadly-sins",
     "tmdb_id": 62104,
     "imdb_id": "",
