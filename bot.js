@@ -174,6 +174,30 @@ function setupBot(bot) {
         }
     }
 
+    // In-memory cache for welcome settings and photo to eliminate delay and unnecessary Firestore reads
+    let cachedWelcomeSettings = null;
+    let lastWelcomeFetchTime = 0;
+    let cachedWelcomePhotoFileId = null;
+
+    async function getCachedWelcomeSettings() {
+        const now = Date.now();
+        if (cachedWelcomeSettings && (now - lastWelcomeFetchTime < 10 * 60 * 1000)) {
+            return cachedWelcomeSettings;
+        }
+        try {
+            const welcomeDoc = await db.collection("settings").doc("welcome").get();
+            if (welcomeDoc.exists) {
+                cachedWelcomeSettings = welcomeDoc.data() || {};
+            } else {
+                cachedWelcomeSettings = {};
+            }
+            lastWelcomeFetchTime = now;
+        } catch (e) {
+            cachedWelcomeSettings = cachedWelcomeSettings || {};
+        }
+        return cachedWelcomeSettings;
+    }
+
     // Command: /start
     bot.command('start', async (ctx) => {
         const userId = String(ctx.from.id);
@@ -182,83 +206,66 @@ function setupBot(bot) {
         
         console.log(`User /start: ${fullName} (${username ? '@' + username : 'No handle'}, ID: ${userId})`);
 
-        // Register user in Firestore
-        let isNewUser = false;
-        try {
-            const userRef = db.collection("users").doc(userId);
-            const userDoc = await userRef.get();
-            
-            const data = {
-                id: userId,
-                username: username,
-                fullName: fullName,
-                lastSeen: admin.firestore.FieldValue.serverTimestamp(),
-                blockedBot: false
-            };
-            
-            if (!userDoc.exists) {
-                isNewUser = true;
-                data.points = 0;
-                data.badge = "";
-                data.badgeExpiresAt = 0;
-                data.pointsBreakdown = { downloads: 0, visits: 0, shares: 0, watched: 0 };
-                data.dailyStats = {};
-                data.joinedDate = admin.firestore.FieldValue.serverTimestamp();
-                data.notificationsEnabled = true;
-                data.subAnime = true;
-                data.subHollywood = true;
-                data.subRecs = true;
-                data.contactPreference = "telegram";
-                await userRef.set(data);
-            } else {
-                await userRef.set(data, { merge: true });
-            }
-        } catch (err) {
-            console.error("Error registering user on /start:", err);
-        }
-
-        // Check for deep-link claim payload (start=claim_docId)
+        // Check for deep-link payload (start=claim_docId, start=boost_docId, start=ref_userId)
         const payload = ctx.startPayload || (ctx.message && ctx.message.text ? ctx.message.text.split(" ")[1] : "");
 
-        // Process referral points if user joined via shared link
-        if (payload && payload.startsWith("ref_")) {
-            const referrerId = payload.substring(4);
-            if (referrerId === userId) {
-                // Self-referral check
-                await ctx.reply("⚠️ *You cannot refer yourself!* Share your link with friends to earn points. 🎁", { parse_mode: "Markdown" }).catch(err => console.warn(err));
-            } else if (isNewUser) {
-                try {
-                    const referrerRef = db.collection("users").doc(referrerId);
-                    const referrerDoc = await referrerRef.get();
-                    if (referrerDoc.exists) {
-                        const referrerData = referrerDoc.data();
-                        const currentPoints = referrerData.points || 0;
-                        const newPoints = currentPoints + 5;
-                        const breakdown = referrerData.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
-                        breakdown.shares = (breakdown.shares || 0) + 1;
-
-                        await referrerRef.update({
-                            points: newPoints,
-                            pointsBreakdown: breakdown
-                        });
-
-                        // Notify the referrer privately in their bot DM
-                        await ctx.telegram.sendMessage(
-                            referrerId,
-                            `🔔 *New Referral!* 🔔\n\n` +
-                            `Your friend *${fullName}* has joined Film House using your invite link! 🎉\n\n` +
-                            `You have been awarded *+5 Loyalty Points*! 🏆`,
-                            { parse_mode: "Markdown" }
-                        ).catch(err => console.warn(`Failed to send referral message to ${referrerId}:`, err));
-                    }
-                } catch (err) {
-                    console.error("Error processing referral points:", err);
+        // Asynchronously register / update user in background (non-blocking for instant /start response)
+        (async () => {
+            try {
+                const userRef = db.collection("users").doc(userId);
+                const userDoc = await userRef.get();
+                const isNewUser = !userDoc.exists;
+                const data = {
+                    id: userId,
+                    username: username,
+                    fullName: fullName,
+                    lastSeen: admin.firestore.FieldValue.serverTimestamp(),
+                    blockedBot: false
+                };
+                if (isNewUser) {
+                    data.points = 0;
+                    data.badge = "";
+                    data.badgeExpiresAt = 0;
+                    data.pointsBreakdown = { downloads: 0, visits: 0, shares: 0, watched: 0 };
+                    data.dailyStats = {};
+                    data.joinedDate = admin.firestore.FieldValue.serverTimestamp();
+                    data.notificationsEnabled = true;
+                    data.subAnime = true;
+                    data.subHollywood = true;
+                    data.subRecs = true;
+                    data.contactPreference = "telegram";
+                    await userRef.set(data);
+                } else {
+                    await userRef.set(data, { merge: true });
                 }
-            } else {
-                // User already exists in database
-                await ctx.reply("ℹ️ *You are already a member of Film House!* Invite links only award points for new users who join for the first time. 🍿", { parse_mode: "Markdown" }).catch(err => console.warn(err));
+
+                // Process referral points in background
+                if (payload && payload.startsWith("ref_")) {
+                    const referrerId = payload.substring(4);
+                    if (referrerId !== userId && isNewUser) {
+                        const referrerRef = db.collection("users").doc(referrerId);
+                        const referrerDoc = await referrerRef.get();
+                        if (referrerDoc.exists) {
+                            const referrerData = referrerDoc.data();
+                            const currentPoints = referrerData.points || 0;
+                            const newPoints = currentPoints + 5;
+                            const breakdown = referrerData.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
+                            breakdown.shares = (breakdown.shares || 0) + 1;
+                            await referrerRef.update({ points: newPoints, pointsBreakdown: breakdown });
+                            await ctx.telegram.sendMessage(
+                                referrerId,
+                                `🔔 *New Referral!* 🔔\n\nYour friend *${fullName}* has joined Film House using your invite link! 🎉\n\nYou have been awarded *+5 Loyalty Points*! 🏆`,
+                                { parse_mode: "Markdown" }
+                            ).catch(() => {});
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("Background user registration warning on /start:", err.message);
             }
-        }
+        })();
+
+
         if (payload && payload.startsWith("claim_")) {
             const docId = payload.substring(6);
             try {
@@ -359,32 +366,16 @@ function setupBot(bot) {
 
         const escapedFullName = fullName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-        // Load custom welcome config from Firestore settings/welcome
-        let welcomeText = null;
-        let welcomePhotoFileId = null;
-        let welcomePhotoUrl = null;
+        // Load custom welcome config from in-memory cache (instant response, zero delay)
+        const welcomeData = await getCachedWelcomeSettings();
+        const welcomeText = welcomeData.text || null;
+        const welcomePhotoFileId = welcomeData.fileId || null;
+        const welcomePhotoUrl = welcomeData.photoUrl || null;
         
-        let appButtonText = "Launch Film House 🚀";
-        let appButtonUrl = "https://t.me/Filmhouseappbot/filmhouseapp";
-        let channelButtonText = "Join Channel 📢";
-        let channelButtonUrl = "https://t.me/filmhouse_main";
-        
-        try {
-            const welcomeDoc = await db.collection("settings").doc("welcome").get();
-            if (welcomeDoc.exists) {
-                const welcomeData = welcomeDoc.data();
-                welcomeText = welcomeData.text || null;
-                welcomePhotoFileId = welcomeData.fileId || null;
-                welcomePhotoUrl = welcomeData.photoUrl || null;
-                
-                if (welcomeData.appButtonText) appButtonText = welcomeData.appButtonText;
-                if (welcomeData.appButtonUrl) appButtonUrl = welcomeData.appButtonUrl;
-                if (welcomeData.channelButtonText) channelButtonText = welcomeData.channelButtonText;
-                if (welcomeData.channelButtonUrl) channelButtonUrl = welcomeData.channelButtonUrl;
-            }
-        } catch (err) {
-            console.warn("Failed to load custom welcome settings:", err);
-        }
+        let appButtonText = welcomeData.appButtonText || "Launch Film House 🚀";
+        let appButtonUrl = welcomeData.appButtonUrl || "https://t.me/Filmhouseappbot/filmhouseapp";
+        let channelButtonText = welcomeData.channelButtonText || "Join Channel 📢";
+        let channelButtonUrl = welcomeData.channelButtonUrl || "https://t.me/filmhouse_main";
 
         let caption = "";
         if (welcomeText) {
@@ -414,54 +405,51 @@ function setupBot(bot) {
             ]
         };
 
-        if (welcomePhotoFileId) {
-            try {
-                return await ctx.replyWithPhoto(
-                    welcomePhotoFileId,
-                    {
-                        caption: caption,
-                        parse_mode: 'HTML',
-                        reply_markup: replyMarkup
-                    }
-                );
-            } catch (err) {
-                console.error("Failed to send welcome photo file ID, falling back to text:", err);
-            }
-        } else if (welcomePhotoUrl) {
-            try {
-                return await ctx.replyWithPhoto(
-                    welcomePhotoUrl,
-                    {
-                        caption: caption,
-                        parse_mode: 'HTML',
-                        reply_markup: replyMarkup
-                    }
-                );
-            } catch (err) {
-                console.error("Failed to send welcome photo URL, falling back to text:", err);
-            }
-        } else {
-            const imagePath = path.join(__dirname, "MOVIE", "img", "FilmHouse.png");
-            if (fs.existsSync(imagePath)) {
-                try {
-                    return await ctx.replyWithPhoto(
-                        { source: imagePath },
-                        {
-                            caption: caption,
-                            parse_mode: 'HTML',
-                            reply_markup: replyMarkup
-                        }
-                    );
-                } catch (err) {
-                    console.error("Failed to send welcome photo, falling back to text:", err);
-                }
+        // Determine best photo source: Custom fileId > Custom URL > Cached Telegram fileId > Local File > GitHub Raw CDN
+        const localImagePath = path.join(__dirname, "MOVIE", "img", "FilmHouse.png");
+        const defaultCdnUrl = "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png";
+
+        let photoSource = welcomePhotoFileId || welcomePhotoUrl || cachedWelcomePhotoFileId;
+        if (!photoSource) {
+            if (fs.existsSync(localImagePath)) {
+                photoSource = { source: localImagePath };
+            } else {
+                photoSource = defaultCdnUrl;
             }
         }
-        
-        return ctx.reply(caption, {
-            parse_mode: 'HTML',
-            reply_markup: replyMarkup
-        });
+
+        try {
+            const sentMsg = await ctx.replyWithPhoto(photoSource, {
+                caption: caption,
+                parse_mode: 'HTML',
+                reply_markup: replyMarkup
+            });
+            if (sentMsg && sentMsg.photo && sentMsg.photo.length > 0) {
+                cachedWelcomePhotoFileId = sentMsg.photo[sentMsg.photo.length - 1].file_id;
+            }
+            return sentMsg;
+        } catch (photoErr) {
+            console.warn("Failed to send welcome photo with primary source, attempting CDN fallback:", photoErr.message);
+            if (photoSource !== defaultCdnUrl) {
+                try {
+                    const fallbackMsg = await ctx.replyWithPhoto(defaultCdnUrl, {
+                        caption: caption,
+                        parse_mode: 'HTML',
+                        reply_markup: replyMarkup
+                    });
+                    if (fallbackMsg && fallbackMsg.photo && fallbackMsg.photo.length > 0) {
+                        cachedWelcomePhotoFileId = fallbackMsg.photo[fallbackMsg.photo.length - 1].file_id;
+                    }
+                    return fallbackMsg;
+                } catch (cdnErr) {
+                    console.error("Failed to send fallback CDN photo:", cdnErr.message);
+                }
+            }
+            return ctx.reply(caption, {
+                parse_mode: 'HTML',
+                reply_markup: replyMarkup
+            });
+        }
     });
 
     // Command: /help
@@ -709,6 +697,7 @@ function setupBot(bot) {
             await db.collection("settings").doc("welcome").set({
                 text: newCaption
             }, { merge: true });
+            cachedWelcomeSettings = { ...(cachedWelcomeSettings || {}), text: newCaption };
 
             return ctx.reply("✅ *Welcome text caption has been successfully updated!*", { parse_mode: 'Markdown' });
         } catch (err) {
@@ -749,6 +738,8 @@ function setupBot(bot) {
                 fileId: fileId,
                 photoUrl: null // clear URL to prioritize fileId
             }, { merge: true });
+            cachedWelcomeSettings = { ...(cachedWelcomeSettings || {}), fileId: fileId, photoUrl: null };
+            cachedWelcomePhotoFileId = fileId;
 
             return ctx.reply("✅ *Welcome photo has been successfully updated!*", { parse_mode: 'Markdown' });
         } catch (err) {
@@ -766,6 +757,8 @@ function setupBot(bot) {
 
         try {
             await db.collection("settings").doc("welcome").delete();
+            cachedWelcomeSettings = {};
+            cachedWelcomePhotoFileId = null;
             return ctx.reply("🔄 *Welcome settings have been reset to app default values.*", { parse_mode: 'Markdown' });
         } catch (err) {
             console.error("Error deleting welcome doc:", err);
