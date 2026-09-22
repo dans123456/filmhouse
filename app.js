@@ -747,76 +747,8 @@ async function initializeDatabase() {
     localStorage.setItem("filmhouse_enriched_db_v5", JSON.stringify(enrichedList));
     statusEl.textContent = "Complete!";
 
-    // 4. Start real-time Firestore sync of custom catalog additions/updates
-    if (typeof firebase !== "undefined" && db) {
-        db.collection("movies").onSnapshot(snapshot => {
-            snapshot.docChanges().forEach(change => {
-                const docData = change.doc.data();
-                const csv_id = change.doc.id;
-                
-                docData.csv_id = csv_id;
-                
-                // Prepend MOVIE/ to local assets relative paths to resolve 404s
-                if (docData.poster && docData.poster.startsWith("img/")) {
-                    docData.poster = "MOVIE/" + docData.poster;
-                }
-                if (docData.backdrop && docData.backdrop.startsWith("img/")) {
-                    docData.backdrop = "MOVIE/" + docData.backdrop;
-                }
-                if (!docData.poster) {
-                    docData.poster = "MOVIE/img/FilmHouse3_nobg.png";
-                }
-                
-                // Precompute search index
-                docData._searchStr = [
-                    docData.title,
-                    docData.overview,
-                    (docData.genres || []).join(" "),
-                    (docData.cast || []).join(" "),
-                    docData.director,
-                    docData.type,
-                    (docData.categories || []).join(" ")
-                ].filter(Boolean).join(" ").toLowerCase();
-
-                if (change.type === "added" || change.type === "modified") {
-                    // Ensure local category array has correct subcategories based on media type
-                    if (!docData.categories || !Array.isArray(docData.categories) || docData.categories.length <= 1) {
-                        docData.categories = docData.categories || ["Main"];
-                        if (!docData.categories.includes("Main")) {
-                            docData.categories.push("Main");
-                        }
-                        const isTV = (docData.type || "").toLowerCase() === "series" || (docData.type || "").toLowerCase() === "tv";
-                        const subCat = isTV ? "Hollywood/British Series" : "Hollywood/British Movies";
-                        if (!docData.categories.includes(subCat)) {
-                            docData.categories.push(subCat);
-                        }
-                    }
-
-                    const idx = state.movies.findIndex(m => m.csv_id === csv_id);
-                    if (idx !== -1) {
-                        state.movies[idx] = { ...state.movies[idx], ...docData };
-                    } else {
-                        state.movies.unshift(docData);
-                        if (state.newMovieIds && !state.newMovieIds.includes(csv_id)) {
-                            state.newMovieIds.push(csv_id);
-                        }
-                    }
-                } else if (change.type === "removed") {
-                    state.movies = state.movies.filter(m => m.csv_id !== csv_id);
-                    if (state.newMovieIds) {
-                        state.newMovieIds = state.newMovieIds.filter(id => id !== csv_id);
-                    }
-                }
-            });
-            
-            // Re-render feed display if currently active on home screen
-            if (state.activeScreen === "home") {
-                renderFeaturedGrid();
-                renderCarouselBanner();
-                renderEditorsChoice();
-            }
-        }, err => console.warn("Firestore live catalog sync warning:", err));
-    }
+    // 4. Custom catalog is delivered via GitHub CDN (movies_metadata.json) without burning Firestore reads.
+    // Client-side onSnapshot of the entire movies collection has been disabled to preserve 100% free Spark tier.
 }
 
 function anyMatch(text, arr) {
@@ -1250,40 +1182,15 @@ function updatePointsUI() {
     const profilePoints = document.getElementById("profile-loyalty-points");
     if (profilePoints) profilePoints.textContent = state.user.points || 0;
     
-    // 3. Profile screen rank label
+    // 3. Profile screen rank label (Calculated locally from state - zero Firestore reads)
     const profileRankLabel = document.getElementById("profile-loyalty-rank-label");
     if (profileRankLabel) {
         if (typeof globalAdminIds !== "undefined" && globalAdminIds.includes(String(state.user.id))) {
             profileRankLabel.textContent = "Global Ranking: Staff Curator 👑";
-        } else if (typeof firebase !== "undefined" && db) {
-            db.collection("users").where("points", ">", state.user.points || 0).get().then(snap => {
-                let nonAdminGreaterCount = 0;
-                snap.forEach(doc => {
-                    const uid = doc.data().id ? String(doc.data().id) : "";
-                    if (typeof globalAdminIds !== "undefined" && !globalAdminIds.includes(uid)) {
-                        nonAdminGreaterCount++;
-                    }
-                });
-                const rank = nonAdminGreaterCount + 1;
-                db.collection("users").get().then(totalSnap => {
-                    let totalUsersCount = 0;
-                    totalSnap.forEach(doc => {
-                        const uid = doc.data().id ? String(doc.data().id) : "";
-                        if (typeof globalAdminIds !== "undefined" && !globalAdminIds.includes(uid)) {
-                            totalUsersCount++;
-                        }
-                    });
-                    profileRankLabel.textContent = `Global Ranking: #${rank} of ${totalUsersCount || totalSnap.size}`;
-                }).catch(() => {
-                    profileRankLabel.textContent = `Global Ranking: #${rank}`;
-                });
-            }).catch(err => {
-                const rank = calculateUserRank();
-                profileRankLabel.textContent = `Global Ranking: #${rank} of ${LEADERBOARD_COMPETITORS.length + 1}`;
-            });
         } else {
             const rank = calculateUserRank();
-            profileRankLabel.textContent = `Global Ranking: #${rank} of ${LEADERBOARD_COMPETITORS.length + 1}`;
+            const total = (typeof LEADERBOARD_COMPETITORS !== "undefined" ? LEADERBOARD_COMPETITORS.length : 25) + 1;
+            profileRankLabel.textContent = `Global Ranking: #${rank} of ${total}`;
         }
     }
 
@@ -1537,23 +1444,9 @@ function renderLeaderboard() {
                     }
                 });
                 
-                // If current user is not in top 25, get their rank
-                let userRank = 1;
-                try {
-                    const allUsersSnapshot = await db.collection("users").where("points", ">", state.user.points || 0).get();
-                    let nonAdminGreaterCount = 0;
-                    allUsersSnapshot.forEach(doc => {
-                        const uid = doc.data().id ? String(doc.data().id) : "";
-                        if (!allAdminIds.includes(uid)) {
-                            nonAdminGreaterCount++;
-                        }
-                    });
-                    userRank = nonAdminGreaterCount + 1;
-                } catch (e) {
-                    console.error("Error fetching user rank:", e);
-                    const index = list.findIndex(item => item.isCurrentUser);
-                    userRank = index !== -1 ? index + 1 : list.length + 1;
-                }
+                // If current user is in top 25, get their rank; otherwise display 25+ (zero additional reads)
+                const index = list.findIndex(item => item.isCurrentUser);
+                const userRank = index !== -1 ? index + 1 : (list.length >= 25 ? "25+" : list.length + 1);
                 
                 const isCurrentUserStaff = allAdminIds.includes(String(state.user.id));
                 displayLeaderboardData(list, userRank, staffList, isCurrentUserStaff);

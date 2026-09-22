@@ -1459,12 +1459,10 @@ async function init() {
         updateBotStatus("online");
         const statusInterval = setInterval(() => updateBotStatus("online"), 60 * 1000);
 
-        // Start weekly movie catalog backup checker
+        // Start weekly movie catalog backup checker (runs every 12 hours, never on immediate reboot)
         setInterval(async () => {
             await checkAndRunWeeklyBackup(bot);
         }, 12 * 60 * 60 * 1000); // Check every 12 hours
-        // Check once immediately on startup
-        checkAndRunWeeklyBackup(bot);
 
         // Start keep-alive ping loop for external File Bots
         const pingExternalFileBots = async () => {
@@ -1918,7 +1916,7 @@ async function init() {
             });
         }, (err) => console.error("Requests listener error:", err));
 
-        // Background loop for farming completion reminders
+        // Background loop for farming completion reminders (Runs every 15 minutes with limit to conserve Firestore quota)
         setInterval(async () => {
             try {
                 const now = Date.now();
@@ -1928,21 +1926,21 @@ async function init() {
                 const snapshot = await db.collection("users")
                     .where("farmingStartedAt", ">", 0)
                     .where("farmingStartedAt", "<=", cutoff)
+                    .limit(20)
                     .get();
 
-                snapshot.forEach(async (doc) => {
+                for (const doc of snapshot.docs) {
                     const userData = doc.data();
-                    if (userData.farmingReminded === true) return;
-                    if (userData.blockedBot === true) return;
+                    if (userData.farmingReminded === true || userData.blockedBot === true) continue;
 
                     const userId = doc.id;
                     try {
                         await callTelegramWithRetry(
                             'sendMessage',
                             userId,
-                            `⚡ *Mining Session Complete!* ⚡\n\nYour 8-hour session has finished. Launch the app now to claim your *80 Loyalty Points* and start your next session! 🍿\n\n🎁 *Tip:* Save up 1,500 points to unlock a **24-Hour Ad-Free Day Pass** in the rewards center! 🎫`,
+                            `⚡ <b>Mining Session Complete!</b> ⚡\n\nYour 8-hour session has finished. Launch the app now to claim your <b>80 Loyalty Points</b> and start your next session! 🍿\n\n🎁 <b>Tip:</b> Save up 1,500 points to unlock a <b>24-Hour Ad-Free Day Pass</b> in the rewards center! 🎫`,
                             {
-                                parse_mode: "Markdown",
+                                parse_mode: "HTML",
                                 reply_markup: {
                                     inline_keyboard: [
                                         [
@@ -1960,17 +1958,16 @@ async function init() {
                         });
                         console.log(`Farming completion notification sent to user ${userId}`);
                     } catch (notifyErr) {
-                        // Mark as reminded anyway to prevent duplicate loop attempts
                         await db.collection("users").doc(userId).update({
                             farmingReminded: true
                         });
                         console.warn(`Could not send farming reminder to ${userId}:`, notifyErr.message);
                     }
-                });
+                }
             } catch (err) {
-                console.error("Error in farming reminder cron loop:", err);
+                console.error("Error in farming reminder cron loop:", err.message);
             }
-        }, 60 * 1000); // check every 60 seconds
+        }, 15 * 60 * 1000); // check every 15 minutes instead of every 60 seconds
 
         // Automated TMDB New Episode Release Alerts for Admins (Runs every 30 minutes)
         const checkNewEpisodeReleasesForAdmins = async () => {
@@ -1984,20 +1981,15 @@ async function init() {
                 const notifiedDoc = await db.collection("settings").doc("new_episodes_notified").get();
                 const notifiedMap = notifiedDoc.exists ? (notifiedDoc.data().episodes || {}) : {};
 
-                const catalogSnapshot = await db.collection("catalog").get();
                 let tvSeriesList = [];
-                catalogSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if ((data.type || "").toLowerCase() === "series" || (data.type || "").toLowerCase() === "tv") {
-                        tvSeriesList.push(data);
-                    }
-                });
-
-                if (tvSeriesList.length === 0) {
+                const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
+                if (fs.existsSync(localMetaPath)) {
                     try {
-                        const localMeta = JSON.parse(fs.readFileSync("./MOVIE/Data/movies_metadata.json", "utf8"));
+                        const localMeta = JSON.parse(fs.readFileSync(localMetaPath, "utf8"));
                         tvSeriesList = localMeta.filter(m => (m.type || "").toLowerCase() === "series" || (m.type || "").toLowerCase() === "tv");
-                    } catch (e) {}
+                    } catch (e) {
+                        console.warn("Could not parse local movies_metadata.json:", e.message);
+                    }
                 }
 
                 for (const show of tvSeriesList) {
