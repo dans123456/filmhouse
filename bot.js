@@ -41,6 +41,15 @@ const db = admin.firestore();
 let callTelegramWithRetry;
 let disableImmediateBlockedBotWrite = false;
 
+// HTML escaping helper for clean Telegram formatting
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
 // Bot setup helper
 function setupBot(bot) {
     // Middleware to automatically make all context replies direct thread replies to the triggering message
@@ -286,6 +295,65 @@ function setupBot(bot) {
                 }
             } catch (err) {
                 console.error("Error processing claim start payload:", err);
+            }
+        }
+
+        // Check for deep-link boost payload (start=boost_docId)
+        if (payload && payload.startsWith("boost_")) {
+            const docId = payload.substring(6);
+            try {
+                const docRef = db.collection("requests").doc(docId);
+                const doc = await docRef.get();
+                if (doc.exists) {
+                    const reqData = doc.data();
+                    if (reqData.status === "priority" || reqData.boosted === true) {
+                        await ctx.reply(`ℹ️ *Your request for "${reqData.title}" is already boosted to High Priority!* 🚀`, { parse_mode: "Markdown" }).catch(() => {});
+                    } else {
+                        // Check user points balance in Firestore
+                        const userRef = db.collection("users").doc(userId);
+                        const userDoc = await userRef.get();
+                        const userPoints = userDoc.exists ? (userDoc.data().points || 0) : 0;
+                        if (userPoints < 1000) {
+                            await ctx.reply(
+                                `⚠️ *Not enough Loyalty Points!*\n\n` +
+                                `You currently have *${userPoints.toLocaleString()}* points. Boosting your request for *${reqData.title}* to High Priority requires *1,000* points.\n\n` +
+                                `Launch the app to mine points and complete daily tasks! 🪙`,
+                                {
+                                    parse_mode: "Markdown",
+                                    reply_markup: {
+                                        inline_keyboard: [
+                                            [{ text: "Mine Points 🪙", url: "https://t.me/Filmhouseappbot/filmhouseapp?startapp=mining" }],
+                                            [{ text: "Open App 🍿", url: "https://t.me/Filmhouseappbot/filmhouseapp" }]
+                                        ]
+                                    }
+                                }
+                            ).catch(() => {});
+                        } else {
+                            // Deduct 1,000 points
+                            await userRef.update({
+                                points: userPoints - 1000
+                            });
+                            // Mark as priority in requests collection - will trigger admin DMs via real-time listener
+                            await docRef.update({
+                                status: "priority",
+                                boosted: true,
+                                boostedAt: admin.firestore.FieldValue.serverTimestamp(),
+                                boostedBy: username ? `@${username}` : fullName,
+                                boostedById: userId,
+                                notifiedPriority: false
+                            });
+                            await ctx.reply(
+                                `🚀 *Request Successfully Boosted to High Priority!* 🚀\n\n` +
+                                `*Title:* ${reqData.title}\n` +
+                                `*Points Deducted:* 1,000 pts (Remaining: ${(userPoints - 1000).toLocaleString()})\n\n` +
+                                `⚡ Our admin team has received an urgent notification in their DMs and will fulfill your request promptly! 🍿`,
+                                { parse_mode: "Markdown" }
+                            ).catch(() => {});
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error processing boost start payload:", err);
             }
         }
 
@@ -768,6 +836,150 @@ function setupBot(bot) {
         };
         
         try {
+            // --- Admin Delete Request Callbacks ---
+            if (data && data.startsWith("delreq_ask_")) {
+                const docId = data.replace("delreq_ask_", "");
+                if (!(await isAdmin(userId))) {
+                    return ctx.answerCbQuery("⛔ Access denied. Only authorized admins can delete requests.", { show_alert: true });
+                }
+
+                try {
+                    const reqDoc = await db.collection("requests").doc(docId).get();
+                    if (!reqDoc.exists) {
+                        return ctx.answerCbQuery("⚠️ Request no longer exists or was already deleted.", { show_alert: true });
+                    }
+
+                    const rData = reqDoc.data();
+                    const rTitle = escapeHtml(String(rData.title || "Movie Request").replace(/[*_`~]/g, '').trim());
+                    const rUser = escapeHtml(String(rData.requestedBy || rData.user || `User ${rData.userId || ''}`).replace(/[*_`~]/g, '').trim());
+
+                    await ctx.answerCbQuery();
+                    return await editMessageInPlace(
+                        `⚠️ <b>CONFIRM REQUEST DELETION</b> ⚠️\n\n` +
+                        `Are you sure you want to permanently delete this request from Film House?\n\n` +
+                        `🎬 <b>Title:</b> <b>${rTitle}</b>\n` +
+                        `👤 <b>Requested By:</b> ${rUser}\n\n` +
+                        `<i>This action will remove the request from the database and admin queue.</i>`,
+                        {
+                            parse_mode: 'HTML',
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [
+                                        { text: "⚠️ Yes, Delete Request 🗑️", callback_data: `delreq_confirm_${docId}` },
+                                        { text: "❌ Cancel", callback_data: `delreq_cancel_${docId}` }
+                                    ]
+                                ]
+                            }
+                        }
+                    );
+                } catch (err) {
+                    console.error("Error in delreq_ask:", err);
+                    return ctx.answerCbQuery("Error loading request details.", { show_alert: true });
+                }
+            }
+
+            if (data && data.startsWith("delreq_confirm_")) {
+                const docId = data.replace("delreq_confirm_", "");
+                if (!(await isAdmin(userId))) {
+                    return ctx.answerCbQuery("⛔ Access denied. Only authorized admins can delete requests.", { show_alert: true });
+                }
+
+                try {
+                    const reqDoc = await db.collection("requests").doc(docId).get();
+                    let rTitle = "Movie Request";
+                    let rUser = "User";
+                    if (reqDoc.exists) {
+                        const rData = reqDoc.data();
+                        rTitle = escapeHtml(String(rData.title || "Movie Request").replace(/[*_`~]/g, '').trim());
+                        rUser = escapeHtml(String(rData.requestedBy || rData.user || `User ${rData.userId || ''}`).replace(/[*_`~]/g, '').trim());
+                        await db.collection("requests").doc(docId).delete();
+                    }
+
+                    const adminHandle = ctx.from.username ? `@${ctx.from.username}` : (fullName || `Admin ${userId}`);
+
+                    await ctx.answerCbQuery(`✅ Request for "${rTitle}" deleted successfully! 🗑️`, { show_alert: true });
+
+                    return await editMessageInPlace(
+                        `🗑️ <b>REQUEST PERMANENTLY DELETED</b>\n\n` +
+                        `🎬 <b>Title:</b> <b>${rTitle}</b>\n` +
+                        `👤 <b>Requested By:</b> ${rUser}\n` +
+                        `👮 <b>Deleted By Admin:</b> ${escapeHtml(adminHandle)} (ID: <code>${userId}</code>)\n` +
+                        `⏱ <b>Status:</b> Removed from database ✅\n\n` +
+                        `<i>This request has been permanently deleted from Film House.</i>`,
+                        {
+                            parse_mode: 'HTML',
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [
+                                        { text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }
+                                    ]
+                                ]
+                            }
+                        }
+                    );
+                } catch (err) {
+                    console.error("Error deleting request via callback:", err);
+                    return ctx.answerCbQuery("Error deleting request: " + err.message, { show_alert: true });
+                }
+            }
+
+            if (data && data.startsWith("delreq_cancel_")) {
+                const docId = data.replace("delreq_cancel_", "");
+                await ctx.answerCbQuery("Deletion cancelled.");
+
+                try {
+                    const reqDoc = await db.collection("requests").doc(docId).get();
+                    if (!reqDoc.exists) {
+                        return await editMessageInPlace(
+                            `ℹ️ <i>This request no longer exists.</i>`,
+                            { parse_mode: 'HTML' }
+                        );
+                    }
+
+                    const rData = reqDoc.data();
+                    const rTitle = escapeHtml(String(rData.title || "Movie Request").replace(/[*_`~]/g, '').trim());
+                    const rYear = rData.year ? ` (${escapeHtml(String(rData.year).replace(/[*_`~()]/g, '').trim())})` : "";
+                    const rType = escapeHtml(String(rData.type || "Movie").replace(/[*_`~]/g, '').trim());
+                    const rUser = escapeHtml(String(rData.requestedBy || rData.user || `User ${rData.userId || ''}`).replace(/[*_`~]/g, '').trim());
+                    const rSeason = rData.seasonOrPart ? `\n📌 <b>Season/Part:</b> ${escapeHtml(String(rData.seasonOrPart).replace(/[*_`~]/g, '').trim())}` : '';
+                    const isPriority = (rData.status === "priority" || rData.boosted === true);
+
+                    const cardHtml = isPriority
+                        ? `🚀🔥 <b>REQUEST BOOSTED TO HIGH PRIORITY!</b> 🔥🚀\n\n` +
+                          `🎬 <b>Title:</b> <b>${rTitle}</b>${rYear}\n` +
+                          `📁 <b>Type:</b> ${rType}${rSeason}\n` +
+                          `👤 <b>Requested By:</b> ${rUser} (ID: <code>${rData.userId || rData.requestedById || ''}</code>)\n` +
+                          `⚡ <b>Boosted By:</b> ${escapeHtml(String(rData.boostedBy || rUser).replace(/[*_`~]/g, '').trim())}\n` +
+                          `🪙 <b>Points Spent:</b> <code>1,000 Loyalty Points</code> ⚡\n` +
+                          `🔥 <b>Priority Level:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
+                          `💡 <i>Action Required: Please expedite in Admin Panel or upload to @filmhouse_main!</i>`
+                        : `🍿 <b>New Movie Request!</b>\n\n` +
+                          `🎬 <b>Title:</b> <b>${rTitle}</b>${rYear}\n` +
+                          `📁 <b>Type:</b> ${rType}${rSeason}\n` +
+                          `👤 <b>Requested By:</b> ${rUser} (ID: <code>${rData.userId || rData.requestedById || ''}</code>)`;
+
+                    return await editMessageInPlace(
+                        cardHtml,
+                        {
+                            parse_mode: 'HTML',
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [
+                                        { text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" },
+                                        { text: "Main Channel 📢", url: "https://t.me/filmhouse_main" }
+                                    ],
+                                    [
+                                        { text: "🗑️ Delete Request", callback_data: `delreq_ask_${docId}` }
+                                    ]
+                                ]
+                            }
+                        }
+                    );
+                } catch (err) {
+                    console.error("Error restoring card:", err);
+                }
+            }
+
             // --- Welcome Card Navigation ---
             if (data === "bot_help") {
                 await ctx.answerCbQuery();
@@ -1066,18 +1278,23 @@ async function checkAndRunWeeklyBackup(bot) {
 
 // Bot Initializer
 async function init() {
-    let botToken = process.env.TELEGRAM_BOT_TOKEN || "8629284780:AAHnUxCjv_S3yzZCgtVrLvw_bfNSATLVCeY";
+    let botToken = process.env.TELEGRAM_BOT_TOKEN;
 
     if (!botToken) {
-        console.log("No TELEGRAM_BOT_TOKEN env variable found. Fetching from Firestore 'settings/telegram'...");
+        console.log("Fetching bot token from Firestore 'settings/telegram'...");
         try {
             const doc = await db.collection("settings").doc("telegram").get();
-            if (doc.exists) {
+            if (doc.exists && doc.data().botToken) {
                 botToken = doc.data().botToken;
+                console.log("Telegram Bot Token successfully loaded from Firestore.");
             }
         } catch (err) {
             console.error("Failed to fetch bot token from Firestore:", err);
         }
+    }
+
+    if (!botToken) {
+        botToken = "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
     }
 
     if (!botToken) {
@@ -1458,9 +1675,20 @@ async function init() {
                         ]
                     } : undefined;
 
+                    const cleanTitle = escapeHtml(String(title || "Movie").replace(/[*_`~]/g, '').trim());
+                    const cleanYear = year ? ` (${escapeHtml(String(year).replace(/[*_`~()]/g, '').trim())})` : "";
+                    const cleanType = escapeHtml(String(type || "Movie").replace(/[*_`~]/g, '').trim());
+                    const cleanSeason = data.seasonOrPart ? `\n📌 <b>Season/Part:</b> ${escapeHtml(String(data.seasonOrPart).replace(/[*_`~]/g, '').trim())}` : '';
+                    const cleanUser = escapeHtml(String(username || `User ${userId}`).replace(/[*_`~]/g, '').trim());
+
+                    const userReqText = `🍿 <b>Request Received!</b>\n\nYour request for <b>${cleanTitle}</b>${cleanYear} (${cleanType}) has been logged in our queue.\n\n` +
+                        (canBoost 
+                            ? `💡 <b>Boost Available!</b> You can boost this request to <b>High Priority</b> for 1,000 points to get it faster! 🚀`
+                            : `We will notify you here as soon as it is fulfilled! 🚀`);
+
                     try {
-                        await callTelegramWithRetry('sendMessage', userId, text, {
-                            parse_mode: "Markdown",
+                        await callTelegramWithRetry('sendMessage', userId, userReqText, {
+                            parse_mode: "HTML",
                             reply_markup: replyMarkup
                         });
                     } catch (e) {
@@ -1471,7 +1699,19 @@ async function init() {
                     }
 
                     // 2. Notify admins
-                    const adminText = `🍿 *New Movie Request!*\n\n*User:* ${username} (ID: \`${userId}\`)\n*Title:* ${title}${yearSuffix} (${type})`;
+                    const isDirectPriority = (data.status === "priority" || data.boosted === true);
+                    const adminText = isDirectPriority
+                        ? `🚀🔥 <b>NEW MOVIE REQUEST (HIGH PRIORITY)!</b> 🔥🚀\n\n` +
+                          `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
+                          `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
+                          `👤 <b>Requested By:</b> ${cleanUser} (ID: <code>${userId}</code>)\n` +
+                          `🔥 <b>Priority:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
+                          `💡 <i>Action Required: Please expedite this request in the Admin Panel or channel!</i>`
+                        : `🍿 <b>New Movie Request!</b>\n\n` +
+                          `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
+                          `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
+                          `👤 <b>Requested By:</b> ${cleanUser} (ID: <code>${userId}</code>)`;
+
                     const defaultAdmins = ["1329840839", "1175336733"];
                     try {
                         const adminDoc = await db.collection("settings").doc("admins").get();
@@ -1480,7 +1720,20 @@ async function init() {
                         const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
                         for (const adminId of allAdmins) {
                             try {
-                                await bot.telegram.sendMessage(adminId, adminText, { parse_mode: "Markdown" });
+                                await callTelegramWithRetry('sendMessage', adminId, adminText, {
+                                    parse_mode: "HTML",
+                                    reply_markup: {
+                                        inline_keyboard: [
+                                            [
+                                                { text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" },
+                                                { text: "Main Channel 📢", url: "https://t.me/filmhouse_main" }
+                                            ],
+                                            [
+                                                { text: "🗑️ Delete Request", callback_data: `delreq_ask_${docId}` }
+                                            ]
+                                        ]
+                                    }
+                                });
                             } catch (e) {
                                 console.warn(`Failed to notify admin ${adminId} of request:`, e.message);
                             }
@@ -1490,13 +1743,28 @@ async function init() {
                     }
 
                 } else if (change.type === "modified") {
-                    if (data.status === "priority" && data.notifiedPriority !== true) {
-                        // Mark as notified in Firestore
-                        await db.collection("requests").doc(docId).update({ notifiedPriority: true }).catch(() => {});
+                    const isBoosted = (data.status === "priority" || data.boosted === true);
+                    if (isBoosted && data.notifiedPriority !== true) {
+                        // Mark as notified in Firestore immediately to prevent duplicate alerts
+                        await db.collection("requests").doc(docId).update({ 
+                            notifiedPriority: true,
+                            boosted: true,
+                            status: "priority"
+                        }).catch(() => {});
 
-                        const text = `🚀 *Request Boosted!*\n\nYour request for *${title}*${yearSuffix} has been successfully boosted to *High Priority*! Our team is on it! 🍿`;
+                        const cleanTitle = escapeHtml(String(title || "Movie").replace(/[*_`~]/g, '').trim());
+                        const cleanYear = year ? ` (${escapeHtml(String(year).replace(/[*_`~()]/g, '').trim())})` : "";
+                        const cleanType = escapeHtml(String(type || "Movie").replace(/[*_`~]/g, '').trim());
+                        const cleanSeason = data.seasonOrPart ? `\n📌 <b>Season/Part:</b> ${escapeHtml(String(data.seasonOrPart).replace(/[*_`~]/g, '').trim())}` : '';
+                        const cleanUser = escapeHtml(String(username || `User ${userId}`).replace(/[*_`~]/g, '').trim());
+                        const boosterName = data.boostedBy || username;
+                        const cleanBooster = escapeHtml(String(boosterName).replace(/[*_`~]/g, '').trim());
+
+                        // 1. Send confirmation to requesting user
+                        const text = `🚀 <b>Request Boosted!</b>\n\n` +
+                                     `Your request for <b>${cleanTitle}</b>${cleanYear} has been successfully boosted to <b>High Priority</b>! Our admin team has received an emergency alert in their private DMs and is working on fulfilling it! 🍿`;
                         try {
-                            await callTelegramWithRetry('sendMessage', userId, text, { parse_mode: "Markdown" });
+                            await callTelegramWithRetry('sendMessage', userId, text, { parse_mode: "HTML" });
                         } catch (e) {
                             if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
                                 await db.collection("users").doc(userId).update({ blockedBot: true });
@@ -1504,22 +1772,49 @@ async function init() {
                             console.warn(`Failed to send boost confirmation to ${userId}:`, e.message);
                         }
 
-                        // Notify admins of the boost
-                        const adminText = `⚡ *Movie Request Boosted to Priority!*\n\n*User:* ${username} (ID: \`${userId}\`)\n*Title:* ${title}${yearSuffix} (${type})`;
+                        // 2. Notify admins in their DMs with high-visibility HTML alert and Delete Request button
+                        const adminBoostText = `🚀🔥 <b>REQUEST BOOSTED TO HIGH PRIORITY!</b> 🔥🚀\n\n` +
+                                              `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
+                                              `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
+                                              `👤 <b>Requested By:</b> ${cleanUser} (ID: <code>${userId}</code>)\n` +
+                                              `⚡ <b>Boosted By:</b> ${cleanBooster}\n` +
+                                              `🪙 <b>Points Spent:</b> <code>1,000 Loyalty Points</code> ⚡\n` +
+                                              `🔥 <b>Priority Level:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
+                                              `💡 <i>Action Required: Please expedite this request in the Admin Panel or upload to @filmhouse_main!</i>`;
+
                         const defaultAdmins = ["1329840839", "1175336733"];
                         try {
                             const adminDoc = await db.collection("settings").doc("admins").get();
                             const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
                             const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
                             const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
+
+                            console.log(`[BOOST ALERT] Sending HTML notification for "${title}" to ${allAdmins.length} admin(s)...`);
+
                             for (const adminId of allAdmins) {
                                 try {
-                                    await bot.telegram.sendMessage(adminId, adminText, { parse_mode: "Markdown" });
+                                    await callTelegramWithRetry('sendMessage', adminId, adminBoostText, {
+                                        parse_mode: "HTML",
+                                        reply_markup: {
+                                            inline_keyboard: [
+                                                [
+                                                    { text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" },
+                                                    { text: "Main Channel 📢", url: "https://t.me/filmhouse_main" }
+                                                ],
+                                                [
+                                                    { text: "🗑️ Delete Request", callback_data: `delreq_ask_${docId}` }
+                                                ]
+                                            ]
+                                        }
+                                    });
+                                    console.log(`[BOOST ALERT] HTML DM successfully sent to admin ${adminId}`);
                                 } catch (e) {
                                     console.warn(`Failed to notify admin ${adminId} of boost:`, e.message);
                                 }
                             }
-                        } catch (err) {}
+                        } catch (err) {
+                            console.error("Error sending admin boost DM notification:", err);
+                        }
                     }
 
                     if (data.status === "fulfilled" && data.notifiedFulfilled !== true && downloadLink) {

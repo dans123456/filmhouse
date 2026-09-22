@@ -1,0 +1,245 @@
+================================================================================
+          FILM HOUSE - TELEGRAM BOT TO ORACLE UBUNTU SERVER FULL GUIDE
+================================================================================
+Generated for: Film House Telegram Bot (bot.js)
+Target Server: Oracle Cloud Infrastructure (OCI) - Ubuntu Linux VM (Always Free Tier)
+Date: September 2026
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS:
+--------------------------------------------------------------------------------
+1. Project Overview & Architecture
+2. Security & Credentials Safety Rules
+3. Oracle Cloud Account Creation Details (Region & Account Name)
+4. Step-by-Step: Creating Your Ubuntu VM Instance on Oracle Cloud
+5. Step-by-Step: Connecting to Your Ubuntu Server via SSH
+6. Step-by-Step: Transferring bot.js Files from Your PC to the Server
+7. Step-by-Step: Installing Dependencies and Launching 24/7 with PM2
+8. Daily Management Commands (Logs, Restart, Status)
+9. Channel Automation (How bot.js handles movies posted to @filmhouse_main)
+10. Common Gotchas & Troubleshooting
+
+================================================================================
+1. PROJECT OVERVIEW & ARCHITECTURE
+================================================================================
+Currently, running "bot.js" on your personal computer means the bot only runs 
+when your PC is powered on and awake.
+
+By transferring "bot.js" to a dedicated Ubuntu server:
+- The bot stays online 24/7/365 with zero interruption.
+- Datacenter connection speeds (1Gbps+) handle Telegram traffic and TMDB 
+  queries instantly.
+- Process manager (PM2) automatically restarts the bot if it crashes or if 
+  the server reboots.
+- Runs smoothly in Telegram "Polling Mode" (--polling), which requires NO 
+  incoming open ports, domain names, or SSL setup.
+
+================================================================================
+2. SECURITY & CREDENTIALS SAFETY RULES
+================================================================================
+- NEVER share your SSH Private Key file (.key or .pem) with anyone or in any 
+  online chat. This is the master access key to your server.
+- NEVER share your Firebase service account private key (firebase-key.json) 
+  publicly.
+- An IP address alone is not dangerous, but keeping your server credentials 
+  private ensures that only YOU have access to your virtual machine.
+- You do all operations directly from your computer terminal into your server.
+
+================================================================================
+3. ORACLE CLOUD ACCOUNT CREATION DETAILS
+================================================================================
+When creating your Oracle Cloud Account:
+
+1. CLOUD ACCOUNT NAME:
+   - Use letters and numbers only, no spaces or special characters.
+   - Recommended names: "filmhouse", "filmhouseapp", or "filmhousebot".
+   - This becomes your tenancy identifier when logging into Oracle Cloud.
+
+2. HOME REGION (CRITICAL):
+   - Choose carefully! Oracle does NOT let you change your Home Region on a 
+     free tier account once created.
+   - Best Choices:
+     * "US East (Ashburn)" or "US Midwest (Chicago)": Oracle's largest, most 
+       interconnected data centers with excellent worldwide routing.
+     * "Canada Southeast (Toronto)": Great if based in or near Canada.
+     * "US West (Phoenix)": Great if based on the US West Coast.
+   - Note: Telegram's core servers are located in Europe and the US; picking 
+     US East (Ashburn) or US Midwest (Chicago) gives ultra-low latency.
+
+================================================================================
+4. STEP-BY-STEP: CREATING YOUR UBUNTU VM INSTANCE ON ORACLE CLOUD
+================================================================================
+1. Log in to your Oracle Cloud Console: https://cloud.oracle.com/
+2. On the main dashboard, click "Create a VM instance" 
+   (or click Menu ☰ -> Compute -> Instances -> Create Instance).
+3. Name your instance: e.g., "filmhouse-server".
+4. Placement / Availability Domain: Leave on the default choice.
+5. Image and Shape:
+   - Click "Edit".
+   - Click "Change Image" -> Select "Canonical Ubuntu" (Choose Ubuntu 22.04 
+     or Ubuntu 24.04 Minimal/Standard) -> Click "Select Image".
+   - Click "Change Shape":
+     * CHOICE A (Recommended - Ampere ARM):
+       Select "Ampere" -> "VM.Standard.A1.Flex".
+       You can allocate 2 to 4 OCPUs and 12 to 24 GB of RAM for FREE!
+     * CHOICE B (Alternative if ARM shows "Out of capacity"):
+       Select "AMD" -> "VM.Standard.E2.1.Micro" (Always Free 1 GB RAM).
+6. Networking:
+   - Leave default settings. Ensure "Assign a public IPv4 address" is checked.
+7. Add SSH Keys (CRITICAL STEP):
+   - Select "Generate a key pair for me".
+   - Click "Save Private Key" and download the .key file to your computer.
+   - Keep this file safe (e.g. C:\Users\USER\Downloads\ssh-key.key).
+8. Click "Create" at the bottom.
+9. Wait 1-2 minutes until the instance state displays green: "Running".
+10. Copy your "Public IP Address" displayed on the instance page.
+
+================================================================================
+5. STEP-BY-STEP: CONNECTING TO YOUR UBUNTU SERVER VIA SSH
+================================================================================
+From your Windows PC:
+1. Open PowerShell or Command Prompt.
+2. The default username for Ubuntu on Oracle Cloud is: "ubuntu" (not root).
+3. Run the SSH connection command:
+
+   ssh -i "C:\path\to\your-saved-key.key" ubuntu@<YOUR_ORACLE_PUBLIC_IP>
+
+   Example:
+   ssh -i "C:\Users\USER\Downloads\ssh-key.key" ubuntu@129.153.xx.xx
+
+4. If prompted with "Are you sure you want to continue connecting (yes/no)?", 
+   type "yes" and hit Enter.
+5. You are now logged into your online Ubuntu server terminal!
+6. Type "exit" anytime to disconnect back to your PC.
+
+================================================================================
+6. STEP-BY-STEP: TRANSFERRING BOT FILES FROM YOUR PC TO THE SERVER
+================================================================================
+From your Windows computer, open PowerShell inside your project folder:
+C:\Users\USER\Desktop\fimlhouse
+
+Run the secure copy command (scp) to copy the necessary bot files:
+
+scp -i "C:\path\to\your-key.key" bot.js package.json firebase-key.json ubuntu@<YOUR_ORACLE_PUBLIC_IP>:~/
+
+This copies:
+- bot.js (the bot backend code)
+- package.json (the dependencies list)
+- firebase-key.json (your Firebase Admin SDK credentials)
+into the home directory (~/) of the Ubuntu server.
+
+Alternatively, you can use FileZilla SFTP:
+- Host: sftp://<YOUR_ORACLE_PUBLIC_IP>
+- Username: ubuntu
+- Logon Type: Key File -> Browse to your .key file.
+- Port: 22
+
+================================================================================
+7. STEP-BY-STEP: INSTALLING DEPENDENCIES AND LAUNCHING 24/7 WITH PM2
+================================================================================
+Connect to your Ubuntu server:
+ssh -i "C:\path\to\your-key.key" ubuntu@<YOUR_ORACLE_PUBLIC_IP>
+
+Once connected inside Ubuntu, execute the following commands step by step:
+
+1. Update system packages:
+   sudo apt update && sudo apt upgrade -y
+
+2. Install Node.js 20.x & Git:
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt install -y nodejs git
+
+   (Verify installation: node -v && npm -v)
+
+3. Install PM2 process manager globally:
+   sudo npm install -g pm2
+
+4. Navigate to your files and install npm packages:
+   cd ~
+   npm install
+
+5. Start the bot with PM2 in polling mode:
+   pm2 start bot.js --name "filmhouse-bot" -- --polling
+
+6. Configure PM2 to restart automatically if server reboots:
+   pm2 save
+   sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+
+================================================================================
+8. DAILY MANAGEMENT COMMANDS
+================================================================================
+Whenever you SSH into your server, use these PM2 commands:
+
+- Check bot status:
+  pm2 status
+
+- View real-time bot console logs (incoming requests, errors, activities):
+  pm2 logs filmhouse-bot
+
+- View last 100 lines of logs:
+  pm2 logs filmhouse-bot --lines 100
+
+- Restart the bot:
+  pm2 restart filmhouse-bot
+
+- Stop the bot:
+  pm2 stop filmhouse-bot
+
+================================================================================
+9. CHANNEL AUTOMATION (UPLOADING MOVIES/SERIES TO @filmhouse_main)
+================================================================================
+How running bot.js on Ubuntu automates your movie channel:
+
+1. Listening to Channel Posts (channel_post):
+   Because the bot is an administrator in your channel (@filmhouse_main), Telegram
+   sends every new message, video, or file posted in the channel directly to the bot.
+
+2. Automatic Extraction & TMDB Sync:
+   When an admin posts a movie file or download link with a caption like:
+   "Inception (2010) [1080p]"
+   The bot extracts the title and year, queries The Movie Database (TMDB) API, 
+   and retrieves:
+   - Official poster and backdrop images
+   - Genres, overview synopsis, and IMDb/TMDB ratings
+   - Cast and director information
+
+3. Automatic Catalog Update (Firestore):
+   The bot creates a new movie entry directly in your Firestore "movies" 
+   collection. Users opening the Film House Web App immediately see the new 
+   movie at the top of the library without needing to touch admin.html!
+
+4. Instant Notification to Users who Requested It:
+   The bot checks the "requests" collection in Firestore. If any user previously 
+   requested that title, it marks their request as "fulfilled" and sends a direct 
+   Telegram DM with the download link instantly!
+
+5. Instant Admin DM Notification When a User Boosts a Request:
+   When any user spends 1,000 points in the app to boost their movie/series request 
+   to High Priority, bot.js immediately dispatches an urgent priority alert 
+   directly into the private Telegram DMs of all designated administrators with 
+   the title, user details, and quick launch buttons.
+
+================================================================================
+10. COMMON GOTCHAS & TROUBLESHOOTING
+================================================================================
+1. "Out of host capacity" on Oracle ARM:
+   - The Ampere A1 (ARM 24GB RAM) instances are very popular and sometimes 
+     temporarily out of capacity in certain regions.
+   - Solution: Either choose the AMD "VM.Standard.E2.1.Micro" shape 
+     (Always Free 1GB RAM, which is more than enough for bot.js), or wait and 
+     try creating the ARM instance again later.
+
+2. Windows SSH Key "Permissions are too open" error:
+   - If Windows OpenSSH warns about unprotected private key file permissions:
+     Right-click your .key file -> Properties -> Security tab -> Advanced:
+     * Disable inheritance and remove other users.
+     * Give only your Windows account "Full control".
+
+3. Polling vs Webhook:
+   - Using "--polling" is the simplest and most bulletproof setup on a VPS 
+     because it does not require opening firewall ports or configuring SSL domains.
+   - The bot pulls updates directly from Telegram's servers.
+
+================================================================================
+                        END OF GUIDE - KEEP THIS FILE SAFE!
+================================================================================

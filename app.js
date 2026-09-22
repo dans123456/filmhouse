@@ -6539,8 +6539,16 @@ function boostRequestToPriority(docId) {
         return;
     }
     
+    const boosterName = state.user.username ? `@${state.user.username.replace(/^@/, '')}` : (state.user.fullName || state.user.firstName || `User ${state.user.id || 'Guest'}`);
+    const boosterId = String(state.user.id || '');
+
     db.collection("requests").doc(docId).update({
-        status: "priority"
+        status: "priority",
+        boosted: true,
+        boostedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        boostedBy: boosterName,
+        boostedById: boosterId,
+        notifiedPriority: false
     }).then(() => {
         deductPoints(1000);
         showToast("Request boosted to High Priority! 🚀", "success");
