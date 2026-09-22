@@ -56,7 +56,26 @@ function escapeHtml(str) {
 function setupBot(bot, adminBot) {
     let callTelegramWithRetry;
     let disableImmediateBlockedBotWrite = false;
+    const PENDING_FILE = path.join(__dirname, "data", "pending_requests.json");
     let cachedPendingRequests = [];
+
+    // Load persisted pending requests from Ubuntu disk (immune to Firestore quota)
+    try {
+        if (fs.existsSync(PENDING_FILE)) {
+            const raw = fs.readFileSync(PENDING_FILE, "utf8");
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) cachedPendingRequests = parsed;
+            console.log(`[PendingStore] Loaded ${cachedPendingRequests.length} pending requests from disk.`);
+        }
+    } catch (e) {}
+
+    const savePendingRequestsToDisk = (requests) => {
+        try {
+            const dir = path.dirname(PENDING_FILE);
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+            fs.writeFileSync(PENDING_FILE, JSON.stringify(requests, null, 2), "utf8");
+        } catch (e) {}
+    };
 
     // Middleware to automatically make all context replies direct thread replies to the triggering message
     bot.use(async (ctx, next) => {
@@ -456,7 +475,7 @@ function setupBot(bot, adminBot) {
                 }
             });
             try {
-                await checkAndRunWeeklyBackup(adminBot, true);
+                await checkAndRunWeeklyBackup(adminBot, true, ctx.chat.id);
                 return ctx.telegram.editMessageText(
                     ctx.chat.id,
                     generatingMsg.message_id,
@@ -516,7 +535,7 @@ function setupBot(bot, adminBot) {
             } catch (e) {}
 
             try {
-                await checkAndRunWeeklyBackup(adminBot, true);
+                await checkAndRunWeeklyBackup(adminBot, true, ctx.chat.id);
                 return await ctx.editMessageText("✅ *Catalog backup generated and sent below!*", {
                     parse_mode: "Markdown",
                     reply_markup: {
@@ -1556,7 +1575,7 @@ function setupBot(bot, adminBot) {
 }
 
 // Automatic Weekly Firestore Database Backup to CSV
-async function checkAndRunWeeklyBackup(botToUse, force = false) {
+async function checkAndRunWeeklyBackup(botToUse, force = false, targetChatId = null) {
     try {
         const today = new Date();
         const todayStr = today.toISOString().split("T")[0];
@@ -1582,6 +1601,8 @@ async function checkAndRunWeeklyBackup(botToUse, force = false) {
             console.log("Running weekly database backup...");
             let moviesList = [];
             const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
+            const localCsvPath = path.resolve(__dirname, "./MOVIE/Data/datafile.csv");
+
             if (fs.existsSync(localMetaPath)) {
                 try {
                     moviesList = JSON.parse(fs.readFileSync(localMetaPath, "utf8"));
@@ -1594,45 +1615,55 @@ async function checkAndRunWeeklyBackup(botToUse, force = false) {
                 } catch (e) {}
             }
             
-            if (moviesList.length === 0) {
-                console.log("Movies collection is empty. Skipping CSV backup.");
+            let csvBuffer;
+            if (moviesList.length > 0) {
+                const fields = [
+                    "csv_id", "tmdb_id", "imdb_id", "title", "type", 
+                    "categories", "genres", "overview", "poster", 
+                    "backdrop", "rating", "release_date", "language", 
+                    "cast", "director", "trailer", "runtime", "links"
+                ];
+                
+                let csvRows = [fields.join(",")];
+                moviesList.forEach(data => {
+                    const row = fields.map(field => {
+                        let val = data[field];
+                        if (val === undefined || val === null) return "";
+                        let str = Array.isArray(val) ? val.join(", ") : String(val);
+                        str = str.replace(/"/g, '""');
+                        if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+                            str = `"${str}"`;
+                        }
+                        return str;
+                    });
+                    csvRows.push(row.join(","));
+                });
+                
+                const csvContent = csvRows.join("\n");
+                csvBuffer = Buffer.from(csvContent, "utf-8");
+            } else if (fs.existsSync(localCsvPath)) {
+                csvBuffer = fs.readFileSync(localCsvPath);
+            }
+
+            if (!csvBuffer) {
+                console.log("Movies collection and local files are empty. Skipping CSV backup.");
                 return;
             }
-            
-            const fields = [
-                "csv_id", "tmdb_id", "imdb_id", "title", "type", 
-                "categories", "genres", "overview", "poster", 
-                "backdrop", "rating", "release_date", "language", 
-                "cast", "director", "trailer", "runtime", "links"
-            ];
-            
-            let csvRows = [fields.join(",")];
-            moviesList.forEach(data => {
-                const row = fields.map(field => {
-                    let val = data[field];
-                    if (val === undefined || val === null) return "";
-                    let str = Array.isArray(val) ? val.join(", ") : String(val);
-                    str = str.replace(/"/g, '""');
-                    if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
-                        str = `"${str}"`;
-                    }
-                    return str;
-                });
-                csvRows.push(row.join(","));
-            });
-            
-            const csvContent = csvRows.join("\n");
-            const csvBuffer = Buffer.from(csvContent, "utf-8");
 
             // Get Master Admin IDs
             const defaultAdmins = ["1329840839", "1175336733"];
             let masters = [...defaultAdmins];
+            if (targetChatId) {
+                masters.push(String(targetChatId));
+            }
             try {
                 const adminDoc = await db.collection("settings").doc("admins").get();
                 if (adminDoc.exists && adminDoc.data().masters) {
                     masters = Array.from(new Set([...masters, ...adminDoc.data().masters.map(String)]));
                 }
             } catch (e) {}
+            
+            masters = Array.from(new Set(masters));
             
             // Send CSV to all Master Admins
             for (const adminId of masters) {
@@ -1641,9 +1672,10 @@ async function checkAndRunWeeklyBackup(botToUse, force = false) {
                         source: csvBuffer,
                         filename: `filmhouse_catalog_backup_${todayStr}.csv`
                     }, {
-                        caption: `📅 *Weekly Film House Catalog Backup*\n\nContains *${moviesList.length}* catalog titles. Keep this safe! 🍿`,
+                        caption: `📅 *Weekly Film House Catalog Backup*\n\nContains *${moviesList.length || 'Full'}* catalog titles. Keep this safe! 🍿`,
                         parse_mode: "Markdown"
                     });
+                    console.log(`Weekly backup CSV sent to admin ${adminId}`);
                 } catch (e) {
                     console.warn(`Failed to send weekly backup file to admin ${adminId}:`, e.message);
                 }
@@ -2055,6 +2087,7 @@ async function init() {
                 cachedPendingRequests = snapshot.docs
                     .map(doc => ({ id: doc.id, ...doc.data() }))
                     .filter(r => r.status === "pending" || r.status === "priority" || (!r.status && !r.fulfilled && !r.claimed));
+                savePendingRequestsToDisk(cachedPendingRequests);
             } catch (e) {}
 
             snapshot.docChanges().forEach(async (change) => {
