@@ -205,6 +205,16 @@ function setupBot(bot, adminBot) {
     // DEDICATED ADMIN BOT SUITE (@Fiimhouse_adminBot)
     // ==========================================
     if (adminBot) {
+        // Register Admin Bot commands with Telegram for native command menu
+        adminBot.telegram.setMyCommands([
+            { command: 'start', description: '👑 Admin Command Center' },
+            { command: 'menu', description: '👑 Show Admin Menu' },
+            { command: 'logs', description: '📜 View live server logs' },
+            { command: 'pending', description: '📋 View pending movie requests' },
+            { command: 'backup', description: '💾 Download weekly CSV backup' },
+            { command: 'stats', description: '📊 Detailed server metrics' }
+        ]).catch(err => console.warn('Could not set admin bot commands:', err.message));
+
         // Direct reply middleware for admin bot
         adminBot.use(async (ctx, next) => {
             const messageId = ctx.message ? ctx.message.message_id : (ctx.callbackQuery && ctx.callbackQuery.message ? ctx.callbackQuery.message.message_id : undefined);
@@ -274,10 +284,10 @@ function setupBot(bot, adminBot) {
                 `• 🛡 *Public Bot:* Online & Polling\n` +
                 `• 👑 *Admin Bot:* Active & Listening\n\n` +
                 `🛠 *Available Commands:*\n` +
-                `• \`/logs\` — View live server & bot logs\n` +
-                `• \`/pending\` — View pending movie requests\n` +
-                `• \`/backup\` — Download weekly CSV catalog backup\n` +
-                `• \`/stats\` — Detailed server & subscriber metrics`,
+                `• /logs — View live server & bot logs\n` +
+                `• /pending — View pending movie requests\n` +
+                `• /backup — Download weekly CSV catalog backup\n` +
+                `• /stats — Detailed server & subscriber metrics`,
                 {
                     parse_mode: 'Markdown',
                     reply_markup: {
