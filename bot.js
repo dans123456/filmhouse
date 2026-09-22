@@ -1,3 +1,4 @@
+try { require("dotenv").config(); } catch (e) {}
 const { Telegraf } = require("telegraf");
 const admin = require("firebase-admin");
 const fs = require("fs");
@@ -33,15 +34,14 @@ if (process.env.FIREBASE_CONFIG) {
         });
         console.log("Firebase Admin initialized using firebase-key.json file.");
     } catch (err) {
-        console.warn("Could not load firebase-key.json. Initializing using default credentials / Project ID...");
+        console.error("Failed to load ./firebase-key.json:", err.message);
         admin.initializeApp({
             projectId: "film-house-2"
         });
     }
 }
+
 const db = admin.firestore();
-let callTelegramWithRetry;
-let disableImmediateBlockedBotWrite = false;
 
 // HTML escaping helper for clean Telegram formatting
 function escapeHtml(str) {
@@ -53,7 +53,10 @@ function escapeHtml(str) {
 }
 
 // Bot setup helper
-function setupBot(bot) {
+function setupBot(bot, adminBot) {
+    let callTelegramWithRetry;
+    let disableImmediateBlockedBotWrite = false;
+
     // Middleware to automatically make all context replies direct thread replies to the triggering message
     bot.use(async (ctx, next) => {
         const messageId = ctx.message ? ctx.message.message_id : (ctx.callbackQuery && ctx.callbackQuery.message ? ctx.callbackQuery.message.message_id : undefined);
@@ -181,6 +184,273 @@ function setupBot(bot) {
                 throw err;
             }
         }
+    }
+
+    // Helper: Call Admin Telegram Bot with fallback to public bot
+    const callAdminTelegramWithRetry = async function(methodName, ...args) {
+        if (!adminBot) return callTelegramWithRetry(methodName, ...args);
+        try {
+            return await adminBot.telegram[methodName](...args);
+        } catch (err) {
+            console.warn(`Admin Bot call ${methodName} fallback to Public Bot:`, err.message);
+            try {
+                return await bot.telegram[methodName](...args);
+            } catch (fbErr) {
+                console.warn(`Public Bot fallback also failed:`, fbErr.message);
+            }
+        }
+    };
+
+    // ==========================================
+    // DEDICATED ADMIN BOT SUITE (@Fiimhouse_adminBot)
+    // ==========================================
+    if (adminBot) {
+        // Direct reply middleware for admin bot
+        adminBot.use(async (ctx, next) => {
+            const messageId = ctx.message ? ctx.message.message_id : (ctx.callbackQuery && ctx.callbackQuery.message ? ctx.callbackQuery.message.message_id : undefined);
+            if (messageId) {
+                const originalReply = ctx.reply;
+                ctx.reply = function (text, extra) {
+                    return originalReply.call(ctx, text, Object.assign({ reply_to_message_id: messageId }, extra || {}));
+                };
+            }
+            return next();
+        });
+
+        // Admin authorization gatekeeper
+        adminBot.use(async (ctx, next) => {
+            const userId = String(ctx.from ? ctx.from.id : "");
+            if (!userId) return;
+            const authorized = await isAdmin(userId);
+            if (!authorized) {
+                return ctx.reply("⛔ *Unauthorized Access*\n\nThis bot is strictly reserved for Film House Administrators.", { parse_mode: "Markdown" });
+            }
+            return next();
+        });
+
+        // Helper to read PM2 logs safely from disk
+        const getRecentLogs = (type = "out") => {
+            const isError = type.toLowerCase() === "error";
+            const filePath = isError
+                ? "/home/ubuntu/.pm2/logs/filmhouse-bot-error.log"
+                : "/home/ubuntu/.pm2/logs/filmhouse-bot-out.log";
+
+            if (!fs.existsSync(filePath)) {
+                return `⚠️ Log file not found at: ${filePath}`;
+            }
+
+            try {
+                const raw = fs.readFileSync(filePath, "utf8");
+                const lines = raw.trim().split("\n").filter(l => l.trim().length > 0);
+                const recent = lines.slice(-25).join("\n");
+                return recent.length > 3500 ? recent.slice(-3500) : recent;
+            } catch (err) {
+                return `❌ Error reading log file: ${err.message}`;
+            }
+        };
+
+        // Command: /start and /menu
+        adminBot.command(['start', 'menu'], async (ctx) => {
+            const subCount = localStore.getCount();
+            const mem = process.memoryUsage();
+            const memoryMB = (mem.heapUsed / 1024 / 1024).toFixed(1);
+            const uptimeHours = (process.uptime() / 3600).toFixed(1);
+
+            let pendingCount = "Checking...";
+            try {
+                const snap = await db.collection("requests").where("status", "in", ["pending", "priority"]).get();
+                pendingCount = snap.size;
+            } catch (e) {
+                pendingCount = "Active";
+            }
+
+            return ctx.reply(
+                `👑 *Film House Admin Command Center*\n\n` +
+                `👋 Welcome, *${ctx.from.first_name || 'Admin'}*!\n\n` +
+                `📊 *Live System Overview:*\n` +
+                `• 👥 *Subscribers (Ubuntu DB):* \`${subCount}\`\n` +
+                `• ⏳ *Pending Requests:* \`${pendingCount}\`\n` +
+                `• ⚡ *Server Uptime:* \`${uptimeHours} hrs\` (RAM: \`${memoryMB} MB\`)\n` +
+                `• 🛡 *Public Bot:* Online & Polling\n` +
+                `• 👑 *Admin Bot:* Active & Listening\n\n` +
+                `🛠 *Available Commands:*\n` +
+                `• \`/logs\` — View live server & bot logs\n` +
+                `• \`/pending\` — View pending movie requests\n` +
+                `• \`/backup\` — Download weekly CSV catalog backup\n` +
+                `• \`/stats\` — Detailed server & subscriber metrics`,
+                {
+                    parse_mode: 'Markdown',
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: "📋 Pending Requests", callback_data: "admin_pending" },
+                                { text: "📜 Server Logs", callback_data: "admin_logs" }
+                            ],
+                            [
+                                { text: "💾 Download Backup", callback_data: "admin_backup" },
+                                { text: "📊 System Stats", callback_data: "admin_stats" }
+                            ]
+                        ]
+                    }
+                }
+            );
+        });
+
+        // Command: /logs [out|error]
+        adminBot.command('logs', async (ctx) => {
+            const text = (ctx.message.text || "").toLowerCase();
+            const type = text.includes("error") ? "error" : "out";
+            const logs = getRecentLogs(type);
+            return ctx.reply(
+                `📜 *Live Film House Logs (${type.toUpperCase()} - Last 25 lines)*:\n\n` +
+                `\`\`\`\n${logs || 'No log entries found.'}\n\`\`\``,
+                {
+                    parse_mode: "Markdown",
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: "🔄 Refresh Out Logs", callback_data: "admin_logs_out" },
+                                { text: "⚠️ View Error Logs", callback_data: "admin_logs_error" }
+                            ]
+                        ]
+                    }
+                }
+            );
+        });
+
+        // Command: /pending
+        adminBot.command('pending', async (ctx) => {
+            try {
+                const snap = await db.collection("requests").where("status", "in", ["pending", "priority"]).limit(10).get();
+                if (snap.empty) {
+                    return ctx.reply("🎉 *All caught up!* There are no pending requests right now.", { parse_mode: "Markdown" });
+                }
+                let msg = `📋 *Pending Movie Requests (${snap.size}):*\n\n`;
+                snap.docs.forEach((doc, idx) => {
+                    const r = doc.data();
+                    const prio = (r.status === "priority" || r.boosted) ? "🔥 *[PRIORITY]*" : "";
+                    const year = r.year ? ` (${r.year})` : "";
+                    msg += `${idx + 1}. *${r.title}*${year} ${prio}\n   • Type: \`${r.type || 'Movie'}\` | User: @${r.requestedBy || r.userId}\n\n`;
+                });
+                msg += `💡 Open the Admin Web App to fulfill these requests with download links!`;
+                return ctx.reply(msg, { parse_mode: "Markdown" });
+            } catch (err) {
+                return ctx.reply(`❌ Could not fetch pending requests: ${err.message}`);
+            }
+        });
+
+        // Command: /stats
+        adminBot.command('stats', async (ctx) => {
+            const mem = process.memoryUsage();
+            const heapUsedMB = (mem.heapUsed / 1024 / 1024).toFixed(1);
+            const rssMB = (mem.rss / 1024 / 1024).toFixed(1);
+            const uptime = (process.uptime() / 3600).toFixed(2);
+            const subscribers = localStore.getCount();
+
+            return ctx.reply(
+                `📊 *Film House Server & Bot Statistics*\n\n` +
+                `🖥 *Server Environment:* Oracle Cloud Always Free (Ubuntu 24.04 LTS)\n` +
+                `⏱ *Process Uptime:* \`${uptime} hours\`\n` +
+                `💾 *Memory:* \`${heapUsedMB} MB\` (Heap) / \`${rssMB} MB\` (RSS)\n` +
+                `👥 *Local Subscribers:* \`${subscribers}\` users on disk\n` +
+                `📁 *Local Database:* \`./data/bot_users.json\`\n` +
+                `🛡 *Public Bot:* Polling mode active\n` +
+                `👑 *Admin Bot:* Polling mode active`,
+                { parse_mode: "Markdown" }
+            );
+        });
+
+        // Command: /backup
+        adminBot.command('backup', async (ctx) => {
+            await ctx.reply("⏳ *Generating catalog backup CSV...*", { parse_mode: "Markdown" });
+            try {
+                await checkAndRunWeeklyBackup(adminBot, true);
+                return ctx.reply("✅ *Backup generation complete and sent to Master Admins!*", { parse_mode: "Markdown" });
+            } catch (err) {
+                return ctx.reply(`❌ Backup failed: ${err.message}`);
+            }
+        });
+
+        // Action Handlers for Inline Buttons
+        adminBot.action('admin_logs', async (ctx) => {
+            await ctx.answerCbQuery();
+            const logs = getRecentLogs("out");
+            return ctx.reply(`📜 *Live Out Logs:*\n\`\`\`\n${logs}\n\`\`\``, {
+                parse_mode: "Markdown",
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: "⚠️ Error Logs", callback_data: "admin_logs_error" }]
+                    ]
+                }
+            });
+        });
+
+        adminBot.action('admin_logs_out', async (ctx) => {
+            await ctx.answerCbQuery("Refreshing...");
+            const logs = getRecentLogs("out");
+            return ctx.editMessageText(`📜 *Live Out Logs (Refreshed):*\n\`\`\`\n${logs}\n\`\`\``, {
+                parse_mode: "Markdown",
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: "🔄 Refresh", callback_data: "admin_logs_out" }, { text: "⚠️ Error Logs", callback_data: "admin_logs_error" }]
+                    ]
+                }
+            }).catch(() => {});
+        });
+
+        adminBot.action('admin_logs_error', async (ctx) => {
+            await ctx.answerCbQuery("Loading errors...");
+            const logs = getRecentLogs("error");
+            return ctx.editMessageText(`⚠️ *Live Error Logs:*\n\`\`\`\n${logs || 'No errors logged!'}\n\`\`\``, {
+                parse_mode: "Markdown",
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: "📜 Out Logs", callback_data: "admin_logs_out" }, { text: "🔄 Refresh Errors", callback_data: "admin_logs_error" }]
+                    ]
+                }
+            }).catch(() => {});
+        });
+
+        adminBot.action('admin_pending', async (ctx) => {
+            await ctx.answerCbQuery();
+            try {
+                const snap = await db.collection("requests").where("status", "in", ["pending", "priority"]).limit(10).get();
+                if (snap.empty) {
+                    return ctx.reply("🎉 *No pending requests!* All caught up.", { parse_mode: "Markdown" });
+                }
+                let msg = `📋 *Pending Movie Requests (${snap.size}):*\n\n`;
+                snap.docs.forEach((doc, idx) => {
+                    const r = doc.data();
+                    const prio = (r.status === "priority" || r.boosted) ? "🔥 [PRIORITY]" : "";
+                    const year = r.year ? ` (${r.year})` : "";
+                    msg += `${idx + 1}. *${r.title}*${year} ${prio}\n   • Type: \`${r.type || 'Movie'}\` | User: @${r.requestedBy || r.userId}\n\n`;
+                });
+                return ctx.reply(msg, { parse_mode: "Markdown" });
+            } catch (err) {
+                return ctx.reply(`❌ Could not fetch pending requests: ${err.message}`);
+            }
+        });
+
+        adminBot.action('admin_stats', async (ctx) => {
+            await ctx.answerCbQuery();
+            const mem = process.memoryUsage();
+            const heapUsedMB = (mem.heapUsed / 1024 / 1024).toFixed(1);
+            const uptime = (process.uptime() / 3600).toFixed(2);
+            const subscribers = localStore.getCount();
+            return ctx.reply(
+                `📊 *Quick System Stats:*\n` +
+                `• Uptime: \`${uptime} hrs\`\n` +
+                `• RAM: \`${heapUsedMB} MB\`\n` +
+                `• Subscribers: \`${subscribers}\` in Ubuntu DB`,
+                { parse_mode: "Markdown" }
+            );
+        });
+
+        adminBot.action('admin_backup', async (ctx) => {
+            await ctx.answerCbQuery("Triggering backup...");
+            await checkAndRunWeeklyBackup(adminBot, true);
+            return ctx.reply("✅ *Backup sent! Check chat above.*", { parse_mode: "Markdown" });
+        });
     }
 
     // In-memory cache for welcome settings and photo to eliminate delay and unnecessary Firestore reads
@@ -1205,33 +1475,45 @@ function setupBot(bot) {
 }
 
 // Automatic Weekly Firestore Database Backup to CSV
-async function checkAndRunWeeklyBackup(bot) {
+async function checkAndRunWeeklyBackup(botToUse, force = false) {
     try {
         const today = new Date();
         const todayStr = today.toISOString().split("T")[0];
         
-        const backupDoc = await db.collection("settings").doc("backup").get();
-        let lastBackupDateStr = "";
-        if (backupDoc.exists) {
-            lastBackupDateStr = backupDoc.data().lastBackupDate || "";
-        }
-        
-        let shouldBackup = false;
-        if (!lastBackupDateStr) {
-            shouldBackup = true;
-        } else {
-            const lastDate = new Date(lastBackupDateStr);
-            const diffTime = Math.abs(today - lastDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            if (diffDays >= 7) {
-                shouldBackup = true;
+        let shouldBackup = force;
+        if (!shouldBackup) {
+            try {
+                const backupDoc = await db.collection("settings").doc("backup").get();
+                let lastBackupDateStr = backupDoc.exists ? (backupDoc.data().lastBackupDate || "") : "";
+                if (!lastBackupDateStr) {
+                    shouldBackup = true;
+                } else {
+                    const lastDate = new Date(lastBackupDateStr);
+                    const diffDays = Math.ceil(Math.abs(today - lastDate) / (1000 * 60 * 60 * 24));
+                    if (diffDays >= 7) shouldBackup = true;
+                }
+            } catch (e) {
+                // Keep operating without failing on quota
             }
         }
         
         if (shouldBackup) {
             console.log("Running weekly database backup...");
-            const snapshot = await db.collection("movies").get();
-            if (snapshot.empty) {
+            let moviesList = [];
+            const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
+            if (fs.existsSync(localMetaPath)) {
+                try {
+                    moviesList = JSON.parse(fs.readFileSync(localMetaPath, "utf8"));
+                } catch (e) {}
+            }
+            if (moviesList.length === 0) {
+                try {
+                    const snapshot = await db.collection("movies").get();
+                    snapshot.forEach(doc => moviesList.push(doc.data()));
+                } catch (e) {}
+            }
+            
+            if (moviesList.length === 0) {
                 console.log("Movies collection is empty. Skipping CSV backup.");
                 return;
             }
@@ -1243,20 +1525,12 @@ async function checkAndRunWeeklyBackup(bot) {
                 "cast", "director", "trailer", "runtime", "links"
             ];
             
-            let csvRows = [];
-            csvRows.push(fields.join(",")); // CSV Header
-            
-            snapshot.forEach(doc => {
-                const data = doc.data();
+            let csvRows = [fields.join(",")];
+            moviesList.forEach(data => {
                 const row = fields.map(field => {
                     let val = data[field];
                     if (val === undefined || val === null) return "";
-                    let str = "";
-                    if (Array.isArray(val)) {
-                        str = val.join(", ");
-                    } else {
-                        str = String(val);
-                    }
+                    let str = Array.isArray(val) ? val.join(", ") : String(val);
                     str = str.replace(/"/g, '""');
                     if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
                         str = `"${str}"`;
@@ -1267,27 +1541,26 @@ async function checkAndRunWeeklyBackup(bot) {
             });
             
             const csvContent = csvRows.join("\n");
-            
+            const csvBuffer = Buffer.from(csvContent, "utf-8");
+
             // Get Master Admin IDs
-            const adminDoc = await db.collection("settings").doc("admins").get();
             const defaultAdmins = ["1329840839", "1175336733"];
             let masters = [...defaultAdmins];
-            if (adminDoc.exists) {
-                const data = adminDoc.data();
-                if (data.masters) {
-                    masters = Array.from(new Set([...masters, ...data.masters.map(String)]));
+            try {
+                const adminDoc = await db.collection("settings").doc("admins").get();
+                if (adminDoc.exists && adminDoc.data().masters) {
+                    masters = Array.from(new Set([...masters, ...adminDoc.data().masters.map(String)]));
                 }
-            }
+            } catch (e) {}
             
             // Send CSV to all Master Admins
-            const csvBuffer = Buffer.from(csvContent, "utf-8");
             for (const adminId of masters) {
                 try {
-                    await bot.telegram.sendDocument(adminId, {
+                    await botToUse.telegram.sendDocument(adminId, {
                         source: csvBuffer,
                         filename: `filmhouse_catalog_backup_${todayStr}.csv`
                     }, {
-                        caption: `📅 *Weekly Film House Catalog Backup*\n\nContains *${snapshot.size}* items. Keep this safe! 🍿`,
+                        caption: `📅 *Weekly Film House Catalog Backup*\n\nContains *${moviesList.length}* catalog titles. Keep this safe! 🍿`,
                         parse_mode: "Markdown"
                     });
                 } catch (e) {
@@ -1296,11 +1569,13 @@ async function checkAndRunWeeklyBackup(bot) {
             }
             
             // Save state in Firestore settings/backup
-            await db.collection("settings").doc("backup").set({
-                lastBackupDate: todayStr,
-                itemCount: snapshot.size,
-                updatedAt: admin.firestore.FieldValue.serverTimestamp()
-            });
+            try {
+                await db.collection("settings").doc("backup").set({
+                    lastBackupDate: todayStr,
+                    itemCount: moviesList.length,
+                    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (e) {}
             console.log("Weekly database backup complete.");
         }
     } catch (err) {
@@ -1310,7 +1585,7 @@ async function checkAndRunWeeklyBackup(bot) {
 
 // Bot Initializer
 async function init() {
-    let botToken = process.env.TELEGRAM_BOT_TOKEN;
+    let botToken = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN;
 
     if (!botToken) {
         console.log("Fetching bot token from Firestore 'settings/telegram'...");
@@ -1329,16 +1604,14 @@ async function init() {
         botToken = "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
     }
 
-    if (!botToken) {
-        console.error("CRITICAL ERROR: No bot token found! Please save the Telegram Bot Token in the Admin Command Center settings, or set the TELEGRAM_BOT_TOKEN environment variable, then restart the bot.");
-        process.exit(1);
-    }
+    const adminBotToken = process.env.ADMIN_BOT_TOKEN || "8669068531:AAEwUFMEWNWk8aXHvTuRQJpmfIAEGjVNe0o";
 
     try {
         const bot = new Telegraf(botToken);
-        setupBot(bot);
+        const adminBot = new Telegraf(adminBotToken);
+        setupBot(bot, adminBot);
         
-        // Register Commands Menu in Telegram dynamically
+        // Register Commands Menu for Public Bot
         bot.telegram.setMyCommands([
             { command: 'start', description: 'Launch the Film House Web App 🚀' },
             { command: 'settings', description: 'View your profile & points status 🪙' },
@@ -1349,6 +1622,19 @@ async function init() {
             console.log("Bot commands menu registered successfully!");
         }).catch(err => {
             console.error("Failed to register bot commands menu:", err);
+        });
+
+        // Register Commands Menu for Admin Bot
+        adminBot.telegram.setMyCommands([
+            { command: 'start', description: 'Admin Command Center 👑' },
+            { command: 'logs', description: 'View live server & bot logs 📜' },
+            { command: 'pending', description: 'List pending movie requests 📋' },
+            { command: 'backup', description: 'Trigger catalog CSV backup 💾' },
+            { command: 'stats', description: 'Server metrics & subscriber counts 📊' }
+        ]).then(() => {
+            console.log("Admin Bot commands menu registered successfully!");
+        }).catch(err => {
+            console.warn("Failed to register admin bot commands menu:", err.message);
         });
 
         const isLocalEnvironment = !process.env.RENDER_EXTERNAL_URL && !process.env.RENDER;
@@ -1452,8 +1738,14 @@ async function init() {
                 console.log(`Dummy health check HTTP server listening on port ${PORT} (Polling mode).`);
             });
             
-            bot.launch();
-            console.log("Film House Bot successfully started! 🚀 Running command listener (Polling)...");
+            bot.launch().catch(err => console.error("Public Bot launch error:", err.message));
+            console.log("Film House Public Bot successfully started! 🚀 Running command listener (Polling)...");
+
+            adminBot.launch().then(() => {
+                console.log("Film House Admin Bot successfully started! 👑 Running listener (@Fiimhouse_adminBot)...");
+            }).catch(err => {
+                console.error("Admin Bot launch error:", err.message);
+            });
         }
 
         // Real-time status synchronization to Firestore settings/bot_status
@@ -1764,7 +2056,7 @@ async function init() {
                         const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
                         for (const adminId of allAdmins) {
                             try {
-                                await callTelegramWithRetry('sendMessage', adminId, adminText, {
+                                await callAdminTelegramWithRetry('sendMessage', adminId, adminText, {
                                     parse_mode: "HTML",
                                     reply_markup: {
                                         inline_keyboard: [
@@ -1942,14 +2234,17 @@ async function init() {
                                 return status !== "fulfilled" && status !== "claimed";
                             }).length;
 
-                            const adminNotifyText = `📋 *Request Fulfilled!*\n\n` +
-                                                 `*Title:* ${title}${yearSuffix}\n` +
-                                                 `*Fulfilled for:* @${username} (ID: \`${userId}\`)\n\n` +
-                                                 `⚡ *Remaining Queue:* \`${pendingCount}\` pending requests left to tackle in our DMs.`;
+                            const fulfilledBy = data.fulfilledBy || data.adminClaimName || "An Admin";
+                            const adminNotifyText = `✅ *Request Fulfilled!*\n\n` +
+                                                 `🎬 *Title:* ${title}${yearSuffix}\n` +
+                                                 `👤 *Fulfilled by:* ${fulfilledBy}\n` +
+                                                 `🍿 *Requested for:* @${username} (ID: \`${userId}\`)\n` +
+                                                 `🔗 *Download Link:* ${downloadLink || 'Provided'}\n\n` +
+                                                 `⚡ *Remaining Queue:* \`${pendingCount}\` pending request(s) left.`;
 
                             for (const adminId of allAdmins) {
                                 try {
-                                    await bot.telegram.sendMessage(adminId, adminNotifyText, { parse_mode: "Markdown" });
+                                    await callAdminTelegramWithRetry('sendMessage', adminId, adminNotifyText, { parse_mode: "Markdown" });
                                 } catch (err) {
                                     console.warn(`Failed to notify admin ${adminId} of fulfillment:`, err.message);
                                 }
@@ -2068,7 +2363,7 @@ async function init() {
 
                     for (const adminId of allAdmins) {
                         try {
-                            await bot.telegram.sendMessage(adminId, adminMsg, { parse_mode: "Markdown" });
+                            await (adminBot || bot).telegram.sendMessage(adminId, adminMsg, { parse_mode: "Markdown" });
                         } catch (err) {
                             console.warn(`Failed to send new episode alert to admin ${adminId}:`, err.message);
                         }
@@ -2100,9 +2395,10 @@ async function init() {
                 });
             } catch (e) {}
             bot.stop(signal);
+            if (adminBot) adminBot.stop(signal);
             process.exit(0);
         };
-        
+
         process.once('SIGINT', () => handleShutdown('SIGINT'));
         process.once('SIGTERM', () => handleShutdown('SIGTERM'));
     } catch (err) {

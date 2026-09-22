@@ -1447,9 +1447,14 @@ async function verifyAdminAccess() {
 
     const urlParams = new URLSearchParams(window.location.search);
     const queryTgId = urlParams.get("tg_id") || urlParams.get("admin_id");
+    if (queryTgId) {
+        sessionStorage.setItem("admin_auth_id", queryTgId.trim());
+        // Sanitize browser address bar immediately so admin ID is not exposed or shareable via URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
 
     const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-    const currentTgId = tgUser ? String(tgUser.id) : (queryTgId ? String(queryTgId).trim() : null);
+    const currentTgId = tgUser ? String(tgUser.id) : (sessionStorage.getItem("admin_auth_id") || null);
 
     const idBox = document.getElementById("your-tg-id-box");
     if (idBox) {
@@ -4249,6 +4254,9 @@ if (fulfillForm && fulfillRequestModal) {
             requestChunks.push(currentFulfillDocIds.slice(i, i + 450));
         }
  
+        const tgUserForFulfill = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
+        const currentAdminName = tgUserForFulfill ? (tgUserForFulfill.username ? `@${tgUserForFulfill.username}` : `${tgUserForFulfill.first_name || 'Admin'}`) : "Admin";
+
         const fulfillPromises = requestChunks.map((chunk, chunkIdx) => {
             const batch = db.batch();
             chunk.forEach(id => {
@@ -4256,6 +4264,9 @@ if (fulfillForm && fulfillRequestModal) {
                 batch.update(ref, {
                     status: "fulfilled",
                     downloadLink: downloadLink,
+                    fulfilledBy: currentAdminName,
+                    fulfilledById: currentAdminId || "",
+                    fulfilledAt: firebase.firestore.FieldValue.serverTimestamp(),
                     adminClaimId: firebase.firestore.FieldValue.delete(),
                     adminClaimName: firebase.firestore.FieldValue.delete(),
                     adminClaimTime: firebase.firestore.FieldValue.delete()

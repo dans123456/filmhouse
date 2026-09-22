@@ -2,22 +2,23 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Movies catalog: Read and write allowed for client-side admin panel updates
+    // Movies catalog: Read and write allowed for admin panel updates
     match /movies/{movie} {
       allow read, write: if true;
     }
     
-    // Settings: Read and write allowed for client-side admin panel settings updates
+    // Settings: Client-side access for app configurations
     match /settings/{setting} {
-      allow read, write: if true;
+      // Restrict internal system documents from public client access
+      allow read, write: if setting != 'backup' && setting != 'new_episodes_notified';
     }
     
-    // Users: Read and write allowed
+    // Users: Read and write allowed for user profiles and points
     match /users/{userId} {
       allow read, write: if true;
     }
     
-    // Requests: Read and write allowed
+    // Requests: Read and write allowed for user requests and admin fulfillment
     match /requests/{requestId} {
       allow read, write: if true;
     }
