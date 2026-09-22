@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "218843-the-seven-deadly-sins",
+    "tmdb_id": 218843,
+    "imdb_id": "",
+    "title": "The Seven Deadly Sins: Four Knights of the Apocalypse",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "As a prophecy of doom unfolds on the peaceful land of Britannia, a purehearted boy sets out on a journey of discovery — and revenge.",
+    "poster": "https://image.tmdb.org/t/p/w500/6SWVJvCIC9B16u6wASZ8FEaNssz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dd1tEbUU9NLLo3drq39NknpHQ6v.jpg",
+    "rating": 8.1,
+    "release_date": "2023-10-08",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "Zic1mn23B_I",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADzREAAsDqkEWmd8Vx3akleBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1511417-b-hubali-the-epic",
     "tmdb_id": 1511417,
     "imdb_id": "",
