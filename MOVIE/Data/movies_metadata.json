@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "552524-lilo-stitch",
+    "tmdb_id": 552524,
+    "imdb_id": "",
+    "title": "Lilo & Stitch",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Family",
+      "Science Fiction",
+      "Comedy"
+    ],
+    "overview": "The wildly funny and touching story of a lonely Hawaiian girl and the fugitive alien who helps to mend her broken family.",
+    "poster": "https://image.tmdb.org/t/p/w500/ckQzKpQJO4ZQDCN5evdpKcfm7Ys.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7Zx3wDG5bBtcfk8lcnCWDOLM4Y4.jpg",
+    "rating": 7.2,
+    "release_date": "2025-05-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "VWqJifMMgZE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADCg8AAsDqmEVrsXdAPhQrDhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "207332-sakamoto-days",
     "tmdb_id": 207332,
     "imdb_id": "",
