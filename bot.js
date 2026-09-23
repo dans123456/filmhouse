@@ -1263,148 +1263,9 @@ function setupBot(bot, adminBot) {
         };
         
         try {
-            // --- Admin Delete Request Callbacks ---
-            if (data && data.startsWith("delreq_ask_")) {
-                const docId = data.replace("delreq_ask_", "");
-                if (!(await isAdmin(userId))) {
-                    return ctx.answerCbQuery("⛔ Access denied. Only authorized admins can delete requests.", { show_alert: true });
-                }
-
-                try {
-                    const reqDoc = await db.collection("requests").doc(docId).get();
-                    if (!reqDoc.exists) {
-                        return ctx.answerCbQuery("⚠️ Request no longer exists or was already deleted.", { show_alert: true });
-                    }
-
-                    const rData = reqDoc.data();
-                    const rTitle = escapeHtml(String(rData.title || "Movie Request").replace(/[*_`~]/g, '').trim());
-                    const rUser = escapeHtml(String(rData.requestedBy || rData.user || `User ${rData.userId || ''}`).replace(/[*_`~]/g, '').trim());
-
-                    await ctx.answerCbQuery();
-                    return await editMessageInPlace(
-                        `⚠️ <b>CONFIRM REQUEST DELETION</b> ⚠️\n\n` +
-                        `Are you sure you want to permanently delete this request from Film House?\n\n` +
-                        `🎬 <b>Title:</b> <b>${rTitle}</b>\n` +
-                        `👤 <b>Requested By:</b> ${rUser}\n\n` +
-                        `<i>This action will remove the request from the database and admin queue.</i>`,
-                        {
-                            parse_mode: 'HTML',
-                            reply_markup: {
-                                inline_keyboard: [
-                                    [
-                                        { text: "⚠️ Yes, Delete Request 🗑️", callback_data: `delreq_confirm_${docId}` },
-                                        { text: "❌ Cancel", callback_data: `delreq_cancel_${docId}` }
-                                    ]
-                                ]
-                            }
-                        }
-                    );
-                } catch (err) {
-                    console.error("Error in delreq_ask:", err);
-                    return ctx.answerCbQuery("Error loading request details.", { show_alert: true });
-                }
-            }
-
-            if (data && data.startsWith("delreq_confirm_")) {
-                const docId = data.replace("delreq_confirm_", "");
-                if (!(await isAdmin(userId))) {
-                    return ctx.answerCbQuery("⛔ Access denied. Only authorized admins can delete requests.", { show_alert: true });
-                }
-
-                try {
-                    const reqDoc = await db.collection("requests").doc(docId).get();
-                    let rTitle = "Movie Request";
-                    let rUser = "User";
-                    if (reqDoc.exists) {
-                        const rData = reqDoc.data();
-                        rTitle = escapeHtml(String(rData.title || "Movie Request").replace(/[*_`~]/g, '').trim());
-                        rUser = escapeHtml(String(rData.requestedBy || rData.user || `User ${rData.userId || ''}`).replace(/[*_`~]/g, '').trim());
-                        await db.collection("requests").doc(docId).delete();
-                    }
-
-                    const adminHandle = ctx.from.username ? `@${ctx.from.username}` : (fullName || `Admin ${userId}`);
-
-                    await ctx.answerCbQuery(`✅ Request for "${rTitle}" deleted successfully! 🗑️`, { show_alert: true });
-
-                    return await editMessageInPlace(
-                        `🗑️ <b>REQUEST PERMANENTLY DELETED</b>\n\n` +
-                        `🎬 <b>Title:</b> <b>${rTitle}</b>\n` +
-                        `👤 <b>Requested By:</b> ${rUser}\n` +
-                        `👮 <b>Deleted By Admin:</b> ${escapeHtml(adminHandle)} (ID: <code>${userId}</code>)\n` +
-                        `⏱ <b>Status:</b> Removed from database ✅\n\n` +
-                        `<i>This request has been permanently deleted from Film House.</i>`,
-                        {
-                            parse_mode: 'HTML',
-                            reply_markup: {
-                                inline_keyboard: [
-                                    [
-                                        { text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }
-                                    ]
-                                ]
-                            }
-                        }
-                    );
-                } catch (err) {
-                    console.error("Error deleting request via callback:", err);
-                    return ctx.answerCbQuery("Error deleting request: " + err.message, { show_alert: true });
-                }
-            }
-
-            if (data && data.startsWith("delreq_cancel_")) {
-                const docId = data.replace("delreq_cancel_", "");
-                await ctx.answerCbQuery("Deletion cancelled.");
-
-                try {
-                    const reqDoc = await db.collection("requests").doc(docId).get();
-                    if (!reqDoc.exists) {
-                        return await editMessageInPlace(
-                            `ℹ️ <i>This request no longer exists.</i>`,
-                            { parse_mode: 'HTML' }
-                        );
-                    }
-
-                    const rData = reqDoc.data();
-                    const rTitle = escapeHtml(String(rData.title || "Movie Request").replace(/[*_`~]/g, '').trim());
-                    const rYear = rData.year ? ` (${escapeHtml(String(rData.year).replace(/[*_`~()]/g, '').trim())})` : "";
-                    const rType = escapeHtml(String(rData.type || "Movie").replace(/[*_`~]/g, '').trim());
-                    const rUser = escapeHtml(String(rData.requestedBy || rData.user || `User ${rData.userId || ''}`).replace(/[*_`~]/g, '').trim());
-                    const rSeason = rData.seasonOrPart ? `\n📌 <b>Season/Part:</b> ${escapeHtml(String(rData.seasonOrPart).replace(/[*_`~]/g, '').trim())}` : '';
-                    const isPriority = (rData.status === "priority" || rData.boosted === true);
-
-                    const cardHtml = isPriority
-                        ? `🚀🔥 <b>REQUEST BOOSTED TO HIGH PRIORITY!</b> 🔥🚀\n\n` +
-                          `🎬 <b>Title:</b> <b>${rTitle}</b>${rYear}\n` +
-                          `📁 <b>Type:</b> ${rType}${rSeason}\n` +
-                          `👤 <b>Requested By:</b> ${rUser} (ID: <code>${rData.userId || rData.requestedById || ''}</code>)\n` +
-                          `⚡ <b>Boosted By:</b> ${escapeHtml(String(rData.boostedBy || rUser).replace(/[*_`~]/g, '').trim())}\n` +
-                          `🪙 <b>Points Spent:</b> <code>1,000 Loyalty Points</code> ⚡\n` +
-                          `🔥 <b>Priority Level:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
-                          `💡 <i>Action Required: Please expedite in Admin Panel or upload to @filmhouse_main!</i>`
-                        : `🍿 <b>New Movie Request!</b>\n\n` +
-                          `🎬 <b>Title:</b> <b>${rTitle}</b>${rYear}\n` +
-                          `📁 <b>Type:</b> ${rType}${rSeason}\n` +
-                          `👤 <b>Requested By:</b> ${rUser} (ID: <code>${rData.userId || rData.requestedById || ''}</code>)`;
-
-                    return await editMessageInPlace(
-                        cardHtml,
-                        {
-                            parse_mode: 'HTML',
-                            reply_markup: {
-                                inline_keyboard: [
-                                    [
-                                        { text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" },
-                                        { text: "Main Channel 📢", url: "https://t.me/filmhouse_main" }
-                                    ],
-                                    [
-                                        { text: "🗑️ Delete Request", callback_data: `delreq_ask_${docId}` }
-                                    ]
-                                ]
-                            }
-                        }
-                    );
-                } catch (err) {
-                    console.error("Error restoring card:", err);
-                }
+            // --- Admin Delete Request Callbacks (Disabled to prevent accidental deletion) ---
+            if (data && (data.startsWith("delreq_ask_") || data.startsWith("delreq_confirm_") || data.startsWith("delreq_cancel_"))) {
+                return ctx.answerCbQuery("ℹ️ Deleting requests directly from Telegram is disabled to prevent accidental deletions. Please manage requests via the Admin Dashboard.", { show_alert: true });
             }
 
             // --- Welcome Card Navigation ---
@@ -2217,11 +2078,7 @@ async function init() {
                                     reply_markup: {
                                         inline_keyboard: [
                                             [
-                                                { text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" },
-                                                { text: "Main Channel 📢", url: "https://t.me/filmhouse_main" }
-                                            ],
-                                            [
-                                                { text: "🗑️ Delete Request", callback_data: `delreq_ask_${docId}` }
+                                                { text: "🍿 Open Film House to Fulfill 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }
                                             ]
                                         ]
                                     }
@@ -2290,11 +2147,7 @@ async function init() {
                                         reply_markup: {
                                             inline_keyboard: [
                                                 [
-                                                    { text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" },
-                                                    { text: "Main Channel 📢", url: "https://t.me/filmhouse_main" }
-                                                ],
-                                                [
-                                                    { text: "🗑️ Delete Request", callback_data: `delreq_ask_${docId}` }
+                                                    { text: "⚡🔥 Fulfill High Priority Request 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }
                                                 ]
                                             ]
                                         }
@@ -2392,20 +2245,21 @@ async function init() {
                                 const cleanAdminYear = year ? ` (${escapeHtml(year)})` : "";
                                 const cleanFulfilledBy = escapeHtml(fulfilledBy);
                                 const cleanReqUser = escapeHtml(username || `User ${userId}`);
+                                const displayUser = cleanReqUser.startsWith('@') ? cleanReqUser : `@${cleanReqUser}`;
 
                                 const adminNotifyText = `✅ <b>Request Fulfilled!</b>\n\n` +
                                                      `🎬 <b>Title:</b> <b>${cleanAdminTitle}</b>${cleanAdminYear}\n` +
                                                      `👤 <b>Fulfilled by:</b> ${cleanFulfilledBy}\n` +
-                                                     `🍿 <b>Requested for:</b> @${cleanReqUser} (ID: <code>${escapeHtml(userId)}</code>)\n\n` +
+                                                     `🍿 <b>Requested for:</b> ${displayUser} (ID: <code>${escapeHtml(userId)}</code>)\n\n` +
                                                      `⚡ <b>Remaining Queue:</b> <code>${pendingCount}</code> pending request(s) left.`;
 
                                 const adminReplyMarkup = downloadLink ? {
                                     inline_keyboard: [
                                         [
-                                            { text: "🎬 View Movie / Download Link", url: downloadLink }
+                                            { text: "🎬 Watch / Download Movie 🍿", url: downloadLink }
                                         ],
                                         [
-                                            { text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }
+                                            { text: "🚀 Open Film House App 🍿", url: "https://t.me/Filmhouseappbot/filmhouseapp" }
                                         ]
                                     ]
                                 } : undefined;
