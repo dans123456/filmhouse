@@ -2463,7 +2463,44 @@ function showMovieDetails(movie) {
                 const rawTitle = (movie.title || "Movie Update").replace(/\s*\([^)]+\)\s*$/g, "").trim();
                 const safeTitle = rawTitle.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 const yearText = movie.release_date ? ` (${movie.release_date.substring(0, 4)})` : "";
-                const caption = `<b>${safeTitle}</b>${yearText}\n${seasonText}\n\n👉 <a href="${deepLink}">CLICK HERE</a> ✔️`;
+
+                // Details (genres, rating, short overview)
+                const rawGenres = Array.isArray(movie.categories) ? movie.categories : (Array.isArray(movie.genres) ? movie.genres : []);
+                const genresText = rawGenres.filter(g => g && g !== "Main").slice(0, 3).join(", ");
+                const ratingVal = movie.rating || movie.vote_average || "";
+                const ratingText = ratingVal ? (String(ratingVal).includes("/") ? ratingVal : `${ratingVal}/10`) : "";
+
+                let metaLine = "";
+                if (genresText && ratingText) {
+                    metaLine = `🎭 ${genresText} | ⭐️ ${ratingText}\n`;
+                } else if (genresText) {
+                    metaLine = `🎭 ${genresText}\n`;
+                } else if (ratingText) {
+                    metaLine = `⭐️ ${ratingText}\n`;
+                }
+
+                let overviewText = "";
+                if (movie.overview && typeof movie.overview === 'string' && movie.overview.toLowerCase() !== "no synopsis available.") {
+                    const cleanO = movie.overview.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+                    if (cleanO.length > 160) {
+                        overviewText = cleanO.substring(0, 157) + "...";
+                    } else {
+                        overviewText = cleanO;
+                    }
+                }
+
+                let overviewLine = "";
+                if (overviewText) {
+                    const safeOverview = overviewText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    overviewLine = `💬 <i>${safeOverview}</i>\n\n`;
+                } else if (metaLine) {
+                    overviewLine = "\n";
+                }
+
+                const caption = `<b>${safeTitle}</b>${yearText}\n${seasonText}\n\n` +
+                                metaLine +
+                                overviewLine +
+                                `👉 <a href="${deepLink}">CLICK HERE TO DOWNLOAD</a> ✔️`;
 
                 const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
                 let posterUrl = (movie.poster && String(movie.poster).startsWith("http"))
@@ -2476,7 +2513,7 @@ function showMovieDetails(movie) {
 
                 const replyMarkup = {
                     inline_keyboard: [
-                        [{ text: "🍿 Watch / Download on Film House 🚀", url: deepLink }]
+                        [{ text: "📥 Download on Film House 🍿", url: deepLink }]
                     ]
                 };
 

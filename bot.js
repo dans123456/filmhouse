@@ -244,20 +244,64 @@ function setupBot(bot, adminBot) {
                 seasonOrQualityText = "Complete Series | All Seasons";
             }
 
-            const movieId = movieInfo.csv_id || movieInfo.tmdb_id || movieInfo.id || "";
-            const deepLinkUrl = movieId 
-                ? `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${movieId}` 
-                : `https://t.me/Filmhouseappbot/filmhouseapp`;
+            // Enrich with metadata if missing
+            if ((!movieInfo.overview || !movieInfo.genres || !movieInfo.categories) && (movieInfo.csv_id || movieInfo.id)) {
+                try {
+                    const lookupId = movieInfo.csv_id || movieInfo.id;
+                    const mDoc = await db.collection("movies").doc(lookupId).get();
+                    if (mDoc.exists) {
+                        const md = mDoc.data();
+                        movieInfo.overview = movieInfo.overview || md.overview;
+                        movieInfo.genres = movieInfo.genres || md.categories || md.genres;
+                        movieInfo.rating = movieInfo.rating || md.rating || md.vote_average;
+                        movieInfo.year = movieInfo.year || (md.release_date ? md.release_date.substring(0, 4) : md.year);
+                        movieInfo.poster = movieInfo.poster || md.poster;
+                    }
+                } catch (e) {}
+            }
+
+            const rawGenres = Array.isArray(movieInfo.genres) ? movieInfo.genres : (Array.isArray(movieInfo.categories) ? movieInfo.categories : []);
+            const genresText = rawGenres.filter(g => g && g !== "Main").slice(0, 3).join(", ");
+            const ratingVal = movieInfo.rating || movieInfo.vote_average || "";
+            const ratingText = ratingVal ? (String(ratingVal).includes("/") ? ratingVal : `${ratingVal}/10`) : "";
+
+            let metaLine = "";
+            if (genresText && ratingText) {
+                metaLine = `🎭 ${escapeHtml(genresText)} | ⭐️ ${escapeHtml(ratingText)}\n`;
+            } else if (genresText) {
+                metaLine = `🎭 ${escapeHtml(genresText)}\n`;
+            } else if (ratingText) {
+                metaLine = `⭐️ ${escapeHtml(ratingText)}\n`;
+            }
+
+            let overviewText = "";
+            if (movieInfo.overview && typeof movieInfo.overview === 'string' && movieInfo.overview.toLowerCase() !== "no synopsis available.") {
+                const cleanO = movieInfo.overview.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+                if (cleanO.length > 160) {
+                    overviewText = cleanO.substring(0, 157) + "...";
+                } else {
+                    overviewText = cleanO;
+                }
+            }
+
+            let overviewLine = "";
+            if (overviewText) {
+                overviewLine = `💬 <i>${escapeHtml(overviewText)}</i>\n\n`;
+            } else if (metaLine) {
+                overviewLine = "\n";
+            }
 
             const caption = 
                 `<b>${escapeHtml(cleanTitle)}</b>${escapeHtml(yearText)}\n` +
                 `${escapeHtml(seasonOrQualityText)}\n\n` +
-                `👉 <a href="${deepLinkUrl}">CLICK HERE</a> ✔️`;
+                metaLine +
+                overviewLine +
+                `👉 <a href="${deepLinkUrl}">CLICK HERE TO DOWNLOAD</a> ✔️`;
 
             const replyMarkup = {
                 inline_keyboard: [
                     [
-                        { text: "🍿 Watch / Download on Film House 🚀", url: deepLinkUrl }
+                        { text: "📥 Download on Film House 🍿", url: deepLinkUrl }
                     ]
                 ]
             };
@@ -2369,7 +2413,7 @@ async function init() {
                                     detailText = `🍿 <b>Good news!</b>\n\n<b>Season 1</b> of <b>${cleanUserTitle}</b> is now ready! We are currently uploading the remaining seasons... 🚀`;
                                     buttonText = "Get Season 1 🍿";
                                 } else {
-                                    detailText = `🚀 <b>Season Update!</b>\n\n<b>${escapeHtml(sLabel)}</b> of <b>${cleanUserTitle}</b> has just been added! To download or watch remaining seasons, open Film House App! 🍿`;
+                                    detailText = `🚀 <b>Season Update!</b>\n\n<b>${escapeHtml(sLabel)}</b> of <b>${cleanUserTitle}</b> has just been added! To download remaining seasons, open Film House App! 🍿`;
                                     buttonText = `Get ${sLabel} 🍿`;
                                 }
                             } else {
@@ -2477,7 +2521,7 @@ async function init() {
                                             : { text: "👑 Open Film House Admin 🚀", web_app: { url: adminUrl } };
                                         const adminReplyMarkup = {
                                             inline_keyboard: [
-                                                ...(downloadLink ? [[{ text: "🎬 Watch / Download Movie 🍿", url: downloadLink }]] : []),
+                                                ...(downloadLink ? [[{ text: "📥 Download Movie / Series 🍿", url: downloadLink }]] : []),
                                                 [adminPanelBtn]
                                             ]
                                         };
