@@ -2457,7 +2457,7 @@ function showMovieDetails(movie) {
             postChannelBtn.disabled = true;
             postChannelBtn.textContent = "Posting to Channel... ⏳";
             try {
-                const deepLink = `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${movie.csv_id || movie.tmdb_id}`;
+                const dlLink = `https://t.me/Filmhouseappbot?start=dl_${movie.csv_id || movie.tmdb_id}`;
                 const isSeries = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
                 const seasonText = isSeries ? "Complete Series" : "Full Movie";
                 const rawTitle = (movie.title || "Movie Update").replace(/\s*\([^)]+\)\s*$/g, "").trim();
@@ -2500,20 +2500,21 @@ function showMovieDetails(movie) {
                 const caption = `<b>${safeTitle}</b>${yearText}\n${seasonText}\n\n` +
                                 metaLine +
                                 overviewLine +
-                                `👉 <a href="${deepLink}">CLICK HERE TO DOWNLOAD</a> ✔️`;
+                                `👉 <a href="${dlLink}">CLICK HERE TO DOWNLOAD</a> ✔️`;
 
                 const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
-                let posterUrl = (movie.poster && String(movie.poster).startsWith("http"))
-                    ? movie.poster
-                    : ((movie.backdrop && String(movie.backdrop).startsWith("http")) ? movie.backdrop : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
+                // Prioritize horizontal backdrop (16:9 widescreen landscape)
+                let bannerUrl = (movie.backdrop && String(movie.backdrop).startsWith("http"))
+                    ? movie.backdrop
+                    : ((movie.poster && String(movie.poster).startsWith("http")) ? movie.poster : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
 
-                if (posterUrl && (posterUrl.includes("w500") || posterUrl.includes("w300"))) {
-                    posterUrl = posterUrl.replace(/\/w(300|500)\//, "/w780/");
+                if (bannerUrl.includes("w500") || bannerUrl.includes("w300") || bannerUrl.includes("w780")) {
+                    bannerUrl = bannerUrl.replace(/\/w(300|500|780)\//, "/w1280/");
                 }
 
                 const replyMarkup = {
                     inline_keyboard: [
-                        [{ text: "📥 Download on Film House 🍿", url: deepLink }]
+                        [{ text: "📥 Download on Film House 🍿", url: dlLink }]
                     ]
                 };
 
@@ -2522,7 +2523,7 @@ function showMovieDetails(movie) {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         chat_id: "-1002098683402",
-                        photo: posterUrl,
+                        photo: bannerUrl,
                         caption: caption,
                         parse_mode: "HTML",
                         reply_markup: replyMarkup
@@ -2530,8 +2531,8 @@ function showMovieDetails(movie) {
                 });
                 let resData = await res.json();
 
-                // If photo send failed due to image URL, fallback to sendMessage
-                if (!resData.ok && (resData.description || "").toLowerCase().includes("photo") || (resData.description || "").toLowerCase().includes("wrong file")) {
+                // If photo send failed due to image URL, fallback to sendMessage without preview
+                if (!resData.ok && ((resData.description || "").toLowerCase().includes("photo") || (resData.description || "").toLowerCase().includes("wrong file") || (resData.description || "").toLowerCase().includes("failed to get http"))) {
                     res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -2539,6 +2540,7 @@ function showMovieDetails(movie) {
                             chat_id: "-1002098683402",
                             text: caption,
                             parse_mode: "HTML",
+                            disable_web_page_preview: true,
                             reply_markup: replyMarkup
                         })
                     });

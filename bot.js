@@ -306,12 +306,18 @@ function setupBot(bot, adminBot) {
                 ]
             };
 
-            let posterUrl = movieInfo.poster && String(movieInfo.poster).startsWith("http") 
-                ? movieInfo.poster 
-                : (movieInfo.backdrop && String(movieInfo.backdrop).startsWith("http") ? movieInfo.backdrop : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
+            const movieId = movieInfo.csv_id || movieInfo.tmdb_id || movieInfo.id || "";
+            const deepLinkUrl = movieId 
+                ? `https://t.me/Filmhouseappbot?start=dl_${movieId}` 
+                : `https://t.me/Filmhouseappbot`;
 
-            if (posterUrl.includes("image.tmdb.org/t/p/w500") || posterUrl.includes("image.tmdb.org/t/p/w300")) {
-                posterUrl = posterUrl.replace(/\/w(300|500)\//, "/w780/");
+            // Prioritize horizontal backdrop (16:9 widescreen landscape)
+            let bannerUrl = (movieInfo.backdrop && String(movieInfo.backdrop).startsWith("http")) 
+                ? movieInfo.backdrop 
+                : ((movieInfo.poster && String(movieInfo.poster).startsWith("http")) ? movieInfo.poster : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
+
+            if (bannerUrl.includes("image.tmdb.org/t/p/w500") || bannerUrl.includes("image.tmdb.org/t/p/w300") || bannerUrl.includes("image.tmdb.org/t/p/w780")) {
+                bannerUrl = bannerUrl.replace(/\/w(300|500|780)\//, "/w1280/");
             }
 
             const candidateTargets = Array.from(new Set([
@@ -326,16 +332,34 @@ function setupBot(bot, adminBot) {
             const sendToTarget = async (botInstance, target) => {
                 if (!botInstance) throw new Error("Bot instance unavailable");
                 try {
-                    return await botInstance.telegram.sendPhoto(target, posterUrl, {
+                    let photoPayload = bannerUrl;
+                    if (bannerUrl && String(bannerUrl).startsWith("http")) {
+                        try {
+                            const fetchModule = await import('node-fetch').catch(() => null);
+                            const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
+                            if (fetchFn) {
+                                const imgRes = await fetchFn(bannerUrl);
+                                if (imgRes.ok) {
+                                    const arrBuf = await imgRes.arrayBuffer();
+                                    photoPayload = { source: Buffer.from(arrBuf) };
+                                }
+                            }
+                        } catch (bufErr) {
+                            console.warn(`[CHANNEL PUBLISH] Buffer fetch warning:`, bufErr.message);
+                        }
+                    }
+
+                    return await botInstance.telegram.sendPhoto(target, photoPayload, {
                         caption: caption,
                         parse_mode: "HTML",
                         reply_markup: replyMarkup
                     });
                 } catch (photoErr) {
-                    if (photoErr.message && (photoErr.message.includes("photo") || photoErr.message.includes("IMAGE") || photoErr.message.includes("wrong file") || photoErr.message.includes("HTTP"))) {
+                    if (photoErr.message && (photoErr.message.includes("photo") || photoErr.message.includes("IMAGE") || photoErr.message.includes("wrong file") || photoErr.message.includes("HTTP") || photoErr.message.includes("failed to get http"))) {
                         console.warn(`[CHANNEL PUBLISH] Photo send failed (${photoErr.message}), falling back to sendMessage...`);
                         return await botInstance.telegram.sendMessage(target, caption, {
                             parse_mode: "HTML",
+                            disable_web_page_preview: true,
                             reply_markup: replyMarkup
                         });
                     }
@@ -388,6 +412,7 @@ function setupBot(bot, adminBot) {
         adminBot.telegram.setMyCommands([
             { command: 'start', description: '👑 Admin Command Center' },
             { command: 'menu', description: '👑 Show Admin Menu' },
+            { command: 'topadmins', description: '🏆 Top Admin Fulfillers Leaderboard' },
             { command: 'logs', description: '📜 View live server logs' },
             { command: 'pending', description: '📋 View pending movie requests' },
             { command: 'post', description: '📢 Post title announcement to @filmhouse_main' },
@@ -737,6 +762,41 @@ function setupBot(bot, adminBot) {
             }
         });
 
+        // Command: /topadmins or /adminstats - View fulfillment leaderboard
+        adminBot.command(['topadmins', 'adminstats'], async (ctx) => {
+            try {
+                const statsDoc = await db.collection("settings").doc("admin_stats").get();
+                if (!statsDoc.exists) {
+                    return ctx.reply("📊 *No fulfillment statistics recorded yet.*", {
+                        parse_mode: "Markdown",
+                        reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
+                    });
+                }
+                const stats = statsDoc.data() || {};
+                const entries = Object.values(stats).filter(s => s && typeof s.count === 'number' && s.count > 0);
+                if (entries.length === 0) {
+                    return ctx.reply("📊 *No fulfillment statistics recorded yet.*", {
+                        parse_mode: "Markdown",
+                        reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
+                    });
+                }
+                entries.sort((a, b) => b.count - a.count);
+                let text = "🏆 <b>Film House Admin Leaderboard</b> 🏆\n\n<i>Most Requests Fulfilled:</i>\n\n";
+                const medals = ["🥇", "🥈", "🥉"];
+                entries.forEach((e, idx) => {
+                    const medal = medals[idx] || `<b>#${idx + 1}</b>`;
+                    text += `${medal} <b>${escapeHtml(e.name || 'Admin')}</b>: <code>${e.count}</code> fulfilled\n`;
+                });
+                text += `\n⚡ <i>Keep up the great work keeping the queue clean!</i>`;
+                return ctx.reply(text, {
+                    parse_mode: "HTML",
+                    reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
+                });
+            } catch (err) {
+                return ctx.reply("❌ Error fetching admin stats: " + err.message);
+            }
+        });
+
         // Action Handlers for Inline Navigation Buttons (All edit seamlessly in-place)
         adminBot.action('admin_menu', async (ctx) => {
             const adminName = ctx.from && ctx.from.first_name ? ctx.from.first_name : 'Admin';
@@ -1007,6 +1067,159 @@ function setupBot(bot, adminBot) {
                 }
             } catch (err) {
                 console.error("Error processing boost start payload:", err);
+            }
+        }
+
+        // Check for download deep-link payload (start=dl_movieId or start=movie_movieId)
+        if (payload && (payload.startsWith("dl_") || payload.startsWith("movie_"))) {
+            const movieId = payload.replace(/^(dl_|movie_)/, "").trim();
+            try {
+                let movieData = null;
+                // 1. Try Firestore movies collection
+                const movieDoc = await db.collection("movies").doc(movieId).get();
+                if (movieDoc.exists) {
+                    movieData = movieDoc.data();
+                } else {
+                    const numericId = parseInt(movieId.split("-")[0]);
+                    if (!isNaN(numericId)) {
+                        const snap = await db.collection("movies").where("tmdb_id", "==", numericId).limit(1).get();
+                        if (!snap.empty) movieData = snap.docs[0].data();
+                    }
+                }
+
+                // 2. Fallback to local movies_metadata.json
+                if (!movieData) {
+                    const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
+                    if (fs.existsSync(localMetaPath)) {
+                        try {
+                            const localMeta = JSON.parse(fs.readFileSync(localMetaPath, "utf8"));
+                            movieData = localMeta.find(m => (m.csv_id && m.csv_id.toLowerCase() === movieId.toLowerCase()) || String(m.tmdb_id) === String(movieId));
+                        } catch (e) {}
+                    }
+                }
+
+                if (movieData) {
+                    const isSeries = (movieData.type || "").toLowerCase() === "series" || (movieData.type || "").toLowerCase() === "tv";
+                    const cleanTitle = (movieData.title || "Movie").replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                    const yearText = movieData.release_date ? ` (${movieData.release_date.substring(0, 4)})` : (movieData.year ? ` (${movieData.year})` : "");
+                    const rawGenres = Array.isArray(movieData.categories) ? movieData.categories : (Array.isArray(movieData.genres) ? movieData.genres : []);
+                    const genresText = rawGenres.filter(g => g && g !== "Main").slice(0, 3).join(", ");
+                    const ratingVal = movieData.rating || movieData.vote_average || "";
+                    const ratingText = ratingVal ? (String(ratingVal).includes("/") ? ratingVal : `${ratingVal}/10`) : "";
+
+                    let metaLine = "";
+                    if (genresText && ratingText) {
+                        metaLine = `🎭 <b>Genre:</b> ${escapeHtml(genresText)} | ⭐️ <b>Rating:</b> ${escapeHtml(ratingText)}\n`;
+                    } else if (genresText) {
+                        metaLine = `🎭 <b>Genre:</b> ${escapeHtml(genresText)}\n`;
+                    } else if (ratingText) {
+                        metaLine = `⭐️ <b>Rating:</b> ${escapeHtml(ratingText)}\n`;
+                    }
+
+                    let overviewText = "";
+                    if (movieData.overview && typeof movieData.overview === 'string' && movieData.overview.toLowerCase() !== "no synopsis available.") {
+                        const cleanO = movieData.overview.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+                        if (cleanO.length > 200) {
+                            overviewText = cleanO.substring(0, 197) + "...";
+                        } else {
+                            overviewText = cleanO;
+                        }
+                    }
+
+                    let overviewLine = "";
+                    if (overviewText) {
+                        overviewLine = `\n💬 <i>${escapeHtml(overviewText)}</i>\n`;
+                    }
+
+                    const deepAppUrl = `https://dans123456.github.io/filmhouse/index.html?startapp=movie_${movieData.csv_id || movieData.tmdb_id || movieId}`;
+
+                    const cardCaption = 
+                        `🎬 <b>${escapeHtml(cleanTitle)}</b>${escapeHtml(yearText)}\n` +
+                        `📦 <b>Type:</b> ${isSeries ? "TV Series" : "Full Movie"}\n` +
+                        metaLine +
+                        overviewLine +
+                        `\n⚡ <b>Download Options:</b>\n` +
+                        `Tap below to open directly in the Film House App or select an episode/season link.\n\n` +
+                        `⏳ <b>Auto-Delete Notice:</b>\n` +
+                        `<i>This message will self-destruct in <b>5 minutes</b> to protect server links. Please download or save now!</i>`;
+
+                    const inlineButtons = [
+                        [
+                            {
+                                text: "🎬 Open in Film House App 🚀",
+                                web_app: { url: deepAppUrl }
+                            }
+                        ]
+                    ];
+
+                    if (Array.isArray(movieData.links) && movieData.links.length > 0) {
+                        const linkRow = [];
+                        movieData.links.slice(0, 4).forEach((l, idx) => {
+                            if (l && l.url) {
+                                const sText = l.season ? (l.season.toLowerCase().includes("season") ? l.season : `S${idx + 1}`) : `Download ${idx + 1}`;
+                                linkRow.push({ text: `📥 ${sText}`, url: l.url });
+                            }
+                        });
+                        if (linkRow.length > 0) {
+                            inlineButtons.push(linkRow);
+                        }
+                    }
+
+                    let cardImage = (movieData.backdrop && String(movieData.backdrop).startsWith("http"))
+                        ? movieData.backdrop
+                        : ((movieData.poster && String(movieData.poster).startsWith("http")) ? movieData.poster : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
+
+                    if (cardImage.includes("image.tmdb.org/t/p/w500") || cardImage.includes("image.tmdb.org/t/p/w300") || cardImage.includes("image.tmdb.org/t/p/w780")) {
+                        cardImage = cardImage.replace(/\/w(300|500|780)\//, "/w1280/");
+                    }
+
+                    let sentMsg = null;
+                    try {
+                        let photoPayload = cardImage;
+                        if (cardImage && String(cardImage).startsWith("http")) {
+                            try {
+                                const fetchModule = await import('node-fetch').catch(() => null);
+                                const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
+                                if (fetchFn) {
+                                    const imgRes = await fetchFn(cardImage);
+                                    if (imgRes.ok) {
+                                        const arrBuf = await imgRes.arrayBuffer();
+                                        photoPayload = { source: Buffer.from(arrBuf) };
+                                    }
+                                }
+                            } catch (bufErr) {}
+                        }
+                        sentMsg = await ctx.replyWithPhoto(photoPayload, {
+                            caption: cardCaption,
+                            parse_mode: "HTML",
+                            reply_markup: { inline_keyboard: inlineButtons }
+                        });
+                    } catch (photoErr) {
+                        console.warn(`[DL CARD] Photo send failed (${photoErr.message}), falling back to text message...`);
+                        sentMsg = await ctx.reply(cardCaption, {
+                            parse_mode: "HTML",
+                            reply_markup: { inline_keyboard: inlineButtons },
+                            disable_web_page_preview: true
+                        });
+                    }
+
+                    if (sentMsg && sentMsg.message_id) {
+                        const targetChatId = ctx.chat.id;
+                        const targetMsgId = sentMsg.message_id;
+                        console.log(`[DL CARD] Scheduled auto-delete for message ${targetMsgId} in chat ${targetChatId} in 5 minutes.`);
+                        setTimeout(async () => {
+                            try {
+                                await ctx.telegram.deleteMessage(targetChatId, targetMsgId);
+                                console.log(`[DL CARD] Auto-deleted temporary download card ${targetMsgId} in chat ${targetChatId} after 5 minutes.`);
+                            } catch (delErr) {
+                                console.warn(`[DL CARD] Could not auto-delete message ${targetMsgId}:`, delErr.message);
+                            }
+                        }, 5 * 60 * 1000);
+                    }
+                    return;
+                }
+            } catch (dlErr) {
+                console.error("Error processing download start payload:", dlErr);
             }
         }
 
@@ -2507,9 +2720,28 @@ async function init() {
                                 const cleanReqUser = escapeHtml(username || `User ${userId}`);
                                 const displayUser = cleanReqUser.startsWith('@') ? cleanReqUser : `@${cleanReqUser}`;
 
+                                // Track fulfillment counts per admin in Firestore
+                                let adminTotalFulfillCount = 0;
+                                const adminIdKey = String(data.fulfilledById || fulfilledBy || "admin").replace(/[^a-zA-Z0-9_]/g, "_");
+                                try {
+                                    const statsDocRef = db.collection("settings").doc("admin_stats");
+                                    const statsDoc = await statsDocRef.get();
+                                    let currentStats = statsDoc.exists ? statsDoc.data() || {} : {};
+                                    const adminStat = currentStats[adminIdKey] || { count: 0, name: fulfilledBy };
+                                    adminStat.count = (adminStat.count || 0) + 1;
+                                    adminStat.name = fulfilledBy || adminStat.name;
+                                    adminStat.lastFulfilledAt = Date.now();
+                                    adminTotalFulfillCount = adminStat.count;
+                                    currentStats[adminIdKey] = adminStat;
+                                    await statsDocRef.set(currentStats, { merge: true });
+                                } catch (statErr) {
+                                    console.warn("Could not update admin fulfillment stats:", statErr.message);
+                                }
+
+                                const countBadge = adminTotalFulfillCount > 0 ? ` (${adminTotalFulfillCount} Fulfilled 🏆)` : "";
                                 const adminNotifyText = `✅ <b>Request Fulfilled!</b>\n\n` +
                                                      `🎬 <b>Title:</b> <b>${cleanAdminTitle}</b>${cleanAdminYear}\n` +
-                                                     `👤 <b>Fulfilled by:</b> ${cleanFulfilledBy}\n` +
+                                                     `👤 <b>Fulfilled by:</b> ${cleanFulfilledBy}${countBadge}\n` +
                                                      `🍿 <b>Requested for:</b> ${displayUser} (ID: <code>${escapeHtml(userId)}</code>)\n\n` +
                                                      `⚡ <b>Remaining Queue:</b> <code>${pendingCount}</code> pending request(s) left.`;
 
