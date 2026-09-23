@@ -41619,7 +41619,14 @@
     "trailer": "u69y5Ie519M",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADiA8AAmjCeUbiEWOrTSPguxYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADiA8AAmjCeUbiEWOrTSPguxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADiBUAArgzoEVNYGmfmBgcHBYE",
+        "quality": "2160p (4K)"
+      }
     ]
   },
   {
