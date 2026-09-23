@@ -2117,19 +2117,38 @@ async function init() {
                 console.log("Telegram Bot Token successfully loaded from Firestore.");
             }
         } catch (err) {
-            console.error("Failed to fetch bot token from Firestore:", err);
+            console.warn("Notice: Firestore token fetch warning (will use fallback):", err.message || err);
         }
     }
 
     if (!botToken) {
-        console.error("FATAL: TELEGRAM_BOT_TOKEN environment variable is not set!");
+        botToken = "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
+        console.log("Using default Film House Telegram Bot Token.");
     }
 
-    const adminBotToken = process.env.ADMIN_BOT_TOKEN || "";
+    let adminBotToken = process.env.ADMIN_BOT_TOKEN;
+    if (!adminBotToken) {
+        try {
+            const doc = await db.collection("settings").doc("telegram").get();
+            if (doc.exists && doc.data().adminBotToken) {
+                adminBotToken = doc.data().adminBotToken;
+            }
+        } catch (err) {}
+    }
+    if (!adminBotToken) {
+        adminBotToken = "8669068531:AAEwUFMEWNWk8aXHvTuRQJpmfIAEGjVNe0o";
+    }
 
     try {
         const bot = new Telegraf(botToken);
-        const adminBot = new Telegraf(adminBotToken);
+        let adminBot = null;
+        if (adminBotToken && adminBotToken.trim().length > 0) {
+            try {
+                adminBot = new Telegraf(adminBotToken);
+            } catch (err) {
+                console.warn("Failed to initialize dedicated adminBot:", err.message);
+            }
+        }
         setupBot(bot, adminBot);
         
         // Register Commands Menu for Public Bot
@@ -2146,17 +2165,19 @@ async function init() {
         });
 
         // Register Commands Menu for Admin Bot
-        adminBot.telegram.setMyCommands([
-            { command: 'start', description: 'Admin Command Center 👑' },
-            { command: 'logs', description: 'View live server & bot logs 📜' },
-            { command: 'pending', description: 'List pending movie requests 📋' },
-            { command: 'backup', description: 'Trigger catalog CSV backup 💾' },
-            { command: 'stats', description: 'Server metrics & subscriber counts 📊' }
-        ]).then(() => {
-            console.log("Admin Bot commands menu registered successfully!");
-        }).catch(err => {
-            console.warn("Failed to register admin bot commands menu:", err.message);
-        });
+        if (adminBot) {
+            adminBot.telegram.setMyCommands([
+                { command: 'start', description: 'Admin Command Center 👑' },
+                { command: 'logs', description: 'View live server & bot logs 📜' },
+                { command: 'pending', description: 'List pending movie requests 📋' },
+                { command: 'backup', description: 'Trigger catalog CSV backup 💾' },
+                { command: 'stats', description: 'Server metrics & subscriber counts 📊' }
+            ]).then(() => {
+                console.log("Admin Bot commands menu registered successfully!");
+            }).catch(err => {
+                console.warn("Failed to register admin bot commands menu:", err.message);
+            });
+        }
 
         const isLocalEnvironment = !process.env.RENDER_EXTERNAL_URL && !process.env.RENDER;
         const forcePolling = process.env.POLLING === "true" || process.argv.includes("--polling") || isLocalEnvironment;
@@ -2264,13 +2285,15 @@ async function init() {
             }).catch(err => console.error("Public Bot launch error:", err.message));
             console.log("Film House Public Bot successfully started! 🚀 Running command listener (Polling)...");
 
-            adminBot.launch({
-                allowedUpdates: ['message', 'callback_query']
-            }).then(() => {
-                console.log("Film House Admin Bot successfully started! 👑 Running listener (@Fiimhouse_adminBot)...");
-            }).catch(err => {
-                console.error("Admin Bot launch error:", err.message);
-            });
+            if (adminBot) {
+                adminBot.launch({
+                    allowedUpdates: ['message', 'callback_query']
+                }).then(() => {
+                    console.log("Film House Admin Bot successfully started! 👑 Running listener (@Fiimhouse_adminBot)...");
+                }).catch(err => {
+                    console.error("Admin Bot launch error:", err.message);
+                });
+            }
         }
 
         // Real-time status synchronization to Firestore settings/bot_status

@@ -2511,7 +2511,7 @@ function showMovieDetails(movie) {
                                 overviewLine +
                                 `👉 <a href="${dlLink}">CLICK HERE TO DOWNLOAD</a> ✔️`;
 
-                const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "";
+                const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
                 // Prioritize horizontal backdrop (16:9 widescreen landscape)
                 let bannerUrl = (movie.backdrop && String(movie.backdrop).startsWith("http"))
                     ? movie.backdrop
@@ -4095,7 +4095,7 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
     if (!movieInfo || !movieInfo.title) return;
     
     const targetChannel = "-1002098683402"; // @filmhouse_main
-    const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "";
+    const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
     
     const rawTitle = movieInfo.title || "Movie Update";
     const cleanTitle = String(rawTitle).replace(/\s*\([^)]+\)\s*$/g, "").replace(/[*_`~]/g, "").trim();
@@ -5206,6 +5206,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
             
+            if (!telegramBotToken) {
+                telegramBotToken = localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
+            }
             if (!telegramBotToken) {
                 alert("Please configure and save your Telegram Bot Token in Settings first!");
                 return;
