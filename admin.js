@@ -1433,6 +1433,9 @@ async function verifyAdminAccess() {
         }
     }
 
+    window.cachedMasterAdminIds = masters;
+    window.cachedSlaveAdminIds = slaves;
+
     const masterInput = document.getElementById("admin-master-tg-ids");
     if (masterInput) {
         masterInput.value = masters.join(", ");
@@ -1440,6 +1443,10 @@ async function verifyAdminAccess() {
     const slaveInput = document.getElementById("admin-slave-tg-ids");
     if (slaveInput) {
         slaveInput.value = slaves.join(", ");
+    }
+
+    if (typeof renderAdminLeaderboard === "function") {
+        renderAdminLeaderboard();
     }
 
     // Context & Bypass checks
@@ -4244,7 +4251,52 @@ function renderAdminLeaderboard() {
 
     const adminMap = {};
 
-    // 1. Process from allRequests (fulfilled items)
+    // 1. Seed adminMap with all known master & slave admin IDs
+    const seedIds = Array.from(new Set([
+        ...(window.cachedMasterAdminIds || []),
+        ...(window.cachedSlaveAdminIds || []),
+        ...(Array.isArray(adminIdsList) ? adminIdsList : [])
+    ]));
+
+    seedIds.forEach(id => {
+        const uidStr = String(id).trim();
+        if (!uidStr) return;
+        const key = uidStr.replace(/[^a-zA-Z0-9_]/g, "_");
+        const userMatch = Array.isArray(allUsers) ? allUsers.find(u => String(u.id) === uidStr) : null;
+        const name = userMatch ? (userMatch.username ? `@${userMatch.username}` : (userMatch.fullName || `Admin (${uidStr})`)) : `Admin (${uidStr})`;
+        
+        adminMap[key] = {
+            id: uidStr,
+            name: name,
+            count: 0,
+            titles: [],
+            lastFulfilledAt: null
+        };
+    });
+
+    if (Array.isArray(allUsers)) {
+        allUsers.forEach(u => {
+            const uidStr = String(u.id).trim();
+            const isAdm = (u.role === 'admin' || u.role === 'slave_admin' || u.isSlaveAdmin || u.isAdmin || seedIds.includes(uidStr));
+            if (isAdm) {
+                const key = uidStr.replace(/[^a-zA-Z0-9_]/g, "_");
+                const name = u.username ? `@${u.username}` : (u.fullName || `Admin (${u.id})`);
+                if (!adminMap[key]) {
+                    adminMap[key] = {
+                        id: uidStr,
+                        name: name,
+                        count: 0,
+                        titles: [],
+                        lastFulfilledAt: null
+                    };
+                } else if (u.username && (!adminMap[key].name || adminMap[key].name.startsWith("Admin ("))) {
+                    adminMap[key].name = `@${u.username}`;
+                }
+            }
+        });
+    }
+
+    // 2. Process from allRequests (fulfilled items)
     if (Array.isArray(allRequests)) {
         allRequests.forEach(req => {
             if (req.status === "fulfilled" || req.status === "claimed" || req.claimed === true) {
@@ -4281,7 +4333,7 @@ function renderAdminLeaderboard() {
         });
     }
 
-    // 2. Merge with adminStatsCache from Firestore
+    // 3. Merge with adminStatsCache from Firestore
     if (adminStatsCache && typeof adminStatsCache === "object") {
         Object.keys(adminStatsCache).forEach(k => {
             const stat = adminStatsCache[k];
@@ -4299,7 +4351,7 @@ function renderAdminLeaderboard() {
                 if (count > adminMap[k].count) {
                     adminMap[k].count = count;
                 }
-                if (stat.name && (!adminMap[k].name || adminMap[k].name === "Admin")) {
+                if (stat.name && (!adminMap[k].name || adminMap[k].name.startsWith("Admin ("))) {
                     adminMap[k].name = stat.name;
                 }
             }
@@ -4331,27 +4383,27 @@ function renderAdminLeaderboard() {
     adminList.forEach((adm, index) => {
         const rank = index + 1;
         let rankBadge = "";
-        let borderHighlight = "1px solid rgba(255, 255, 255, 0.06)";
+        let borderHighlight = "1px solid rgba(255, 255, 255, 0.08)";
         let bgHighlight = "rgba(255, 255, 255, 0.02)";
         let titleRole = "Curator";
 
         if (rank === 1) {
-            rankBadge = `<span style="font-size: 20px;">🥇</span>`;
+            rankBadge = `<span style="font-size: 18px;">🥇</span>`;
             borderHighlight = "1px solid rgba(255, 188, 0, 0.4)";
             bgHighlight = "linear-gradient(90deg, rgba(255, 188, 0, 0.12) 0%, rgba(255, 188, 0, 0.03) 100%)";
             titleRole = "👑 Grand Curator";
         } else if (rank === 2) {
-            rankBadge = `<span style="font-size: 20px;">🥈</span>`;
+            rankBadge = `<span style="font-size: 18px;">🥈</span>`;
             borderHighlight = "1px solid rgba(220, 220, 220, 0.35)";
             bgHighlight = "linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)";
             titleRole = "⭐ Master Admin";
         } else if (rank === 3) {
-            rankBadge = `<span style="font-size: 20px;">🥉</span>`;
+            rankBadge = `<span style="font-size: 18px;">🥉</span>`;
             borderHighlight = "1px solid rgba(205, 127, 50, 0.35)";
             bgHighlight = "linear-gradient(90deg, rgba(205, 127, 50, 0.08) 0%, rgba(205, 127, 50, 0.02) 100%)";
             titleRole = "⚡ Senior Admin";
         } else {
-            rankBadge = `<span style="font-size: 13px; font-weight: 800; color: var(--text-muted); width: 24px; text-align: center;">#${rank}</span>`;
+            rankBadge = `<span style="font-size: 12px; font-weight: 800; color: var(--text-muted); width: 20px; text-align: center;">#${rank}</span>`;
             titleRole = "🎬 Admin";
         }
 
@@ -4363,13 +4415,15 @@ function renderAdminLeaderboard() {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
+            padding: 12px 14px;
             background: ${bgHighlight};
             border: ${borderHighlight};
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
             gap: 12px;
+            box-sizing: border-box;
+            width: 100%;
         `;
         card.onmouseenter = () => {
             card.style.transform = "translateY(-1px)";
@@ -4381,30 +4435,29 @@ function renderAdminLeaderboard() {
         };
 
         card.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="display: flex; align-items: center; justify-content: center; min-width: 28px;">
+            <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                <div style="display: flex; align-items: center; justify-content: center; width: 24px; flex-shrink: 0;">
                     ${rankBadge}
                 </div>
                 <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 188, 0, 0.25), rgba(255, 59, 48, 0.25)); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #ffbc00; font-size: 14px; border: 1px solid rgba(255, 188, 0, 0.4); flex-shrink: 0;">
                     ${initial}
                 </div>
-                <div>
-                    <div style="font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
-                        ${escapeHTML(adm.name)}
-                        <span style="font-size: 10px; padding: 2px 6px; border-radius: 12px; background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.3); font-weight: 600;">${titleRole}</span>
+                <div style="display: flex; flex-direction: column; min-width: 0; flex: 1; justify-content: center;">
+                    <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
+                        <span style="font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">${escapeHTML(adm.name)}</span>
+                        <span style="font-size: 9px; padding: 2px 7px; border-radius: 10px; background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.3); font-weight: 700; white-space: nowrap; flex-shrink: 0; line-height: 1.1;">${titleRole}</span>
                     </div>
-                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
-                        Rank #${rank} • ${adm.titles.length} unique titles resolved
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        Rank #${rank} • ${adm.titles.length} unique title${adm.titles.length === 1 ? '' : 's'} resolved
                     </div>
                 </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="text-align: right;">
-                    <div style="font-size: 14px; font-weight: 800; color: #ffbc00; font-family: monospace;">
-                        ${adm.count} <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">fulfilled</span>
-                    </div>
+            <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: 6px;">
+                <div style="background: rgba(255, 188, 0, 0.12); border: 1px solid rgba(255, 188, 0, 0.3); padding: 5px 10px; border-radius: 20px; font-size: 12px; color: #ffbc00; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
+                    <span style="font-weight: 800; font-size: 13px;">${adm.count}</span>
+                    <span style="font-size: 10px; font-weight: 600; color: rgba(255, 255, 255, 0.7);">fulfilled</span>
                 </div>
-                <span style="color: var(--text-muted); font-size: 14px;">➔</span>
+                <span style="color: var(--text-muted); font-size: 13px; flex-shrink: 0;">➔</span>
             </div>
         `;
 
@@ -4834,7 +4887,7 @@ if (fulfillForm && fulfillRequestModal) {
                     fulfilledBy: currentAdminName,
                     fulfilledById: currentAdminId || "",
                     publishToChannel: shouldPostToChannel,
-                    channelPosted: false,
+                    channelPosted: shouldPostToChannel ? true : false,
                     fulfilledAt: firebase.firestore.FieldValue.serverTimestamp(),
                     adminClaimId: firebase.firestore.FieldValue.delete(),
                     adminClaimName: firebase.firestore.FieldValue.delete(),

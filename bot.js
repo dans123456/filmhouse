@@ -59,6 +59,18 @@ let publishMovieToChannel = async () => {};
 const PENDING_FILE = path.join(__dirname, "data", "pending_requests.json");
 let cachedPendingRequests = [];
 
+// Pre-load movies_metadata.json into memory for instant (<1ms) deep-link lookup
+let cachedMoviesMetadata = null;
+const localMetaPathGlobal = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
+try {
+    if (fs.existsSync(localMetaPathGlobal)) {
+        cachedMoviesMetadata = JSON.parse(fs.readFileSync(localMetaPathGlobal, "utf8"));
+        console.log(`[MetadataCache] Successfully pre-loaded ${cachedMoviesMetadata.length} movie entries into memory.`);
+    }
+} catch (e) {
+    console.warn("[MetadataCache] Could not pre-load movies_metadata.json:", e.message);
+}
+
 // Load persisted pending requests from disk (immune to Firestore quota)
 try {
     if (fs.existsSync(PENDING_FILE)) {
@@ -1155,19 +1167,15 @@ function setupBot(bot, adminBot) {
             try {
                 let movieData = null;
 
-                // 1. Fast in-memory cache from local movies_metadata.json (instant <1ms response)
-                const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
-                if (fs.existsSync(localMetaPath)) {
-                    try {
-                        const localMeta = JSON.parse(fs.readFileSync(localMetaPath, "utf8"));
-                        const idLower = movieId.toLowerCase();
-                        const numericId = parseInt(idLower.split("-")[0]);
-                        movieData = localMeta.find(m => 
-                            (m.csv_id && String(m.csv_id).toLowerCase() === idLower) ||
-                            (String(m.tmdb_id) === String(movieId)) ||
-                            (!isNaN(numericId) && m.tmdb_id && parseInt(m.tmdb_id) === numericId)
-                        );
-                    } catch (e) {}
+                // 1. Fast in-memory cache from pre-loaded movies_metadata.json (instant <1ms response)
+                if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                    const idLower = movieId.toLowerCase();
+                    const numericId = parseInt(idLower.split("-")[0]);
+                    movieData = cachedMoviesMetadata.find(m => 
+                        (m.csv_id && String(m.csv_id).toLowerCase() === idLower) ||
+                        (String(m.tmdb_id) === String(movieId)) ||
+                        (!isNaN(numericId) && m.tmdb_id && parseInt(m.tmdb_id) === numericId)
+                    );
                 }
 
                 // 2. Fallback to Firestore movies collection if not found locally
@@ -2749,9 +2757,12 @@ async function init() {
                                 }).catch(() => {});
                             }
 
-                            // Auto-publish release announcement to Main Channel (@filmhouse_main)
+                            // Auto-publish release announcement to Main Channel (@filmhouse_main) if not already posted by admin client
                             if (data.publishToChannel !== false && data.channelPosted !== true) {
                                 try {
+                                    // Set lock immediately to prevent race condition duplicate posts
+                                    await db.collection("requests").doc(docId).update({ channelPosted: true }).catch(() => {});
+                                    
                                     let movieDataForChannel = null;
                                     if (data.csv_id) {
                                         const mDoc = await db.collection("movies").doc(data.csv_id).get();
@@ -2772,7 +2783,6 @@ async function init() {
                                     const pubResult = await publishMovieToChannel(movieDataForChannel);
                                     if (pubResult && pubResult.message_id) {
                                         await db.collection("requests").doc(docId).update({
-                                            channelPosted: true,
                                             channelMessageId: pubResult.message_id,
                                             channelPostedAt: admin.firestore.FieldValue.serverTimestamp()
                                         }).catch(() => {});
