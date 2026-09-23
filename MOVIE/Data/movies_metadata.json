@@ -1,32 +1,32 @@
 [
   {
-    "csv_id": "289763-see-you-at-work-tomorrow",
-    "tmdb_id": 289763,
+    "csv_id": "1607127-one-last-shot",
+    "tmdb_id": 1607127,
     "imdb_id": "",
-    "title": "See You at Work Tomorrow!",
-    "type": "Series",
+    "title": "One Last Shot",
+    "type": "Movie",
     "categories": [
       "Main",
-      "Asian Drama"
+      "Hollywood/British Movies"
     ],
     "genres": [
-      "Comedy",
-      "Drama"
+      "Action",
+      "Thriller"
     ],
-    "overview": "Cha Ji-yoon is a 7th-year corporate worker who's tired of both work and dating. She crosses paths with Kang Si-woo, the cynical boss with a terrifying reputation. Unexpectedly, she regains spark in her life as she gets to know the kindness behind his stern words. Amid repeated commutes, accidents at work, and failed relationships, the two become each other's irreplaceable anchor.",
-    "poster": "https://image.tmdb.org/t/p/w500/gTP1MKGz5kIrXCpb3HTgzVyIW6l.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/zftF4KDGuhAGIA50bywcCXPjz5f.jpg",
-    "rating": 8.8,
-    "release_date": "2026-06-22",
-    "language": "ko",
+    "overview": "Seasoned Navy SEAL Jake Harris is called back into action when the world is threatened by a former comrade. To track down and prevent the mastermind from extracting the nuclear codes, Harris must lead his team into enemy territory against a brutal barrage of mercenaries, deadly traps, and a reckoning with his own checkered past.",
+    "poster": "https://image.tmdb.org/t/p/w500/niQ4NBh2jqAf1hDZP5m6ReWFAb7.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/8giIQcHpxgsPVP6c7aQtHl3txuh.jpg",
+    "rating": 8.1,
+    "release_date": "2026-09-22",
+    "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "kBGgK8F3CSU",
+    "trailer": "8PAy3i9uU0A",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADNRMAArgzoEUFsj-S06LRYE",
-        "season": "Season 1"
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADjRMAArgzoEX2aclmnCwS7xYE",
+        "quality": "720p"
       }
     ]
   },
