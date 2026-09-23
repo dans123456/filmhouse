@@ -291,6 +291,11 @@ function setupBot(bot, adminBot) {
                 overviewLine = "\n";
             }
 
+            const movieId = movieInfo.csv_id || movieInfo.tmdb_id || movieInfo.id || "";
+            const deepLinkUrl = movieId 
+                ? `https://t.me/Filmhouseappbot?start=dl_${movieId}` 
+                : `https://t.me/Filmhouseappbot`;
+
             const caption = 
                 `<b>${escapeHtml(cleanTitle)}</b>${escapeHtml(yearText)}\n` +
                 `${escapeHtml(seasonOrQualityText)}\n\n` +
@@ -305,11 +310,6 @@ function setupBot(bot, adminBot) {
                     ]
                 ]
             };
-
-            const movieId = movieInfo.csv_id || movieInfo.tmdb_id || movieInfo.id || "";
-            const deepLinkUrl = movieId 
-                ? `https://t.me/Filmhouseappbot?start=dl_${movieId}` 
-                : `https://t.me/Filmhouseappbot`;
 
             // Prioritize horizontal backdrop (16:9 widescreen landscape)
             let bannerUrl = (movieInfo.backdrop && String(movieInfo.backdrop).startsWith("http")) 
@@ -1075,26 +1075,33 @@ function setupBot(bot, adminBot) {
             const movieId = payload.replace(/^(dl_|movie_)/, "").trim();
             try {
                 let movieData = null;
-                // 1. Try Firestore movies collection
-                const movieDoc = await db.collection("movies").doc(movieId).get();
-                if (movieDoc.exists) {
-                    movieData = movieDoc.data();
-                } else {
-                    const numericId = parseInt(movieId.split("-")[0]);
-                    if (!isNaN(numericId)) {
-                        const snap = await db.collection("movies").where("tmdb_id", "==", numericId).limit(1).get();
-                        if (!snap.empty) movieData = snap.docs[0].data();
-                    }
+
+                // 1. Fast in-memory cache from local movies_metadata.json (instant <1ms response)
+                const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
+                if (fs.existsSync(localMetaPath)) {
+                    try {
+                        const localMeta = JSON.parse(fs.readFileSync(localMetaPath, "utf8"));
+                        const idLower = movieId.toLowerCase();
+                        const numericId = parseInt(idLower.split("-")[0]);
+                        movieData = localMeta.find(m => 
+                            (m.csv_id && String(m.csv_id).toLowerCase() === idLower) ||
+                            (String(m.tmdb_id) === String(movieId)) ||
+                            (!isNaN(numericId) && m.tmdb_id && parseInt(m.tmdb_id) === numericId)
+                        );
+                    } catch (e) {}
                 }
 
-                // 2. Fallback to local movies_metadata.json
+                // 2. Fallback to Firestore movies collection if not found locally
                 if (!movieData) {
-                    const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
-                    if (fs.existsSync(localMetaPath)) {
-                        try {
-                            const localMeta = JSON.parse(fs.readFileSync(localMetaPath, "utf8"));
-                            movieData = localMeta.find(m => (m.csv_id && m.csv_id.toLowerCase() === movieId.toLowerCase()) || String(m.tmdb_id) === String(movieId));
-                        } catch (e) {}
+                    const movieDoc = await db.collection("movies").doc(movieId).get();
+                    if (movieDoc.exists) {
+                        movieData = movieDoc.data();
+                    } else {
+                        const numericId = parseInt(movieId.split("-")[0]);
+                        if (!isNaN(numericId)) {
+                            const snap = await db.collection("movies").where("tmdb_id", "==", numericId).limit(1).get();
+                            if (!snap.empty) movieData = snap.docs[0].data();
+                        }
                     }
                 }
 
@@ -1138,11 +1145,10 @@ function setupBot(bot, adminBot) {
                         `📦 <b>Type:</b> ${isSeries ? "TV Series" : "Full Movie"}\n` +
                         metaLine +
                         overviewLine +
-                        `\n⚡ <b>Download Options:</b>\n` +
-                        `Tap below to open directly in the Film House App or select an episode/season link.\n\n` +
-                        `⏳ <b>Auto-Delete Notice:</b>\n` +
-                        `<i>This message will self-destruct in <b>5 minutes</b> to protect server links. Please download or save now!</i>`;
+                        `\n<blockquote>⏳ <b>Auto-Delete Notice:</b>\n` +
+                        `This message will self-destruct in <b>5 minutes</b> to protect server links. Please download or save now!</blockquote>`;
 
+                    // Single primary button only
                     const inlineButtons = [
                         [
                             {
@@ -1151,19 +1157,6 @@ function setupBot(bot, adminBot) {
                             }
                         ]
                     ];
-
-                    if (Array.isArray(movieData.links) && movieData.links.length > 0) {
-                        const linkRow = [];
-                        movieData.links.slice(0, 4).forEach((l, idx) => {
-                            if (l && l.url) {
-                                const sText = l.season ? (l.season.toLowerCase().includes("season") ? l.season : `S${idx + 1}`) : `Download ${idx + 1}`;
-                                linkRow.push({ text: `📥 ${sText}`, url: l.url });
-                            }
-                        });
-                        if (linkRow.length > 0) {
-                            inlineButtons.push(linkRow);
-                        }
-                    }
 
                     let cardImage = (movieData.backdrop && String(movieData.backdrop).startsWith("http"))
                         ? movieData.backdrop
@@ -1175,32 +1168,38 @@ function setupBot(bot, adminBot) {
 
                     let sentMsg = null;
                     try {
-                        let photoPayload = cardImage;
-                        if (cardImage && String(cardImage).startsWith("http")) {
-                            try {
-                                const fetchModule = await import('node-fetch').catch(() => null);
-                                const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
-                                if (fetchFn) {
-                                    const imgRes = await fetchFn(cardImage);
-                                    if (imgRes.ok) {
-                                        const arrBuf = await imgRes.arrayBuffer();
-                                        photoPayload = { source: Buffer.from(arrBuf) };
-                                    }
-                                }
-                            } catch (bufErr) {}
-                        }
-                        sentMsg = await ctx.replyWithPhoto(photoPayload, {
+                        // Attempt direct URL send first for instant sub-second delivery
+                        sentMsg = await ctx.replyWithPhoto(cardImage, {
                             caption: cardCaption,
                             parse_mode: "HTML",
                             reply_markup: { inline_keyboard: inlineButtons }
                         });
-                    } catch (photoErr) {
-                        console.warn(`[DL CARD] Photo send failed (${photoErr.message}), falling back to text message...`);
-                        sentMsg = await ctx.reply(cardCaption, {
-                            parse_mode: "HTML",
-                            reply_markup: { inline_keyboard: inlineButtons },
-                            disable_web_page_preview: true
-                        });
+                    } catch (urlSendErr) {
+                        // If direct URL fails, buffer fetch and retry
+                        try {
+                            const fetchModule = await import('node-fetch').catch(() => null);
+                            const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
+                            if (fetchFn) {
+                                const imgRes = await fetchFn(cardImage);
+                                if (imgRes.ok) {
+                                    const arrBuf = await imgRes.arrayBuffer();
+                                    sentMsg = await ctx.replyWithPhoto({ source: Buffer.from(arrBuf) }, {
+                                        caption: cardCaption,
+                                        parse_mode: "HTML",
+                                        reply_markup: { inline_keyboard: inlineButtons }
+                                    });
+                                }
+                            }
+                        } catch (bufErr) {
+                            console.warn(`[DL CARD] Buffer photo send failed (${bufErr.message}), falling back to text message...`);
+                        }
+                        if (!sentMsg) {
+                            sentMsg = await ctx.reply(cardCaption, {
+                                parse_mode: "HTML",
+                                reply_markup: { inline_keyboard: inlineButtons },
+                                disable_web_page_preview: true
+                            });
+                        }
                     }
 
                     if (sentMsg && sentMsg.message_id) {

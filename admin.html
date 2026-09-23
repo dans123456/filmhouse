@@ -698,6 +698,29 @@
         </div>
     </div>
 
+    <!-- ADMIN PERFORMANCE LEADERBOARD SECTION -->
+    <div class="glass-panel" id="admin-leaderboard-panel" style="border: 1px solid rgba(255, 188, 0, 0.25); background: linear-gradient(180deg, rgba(255, 188, 0, 0.04) 0%, rgba(10, 14, 26, 0.95) 100%); margin-bottom: 24px;">
+        <div class="section-header collapsible-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePanel('admin-leaderboard-content', 'admin-leaderboard-chevron')">
+            <h4 class="section-title" style="color: #ffbc00; display: flex; align-items: center; gap: 8px; margin: 0; font-family: var(--font-heading);">
+                🏆 Admin Performance Leaderboard
+            </h4>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="admin-leaderboard-top-performer" style="font-size: 11px; font-weight: 700; color: #ffbc00; background: rgba(255, 188, 0, 0.12); border: 1px solid rgba(255, 188, 0, 0.25); padding: 3px 10px; border-radius: 20px;">Top: Loading...</span>
+                <span id="admin-leaderboard-chevron" style="color: var(--text-secondary); transition: transform 0.2s;">▼</span>
+            </div>
+        </div>
+
+        <div id="admin-leaderboard-content" style="margin-top: 16px; display: block;">
+            <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">
+                👑 Rankings updated live based on requests fulfilled and titles curated. Click on any admin to view their full performance breakdown!
+            </div>
+
+            <div id="admin-leaderboard-list" style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">Loading admin rankings...</div>
+            </div>
+        </div>
+    </div>
+
     <!-- EDITOR'S CHOICE SPOTLIGHT MANAGER -->
     <div class="glass-panel" id="editors-choice-panel" style="border: 1px solid rgba(255, 188, 0, 0.15); margin-bottom: 24px;">
         <div class="section-header collapsible-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePanel('editors-choice-content', 'editors-choice-chevron')">
@@ -1059,6 +1082,12 @@
                         <button type="button" class="btn btn-secondary btn-sm" id="btn-add-movie-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">+ Add Link</button>
                     </div>
                 </div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; background: rgba(0, 136, 204, 0.08); border: 1px solid rgba(0, 136, 204, 0.25); padding: 10px 12px; border-radius: 6px;">
+                    <input type="checkbox" id="add-movie-post-to-channel" checked style="width: 16px; height: 16px; accent-color: #0088cc; cursor: pointer;">
+                    <label for="add-movie-post-to-channel" style="margin: 0; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; user-select: none;">
+                        📢 Post release announcement to Main Channel (@filmhouse_main)
+                    </label>
+                </div>
                 <button type="submit" class="btn btn-primary btn-block">Add to Local List</button>
             </form>
         </div>
@@ -1157,6 +1186,21 @@
         </div>
     </div>
 
+    <!-- ADMIN PERFORMANCE DETAILS MODAL -->
+    <div class="admin-modal-overlay" id="admin-perf-modal">
+        <div class="admin-modal-container" style="max-width: 500px; width: 95%;">
+            <div class="modal-header">
+                <h3 id="admin-perf-modal-title">Admin Performance</h3>
+                <button type="button" class="close-modal-btn" onclick="closeAdminPerfModal()" title="Close" aria-label="Close" style="cursor: pointer; z-index: 10;">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;pointer-events:none;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+                </button>
+            </div>
+            <div id="admin-perf-modal-body" style="padding: 16px 0 0 0;">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
     <svg style="display:none;">
         <g id="icon-close">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
@@ -1164,6 +1208,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=87"></script>
+    <script src="admin.js?v=88"></script>
 </body>
 </html>

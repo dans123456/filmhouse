@@ -281,6 +281,7 @@ if (db) {
         });
         updateStatsCounters();
         renderRequestsList();
+        renderAdminLeaderboard();
     }, err => {
         console.error("Requests sync issue:", err);
     });
@@ -1174,6 +1175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     loadCatalog();
+    initAdminLeaderboardListener();
     
     // 2. Fetch token from Firestore to sync/update
     if (db) {
@@ -3428,6 +3430,12 @@ if (addMovieForm) {
         updatePublishButtonState();
         renderCatalogList();
         
+        // Auto-post release announcement to Main Channel if checked
+        const postAddMovieToChan = document.getElementById("add-movie-post-to-channel");
+        if (postAddMovieToChan && postAddMovieToChan.checked && typeof window.broadcastMovieToMainChannel === 'function') {
+            window.broadcastMovieToMainChannel(newMovie);
+        }
+        
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
@@ -4071,8 +4079,406 @@ document.addEventListener("keydown", (e) => {
         if (modal && modal.classList.contains("active")) {
             closeFulfillRequestModal();
         }
+        closeAdminPerfModal();
     }
 });
+
+// --- BROADCAST TO MAIN CHANNEL (@filmhouse_main) ---
+window.broadcastMovieToMainChannel = async function(movieInfo) {
+    if (!movieInfo || !movieInfo.title) return;
+    
+    const targetChannel = "-1002098683402"; // @filmhouse_main
+    const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
+    
+    const rawTitle = movieInfo.title || "Movie Update";
+    const cleanTitle = String(rawTitle).replace(/\s*\([^)]+\)\s*$/g, "").replace(/[*_`~]/g, "").trim();
+    const yearText = movieInfo.release_date ? ` (${movieInfo.release_date.substring(0, 4)})` : (movieInfo.year ? ` (${movieInfo.year})` : "");
+    const isSeries = (movieInfo.type || "").toLowerCase() === "series" || (movieInfo.type || "").toLowerCase() === "tv";
+    const rawSeason = movieInfo.seasonOrPart || (isSeries ? "Complete Series" : "Full Movie");
+
+    let seasonOrQualityText = isSeries 
+        ? (String(rawSeason).toLowerCase().includes("season") ? rawSeason : `Season ${rawSeason}`)
+        : (String(rawSeason).toLowerCase().includes("quality") ? rawSeason : `${rawSeason} Quality`);
+    if (movieInfo.isSeriesComplete) {
+        seasonOrQualityText = "Complete Series | All Seasons";
+    }
+
+    const rawGenres = Array.isArray(movieInfo.genres) ? movieInfo.genres : (Array.isArray(movieInfo.categories) ? movieInfo.categories : []);
+    const genresText = rawGenres.filter(g => g && g !== "Main").slice(0, 3).join(", ");
+    const ratingVal = movieInfo.rating || movieInfo.vote_average || "";
+    const ratingText = ratingVal ? (String(ratingVal).includes("/") ? ratingVal : `${ratingVal}/10`) : "";
+
+    let metaLine = "";
+    if (genresText && ratingText) {
+        metaLine = `🎭 ${escapeHTML(genresText)} | ⭐️ ${escapeHTML(ratingText)}\n`;
+    } else if (genresText) {
+        metaLine = `🎭 ${escapeHTML(genresText)}\n`;
+    } else if (ratingText) {
+        metaLine = `⭐️ ${escapeHTML(ratingText)}\n`;
+    }
+
+    let overviewText = "";
+    if (movieInfo.overview && typeof movieInfo.overview === 'string' && movieInfo.overview.toLowerCase() !== "no synopsis available.") {
+        const cleanO = movieInfo.overview.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+        if (cleanO.length > 160) {
+            overviewText = cleanO.substring(0, 157) + "...";
+        } else {
+            overviewText = cleanO;
+        }
+    }
+
+    let overviewLine = "";
+    if (overviewText) {
+        overviewLine = `💬 <i>${escapeHTML(overviewText)}</i>\n\n`;
+    } else if (metaLine) {
+        overviewLine = "\n";
+    }
+
+    const movieId = movieInfo.csv_id || movieInfo.tmdb_id || movieInfo.id || "";
+    const deepLinkUrl = movieId 
+        ? `https://t.me/Filmhouseappbot?start=dl_${movieId}` 
+        : `https://t.me/Filmhouseappbot`;
+
+    const caption = 
+        `<b>${escapeHTML(cleanTitle)}</b>${escapeHTML(yearText)}\n` +
+        `${escapeHTML(seasonOrQualityText)}\n\n` +
+        metaLine +
+        overviewLine +
+        `👉 <a href="${deepLinkUrl}">CLICK HERE TO DOWNLOAD</a> ✔️`;
+
+    const replyMarkup = {
+        inline_keyboard: [
+            [
+                { text: "📥 Download on Film House 🍿", url: deepLinkUrl }
+            ]
+        ]
+    };
+
+    let bannerUrl = (movieInfo.backdrop && String(movieInfo.backdrop).startsWith("http")) 
+        ? movieInfo.backdrop 
+        : ((movieInfo.poster && String(movieInfo.poster).startsWith("http")) ? movieInfo.poster : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
+
+    if (bannerUrl.includes("image.tmdb.org/t/p/w500") || bannerUrl.includes("image.tmdb.org/t/p/w300") || bannerUrl.includes("image.tmdb.org/t/p/w780")) {
+        bannerUrl = bannerUrl.replace(/\/w(300|500|780)\//, "/w1280/");
+    }
+
+    console.log(`[MAIN CHANNEL POST] Broadcasting "${cleanTitle}" announcement to @filmhouse_main...`);
+
+    try {
+        const sendPhotoUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
+        const res = await fetch(sendPhotoUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                chat_id: targetChannel,
+                photo: bannerUrl,
+                caption: caption,
+                parse_mode: "HTML",
+                reply_markup: replyMarkup
+            })
+        });
+        const result = await res.json();
+        if (result.ok) {
+            console.log("[MAIN CHANNEL POST] Photo announcement sent successfully:", result);
+            showToast(`📢 Announcement for "${cleanTitle}" posted to Main Channel!`, "success");
+            return result;
+        } else {
+            console.warn("[MAIN CHANNEL POST] Photo post failed, falling back to text:", result.description);
+            const sendMsgUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+            const msgRes = await fetch(sendMsgUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: targetChannel,
+                    text: caption,
+                    parse_mode: "HTML",
+                    reply_markup: replyMarkup,
+                    disable_web_page_preview: false
+                })
+            });
+            const msgResult = await msgRes.json();
+            if (msgResult.ok) {
+                showToast(`📢 Announcement for "${cleanTitle}" posted to Main Channel!`, "success");
+                return msgResult;
+            } else {
+                console.warn("[MAIN CHANNEL POST] Text broadcast also failed:", msgResult.description);
+            }
+        }
+    } catch (e) {
+        console.warn("[MAIN CHANNEL POST] Error broadcasting to channel:", e);
+    }
+};
+
+// --- ADMIN PERFORMANCE LEADERBOARD LOGIC ---
+let adminStatsCache = {};
+
+function initAdminLeaderboardListener() {
+    if (typeof firebase === "undefined" || !db) return;
+    try {
+        db.collection("settings").doc("admin_stats").onSnapshot(doc => {
+            if (doc.exists) {
+                adminStatsCache = doc.data() || {};
+            } else {
+                adminStatsCache = {};
+            }
+            renderAdminLeaderboard();
+        }, err => {
+            console.warn("Could not listen to admin_stats:", err);
+            renderAdminLeaderboard();
+        });
+    } catch (e) {
+        console.warn("Error setting up admin_stats listener:", e);
+    }
+}
+
+function renderAdminLeaderboard() {
+    const listContainer = document.getElementById("admin-leaderboard-list");
+    const topPerformerBadge = document.getElementById("admin-leaderboard-top-performer");
+    if (!listContainer) return;
+
+    const adminMap = {};
+
+    // 1. Process from allRequests (fulfilled items)
+    if (Array.isArray(allRequests)) {
+        allRequests.forEach(req => {
+            if (req.status === "fulfilled" || req.status === "claimed" || req.claimed === true) {
+                const adminName = req.fulfilledBy || "Admin";
+                const adminId = String(req.fulfilledById || req.adminClaimId || adminName).replace(/[^a-zA-Z0-9_]/g, "_");
+                
+                if (!adminMap[adminId]) {
+                    adminMap[adminId] = {
+                        id: req.fulfilledById || adminId,
+                        name: adminName,
+                        count: 0,
+                        titles: [],
+                        lastFulfilledAt: null
+                    };
+                }
+                adminMap[adminId].count++;
+                
+                const titleKey = (req.title || "").trim();
+                const existingTitle = adminMap[adminId].titles.find(t => t.title.toLowerCase() === titleKey.toLowerCase());
+                if (!existingTitle) {
+                    let fulfilledTime = null;
+                    if (req.fulfilledAt) {
+                        fulfilledTime = req.fulfilledAt.toDate ? req.fulfilledAt.toDate() : new Date(req.fulfilledAt);
+                    }
+                    adminMap[adminId].titles.push({
+                        title: req.title,
+                        year: req.year || "",
+                        type: req.type || "Movie",
+                        user: req.requestedBy || "User",
+                        date: fulfilledTime
+                    });
+                }
+            }
+        });
+    }
+
+    // 2. Merge with adminStatsCache from Firestore
+    if (adminStatsCache && typeof adminStatsCache === "object") {
+        Object.keys(adminStatsCache).forEach(k => {
+            const stat = adminStatsCache[k];
+            if (!stat) return;
+            const count = Number(stat.count || 0);
+            if (!adminMap[k]) {
+                adminMap[k] = {
+                    id: k,
+                    name: stat.name || k,
+                    count: count,
+                    titles: [],
+                    lastFulfilledAt: stat.lastFulfilledAt ? new Date(stat.lastFulfilledAt) : null
+                };
+            } else {
+                if (count > adminMap[k].count) {
+                    adminMap[k].count = count;
+                }
+                if (stat.name && (!adminMap[k].name || adminMap[k].name === "Admin")) {
+                    adminMap[k].name = stat.name;
+                }
+            }
+        });
+    }
+
+    const adminList = Object.values(adminMap);
+
+    if (adminList.length === 0) {
+        listContainer.innerHTML = `
+            <div style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 12px;">
+                🎯 No fulfillments recorded yet. Fulfill incoming requests above to earn your spot on the leaderboard!
+            </div>
+        `;
+        if (topPerformerBadge) topPerformerBadge.textContent = "Top: None";
+        return;
+    }
+
+    // Sort descending by fulfill count
+    adminList.sort((a, b) => b.count - a.count);
+
+    const topAdmin = adminList[0];
+    if (topPerformerBadge) {
+        topPerformerBadge.textContent = `Top: ${escapeHTML(topAdmin.name)} (${topAdmin.count})`;
+    }
+
+    listContainer.replaceChildren();
+
+    adminList.forEach((adm, index) => {
+        const rank = index + 1;
+        let rankBadge = "";
+        let borderHighlight = "1px solid rgba(255, 255, 255, 0.06)";
+        let bgHighlight = "rgba(255, 255, 255, 0.02)";
+        let titleRole = "Curator";
+
+        if (rank === 1) {
+            rankBadge = `<span style="font-size: 20px;">🥇</span>`;
+            borderHighlight = "1px solid rgba(255, 188, 0, 0.4)";
+            bgHighlight = "linear-gradient(90deg, rgba(255, 188, 0, 0.12) 0%, rgba(255, 188, 0, 0.03) 100%)";
+            titleRole = "👑 Grand Curator";
+        } else if (rank === 2) {
+            rankBadge = `<span style="font-size: 20px;">🥈</span>`;
+            borderHighlight = "1px solid rgba(220, 220, 220, 0.35)";
+            bgHighlight = "linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)";
+            titleRole = "⭐ Master Admin";
+        } else if (rank === 3) {
+            rankBadge = `<span style="font-size: 20px;">🥉</span>`;
+            borderHighlight = "1px solid rgba(205, 127, 50, 0.35)";
+            bgHighlight = "linear-gradient(90deg, rgba(205, 127, 50, 0.08) 0%, rgba(205, 127, 50, 0.02) 100%)";
+            titleRole = "⚡ Senior Admin";
+        } else {
+            rankBadge = `<span style="font-size: 13px; font-weight: 800; color: var(--text-muted); width: 24px; text-align: center;">#${rank}</span>`;
+            titleRole = "🎬 Admin";
+        }
+
+        const initial = (adm.name.replace(/^@/, "").charAt(0) || "A").toUpperCase();
+
+        const card = document.createElement("div");
+        card.className = "admin-leaderboard-card";
+        card.style.cssText = `
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: ${bgHighlight};
+            border: ${borderHighlight};
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            gap: 12px;
+        `;
+        card.onmouseenter = () => {
+            card.style.transform = "translateY(-1px)";
+            card.style.borderColor = "#ffbc00";
+        };
+        card.onmouseleave = () => {
+            card.style.transform = "none";
+            card.style.border = borderHighlight;
+        };
+
+        card.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="display: flex; align-items: center; justify-content: center; min-width: 28px;">
+                    ${rankBadge}
+                </div>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 188, 0, 0.25), rgba(255, 59, 48, 0.25)); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #ffbc00; font-size: 14px; border: 1px solid rgba(255, 188, 0, 0.4); flex-shrink: 0;">
+                    ${initial}
+                </div>
+                <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
+                        ${escapeHTML(adm.name)}
+                        <span style="font-size: 10px; padding: 2px 6px; border-radius: 12px; background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.3); font-weight: 600;">${titleRole}</span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                        Rank #${rank} • ${adm.titles.length} unique titles resolved
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="text-align: right;">
+                    <div style="font-size: 14px; font-weight: 800; color: #ffbc00; font-family: monospace;">
+                        ${adm.count} <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">fulfilled</span>
+                    </div>
+                </div>
+                <span style="color: var(--text-muted); font-size: 14px;">➔</span>
+            </div>
+        `;
+
+        card.addEventListener("click", () => {
+            showAdminPerformanceModal(adm);
+        });
+
+        listContainer.appendChild(card);
+    });
+}
+
+function showAdminPerformanceModal(adm) {
+    const modal = document.getElementById("admin-perf-modal");
+    const titleEl = document.getElementById("admin-perf-modal-title");
+    const bodyEl = document.getElementById("admin-perf-modal-body");
+    if (!modal || !bodyEl) return;
+
+    if (titleEl) {
+        titleEl.innerHTML = `🏆 Performance: ${escapeHTML(adm.name)}`;
+    }
+
+    const initial = (adm.name.replace(/^@/, "").charAt(0) || "A").toUpperCase();
+    
+    let titlesListHtml = "";
+    if (adm.titles && adm.titles.length > 0) {
+        titlesListHtml = adm.titles.map(t => {
+            const timeStr = t.date ? t.date.toLocaleDateString() : "Recent";
+            return `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; font-size: 12px; margin-bottom: 6px;">
+                    <div>
+                        <div style="font-weight: 700; color: #fff;">🎬 ${escapeHTML(t.title)} ${t.year ? `(${t.year})` : ''}</div>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">For @${escapeHTML(t.user)} • ${t.type} • ${timeStr}</div>
+                    </div>
+                    <span style="font-size: 10px; color: #4caf50; background: rgba(76, 175, 80, 0.12); padding: 3px 8px; border-radius: 4px; font-weight: 700;">🟢 Fulfilled</span>
+                </div>
+            `;
+        }).join("");
+    } else {
+        titlesListHtml = `<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px;">No individual title history records available for this admin.</div>`;
+    }
+
+    bodyEl.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: linear-gradient(135deg, rgba(255, 188, 0, 0.1) 0%, rgba(10, 14, 26, 0.6) 100%); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 8px; margin-bottom: 16px;">
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #ffbc00, #ff3b30); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #000; font-size: 20px; flex-shrink: 0; box-shadow: 0 0 15px rgba(255, 188, 0, 0.3);">
+                ${initial}
+            </div>
+            <div>
+                <h4 style="margin: 0; font-size: 16px; color: #fff; font-family: var(--font-heading);">${escapeHTML(adm.name)}</h4>
+                <div style="display: flex; gap: 8px; margin-top: 4px;">
+                    <span style="font-size: 11px; background: rgba(255, 188, 0, 0.2); color: #ffbc00; padding: 2px 8px; border-radius: 12px; font-weight: 700;">🔥 ${adm.count} Fulfillments</span>
+                    <span style="font-size: 11px; background: rgba(76, 175, 80, 0.15); color: #4caf50; padding: 2px 8px; border-radius: 12px; font-weight: 700;">100% Resolved</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <h5 style="margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px;">Recently Fulfilled Titles</h5>
+            <div style="display: flex; flex-direction: column; max-height: 240px; overflow-y: auto; padding-right: 4px;">
+                ${titlesListHtml}
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-secondary btn-block" onclick="closeAdminPerfModal()" style="margin-top: 14px; height: 38px;">Close</button>
+    `;
+
+    modal.classList.add("active");
+}
+
+window.closeAdminPerfModal = function() {
+    const modal = document.getElementById("admin-perf-modal");
+    if (modal) modal.classList.remove("active");
+};
+
+// Bind modal background for admin perf modal
+const adminPerfModal = document.getElementById("admin-perf-modal");
+if (adminPerfModal) {
+    adminPerfModal.addEventListener("click", (e) => {
+        if (e.target === adminPerfModal) closeAdminPerfModal();
+    });
+}
 
 function renderFulfillLinksInputs(existingMovie, isSeries = true, reqSpec = "") {
     const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
@@ -4438,6 +4844,18 @@ if (fulfillForm && fulfillRequestModal) {
         });
  
         Promise.all(fulfillPromises).then(async () => {
+            // Auto-post release announcement directly to Main Channel if checked
+            if (shouldPostToChannel && typeof window.broadcastMovieToMainChannel === 'function') {
+                const titleToBroadcast = movieToSync || {
+                    title: currentFulfillTitle,
+                    type: isSeries ? 'Series' : 'Movie',
+                    seasonOrPart: matchedReq ? (matchedReq.seasonOrPart || "") : "",
+                    csv_id: movieToSync ? movieToSync.csv_id : "",
+                    tmdb_id: reqTmdbId || (movieToSync ? movieToSync.tmdb_id : null)
+                };
+                window.broadcastMovieToMainChannel(titleToBroadcast);
+            }
+
             const requesters = [];
             currentFulfillDocIds.forEach(id => {
                 const req = allRequests.find(r => r.docId === id);
