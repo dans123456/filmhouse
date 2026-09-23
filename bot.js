@@ -705,13 +705,21 @@ function setupBot(bot, adminBot) {
                     // Send the download link directly to the user
                     const dlLink = reqData.downloadLink;
                     if (dlLink) {
-                        const yearSuffix = reqData.year ? ` (${reqData.year})` : "";
+                        const yearSuffix = reqData.year ? ` (${escapeHtml(reqData.year)})` : "";
                         return await ctx.reply(
-                            `🍿 *Your Requested Movie is Ready!* 🍿\n\n` +
-                            `Here is your direct download link for *${reqData.title}*${yearSuffix}:\n` +
-                            `🔗 ${dlLink}\n\n` +
-                            `This request has been marked as claimed on your account. Enjoy your download! 🎬`,
-                            { parse_mode: "Markdown" }
+                            `🍿 <b>Your Requested Movie is Ready!</b> 🍿\n\n` +
+                            `Your request for <b>${escapeHtml(reqData.title || "Movie")}</b>${yearSuffix} has been claimed on your account.\n\n` +
+                            `Tap the button below to download or watch now! 🎬`,
+                            {
+                                parse_mode: "HTML",
+                                reply_markup: {
+                                    inline_keyboard: [
+                                        [
+                                            { text: "Download / Watch Now 🎬", url: dlLink }
+                                        ]
+                                    ]
+                                }
+                            }
                         );
                     }
                 }
@@ -2384,18 +2392,30 @@ async function init() {
                                 const cleanAdminYear = year ? ` (${escapeHtml(year)})` : "";
                                 const cleanFulfilledBy = escapeHtml(fulfilledBy);
                                 const cleanReqUser = escapeHtml(username || `User ${userId}`);
-                                const cleanDownloadLink = escapeHtml(downloadLink || "Provided");
 
                                 const adminNotifyText = `✅ <b>Request Fulfilled!</b>\n\n` +
                                                      `🎬 <b>Title:</b> <b>${cleanAdminTitle}</b>${cleanAdminYear}\n` +
                                                      `👤 <b>Fulfilled by:</b> ${cleanFulfilledBy}\n` +
-                                                     `🍿 <b>Requested for:</b> @${cleanReqUser} (ID: <code>${escapeHtml(userId)}</code>)\n` +
-                                                     `🔗 <b>Download Link:</b> ${cleanDownloadLink}\n\n` +
+                                                     `🍿 <b>Requested for:</b> @${cleanReqUser} (ID: <code>${escapeHtml(userId)}</code>)\n\n` +
                                                      `⚡ <b>Remaining Queue:</b> <code>${pendingCount}</code> pending request(s) left.`;
+
+                                const adminReplyMarkup = downloadLink ? {
+                                    inline_keyboard: [
+                                        [
+                                            { text: "🎬 View Movie / Download Link", url: downloadLink }
+                                        ],
+                                        [
+                                            { text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }
+                                        ]
+                                    ]
+                                } : undefined;
 
                                 for (const adminId of allAdmins) {
                                     try {
-                                        await callAdminTelegramWithRetry('sendMessage', adminId, adminNotifyText, { parse_mode: "HTML" });
+                                        await callAdminTelegramWithRetry('sendMessage', adminId, adminNotifyText, {
+                                            parse_mode: "HTML",
+                                            reply_markup: adminReplyMarkup
+                                        });
                                     } catch (err) {
                                         console.warn(`Failed to notify admin ${adminId} of fulfillment:`, err.message);
                                     }
