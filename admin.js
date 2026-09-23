@@ -4154,9 +4154,17 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
         ]
     };
 
-    let bannerUrl = (movieInfo.backdrop && String(movieInfo.backdrop).startsWith("http")) 
-        ? movieInfo.backdrop 
-        : ((movieInfo.poster && String(movieInfo.poster).startsWith("http")) ? movieInfo.poster : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
+    let bannerUrl = "";
+    const lPoster = movieInfo.landscape_poster || movieInfo.landscapePoster || movieInfo.landscape;
+    if (lPoster && String(lPoster).startsWith("http")) {
+        bannerUrl = lPoster;
+    } else if (movieInfo.backdrop && String(movieInfo.backdrop).startsWith("http")) {
+        bannerUrl = movieInfo.backdrop;
+    } else if (movieInfo.poster && String(movieInfo.poster).startsWith("http")) {
+        bannerUrl = movieInfo.poster;
+    } else {
+        bannerUrl = "https://dans123456.github.io/filmhouse/img/FilmHouse.png";
+    }
 
     if (bannerUrl.includes("image.tmdb.org/t/p/w500") || bannerUrl.includes("image.tmdb.org/t/p/w300") || bannerUrl.includes("image.tmdb.org/t/p/w780")) {
         bannerUrl = bannerUrl.replace(/\/w(300|500|780)\//, "/w1280/");
@@ -4173,8 +4181,7 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
                 chat_id: targetChannel,
                 photo: bannerUrl,
                 caption: caption,
-                parse_mode: "HTML",
-                reply_markup: replyMarkup
+                parse_mode: "HTML"
             })
         });
         const result = await res.json();
@@ -4192,8 +4199,7 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
                     chat_id: targetChannel,
                     text: caption,
                     parse_mode: "HTML",
-                    reply_markup: replyMarkup,
-                    disable_web_page_preview: false
+                    disable_web_page_preview: true
                 })
             });
             const msgResult = await msgRes.json();

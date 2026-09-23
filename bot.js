@@ -311,10 +311,18 @@ function setupBot(bot, adminBot) {
                 ]
             };
 
-            // Prioritize horizontal backdrop (16:9 widescreen landscape)
-            let bannerUrl = (movieInfo.backdrop && String(movieInfo.backdrop).startsWith("http")) 
-                ? movieInfo.backdrop 
-                : ((movieInfo.poster && String(movieInfo.poster).startsWith("http")) ? movieInfo.poster : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
+            // Prioritize landscape poster, fallback to backdrop, then vertical poster
+            let bannerUrl = "";
+            const lPoster = movieInfo.landscape_poster || movieInfo.landscapePoster || movieInfo.landscape;
+            if (lPoster && String(lPoster).startsWith("http")) {
+                bannerUrl = lPoster;
+            } else if (movieInfo.backdrop && String(movieInfo.backdrop).startsWith("http")) {
+                bannerUrl = movieInfo.backdrop;
+            } else if (movieInfo.poster && String(movieInfo.poster).startsWith("http")) {
+                bannerUrl = movieInfo.poster;
+            } else {
+                bannerUrl = "https://dans123456.github.io/filmhouse/img/FilmHouse.png";
+            }
 
             if (bannerUrl.includes("image.tmdb.org/t/p/w500") || bannerUrl.includes("image.tmdb.org/t/p/w300") || bannerUrl.includes("image.tmdb.org/t/p/w780")) {
                 bannerUrl = bannerUrl.replace(/\/w(300|500|780)\//, "/w1280/");
@@ -351,16 +359,14 @@ function setupBot(bot, adminBot) {
 
                     return await botInstance.telegram.sendPhoto(target, photoPayload, {
                         caption: caption,
-                        parse_mode: "HTML",
-                        reply_markup: replyMarkup
+                        parse_mode: "HTML"
                     });
                 } catch (photoErr) {
                     if (photoErr.message && (photoErr.message.includes("photo") || photoErr.message.includes("IMAGE") || photoErr.message.includes("wrong file") || photoErr.message.includes("HTTP") || photoErr.message.includes("failed to get http"))) {
                         console.warn(`[CHANNEL PUBLISH] Photo send failed (${photoErr.message}), falling back to sendMessage...`);
                         return await botInstance.telegram.sendMessage(target, caption, {
                             parse_mode: "HTML",
-                            disable_web_page_preview: true,
-                            reply_markup: replyMarkup
+                            disable_web_page_preview: true
                         });
                     }
                     throw photoErr;
@@ -557,37 +563,104 @@ function setupBot(bot, adminBot) {
             return { text, keyboard };
         };
 
-        // View 2: Pending Requests
-        const getPendingRequestsPayload = (requests = []) => {
-            const list = requests.slice(0, 15);
-            let msg = `📋 <b>Pending Movie Requests (${requests.length}):</b>\n\n`;
-            if (requests.length === 0) {
+        // View 2: Pending Requests (Grouped with Pagination)
+        const getPendingRequestsPayload = (requests = [], page = 0) => {
+            // Group requests by Title
+            const groupedMap = {};
+            requests.forEach(r => {
+                const rawTitle = r.title || "Movie";
+                const cleanTitleKey = rawTitle.toLowerCase().trim();
+                
+                if (!groupedMap[cleanTitleKey]) {
+                    groupedMap[cleanTitleKey] = {
+                        title: rawTitle,
+                        year: r.year || "",
+                        type: r.type || "Movie",
+                        seasonOrPart: r.seasonOrPart || "",
+                        isPriority: (r.status === "priority" || r.boosted || r.isPriority === true),
+                        requesters: []
+                    };
+                }
+                if (r.status === "priority" || r.boosted) {
+                    groupedMap[cleanTitleKey].isPriority = true;
+                }
+                
+                const reqUser = r.requestedBy || r.user || r.userId || 'guest';
+                const userDisplay = String(reqUser).startsWith('@') ? reqUser : `@${reqUser}`;
+                if (!groupedMap[cleanTitleKey].requesters.includes(userDisplay)) {
+                    groupedMap[cleanTitleKey].requesters.push(userDisplay);
+                }
+            });
+
+            const groupedList = Object.values(groupedMap);
+            
+            // Sort: High priority first, then by requester count descending
+            groupedList.sort((a, b) => {
+                if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
+                return b.requesters.length - a.requesters.length;
+            });
+
+            const pageSize = 10;
+            const totalPages = Math.ceil(groupedList.length / pageSize) || 1;
+            const currentPage = Math.max(0, Math.min(page, totalPages - 1));
+            const pageItems = groupedList.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+
+            let msg = `📋 <b>Pending Movie Requests (${requests.length} total, ${groupedList.length} titles):</b>\n`;
+            if (totalPages > 1) {
+                msg += `<i>Page ${currentPage + 1} of ${totalPages}</i>\n\n`;
+            } else {
+                msg += `\n`;
+            }
+
+            if (groupedList.length === 0) {
                 msg += `🎉 <b>All caught up!</b> There are no pending requests right now.\n\n`;
             } else {
-                list.forEach((r, idx) => {
-                    const isPrio = (r.status === "priority" || r.boosted);
-                    const prioBadge = isPrio ? " 🔥 <b>[HIGH PRIORITY]</b>" : "";
-                    const year = r.year ? ` (${escapeHtml(r.year)})` : "";
-                    const cleanTitle = escapeHtml(r.title || "Movie");
-                    const cleanType = escapeHtml(r.type || "Movie");
-                    const user = escapeHtml(r.requestedBy || r.userId || 'guest');
-                    msg += `${idx + 1}. <b>${cleanTitle}</b>${year}${prioBadge}\n   • 📁 <i>${cleanType}</i> | 👤 @${user}\n\n`;
+                pageItems.forEach((item, idx) => {
+                    const globalIdx = currentPage * pageSize + idx + 1;
+                    const prioBadge = item.isPriority ? " 🔥 <b>[HIGH PRIORITY]</b>" : "";
+                    const year = item.year ? ` (${escapeHtml(item.year)})` : "";
+                    const cleanTitle = escapeHtml(item.title);
+                    const cleanType = escapeHtml(item.type);
+                    
+                    let requestersStr = "";
+                    if (item.requesters.length === 1) {
+                        requestersStr = escapeHtml(item.requesters[0]);
+                    } else {
+                        requestersStr = `Requesters (${item.requesters.length}): ` + item.requesters.map(u => escapeHtml(u)).join(", ");
+                    }
+                    
+                    msg += `${globalIdx}. <b>${cleanTitle}</b>${year}${prioBadge}\n   • 📁 <i>${cleanType}</i> | 👤 ${requestersStr}\n\n`;
                 });
-                if (requests.length > list.length) {
-                    msg += `➕ <i>...and ${requests.length - list.length} more pending in queue.</i>\n\n`;
-                }
+
                 msg += `💡 Open the Admin Web App to fulfill these requests with download links!\n`;
+            }
+
+            // Pagination buttons
+            const navButtons = [];
+            if (currentPage > 0) {
+                navButtons.push({ text: "⬅️ Previous", callback_data: `admin_req_page_${currentPage - 1}` });
+            }
+            if (totalPages > 1) {
+                navButtons.push({ text: `${currentPage + 1}/${totalPages}`, callback_data: `admin_req_page_${currentPage}` });
+            }
+            if (currentPage < totalPages - 1) {
+                navButtons.push({ text: "Next ➡️", callback_data: `admin_req_page_${currentPage + 1}` });
             }
 
             const keyboard = [
                 [
                     { text: "👑 Open Admin to Fulfill 🚀", web_app: { url: "https://dans123456.github.io/filmhouse/admin.html" } }
-                ],
-                [
-                    { text: "🔄 Refresh Requests", callback_data: "admin_pending" },
-                    { text: "« Back to Menu", callback_data: "admin_menu" }
                 ]
             ];
+
+            if (navButtons.length > 0) {
+                keyboard.push(navButtons);
+            }
+
+            keyboard.push([
+                { text: "🔄 Refresh Requests", callback_data: `admin_req_page_${currentPage}` },
+                { text: "« Back to Menu", callback_data: "admin_menu" }
+            ]);
 
             return { text: msg, keyboard, parse_mode: "HTML" };
         };
@@ -817,7 +890,13 @@ function setupBot(bot, adminBot) {
 
         adminBot.action('admin_pending', async (ctx) => {
             const list = await getPendingRequestsList();
-            return renderOrEdit(ctx, getPendingRequestsPayload(list));
+            return renderOrEdit(ctx, getPendingRequestsPayload(list, 0));
+        });
+
+        adminBot.action(/^admin_req_page_(\d+)$/, async (ctx) => {
+            const page = parseInt(ctx.match[1], 10) || 0;
+            const list = await getPendingRequestsList();
+            return renderOrEdit(ctx, getPendingRequestsPayload(list, page));
         });
 
         adminBot.action('admin_stats', async (ctx) => {
