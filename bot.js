@@ -2126,6 +2126,7 @@ async function init() {
         console.log("Using default Film House Telegram Bot Token.");
     }
 
+    // Load admin bot token strictly from environment variable or Firestore
     let adminBotToken = process.env.ADMIN_BOT_TOKEN;
     if (!adminBotToken) {
         try {
@@ -2134,9 +2135,6 @@ async function init() {
                 adminBotToken = doc.data().adminBotToken;
             }
         } catch (err) {}
-    }
-    if (!adminBotToken) {
-        adminBotToken = "8669068531:AAEwUFMEWNWk8aXHvTuRQJpmfIAEGjVNe0o";
     }
 
     try {
