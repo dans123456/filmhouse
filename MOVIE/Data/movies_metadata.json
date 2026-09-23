@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "271016-mystic-nine",
+    "tmdb_id": 271016,
+    "imdb_id": "",
+    "title": "Mystic Nine",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama",
+      "Action & Adventure"
+    ],
+    "overview": "Mystic Nine follows Zhang Qishan as he joins forces with Wu Laogou, alongside Huo Xiangu and the other members of the Mystic Nine, when turmoil returns to Changsha. The mysterious disappearance of Unit 401 uncovers a century-old secret. Faced with life-and-death choices, bound by brotherhood, responsibility to their sects, and devotion to their country, they risk everything to protect their home and overcome the crisis.",
+    "poster": "https://image.tmdb.org/t/p/w500/xg0fpIMplp3tedtsdlTZYPiJgNB.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/paF9IoqXN3inVb5eR9rxElbpYyb.jpg",
+    "rating": 7,
+    "release_date": "2026-07-30",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "ze6BQOn1zGo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADfRIAArgzoEUW3i0Qe8CurRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "249907-sentenced-to-be-a-hero",
     "tmdb_id": 249907,
     "imdb_id": "",
