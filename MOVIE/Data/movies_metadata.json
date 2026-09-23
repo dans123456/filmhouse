@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "671583-upside-down-magic",
+    "tmdb_id": 671583,
+    "imdb_id": "",
+    "title": "Upside-Down Magic",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Fantasy",
+      "Family",
+      "TV Movie"
+    ],
+    "overview": "Nory and her best friend Reina enter the Sage Academy for Magical Studies, where Nory’s unconventional powers land her in a class for those with wonky, or “upside-down,” magic. Undaunted, Nory sets out to prove that that upside-down magic can be just as powerful as right-side-up.",
+    "poster": "https://image.tmdb.org/t/p/w500/r2MfnMmFzGvRvjGVLIuyx3R16a6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/1SZuV2Qp1RD13MhdTdqTGBVhcyc.jpg",
+    "rating": 7.1,
+    "release_date": "2020-07-31",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "sQ3PiZTEOBg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADiRUAArgzoEWV4Ierb76pChYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "289763-see-you-at-work-tomorrow",
     "tmdb_id": 289763,
     "imdb_id": "",
