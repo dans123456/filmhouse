@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "249907-sentenced-to-be-a-hero",
+    "tmdb_id": 249907,
+    "imdb_id": "",
+    "title": "Sentenced to Be a Hero",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Sci-Fi & Fantasy",
+      "Action & Adventure"
+    ],
+    "overview": "In a world where heroism is a punishment, Xylo Forbartz, a condemned goddess killer, battles endless hordes of monstrous abominations as part of Penal Hero Unit 9004. Death is no escape, only a cycle of resurrection and relentless combat. But when Xylo encounters a mysterious new goddess, their unlikely alliance sparks a rebellion that could shatter the chains of eternal punishment.",
+    "poster": "https://image.tmdb.org/t/p/w500/k8bh5mvHDx3czHSF56v9lRyulLC.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/k8uBEraJWZf9o7oJbaVHrECwvjC.jpg",
+    "rating": 8.3,
+    "release_date": "2026-01-03",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "B5qZX2kh-7w",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADIREAArgzoEUF6moAAblyuqYWBA",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "552524-lilo-stitch",
     "tmdb_id": 552524,
     "imdb_id": "",
