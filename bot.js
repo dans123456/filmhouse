@@ -270,30 +270,64 @@ function setupBot(bot, adminBot) {
                 posterUrl = posterUrl.replace(/\/w(300|500)\//, "/w780/");
             }
 
-            console.log(`[CHANNEL PUBLISH] Publishing "${cleanTitle}" announcement to @filmhouse_main...`);
+            const candidateTargets = Array.from(new Set([
+                process.env.MAIN_CHANNEL_ID,
+                process.env.CHANNEL_ID,
+                "-1002098683402",
+                "@filmhouse_main"
+            ].filter(Boolean)));
 
-            const sendPhotoCall = async (botInstance) => {
+            console.log(`[CHANNEL PUBLISH] Publishing "${cleanTitle}" announcement to channel...`);
+
+            const sendToTarget = async (botInstance, target) => {
                 if (!botInstance) throw new Error("Bot instance unavailable");
-                return await botInstance.telegram.sendPhoto(channelTarget, posterUrl, {
-                    caption: caption,
-                    parse_mode: "HTML",
-                    reply_markup: replyMarkup
-                });
+                try {
+                    return await botInstance.telegram.sendPhoto(target, posterUrl, {
+                        caption: caption,
+                        parse_mode: "HTML",
+                        reply_markup: replyMarkup
+                    });
+                } catch (photoErr) {
+                    if (photoErr.message && (photoErr.message.includes("photo") || photoErr.message.includes("IMAGE") || photoErr.message.includes("wrong file") || photoErr.message.includes("HTTP"))) {
+                        console.warn(`[CHANNEL PUBLISH] Photo send failed (${photoErr.message}), falling back to sendMessage...`);
+                        return await botInstance.telegram.sendMessage(target, caption, {
+                            parse_mode: "HTML",
+                            reply_markup: replyMarkup
+                        });
+                    }
+                    throw photoErr;
+                }
             };
 
             let result = null;
-            try {
-                result = await sendPhotoCall(bot);
-                console.log(`[CHANNEL PUBLISH] Published to @filmhouse_main via public bot (msg_id: ${result.message_id})`);
-            } catch (botErr) {
-                console.warn(`[CHANNEL PUBLISH] Public bot failed: ${botErr.message}. Trying admin bot...`);
+            let lastError = null;
+
+            // Try public bot first on all candidate targets
+            for (const target of candidateTargets) {
                 try {
-                    result = await sendPhotoCall(adminBot);
-                    console.log(`[CHANNEL PUBLISH] Published to @filmhouse_main via admin bot (msg_id: ${result.message_id})`);
-                } catch (adminErr) {
-                    console.warn(`[CHANNEL PUBLISH] Admin bot also failed: ${adminErr.message}`);
-                    throw adminErr;
+                    result = await sendToTarget(bot, target);
+                    console.log(`[CHANNEL PUBLISH] Published to ${target} via public bot (msg_id: ${result.message_id})`);
+                    break;
+                } catch (bErr) {
+                    lastError = bErr;
                 }
+            }
+
+            // Fall back to admin bot if public bot was not able to post
+            if (!result && adminBot) {
+                for (const target of candidateTargets) {
+                    try {
+                        result = await sendToTarget(adminBot, target);
+                        console.log(`[CHANNEL PUBLISH] Published to ${target} via admin bot (msg_id: ${result.message_id})`);
+                        break;
+                    } catch (aErr) {
+                        lastError = aErr;
+                    }
+                }
+            }
+
+            if (!result && lastError) {
+                throw lastError;
             }
             return result;
         } catch (err) {
