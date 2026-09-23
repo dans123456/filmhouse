@@ -52,30 +52,35 @@ function escapeHtml(str) {
         .replace(/>/g, "&gt;");
 }
 
+// Global Telegram helpers and pending requests store (module-scoped for access across setupBot and init)
+let callTelegramWithRetry = async () => {};
+let callAdminTelegramWithRetry = async () => {};
+const PENDING_FILE = path.join(__dirname, "data", "pending_requests.json");
+let cachedPendingRequests = [];
+
+// Load persisted pending requests from disk (immune to Firestore quota)
+try {
+    if (fs.existsSync(PENDING_FILE)) {
+        const raw = fs.readFileSync(PENDING_FILE, "utf8");
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) cachedPendingRequests = parsed;
+        console.log(`[PendingStore] Loaded ${cachedPendingRequests.length} pending requests from disk.`);
+    }
+} catch (e) {}
+
+const savePendingRequestsToDisk = (requests) => {
+    try {
+        const dir = path.dirname(PENDING_FILE);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(PENDING_FILE, JSON.stringify(requests, null, 2), "utf8");
+    } catch (e) {
+        console.error("Failed to save pending requests to disk:", e.message);
+    }
+};
+
 // Bot setup helper
 function setupBot(bot, adminBot) {
-    let callTelegramWithRetry;
     let disableImmediateBlockedBotWrite = false;
-    const PENDING_FILE = path.join(__dirname, "data", "pending_requests.json");
-    let cachedPendingRequests = [];
-
-    // Load persisted pending requests from Ubuntu disk (immune to Firestore quota)
-    try {
-        if (fs.existsSync(PENDING_FILE)) {
-            const raw = fs.readFileSync(PENDING_FILE, "utf8");
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) cachedPendingRequests = parsed;
-            console.log(`[PendingStore] Loaded ${cachedPendingRequests.length} pending requests from disk.`);
-        }
-    } catch (e) {}
-
-    const savePendingRequestsToDisk = (requests) => {
-        try {
-            const dir = path.dirname(PENDING_FILE);
-            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-            fs.writeFileSync(PENDING_FILE, JSON.stringify(requests, null, 2), "utf8");
-        } catch (e) {}
-    };
 
     // Middleware to automatically make all context replies direct thread replies to the triggering message
     bot.use(async (ctx, next) => {
@@ -207,7 +212,7 @@ function setupBot(bot, adminBot) {
     }
 
     // Helper: Call Admin Telegram Bot with fallback to public bot
-    const callAdminTelegramWithRetry = async function(methodName, ...args) {
+    callAdminTelegramWithRetry = async function(methodName, ...args) {
         if (!adminBot) return callTelegramWithRetry(methodName, ...args);
         try {
             return await adminBot.telegram[methodName](...args);
@@ -291,20 +296,25 @@ function setupBot(bot, adminBot) {
         const getPendingRequestsList = async () => {
             if (cachedPendingRequests.length > 0) return cachedPendingRequests;
             try {
-                const fetchPromise = db.collection("requests").where("status", "in", ["pending", "priority"]).limit(15).get();
-                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1200));
+                const fetchPromise = db.collection("requests").get();
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 2500));
                 const snap = await Promise.race([fetchPromise, timeoutPromise]);
                 if (snap && snap.docs) {
-                    cachedPendingRequests = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    cachedPendingRequests = snap.docs
+                        .map(doc => ({ id: doc.id, ...doc.data() }))
+                        .filter(r => r.status !== "fulfilled" && r.status !== "claimed" && !r.fulfilled && !r.claimed);
+                    savePendingRequestsToDisk(cachedPendingRequests);
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error("Error fetching pending requests:", e.message);
+            }
             return cachedPendingRequests;
         };
 
         // Render helper: edits existing message if callback query, otherwise replies with new message
         const renderOrEdit = async (ctx, payload) => {
             const options = {
-                parse_mode: "Markdown",
+                parse_mode: payload.parse_mode || "Markdown",
                 reply_markup: {
                     inline_keyboard: payload.keyboard
                 }
@@ -366,16 +376,23 @@ function setupBot(bot, adminBot) {
 
         // View 2: Pending Requests
         const getPendingRequestsPayload = (requests = []) => {
-            const list = requests.slice(0, 10);
-            let msg = `📋 *Pending Movie Requests (${requests.length}):*\n\n`;
-            if (list.length === 0) {
-                msg += `🎉 *All caught up!* There are no pending requests right now.\n\n`;
+            const list = requests.slice(0, 15);
+            let msg = `📋 <b>Pending Movie Requests (${requests.length}):</b>\n\n`;
+            if (requests.length === 0) {
+                msg += `🎉 <b>All caught up!</b> There are no pending requests right now.\n\n`;
             } else {
                 list.forEach((r, idx) => {
-                    const prio = (r.status === "priority" || r.boosted) ? "🔥 *[PRIORITY]*" : "";
-                    const year = r.year ? ` (${r.year})` : "";
-                    msg += `${idx + 1}. *${r.title}*${year} ${prio}\n   • Type: \`${r.type || 'Movie'}\` | User: @${r.requestedBy || r.userId || 'guest'}\n\n`;
+                    const isPrio = (r.status === "priority" || r.boosted);
+                    const prioBadge = isPrio ? " 🔥 <b>[HIGH PRIORITY]</b>" : "";
+                    const year = r.year ? ` (${escapeHtml(r.year)})` : "";
+                    const cleanTitle = escapeHtml(r.title || "Movie");
+                    const cleanType = escapeHtml(r.type || "Movie");
+                    const user = escapeHtml(r.requestedBy || r.userId || 'guest');
+                    msg += `${idx + 1}. <b>${cleanTitle}</b>${year}${prioBadge}\n   • 📁 <i>${cleanType}</i> | 👤 @${user}\n\n`;
                 });
+                if (requests.length > list.length) {
+                    msg += `➕ <i>...and ${requests.length - list.length} more pending in queue.</i>\n\n`;
+                }
                 msg += `💡 Open the Admin Web App to fulfill these requests with download links!\n`;
             }
 
@@ -386,7 +403,7 @@ function setupBot(bot, adminBot) {
                 ]
             ];
 
-            return { text: msg, keyboard };
+            return { text: msg, keyboard, parse_mode: "HTML" };
         };
 
         // View 3: Server Logs
@@ -1902,7 +1919,7 @@ async function init() {
 
         // Start weekly movie catalog backup checker (runs every 12 hours, never on immediate reboot)
         setInterval(async () => {
-            await checkAndRunWeeklyBackup(bot);
+            await checkAndRunWeeklyBackup(adminBot || bot);
         }, 12 * 60 * 60 * 1000); // Check every 12 hours
 
         // Start background synchronization from Firestore to Ubuntu local user store
@@ -2052,13 +2069,17 @@ async function init() {
                         const docMs = data.timestamp.toMillis ? data.timestamp.toMillis() : new Date(data.timestamp).getTime();
                         if (Date.now() - docMs > 15000) return;
                     }
-                    const user = data.user || "guest";
-                    const userId = data.userId || "unknown";
-                    const category = data.category || "General";
-                    const subject = data.subject || "No Subject";
-                    const msg = data.message || "No Message";
+                    const cleanUser = escapeHtml(user);
+                    const cleanUserId = escapeHtml(userId);
+                    const cleanCategory = escapeHtml(category);
+                    const cleanSubject = escapeHtml(subject);
+                    const cleanMsg = escapeHtml(msg);
 
-                    const adminText = `📝 *New Feedback Submitted!*\n\n*User:* @${user} (ID: \`${userId}\`)\n*Type:* ${category}\n*Subject:* ${subject}\n\n*Message:* ${msg}`;
+                    const adminText = `📝 <b>New Feedback Submitted!</b>\n\n` +
+                                      `👤 <b>User:</b> @${cleanUser} (ID: <code>${cleanUserId}</code>)\n` +
+                                      `📁 <b>Type:</b> ${cleanCategory}\n` +
+                                      `📌 <b>Subject:</b> ${cleanSubject}\n\n` +
+                                      `💬 <b>Message:</b>\n${cleanMsg}`;
                     
                     const defaultAdmins = ["1329840839", "1175336733"];
                     try {
@@ -2068,7 +2089,7 @@ async function init() {
                         const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
                         for (const adminId of allAdmins) {
                             try {
-                                await bot.telegram.sendMessage(adminId, adminText, { parse_mode: "Markdown" });
+                                await callAdminTelegramWithRetry('sendMessage', adminId, adminText, { parse_mode: "HTML" });
                                 console.log(`Feedback DM notification successfully sent to admin ${adminId}`);
                             } catch (e) {
                                 console.warn(`Failed to notify admin ${adminId} of feedback:`, e.message);
@@ -2086,9 +2107,12 @@ async function init() {
             try {
                 cachedPendingRequests = snapshot.docs
                     .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .filter(r => r.status === "pending" || r.status === "priority" || (!r.status && !r.fulfilled && !r.claimed));
+                    .filter(r => r.status !== "fulfilled" && r.status !== "claimed" && !r.fulfilled && !r.claimed);
                 savePendingRequestsToDisk(cachedPendingRequests);
-            } catch (e) {}
+                console.log(`[PendingStore] Synchronized ${cachedPendingRequests.length} pending requests from Firestore.`);
+            } catch (e) {
+                console.error("Error updating cached pending requests:", e.message);
+            }
 
             snapshot.docChanges().forEach(async (change) => {
                 const data = change.doc.data();
@@ -2253,7 +2277,7 @@ async function init() {
 
                             for (const adminId of allAdmins) {
                                 try {
-                                    await callTelegramWithRetry('sendMessage', adminId, adminBoostText, {
+                                    await callAdminTelegramWithRetry('sendMessage', adminId, adminBoostText, {
                                         parse_mode: "HTML",
                                         reply_markup: {
                                             inline_keyboard: [
@@ -2278,106 +2302,109 @@ async function init() {
                     }
 
                     if (data.status === "fulfilled" && data.notifiedFulfilled !== true && downloadLink) {
+                        const cleanUserTitle = escapeHtml(title || "Movie");
+                        const cleanYearSuffix = year ? ` (${escapeHtml(year)})` : "";
                         const isSeries = (data.type || "").toLowerCase() === "series" || (data.type || "").toLowerCase() === "tv";
                         let detailText = "";
                         let buttonText = "Download/Watch Now 🎬";
-                        if (isSeries) {
-                            let requestedSeason = data.seasonOrPart || "";
-                            if (!requestedSeason && title) {
-                                const sMatch = title.match(/Season\s*\d+/i) || title.match(/\(Season\s*\d+\)/i) || title.match(/S\d+/i);
-                                if (sMatch) {
-                                    requestedSeason = sMatch[0].replace(/[()]/g, '').trim();
+                            if (isSeries) {
+                                let requestedSeason = data.seasonOrPart || "";
+                                if (!requestedSeason && title) {
+                                    const sMatch = title.match(/Season\s*\d+/i) || title.match(/\(Season\s*\d+\)/i) || title.match(/S\d+/i);
+                                    if (sMatch) {
+                                        requestedSeason = sMatch[0].replace(/[()]/g, '').trim();
+                                    }
                                 }
-                            }
-                            const sLabel = requestedSeason ? requestedSeason : "Series";
-                            const isComplete = data.isSeriesComplete === true || data.status === "completed" || sLabel.toLowerCase() === "all seasons";
+                                const sLabel = requestedSeason ? requestedSeason : "Series";
+                                const isComplete = data.isSeriesComplete === true || data.status === "completed" || sLabel.toLowerCase() === "all seasons";
 
-                            if (isComplete) {
-                                detailText = `🎉 *All Seasons Completed!*\n\nAll seasons of *${title}* have been fully uploaded to Film House! Enjoy the full series! 📺`;
-                                buttonText = "Open Film House App 🍿";
-                            } else if (sLabel.toLowerCase().includes("season 1") || sLabel.toLowerCase() === "s1") {
-                                detailText = `🍿 *Good news!*\n\n*Season 1* of *${title}* is now ready! We are currently uploading the remaining seasons... 🚀`;
-                                buttonText = "Get Season 1 🍿";
+                                if (isComplete) {
+                                    detailText = `🎉 <b>All Seasons Completed!</b>\n\nAll seasons of <b>${cleanUserTitle}</b> have been fully uploaded to Film House! Enjoy the full series! 📺`;
+                                    buttonText = "Open Film House App 🍿";
+                                } else if (sLabel.toLowerCase().includes("season 1") || sLabel.toLowerCase() === "s1") {
+                                    detailText = `🍿 <b>Good news!</b>\n\n<b>Season 1</b> of <b>${cleanUserTitle}</b> is now ready! We are currently uploading the remaining seasons... 🚀`;
+                                    buttonText = "Get Season 1 🍿";
+                                } else {
+                                    detailText = `🚀 <b>Season Update!</b>\n\n<b>${escapeHtml(sLabel)}</b> of <b>${cleanUserTitle}</b> has just been added! To download or watch remaining seasons, open Film House App! 🍿`;
+                                    buttonText = `Get ${sLabel} 🍿`;
+                                }
                             } else {
-                                detailText = `🚀 *Season Update!*\n\n*${sLabel}* of *${title}* has just been added! To download or watch remaining seasons, open Film House App! 🍿`;
-                                buttonText = `Get ${sLabel} 🍿`;
+                                detailText = "💡 <b>Note:</b> This is a single movie request, so this contains the full film. Enjoy! 🍿";
+                                buttonText = "Get Movie 🎬";
                             }
-                        } else {
-                            detailText = "💡 *Note:* This is a single movie request, so this contains the full film. Enjoy! 🍿";
-                            buttonText = "Get Movie 🎬";
-                        }
 
-                        const text = `🎉 *Good news!*\n\n` +
-                                     `Your request for *${title}*${yearSuffix} has been fulfilled! 🍿\n\n` +
-                                     `${detailText}\n\n` +
-                                     `Thank you for using Film House!`;
-                        try {
-                            await callTelegramWithRetry('sendMessage', userId, text, {
-                                parse_mode: "Markdown",
-                                reply_markup: {
-                                    inline_keyboard: [
-                                        [
-                                            {
-                                                text: buttonText,
-                                                url: downloadLink
-                                            }
+                            const text = `🎉 <b>Good news!</b>\n\n` +
+                                         `Your request for <b>${cleanUserTitle}</b>${cleanYearSuffix} has been fulfilled! 🍿\n\n` +
+                                         `${detailText}\n\n` +
+                                         `Thank you for using Film House!`;
+                            try {
+                                await callTelegramWithRetry('sendMessage', userId, text, {
+                                    parse_mode: "HTML",
+                                    reply_markup: {
+                                        inline_keyboard: [
+                                            [
+                                                {
+                                                    text: buttonText,
+                                                    url: downloadLink
+                                                }
+                                            ]
                                         ]
-                                    ]
-                                }
-                            });
-                            await db.collection("requests").doc(docId).update({ 
-                                notifiedFulfilled: true,
-                                notificationStatus: "delivered",
-                                notificationError: null,
-                                notifiedAt: admin.firestore.FieldValue.serverTimestamp()
-                            }).catch(() => {});
-                        } catch (e) {
-                            console.warn(`Failed to send request fulfillment to ${userId}:`, e.message);
-                            const isBlocked = e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"));
-                            if (isBlocked) await db.collection("users").doc(userId).update({ blockedBot: true });
-                            await db.collection("requests").doc(docId).update({ 
-                                notifiedFulfilled: true,
-                                notificationStatus: "failed",
-                                notificationError: e.message,
-                                isBlockedUser: isBlocked,
-                                notifiedAt: admin.firestore.FieldValue.serverTimestamp()
-                            }).catch(() => {});
-                        }
-
-                        // Notify admins of the fulfillment
-                        try {
-                            const defaultAdmins = ["1329840839", "1175336733"];
-                            const adminDoc = await db.collection("settings").doc("admins").get();
-                            const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
-                            const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
-                            const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
-
-                            const pendingSnapshot = await db.collection("requests").get();
-                            const pendingCount = pendingSnapshot.docs.filter(doc => {
-                                const status = doc.data().status;
-                                return status !== "fulfilled" && status !== "claimed";
-                            }).length;
-
-                            const fulfilledBy = data.fulfilledBy || data.adminClaimName || "An Admin";
-                            const adminNotifyText = `✅ *Request Fulfilled!*\n\n` +
-                                                 `🎬 *Title:* ${title}${yearSuffix}\n` +
-                                                 `👤 *Fulfilled by:* ${fulfilledBy}\n` +
-                                                 `🍿 *Requested for:* @${username} (ID: \`${userId}\`)\n` +
-                                                 `🔗 *Download Link:* ${downloadLink || 'Provided'}\n\n` +
-                                                 `⚡ *Remaining Queue:* \`${pendingCount}\` pending request(s) left.`;
-
-                            for (const adminId of allAdmins) {
-                                try {
-                                    await callAdminTelegramWithRetry('sendMessage', adminId, adminNotifyText, { parse_mode: "Markdown" });
-                                } catch (err) {
-                                    console.warn(`Failed to notify admin ${adminId} of fulfillment:`, err.message);
-                                }
+                                    }
+                                });
+                                await db.collection("requests").doc(docId).update({ 
+                                    notifiedFulfilled: true,
+                                    notificationStatus: "delivered",
+                                    notificationError: null,
+                                    notifiedAt: admin.firestore.FieldValue.serverTimestamp()
+                                }).catch(() => {});
+                            } catch (e) {
+                                console.warn(`Failed to send request fulfillment to ${userId}:`, e.message);
+                                const isBlocked = e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"));
+                                if (isBlocked) await db.collection("users").doc(userId).update({ blockedBot: true });
+                                await db.collection("requests").doc(docId).update({ 
+                                    notifiedFulfilled: true,
+                                    notificationStatus: "failed",
+                                    notificationError: e.message,
+                                    isBlockedUser: isBlocked,
+                                    notifiedAt: admin.firestore.FieldValue.serverTimestamp()
+                                }).catch(() => {});
                             }
-                        } catch (adminErr) {
-                            console.error("Error in admin notification:", adminErr);
+
+                            // Notify admins of the fulfillment
+                            try {
+                                const defaultAdmins = ["1329840839", "1175336733"];
+                                const adminDoc = await db.collection("settings").doc("admins").get();
+                                const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
+                                const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
+                                const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
+
+                                const pendingCount = cachedPendingRequests.length;
+                                const fulfilledBy = data.fulfilledBy || data.adminClaimName || "An Admin";
+                                const cleanAdminTitle = escapeHtml(title || "Movie");
+                                const cleanAdminYear = year ? ` (${escapeHtml(year)})` : "";
+                                const cleanFulfilledBy = escapeHtml(fulfilledBy);
+                                const cleanReqUser = escapeHtml(username || `User ${userId}`);
+                                const cleanDownloadLink = escapeHtml(downloadLink || "Provided");
+
+                                const adminNotifyText = `✅ <b>Request Fulfilled!</b>\n\n` +
+                                                     `🎬 <b>Title:</b> <b>${cleanAdminTitle}</b>${cleanAdminYear}\n` +
+                                                     `👤 <b>Fulfilled by:</b> ${cleanFulfilledBy}\n` +
+                                                     `🍿 <b>Requested for:</b> @${cleanReqUser} (ID: <code>${escapeHtml(userId)}</code>)\n` +
+                                                     `🔗 <b>Download Link:</b> ${cleanDownloadLink}\n\n` +
+                                                     `⚡ <b>Remaining Queue:</b> <code>${pendingCount}</code> pending request(s) left.`;
+
+                                for (const adminId of allAdmins) {
+                                    try {
+                                        await callAdminTelegramWithRetry('sendMessage', adminId, adminNotifyText, { parse_mode: "HTML" });
+                                    } catch (err) {
+                                        console.warn(`Failed to notify admin ${adminId} of fulfillment:`, err.message);
+                                    }
+                                }
+                            } catch (adminErr) {
+                                console.error("Error in admin notification:", adminErr);
+                            }
                         }
                     }
-                }
             });
         }, (err) => console.error("Requests listener error:", err));
 
