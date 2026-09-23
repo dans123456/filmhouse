@@ -2460,17 +2460,27 @@ function showMovieDetails(movie) {
                 const deepLink = `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${movie.csv_id || movie.tmdb_id}`;
                 const isSeries = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
                 const seasonText = isSeries ? "Complete Series" : "Full Movie";
-                const cleanTitle = (movie.title || "Movie Update").replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                const rawTitle = (movie.title || "Movie Update").replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                const safeTitle = rawTitle.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 const yearText = movie.release_date ? ` (${movie.release_date.substring(0, 4)})` : "";
-                const caption = `<b>${escapeHTML(cleanTitle)}</b>${yearText}\n${seasonText}\n\n👉 <a href="${deepLink}">CLICK HERE</a> ✔️`;
+                const caption = `<b>${safeTitle}</b>${yearText}\n${seasonText}\n\n👉 <a href="${deepLink}">CLICK HERE</a> ✔️`;
 
                 const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
-                let posterUrl = getPosterUrl(movie.poster);
+                let posterUrl = (movie.poster && String(movie.poster).startsWith("http"))
+                    ? movie.poster
+                    : ((movie.backdrop && String(movie.backdrop).startsWith("http")) ? movie.backdrop : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
+
                 if (posterUrl && (posterUrl.includes("w500") || posterUrl.includes("w300"))) {
                     posterUrl = posterUrl.replace(/\/w(300|500)\//, "/w780/");
                 }
 
-                const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+                const replyMarkup = {
+                    inline_keyboard: [
+                        [{ text: "🍿 Watch / Download on Film House 🚀", url: deepLink }]
+                    ]
+                };
+
+                let res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -2478,14 +2488,26 @@ function showMovieDetails(movie) {
                         photo: posterUrl,
                         caption: caption,
                         parse_mode: "HTML",
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{ text: "🍿 Watch / Download on Film House 🚀", url: deepLink }]
-                            ]
-                        }
+                        reply_markup: replyMarkup
                     })
                 });
-                const resData = await res.json();
+                let resData = await res.json();
+
+                // If photo send failed due to image URL, fallback to sendMessage
+                if (!resData.ok && (resData.description || "").toLowerCase().includes("photo") || (resData.description || "").toLowerCase().includes("wrong file")) {
+                    res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            chat_id: "-1002098683402",
+                            text: caption,
+                            parse_mode: "HTML",
+                            reply_markup: replyMarkup
+                        })
+                    });
+                    resData = await res.json();
+                }
+
                 if (resData.ok) {
                     showToast(`Successfully published "${movie.title}" announcement to @filmhouse_main! 📢`, "success");
                 } else {
