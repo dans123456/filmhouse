@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "289763-see-you-at-work-tomorrow",
+    "tmdb_id": 289763,
+    "imdb_id": "",
+    "title": "See You at Work Tomorrow!",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "Cha Ji-yoon is a 7th-year corporate worker who's tired of both work and dating. She crosses paths with Kang Si-woo, the cynical boss with a terrifying reputation. Unexpectedly, she regains spark in her life as she gets to know the kindness behind his stern words. Amid repeated commutes, accidents at work, and failed relationships, the two become each other's irreplaceable anchor.",
+    "poster": "https://image.tmdb.org/t/p/w500/gTP1MKGz5kIrXCpb3HTgzVyIW6l.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zftF4KDGuhAGIA50bywcCXPjz5f.jpg",
+    "rating": 8.8,
+    "release_date": "2026-06-22",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "kBGgK8F3CSU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADNRMAArgzoEUFsj-S06LRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "271016-mystic-nine",
     "tmdb_id": 271016,
     "imdb_id": "",
