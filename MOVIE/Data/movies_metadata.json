@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "260463-daemons-of-the-shadow-realm",
+    "tmdb_id": 260463,
+    "imdb_id": "",
+    "title": "Daemons of the Shadow Realm",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Yuru, a young hunter, lives in a small village deep in the mountains, hunting wild game and leading a humble life with Asa, his younger twin sister. Their peaceful lives are torn apart when a dragon’s roar echoes across the sky. What secrets lurk within their village? What fate awaits them?",
+    "poster": "https://image.tmdb.org/t/p/w500/vIE1llfr1lcmzlsV4xn8vhgtlQN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qc30hdrxHQgN5wiopU4bkRZow5L.jpg",
+    "rating": 8.4,
+    "release_date": "2026-04-04",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "NYFJqJGvUHE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADOhEAAsDqmEVOnFowKvuAzBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1607127-one-last-shot",
     "tmdb_id": 1607127,
     "imdb_id": "",
