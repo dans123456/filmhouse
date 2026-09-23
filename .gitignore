@@ -2,9 +2,14 @@
 node_modules/
 package-lock.json
 
-# Private configuration files
+# Private configuration files & keys
 firebase-key.json
 .env
+*.pem
+*.key
+*.pub
+*_deploy_key*
+id_*
 
 # Python cache
 __pycache__/

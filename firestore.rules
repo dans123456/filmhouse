@@ -9,8 +9,8 @@ service cloud.firestore {
     
     // Settings: Client-side access for app configurations
     match /settings/{setting} {
-      // Restrict internal system documents from public client access
-      allow read, write: if setting != 'backup' && setting != 'new_episodes_notified';
+      // Restrict internal system documents and sensitive bot credentials from public client access
+      allow read, write: if setting != 'backup' && setting != 'new_episodes_notified' && setting != 'telegram';
     }
     
     // Users: Read and write allowed for user profiles and points
