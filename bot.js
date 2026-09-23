@@ -2122,10 +2122,10 @@ async function init() {
     }
 
     if (!botToken) {
-        botToken = "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
+        console.error("FATAL: TELEGRAM_BOT_TOKEN environment variable is not set!");
     }
 
-    const adminBotToken = process.env.ADMIN_BOT_TOKEN || "8669068531:AAEwUFMEWNWk8aXHvTuRQJpmfIAEGjVNe0o";
+    const adminBotToken = process.env.ADMIN_BOT_TOKEN || "";
 
     try {
         const bot = new Telegraf(botToken);
