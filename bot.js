@@ -52,6 +52,12 @@ function escapeHtml(str) {
         .replace(/>/g, "&gt;");
 }
 
+// Markdown escaping helper for clean Telegram formatting
+function escapeMarkdown(str) {
+    if (!str) return "";
+    return String(str).replace(/([_*\[\]()~`>#+=|{}.!\\-])/g, '\\$1');
+}
+
 // Global Telegram helpers and pending requests store (module-scoped for access across setupBot and init)
 let callTelegramWithRetry = async () => {};
 let callAdminTelegramWithRetry = async () => {};
@@ -94,6 +100,17 @@ const savePendingRequestsToDisk = (requests) => {
 // Bot setup helper
 function setupBot(bot, adminBot) {
     let disableImmediateBlockedBotWrite = false;
+
+    // Global Telegraf error handlers to keep polling loops alive during network or formatting glitches
+    bot.catch((err, ctx) => {
+        console.error(`[PublicBot Error] Handled error on update ${ctx ? ctx.updateType : 'unknown'}:`, err.message || err);
+    });
+
+    if (adminBot && typeof adminBot.catch === 'function') {
+        adminBot.catch((err, ctx) => {
+            console.error(`[AdminBot Error] Handled error on update ${ctx ? ctx.updateType : 'unknown'}:`, err.message || err);
+        });
+    }
 
     // Middleware to automatically make all context replies direct thread replies to the triggering message
     bot.use(async (ctx, next) => {
@@ -970,7 +987,8 @@ function setupBot(bot, adminBot) {
 
     // Command: /start
     bot.command('start', async (ctx) => {
-        const userId = String(ctx.from.id);
+        try {
+            const userId = String(ctx.from.id);
         const username = ctx.from.username || "";
         const fullName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" ") || "Guest User";
         
@@ -1390,10 +1408,32 @@ function setupBot(bot, adminBot) {
                     console.error("Failed to send fallback CDN photo:", cdnErr.message);
                 }
             }
-            return ctx.reply(caption, {
-                parse_mode: 'HTML',
-                reply_markup: replyMarkup
-            });
+            try {
+                return await ctx.reply(caption, {
+                    parse_mode: 'HTML',
+                    reply_markup: replyMarkup
+                });
+            } catch (textHtmlErr) {
+                console.warn("HTML caption reply failed, falling back to plain text:", textHtmlErr.message);
+                const plainCaption = caption.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+                return await ctx.reply(plainCaption, {
+                    reply_markup: replyMarkup
+                }).catch(finalErr => console.error("Final fallback text reply failed:", finalErr.message));
+            }
+        }
+    } catch (fatalStartErr) {
+            console.error("[Fatal /start Error] Caught unhandled exception in /start handler:", fatalStartErr);
+            try {
+                await ctx.reply("🍿 Welcome to Film House! Tap below to open the app:", {
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: "Launch Film House 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }]
+                        ]
+                    }
+                });
+            } catch (fallbackSendErr) {
+                console.error("Critical fallback reply failed:", fallbackSendErr.message);
+            }
         }
     });
 
@@ -1467,19 +1507,34 @@ function setupBot(bot, adminBot) {
         };
 
         const usernameDisplay = username && username !== "guest" && username !== "None" ? '@' + username.replace(/^@/, '') : "None";
+        const safeUsername = escapeMarkdown(usernameDisplay);
 
-        return ctx.reply(
-            `👤 *Your Profile Status*\n\n` +
-            `• *Telegram ID:* \`${userId}\`\n` +
-            `• *Username:* ${usernameDisplay}\n` +
-            `• *Loyalty Points:* 🪙 \`${points.toLocaleString()}\` pts\n` +
-            `• *VIP Badge:* 🏆 \`${badge}\``,
-            { 
-                parse_mode: 'Markdown',
-                reply_markup: replyMarkup,
-                reply_to_message_id: ctx.message.message_id
-            }
-        );
+        try {
+            return await ctx.reply(
+                `👤 *Your Profile Status*\n\n` +
+                `• *Telegram ID:* \`${userId}\`\n` +
+                `• *Username:* ${safeUsername}\n` +
+                `• *Loyalty Points:* 🪙 \`${points.toLocaleString()}\` pts\n` +
+                `• *VIP Badge:* 🏆 \`${badge}\``,
+                { 
+                    parse_mode: 'Markdown',
+                    reply_markup: replyMarkup,
+                    reply_to_message_id: ctx.message.message_id
+                }
+            );
+        } catch (settingsErr) {
+            return await ctx.reply(
+                `👤 Your Profile Status\n\n` +
+                `• Telegram ID: ${userId}\n` +
+                `• Username: ${usernameDisplay}\n` +
+                `• Loyalty Points: 🪙 ${points.toLocaleString()} pts\n` +
+                `• VIP Badge: 🏆 ${badge}`,
+                { 
+                    reply_markup: replyMarkup,
+                    reply_to_message_id: ctx.message.message_id
+                }
+            );
+        }
     });
 
     // Command: /ping
