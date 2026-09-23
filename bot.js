@@ -1,8 +1,29 @@
-try { require("dotenv").config(); } catch (e) {}
-const { Telegraf } = require("telegraf");
-const admin = require("firebase-admin");
 const fs = require("fs");
 const path = require("path");
+
+// Native .env parser (guarantees instant loading of .env without external dependencies)
+try {
+    const envPath = path.join(__dirname, ".env");
+    if (fs.existsSync(envPath)) {
+        const envContent = fs.readFileSync(envPath, "utf8");
+        envContent.split(/\r?\n/).forEach(line => {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith("#")) return;
+            const eqIdx = trimmed.indexOf("=");
+            if (eqIdx > 0) {
+                const key = trimmed.substring(0, eqIdx).trim();
+                const val = trimmed.substring(eqIdx + 1).trim();
+                if (!process.env[key]) {
+                    process.env[key] = val;
+                }
+            }
+        });
+        console.log("[Config] Loaded environment variables from .env successfully.");
+    }
+} catch (e) {}
+
+const { Telegraf } = require("telegraf");
+const admin = require("firebase-admin");
 const http = require("http");
 const crypto = require("crypto");
 const LocalUserStore = require("./localStore");
@@ -2177,7 +2198,7 @@ async function init() {
     }
 
     if (!botToken) {
-        botToken = "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
+        botToken = "8777518927:AAHl73JHfOXQrDGk-DR92XWoVkBMpMKXvYQ";
         console.log("Using default Film House Telegram Bot Token.");
     }
 
