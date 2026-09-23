@@ -359,6 +359,9 @@ function setupBot(bot, adminBot) {
 
             const keyboard = [
                 [
+                    { text: "👑 Open Admin Panel 🚀", web_app: { url: "https://dans123456.github.io/filmhouse/admin.html" } }
+                ],
+                [
                     { text: "📋 Pending Requests", callback_data: "admin_pending" },
                     { text: "📜 Server Logs", callback_data: "admin_logs" }
                 ],
@@ -397,6 +400,9 @@ function setupBot(bot, adminBot) {
             }
 
             const keyboard = [
+                [
+                    { text: "👑 Open Admin to Fulfill 🚀", web_app: { url: "https://dans123456.github.io/filmhouse/admin.html" } }
+                ],
                 [
                     { text: "🔄 Refresh Requests", callback_data: "admin_pending" },
                     { text: "« Back to Menu", callback_data: "admin_menu" }
@@ -2073,13 +2079,15 @@ async function init() {
                         const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
                         for (const adminId of allAdmins) {
                             try {
+                                const adminUrl = `https://dans123456.github.io/filmhouse/admin.html?tg_id=${adminId}`;
+                                const fulfillBtn = String(adminId).startsWith("-")
+                                    ? { text: "👑 Open Film House Admin to Fulfill 🚀", url: adminUrl }
+                                    : { text: "👑 Open Film House Admin to Fulfill 🚀", web_app: { url: adminUrl } };
                                 await callAdminTelegramWithRetry('sendMessage', adminId, adminText, {
                                     parse_mode: "HTML",
                                     reply_markup: {
                                         inline_keyboard: [
-                                            [
-                                                { text: "🍿 Open Film House to Fulfill 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }
-                                            ]
+                                            [fulfillBtn]
                                         ]
                                     }
                                 });
@@ -2142,13 +2150,15 @@ async function init() {
 
                             for (const adminId of allAdmins) {
                                 try {
+                                    const adminUrl = `https://dans123456.github.io/filmhouse/admin.html?tg_id=${adminId}`;
+                                    const boostFulfillBtn = String(adminId).startsWith("-")
+                                        ? { text: "⚡🔥 Open Admin to Fulfill Priority 🚀", url: adminUrl }
+                                        : { text: "⚡🔥 Open Admin to Fulfill Priority 🚀", web_app: { url: adminUrl } };
                                     await callAdminTelegramWithRetry('sendMessage', adminId, adminBoostText, {
                                         parse_mode: "HTML",
                                         reply_markup: {
                                             inline_keyboard: [
-                                                [
-                                                    { text: "⚡🔥 Fulfill High Priority Request 🚀", url: "https://t.me/Filmhouseappbot/filmhouseapp" }
-                                                ]
+                                                [boostFulfillBtn]
                                             ]
                                         }
                                     });
@@ -2253,19 +2263,18 @@ async function init() {
                                                      `🍿 <b>Requested for:</b> ${displayUser} (ID: <code>${escapeHtml(userId)}</code>)\n\n` +
                                                      `⚡ <b>Remaining Queue:</b> <code>${pendingCount}</code> pending request(s) left.`;
 
-                                const adminReplyMarkup = downloadLink ? {
-                                    inline_keyboard: [
-                                        [
-                                            { text: "🎬 Watch / Download Movie 🍿", url: downloadLink }
-                                        ],
-                                        [
-                                            { text: "🚀 Open Film House App 🍿", url: "https://t.me/Filmhouseappbot/filmhouseapp" }
-                                        ]
-                                    ]
-                                } : undefined;
-
                                 for (const adminId of allAdmins) {
                                     try {
+                                        const adminUrl = `https://dans123456.github.io/filmhouse/admin.html?tg_id=${adminId}`;
+                                        const adminPanelBtn = String(adminId).startsWith("-")
+                                            ? { text: "👑 Open Film House Admin 🚀", url: adminUrl }
+                                            : { text: "👑 Open Film House Admin 🚀", web_app: { url: adminUrl } };
+                                        const adminReplyMarkup = {
+                                            inline_keyboard: [
+                                                ...(downloadLink ? [[{ text: "🎬 Watch / Download Movie 🍿", url: downloadLink }]] : []),
+                                                [adminPanelBtn]
+                                            ]
+                                        };
                                         await callAdminTelegramWithRetry('sendMessage', adminId, adminNotifyText, {
                                             parse_mode: "HTML",
                                             reply_markup: adminReplyMarkup
@@ -2388,7 +2397,18 @@ async function init() {
 
                     for (const adminId of allAdmins) {
                         try {
-                            await (adminBot || bot).telegram.sendMessage(adminId, adminMsg, { parse_mode: "Markdown" });
+                            const adminUrl = `https://dans123456.github.io/filmhouse/admin.html?tg_id=${adminId}`;
+                            const adminEpBtn = String(adminId).startsWith("-")
+                                ? { text: "👑 Open Film House Admin 🚀", url: adminUrl }
+                                : { text: "👑 Open Film House Admin 🚀", web_app: { url: adminUrl } };
+                            await (adminBot || bot).telegram.sendMessage(adminId, adminMsg, {
+                                parse_mode: "Markdown",
+                                reply_markup: {
+                                    inline_keyboard: [
+                                        [adminEpBtn]
+                                    ]
+                                }
+                            });
                         } catch (err) {
                             console.warn(`Failed to send new episode alert to admin ${adminId}:`, err.message);
                         }
