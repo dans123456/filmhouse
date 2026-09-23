@@ -982,7 +982,7 @@ function fulfillMovieTitleRequests(title, docIds) {
                 if (!modal || !titleEl) return;
                 
                 currentFulfillTitle = title;
-                currentFulfillDocIds = docIds;
+                currentFulfillDocIds = Array.from(new Set([...(docIds || []), ...snapshot.docs.map(d => d.id)]));
                 
                 titleEl.textContent = `Fulfill Request: "${title}"`;
                 
@@ -2179,7 +2179,10 @@ function showMovieDetails(movie) {
         </div>
 
         <div style="display: flex; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 10px;">
-            <button class="btn btn-secondary btn-block" id="btn-details-delete-movie" data-csv-id="${movie.csv_id}" style="border-color: rgba(255, 59, 48, 0.4); color: #ff3b30; background: rgba(255, 59, 48, 0.05); cursor: pointer; padding: 12px; font-weight: 600; transition: all 0.3s;">
+            <button type="button" class="btn btn-secondary" id="btn-details-post-channel" data-csv-id="${movie.csv_id}" style="flex: 1; border-color: rgba(0, 136, 204, 0.4); color: #0088cc; background: rgba(0, 136, 204, 0.08); cursor: pointer; padding: 12px; font-weight: 700; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                📢 Post to Channel
+            </button>
+            <button type="button" class="btn btn-secondary" id="btn-details-delete-movie" data-csv-id="${movie.csv_id}" style="flex: 1; border-color: rgba(255, 59, 48, 0.4); color: #ff3b30; background: rgba(255, 59, 48, 0.05); cursor: pointer; padding: 12px; font-weight: 600; transition: all 0.3s;">
                 Delete Title 🗑️
             </button>
         </div>
@@ -2443,6 +2446,56 @@ function showMovieDetails(movie) {
                     deleteBtn.style.backgroundColor = "rgba(255, 59, 48, 0.05)";
                     deleteBtn.style.color = "#ff3b30";
                 }, 3000);
+            }
+        });
+    }
+
+    // Bind Post to Channel inside details modal
+    const postChannelBtn = document.getElementById("btn-details-post-channel");
+    if (postChannelBtn) {
+        postChannelBtn.addEventListener("click", async () => {
+            postChannelBtn.disabled = true;
+            postChannelBtn.textContent = "Posting to Channel... ⏳";
+            try {
+                const deepLink = `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${movie.csv_id || movie.tmdb_id}`;
+                const isSeries = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
+                const seasonText = isSeries ? "Complete Series" : "Full Movie";
+                const cleanTitle = (movie.title || "Movie Update").replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                const yearText = movie.release_date ? ` (${movie.release_date.substring(0, 4)})` : "";
+                const caption = `<b>${escapeHTML(cleanTitle)}</b>${yearText}\n${seasonText}\n\n👉 <a href="${deepLink}">CLICK HERE</a> ✔️`;
+
+                const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAGy34k3vhx2QtitGQh8n9B1RTt-1xOMuzQ";
+                let posterUrl = getPosterUrl(movie.poster);
+                if (posterUrl && (posterUrl.includes("w500") || posterUrl.includes("w300"))) {
+                    posterUrl = posterUrl.replace(/\/w(300|500)\//, "/w780/");
+                }
+
+                const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: "-1002098683402",
+                        photo: posterUrl,
+                        caption: caption,
+                        parse_mode: "HTML",
+                        reply_markup: {
+                            inline_keyboard: [
+                                [{ text: "🍿 Watch / Download on Film House 🚀", url: deepLink }]
+                            ]
+                        }
+                    })
+                });
+                const resData = await res.json();
+                if (resData.ok) {
+                    showToast(`Successfully published "${movie.title}" announcement to @filmhouse_main! 📢`, "success");
+                } else {
+                    showToast(`Channel post notice: ${resData.description}. (Make sure @Filmhouseappbot is an Admin in @filmhouse_main with Post Messages permission)`, "warning");
+                }
+            } catch (e) {
+                showToast("Failed to post to channel: " + e.message, "error");
+            } finally {
+                postChannelBtn.disabled = false;
+                postChannelBtn.textContent = "📢 Post to Channel";
             }
         });
     }
@@ -3926,12 +3979,39 @@ const fulfillForm = document.getElementById("fulfill-request-form");
 const fulfillRequestModal = document.getElementById("fulfill-request-modal");
 const closeFulfillModalBtn = document.getElementById("btn-close-fulfill-modal");
 
-if (closeFulfillModalBtn && fulfillRequestModal) {
-    closeFulfillModalBtn.addEventListener("click", () => {
-        releaseClaimLock(currentFulfillTitle);
-        fulfillRequestModal.classList.remove("active");
+window.closeFulfillRequestModal = function() {
+    const modal = document.getElementById("fulfill-request-modal");
+    if (modal) {
+        modal.classList.remove("active");
+    }
+    currentFulfillTitle = "";
+    currentFulfillDocIds = [];
+};
+
+if (closeFulfillModalBtn) {
+    closeFulfillModalBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeFulfillRequestModal();
     });
 }
+
+if (fulfillRequestModal) {
+    fulfillRequestModal.addEventListener("click", (e) => {
+        if (e.target === fulfillRequestModal) {
+            closeFulfillRequestModal();
+        }
+    });
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        const modal = document.getElementById("fulfill-request-modal");
+        if (modal && modal.classList.contains("active")) {
+            closeFulfillRequestModal();
+        }
+    }
+});
 
 function renderFulfillLinksInputs(existingMovie, isSeries = true, reqSpec = "") {
     const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
@@ -4249,13 +4329,27 @@ if (fulfillForm && fulfillRequestModal) {
         }
         
         // 2. Commit Firestore batch update (chunked into groups of 450 to avoid Firestore limits)
+        let targetDocIds = Array.isArray(currentFulfillDocIds) && currentFulfillDocIds.length > 0 ? [...currentFulfillDocIds] : [];
+        if (targetDocIds.length === 0 && currentFulfillTitle) {
+            const cleanT = currentFulfillTitle.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+            allRequests.forEach(r => {
+                if (r.docId && r.title && r.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim() === cleanT) {
+                    targetDocIds.push(r.docId);
+                }
+            });
+        }
+
         const requestChunks = [];
-        for (let i = 0; i < currentFulfillDocIds.length; i += 450) {
-            requestChunks.push(currentFulfillDocIds.slice(i, i + 450));
+        for (let i = 0; i < targetDocIds.length; i += 450) {
+            requestChunks.push(targetDocIds.slice(i, i + 450));
         }
  
         const tgUserForFulfill = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
         const currentAdminName = tgUserForFulfill ? (tgUserForFulfill.username ? `@${tgUserForFulfill.username}` : `${tgUserForFulfill.first_name || 'Admin'}`) : "Admin";
+        const currentAdminId = String(tgUserForFulfill ? tgUserForFulfill.id : (sessionStorage.getItem("admin_auth_id") || new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || ""));
+
+        const postToChanEl = document.getElementById("fulfill-post-to-channel");
+        const shouldPostToChannel = postToChanEl ? postToChanEl.checked : true;
 
         const fulfillPromises = requestChunks.map((chunk, chunkIdx) => {
             const batch = db.batch();
@@ -4266,6 +4360,8 @@ if (fulfillForm && fulfillRequestModal) {
                     downloadLink: downloadLink,
                     fulfilledBy: currentAdminName,
                     fulfilledById: currentAdminId || "",
+                    publishToChannel: shouldPostToChannel,
+                    channelPosted: false,
                     fulfilledAt: firebase.firestore.FieldValue.serverTimestamp(),
                     adminClaimId: firebase.firestore.FieldValue.delete(),
                     adminClaimName: firebase.firestore.FieldValue.delete(),
@@ -4273,8 +4369,9 @@ if (fulfillForm && fulfillRequestModal) {
                 });
             });
             if (chunkIdx === 0 && movieToSync) {
+                const sanitizedMovie = JSON.parse(JSON.stringify(movieToSync));
                 const movieRef = db.collection("movies").doc(movieToSync.csv_id);
-                batch.set(movieRef, movieToSync, { merge: true });
+                batch.set(movieRef, sanitizedMovie, { merge: true });
             }
             return batch.commit();
         });

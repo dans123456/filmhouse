@@ -1126,8 +1126,8 @@
         <div class="admin-modal-container" style="max-width: 520px; width: 95%;">
             <div class="modal-header">
                 <h3 id="fulfill-modal-title">Fulfill Request</h3>
-                <button class="close-modal-btn" id="btn-close-fulfill-modal">
-                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><use href="#icon-close"></use></svg>
+                <button type="button" class="close-modal-btn" id="btn-close-fulfill-modal" onclick="closeFulfillRequestModal()" title="Close" aria-label="Close" style="cursor: pointer; z-index: 10;">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;pointer-events:none;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
                 </button>
             </div>
             <form id="fulfill-request-form" onsubmit="event.preventDefault();">
@@ -1140,10 +1140,19 @@
                         <button type="button" class="btn btn-secondary btn-sm" id="btn-add-fulfill-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">+ Add Another Season / Link</button>
                     </div>
                 </div>
-                <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 16px;">
+                <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 14px;">
                     💡 Season 1 link will be sent directly to Telegram users. All published seasons will be saved into their exact slots in the Film House App!
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px; font-weight: 700; border-radius: var(--border-radius-md);">Submit Fulfillment 📥</button>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; background: rgba(0, 136, 204, 0.08); border: 1px solid rgba(0, 136, 204, 0.25); padding: 10px 12px; border-radius: 6px;">
+                    <input type="checkbox" id="fulfill-post-to-channel" checked style="width: 16px; height: 16px; accent-color: #0088cc; cursor: pointer;">
+                    <label for="fulfill-post-to-channel" style="margin: 0; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; user-select: none;">
+                        📢 Post release announcement to Main Channel (@filmhouse_main)
+                    </label>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeFulfillRequestModal()" style="flex: 1; height: 42px; font-weight: 600; border-radius: var(--border-radius-md);">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 2; height: 42px; font-weight: 700; border-radius: var(--border-radius-md);">Submit Fulfillment 📥</button>
+                </div>
             </form>
         </div>
     </div>
@@ -1155,6 +1164,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=83"></script>
+    <script src="admin.js?v=84"></script>
 </body>
 </html>

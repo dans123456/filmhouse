@@ -55,6 +55,7 @@ function escapeHtml(str) {
 // Global Telegram helpers and pending requests store (module-scoped for access across setupBot and init)
 let callTelegramWithRetry = async () => {};
 let callAdminTelegramWithRetry = async () => {};
+let publishMovieToChannel = async () => {};
 const PENDING_FILE = path.join(__dirname, "data", "pending_requests.json");
 let cachedPendingRequests = [];
 
@@ -226,6 +227,81 @@ function setupBot(bot, adminBot) {
         }
     };
 
+    // Engine: Publish new movie/series release update to Film House Main Channel (@filmhouse_main)
+    publishMovieToChannel = async function(movieInfo) {
+        const channelTarget = "-1002098683402"; // Film House Main Channel (@filmhouse_main)
+        try {
+            const rawTitle = movieInfo.title || "Movie Update";
+            const cleanTitle = String(rawTitle).replace(/\s*\([^)]+\)\s*$/g, "").replace(/[*_`~]/g, "").trim();
+            const yearText = movieInfo.year ? ` (${movieInfo.year})` : "";
+            const isSeries = (movieInfo.type || "").toLowerCase() === "series" || (movieInfo.type || "").toLowerCase() === "tv";
+            const rawSeason = movieInfo.seasonOrPart || (isSeries ? "Complete Series" : "Full Movie");
+
+            let seasonOrQualityText = isSeries 
+                ? (String(rawSeason).toLowerCase().includes("season") ? rawSeason : `Season ${rawSeason}`)
+                : (String(rawSeason).toLowerCase().includes("quality") ? rawSeason : `${rawSeason} Quality`);
+            if (movieInfo.isSeriesComplete) {
+                seasonOrQualityText = "Complete Series | All Seasons";
+            }
+
+            const movieId = movieInfo.csv_id || movieInfo.tmdb_id || movieInfo.id || "";
+            const deepLinkUrl = movieId 
+                ? `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${movieId}` 
+                : `https://t.me/Filmhouseappbot/filmhouseapp`;
+
+            const caption = 
+                `<b>${escapeHtml(cleanTitle)}</b>${escapeHtml(yearText)}\n` +
+                `${escapeHtml(seasonOrQualityText)}\n\n` +
+                `👉 <a href="${deepLinkUrl}">CLICK HERE</a> ✔️`;
+
+            const replyMarkup = {
+                inline_keyboard: [
+                    [
+                        { text: "🍿 Watch / Download on Film House 🚀", url: deepLinkUrl }
+                    ]
+                ]
+            };
+
+            let posterUrl = movieInfo.poster && String(movieInfo.poster).startsWith("http") 
+                ? movieInfo.poster 
+                : (movieInfo.backdrop && String(movieInfo.backdrop).startsWith("http") ? movieInfo.backdrop : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
+
+            if (posterUrl.includes("image.tmdb.org/t/p/w500") || posterUrl.includes("image.tmdb.org/t/p/w300")) {
+                posterUrl = posterUrl.replace(/\/w(300|500)\//, "/w780/");
+            }
+
+            console.log(`[CHANNEL PUBLISH] Publishing "${cleanTitle}" announcement to @filmhouse_main...`);
+
+            const sendPhotoCall = async (botInstance) => {
+                if (!botInstance) throw new Error("Bot instance unavailable");
+                return await botInstance.telegram.sendPhoto(channelTarget, posterUrl, {
+                    caption: caption,
+                    parse_mode: "HTML",
+                    reply_markup: replyMarkup
+                });
+            };
+
+            let result = null;
+            try {
+                result = await sendPhotoCall(bot);
+                console.log(`[CHANNEL PUBLISH] Published to @filmhouse_main via public bot (msg_id: ${result.message_id})`);
+            } catch (botErr) {
+                console.warn(`[CHANNEL PUBLISH] Public bot failed: ${botErr.message}. Trying admin bot...`);
+                try {
+                    result = await sendPhotoCall(adminBot);
+                    console.log(`[CHANNEL PUBLISH] Published to @filmhouse_main via admin bot (msg_id: ${result.message_id})`);
+                } catch (adminErr) {
+                    console.warn(`[CHANNEL PUBLISH] Admin bot also failed: ${adminErr.message}`);
+                    throw adminErr;
+                }
+            }
+            return result;
+        } catch (err) {
+            console.warn(`[CHANNEL PUBLISH] Notice: Could not post to channel: ${err.message}. (Ensure @Filmhouseappbot is an Administrator in @filmhouse_main with 'Post Messages' permission enabled)`);
+            return null;
+        }
+    };
+
     // ==========================================
     // DEDICATED ADMIN BOT SUITE (@Fiimhouse_adminBot)
     // ==========================================
@@ -236,6 +312,7 @@ function setupBot(bot, adminBot) {
             { command: 'menu', description: '👑 Show Admin Menu' },
             { command: 'logs', description: '📜 View live server logs' },
             { command: 'pending', description: '📋 View pending movie requests' },
+            { command: 'post', description: '📢 Post title announcement to @filmhouse_main' },
             { command: 'backup', description: '💾 Download weekly CSV backup' },
             { command: 'stats', description: '📊 Detailed server metrics' }
         ]).catch(err => console.warn('Could not set admin bot commands:', err.message));
@@ -513,6 +590,68 @@ function setupBot(bot, adminBot) {
                 ).catch(() => {});
             } catch (err) {
                 return ctx.reply(`❌ Backup failed: ${err.message}`, {
+                    reply_markup: {
+                        inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                    }
+                });
+            }
+        });
+
+        // Command: /post <Title> - Publish title announcement to @filmhouse_main
+        adminBot.command('post', async (ctx) => {
+            const raw = ctx.message && ctx.message.text ? ctx.message.text : "";
+            const query = raw.replace(/^\/post(@\w+)?/i, '').trim();
+            if (!query) {
+                return ctx.reply("📢 *Usage:* `/post <Movie or Series Title>`\n\nExample: `/post Inception` or `/post Young Sheldon`\nThis will publish the title announcement with high-res poster and deep link to @filmhouse_main.", {
+                    parse_mode: "Markdown",
+                    reply_markup: {
+                        inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                    }
+                });
+            }
+            await ctx.reply(`🔍 Searching for "${escapeHtml(query)}" to publish...`, { parse_mode: "HTML" });
+            try {
+                let foundMovie = null;
+                const qSnap = await db.collection("movies").where("title", "==", query).limit(1).get();
+                if (!qSnap.empty) {
+                    foundMovie = qSnap.docs[0].data();
+                } else {
+                    const allSnap = await db.collection("movies").limit(100).get();
+                    for (const doc of allSnap.docs) {
+                        const m = doc.data();
+                        if (m.title && m.title.toLowerCase().includes(query.toLowerCase())) {
+                            foundMovie = m;
+                            break;
+                        }
+                    }
+                }
+                if (!foundMovie) {
+                    foundMovie = {
+                        title: query,
+                        type: "Movie",
+                        seasonOrPart: "Full Movie",
+                        poster: "https://dans123456.github.io/filmhouse/img/FilmHouse.png"
+                    };
+                }
+                const res = await publishMovieToChannel(foundMovie);
+                if (res && res.message_id) {
+                    return ctx.reply(`✅ <b>Published to @filmhouse_main!</b>\n\n🎬 <b>Title:</b> ${escapeHtml(foundMovie.title)}\n🔗 <b>Message ID:</b> <code>${res.message_id}</code>`, {
+                        parse_mode: "HTML",
+                        reply_markup: {
+                            inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                        }
+                    });
+                } else {
+                    return ctx.reply(`⚠️ *Notice:* Could not post to @filmhouse_main.\n\nPlease make sure *@Filmhouseappbot* is added to your channel *@filmhouse_main* as an *Administrator* with *Post Messages* permission enabled!`, {
+                        parse_mode: "Markdown",
+                        reply_markup: {
+                            inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                        }
+                    });
+                }
+            } catch (err) {
+                return ctx.reply(`❌ *Failed to post:* ${err.message}`, {
+                    parse_mode: "Markdown",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
@@ -2239,6 +2378,39 @@ async function init() {
                                     isBlockedUser: isBlocked,
                                     notifiedAt: admin.firestore.FieldValue.serverTimestamp()
                                 }).catch(() => {});
+                            }
+
+                            // Auto-publish release announcement to Main Channel (@filmhouse_main)
+                            if (data.publishToChannel !== false && data.channelPosted !== true) {
+                                try {
+                                    let movieDataForChannel = null;
+                                    if (data.csv_id) {
+                                        const mDoc = await db.collection("movies").doc(data.csv_id).get();
+                                        if (mDoc.exists) movieDataForChannel = mDoc.data();
+                                    }
+                                    if (!movieDataForChannel) {
+                                        movieDataForChannel = {
+                                            title: title,
+                                            year: year,
+                                            type: data.type,
+                                            seasonOrPart: data.seasonOrPart,
+                                            csv_id: data.csv_id || "",
+                                            tmdb_id: data.tmdb_id || null,
+                                            poster: data.poster || null,
+                                            backdrop: data.backdrop || null
+                                        };
+                                    }
+                                    const pubResult = await publishMovieToChannel(movieDataForChannel);
+                                    if (pubResult && pubResult.message_id) {
+                                        await db.collection("requests").doc(docId).update({
+                                            channelPosted: true,
+                                            channelMessageId: pubResult.message_id,
+                                            channelPostedAt: admin.firestore.FieldValue.serverTimestamp()
+                                        }).catch(() => {});
+                                    }
+                                } catch (pubErr) {
+                                    console.warn("Error auto-publishing request fulfillment to channel:", pubErr.message);
+                                }
                             }
 
                             // Notify admins of the fulfillment

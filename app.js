@@ -6878,9 +6878,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     handleTelegramAuth();
     updateUserGreeting();
 
-    // Parse Telegram startapp parameter (e.g. startapp=mining or boost_docId)
+    // Parse Telegram startapp parameter (e.g. startapp=mining or boost_docId or movie_id)
     let initialScreen = "home";
     let boostRequestDocId = null;
+    let targetDeepLinkMovieId = null;
     if (state.isTelegram && window.Telegram && window.Telegram.WebApp) {
         const initData = window.Telegram.WebApp.initDataUnsafe;
         if (initData && initData.start_param) {
@@ -6890,7 +6891,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 initialScreen = "mining";
             } else if (param.startsWith("boost_")) {
                 boostRequestDocId = rawParam.substring(6);
+            } else if (param.startsWith("movie_") || param.startsWith("open_") || param.startsWith("watch_")) {
+                targetDeepLinkMovieId = rawParam.replace(/^(movie_|open_|watch_)/i, "").trim();
             }
+        }
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryMovie = urlParams.get("movie") || urlParams.get("id");
+    const queryStartApp = urlParams.get("startapp") || urlParams.get("tgWebAppStartParam");
+    if (!targetDeepLinkMovieId) {
+        if (queryMovie) {
+            targetDeepLinkMovieId = queryMovie.trim();
+        } else if (queryStartApp && (queryStartApp.startsWith("movie_") || queryStartApp.startsWith("open_") || queryStartApp.startsWith("watch_"))) {
+            targetDeepLinkMovieId = queryStartApp.replace(/^(movie_|open_|watch_)/i, "").trim();
         }
     }
     
@@ -7158,6 +7171,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }).catch(err => console.warn("Error loading boost request details:", err));
             }
         }, 3000);
+    }
+
+    if (targetDeepLinkMovieId) {
+        setTimeout(() => {
+            const cleanTarget = targetDeepLinkMovieId.toLowerCase().trim();
+            const movie = state.allMovies.find(m => {
+                const csvMatch = m.csv_id && String(m.csv_id).toLowerCase() === cleanTarget;
+                const tmdbMatch = m.tmdb_id && String(m.tmdb_id).toLowerCase() === cleanTarget;
+                const titleMatch = m.title && m.title.toLowerCase().trim() === cleanTarget;
+                const slugMatch = m.csv_id && m.csv_id.toLowerCase().includes(cleanTarget);
+                return csvMatch || tmdbMatch || titleMatch || slugMatch;
+            });
+            if (movie) {
+                openDetailModal(movie);
+            }
+        }, 1500);
     }
 
     // 11. Clear loader splash page with a cinematic 1.5s delay presentation
