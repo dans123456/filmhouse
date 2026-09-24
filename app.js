@@ -2406,11 +2406,56 @@ function renderFeaturedGrid(preservePagination = false) {
 
     // Apply Search Term with tokenized multi-word and year matching
     if (state.searchQuery) {
-        const query = state.searchQuery.toLowerCase().trim();
-        const tokens = query.split(/\s+/).filter(Boolean);
+        const raw = state.searchQuery.toLowerCase().trim();
+        const cleanTokens = raw.replace(/[()[\]{}.,:;!?'"`\-_/\\]/g, ' ').split(/\s+/).filter(Boolean);
+        const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
+        const targetYear = yearMatch ? yearMatch[1] : null;
+        const titleOnlyTokens = cleanTokens.filter(t => t !== targetYear);
+        const searchTitleStr = titleOnlyTokens.join(" ");
+
         list = list.filter(m => {
             const searchTarget = m._searchStr || buildMovieSearchStr(m);
-            return tokens.every(tok => searchTarget.includes(tok));
+            return cleanTokens.every(tok => searchTarget.includes(tok));
+        });
+
+        // Re-score and sort matches so most relevant matches (exact title / year) appear first
+        list.sort((a, b) => {
+            const aTitle = (a.title || "").toLowerCase().trim();
+            const bTitle = (b.title || "").toLowerCase().trim();
+            const aYear = a.release_date ? String(a.release_date).substring(0, 4) : (a.year ? String(a.year) : "");
+            const bYear = b.release_date ? String(b.release_date).substring(0, 4) : (b.year ? String(b.year) : "");
+
+            // 1. Exact title + exact year match
+            if (targetYear && searchTitleStr) {
+                const aExactBoth = aTitle === searchTitleStr && aYear === targetYear;
+                const bExactBoth = bTitle === searchTitleStr && bYear === targetYear;
+                if (aExactBoth && !bExactBoth) return -1;
+                if (!aExactBoth && bExactBoth) return 1;
+            }
+
+            // 2. Exact title match
+            if (searchTitleStr) {
+                const aExactTitle = aTitle === searchTitleStr;
+                const bExactTitle = bTitle === searchTitleStr;
+                if (aExactTitle && !bExactTitle) return -1;
+                if (!aExactTitle && bExactTitle) return 1;
+
+                // 3. Title starts with search title
+                const aStarts = aTitle.startsWith(searchTitleStr);
+                const bStarts = bTitle.startsWith(searchTitleStr);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+            }
+
+            // 4. Exact year match
+            if (targetYear) {
+                const aYearMatch = aYear === targetYear;
+                const bYearMatch = bYear === targetYear;
+                if (aYearMatch && !bYearMatch) return -1;
+                if (!aYearMatch && bYearMatch) return 1;
+            }
+
+            return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
         });
 
         if (state.externalSearchResults && state.externalSearchResults.length > 0) {
@@ -2627,9 +2672,13 @@ function renderEditorsChoice() {
         picks = state.editorPicks.map(id => state.movies.find(m => m.csv_id === id)).filter(Boolean);
     }
 
-    // Fallback if no picks are loaded/saved yet (use top 10 rated catalog movies)
+    // Fallback if no picks are loaded/saved yet (use top rated catalog movies)
     if (picks.length === 0) {
-        picks = state.movies.filter(m => m.rating >= 7.5).slice(0, 10);
+        picks = state.movies.filter(m => (parseFloat(m.rating) || 0) >= 7.0).slice(0, 12);
+    }
+
+    if (picks.length === 0 && state.movies.length > 0) {
+        picks = state.movies.slice(0, 10);
     }
 
     if (picks.length === 0) {
@@ -4816,6 +4865,89 @@ async function fetchTmdbCategoryMovies(category) {
     }
 }
 
+// Helper to perform smart TMDB search supporting year extraction and parallel TV/Movie/Multi queries
+async function fetchTmdbSearchResults(query, apiKey) {
+    if (!query) return [];
+    const raw = query.trim();
+    const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
+    const matchedYear = yearMatch ? yearMatch[1] : null;
+    const cleanTitle = raw
+        .replace(/\b(19\d\d|20\d\d)\b/g, '')
+        .replace(/[()[\]{}.,:;!?'"`\-_/\\]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    let allResults = [];
+
+    if (matchedYear && cleanTitle.length >= 2) {
+        // Query TV, Movie, and Multi in parallel with year constraints
+        const tvUrl = `${TMDB_BASE_URL}/search/tv?api_key=${apiKey}&query=${encodeURIComponent(cleanTitle)}&first_air_date_year=${matchedYear}`;
+        const movieUrl = `${TMDB_BASE_URL}/search/movie?api_key=${apiKey}&query=${encodeURIComponent(cleanTitle)}&primary_release_year=${matchedYear}`;
+        const multiUrl = `${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(cleanTitle)}`;
+
+        const [tvRes, movRes, multiRes] = await Promise.allSettled([
+            fetch(tvUrl).then(r => r.ok ? r.json() : null),
+            fetch(movieUrl).then(r => r.ok ? r.json() : null),
+            fetch(multiUrl).then(r => r.ok ? r.json() : null)
+        ]);
+
+        const tvItems = (tvRes.status === 'fulfilled' && tvRes.value?.results) ? tvRes.value.results.map(r => ({ ...r, media_type: 'tv' })) : [];
+        const movItems = (movRes.status === 'fulfilled' && movRes.value?.results) ? movRes.value.results.map(r => ({ ...r, media_type: 'movie' })) : [];
+        const multiItems = (multiRes.status === 'fulfilled' && multiRes.value?.results) ? multiRes.value.results.filter(r => r.media_type === 'movie' || r.media_type === 'tv') : [];
+
+        const seenIds = new Set();
+        const combined = [];
+        [...tvItems, ...movItems].forEach(item => {
+            if (!seenIds.has(item.id)) {
+                seenIds.add(item.id);
+                combined.push(item);
+            }
+        });
+        multiItems.forEach(item => {
+            if (!seenIds.has(item.id)) {
+                seenIds.add(item.id);
+                combined.push(item);
+            }
+        });
+
+        // Prioritize items whose release/air date matches matchedYear and title matches cleanTitle
+        combined.sort((a, b) => {
+            const aTitle = (a.title || a.name || '').toLowerCase().trim();
+            const bTitle = (b.title || b.name || '').toLowerCase().trim();
+            const aDate = a.release_date || a.first_air_date || '';
+            const bDate = b.release_date || b.first_air_date || '';
+            const cleanLower = cleanTitle.toLowerCase();
+
+            const aYearMatch = aDate.startsWith(matchedYear);
+            const bYearMatch = bDate.startsWith(matchedYear);
+            const aExactTitle = aTitle === cleanLower;
+            const bExactTitle = bTitle === cleanLower;
+
+            if (aExactTitle && aYearMatch && !(bExactTitle && bYearMatch)) return -1;
+            if (!(aExactTitle && aYearMatch) && bExactTitle && bYearMatch) return 1;
+
+            if (aYearMatch && !bYearMatch) return -1;
+            if (!aYearMatch && bYearMatch) return 1;
+
+            if (aExactTitle && !bExactTitle) return -1;
+            if (!aExactTitle && bExactTitle) return 1;
+
+            return (b.popularity || 0) - (a.popularity || 0);
+        });
+
+        allResults = combined;
+    } else {
+        const url = `${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(raw)}`;
+        const res = await fetch(url);
+        if (res.ok) {
+            const data = await res.json();
+            allResults = (data.results || []).filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+        }
+    }
+
+    return allResults;
+}
+
 // Global TMDB Multi-Search for global search support
 async function performGlobalTmdbSearch(query) {
     if (!query || query.trim().length < 3 || state.searchQuery !== query) return;
@@ -4824,85 +4956,47 @@ async function performGlobalTmdbSearch(query) {
     console.log("[Search Debug] Starting global search for query:", query);
     try {
         const apiKey = getTmdbApiKey();
-        const url = `${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
-        const res = await fetch(url);
-        console.log("[Search Debug] API response status:", res.status, res.statusText);
-        if (!res.ok) {
-            console.error("[Search Debug] API request failed with status:", res.status);
-            return;
-        }
+        const results = await fetchTmdbSearchResults(query, apiKey);
         
-        const data = await res.json();
-        console.log("[Search Debug] Raw results count:", data.results ? data.results.length : 0);
         if (state.searchQuery !== query) {
             console.warn("[Search Debug] Search query changed while fetching. Aborting render.");
             return;
         }
         
-        if (data.results) {
-            let results = data.results.filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+        console.log("[Search Debug] Filtered movie/tv results count:", results.length);
+        
+        const formatted = results.map(item => {
+            const title = item.title || item.name || "";
+            const releaseDate = item.release_date || item.first_air_date || "";
+            const mType = item.media_type === 'tv' ? 'Series' : 'Movie';
             
-            // If TMDB multi-search returns 0 items and query contains a 4-digit year (e.g. "Avatar 2022"),
-            // try searching with clean title and matching/filtering by release year
-            if (results.length === 0) {
-                const yearMatch = query.match(/\b(19\d\d|20\d\d)\b/);
-                if (yearMatch) {
-                    const matchedYear = yearMatch[1];
-                    const cleanTitle = query.replace(/\b(19\d\d|20\d\d)\b/g, "").trim();
-                    if (cleanTitle.length >= 2) {
-                        try {
-                            const fbRes = await fetch(`${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(cleanTitle)}`);
-                            if (fbRes.ok) {
-                                const fbData = await fbRes.json();
-                                if (fbData.results) {
-                                    const fbFiltered = fbData.results.filter(item => item.media_type === 'movie' || item.media_type === 'tv');
-                                    const yearFiltered = fbFiltered.filter(item => {
-                                        const dateStr = item.release_date || item.first_air_date || "";
-                                        return dateStr.startsWith(matchedYear);
-                                    });
-                                    results = yearFiltered.length > 0 ? yearFiltered : fbFiltered;
-                                }
-                            }
-                        } catch (e) {}
-                    }
-                }
-            }
-            
-            console.log("[Search Debug] Filtered movie/tv results count:", results.length);
-            
-            const formatted = results.map(item => {
-                const title = item.title || item.name || "";
-                const releaseDate = item.release_date || item.first_air_date || "";
-                const mType = item.media_type === 'tv' ? 'Series' : 'Movie';
-                
-                return {
-                    csv_id: String(item.id),
-                    tmdb_id: item.id,
-                    imdb_id: "",
-                    title: title,
-                    type: mType,
-                    categories: [],
-                    genres: [],
-                    overview: item.overview || "No synopsis available.",
-                    poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
-                    backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
-                    rating: Math.round((item.vote_average || 0) * 10) / 10,
-                    release_date: releaseDate,
-                    language: item.original_language || "en",
-                    cast: [],
-                    director: "",
-                    trailer: "",
-                    runtime: "",
-                    links: []
-                };
-            });
-            
-            const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
-            state.externalSearchResults = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
-            console.log("[Search Debug] Final external search results to display:", state.externalSearchResults.length);
-            
-            renderFeaturedGrid();
-        }
+            return {
+                csv_id: String(item.id),
+                tmdb_id: item.id,
+                imdb_id: "",
+                title: title,
+                type: mType,
+                categories: [],
+                genres: [],
+                overview: item.overview || "No synopsis available.",
+                poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
+                backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
+                rating: Math.round((item.vote_average || 0) * 10) / 10,
+                release_date: releaseDate,
+                language: item.original_language || "en",
+                cast: [],
+                director: "",
+                trailer: "",
+                runtime: "",
+                links: []
+            };
+        });
+        
+        const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
+        state.externalSearchResults = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+        console.log("[Search Debug] Final external search results to display:", state.externalSearchResults.length);
+        
+        renderFeaturedGrid();
     } catch (err) {
         console.error("[Search Debug] Error doing global search: ", err);
     }
@@ -5151,20 +5245,58 @@ function bindEvents() {
             }
             
             // Filter local library movies with multi-word token and year support
-            const tokens = q.split(/\s+/).filter(Boolean);
+            const raw = q.toLowerCase().trim();
+            const cleanTokens = raw.replace(/[()[\]{}.,:;!?'"`\-_/\\]/g, ' ').split(/\s+/).filter(Boolean);
+            const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
+            const targetYear = yearMatch ? yearMatch[1] : null;
+            const titleOnlyTokens = cleanTokens.filter(t => t !== targetYear);
+            const searchTitleStr = titleOnlyTokens.join(" ");
+
             const matches = state.movies.filter(m => {
                 const searchTarget = m._searchStr || buildMovieSearchStr(m);
-                return tokens.every(tok => searchTarget.includes(tok));
-            }).slice(0, 5);
-            
-            if (matches.length === 0) {
+                return cleanTokens.every(tok => searchTarget.includes(tok));
+            });
+
+            matches.sort((a, b) => {
+                const aTitle = (a.title || "").toLowerCase().trim();
+                const bTitle = (b.title || "").toLowerCase().trim();
+                const aYear = a.release_date ? String(a.release_date).substring(0, 4) : (a.year ? String(a.year) : "");
+                const bYear = b.release_date ? String(b.release_date).substring(0, 4) : (b.year ? String(b.year) : "");
+
+                if (targetYear && searchTitleStr) {
+                    const aExactBoth = aTitle === searchTitleStr && aYear === targetYear;
+                    const bExactBoth = bTitle === searchTitleStr && bYear === targetYear;
+                    if (aExactBoth && !bExactBoth) return -1;
+                    if (!aExactBoth && bExactBoth) return 1;
+                }
+                if (searchTitleStr) {
+                    const aExactTitle = aTitle === searchTitleStr;
+                    const bExactTitle = bTitle === searchTitleStr;
+                    if (aExactTitle && !bExactTitle) return -1;
+                    if (!aExactTitle && bExactTitle) return 1;
+
+                    const aStarts = aTitle.startsWith(searchTitleStr);
+                    const bStarts = bTitle.startsWith(searchTitleStr);
+                    if (aStarts && !bStarts) return -1;
+                    if (!aStarts && bStarts) return 1;
+                }
+                if (targetYear) {
+                    if (aYear === targetYear && bYear !== targetYear) return -1;
+                    if (aYear !== targetYear && bYear === targetYear) return 1;
+                }
+                return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
+            });
+
+            const topMatches = matches.slice(0, 5);
+
+            if (topMatches.length === 0) {
                 dropdown.style.display = "none";
                 dropdown.innerHTML = "";
                 return;
             }
             
             dropdown.innerHTML = "";
-            matches.forEach(m => {
+            topMatches.forEach(m => {
                 const item = document.createElement("div");
                 item.className = "autocomplete-item";
                 
@@ -8342,14 +8474,48 @@ function triggerOverlaySearch(query) {
         return;
     }
 
+    // Tokenize search query and extract year for precise matching
+    const cleanTokens = q.replace(/[()[\]{}.,:;!?'"`\-_/\\]/g, ' ').split(/\s+/).filter(Boolean);
+    const yearMatch = q.match(/\b(19\d\d|20\d\d)\b/);
+    const targetYear = yearMatch ? yearMatch[1] : null;
+    const titleOnlyTokens = cleanTokens.filter(t => t !== targetYear);
+    const searchTitleStr = titleOnlyTokens.join(" ");
+
     // Filter local movies
     let filtered = state.movies.filter(m => {
-        const titleMatch = (m.title || "").toLowerCase().includes(q);
-        const overviewMatch = (m.overview || "").toLowerCase().includes(q);
-        const castMatch = m.cast && m.cast.some(c => c && c.toLowerCase().includes(q));
-        const directorMatch = m.director && m.director.toLowerCase().includes(q);
-        const genresMatch = m.genres && m.genres.some(g => g && g.toLowerCase().includes(q));
-        return titleMatch || overviewMatch || castMatch || directorMatch || genresMatch;
+        const searchTarget = m._searchStr || buildMovieSearchStr(m);
+        return cleanTokens.every(tok => searchTarget.includes(tok));
+    });
+
+    // Score and sort local matches
+    filtered.sort((a, b) => {
+        const aTitle = (a.title || "").toLowerCase().trim();
+        const bTitle = (b.title || "").toLowerCase().trim();
+        const aYear = a.release_date ? String(a.release_date).substring(0, 4) : (a.year ? String(a.year) : "");
+        const bYear = b.release_date ? String(b.release_date).substring(0, 4) : (b.year ? String(b.year) : "");
+
+        if (targetYear && searchTitleStr) {
+            const aExactBoth = aTitle === searchTitleStr && aYear === targetYear;
+            const bExactBoth = bTitle === searchTitleStr && bYear === targetYear;
+            if (aExactBoth && !bExactBoth) return -1;
+            if (!aExactBoth && bExactBoth) return 1;
+        }
+        if (searchTitleStr) {
+            const aExactTitle = aTitle === searchTitleStr;
+            const bExactTitle = bTitle === searchTitleStr;
+            if (aExactTitle && !bExactTitle) return -1;
+            if (!aExactTitle && bExactTitle) return 1;
+
+            const aStarts = aTitle.startsWith(searchTitleStr);
+            const bStarts = bTitle.startsWith(searchTitleStr);
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+        }
+        if (targetYear) {
+            if (aYear === targetYear && bYear !== targetYear) return -1;
+            if (aYear !== targetYear && bYear === targetYear) return 1;
+        }
+        return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
     });
 
     // Apply scope filtering (case-insensitive checks to support capitalized type schemas like "Series" and "Movie")
@@ -8410,7 +8576,20 @@ function triggerOverlaySearch(query) {
                 
                 // Exclude any TMDB IDs already in our local filtered results
                 const localTmdbIds = new Set(filtered.map(m => m.tmdb_id).filter(id => id));
-                const uniqueExt = extResults.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+                let uniqueExt = extResults.filter(ext => !localTmdbIds.has(ext.tmdb_id));
+
+                // Apply scope to cloud results as well
+                if (scope === "movies") {
+                    uniqueExt = uniqueExt.filter(m => (m.type || "").toLowerCase() === "movie");
+                } else if (scope === "series") {
+                    uniqueExt = uniqueExt.filter(m => (m.type || "").toLowerCase() === "series");
+                } else if (scope === "anime") {
+                    uniqueExt = uniqueExt.filter(m => {
+                        const hasAnimeCat = m.categories && m.categories.some(cat => (cat || "").toLowerCase() === "anime");
+                        const hasAnimeGen = m.genres && m.genres.some(g => (g || "").toLowerCase() === "anime" || (g || "").toLowerCase() === "animation");
+                        return hasAnimeCat || hasAnimeGen;
+                    });
+                }
                 
                 if (globalContainer) {
                     if (uniqueExt.length === 0) {
@@ -8493,48 +8672,41 @@ async function fetchGlobalTmdbSearchResults(query) {
 
     try {
         const apiKey = getTmdbApiKey();
-        const url = `${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
-        const res = await fetch(url);
-        if (!res.ok) return [];
-        
-        const data = await res.json();
-        if (data.results) {
-            const results = data.results.filter(item => item.media_type === 'movie' || item.media_type === 'tv');
-            const mapped = results.map(item => {
-                const title = item.title || item.name || "";
-                const releaseDate = item.release_date || item.first_air_date || "";
-                const mType = item.media_type === 'tv' ? 'Series' : 'Movie';
-                
-                return {
-                    csv_id: String(item.id),
-                    tmdb_id: item.id,
-                    imdb_id: "",
-                    title: title,
-                    type: mType,
-                    categories: [],
-                    genres: [],
-                    overview: item.overview || "No synopsis available.",
-                    poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
-                    backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
-                    rating: Math.round((item.vote_average || 0) * 10) / 10,
-                    release_date: releaseDate,
-                    language: item.original_language || "en",
-                    cast: [],
-                    director: "",
-                    trailer: "",
-                    runtime: "",
-                    links: []
-                };
-            });
+        const results = await fetchTmdbSearchResults(query, apiKey);
+        const mapped = results.map(item => {
+            const title = item.title || item.name || "";
+            const releaseDate = item.release_date || item.first_air_date || "";
+            const mType = item.media_type === 'tv' ? 'Series' : 'Movie';
             
-            // Set cache and limit size to 50 items
-            searchCache.set(qKey, mapped);
-            if (searchCache.size > 50) {
-                const firstKey = searchCache.keys().next().value;
-                searchCache.delete(firstKey);
-            }
-            return mapped;
+            return {
+                csv_id: String(item.id),
+                tmdb_id: item.id,
+                imdb_id: "",
+                title: title,
+                type: mType,
+                categories: [],
+                genres: [],
+                overview: item.overview || "No synopsis available.",
+                poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "img/FilmHouse3_nobg.png",
+                backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : "img/FilmHouse.png",
+                rating: Math.round((item.vote_average || 0) * 10) / 10,
+                release_date: releaseDate,
+                language: item.original_language || "en",
+                cast: [],
+                director: "",
+                trailer: "",
+                runtime: "",
+                links: []
+            };
+        });
+        
+        // Set cache and limit size to 50 items
+        searchCache.set(qKey, mapped);
+        if (searchCache.size > 50) {
+            const firstKey = searchCache.keys().next().value;
+            searchCache.delete(firstKey);
         }
+        return mapped;
     } catch (err) {
         console.error("Error fetching TMDB search:", err);
     }

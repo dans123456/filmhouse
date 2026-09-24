@@ -3184,12 +3184,79 @@ if (btnSearchTmdb && inputSearchTmdb && resultsSearchTmdb) {
         resultsSearchTmdb.style.display = "block";
         
         try {
-            const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`;
-            const response = await fetch(searchUrl);
-            if (!response.ok) throw new Error("Search failed");
-            
-            const data = await response.json();
-            const filteredResults = (data.results || []).filter(item => item.media_type === "movie" || item.media_type === "tv");
+            const raw = query.trim();
+            const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
+            const matchedYear = yearMatch ? yearMatch[1] : null;
+            const cleanTitle = raw
+                .replace(/\b(19\d\d|20\d\d)\b/g, '')
+                .replace(/[()[\]{}.,:;!?'"`\-_/\\]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            let filteredResults = [];
+
+            if (matchedYear && cleanTitle.length >= 2) {
+                const tvUrl = `https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}&first_air_date_year=${matchedYear}`;
+                const movieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}&primary_release_year=${matchedYear}`;
+                const multiUrl = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}`;
+
+                const [tvRes, movRes, multiRes] = await Promise.allSettled([
+                    fetch(tvUrl).then(r => r.ok ? r.json() : null),
+                    fetch(movieUrl).then(r => r.ok ? r.json() : null),
+                    fetch(multiUrl).then(r => r.ok ? r.json() : null)
+                ]);
+
+                const tvItems = (tvRes.status === 'fulfilled' && tvRes.value?.results) ? tvRes.value.results.map(r => ({ ...r, media_type: 'tv' })) : [];
+                const movItems = (movRes.status === 'fulfilled' && movRes.value?.results) ? movRes.value.results.map(r => ({ ...r, media_type: 'movie' })) : [];
+                const multiItems = (multiRes.status === 'fulfilled' && multiRes.value?.results) ? multiRes.value.results.filter(r => r.media_type === 'movie' || r.media_type === 'tv') : [];
+
+                const seenIds = new Set();
+                const combined = [];
+                [...tvItems, ...movItems].forEach(item => {
+                    if (!seenIds.has(item.id)) {
+                        seenIds.add(item.id);
+                        combined.push(item);
+                    }
+                });
+                multiItems.forEach(item => {
+                    if (!seenIds.has(item.id)) {
+                        seenIds.add(item.id);
+                        combined.push(item);
+                    }
+                });
+
+                combined.sort((a, b) => {
+                    const aTitle = (a.title || a.name || '').toLowerCase().trim();
+                    const bTitle = (b.title || b.name || '').toLowerCase().trim();
+                    const aDate = a.release_date || a.first_air_date || '';
+                    const bDate = b.release_date || b.first_air_date || '';
+                    const cleanLower = cleanTitle.toLowerCase();
+
+                    const aYearMatch = aDate.startsWith(matchedYear);
+                    const bYearMatch = bDate.startsWith(matchedYear);
+                    const aExactTitle = aTitle === cleanLower;
+                    const bExactTitle = bTitle === cleanLower;
+
+                    if (aExactTitle && aYearMatch && !(bExactTitle && bYearMatch)) return -1;
+                    if (!(aExactTitle && aYearMatch) && bExactTitle && bYearMatch) return 1;
+
+                    if (aYearMatch && !bYearMatch) return -1;
+                    if (!aYearMatch && bYearMatch) return 1;
+
+                    if (aExactTitle && !bExactTitle) return -1;
+                    if (!aExactTitle && bExactTitle) return 1;
+
+                    return (b.popularity || 0) - (a.popularity || 0);
+                });
+
+                filteredResults = combined;
+            } else {
+                const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`;
+                const response = await fetch(searchUrl);
+                if (!response.ok) throw new Error("Search failed");
+                const data = await response.json();
+                filteredResults = (data.results || []).filter(item => item.media_type === "movie" || item.media_type === "tv");
+            }
             
             if (filteredResults.length === 0) {
                 resultsSearchTmdb.innerHTML = `<div style="padding: 12px; text-align: center; color: var(--text-secondary); font-size: 13px;">No movies or series found ✖</div>`;

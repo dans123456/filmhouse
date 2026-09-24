@@ -779,10 +779,10 @@ img {
 #screen-home .categories-container-outer {
     order: 2;
 }
-#screen-home .genre-chips-container-outer {
+#screen-home #editors-choice-section-wrapper {
     order: 3;
 }
-#screen-home #editors-choice-section-wrapper {
+#screen-home .genre-chips-container-outer {
     order: 4;
 }
 #screen-home .movie-listing-section {
