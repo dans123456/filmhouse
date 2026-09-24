@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "279388-pursuit-of-jade",
+    "tmdb_id": 279388,
+    "imdb_id": "",
+    "title": "Pursuit of Jade",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama",
+      "Action & Adventure",
+      "War & Politics"
+    ],
+    "overview": "This drama follows Fan Changyu, a butcher’s daughter, and Xie Zheng, a fallen noble seeking revenge. Their fake marriage turns into true love, but war tears them apart. Determined, Fan Changyu wields her butcher’s knife on the battlefield, searching for justice and her husband. Meanwhile, Xie Zheng reclaims his title, fighting to protect his country and love. Reunited in battle, they stand together, defying fate, uncovering the truth, and returning home without forgetting their vows.",
+    "poster": "https://image.tmdb.org/t/p/w500/g2CSCJuWm7IcpuRjxySQvZcJYnp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/yiUZ8Ck86FF3obLztVvSQqeBi0Y.jpg",
+    "rating": 8.1,
+    "release_date": "2026-03-06",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "_ftwQZjmgqU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADtggAAp_rsEX7gAE1-nK79xYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "15917-devdas",
     "tmdb_id": 15917,
     "imdb_id": "",
