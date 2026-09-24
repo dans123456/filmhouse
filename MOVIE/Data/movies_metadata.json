@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "1227877-i-love-boosters",
+    "tmdb_id": 1227877,
+    "imdb_id": "",
+    "title": "I Love Boosters",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Science Fiction",
+      "Crime"
+    ],
+    "overview": "A group of shoplifters take aim at a cutthroat fashion maven by stealing from her stores and reselling them at a lower price — what they call 'fashion-forward philanthropy'.",
+    "poster": "https://image.tmdb.org/t/p/w500/4pNKIUFy7tkZiBx0rnSmG9ysRy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fBZ9cWUI1yB9Fcs2eoYZ4mmMUmI.jpg",
+    "rating": 6.2,
+    "release_date": "2026-05-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "I1xZegSgN8w",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADIw0AArgzqEV6Riz-h2WRHhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "6869-dyesebel",
     "tmdb_id": 6869,
     "imdb_id": "",
