@@ -236,40 +236,110 @@ try {
     }
 }
 
-// Bind Live Snapshot Listeners
-if (db) {
-    // 1. Real-time Users Listener (without query sorting to prevent Firestore from excluding documents missing 'lastSeen')
-    db.collection("users").onSnapshot(snapshot => {
+// Smart Caching for Users to save Firestore daily read quota
+const USERS_CACHE_KEY = "filmhouse_admin_users_cache";
+const USERS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
+
+function loadUsersFromCache() {
+    try {
+        const raw = sessionStorage.getItem(USERS_CACHE_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.timestamp && (Date.now() - parsed.timestamp < USERS_CACHE_TTL) && Array.isArray(parsed.users)) {
+                return parsed.users;
+            }
+        }
+    } catch (e) {}
+    return null;
+}
+
+function saveUsersToCache(users) {
+    try {
+        sessionStorage.setItem(USERS_CACHE_KEY, JSON.stringify({
+            timestamp: Date.now(),
+            users: users
+        }));
+    } catch (e) {}
+}
+
+window.forceRefreshUsers = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const refreshBtn = document.getElementById("btn-refresh-users");
+    if (refreshBtn) {
+        refreshBtn.style.transform = "rotate(360deg)";
+        refreshBtn.style.transition = "transform 0.5s ease";
+        setTimeout(() => { refreshBtn.style.transform = "none"; }, 500);
+    }
+    sessionStorage.removeItem(USERS_CACHE_KEY);
+    initUsersSync(true);
+};
+
+function initUsersSync(force = false) {
+    const cached = !force ? loadUsersFromCache() : null;
+    if (cached && cached.length > 0) {
+        console.log(`[Cache] Loaded ${cached.length} users from sessionStorage (0 Firestore reads consumed).`);
+        allUsers = cached;
+        db.collection("settings").doc("admins").get().then(adminDoc => {
+            const adminIds = adminDoc.exists ? adminDoc.data().ids || [] : [];
+            const defaultAdmins = ["1329840839", "1175336733"];
+            adminIdsList = Array.from(new Set([...defaultAdmins, ...adminIds]));
+            updateStatsCounters();
+            renderUsersList();
+            populateAllocatorDropdowns();
+        }).catch(() => {
+            updateStatsCounters();
+            renderUsersList();
+            populateAllocatorDropdowns();
+        });
+        return;
+    }
+
+    if (!db) return;
+    db.collection("users").get().then(snapshot => {
         allUsers = [];
         snapshot.forEach(doc => {
             const u = doc.data();
             u.id = u.id || doc.id;
             allUsers.push(u);
         });
-        
-        // Sort locally by lastSeen (descending) safely
         allUsers.sort((a, b) => {
             const timeA = a.lastSeen ? (a.lastSeen.toMillis ? a.lastSeen.toMillis() : new Date(a.lastSeen).getTime()) : 0;
             const timeB = b.lastSeen ? (b.lastSeen.toMillis ? b.lastSeen.toMillis() : new Date(b.lastSeen).getTime()) : 0;
             return timeB - timeA;
         });
+        saveUsersToCache(allUsers);
         db.collection("settings").doc("admins").get().then(adminDoc => {
             const adminIds = adminDoc.exists ? adminDoc.data().ids || [] : [];
             const defaultAdmins = ["1329840839", "1175336733"];
             adminIdsList = Array.from(new Set([...defaultAdmins, ...adminIds]));
-            
             updateStatsCounters();
             renderUsersList();
             populateAllocatorDropdowns();
-        }).catch(err => {
-            console.warn("Admins list fetch fail:", err);
+        }).catch(() => {
             updateStatsCounters();
             renderUsersList();
             populateAllocatorDropdowns();
         });
-    }, err => {
-        console.error("Users sync issue:", err);
+    }).catch(err => {
+        console.warn("Users fetch issue (quota or offline):", err.message);
+        try {
+            const fallbackRaw = sessionStorage.getItem(USERS_CACHE_KEY);
+            if (fallbackRaw) {
+                const parsed = JSON.parse(fallbackRaw);
+                if (parsed && Array.isArray(parsed.users)) {
+                    allUsers = parsed.users;
+                    updateStatsCounters();
+                    renderUsersList();
+                }
+            }
+        } catch (e) {}
     });
+}
+
+// Bind Live Snapshot Listeners
+if (db) {
+    // 1. Synchronize Users using intelligent cache
+    initUsersSync();
 
     // 2. Real-time Movie Requests Listener
     db.collection("requests").orderBy("requestedAt", "desc").onSnapshot(snapshot => {
@@ -3441,6 +3511,8 @@ if (addMovieForm) {
         const postAddMovieToChan = document.getElementById("add-movie-post-to-channel");
         if (postAddMovieToChan && postAddMovieToChan.checked && typeof window.broadcastMovieToMainChannel === 'function') {
             window.broadcastMovieToMainChannel(newMovie);
+        } else if (typeof window.recordAdminActivity === 'function') {
+            window.recordAdminActivity("publication", title);
         }
         
         if (submitBtn) {
@@ -4195,6 +4267,9 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
         if (result.ok) {
             console.log("[MAIN CHANNEL POST] Photo announcement sent successfully:", result);
             showToast(`📢 Announcement for "${cleanTitle}" posted to Main Channel!`, "success");
+            if (typeof window.recordAdminActivity === 'function') {
+                window.recordAdminActivity("publication", cleanTitle);
+            }
             return result;
         } else {
             console.warn("[MAIN CHANNEL POST] Photo post failed, falling back to text:", result.description);
@@ -4222,8 +4297,10 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
     }
 };
 
-// --- ADMIN PERFORMANCE LEADERBOARD LOGIC ---
+// --- FRESH ADMIN PERFORMANCE & ACTIVITY RANKINGS LOGIC ---
 let adminStatsCache = {};
+// Starting fresh from today (September 2026) - ignores past arbitrary legacy counts
+const FRESH_RANKING_START_MS = 1790200000000;
 
 function initAdminLeaderboardListener() {
     if (typeof firebase === "undefined" || !db) return;
@@ -4236,7 +4313,7 @@ function initAdminLeaderboardListener() {
             }
             renderAdminLeaderboard();
         }, err => {
-            console.warn("Could not listen to admin_stats:", err);
+            console.warn("Could not listen to admin_stats:", err.message);
             renderAdminLeaderboard();
         });
     } catch (e) {
@@ -4244,14 +4321,63 @@ function initAdminLeaderboardListener() {
     }
 }
 
-function renderAdminLeaderboard() {
-    const listContainer = document.getElementById("admin-leaderboard-list");
-    const topPerformerBadge = document.getElementById("admin-leaderboard-top-performer");
-    if (!listContainer) return;
+// Track Admin Activity (Fulfillments & Publications)
+window.recordAdminActivity = function(type, title) {
+    const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
+    const currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : (localStorage.getItem("filmhouse_admin_name") || "Admin");
+    const currentAdminId = String(tgUser ? tgUser.id : (sessionStorage.getItem("admin_auth_id") || "admin"));
+    const adminKey = currentAdminId.replace(/[^a-zA-Z0-9_]/g, "_");
 
+    if (!adminStatsCache[adminKey]) {
+        adminStatsCache[adminKey] = {
+            id: currentAdminId,
+            name: currentAdminName,
+            fulfillments: 0,
+            publications: 0,
+            score: 0,
+            lastActiveAt: Date.now(),
+            titles: []
+        };
+    }
+
+    if (type === "fulfillment") {
+        adminStatsCache[adminKey].fulfillments = (adminStatsCache[adminKey].fulfillments || 0) + 1;
+    } else if (type === "publication") {
+        adminStatsCache[adminKey].publications = (adminStatsCache[adminKey].publications || 0) + 1;
+    }
+
+    adminStatsCache[adminKey].score = ((adminStatsCache[adminKey].fulfillments || 0) * 10) + ((adminStatsCache[adminKey].publications || 0) * 10);
+    adminStatsCache[adminKey].lastActiveAt = Date.now();
+    adminStatsCache[adminKey].name = currentAdminName;
+
+    if (title) {
+        adminStatsCache[adminKey].titles = adminStatsCache[adminKey].titles || [];
+        adminStatsCache[adminKey].titles.unshift({
+            type: type,
+            title: title,
+            date: new Date().toISOString()
+        });
+        if (adminStatsCache[adminKey].titles.length > 25) {
+            adminStatsCache[adminKey].titles = adminStatsCache[adminKey].titles.slice(0, 25);
+        }
+    }
+
+    try {
+        localStorage.setItem("filmhouse_admin_stats_cache", JSON.stringify(adminStatsCache));
+        if (db) {
+            db.collection("settings").doc("admin_stats").set(adminStatsCache, { merge: true }).catch(err => {
+                console.warn("Could not save admin stats to Firestore (quota or permission):", err.message);
+            });
+        }
+    } catch (e) {}
+
+    renderAdminLeaderboard();
+};
+
+function getComputedAdminRankings() {
     const adminMap = {};
 
-    // 1. Seed adminMap with all known master & slave admin IDs
+    // 1. Seed known admins
     const seedIds = Array.from(new Set([
         ...(window.cachedMasterAdminIds || []),
         ...(window.cachedSlaveAdminIds || []),
@@ -4268,9 +4394,11 @@ function renderAdminLeaderboard() {
         adminMap[key] = {
             id: uidStr,
             name: name,
-            count: 0,
+            fulfillments: 0,
+            publications: 0,
+            score: 0,
             titles: [],
-            lastFulfilledAt: null
+            lastActiveAt: null
         };
     });
 
@@ -4285,9 +4413,11 @@ function renderAdminLeaderboard() {
                     adminMap[key] = {
                         id: uidStr,
                         name: name,
-                        count: 0,
+                        fulfillments: 0,
+                        publications: 0,
+                        score: 0,
                         titles: [],
-                        lastFulfilledAt: null
+                        lastActiveAt: null
                     };
                 } else if (u.username && (!adminMap[key].name || adminMap[key].name.startsWith("Admin ("))) {
                     adminMap[key].name = `@${u.username}`;
@@ -4296,235 +4426,266 @@ function renderAdminLeaderboard() {
         });
     }
 
-    // 2. Process from allRequests (fulfilled items)
+    // 2. Count fulfillments from allRequests (only fresh ones starting from today)
     if (Array.isArray(allRequests)) {
         allRequests.forEach(req => {
             if (req.status === "fulfilled" || req.status === "claimed" || req.claimed === true) {
+                let fulfilledMs = 0;
+                if (req.fulfilledAt) {
+                    fulfilledMs = req.fulfilledAt.toDate ? req.fulfilledAt.toDate().getTime() : new Date(req.fulfilledAt).getTime();
+                }
+                // Filter out legacy requests before today so we start completely fresh!
+                if (fulfilledMs > 0 && fulfilledMs < FRESH_RANKING_START_MS) return;
+
                 const adminName = req.fulfilledBy || "Admin";
                 const adminId = String(req.fulfilledById || req.adminClaimId || adminName).replace(/[^a-zA-Z0-9_]/g, "_");
-                
+
                 if (!adminMap[adminId]) {
                     adminMap[adminId] = {
                         id: req.fulfilledById || adminId,
                         name: adminName,
-                        count: 0,
+                        fulfillments: 0,
+                        publications: 0,
+                        score: 0,
                         titles: [],
-                        lastFulfilledAt: null
+                        lastActiveAt: null
                     };
                 }
-                adminMap[adminId].count++;
-                
+                adminMap[adminId].fulfillments = (adminMap[adminId].fulfillments || 0) + 1;
+                if (fulfilledMs > (adminMap[adminId].lastActiveAt || 0)) {
+                    adminMap[adminId].lastActiveAt = fulfilledMs;
+                }
+
                 const titleKey = (req.title || "").trim();
-                const existingTitle = adminMap[adminId].titles.find(t => t.title.toLowerCase() === titleKey.toLowerCase());
+                const existingTitle = adminMap[adminId].titles.find(t => t.title && t.title.toLowerCase() === titleKey.toLowerCase());
                 if (!existingTitle) {
-                    let fulfilledTime = null;
-                    if (req.fulfilledAt) {
-                        fulfilledTime = req.fulfilledAt.toDate ? req.fulfilledAt.toDate() : new Date(req.fulfilledAt);
-                    }
                     adminMap[adminId].titles.push({
+                        type: "fulfillment",
                         title: req.title,
                         year: req.year || "",
-                        type: req.type || "Movie",
                         user: req.requestedBy || "User",
-                        date: fulfilledTime
+                        date: fulfilledMs ? new Date(fulfilledMs) : new Date()
                     });
                 }
             }
         });
     }
 
-    // 3. Merge with adminStatsCache from Firestore
+    // 3. Merge with adminStatsCache
     if (adminStatsCache && typeof adminStatsCache === "object") {
         Object.keys(adminStatsCache).forEach(k => {
             const stat = adminStatsCache[k];
             if (!stat) return;
-            const count = Number(stat.count || 0);
+            const lastActive = stat.lastActiveAt ? (typeof stat.lastActiveAt === 'number' ? stat.lastActiveAt : new Date(stat.lastActiveAt).getTime()) : 0;
+            if (lastActive > 0 && lastActive < FRESH_RANKING_START_MS && !stat.publications) return;
+
             if (!adminMap[k]) {
                 adminMap[k] = {
                     id: k,
                     name: stat.name || k,
-                    count: count,
-                    titles: [],
-                    lastFulfilledAt: stat.lastFulfilledAt ? new Date(stat.lastFulfilledAt) : null
+                    fulfillments: Number(stat.fulfillments || (lastActive >= FRESH_RANKING_START_MS ? stat.count : 0) || 0),
+                    publications: Number(stat.publications || 0),
+                    score: 0,
+                    titles: stat.titles || [],
+                    lastActiveAt: lastActive || null
                 };
             } else {
-                if (count > adminMap[k].count) {
-                    adminMap[k].count = count;
+                adminMap[k].fulfillments = Math.max(adminMap[k].fulfillments || 0, Number(stat.fulfillments || 0));
+                adminMap[k].publications = Math.max(adminMap[k].publications || 0, Number(stat.publications || 0));
+                if (lastActive > (adminMap[k].lastActiveAt || 0)) {
+                    adminMap[k].lastActiveAt = lastActive;
                 }
                 if (stat.name && (!adminMap[k].name || adminMap[k].name.startsWith("Admin ("))) {
                     adminMap[k].name = stat.name;
+                }
+                if (Array.isArray(stat.titles) && stat.titles.length > 0) {
+                    stat.titles.forEach(st => {
+                        if (!adminMap[k].titles.some(t => t.title === st.title)) {
+                            adminMap[k].titles.push(st);
+                        }
+                    });
                 }
             }
         });
     }
 
-    const adminList = Object.values(adminMap);
-
-    if (adminList.length === 0) {
-        listContainer.innerHTML = `
-            <div style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 12px;">
-                🎯 No fulfillments recorded yet. Fulfill incoming requests above to earn your spot on the leaderboard!
-            </div>
-        `;
-        if (topPerformerBadge) topPerformerBadge.textContent = "Top: None";
-        return;
-    }
-
-    // Sort descending by fulfill count
-    adminList.sort((a, b) => b.count - a.count);
-
-    const topAdmin = adminList[0];
-    if (topPerformerBadge) {
-        topPerformerBadge.textContent = `Top: ${escapeHTML(topAdmin.name)} (${topAdmin.count})`;
-    }
-
-    listContainer.replaceChildren();
-
-    adminList.forEach((adm, index) => {
-        const rank = index + 1;
-        let rankBadge = "";
-        let borderHighlight = "1px solid rgba(255, 255, 255, 0.08)";
-        let bgHighlight = "rgba(255, 255, 255, 0.02)";
-        let titleRole = "Curator";
-
-        if (rank === 1) {
-            rankBadge = `<span style="font-size: 18px;">🥇</span>`;
-            borderHighlight = "1px solid rgba(255, 188, 0, 0.4)";
-            bgHighlight = "linear-gradient(90deg, rgba(255, 188, 0, 0.12) 0%, rgba(255, 188, 0, 0.03) 100%)";
-            titleRole = "👑 Grand Curator";
-        } else if (rank === 2) {
-            rankBadge = `<span style="font-size: 18px;">🥈</span>`;
-            borderHighlight = "1px solid rgba(220, 220, 220, 0.35)";
-            bgHighlight = "linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)";
-            titleRole = "⭐ Master Admin";
-        } else if (rank === 3) {
-            rankBadge = `<span style="font-size: 18px;">🥉</span>`;
-            borderHighlight = "1px solid rgba(205, 127, 50, 0.35)";
-            bgHighlight = "linear-gradient(90deg, rgba(205, 127, 50, 0.08) 0%, rgba(205, 127, 50, 0.02) 100%)";
-            titleRole = "⚡ Senior Admin";
-        } else {
-            rankBadge = `<span style="font-size: 12px; font-weight: 800; color: var(--text-muted); width: 20px; text-align: center;">#${rank}</span>`;
-            titleRole = "🎬 Admin";
-        }
-
-        const initial = (adm.name.replace(/^@/, "").charAt(0) || "A").toUpperCase();
-
-        const card = document.createElement("div");
-        card.className = "admin-leaderboard-card";
-        card.style.cssText = `
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 14px;
-            background: ${bgHighlight};
-            border: ${borderHighlight};
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            gap: 12px;
-            box-sizing: border-box;
-            width: 100%;
-        `;
-        card.onmouseenter = () => {
-            card.style.transform = "translateY(-1px)";
-            card.style.borderColor = "#ffbc00";
-        };
-        card.onmouseleave = () => {
-            card.style.transform = "none";
-            card.style.border = borderHighlight;
-        };
-
-        card.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-                <div style="display: flex; align-items: center; justify-content: center; width: 24px; flex-shrink: 0;">
-                    ${rankBadge}
-                </div>
-                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 188, 0, 0.25), rgba(255, 59, 48, 0.25)); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #ffbc00; font-size: 14px; border: 1px solid rgba(255, 188, 0, 0.4); flex-shrink: 0;">
-                    ${initial}
-                </div>
-                <div style="display: flex; flex-direction: column; min-width: 0; flex: 1; justify-content: center;">
-                    <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
-                        <span style="font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">${escapeHTML(adm.name)}</span>
-                        <span style="font-size: 9px; padding: 2px 7px; border-radius: 10px; background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.3); font-weight: 700; white-space: nowrap; flex-shrink: 0; line-height: 1.1;">${titleRole}</span>
-                    </div>
-                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        Rank #${rank} • ${adm.titles.length} unique title${adm.titles.length === 1 ? '' : 's'} resolved
-                    </div>
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: 6px;">
-                <div style="background: rgba(255, 188, 0, 0.12); border: 1px solid rgba(255, 188, 0, 0.3); padding: 5px 10px; border-radius: 20px; font-size: 12px; color: #ffbc00; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-                    <span style="font-weight: 800; font-size: 13px;">${adm.count}</span>
-                    <span style="font-size: 10px; font-weight: 600; color: rgba(255, 255, 255, 0.7);">fulfilled</span>
-                </div>
-                <span style="color: var(--text-muted); font-size: 13px; flex-shrink: 0;">➔</span>
-            </div>
-        `;
-
-        card.addEventListener("click", () => {
-            showAdminPerformanceModal(adm);
-        });
-
-        listContainer.appendChild(card);
+    // 4. Calculate total score for each admin: (fulfillments * 10) + (publications * 10)
+    const now = Date.now();
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    const adminList = Object.values(adminMap).map(adm => {
+        adm.score = ((adm.fulfillments || 0) * 10) + ((adm.publications || 0) * 10);
+        adm.isActive24h = adm.lastActiveAt ? (now - adm.lastActiveAt <= oneDayMs) : false;
+        return adm;
     });
+
+    // Sort by score descending, then lastActiveAt descending
+    adminList.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return (b.lastActiveAt || 0) - (a.lastActiveAt || 0);
+    });
+
+    return adminList;
 }
 
-function showAdminPerformanceModal(adm) {
+function renderAdminLeaderboard() {
+    const adminList = getComputedAdminRankings();
+    const activeAdmins = adminList.filter(a => a.isActive24h);
+    const activeCount = activeAdmins.length;
+
+    // Update 4th card in Command Center 2x2 matrix
+    const activeCountEl = document.getElementById("stat-active-admins-count");
+    if (activeCountEl) {
+        activeCountEl.textContent = activeCount;
+    }
+
+    const topSubEl = document.getElementById("stat-top-admin-sub");
+    if (topSubEl) {
+        const topAdmin = adminList.find(a => a.score > 0);
+        if (topAdmin) {
+            topSubEl.textContent = `Top: ${escapeHTML(topAdmin.name)} (${topAdmin.score} pts)`;
+        } else {
+            topSubEl.textContent = `${activeCount} active in last 24h`;
+        }
+    }
+}
+
+window.openAdminRankingsModal = function(filter = 'active') {
     const modal = document.getElementById("admin-perf-modal");
     const titleEl = document.getElementById("admin-perf-modal-title");
     const bodyEl = document.getElementById("admin-perf-modal-body");
     if (!modal || !bodyEl) return;
 
     if (titleEl) {
-        titleEl.innerHTML = `🏆 Performance: ${escapeHTML(adm.name)}`;
+        titleEl.innerHTML = `🏆 Admin Performance Rankings`;
     }
 
-    const initial = (adm.name.replace(/^@/, "").charAt(0) || "A").toUpperCase();
-    
-    let titlesListHtml = "";
-    if (adm.titles && adm.titles.length > 0) {
-        titlesListHtml = adm.titles.map(t => {
-            const timeStr = t.date ? t.date.toLocaleDateString() : "Recent";
+    const adminList = getComputedAdminRankings();
+    const activeAdmins = adminList.filter(a => a.isActive24h);
+    const displayList = (filter === 'active') ? activeAdmins : adminList;
+
+    let listHtml = "";
+    if (displayList.length === 0) {
+        listHtml = `
+            <div style="padding: 28px 16px; text-align: center; color: var(--text-muted); font-size: 13px;">
+                ${filter === 'active' 
+                    ? '😴 No admins active in the last 24 hours. Fulfill a request or publish a movie to get ranked!' 
+                    : '🎯 Rankings start fresh today! Fulfill movie requests or publish titles to claim the #1 spot!'}
+            </div>
+        `;
+    } else {
+        listHtml = displayList.map((adm, idx) => {
+            const rank = idx + 1;
+            let rankBadge = "";
+            let rankColor = "#ffbc00";
+            if (rank === 1) {
+                rankBadge = "🥇";
+            } else if (rank === 2) {
+                rankBadge = "🥈";
+                rankColor = "#dcdcdc";
+            } else if (rank === 3) {
+                rankBadge = "🥉";
+                rankColor = "#cd7f32";
+            } else {
+                rankBadge = `#${rank}`;
+                rankColor = "var(--text-muted)";
+            }
+
+            const initial = (adm.name.replace(/^@/, "").charAt(0) || "A").toUpperCase();
+            const timeAgo = adm.lastActiveAt ? formatTimeAgo(adm.lastActiveAt) : "Not yet active";
+
             return `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; font-size: 12px; margin-bottom: 6px;">
-                    <div>
-                        <div style="font-weight: 700; color: #fff;">🎬 ${escapeHTML(t.title)} ${t.year ? `(${t.year})` : ''}</div>
-                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">For @${escapeHTML(t.user)} • ${t.type} • ${timeStr}</div>
+                <div style="display: flex; flex-direction: column; background: rgba(255,255,255,0.02); border: 1px solid ${rank === 1 ? 'rgba(255, 188, 0, 0.3)' : 'rgba(255,255,255,0.06)'}; border-radius: 10px; padding: 12px; margin-bottom: 8px; transition: border-color 0.2s;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                            <span style="font-size: 18px; font-weight: 800; min-width: 24px; text-align: center; color: ${rankColor};">${rankBadge}</span>
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 188, 0, 0.2), rgba(255, 59, 48, 0.2)); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #ffbc00; font-size: 14px; border: 1px solid rgba(255, 188, 0, 0.3); flex-shrink: 0;">
+                                ${initial}
+                            </div>
+                            <div style="min-width: 0;">
+                                <div style="font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">
+                                    ${escapeHTML(adm.name)}
+                                </div>
+                                <div style="font-size: 10px; color: ${adm.isActive24h ? '#4caf50' : 'var(--text-muted)'}; margin-top: 2px;">
+                                    ${adm.isActive24h ? '🟢 Active in last 24h' : `⚪ ${timeAgo}`}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right; flex-shrink: 0;">
+                            <div style="font-size: 16px; font-weight: 800; color: #ffbc00; font-family: var(--font-heading);">${adm.score} <span style="font-size: 10px; color: rgba(255,255,255,0.6); font-family: inherit;">pts</span></div>
+                        </div>
                     </div>
-                    <span style="font-size: 10px; color: #4caf50; background: rgba(76, 175, 80, 0.12); padding: 3px 8px; border-radius: 4px; font-weight: 700;">🟢 Fulfilled</span>
+                    <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.04); flex-wrap: wrap; align-items: center;">
+                        <span style="font-size: 10px; background: rgba(255, 188, 0, 0.12); color: #ffbc00; padding: 2px 8px; border-radius: 10px; font-weight: 700;">📥 ${adm.fulfillments || 0} Fulfilled</span>
+                        <span style="font-size: 10px; background: rgba(0, 136, 204, 0.15); color: #0088cc; padding: 2px 8px; border-radius: 10px; font-weight: 700;">🎬 ${adm.publications || 0} Published</span>
+                        ${adm.titles && adm.titles.length > 0 ? `<button type="button" onclick="showAdminTitlesBreakdown('${adm.id}')" style="margin-left: auto; background: none; border: none; color: var(--primary-color); font-size: 10px; font-weight: 700; cursor: pointer; text-decoration: underline;">View ${adm.titles.length} Titles ❯</button>` : ''}
+                    </div>
                 </div>
             `;
         }).join("");
-    } else {
-        titlesListHtml = `<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px;">No individual title history records available for this admin.</div>`;
     }
 
     bodyEl.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: linear-gradient(135deg, rgba(255, 188, 0, 0.1) 0%, rgba(10, 14, 26, 0.6) 100%); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 8px; margin-bottom: 16px;">
-            <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #ffbc00, #ff3b30); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #000; font-size: 20px; flex-shrink: 0; box-shadow: 0 0 15px rgba(255, 188, 0, 0.3);">
-                ${initial}
-            </div>
-            <div>
-                <h4 style="margin: 0; font-size: 16px; color: #fff; font-family: var(--font-heading);">${escapeHTML(adm.name)}</h4>
-                <div style="display: flex; gap: 8px; margin-top: 4px;">
-                    <span style="font-size: 11px; background: rgba(255, 188, 0, 0.2); color: #ffbc00; padding: 2px 8px; border-radius: 12px; font-weight: 700;">🔥 ${adm.count} Fulfillments</span>
-                    <span style="font-size: 11px; background: rgba(76, 175, 80, 0.15); color: #4caf50; padding: 2px 8px; border-radius: 12px; font-weight: 700;">100% Resolved</span>
-                </div>
-            </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 14px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <button class="btn btn-sm ${filter === 'active' ? 'btn-primary' : 'btn-secondary'}" onclick="openAdminRankingsModal('active')" style="flex: 1; height: 32px; font-size: 11px; font-weight: 700;">⚡ Active (Last 24h) (${activeAdmins.length})</button>
+            <button class="btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-secondary'}" onclick="openAdminRankingsModal('all')" style="flex: 1; height: 32px; font-size: 11px; font-weight: 700;">🏆 All Ranked (${adminList.length})</button>
         </div>
-
-        <div style="margin-bottom: 12px;">
-            <h5 style="margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px;">Recently Fulfilled Titles</h5>
-            <div style="display: flex; flex-direction: column; max-height: 240px; overflow-y: auto; padding-right: 4px;">
-                ${titlesListHtml}
-            </div>
+        <p style="font-size: 11px; color: var(--text-secondary); margin: 0 0 12px 0; line-height: 1.4;">
+            ✨ <i>Rankings start fresh today. Admins earn 10 points per request fulfilled and 10 points per movie/series published.</i>
+        </p>
+        <div style="max-height: 340px; overflow-y: auto; padding-right: 4px;">
+            ${listHtml}
         </div>
-
         <button type="button" class="btn btn-secondary btn-block" onclick="closeAdminPerfModal()" style="margin-top: 14px; height: 38px;">Close</button>
     `;
 
     modal.classList.add("active");
+};
+
+function formatTimeAgo(timestamp) {
+    if (!timestamp) return "Never";
+    const ms = typeof timestamp === 'number' ? timestamp : new Date(timestamp).getTime();
+    const diff = Math.floor((Date.now() - ms) / 1000);
+    if (diff < 60) return "Just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
 }
+
+window.showAdminTitlesBreakdown = function(adminId) {
+    const adminList = getComputedAdminRankings();
+    const adm = adminList.find(a => String(a.id) === String(adminId));
+    if (!adm || !adm.titles || adm.titles.length === 0) return;
+
+    const bodyEl = document.getElementById("admin-perf-modal-body");
+    if (!bodyEl) return;
+
+    const titlesHtml = adm.titles.map(t => {
+        const timeStr = t.date ? (t.date.toLocaleDateString ? t.date.toLocaleDateString() : new Date(t.date).toLocaleDateString()) : "Recent";
+        const isFulfill = t.type === "fulfillment";
+        return `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; font-size: 12px; margin-bottom: 6px;">
+                <div>
+                    <div style="font-weight: 700; color: #fff;">${isFulfill ? '🍿' : '🎬'} ${escapeHTML(t.title)}</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">${isFulfill ? 'Request Fulfilled' : 'Catalog / Channel Published'} • ${timeStr}</div>
+                </div>
+                <span style="font-size: 10px; color: ${isFulfill ? '#4caf50' : '#0088cc'}; background: ${isFulfill ? 'rgba(76, 175, 80, 0.12)' : 'rgba(0, 136, 204, 0.12)'}; padding: 3px 8px; border-radius: 4px; font-weight: 700;">
+                    ${isFulfill ? '🟢 Fulfilled' : '📢 Published'}
+                </span>
+            </div>
+        `;
+    }).join("");
+
+    bodyEl.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openAdminRankingsModal('all')" style="padding: 4px 10px; font-size: 11px;">❮ Back to Rankings</button>
+            <span style="font-size: 13px; font-weight: 700; color: #fff;">${escapeHTML(adm.name)}'s Activity</span>
+        </div>
+        <div style="max-height: 320px; overflow-y: auto; padding-right: 4px;">
+            ${titlesHtml}
+        </div>
+        <button type="button" class="btn btn-secondary btn-block" onclick="closeAdminPerfModal()" style="margin-top: 14px; height: 38px;">Close</button>
+    `;
+};
 
 window.closeAdminPerfModal = function() {
     const modal = document.getElementById("admin-perf-modal");
@@ -4903,6 +5064,9 @@ if (fulfillForm && fulfillRequestModal) {
         });
  
         Promise.all(fulfillPromises).then(async () => {
+            if (typeof window.recordAdminActivity === 'function') {
+                window.recordAdminActivity("fulfillment", currentFulfillTitle);
+            }
             // Auto-post release announcement directly to Main Channel if checked
             if (shouldPostToChannel && typeof window.broadcastMovieToMainChannel === 'function') {
                 const titleToBroadcast = movieToSync || {

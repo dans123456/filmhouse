@@ -468,6 +468,7 @@ function setupBot(bot, adminBot) {
         adminBot.telegram.setMyCommands([
             { command: 'start', description: '👑 Admin Command Center' },
             { command: 'menu', description: '👑 Show Admin Menu' },
+            { command: 'broadcast', description: '📢 Broadcast Announcement to All Users' },
             { command: 'topadmins', description: '🏆 Top Admin Fulfillers Leaderboard' },
             { command: 'logs', description: '📜 View live server logs' },
             { command: 'pending', description: '📋 View pending movie requests' },
@@ -1565,17 +1566,17 @@ function setupBot(bot, adminBot) {
         });
     });
 
-    // Command: /broadcast (Admin Only)
-    bot.command('broadcast', async (ctx) => {
+    // Command: /broadcast (Seamless In-Place Single-Message Editing)
+    const handleSeamlessBroadcast = async (ctx) => {
         const userId = String(ctx.from.id);
         if (!(await isMasterAdmin(userId))) {
             return ctx.reply("❌ Unauthorized. This command is restricted to Master Administrators.");
         }
 
         const replyTo = ctx.message.reply_to_message;
-        const messageText = ctx.message.text.substring(10).trim(); // remove "/broadcast" prefix
+        const textParam = ctx.message.text ? ctx.message.text.replace(/^\/broadcast(@\w+)?/i, "").trim() : "";
         
-        if (!replyTo && !messageText) {
+        if (!replyTo && !textParam) {
             return ctx.reply(
                 "📢 *How to use /broadcast*:\n\n" +
                 "• *To broadcast a post (with image/video/caption)*:\n" +
@@ -1589,10 +1590,18 @@ function setupBot(bot, adminBot) {
             );
         }
 
-        ctx.reply("✈️ *Starting broadcast...*", { 
+        // Send a SINGLE status message that will be edited in-place
+        let statusMsg = await ctx.reply("✈️ *Initializing broadcast...*", { 
             parse_mode: 'Markdown',
             reply_to_message_id: ctx.message.message_id
-        });
+        }).catch(() => null);
+
+        if (!statusMsg) {
+            return ctx.reply("❌ Could not initiate broadcast status message.");
+        }
+
+        const statusChatId = ctx.chat.id;
+        const statusMsgId = statusMsg.message_id;
 
         // Retrieve subscribers from Ubuntu local store (ZERO Firestore reads, immune to quotas!)
         let subscribers = localStore.getActiveSubscribers();
@@ -1611,24 +1620,49 @@ function setupBot(bot, adminBot) {
             }
         }
 
-        if (subscribers.length === 0) {
-            return ctx.reply("⚠️ No bot subscribers found in local database yet. Users who message or /start the bot will appear here automatically.");
+        const totalSubs = subscribers.length;
+        if (totalSubs === 0) {
+            return ctx.telegram.editMessageText(
+                statusChatId,
+                statusMsgId,
+                null,
+                "⚠️ *No subscribers found in database to broadcast to.*",
+                { parse_mode: 'Markdown' }
+            ).catch(() => {});
         }
 
-        ctx.reply(`✈️ *Starting broadcast to ${subscribers.length} subscriber(s)...*`, { 
-            parse_mode: 'Markdown',
-            reply_to_message_id: ctx.message.message_id
-        });
-
+        const startTime = Date.now();
         let successCount = 0;
         let failedCount = 0;
+        let lastEditTime = Date.now();
 
-        for (const u of subscribers) {
+        // Helper to generate a visual progress bar
+        const getProgressBar = (current, total) => {
+            const barLength = 10;
+            const filled = Math.min(barLength, Math.round((current / total) * barLength));
+            return '█'.repeat(filled) + '░'.repeat(barLength - filled);
+        };
+
+        // Initial edit
+        await ctx.telegram.editMessageText(
+            statusChatId,
+            statusMsgId,
+            null,
+            `✈️ *Broadcasting Announcement...* 📢\n\n` +
+            `⏳ *Progress:* \`0%\` [${getProgressBar(0, totalSubs)}] (\`0/${totalSubs}\`)\n` +
+            `🟢 *Delivered:* \`0\`\n` +
+            `🔴 *Failed / Blocked:* \`0\`\n\n` +
+            `_Sending seamlessly to active subscribers..._`,
+            { parse_mode: 'Markdown' }
+        ).catch(() => {});
+
+        for (let i = 0; i < totalSubs; i++) {
+            const u = subscribers[i];
             try {
                 if (replyTo) {
                     await callTelegramWithRetry('copyMessage', u.id, ctx.chat.id, replyTo.message_id);
                 } else {
-                    await callTelegramWithRetry('sendMessage', u.id, messageText, { parse_mode: "Markdown" });
+                    await callTelegramWithRetry('sendMessage', u.id, textParam, { parse_mode: "Markdown" });
                 }
                 successCount++;
             } catch (err) {
@@ -1639,15 +1673,49 @@ function setupBot(bot, adminBot) {
                     db.collection("users").doc(String(u.id)).set({ blockedBot: true }, { merge: true }).catch(() => {});
                 }
             }
-            // Rate limiting delay (35ms between Telegram sends = ~30 msgs/sec safely under Telegram limit)
+
+            // Edit progress message every 20 users or every 2.5 seconds (Telegram limits max ~1 edit/sec per chat)
+            const now = Date.now();
+            const isLast = (i === totalSubs - 1);
+            if ((i > 0 && i % 20 === 0 && now - lastEditTime > 2000) && !isLast) {
+                lastEditTime = now;
+                const percent = Math.round(((i + 1) / totalSubs) * 100);
+                const bar = getProgressBar(i + 1, totalSubs);
+                await ctx.telegram.editMessageText(
+                    statusChatId,
+                    statusMsgId,
+                    null,
+                    `✈️ *Broadcasting Announcement...* 📢\n\n` +
+                    `⏳ *Progress:* \`${percent}%\` [${bar}] (\`${i + 1}/${totalSubs}\`)\n` +
+                    `🟢 *Delivered:* \`${successCount}\`\n` +
+                    `🔴 *Failed / Blocked:* \`${failedCount}\`\n\n` +
+                    `_Sending seamlessly to active subscribers..._`,
+                    { parse_mode: 'Markdown' }
+                ).catch(() => {});
+            }
+
+            // Rate limiting delay (35ms between Telegram sends = ~28 msgs/sec safely under Telegram limit)
             await new Promise(r => setTimeout(r, 35));
         }
 
-        return ctx.reply(`📢 *Broadcast Finished*\n\n🟢 Success: \`${successCount}\`\n🔴 Failed: \`${failedCount}\`\n👥 Total Subscribers in Ubuntu DB: \`${subscribers.length}\``, { 
-            parse_mode: 'Markdown',
-            reply_to_message_id: ctx.message.message_id
-        });
-    });
+        const elapsedSec = Math.max(1, Math.round((Date.now() - startTime) / 1000));
+
+        // Final seamless in-place edit!
+        await ctx.telegram.editMessageText(
+            statusChatId,
+            statusMsgId,
+            null,
+            `📢 *Broadcast Completed Successfully!* 🎉\n\n` +
+            `🟢 *Delivered:* \`${successCount}\`\n` +
+            `🔴 *Failed / Blocked:* \`${failedCount}\`\n` +
+            `👥 *Total Audience:* \`${totalSubs}\`\n` +
+            `⏱️ *Time Elapsed:* \`${elapsedSec}s\``,
+            { parse_mode: 'Markdown' }
+        ).catch(() => {});
+    };
+
+    bot.command('broadcast', handleSeamlessBroadcast);
+    if (adminBot) adminBot.command('broadcast', handleSeamlessBroadcast);
 
     // Command: /ban <user_id> (Admin Only)
     bot.command('ban', async (ctx) => {
@@ -3020,8 +3088,14 @@ async function init() {
                 const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
                 const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
 
-                const notifiedDoc = await db.collection("settings").doc("new_episodes_notified").get();
-                const notifiedMap = notifiedDoc.exists ? (notifiedDoc.data().episodes || {}) : {};
+                // Load notified episodes from local disk cache to eliminate ~20,000 Firestore operations per day!
+                const notifiedFilePath = path.resolve(__dirname, "./data/new_episodes_notified.json");
+                let notifiedMap = {};
+                try {
+                    if (fs.existsSync(notifiedFilePath)) {
+                        notifiedMap = JSON.parse(fs.readFileSync(notifiedFilePath, "utf8"));
+                    }
+                } catch (e) {}
 
                 let tvSeriesList = [];
                 const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
@@ -3082,10 +3156,13 @@ async function init() {
                     }
 
                     notifiedMap[epKey] = true;
-                    await db.collection("settings").doc("new_episodes_notified").set({
-                        episodes: notifiedMap,
-                        lastCheckedAt: admin.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
+                    try {
+                        const dir = path.dirname(notifiedFilePath);
+                        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+                        fs.writeFileSync(notifiedFilePath, JSON.stringify(notifiedMap, null, 2), "utf8");
+                    } catch (writeErr) {
+                        console.warn("Could not save new_episodes_notified to disk:", writeErr.message);
+                    }
                 }
             } catch (err) {
                 console.error("Error in checkNewEpisodeReleasesForAdmins:", err);
