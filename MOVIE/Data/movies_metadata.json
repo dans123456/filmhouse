@@ -1,5 +1,260 @@
 [
   {
+    "csv_id": "1479688-clutch",
+    "tmdb_id": 1479688,
+    "imdb_id": "",
+    "title": "Clutch",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Crime",
+      "Thriller"
+    ],
+    "overview": "A ride-hailing driver is hijacked by a criminal on the run from his crime boss, setting in motion a series of events, placing both their lives in peril.",
+    "poster": "https://image.tmdb.org/t/p/w500/lHaTfA5UvjDpZwlDWweh1p0wIxP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/sKXh5XycO1zzF5efsRdnZ1Ir9M4.jpg",
+    "rating": 8,
+    "release_date": "2025-07-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADuxAAArgzqEUKljOfuAYWQRYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1748520-exiles-of-earth",
+    "tmdb_id": 1748520,
+    "imdb_id": "",
+    "title": "Exiles of Earth",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [],
+    "overview": "Five stories follow humanity beyond Earth, where explorers and survivors face alien worlds, impossible choices and the struggle to find a new place to call home.",
+    "poster": "https://image.tmdb.org/t/p/w500/dFYPwQ8abeMHAjuIuFYnPptHQVp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xtsR3TZpynxuJJieD2EqkblU7eJ.jpg",
+    "rating": 6,
+    "release_date": "2026-08-11",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADvBAAArgzqEU3H_pxk6EcmRYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1418565-fwends",
+    "tmdb_id": 1418565,
+    "imdb_id": "",
+    "title": "Fwends",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "When Jessie's estranged friend from Sydney spontaneously arrives in Melbourne, they spend a weekend together to distract themselves from their many problems and their existential dread. FWENDS is a celebration of the power of friendship and an ode to the splendiferous messiness of growing up and, maybe, growing apart.",
+    "poster": "https://image.tmdb.org/t/p/w500/luEnVu9xQP61K0CndpETBihtMO3.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lQg3LaHcgMDXV7PSdKORCX3PpAR.jpg",
+    "rating": 0,
+    "release_date": "2025-11-06",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "OLpWvEBOEtU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADvhAAArgzqEWDyGbFennutxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1274134-i-live-here-now",
+    "tmdb_id": 1274134,
+    "imdb_id": "",
+    "title": "I Live Here Now",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies"
+    ],
+    "genres": [
+      "Horror",
+      "Thriller"
+    ],
+    "overview": "Struggling actress Rose finds her life upended by unexpected news. Things spiral further when her casual boyfriend, Travis, brings his overbearing mother into the fold, pushing Rose to the brink. She flees to The Crown Inn—a crumbling motel at the edge of nowhere—where time fractures and reality bends.",
+    "poster": "https://image.tmdb.org/t/p/w500/dWgaHEgorSUPHLUKLhvavkEDuLK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/eG4DBdOzkaXMhfq3jLRnCE1FMlt.jpg",
+    "rating": 2.5,
+    "release_date": "2026-03-20",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADvxAAArgzqEXSuAvaw3Ux8RYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1099501-the-idaho-college-murders",
+    "tmdb_id": 1099501,
+    "imdb_id": "",
+    "title": "The Idaho College Murders",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Crime",
+      "Documentary"
+    ],
+    "overview": "With insight from investigative journalists and criminal experts, explores the horrific crime that claimed the lives of four college students in Moscow, Idaho.",
+    "poster": "https://image.tmdb.org/t/p/w500/jWiGyXcggMfZ0EJor3PwTKnlDBL.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qFvlhPPunFR6MFLoNuMfKTh5U8X.jpg",
+    "rating": 5,
+    "release_date": "2023-03-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "F_5ujSCpAPM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADwBAAArgzqEU-NgoWu2N8mhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADwhAAArgzqEWAMF-il2jnhBYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1767141-the-ocean-between-them",
+    "tmdb_id": 1767141,
+    "imdb_id": "",
+    "title": "The Ocean Between Them",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama",
+      "Thriller",
+      "TV Movie"
+    ],
+    "overview": "A family vacation in Belize turns into a nightmare when a sudden storm strands a young kayaker named Miranda at sea, prompting her mother, Joan, to launch a desperate search.",
+    "poster": "https://image.tmdb.org/t/p/w500/rvDlonSUbTk182BQJSdSVULMsSK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qDLfUkq1L7YIBbYlg6tF2IEzLpS.jpg",
+    "rating": 0,
+    "release_date": "2026-09-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADxBAAArgzqEWMSWsJ39mNvBYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1416758-thou-shalt-kill",
+    "tmdb_id": 1416758,
+    "imdb_id": "",
+    "title": "Thou Shalt Kill",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror",
+      "Thriller"
+    ],
+    "overview": "A distraught ex-alcoholic mother who has nothing left to fear in life is confronted one night in her car by a crazed serial killer who can only kill those who fear him.",
+    "poster": "https://image.tmdb.org/t/p/w500/lsx9XhQLycwpoy5eQHSiNAIyJTr.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3j5ghqDHuY4kA2EuMtGvvJes1kW.jpg",
+    "rating": 0,
+    "release_date": "2025-01-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "DrV5qugaXIQ",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADxhAAArgzqEVsvocElqsX7xYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1740502-worlds-apart",
+    "tmdb_id": 1740502,
+    "imdb_id": "",
+    "title": "Worlds Apart",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Science Fiction"
+    ],
+    "overview": "Worlds Apart is an animated sci-fi anthology exploring three distant worlds and one uncertain future. From a lonely scientist stranded on Europa, to a young woman escaping an oppressive post-apocalyptic society with a decommissioned military droid, to a cadet caught between a secretive agency and an alien encounter, three characters are forced to question the worlds they have been told to trust.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2026-07-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADyRAAArgzqEWRTkD5RkMEDBYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
     "csv_id": "9641-cheaper-by-the-dozen-2",
     "tmdb_id": 9641,
     "imdb_id": "",
