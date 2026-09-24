@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "259909-dexter-resurrection",
+    "tmdb_id": 259909,
+    "imdb_id": "",
+    "title": "Dexter: Resurrection",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Crime",
+      "Drama",
+      "Mystery"
+    ],
+    "overview": "Dexter Morgan awakens from a coma to find Harrison gone without a trace. Realizing the weight of what he put his son through, Dexter sets out for New York City, determined to find him and make things right. But closure won't come easy. When Miami Metro's Angel Batista arrives with questions, Dexter realizes his past is catching up to him fast. As father and son navigate their own darkness in the city that never sleeps, they soon find themselves deeper than they ever imagined - and that the only way out is together.",
+    "poster": "https://image.tmdb.org/t/p/w500/8eg1Ka32Mwcs9fBLcJG1iR8CbPo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/8J0SjKToFBbg8dKpocVOCsrC77C.jpg",
+    "rating": 8.5,
+    "release_date": "2025-07-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "84o1Q6fB20k",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADYxQAArgzqEV1O5JzwCAfBRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1080959-alien-storm",
     "tmdb_id": 1080959,
     "imdb_id": "",
@@ -46556,7 +46588,14 @@
     "csv_id": "505262-the-movie-2",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADFBkAArFaKUZa_YKYAAGaWMAWBA"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADFBkAArFaKUZa_YKYAAGaWMAWBA",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADRxQAArgzqEUwiJfdeR7r5xYE",
+        "quality": "1080p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/hC4nTxdhXqFWzgqynGvvXVMiMNp.jpg",
     "rating": 7.9,
