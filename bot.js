@@ -3295,7 +3295,9 @@ async function init() {
                     }
                 }
             } catch (err) {
-                console.error("Error in farming reminder cron loop:", err.message);
+                if (err.message && !err.message.includes("RESOURCE_EXHAUSTED") && !err.message.includes("Quota exceeded")) {
+                    console.error("Error in farming reminder cron loop:", err.message);
+                }
             }
         }, 15 * 60 * 1000); // check every 15 minutes instead of every 60 seconds
 
