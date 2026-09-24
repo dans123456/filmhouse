@@ -85,6 +85,7 @@ let callAdminTelegramWithRetry = async () => {};
 let publishMovieToChannel = async () => {};
 const PENDING_FILE = path.join(__dirname, "data", "pending_requests.json");
 let cachedPendingRequests = [];
+const _channelPostingLocks = new Set();
 
 // Pre-load movies_metadata.json into memory for instant (<1ms) deep-link lookup
 let cachedMoviesMetadata = null;
@@ -363,20 +364,20 @@ function setupBot(bot, adminBot) {
                 seasonOrQualityText = "Complete Series | All Seasons";
             }
 
-            // Enrich with metadata if missing
+            // Enrich with metadata if missing using in-memory cache (0 Firestore reads)
             if ((!movieInfo.overview || !movieInfo.genres || !movieInfo.categories) && (movieInfo.csv_id || movieInfo.id)) {
-                try {
-                    const lookupId = movieInfo.csv_id || movieInfo.id;
-                    const mDoc = await db.collection("movies").doc(lookupId).get();
-                    if (mDoc.exists) {
-                        const md = mDoc.data();
-                        movieInfo.overview = movieInfo.overview || md.overview;
-                        movieInfo.genres = movieInfo.genres || md.categories || md.genres;
-                        movieInfo.rating = movieInfo.rating || md.rating || md.vote_average;
-                        movieInfo.year = movieInfo.year || (md.release_date ? md.release_date.substring(0, 4) : md.year);
-                        movieInfo.poster = movieInfo.poster || md.poster;
-                    }
-                } catch (e) {}
+                const lookupId = String(movieInfo.csv_id || movieInfo.id).toLowerCase();
+                const localMatch = cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)
+                    ? cachedMoviesMetadata.find(m => String(m.csv_id || "").toLowerCase() === lookupId || String(m.tmdb_id) === lookupId)
+                    : null;
+                if (localMatch) {
+                    movieInfo.overview = movieInfo.overview || localMatch.overview;
+                    movieInfo.genres = movieInfo.genres || localMatch.genres || localMatch.categories;
+                    movieInfo.rating = movieInfo.rating || localMatch.rating || localMatch.vote_average;
+                    movieInfo.year = movieInfo.year || (localMatch.release_date ? localMatch.release_date.substring(0, 4) : localMatch.year);
+                    movieInfo.poster = movieInfo.poster || localMatch.poster;
+                    movieInfo.backdrop = movieInfo.backdrop || localMatch.backdrop;
+                }
             }
 
             const rawGenres = Array.isArray(movieInfo.genres) ? movieInfo.genres : (Array.isArray(movieInfo.categories) ? movieInfo.categories : []);
@@ -478,13 +479,15 @@ function setupBot(bot, adminBot) {
 
                     return await botInstance.telegram.sendPhoto(target, photoPayload, {
                         caption: caption,
-                        parse_mode: "HTML"
+                        parse_mode: "HTML",
+                        reply_markup: replyMarkup
                     });
                 } catch (photoErr) {
                     if (photoErr.message && (photoErr.message.includes("photo") || photoErr.message.includes("IMAGE") || photoErr.message.includes("wrong file") || photoErr.message.includes("HTTP") || photoErr.message.includes("failed to get http"))) {
                         console.warn(`[CHANNEL PUBLISH] Photo send failed (${photoErr.message}), falling back to sendMessage...`);
                         return await botInstance.telegram.sendMessage(target, caption, {
                             parse_mode: "HTML",
+                            reply_markup: replyMarkup,
                             disable_web_page_preview: true
                         });
                     }
@@ -3025,47 +3028,20 @@ async function init() {
                                 }).catch(() => {});
                             }
 
-                            // Auto-publish release announcement to Main Channel (@filmhouse_main) if not already posted by admin client
-                            if (data.publishToChannel !== false && data.channelPosted !== true) {
-                                try {
-                                    // Set lock immediately to prevent race condition duplicate posts
-                                    await db.collection("requests").doc(docId).update({ channelPosted: true }).catch(() => {});
-                                    
-                                    let movieDataForChannel = null;
-                                    if (data.csv_id) {
-                                        const mDoc = await db.collection("movies").doc(data.csv_id).get();
-                                        if (mDoc.exists) movieDataForChannel = mDoc.data();
-                                    }
-                                    if (!movieDataForChannel) {
-                                        movieDataForChannel = {
-                                            title: title,
-                                            year: year,
-                                            type: data.type,
-                                            seasonOrPart: data.seasonOrPart,
-                                            csv_id: data.csv_id || "",
-                                            tmdb_id: data.tmdb_id || null,
-                                            poster: data.poster || null,
-                                            backdrop: data.backdrop || null
-                                        };
-                                    }
-                                    const pubResult = await publishMovieToChannel(movieDataForChannel);
-                                    if (pubResult && pubResult.message_id) {
-                                        await db.collection("requests").doc(docId).update({
-                                            channelMessageId: pubResult.message_id,
-                                            channelPostedAt: admin.firestore.FieldValue.serverTimestamp()
-                                        }).catch(() => {});
-                                    }
-                                } catch (pubErr) {
-                                    console.warn("Error auto-publishing request fulfillment to channel:", pubErr.message);
-                                }
-                            }
-
                             // Notify admins of the fulfillment
                             try {
                                 const defaultAdmins = ["1329840839", "1175336733"];
-                                const adminDoc = await db.collection("settings").doc("admins").get();
-                                const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
-                                const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
+                                let adminList = [];
+                                let masterList = [];
+                                try {
+                                    const adminDoc = await db.collection("settings").doc("admins").get();
+                                    if (adminDoc && adminDoc.exists) {
+                                        adminList = adminDoc.data().ids || [];
+                                        masterList = adminDoc.data().masters || [];
+                                    }
+                                } catch (e) {
+                                    // Quota fallback to default admins
+                                }
                                 const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
 
                                 const pendingCount = cachedPendingRequests.length;
@@ -3076,13 +3052,13 @@ async function init() {
                                 const cleanReqUser = escapeHtml(username || `User ${userId}`);
                                 const displayUser = cleanReqUser.startsWith('@') ? cleanReqUser : `@${cleanReqUser}`;
 
-                                // Track fulfillment counts per admin in Firestore
+                                // Track fulfillment counts per admin in Firestore safely
                                 let adminTotalFulfillCount = 0;
                                 const adminIdKey = String(data.fulfilledById || fulfilledBy || "admin").replace(/[^a-zA-Z0-9_]/g, "_");
                                 try {
                                     const statsDocRef = db.collection("settings").doc("admin_stats");
                                     const statsDoc = await statsDocRef.get();
-                                    let currentStats = statsDoc.exists ? statsDoc.data() || {} : {};
+                                    let currentStats = statsDoc && statsDoc.exists ? statsDoc.data() || {} : {};
                                     const adminStat = currentStats[adminIdKey] || { count: 0, name: fulfilledBy };
                                     adminStat.count = (adminStat.count || 0) + 1;
                                     adminStat.name = fulfilledBy || adminStat.name;
@@ -3123,6 +3099,62 @@ async function init() {
                                 }
                             } catch (adminErr) {
                                 console.error("Error in admin notification:", adminErr);
+                            }
+                        }
+
+                        // Auto-publish release announcement to Main Channel (@filmhouse_main)
+                        // Evaluated independently from user DM flag so channel posts are never skipped or blocked
+                        if (data.status === "fulfilled" && data.publishToChannel !== false && !data.channelMessageId) {
+                            const movieKey = String(data.csv_id || data.tmdb_id || title || docId).toLowerCase().trim();
+                            if (movieKey && !_channelPostingLocks.has(movieKey)) {
+                                _channelPostingLocks.add(movieKey);
+                                (async () => {
+                                    try {
+                                        console.log(`[CHANNEL PUBLISH] Initiating auto-publish for fulfilled request "${title}" (Key: ${movieKey})...`);
+
+                                        let movieDataForChannel = null;
+                                        const lookupCsvId = String(data.csv_id || "").toLowerCase().trim();
+                                        const lookupTmdbId = String(data.tmdb_id || "").trim();
+                                        const lookupTitle = String(title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+
+                                        if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                                            movieDataForChannel = cachedMoviesMetadata.find(m => 
+                                                (lookupCsvId && String(m.csv_id || "").toLowerCase().trim() === lookupCsvId) ||
+                                                (lookupTmdbId && String(m.tmdb_id || "").trim() === lookupTmdbId) ||
+                                                (lookupTitle && String(m.title || "").toLowerCase().trim() === lookupTitle)
+                                            );
+                                        }
+
+                                        if (!movieDataForChannel) {
+                                            movieDataForChannel = {
+                                                title: title,
+                                                year: year,
+                                                type: data.type,
+                                                seasonOrPart: data.seasonOrPart,
+                                                csv_id: data.csv_id || "",
+                                                tmdb_id: data.tmdb_id || null,
+                                                poster: data.poster || null,
+                                                backdrop: data.backdrop || null
+                                            };
+                                        }
+
+                                        const pubResult = await publishMovieToChannel(movieDataForChannel);
+                                        if (pubResult && pubResult.message_id) {
+                                            console.log(`[CHANNEL PUBLISH] Successfully published announcement for "${title}" to @filmhouse_main (msg_id: ${pubResult.message_id})`);
+                                            await db.collection("requests").doc(docId).update({
+                                                channelPosted: true,
+                                                channelMessageId: pubResult.message_id,
+                                                channelPostedAt: admin.firestore.FieldValue.serverTimestamp()
+                                            }).catch(() => {});
+                                        } else {
+                                            console.warn(`[CHANNEL PUBLISH] publishMovieToChannel returned null for "${title}".`);
+                                            _channelPostingLocks.delete(movieKey);
+                                        }
+                                    } catch (pubErr) {
+                                        console.warn(`[CHANNEL PUBLISH] Error auto-publishing "${title}" to channel:`, pubErr.message);
+                                        _channelPostingLocks.delete(movieKey);
+                                    }
+                                })();
                             }
                         }
                     }

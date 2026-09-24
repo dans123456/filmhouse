@@ -5048,7 +5048,7 @@ if (fulfillForm && fulfillRequestModal) {
                     fulfilledBy: currentAdminName,
                     fulfilledById: currentAdminId || "",
                     publishToChannel: shouldPostToChannel,
-                    channelPosted: shouldPostToChannel ? true : false,
+                    channelPosted: false,
                     fulfilledAt: firebase.firestore.FieldValue.serverTimestamp(),
                     adminClaimId: firebase.firestore.FieldValue.delete(),
                     adminClaimName: firebase.firestore.FieldValue.delete(),
