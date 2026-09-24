@@ -24506,10 +24506,12 @@
       "Hollywood/British Movies",
       "Teen/High-School"
     ],
-    "genres": [],
+    "genres": [
+      "Horror"
+    ],
     "overview": "A group of high school seniors face the challenges of graduation and college while a serial killer stalks their town.",
     "poster": "https://image.tmdb.org/t/p/w500/8bHWetIMhtoFbPtEHblbdiHO5WG.jpg",
-    "backdrop": "",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/km8bjFSPf9jQycsl9HYzbObGhNk.jpg",
     "rating": 2,
     "release_date": "2025-08-22",
     "language": "en",
@@ -24518,7 +24520,10 @@
     "trailer": "CB7aB7qiRpk",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADJBIAAhoLoUa6j7vh7EuGVhYE"
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADuhAAArgzqEVkoqIzCg2GwxYE",
+        "quality": "1080p"
+      }
     ]
   },
   {
