@@ -246,8 +246,9 @@ function setupBot(bot, adminBot) {
 
     // In-memory cache for banned users and admin lists to eliminate per-update Firestore latency
     const bannedUsersCache = new Set();
-    let cachedAdmins = ["1329840839", "1175336733"];
-    let cachedMasters = ["1329840839", "1175336733"];
+    const envAdmins = (process.env.ADMIN_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
+    let cachedAdmins = Array.from(new Set(["1329840839", "1175336733", ...envAdmins]));
+    let cachedMasters = Array.from(new Set(["1329840839", "1175336733", ...envAdmins]));
     let lastAdminFetchTime = 0;
 
     async function refreshAdminCache() {
@@ -258,14 +259,20 @@ function setupBot(bot, adminBot) {
             const adminPromise = db.collection("settings").doc("admins").get();
             const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1500));
             const doc = await Promise.race([adminPromise, timeoutPromise]);
-            if (doc.exists) {
+            if (doc && doc.exists) {
                 const adminList = doc.data().ids || [];
                 const masterList = doc.data().masters || [];
-                cachedAdmins = Array.from(new Set(["1329840839", "1175336733", ...adminList, ...masterList]));
-                cachedMasters = Array.from(new Set(["1329840839", "1175336733", ...masterList]));
+                cachedAdmins = Array.from(new Set(["1329840839", "1175336733", ...envAdmins, ...adminList, ...masterList]));
+                cachedMasters = Array.from(new Set(["1329840839", "1175336733", ...envAdmins, ...masterList]));
             }
         } catch (e) {}
     }
+
+    // Helper: Get all active admin Telegram IDs safely with zero-dependency quota fallback
+    const getAllAdminIds = async () => {
+        await refreshAdminCache().catch(() => {});
+        return cachedAdmins.map(String).filter(Boolean);
+    };
 
     // Middleware to check if user is banned (Instant in-memory lookup - zero Firestore reads)
     bot.use(async (ctx, next) => {
@@ -332,18 +339,17 @@ function setupBot(bot, adminBot) {
         }
     }
 
-    // Helper: Call Admin Telegram Bot with fallback to public bot
+    // Helper: Call Admin Telegram Bot strictly on the dedicated admin bot instance
     callAdminTelegramWithRetry = async function(methodName, ...args) {
-        if (!adminBot) return callTelegramWithRetry(methodName, ...args);
+        if (!adminBot) {
+            console.warn(`[AdminBot] Dedicated adminBot not configured, skipping admin notification.`);
+            return null;
+        }
         try {
             return await adminBot.telegram[methodName](...args);
         } catch (err) {
-            console.warn(`Admin Bot call ${methodName} fallback to Public Bot:`, err.message);
-            try {
-                return await bot.telegram[methodName](...args);
-            } catch (fbErr) {
-                console.warn(`Public Bot fallback also failed:`, fbErr.message);
-            }
+            console.warn(`[AdminBot] Call ${methodName} error:`, err.message);
+            return null;
         }
     };
 
@@ -623,7 +629,7 @@ function setupBot(bot, adminBot) {
         // Render helper: edits existing message if callback query, otherwise replies with new message
         const renderOrEdit = async (ctx, payload) => {
             const options = {
-                parse_mode: payload.parse_mode || "Markdown",
+                parse_mode: payload.parse_mode || "HTML",
                 reply_markup: {
                     inline_keyboard: payload.keyboard
                 }
@@ -644,32 +650,37 @@ function setupBot(bot, adminBot) {
         };
 
         // View 1: Main Admin Menu / Command Center
-        const getAdminMenuPayload = (adminName = 'Admin') => {
+        const getAdminMenuPayload = (adminName = 'Admin', adminId = '') => {
             const subCount = localStore.getCount();
             const mem = process.memoryUsage();
             const memoryMB = (mem.heapUsed / 1024 / 1024).toFixed(1);
             const uptimeHours = (process.uptime() / 3600).toFixed(1);
             const pendingCount = cachedPendingRequests.length;
+            const safeName = escapeHtml(adminName || 'Admin');
+            const adminUrl = adminId 
+                ? `https://dans123456.github.io/filmhouse/admin.html?tg_id=${adminId}`
+                : `https://dans123456.github.io/filmhouse/admin.html`;
 
             const text = 
-                `👑 *Film House Admin Command Center*\n\n` +
-                `👋 Welcome, *${adminName}*!\n\n` +
-                `📊 *Live System Overview:*\n` +
-                `• 👥 *Subscribers (Ubuntu DB):* \`${subCount}\`\n` +
-                `• ⏳ *Pending Requests:* \`${pendingCount}\`\n` +
-                `• ⚡ *Server Uptime:* \`${uptimeHours} hrs\` (RAM: \`${memoryMB} MB\`)\n` +
-                `• 🛡 *Public Bot:* Online & Polling\n` +
-                `• 👑 *Admin Bot:* Active & Listening\n\n` +
-                `🛠 *Available Commands:*\n` +
+                `👑 <b>Film House Admin Command Center</b>\n\n` +
+                `👋 Welcome, <b>${safeName}</b>!\n\n` +
+                `📊 <b>Live System Overview:</b>\n` +
+                `• 👥 <b>Subscribers (Ubuntu DB):</b> <code>${subCount}</code>\n` +
+                `• ⏳ <b>Pending Requests:</b> <code>${pendingCount}</code>\n` +
+                `• ⚡ <b>Server Uptime:</b> <code>${uptimeHours} hrs</code> (RAM: <code>${memoryMB} MB</code>)\n` +
+                `• 🛡 <b>Public Bot:</b> Online & Polling\n` +
+                `• 👑 <b>Admin Bot:</b> Active & Listening\n\n` +
+                `🛠 <b>Available Commands:</b>\n` +
                 `• /logs — View live server & bot logs\n` +
                 `• /pending — View pending movie requests\n` +
                 `• /backup — Download weekly CSV catalog backup\n` +
                 `• /sync_catalog — Sync movies catalog from GitHub\n` +
+                `• /topadmins — View admin leaderboard\n` +
                 `• /stats — Detailed server & subscriber metrics`;
 
             const keyboard = [
                 [
-                    { text: "👑 Open Admin Panel 🚀", web_app: { url: "https://dans123456.github.io/filmhouse/admin.html" } }
+                    { text: "👑 Open Admin Panel 🚀", web_app: { url: adminUrl } }
                 ],
                 [
                     { text: "📋 Pending Requests", callback_data: "admin_pending" },
@@ -684,7 +695,7 @@ function setupBot(bot, adminBot) {
                 ]
             ];
 
-            return { text, keyboard };
+            return { text, keyboard, parse_mode: "HTML" };
         };
 
         // View 2: Pending Requests (Grouped with Pagination)
@@ -792,8 +803,8 @@ function setupBot(bot, adminBot) {
         // View 3: Server Logs
         const getLogsPayload = (type = "out") => {
             const logs = getRecentLogs(type);
-            const msg = `📜 *Live Film House Logs (${type.toUpperCase()} - Last 25 lines)*:\n\n` +
-                        `\`\`\`\n${logs || 'No log entries found.'}\n\`\`\``;
+            const safeLogs = escapeHtml(logs || 'No log entries found.');
+            const msg = `📜 <b>Live Film House Logs (${type.toUpperCase()} - Last 25 lines)</b>:\n\n<pre>${safeLogs}</pre>`;
 
             const keyboard = [
                 type === "out"
@@ -810,7 +821,7 @@ function setupBot(bot, adminBot) {
                 ]
             ];
 
-            return { text: msg, keyboard };
+            return { text: msg, keyboard, parse_mode: "HTML" };
         };
 
         // View 4: System Stats
@@ -822,14 +833,14 @@ function setupBot(bot, adminBot) {
             const subscribers = localStore.getCount();
 
             const msg = 
-                `📊 *Film House Server & Bot Statistics*\n\n` +
-                `🖥 *Server Environment:* Oracle Cloud Always Free (Ubuntu 24.04 LTS)\n` +
-                `⏱ *Process Uptime:* \`${uptime} hours\`\n` +
-                `💾 *Memory:* \`${heapUsedMB} MB\` (Heap) / \`${rssMB} MB\` (RSS)\n` +
-                `👥 *Local Subscribers:* \`${subscribers}\` users on disk\n` +
-                `📁 *Local Database:* \`./data/bot_users.json\`\n` +
-                `🛡 *Public Bot:* Polling mode active\n` +
-                `👑 *Admin Bot:* Polling mode active`;
+                `📊 <b>Film House Server & Bot Statistics</b>\n\n` +
+                `🖥 <b>Server Environment:</b> Oracle Cloud Always Free (Ubuntu 24.04 LTS)\n` +
+                `⏱ <b>Process Uptime:</b> <code>${uptime} hours</code>\n` +
+                `💾 <b>Memory:</b> <code>${heapUsedMB} MB</code> (Heap) / <code>${rssMB} MB</code> (RSS)\n` +
+                `👥 <b>Local Subscribers:</b> <code>${subscribers}</code> users on disk\n` +
+                `📁 <b>Local Database:</b> <code>./data/bot_users.json</code>\n` +
+                `🛡 <b>Public Bot:</b> Polling mode active\n` +
+                `👑 <b>Admin Bot:</b> Polling mode active`;
 
             const keyboard = [
                 [
@@ -838,14 +849,15 @@ function setupBot(bot, adminBot) {
                 ]
             ];
 
-            return { text: msg, keyboard };
+            return { text: msg, keyboard, parse_mode: "HTML" };
         };
 
         // Command: /start and /menu
         adminBot.command(['start', 'menu'], async (ctx) => {
             const adminName = ctx.from && ctx.from.first_name ? ctx.from.first_name : 'Admin';
+            const adminId = ctx.from && ctx.from.id ? String(ctx.from.id) : '';
             await getPendingRequestsList();
-            return renderOrEdit(ctx, getAdminMenuPayload(adminName));
+            return renderOrEdit(ctx, getAdminMenuPayload(adminName, adminId));
         });
 
         // Command: /logs [out|error]
@@ -868,8 +880,8 @@ function setupBot(bot, adminBot) {
 
         // Command: /backup
         adminBot.command('backup', async (ctx) => {
-            const generatingMsg = await ctx.reply("⏳ *Syncing latest catalog from GitHub & generating backup CSV...*", {
-                parse_mode: "Markdown",
+            const generatingMsg = await ctx.reply("⏳ <b>Syncing latest catalog from GitHub & generating backup CSV...</b>", {
+                parse_mode: "HTML",
                 reply_markup: {
                     inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                 }
@@ -881,16 +893,17 @@ function setupBot(bot, adminBot) {
                     ctx.chat.id,
                     generatingMsg.message_id,
                     undefined,
-                    "✅ *Backup generation complete and sent to Master Admins above! (Synchronized with GitHub)*",
+                    "✅ <b>Backup generation complete and sent to Master Admins above! (Synchronized with GitHub)</b>",
                     {
-                        parse_mode: "Markdown",
+                        parse_mode: "HTML",
                         reply_markup: {
                             inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                         }
                     }
                 ).catch(() => {});
             } catch (err) {
-                return ctx.reply(`❌ Backup failed: ${err.message}`, {
+                return ctx.reply(`❌ Backup failed: ${escapeHtml(err.message)}`, {
+                    parse_mode: "HTML",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
@@ -900,21 +913,21 @@ function setupBot(bot, adminBot) {
 
         // Command: /sync_catalog (Manually trigger sync from GitHub to Ubuntu disk & memory)
         adminBot.command('sync_catalog', async (ctx) => {
-            const waitMsg = await ctx.reply("⏳ *Synchronizing catalog with GitHub repository...*", { parse_mode: "Markdown" });
+            const waitMsg = await ctx.reply("⏳ <b>Synchronizing catalog with GitHub repository...</b>", { parse_mode: "HTML" });
             const result = await syncCatalogFromGitHub();
             if (result.success) {
                 const statusTxt = result.updated
-                    ? `✅ *Successfully synchronized!* Updated local disk and memory to *${result.count}* movies from GitHub main.`
-                    : `✅ *Catalog already up to date!* Total movies in catalog: *${result.count}*.`;
+                    ? `✅ <b>Successfully synchronized!</b> Updated local disk and memory to <b>${result.count}</b> movies from GitHub main.`
+                    : `✅ <b>Catalog already up to date!</b> Total movies in catalog: <b>${result.count}</b>.`;
                 return ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, statusTxt, {
-                    parse_mode: "Markdown",
+                    parse_mode: "HTML",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
                 }).catch(() => {});
             } else {
-                return ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, `❌ *Sync failed:* ${result.error || "Unknown error"}`, {
-                    parse_mode: "Markdown",
+                return ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, `❌ <b>Sync failed:</b> ${escapeHtml(result.error || "Unknown error")}`, {
+                    parse_mode: "HTML",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
@@ -927,8 +940,8 @@ function setupBot(bot, adminBot) {
             const raw = ctx.message && ctx.message.text ? ctx.message.text : "";
             const query = raw.replace(/^\/post(@\w+)?/i, '').trim();
             if (!query) {
-                return ctx.reply("📢 *Usage:* `/post <Movie or Series Title>`\n\nExample: `/post Inception` or `/post Young Sheldon`\nThis will publish the title announcement with high-res poster and deep link to @filmhouse_main.", {
-                    parse_mode: "Markdown",
+                return ctx.reply("📢 <b>Usage:</b> <code>/post &lt;Movie or Series Title&gt;</code>\n\nExample: <code>/post Inception</code> or <code>/post Young Sheldon</code>\nThis will publish the title announcement with high-res poster and deep link to @filmhouse_main.", {
+                    parse_mode: "HTML",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
@@ -967,16 +980,16 @@ function setupBot(bot, adminBot) {
                         }
                     });
                 } else {
-                    return ctx.reply(`⚠️ *Notice:* Could not post to @filmhouse_main.\n\nPlease make sure *@Filmhouseappbot* is added to your channel *@filmhouse_main* as an *Administrator* with *Post Messages* permission enabled!`, {
-                        parse_mode: "Markdown",
+                    return ctx.reply(`⚠️ <b>Notice:</b> Could not post to @filmhouse_main.\n\nPlease make sure <b>@Filmhouseappbot</b> is added to your channel <b>@filmhouse_main</b> as an <b>Administrator</b> with <b>Post Messages</b> permission enabled!`, {
+                        parse_mode: "HTML",
                         reply_markup: {
                             inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                         }
                     });
                 }
             } catch (err) {
-                return ctx.reply(`❌ *Failed to post:* ${err.message}`, {
-                    parse_mode: "Markdown",
+                return ctx.reply(`❌ <b>Failed to post:</b> ${escapeHtml(err.message)}`, {
+                    parse_mode: "HTML",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
@@ -989,16 +1002,16 @@ function setupBot(bot, adminBot) {
             try {
                 const statsDoc = await db.collection("settings").doc("admin_stats").get();
                 if (!statsDoc.exists) {
-                    return ctx.reply("📊 *No fulfillment statistics recorded yet.*", {
-                        parse_mode: "Markdown",
+                    return ctx.reply("📊 <b>No fulfillment statistics recorded yet.</b>", {
+                        parse_mode: "HTML",
                         reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
                     });
                 }
                 const stats = statsDoc.data() || {};
                 const entries = Object.values(stats).filter(s => s && typeof s.count === 'number' && s.count > 0);
                 if (entries.length === 0) {
-                    return ctx.reply("📊 *No fulfillment statistics recorded yet.*", {
-                        parse_mode: "Markdown",
+                    return ctx.reply("📊 <b>No fulfillment statistics recorded yet.</b>", {
+                        parse_mode: "HTML",
                         reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
                     });
                 }
@@ -1015,14 +1028,15 @@ function setupBot(bot, adminBot) {
                     reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
                 });
             } catch (err) {
-                return ctx.reply("❌ Error fetching admin stats: " + err.message);
+                return ctx.reply(`❌ Error fetching admin stats: ${escapeHtml(err.message)}`, { parse_mode: "HTML" });
             }
         });
 
         // Action Handlers for Inline Navigation Buttons (All edit seamlessly in-place)
         adminBot.action('admin_menu', async (ctx) => {
             const adminName = ctx.from && ctx.from.first_name ? ctx.from.first_name : 'Admin';
-            return renderOrEdit(ctx, getAdminMenuPayload(adminName));
+            const adminId = ctx.from && ctx.from.id ? String(ctx.from.id) : '';
+            return renderOrEdit(ctx, getAdminMenuPayload(adminName, adminId));
         });
 
         adminBot.action('admin_logs', async (ctx) => {
@@ -1054,8 +1068,8 @@ function setupBot(bot, adminBot) {
 
         adminBot.action('admin_backup', async (ctx) => {
             try {
-                await ctx.editMessageText("⏳ *Generating catalog backup CSV and sending document...*", {
-                    parse_mode: "Markdown",
+                await ctx.editMessageText("⏳ <b>Generating catalog backup CSV and sending document...</b>", {
+                    parse_mode: "HTML",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
@@ -1064,15 +1078,15 @@ function setupBot(bot, adminBot) {
 
             try {
                 await checkAndRunWeeklyBackup(adminBot, true, ctx.chat.id);
-                return await ctx.editMessageText("✅ *Catalog backup generated and sent below!*", {
-                    parse_mode: "Markdown",
+                return await ctx.editMessageText("✅ <b>Catalog backup generated and sent below!</b>", {
+                    parse_mode: "HTML",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
                 });
             } catch (err) {
-                return await ctx.editMessageText(`❌ Backup failed: ${err.message}`, {
-                    parse_mode: "Markdown",
+                return await ctx.editMessageText(`❌ <b>Backup failed:</b> ${escapeHtml(err.message)}`, {
+                    parse_mode: "HTML",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
@@ -2743,12 +2757,8 @@ async function init() {
                                       `📌 <b>Subject:</b> ${cleanSubject}\n\n` +
                                       `💬 <b>Message:</b>\n${cleanMsg}`;
                     
-                    const defaultAdmins = ["1329840839", "1175336733"];
                     try {
-                        const adminDoc = await db.collection("settings").doc("admins").get();
-                        const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
-                        const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
-                        const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
+                        const allAdmins = await getAllAdminIds();
                         for (const adminId of allAdmins) {
                             try {
                                 await callAdminTelegramWithRetry('sendMessage', adminId, adminText, { parse_mode: "HTML" });
@@ -2758,7 +2768,7 @@ async function init() {
                             }
                         }
                     } catch (err) {
-                        console.error("Error fetching admin list for feedback notify:", err);
+                        console.error("Error sending feedback notification to admins:", err);
                     }
                 }
             });
@@ -2858,12 +2868,8 @@ async function init() {
                           `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
                           `👤 <b>Requested By:</b> ${cleanUser} (ID: <code>${userId}</code>)`;
 
-                    const defaultAdmins = ["1329840839", "1175336733"];
                     try {
-                        const adminDoc = await db.collection("settings").doc("admins").get();
-                        const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
-                        const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
-                        const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
+                        const allAdmins = await getAllAdminIds();
                         for (const adminId of allAdmins) {
                             try {
                                 const adminUrl = `https://dans123456.github.io/filmhouse/admin.html?tg_id=${adminId}`;
@@ -2883,7 +2889,7 @@ async function init() {
                             }
                         }
                     } catch (err) {
-                        console.error("Error fetching admin list for request notify:", err);
+                        console.error("Error sending new request notification to admins:", err);
                     }
 
                 } else if (change.type === "modified") {
@@ -2926,13 +2932,8 @@ async function init() {
                                               `🔥 <b>Priority Level:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
                                               `💡 <i>Action Required: Please expedite this request in the Admin Panel or upload to @filmhouse_main!</i>`;
 
-                        const defaultAdmins = ["1329840839", "1175336733"];
                         try {
-                            const adminDoc = await db.collection("settings").doc("admins").get();
-                            const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
-                            const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
-                            const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
-
+                            const allAdmins = await getAllAdminIds();
                             console.log(`[BOOST ALERT] Sending HTML notification for "${title}" to ${allAdmins.length} admin(s)...`);
 
                             for (const adminId of allAdmins) {
@@ -3030,19 +3031,7 @@ async function init() {
 
                             // Notify admins of the fulfillment
                             try {
-                                const defaultAdmins = ["1329840839", "1175336733"];
-                                let adminList = [];
-                                let masterList = [];
-                                try {
-                                    const adminDoc = await db.collection("settings").doc("admins").get();
-                                    if (adminDoc && adminDoc.exists) {
-                                        adminList = adminDoc.data().ids || [];
-                                        masterList = adminDoc.data().masters || [];
-                                    }
-                                } catch (e) {
-                                    // Quota fallback to default admins
-                                }
-                                const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
+                                const allAdmins = await getAllAdminIds();
 
                                 const pendingCount = cachedPendingRequests.length;
                                 const fulfilledBy = data.fulfilledBy || data.adminClaimName || "An Admin";

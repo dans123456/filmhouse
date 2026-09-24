@@ -342,12 +342,17 @@ if (db) {
     initUsersSync();
 
     // 2. Real-time Movie Requests Listener
-    db.collection("requests").orderBy("requestedAt", "desc").onSnapshot(snapshot => {
+    db.collection("requests").onSnapshot(snapshot => {
         allRequests = [];
         snapshot.forEach(doc => {
             const req = doc.data();
             req.docId = doc.id;
             allRequests.push(req);
+        });
+        allRequests.sort((a, b) => {
+            const tA = (a.requestedAt && a.requestedAt.seconds) || (a.timestamp && a.timestamp.seconds) || (a.fulfilledAt && a.fulfilledAt.seconds) || 0;
+            const tB = (b.requestedAt && b.requestedAt.seconds) || (b.timestamp && b.timestamp.seconds) || (b.fulfilledAt && b.fulfilledAt.seconds) || 0;
+            return tB - tA;
         });
         updateStatsCounters();
         renderRequestsList();
@@ -702,12 +707,22 @@ function renderRequestsList() {
                 count: 0, 
                 isPriority: false, 
                 isFulfilled: true,
+                fulfilledBy: r.fulfilledBy || null,
+                fulfilledById: r.fulfilledById || null,
+                downloadLink: r.downloadLink || null,
                 docIds: [],
                 requesters: [],
                 requesterDetails: [],
                 adminClaimId: null,
                 adminClaimName: null
             };
+        }
+        if (r.fulfilledBy && !counts[key].fulfilledBy) {
+            counts[key].fulfilledBy = r.fulfilledBy;
+            counts[key].fulfilledById = r.fulfilledById;
+        }
+        if (r.downloadLink && !counts[key].downloadLink) {
+            counts[key].downloadLink = r.downloadLink;
         }
         counts[key].count++;
         counts[key].docIds.push(r.docId);
@@ -722,6 +737,7 @@ function renderRequestsList() {
             username: r.requestedBy || r.user || "guest",
             docId: r.docId,
             status: r.status || "pending",
+            fulfilledBy: r.fulfilledBy || null,
             notificationStatus: r.notificationStatus || null,
             notificationError: r.notificationError || null,
             isBlockedUser: r.isBlockedUser || false
@@ -834,7 +850,8 @@ function renderRequestsList() {
         if (req.isPriority) {
             badgeMarkup = `<span style="font-size: 10px; background: rgba(255, 59, 48, 0.15); border: 1px solid rgba(255, 59, 48, 0.3); color: #ff3b30; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🔥 High Priority</span>`;
         } else if (req.isFulfilled) {
-            badgeMarkup = `<span style="font-size: 10px; background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🟢 Fulfilled</span>`;
+            const fulfillerText = req.fulfilledBy ? ` by ${escapeHTML(req.fulfilledBy)}` : "";
+            badgeMarkup = `<span style="font-size: 10px; background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🟢 Fulfilled${fulfillerText}</span>`;
         } else {
             badgeMarkup = `<span style="font-size: 10px; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🟠 Pending</span>`;
         }
@@ -864,8 +881,15 @@ function renderRequestsList() {
                 `;
             }
         } else {
+            const fulfillerLabel = req.fulfilledBy ? `Fulfilled by ${escapeHTML(req.fulfilledBy)} ✅` : `Resolved ✅`;
+            const linkBtn = req.downloadLink 
+                ? `<a href="${escapeHTML(req.downloadLink)}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; color: var(--primary-color); text-decoration: none; border: 1px solid rgba(255,188,0,0.3); padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; background: rgba(255,188,0,0.05);">📥 Link</a>` 
+                : "";
             fulfillBtnMarkup = `
-                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Resolved</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 11px; color: #4caf50; font-weight: 600;">${fulfillerLabel}</span>
+                    ${linkBtn}
+                </div>
             `;
         }
 
@@ -879,14 +903,16 @@ function renderRequestsList() {
         if (req.requesterDetails && req.requesterDetails.length > 0) {
             req.requesterDetails.forEach(detail => {
                 let statusBadge = "";
+                const detailFulfiller = detail.fulfilledBy || req.fulfilledBy;
+                const fulfillerTag = detailFulfiller ? ` <span style="font-size: 10px; opacity: 0.85; color: var(--text-secondary);">(${escapeHTML(detailFulfiller)})</span>` : "";
                 if (detail.status === "fulfilled" || detail.status === "claimed") {
                     if (detail.notificationStatus === "delivered") {
-                        statusBadge = `<span style="color: #4caf50; font-weight: bold; background: rgba(76, 175, 80, 0.1); padding: 1px 6px; border-radius: 4px;">🟢 Delivered</span>`;
+                        statusBadge = `<span style="color: #4caf50; font-weight: bold; background: rgba(76, 175, 80, 0.1); padding: 1px 6px; border-radius: 4px;">🟢 Delivered${fulfillerTag}</span>`;
                     } else if (detail.notificationStatus === "failed") {
                         const errMsg = detail.notificationError || "Unknown error";
-                        statusBadge = `<span style="color: #ff3b30; font-weight: bold; background: rgba(255, 59, 48, 0.1); padding: 1px 6px; border-radius: 4px;" title="${escapeHTML(errMsg)}">🔴 Failed</span>`;
+                        statusBadge = `<span style="color: #ff3b30; font-weight: bold; background: rgba(255, 59, 48, 0.1); padding: 1px 6px; border-radius: 4px;" title="${escapeHTML(errMsg)}">🔴 Failed${fulfillerTag}</span>`;
                     } else {
-                        statusBadge = `<span style="color: #ffbc00; font-weight: bold; background: rgba(255, 188, 0, 0.1); padding: 1px 6px; border-radius: 4px;">⚪ Pending Send</span>`;
+                        statusBadge = `<span style="color: #4caf50; font-weight: bold; background: rgba(76, 175, 80, 0.1); padding: 1px 6px; border-radius: 4px;">🟢 Fulfilled${fulfillerTag}</span>`;
                     }
                 } else if (detail.status === "priority") {
                     statusBadge = `<span style="color: #ff3b30; font-weight: bold; background: rgba(255, 59, 48, 0.1); padding: 1px 6px; border-radius: 4px;">🔥 Priority</span>`;
@@ -1526,18 +1552,32 @@ async function verifyAdminAccess() {
 
     const urlParams = new URLSearchParams(window.location.search);
     const queryTgId = urlParams.get("tg_id") || urlParams.get("admin_id");
+    const queryTgName = urlParams.get("admin_name") || urlParams.get("username") || urlParams.get("name");
     if (queryTgId) {
         sessionStorage.setItem("admin_auth_id", queryTgId.trim());
-        // Sanitize browser address bar immediately so admin ID is not exposed or shareable via URL
+    }
+    if (queryTgName) {
+        sessionStorage.setItem("admin_auth_name", queryTgName.trim());
+    }
+    if (queryTgId || queryTgName) {
+        // Sanitize browser address bar immediately so admin credentials are not exposed or shareable via URL
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 
     const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
+    if (tgUser) {
+        const uName = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`;
+        sessionStorage.setItem("admin_auth_name", uName);
+        sessionStorage.setItem("admin_auth_id", String(tgUser.id));
+    }
     const currentTgId = tgUser ? String(tgUser.id) : (sessionStorage.getItem("admin_auth_id") || null);
 
     const idBox = document.getElementById("your-tg-id-box");
     if (idBox) {
-        idBox.textContent = currentTgId ? `Your Telegram User ID: ${currentTgId}` : "Not running inside Telegram WebApp";
+        const currentName = sessionStorage.getItem("admin_auth_name");
+        idBox.textContent = currentTgId 
+            ? `Your Telegram ID: ${currentTgId}${currentName ? ` (${currentName})` : ''}` 
+            : "Not running inside Telegram WebApp";
     }
 
     // Determine current user's role
@@ -5032,7 +5072,9 @@ if (fulfillForm && fulfillRequestModal) {
         }
  
         const tgUserForFulfill = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-        const currentAdminName = tgUserForFulfill ? (tgUserForFulfill.username ? `@${tgUserForFulfill.username}` : `${tgUserForFulfill.first_name || 'Admin'}`) : "Admin";
+        const currentAdminName = tgUserForFulfill 
+            ? (tgUserForFulfill.username ? `@${tgUserForFulfill.username}` : `${tgUserForFulfill.first_name || 'Admin'}`) 
+            : (sessionStorage.getItem("admin_auth_name") || localStorage.getItem("filmhouse_admin_username") || "Admin");
         const currentAdminId = String(tgUserForFulfill ? tgUserForFulfill.id : (sessionStorage.getItem("admin_auth_id") || new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || ""));
 
         const postToChanEl = document.getElementById("fulfill-post-to-channel");
@@ -5064,6 +5106,22 @@ if (fulfillForm && fulfillRequestModal) {
         });
  
         Promise.all(fulfillPromises).then(async () => {
+            // Update in-memory allRequests immediately so UI shows fulfilled state without delay
+            targetDocIds.forEach(id => {
+                const reqItem = allRequests.find(r => r.docId === id);
+                if (reqItem) {
+                    reqItem.status = "fulfilled";
+                    reqItem.fulfilledBy = currentAdminName;
+                    reqItem.fulfilledById = currentAdminId || "";
+                    reqItem.downloadLink = downloadLink;
+                    reqItem.isFulfilled = true;
+                    reqItem.fulfilledAt = { seconds: Math.floor(Date.now() / 1000) };
+                }
+            });
+            renderRequestsList();
+            updateStatsCounters();
+            renderAdminLeaderboard();
+
             if (typeof window.recordAdminActivity === 'function') {
                 window.recordAdminActivity("fulfillment", currentFulfillTitle);
             }
