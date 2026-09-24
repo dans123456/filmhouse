@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "299952-the-early-spring",
+    "tmdb_id": 299952,
+    "imdb_id": "",
+    "title": "The Early Spring",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "New to Beijing, Shang Zhitao crosses paths with Luan Nian, a true creative genius. Bold and open-hearted, she grows stronger step by step and gradually breaks through the defenses around Luan's guarded heart. Drawn to each other, they find themselves caught in an intense, on-again, off-again relationship in the urban jungle. To love is to summon all your courage and leave no regrets, to heal each other, and to grow together. But when love and her career pull her in different directions, she puts her career first. When she has come into her own and he has learned to soften his sharp edges, they finally stand as equals, ready to write a new ending together...",
+    "poster": "https://image.tmdb.org/t/p/w500/lGFngmJWMO4HTPcI0sUGKBAFqMe.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/oUFUvEMCBP80e4eYsfVfxC8n7ih.jpg",
+    "rating": 8.4,
+    "release_date": "2026-08-26",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "7JsnZ47CTDg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADlhYAArgzoEVzkZ7GW9gNWBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "575265-mission-impossible-the-final-reckoning",
     "tmdb_id": 575265,
     "imdb_id": "",
