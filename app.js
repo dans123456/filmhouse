@@ -221,8 +221,27 @@ function getTmdbApiKey() {
 }
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p";
-const CSV_FILE_PATH = "./MOVIE/Data/datafile.csv";
 const JSON_FILE_PATH = "./MOVIE/Data/movies_metadata.json";
+
+// Centralized search string generator with full title, year, release date, genres, and metadata
+function buildMovieSearchStr(m) {
+    if (!m) return "";
+    const releaseYear = m.release_date ? String(m.release_date).substring(0, 4) : "";
+    const explicitYear = m.year ? String(m.year) : "";
+    return [
+        m.title,
+        releaseYear,
+        explicitYear,
+        m.release_date,
+        m.overview,
+        Array.isArray(m.genres) ? m.genres.join(" ") : (m.genre || ""),
+        Array.isArray(m.cast) ? m.cast.join(" ") : "",
+        m.director,
+        m.type,
+        Array.isArray(m.categories) ? m.categories.join(" ") : (m.category || ""),
+        m.language
+    ].filter(Boolean).join(" ").toLowerCase();
+}
 
 // Adsgram Ad Placement Configuration
 const ADSGRAM_DOWNLOAD_BLOCK_ID = "36631";
@@ -408,16 +427,8 @@ async function initializeDatabase() {
                         m.poster = "MOVIE/img/FilmHouse3_nobg.png";
                     }
                     
-                    // Precompute search string for highly responsive filtering
-                    m._searchStr = [
-                        m.title,
-                        m.overview,
-                        (m.genres || []).join(" "),
-                        (m.cast || []).join(" "),
-                        m.director,
-                        m.type,
-                        (m.categories || []).join(" ")
-                    ].filter(Boolean).join(" ").toLowerCase();
+                    // Precompute search string for highly responsive filtering including year
+                    m._searchStr = buildMovieSearchStr(m);
                 });
                 state.newMovieIds = data.slice(0, 10).map(m => m.csv_id);
                 state.movies = shuffleAndPinNewMovies(data);
@@ -447,16 +458,8 @@ async function initializeDatabase() {
                         m.backdrop = "MOVIE/" + m.backdrop;
                     }
                     
-                    // Precompute search string for highly responsive filtering
-                    m._searchStr = [
-                        m.title,
-                        m.overview,
-                        (m.genres || []).join(" "),
-                        (m.cast || []).join(" "),
-                        m.director,
-                        m.type,
-                        (m.categories || []).join(" ")
-                    ].filter(Boolean).join(" ").toLowerCase();
+                    // Precompute search string for highly responsive filtering including year
+                    m._searchStr = buildMovieSearchStr(m);
                 });
                 state.newMovieIds = parsed.slice(0, 10).map(m => m.csv_id);
                 state.movies = shuffleAndPinNewMovies(parsed);
@@ -727,15 +730,7 @@ async function initializeDatabase() {
             runtime,
             links
         };
-        movieObj._searchStr = [
-            movieObj.title,
-            movieObj.overview,
-            (movieObj.genres || []).join(" "),
-            (movieObj.cast || []).join(" "),
-            movieObj.director,
-            movieObj.type,
-            (movieObj.categories || []).join(" ")
-        ].filter(Boolean).join(" ").toLowerCase();
+        movieObj._searchStr = buildMovieSearchStr(movieObj);
         enrichedList.push(movieObj);
 
         // Small spacing delay between fetch calls to avoid API lockups
@@ -2409,22 +2404,13 @@ function renderFeaturedGrid(preservePagination = false) {
         }
     }
 
-    // Apply Search Term
+    // Apply Search Term with tokenized multi-word and year matching
     if (state.searchQuery) {
         const query = state.searchQuery.toLowerCase().trim();
+        const tokens = query.split(/\s+/).filter(Boolean);
         list = list.filter(m => {
-            if (m._searchStr) {
-                return m._searchStr.includes(query);
-            }
-            // Fallback filtering if search string is not precomputed
-            const titleMatch = m.title && m.title.toLowerCase().includes(query);
-            const overviewMatch = m.overview && m.overview.toLowerCase().includes(query);
-            const genresMatch = m.genres && m.genres.some(g => g && g.toLowerCase().includes(query));
-            const castMatch = m.cast && m.cast.some(c => c && c.toLowerCase().includes(query));
-            const directorMatch = m.director && m.director.toLowerCase().includes(query);
-            const typeMatch = m.type && m.type.toLowerCase().includes(query);
-            const categoriesMatch = m.categories && m.categories.some(c => c && c.toLowerCase().includes(query));
-            return titleMatch || overviewMatch || genresMatch || castMatch || directorMatch || typeMatch || categoriesMatch;
+            const searchTarget = m._searchStr || buildMovieSearchStr(m);
+            return tokens.every(tok => searchTarget.includes(tok));
         });
 
         if (state.externalSearchResults && state.externalSearchResults.length > 0) {
@@ -4854,7 +4840,34 @@ async function performGlobalTmdbSearch(query) {
         }
         
         if (data.results) {
-            const results = data.results.filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+            let results = data.results.filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+            
+            // If TMDB multi-search returns 0 items and query contains a 4-digit year (e.g. "Avatar 2022"),
+            // try searching with clean title and matching/filtering by release year
+            if (results.length === 0) {
+                const yearMatch = query.match(/\b(19\d\d|20\d\d)\b/);
+                if (yearMatch) {
+                    const matchedYear = yearMatch[1];
+                    const cleanTitle = query.replace(/\b(19\d\d|20\d\d)\b/g, "").trim();
+                    if (cleanTitle.length >= 2) {
+                        try {
+                            const fbRes = await fetch(`${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(cleanTitle)}`);
+                            if (fbRes.ok) {
+                                const fbData = await fbRes.json();
+                                if (fbData.results) {
+                                    const fbFiltered = fbData.results.filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+                                    const yearFiltered = fbFiltered.filter(item => {
+                                        const dateStr = item.release_date || item.first_air_date || "";
+                                        return dateStr.startsWith(matchedYear);
+                                    });
+                                    results = yearFiltered.length > 0 ? yearFiltered : fbFiltered;
+                                }
+                            }
+                        } catch (e) {}
+                    }
+                }
+            }
+            
             console.log("[Search Debug] Filtered movie/tv results count:", results.length);
             
             const formatted = results.map(item => {
@@ -5137,10 +5150,12 @@ function bindEvents() {
                 return;
             }
             
-            // Filter local library movies
-            const matches = state.movies.filter(m => 
-                (m.title || "").toLowerCase().includes(q)
-            ).slice(0, 5);
+            // Filter local library movies with multi-word token and year support
+            const tokens = q.split(/\s+/).filter(Boolean);
+            const matches = state.movies.filter(m => {
+                const searchTarget = m._searchStr || buildMovieSearchStr(m);
+                return tokens.every(tok => searchTarget.includes(tok));
+            }).slice(0, 5);
             
             if (matches.length === 0) {
                 dropdown.style.display = "none";
@@ -5156,11 +5171,13 @@ function bindEvents() {
                 const posterUrl = m.poster || (badgePrefix + "img/FilmHouse3_nobg.png");
                 const genreStr = Array.isArray(m.genres) ? m.genres.join(", ") : (m.genre || "Media");
                 const ratingStr = m.rating ? `⭐ ${m.rating}` : "N/A";
+                const releaseYear = m.release_date ? String(m.release_date).substring(0, 4) : (m.year ? String(m.year) : "");
+                const yearLabel = releaseYear ? ` (${releaseYear})` : "";
                 
                 item.innerHTML = `
                     <img src="${escapeHTML(posterUrl)}" alt="Poster" class="autocomplete-poster" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
                     <div class="autocomplete-details">
-                        <div class="autocomplete-title">${escapeHTML(m.title)}</div>
+                        <div class="autocomplete-title">${escapeHTML(m.title)}${yearLabel}</div>
                         <div class="autocomplete-meta">${escapeHTML(genreStr)} | ${ratingStr}</div>
                     </div>
                 `;
@@ -7947,6 +7964,8 @@ function startWelcomeTour() {
     const tourOverlay = document.getElementById("app-tour-overlay");
     if (!tourOverlay) return;
     
+    tourOverlay.style.display = "";
+    tourOverlay.style.visibility = "";
     currentTourStep = 1;
     showTourStep(1);
     tourOverlay.classList.add("active");
@@ -8097,50 +8116,63 @@ function showTourStep(stepNum) {
 }
 
 function closeWelcomeTour() {
-    const tourOverlay = document.getElementById("app-tour-overlay");
-    if (tourOverlay) {
-        tourOverlay.classList.remove("active");
+    try {
+        const tourOverlay = document.getElementById("app-tour-overlay");
+        if (tourOverlay) {
+            tourOverlay.classList.remove("active");
+            tourOverlay.style.display = "none";
+        }
+        localStorage.setItem("filmhouse_tour_completed", "true");
+        
+        // Clean up highlights
+        const highlighted = document.querySelectorAll(".tour-highlight-target");
+        highlighted.forEach(el => el.classList.remove("tour-highlight-target"));
+        
+        // Close any drawers that were opened during the tour
+        const rewardsDrawer = document.getElementById("rewards-drawer");
+        if (rewardsDrawer) rewardsDrawer.classList.remove("active");
+        
+        const filterToggle = document.getElementById("search-filter-toggle");
+        const filterPanel = document.getElementById("search-filters-panel");
+        if (filterToggle && filterPanel) {
+            filterToggle.classList.remove("active");
+            filterPanel.style.display = "none";
+        }
+
+        const searchWrapper = document.querySelector(".search-bar-wrapper");
+        if (searchWrapper) searchWrapper.classList.remove("expanded");
+
+        // Reset search state and search text box to avoid getting stuck in search layout
+        const searchInput = document.getElementById("global-search-input");
+        if (searchInput) {
+            searchInput.value = "";
+        }
+        state.searchQuery = "";
+        state.externalSearchResults = [];
+        document.body.classList.remove("search-active");
+
+        const clearBtn = document.getElementById("search-clear-btn");
+        if (clearBtn) clearBtn.style.display = "none";
+
+        const dropdown = document.getElementById("search-autocomplete-dropdown");
+        if (dropdown) {
+            dropdown.style.display = "none";
+            dropdown.innerHTML = "";
+        }
+
+        navigateToScreen("home");
+        if (typeof renderFeaturedGrid === "function") {
+            renderFeaturedGrid();
+        }
+    } catch (err) {
+        console.error("Error closing welcome tour:", err);
+        const tourOverlay = document.getElementById("app-tour-overlay");
+        if (tourOverlay) {
+            tourOverlay.classList.remove("active");
+            tourOverlay.style.display = "none";
+        }
+        localStorage.setItem("filmhouse_tour_completed", "true");
     }
-    localStorage.setItem("filmhouse_tour_completed", "true");
-    
-    // Clean up highlights
-    const highlighted = document.querySelectorAll(".tour-highlight-target");
-    highlighted.forEach(el => el.classList.remove("tour-highlight-target"));
-    
-    // Close any drawers that were opened during the tour
-    const rewardsDrawer = document.getElementById("rewards-drawer");
-    if (rewardsDrawer) rewardsDrawer.classList.remove("active");
-    
-    const filterToggle = document.getElementById("search-filter-toggle");
-    const filterPanel = document.getElementById("search-filters-panel");
-    if (filterToggle && filterPanel) {
-        filterToggle.classList.remove("active");
-        filterPanel.style.display = "none";
-    }
-
-    const searchWrapper = document.querySelector(".search-bar-wrapper");
-    if (searchWrapper) searchWrapper.classList.remove("expanded");
-
-    // Reset search state and search text box to avoid getting stuck in search layout
-    const searchInput = document.getElementById("global-search-input");
-    if (searchInput) {
-        searchInput.value = "";
-    }
-    state.searchQuery = "";
-    state.externalSearchResults = [];
-    document.body.classList.remove("search-active");
-
-    const clearBtn = document.getElementById("search-clear-btn");
-    if (clearBtn) clearBtn.style.display = "none";
-
-    const dropdown = document.getElementById("search-autocomplete-dropdown");
-    if (dropdown) {
-        dropdown.style.display = "none";
-        dropdown.innerHTML = "";
-    }
-
-    navigateToScreen("home");
-    renderFeaturedGrid();
 }
 
 function initWelcomeTourHandlers() {
@@ -8148,9 +8180,12 @@ function initWelcomeTourHandlers() {
     const prevBtn = document.getElementById("btn-tour-prev");
     const skipBtn = document.getElementById("btn-tour-skip");
     const tourBtn = document.getElementById("btn-profile-tutorial");
+    const tourOverlay = document.getElementById("app-tour-overlay");
     
     if (nextBtn) {
-        nextBtn.addEventListener("click", () => {
+        nextBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             if (currentTourStep < 6) {
                 showTourStep(currentTourStep + 1);
             } else {
@@ -8160,7 +8195,9 @@ function initWelcomeTourHandlers() {
     }
     
     if (prevBtn) {
-        prevBtn.addEventListener("click", () => {
+        prevBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             if (currentTourStep > 1) {
                 showTourStep(currentTourStep - 1);
             }
@@ -8168,13 +8205,25 @@ function initWelcomeTourHandlers() {
     }
     
     if (skipBtn) {
-        skipBtn.addEventListener("click", () => {
+        skipBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             closeWelcomeTour();
+        });
+    }
+
+    // Dismiss tour when clicking outside card on the dark scrim
+    if (tourOverlay) {
+        tourOverlay.addEventListener("click", (e) => {
+            if (e.target === tourOverlay) {
+                closeWelcomeTour();
+            }
         });
     }
     
     if (tourBtn) {
-        tourBtn.addEventListener("click", () => {
+        tourBtn.addEventListener("click", (e) => {
+            e.preventDefault();
             startWelcomeTour();
         });
     }

@@ -98,6 +98,75 @@ try {
     console.warn("[MetadataCache] Could not pre-load movies_metadata.json:", e.message);
 }
 
+// Native helper to fetch JSON via HTTP/HTTPS with redirect support
+async function fetchJsonFromUrl(url) {
+    if (typeof fetch === "function") {
+        const res = await fetch(url, { headers: { "User-Agent": "FilmHouse-Bot-AutoSync" } });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        return await res.json();
+    }
+    return new Promise((resolve, reject) => {
+        const https = require("https");
+        https.get(url, { headers: { "User-Agent": "FilmHouse-Bot-AutoSync" } }, (res) => {
+            if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+                return fetchJsonFromUrl(res.headers.location).then(resolve).catch(reject);
+            }
+            if (res.statusCode < 200 || res.statusCode >= 300) {
+                return reject(new Error(`HTTP ${res.statusCode}`));
+            }
+            let body = "";
+            res.setEncoding("utf8");
+            res.on("data", chunk => body += chunk);
+            res.on("end", () => {
+                try {
+                    resolve(JSON.parse(body));
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        }).on("error", reject);
+    });
+}
+
+// Automatically sync movies_metadata.json from GitHub to Ubuntu disk and update in-memory cache
+async function syncCatalogFromGitHub() {
+    try {
+        const rawUrl = "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/Data/movies_metadata.json?t=" + Date.now();
+        console.log("[GitHubSync] Checking GitHub for catalog updates...");
+        const data = await fetchJsonFromUrl(rawUrl);
+        if (Array.isArray(data) && data.length > 0) {
+            const currentCount = cachedMoviesMetadata ? cachedMoviesMetadata.length : 0;
+            const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
+            
+            // Check if length differs or file doesn't exist
+            if (data.length !== currentCount || !fs.existsSync(localMetaPath)) {
+                const dir = path.dirname(localMetaPath);
+                if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+                fs.writeFileSync(localMetaPath, JSON.stringify(data, null, 2), "utf8");
+                cachedMoviesMetadata = data;
+                console.log(`[GitHubSync] Successfully synchronized ${data.length} movies from GitHub main to Ubuntu disk! (Previous in-memory: ${currentCount})`);
+                return { success: true, count: data.length, updated: true };
+            } else {
+                if (!cachedMoviesMetadata) cachedMoviesMetadata = data;
+                console.log(`[GitHubSync] Catalog is already up to date (${data.length} movies).`);
+                return { success: true, count: data.length, updated: false };
+            }
+        }
+    } catch (err) {
+        console.warn("[GitHubSync] Sync failed or timed out:", err.message);
+        return { success: false, error: err.message };
+    }
+    return { success: false, error: "Empty or invalid catalog data received" };
+}
+
+// Run initial catalog sync 5 seconds after startup, then poll every 15 minutes
+setTimeout(() => {
+    syncCatalogFromGitHub().catch(() => {});
+}, 5000);
+setInterval(() => {
+    syncCatalogFromGitHub().catch(() => {});
+}, 15 * 60 * 1000);
+
 // Load persisted pending requests from disk (immune to Firestore quota)
 try {
     if (fs.existsSync(PENDING_FILE)) {
@@ -592,6 +661,7 @@ function setupBot(bot, adminBot) {
                 `• /logs — View live server & bot logs\n` +
                 `• /pending — View pending movie requests\n` +
                 `• /backup — Download weekly CSV catalog backup\n` +
+                `• /sync_catalog — Sync movies catalog from GitHub\n` +
                 `• /stats — Detailed server & subscriber metrics`;
 
             const keyboard = [
@@ -795,19 +865,20 @@ function setupBot(bot, adminBot) {
 
         // Command: /backup
         adminBot.command('backup', async (ctx) => {
-            const generatingMsg = await ctx.reply("⏳ *Generating catalog backup CSV and sending document...*", {
+            const generatingMsg = await ctx.reply("⏳ *Syncing latest catalog from GitHub & generating backup CSV...*", {
                 parse_mode: "Markdown",
                 reply_markup: {
                     inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                 }
             });
             try {
+                await syncCatalogFromGitHub();
                 await checkAndRunWeeklyBackup(adminBot, true, ctx.chat.id);
                 return ctx.telegram.editMessageText(
                     ctx.chat.id,
                     generatingMsg.message_id,
                     undefined,
-                    "✅ *Backup generation complete and sent to Master Admins above!*",
+                    "✅ *Backup generation complete and sent to Master Admins above! (Synchronized with GitHub)*",
                     {
                         parse_mode: "Markdown",
                         reply_markup: {
@@ -821,6 +892,30 @@ function setupBot(bot, adminBot) {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
                 });
+            }
+        });
+
+        // Command: /sync_catalog (Manually trigger sync from GitHub to Ubuntu disk & memory)
+        adminBot.command('sync_catalog', async (ctx) => {
+            const waitMsg = await ctx.reply("⏳ *Synchronizing catalog with GitHub repository...*", { parse_mode: "Markdown" });
+            const result = await syncCatalogFromGitHub();
+            if (result.success) {
+                const statusTxt = result.updated
+                    ? `✅ *Successfully synchronized!* Updated local disk and memory to *${result.count}* movies from GitHub main.`
+                    : `✅ *Catalog already up to date!* Total movies in catalog: *${result.count}*.`;
+                return ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, statusTxt, {
+                    parse_mode: "Markdown",
+                    reply_markup: {
+                        inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                    }
+                }).catch(() => {});
+            } else {
+                return ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, `❌ *Sync failed:* ${result.error || "Unknown error"}`, {
+                    parse_mode: "Markdown",
+                    reply_markup: {
+                        inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                    }
+                }).catch(() => {});
             }
         });
 
@@ -2151,11 +2246,19 @@ async function checkAndRunWeeklyBackup(botToUse, force = false, targetChatId = n
         
         if (shouldBackup) {
             console.log("Running weekly database backup...");
+            // Ensure Ubuntu disk and in-memory cache are 100% in sync with latest GitHub publications first
+            try {
+                await syncCatalogFromGitHub();
+            } catch (syncErr) {
+                console.warn("[WeeklyBackup] Catalog sync before backup encountered error:", syncErr.message);
+            }
             let moviesList = [];
             const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
             const localCsvPath = path.resolve(__dirname, "./MOVIE/Data/datafile.csv");
 
-            if (fs.existsSync(localMetaPath)) {
+            if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata) && cachedMoviesMetadata.length > 0) {
+                moviesList = cachedMoviesMetadata;
+            } else if (fs.existsSync(localMetaPath)) {
                 try {
                     moviesList = JSON.parse(fs.readFileSync(localMetaPath, "utf8"));
                 } catch (e) {}
