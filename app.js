@@ -223,12 +223,42 @@ const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p";
 const JSON_FILE_PATH = "./MOVIE/Data/movies_metadata.json";
 
+// Universal target string normalizer to strip symbols for fast indexing
+function normalizeTargetString(str) {
+    if (!str) return "";
+    return String(str).toLowerCase().replace(/&/g, " and ").replace(/[^\p{L}\p{N}\s]/gu, " ");
+}
+
+// Universal search query normalizer: strips symbols ( , & : ; ? - ! ( ) etc. ), extracts year, strips junk tags
+function sanitizeSearchQuery(query) {
+    if (!query) return { cleanTokens: [], titleOnlyTokens: [], searchTitleStr: "", targetYear: null, cleanFullStr: "" };
+    
+    let raw = String(query).toLowerCase();
+    raw = raw.replace(/&/g, " and ");
+    
+    const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
+    const targetYear = yearMatch ? yearMatch[1] : null;
+    
+    // Strip common copy-pasted video quality & release tags
+    raw = raw.replace(/\b(1080p|720p|480p|360p|4k|2160p|web-dl|webrip|bluray|brrip|dvdrip|hdrip|hdcam|camrip|cam|x264|x265|hevc|aac|sub|dub|multi|dual\s*audio|season|episode|s\d{1,2}|e\d{1,2}|complete)\b/gi, " ");
+    
+    // Replace all symbols and punctuation with spaces
+    raw = raw.replace(/[^\p{L}\p{N}\s]/gu, " ");
+    
+    const cleanTokens = raw.split(/\s+/).filter(tok => tok.length > 0);
+    const titleOnlyTokens = cleanTokens.filter(t => t !== targetYear);
+    const searchTitleStr = titleOnlyTokens.join(" ").trim();
+    const cleanFullStr = cleanTokens.join(" ").trim();
+    
+    return { cleanTokens, titleOnlyTokens, searchTitleStr, targetYear, cleanFullStr };
+}
+
 // Centralized search string generator with full title, year, release date, genres, and metadata
 function buildMovieSearchStr(m) {
     if (!m) return "";
     const releaseYear = m.release_date ? String(m.release_date).substring(0, 4) : "";
     const explicitYear = m.year ? String(m.year) : "";
-    return [
+    const base = [
         m.title,
         releaseYear,
         explicitYear,
@@ -240,7 +270,8 @@ function buildMovieSearchStr(m) {
         m.type,
         Array.isArray(m.categories) ? m.categories.join(" ") : (m.category || ""),
         m.language
-    ].filter(Boolean).join(" ").toLowerCase();
+    ].filter(Boolean).join(" ");
+    return normalizeTargetString(base);
 }
 
 // Adsgram Ad Placement Configuration
@@ -2406,12 +2437,7 @@ function renderFeaturedGrid(preservePagination = false) {
 
     // Apply Search Term with tokenized multi-word and year matching
     if (state.searchQuery) {
-        const raw = state.searchQuery.toLowerCase().trim();
-        const cleanTokens = raw.replace(/[()[\]{}.,:;!?'"`\-_/\\]/g, ' ').split(/\s+/).filter(Boolean);
-        const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
-        const targetYear = yearMatch ? yearMatch[1] : null;
-        const titleOnlyTokens = cleanTokens.filter(t => t !== targetYear);
-        const searchTitleStr = titleOnlyTokens.join(" ");
+        const { cleanTokens, searchTitleStr, targetYear } = sanitizeSearchQuery(state.searchQuery);
 
         list = list.filter(m => {
             const searchTarget = m._searchStr || buildMovieSearchStr(m);
@@ -4868,14 +4894,9 @@ async function fetchTmdbCategoryMovies(category) {
 // Helper to perform smart TMDB search supporting year extraction and parallel TV/Movie/Multi queries
 async function fetchTmdbSearchResults(query, apiKey) {
     if (!query) return [];
-    const raw = query.trim();
-    const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
-    const matchedYear = yearMatch ? yearMatch[1] : null;
-    const cleanTitle = raw
-        .replace(/\b(19\d\d|20\d\d)\b/g, '')
-        .replace(/[()[\]{}.,:;!?'"`\-_/\\]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
+    const { cleanTokens, titleOnlyTokens, searchTitleStr, targetYear, cleanFullStr } = sanitizeSearchQuery(query);
+    const cleanTitle = searchTitleStr || cleanFullStr;
+    const matchedYear = targetYear;
 
     let allResults = [];
 
@@ -4937,7 +4958,8 @@ async function fetchTmdbSearchResults(query, apiKey) {
 
         allResults = combined;
     } else {
-        const url = `${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(raw)}`;
+        const queryTerm = cleanFullStr || query.trim();
+        const url = `${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(queryTerm)}`;
         const res = await fetch(url);
         if (res.ok) {
             const data = await res.json();
@@ -5245,12 +5267,7 @@ function bindEvents() {
             }
             
             // Filter local library movies with multi-word token and year support
-            const raw = q.toLowerCase().trim();
-            const cleanTokens = raw.replace(/[()[\]{}.,:;!?'"`\-_/\\]/g, ' ').split(/\s+/).filter(Boolean);
-            const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
-            const targetYear = yearMatch ? yearMatch[1] : null;
-            const titleOnlyTokens = cleanTokens.filter(t => t !== targetYear);
-            const searchTitleStr = titleOnlyTokens.join(" ");
+            const { cleanTokens, searchTitleStr, targetYear } = sanitizeSearchQuery(q);
 
             const matches = state.movies.filter(m => {
                 const searchTarget = m._searchStr || buildMovieSearchStr(m);
@@ -5377,6 +5394,32 @@ function bindEvents() {
                 document.body.classList.remove("search-active");
                 renderFeaturedGrid();
                 searchInput.focus();
+            });
+        }
+
+        const pasteBtn = document.getElementById("search-paste-btn");
+        if (pasteBtn) {
+            pasteBtn.addEventListener("click", async (e) => {
+                e.stopPropagation();
+                try {
+                    let text = "";
+                    if (navigator.clipboard && navigator.clipboard.readText) {
+                        text = await navigator.clipboard.readText();
+                    }
+                    if (!text) {
+                        text = prompt("Paste your search text:") || "";
+                    }
+                    if (text) {
+                        searchInput.value = text;
+                        searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+                    }
+                } catch (err) {
+                    const text = prompt("Paste your search text:") || "";
+                    if (text) {
+                        searchInput.value = text;
+                        searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+                    }
+                }
             });
         }
 
@@ -8436,6 +8479,33 @@ function initPremiumSearchOverlay() {
         });
     }
 
+    // 1-tap paste button
+    const overlayPasteBtn = document.getElementById("overlay-search-paste");
+    if (overlayPasteBtn) {
+        overlayPasteBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            try {
+                let text = "";
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    text = await navigator.clipboard.readText();
+                }
+                if (!text) {
+                    text = prompt("Paste your search text:") || "";
+                }
+                if (text) {
+                    overlayInput.value = text;
+                    triggerOverlaySearch(text);
+                }
+            } catch (err) {
+                const text = prompt("Paste your search text:") || "";
+                if (text) {
+                    overlayInput.value = text;
+                    triggerOverlaySearch(text);
+                }
+            }
+        });
+    }
+
     // Input text listener with 150ms debounce to prevent typing lag
     overlayInput.addEventListener("input", (e) => {
         const query = e.target.value;
@@ -8475,11 +8545,7 @@ function triggerOverlaySearch(query) {
     }
 
     // Tokenize search query and extract year for precise matching
-    const cleanTokens = q.replace(/[()[\]{}.,:;!?'"`\-_/\\]/g, ' ').split(/\s+/).filter(Boolean);
-    const yearMatch = q.match(/\b(19\d\d|20\d\d)\b/);
-    const targetYear = yearMatch ? yearMatch[1] : null;
-    const titleOnlyTokens = cleanTokens.filter(t => t !== targetYear);
-    const searchTitleStr = titleOnlyTokens.join(" ");
+    const { cleanTokens, searchTitleStr, targetYear } = sanitizeSearchQuery(q);
 
     // Filter local movies
     let filtered = state.movies.filter(m => {

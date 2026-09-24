@@ -3184,14 +3184,14 @@ if (btnSearchTmdb && inputSearchTmdb && resultsSearchTmdb) {
         resultsSearchTmdb.style.display = "block";
         
         try {
-            const raw = query.trim();
-            const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
+            let rawStr = String(query).toLowerCase().replace(/&/g, " and ");
+            const yearMatch = rawStr.match(/\b(19\d\d|20\d\d)\b/);
             const matchedYear = yearMatch ? yearMatch[1] : null;
-            const cleanTitle = raw
-                .replace(/\b(19\d\d|20\d\d)\b/g, '')
-                .replace(/[()[\]{}.,:;!?'"`\-_/\\]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
+            rawStr = rawStr.replace(/\b(1080p|720p|480p|360p|4k|2160p|web-dl|webrip|bluray|brrip|dvdrip|hdrip|hdcam|camrip|cam|x264|x265|hevc|aac|sub|dub|multi|dual\s*audio|season|episode|s\d{1,2}|e\d{1,2}|complete)\b/gi, " ");
+            rawStr = rawStr.replace(/[^\p{L}\p{N}\s]/gu, " ");
+            const tokens = rawStr.split(/\s+/).filter(Boolean);
+            const titleTokens = tokens.filter(t => t !== matchedYear);
+            const cleanTitle = titleTokens.join(" ").trim() || tokens.join(" ").trim();
 
             let filteredResults = [];
 
@@ -4465,14 +4465,17 @@ function initAdminLeaderboardListener() {
 // Track Admin Activity (Fulfillments & Publications)
 window.recordAdminActivity = function(type, title) {
     const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-    const currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : (localStorage.getItem("filmhouse_admin_name") || "Admin");
-    const currentAdminId = String(tgUser ? tgUser.id : (sessionStorage.getItem("admin_auth_id") || "admin"));
+    const currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : (localStorage.getItem("filmhouse_admin_name") || "");
+    const currentAdminId = String(tgUser ? tgUser.id : (sessionStorage.getItem("admin_auth_id") || ""));
+
+    // Guard: Never record unauthenticated generic "admin"
+    if (!currentAdminId || currentAdminId.toLowerCase() === "admin") return;
     const adminKey = currentAdminId.replace(/[^a-zA-Z0-9_]/g, "_");
 
     if (!adminStatsCache[adminKey]) {
         adminStatsCache[adminKey] = {
             id: currentAdminId,
-            name: currentAdminName,
+            name: currentAdminName || `Admin (${currentAdminId})`,
             fulfillments: 0,
             publications: 0,
             score: 0,
@@ -4481,27 +4484,36 @@ window.recordAdminActivity = function(type, title) {
         };
     }
 
-    if (type === "fulfillment") {
-        adminStatsCache[adminKey].fulfillments = (adminStatsCache[adminKey].fulfillments || 0) + 1;
-    } else if (type === "publication") {
-        adminStatsCache[adminKey].publications = (adminStatsCache[adminKey].publications || 0) + 1;
-    }
-
-    adminStatsCache[adminKey].score = ((adminStatsCache[adminKey].fulfillments || 0) * 10) + ((adminStatsCache[adminKey].publications || 0) * 10);
-    adminStatsCache[adminKey].lastActiveAt = Date.now();
-    adminStatsCache[adminKey].name = currentAdminName;
-
     if (title) {
         adminStatsCache[adminKey].titles = adminStatsCache[adminKey].titles || [];
-        adminStatsCache[adminKey].titles.unshift({
-            type: type,
-            title: title,
-            date: new Date().toISOString()
-        });
-        if (adminStatsCache[adminKey].titles.length > 25) {
-            adminStatsCache[adminKey].titles = adminStatsCache[adminKey].titles.slice(0, 25);
+        const cleanT = String(title).trim();
+        const existingIdx = adminStatsCache[adminKey].titles.findIndex(t => t.title && t.title.toLowerCase() === cleanT.toLowerCase());
+        if (existingIdx >= 0) {
+            adminStatsCache[adminKey].titles[existingIdx].date = new Date().toISOString();
+        } else {
+            adminStatsCache[adminKey].titles.unshift({
+                type: type,
+                title: cleanT,
+                date: new Date().toISOString()
+            });
+        }
+        if (adminStatsCache[adminKey].titles.length > 30) {
+            adminStatsCache[adminKey].titles = adminStatsCache[adminKey].titles.slice(0, 30);
         }
     }
+
+    // Keep counts strictly equal to verified titles
+    const fCount = (adminStatsCache[adminKey].titles || []).filter(t => t.type === "fulfillment" || !t.type).length;
+    const pCount = (adminStatsCache[adminKey].titles || []).filter(t => t.type === "publication").length;
+    adminStatsCache[adminKey].fulfillments = fCount;
+    adminStatsCache[adminKey].publications = pCount;
+    adminStatsCache[adminKey].score = (fCount * 10) + (pCount * 10);
+    adminStatsCache[adminKey].lastActiveAt = Date.now();
+    if (currentAdminName) adminStatsCache[adminKey].name = currentAdminName;
+
+    // Purge fake legacy keys if present
+    delete adminStatsCache.admin;
+    delete adminStatsCache.Admin;
 
     try {
         localStorage.setItem("filmhouse_admin_stats_cache", JSON.stringify(adminStatsCache));
@@ -4518,20 +4530,25 @@ window.recordAdminActivity = function(type, title) {
 function getComputedAdminRankings() {
     const adminMap = {};
 
-    // 1. Seed known admins
-    const seedIds = Array.from(new Set([
+    // 1. Seed known, verified admins only
+    const verifiedAdminIds = Array.from(new Set([
         ...(window.cachedMasterAdminIds || []),
         ...(window.cachedSlaveAdminIds || []),
-        ...(Array.isArray(adminIdsList) ? adminIdsList : [])
-    ]));
+        ...(Array.isArray(adminIdsList) ? adminIdsList : []),
+        "1329840839", "1175336733", "8266055508", "6462272022", "978567096"
+    ])).map(s => String(s).trim()).filter(Boolean);
 
-    seedIds.forEach(id => {
+    verifiedAdminIds.forEach(id => {
         const uidStr = String(id).trim();
         if (!uidStr) return;
         const key = uidStr.replace(/[^a-zA-Z0-9_]/g, "_");
         const userMatch = Array.isArray(allUsers) ? allUsers.find(u => String(u.id) === uidStr) : null;
-        const name = userMatch ? (userMatch.username ? `@${userMatch.username}` : (userMatch.fullName || `Admin (${uidStr})`)) : `Admin (${uidStr})`;
+        let name = userMatch ? (userMatch.username ? `@${userMatch.username}` : (userMatch.fullName || `Admin (${uidStr})`)) : `Admin (${uidStr})`;
         
+        // Known defaults for master admins
+        if (uidStr === "1329840839" && (!name || name.startsWith("Admin ("))) name = "@Siawblaze";
+        if (uidStr === "1175336733" && (!name || name.startsWith("Admin ("))) name = "@damnitzjoel";
+
         adminMap[key] = {
             id: uidStr,
             name: name,
@@ -4546,7 +4563,7 @@ function getComputedAdminRankings() {
     if (Array.isArray(allUsers)) {
         allUsers.forEach(u => {
             const uidStr = String(u.id).trim();
-            const isAdm = (u.role === 'admin' || u.role === 'slave_admin' || u.isSlaveAdmin || u.isAdmin || seedIds.includes(uidStr));
+            const isAdm = (u.role === 'admin' || u.role === 'slave_admin' || u.isSlaveAdmin || u.isAdmin || verifiedAdminIds.includes(uidStr));
             if (isAdm) {
                 const key = uidStr.replace(/[^a-zA-Z0-9_]/g, "_");
                 const name = u.username ? `@${u.username}` : (u.fullName || `Admin (${u.id})`);
@@ -4575,38 +4592,48 @@ function getComputedAdminRankings() {
                 if (req.fulfilledAt) {
                     fulfilledMs = req.fulfilledAt.toDate ? req.fulfilledAt.toDate().getTime() : new Date(req.fulfilledAt).getTime();
                 }
-                // Filter out legacy requests before today so we start completely fresh!
-                if (fulfilledMs > 0 && fulfilledMs < FRESH_RANKING_START_MS) return;
+                // Filter out legacy requests without timestamp or before fresh start
+                if (!fulfilledMs || fulfilledMs < FRESH_RANKING_START_MS) return;
 
-                const adminName = req.fulfilledBy || "Admin";
-                const adminId = String(req.fulfilledById || req.adminClaimId || adminName).replace(/[^a-zA-Z0-9_]/g, "_");
+                const reqAdminId = String(req.fulfilledById || req.adminClaimId || "").trim();
+                const reqAdminName = String(req.fulfilledBy || req.adminClaimName || "").trim();
 
-                if (!adminMap[adminId]) {
-                    adminMap[adminId] = {
-                        id: req.fulfilledById || adminId,
-                        name: adminName,
-                        fulfillments: 0,
-                        publications: 0,
-                        score: 0,
-                        titles: [],
-                        lastActiveAt: null
-                    };
+                // Skip generic placeholder "Admin" or unverified IDs
+                if (!reqAdminId && (!reqAdminName || reqAdminName.toLowerCase() === "admin")) return;
+
+                // Match to verified admin
+                let matchedKey = null;
+                const idKey = reqAdminId ? reqAdminId.replace(/[^a-zA-Z0-9_]/g, "_") : "";
+                if (idKey && adminMap[idKey]) {
+                    matchedKey = idKey;
+                } else if (reqAdminId && verifiedAdminIds.includes(reqAdminId)) {
+                    matchedKey = idKey;
+                } else if (reqAdminName) {
+                    const cleanReqName = reqAdminName.toLowerCase().replace(/^@/, '');
+                    matchedKey = Object.keys(adminMap).find(k => {
+                        const admName = (adminMap[k].name || "").toLowerCase().replace(/^@/, '');
+                        return admName === cleanReqName || admName.includes(cleanReqName);
+                    });
                 }
-                adminMap[adminId].fulfillments = (adminMap[adminId].fulfillments || 0) + 1;
-                if (fulfilledMs > (adminMap[adminId].lastActiveAt || 0)) {
-                    adminMap[adminId].lastActiveAt = fulfilledMs;
+
+                if (!matchedKey || !adminMap[matchedKey]) return;
+
+                if (fulfilledMs > (adminMap[matchedKey].lastActiveAt || 0)) {
+                    adminMap[matchedKey].lastActiveAt = fulfilledMs;
                 }
 
                 const titleKey = (req.title || "").trim();
-                const existingTitle = adminMap[adminId].titles.find(t => t.title && t.title.toLowerCase() === titleKey.toLowerCase());
-                if (!existingTitle) {
-                    adminMap[adminId].titles.push({
-                        type: "fulfillment",
-                        title: req.title,
-                        year: req.year || "",
-                        user: req.requestedBy || "User",
-                        date: fulfilledMs ? new Date(fulfilledMs) : new Date()
-                    });
+                if (titleKey) {
+                    const existingTitle = adminMap[matchedKey].titles.find(t => t.title && t.title.toLowerCase() === titleKey.toLowerCase());
+                    if (!existingTitle) {
+                        adminMap[matchedKey].titles.push({
+                            type: "fulfillment",
+                            title: req.title,
+                            year: req.year || "",
+                            user: req.requestedBy || "User",
+                            date: fulfilledMs ? new Date(fulfilledMs) : new Date()
+                        });
+                    }
                 }
             }
         });
@@ -4617,47 +4644,77 @@ function getComputedAdminRankings() {
         Object.keys(adminStatsCache).forEach(k => {
             const stat = adminStatsCache[k];
             if (!stat) return;
+            const kLower = k.toLowerCase();
+            const statNameLower = (stat.name || "").toLowerCase();
+            // Purge fake Admin entry
+            if (kLower === "admin" || statNameLower === "admin") return;
+
             const lastActive = stat.lastActiveAt ? (typeof stat.lastActiveAt === 'number' ? stat.lastActiveAt : new Date(stat.lastActiveAt).getTime()) : 0;
             if (lastActive > 0 && lastActive < FRESH_RANKING_START_MS && !stat.publications) return;
 
-            if (!adminMap[k]) {
-                adminMap[k] = {
-                    id: k,
-                    name: stat.name || k,
-                    fulfillments: Number(stat.fulfillments || (lastActive >= FRESH_RANKING_START_MS ? stat.count : 0) || 0),
-                    publications: Number(stat.publications || 0),
-                    score: 0,
-                    titles: stat.titles || [],
-                    lastActiveAt: lastActive || null
-                };
-            } else {
-                adminMap[k].fulfillments = Math.max(adminMap[k].fulfillments || 0, Number(stat.fulfillments || 0));
-                adminMap[k].publications = Math.max(adminMap[k].publications || 0, Number(stat.publications || 0));
-                if (lastActive > (adminMap[k].lastActiveAt || 0)) {
-                    adminMap[k].lastActiveAt = lastActive;
+            let matchedKey = null;
+            if (adminMap[k]) {
+                matchedKey = k;
+            } else if (verifiedAdminIds.includes(k) || verifiedAdminIds.includes(String(stat.id))) {
+                matchedKey = (stat.id || k).replace(/[^a-zA-Z0-9_]/g, "_");
+                if (!adminMap[matchedKey]) {
+                    adminMap[matchedKey] = {
+                        id: stat.id || k,
+                        name: stat.name || k,
+                        fulfillments: 0,
+                        publications: 0,
+                        score: 0,
+                        titles: [],
+                        lastActiveAt: lastActive || null
+                    };
                 }
-                if (stat.name && (!adminMap[k].name || adminMap[k].name.startsWith("Admin ("))) {
-                    adminMap[k].name = stat.name;
-                }
-                if (Array.isArray(stat.titles) && stat.titles.length > 0) {
-                    stat.titles.forEach(st => {
-                        if (!adminMap[k].titles.some(t => t.title === st.title)) {
-                            adminMap[k].titles.push(st);
-                        }
-                    });
-                }
+            } else if (stat.name) {
+                const cleanStatName = statNameLower.replace(/^@/, '');
+                matchedKey = Object.keys(adminMap).find(mKey => {
+                    const admName = (adminMap[mKey].name || "").toLowerCase().replace(/^@/, '');
+                    return admName === cleanStatName;
+                });
+            }
+
+            if (!matchedKey || !adminMap[matchedKey]) return;
+
+            if (lastActive > (adminMap[matchedKey].lastActiveAt || 0)) {
+                adminMap[matchedKey].lastActiveAt = lastActive;
+            }
+            if (stat.name && (!adminMap[matchedKey].name || adminMap[matchedKey].name.startsWith("Admin ("))) {
+                adminMap[matchedKey].name = stat.name;
+            }
+            if (Array.isArray(stat.titles) && stat.titles.length > 0) {
+                stat.titles.forEach(st => {
+                    if (st && st.title && !adminMap[matchedKey].titles.some(t => t.title && t.title.toLowerCase() === st.title.toLowerCase())) {
+                        adminMap[matchedKey].titles.push(st);
+                    }
+                });
             }
         });
     }
 
-    // 4. Calculate total score for each admin: (fulfillments * 10) + (publications * 10)
+    // 4. Calculate total score strictly from verified titles list (Guarantees fulfillments === titles length)
     const now = Date.now();
     const oneDayMs = 24 * 60 * 60 * 1000;
-    const adminList = Object.values(adminMap).map(adm => {
-        adm.score = ((adm.fulfillments || 0) * 10) + ((adm.publications || 0) * 10);
-        adm.isActive24h = adm.lastActiveAt ? (now - adm.lastActiveAt <= oneDayMs) : false;
-        return adm;
-    });
+    const adminList = Object.values(adminMap)
+        .filter(adm => {
+            if (!adm) return false;
+            const nameLower = (adm.name || "").toLowerCase().trim();
+            if (nameLower === "admin" && !verifiedAdminIds.includes(String(adm.id))) return false;
+            return true;
+        })
+        .map(adm => {
+            const fulfillmentTitles = (adm.titles || []).filter(t => t.type === 'fulfillment' || !t.type);
+            const publicationTitles = (adm.titles || []).filter(t => t.type === 'publication');
+
+            // Fulfillments count strictly equals verified titles list
+            adm.fulfillments = fulfillmentTitles.length;
+            adm.publications = publicationTitles.length;
+            adm.score = (adm.fulfillments * 10) + (adm.publications * 10);
+            adm.isActive24h = adm.lastActiveAt ? (now - adm.lastActiveAt <= oneDayMs) : false;
+            return adm;
+        });
 
     // Sort by score descending, then lastActiveAt descending
     adminList.sort((a, b) => {

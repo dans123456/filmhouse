@@ -88,6 +88,71 @@ const PENDING_FILE = path.join(__dirname, "data", "pending_requests.json");
 let cachedPendingRequests = [];
 const _channelPostingLocks = new Set();
 
+// Categorized in-memory ring buffers for live tracing
+const categorizedLogs = {
+    server: [],
+    admin_bot: [],
+    user_bot: [],
+    user_app: [],
+    admin_app: [],
+    error: []
+};
+
+function recordLog(category, msg) {
+    if (!categorizedLogs[category]) categorizedLogs[category] = [];
+    const timestamp = new Date().toLocaleTimeString("en-GB", { timeZone: "UTC", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const entry = `[${timestamp} UTC] ${String(msg)}`;
+    categorizedLogs[category].push(entry);
+    if (categorizedLogs[category].length > 60) {
+        categorizedLogs[category].shift();
+    }
+    const lower = String(msg).toLowerCase();
+    if (category === "error" || lower.includes("error") || lower.includes("failed") || lower.includes("exception")) {
+        if (category !== "error") {
+            categorizedLogs.error.push(`[${timestamp} UTC][${category.toUpperCase()}] ${String(msg)}`);
+            if (categorizedLogs.error.length > 60) categorizedLogs.error.shift();
+        }
+    }
+}
+
+// Global console interception to automatically feed live logs into categories
+const _origConsoleLog = console.log;
+const _origConsoleWarn = console.warn;
+const _origConsoleError = console.error;
+
+console.log = function(...args) {
+    _origConsoleLog.apply(console, args);
+    const msg = args.map(a => (typeof a === 'object' ? (a && a.message ? a.message : JSON.stringify(a)) : String(a))).join(' ');
+    let cat = "server";
+    const lower = msg.toLowerCase();
+    if (lower.includes("adminbot") || lower.includes("admin bot") || lower.includes("admin command") || lower.includes("admin menu") || lower.includes("boost alert") || lower.includes("[admin")) {
+        cat = "admin_bot";
+    } else if (lower.includes("user /start") || lower.includes("publicbot") || lower.includes("public bot") || lower.includes("inline query") || lower.includes("channel publish") || lower.includes("request received")) {
+        cat = "user_bot";
+    } else if (lower.includes("userapp") || lower.includes("user app") || lower.includes("request submitted") || lower.includes("feedback")) {
+        cat = "user_app";
+    } else if (lower.includes("adminapp") || lower.includes("admin app") || lower.includes("fulfilled") || lower.includes("catalog update")) {
+        cat = "admin_app";
+    }
+    recordLog(cat, msg);
+};
+
+console.warn = function(...args) {
+    _origConsoleWarn.apply(console, args);
+    const msg = args.map(a => (typeof a === 'object' ? (a && a.message ? a.message : JSON.stringify(a)) : String(a))).join(' ');
+    let cat = "server";
+    const lower = msg.toLowerCase();
+    if (lower.includes("admin")) cat = "admin_bot";
+    else if (lower.includes("user")) cat = "user_bot";
+    recordLog(cat, `⚠️ ${msg}`);
+};
+
+console.error = function(...args) {
+    _origConsoleError.apply(console, args);
+    const msg = args.map(a => (typeof a === 'object' ? (a && a.message ? a.message : JSON.stringify(a)) : String(a))).join(' ');
+    recordLog("error", `❌ ${msg}`);
+};
+
 // Pre-load movies_metadata.json into memory for instant (<1ms) deep-link lookup
 let cachedMoviesMetadata = null;
 const localMetaPathGlobal = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
@@ -842,22 +907,89 @@ function setupBot(bot, adminBot) {
             return { text: msg, keyboard, parse_mode: "HTML" };
         };
 
-        // View 3: Server Logs
-        const getLogsPayload = (type = "out") => {
-            const logs = getRecentLogs(type);
-            const safeLogs = escapeHtml(logs || 'No log entries found.');
-            const msg = `📜 <b>Live Film House Logs (${type.toUpperCase()} - Last 25 lines)</b>:\n\n<pre>${safeLogs}</pre>`;
+        // View 3A: Server & Diagnostic Logs Category Selection Menu
+        const getLogsCategoryMenuPayload = () => {
+            const serverCount = (categorizedLogs.server || []).length;
+            const adminBotCount = (categorizedLogs.admin_bot || []).length;
+            const userBotCount = (categorizedLogs.user_bot || []).length;
+            const userAppCount = (categorizedLogs.user_app || []).length;
+            const adminAppCount = (categorizedLogs.admin_app || []).length;
+            const errCount = (categorizedLogs.error || []).length;
+
+            const msg = 
+                `📜 <b>Server & Application Diagnostics Logs</b>\n\n` +
+                `Select a specific log stream to inspect live diagnostic traces and troubleshoot issues:\n\n` +
+                `• 🖥 <b>Server / General:</b> <code>${serverCount}</code> entries\n` +
+                `• 👑 <b>Admin Bot:</b> <code>${adminBotCount}</code> entries\n` +
+                `• 🤖 <b>User Bot:</b> <code>${userBotCount}</code> entries\n` +
+                `• 📱 <b>User App:</b> <code>${userAppCount}</code> entries\n` +
+                `• 💼 <b>Admin App:</b> <code>${adminAppCount}</code> entries\n` +
+                `• ⚠️ <b>Error Logs:</b> <code>${errCount}</code> errors\n\n` +
+                `💡 <i>Tap any category below to inspect recent activity in real time.</i>`;
 
             const keyboard = [
-                type === "out"
-                    ? [
-                        { text: "🔄 Refresh Out", callback_data: "admin_logs_out" },
-                        { text: "⚠️ Error Logs", callback_data: "admin_logs_error" }
-                      ]
-                    : [
-                        { text: "📜 Out Logs", callback_data: "admin_logs_out" },
-                        { text: "🔄 Refresh Errors", callback_data: "admin_logs_error" }
-                      ],
+                [
+                    { text: `🖥 Server / General (${serverCount})`, callback_data: "admin_log_cat_server" },
+                    { text: `👑 Admin Bot (${adminBotCount})`, callback_data: "admin_log_cat_admin_bot" }
+                ],
+                [
+                    { text: `🤖 User Bot (${userBotCount})`, callback_data: "admin_log_cat_user_bot" },
+                    { text: `📱 User App (${userAppCount})`, callback_data: "admin_log_cat_user_app" }
+                ],
+                [
+                    { text: `💼 Admin App (${adminAppCount})`, callback_data: "admin_log_cat_admin_app" },
+                    { text: `⚠️ Error Logs (${errCount})`, callback_data: "admin_log_cat_error" }
+                ],
+                [
+                    { text: "« Back to Menu", callback_data: "admin_menu" }
+                ]
+            ];
+
+            return { text: msg, keyboard, parse_mode: "HTML" };
+        };
+
+        // View 3B: Categorized Logs Stream Viewer
+        const getLogsPayload = (category = "server") => {
+            const catMap = {
+                server: { title: "🖥 Server / General", desc: "Process, PM2, DB sync & background cron" },
+                admin_bot: { title: "👑 Admin Bot", desc: "Admin commands, menu clicks, backups & alerts" },
+                user_bot: { title: "🤖 User Bot", desc: "User /start, movie searches, DM delivery & pings" },
+                user_app: { title: "📱 User App", desc: "Movie requests, search queries & user actions" },
+                admin_app: { title: "💼 Admin App", desc: "Admin fulfillments, catalog updates & management" },
+                error: { title: "⚠️ Error Logs", desc: "Exceptions, network errors & failed deliveries" }
+            };
+
+            const catInfo = catMap[category] || catMap.server;
+            const entries = categorizedLogs[category] || [];
+            
+            let logText = "";
+            if (entries.length > 0) {
+                logText = entries.slice(-25).join("\n");
+            } else {
+                // If on Ubuntu with PM2 logs, fallback for server and error categories
+                if (category === "server" || category === "error") {
+                    const pm2Logs = getRecentLogs(category === "error" ? "error" : "out");
+                    if (pm2Logs && !pm2Logs.includes("Log file not found")) {
+                        logText = pm2Logs;
+                    }
+                }
+            }
+
+            if (!logText || logText.trim().length === 0) {
+                logText = `No entries recorded for ${catInfo.title} yet.\n(Listening for live events...)`;
+            }
+
+            const safeLogs = escapeHtml(logText);
+            const msg = 
+                `📜 <b>Log Stream: ${catInfo.title}</b>\n` +
+                `<i>${catInfo.desc}</i> (Last 25 entries):\n\n` +
+                `<pre>${safeLogs.slice(-3500)}</pre>`;
+
+            const keyboard = [
+                [
+                    { text: "🔄 Refresh", callback_data: `admin_log_cat_${category}` },
+                    { text: "📋 Log Categories", callback_data: "admin_logs" }
+                ],
                 [
                     { text: "« Back to Menu", callback_data: "admin_menu" }
                 ]
@@ -902,11 +1034,22 @@ function setupBot(bot, adminBot) {
             return renderOrEdit(ctx, getAdminMenuPayload(adminName, adminId));
         });
 
-        // Command: /logs [out|error]
+        // Command: /logs [category]
         adminBot.command('logs', async (ctx) => {
-            const text = (ctx.message && ctx.message.text ? ctx.message.text : "").toLowerCase();
-            const type = text.includes("error") ? "error" : "out";
-            return renderOrEdit(ctx, getLogsPayload(type));
+            const rawText = (ctx.message && ctx.message.text ? ctx.message.text : "").toLowerCase().trim();
+            const parts = rawText.split(/\s+/);
+            const arg = parts[1] || "";
+            if (arg) {
+                let cat = "server";
+                if (arg.includes("admin") && arg.includes("bot")) cat = "admin_bot";
+                else if (arg.includes("admin") && arg.includes("app")) cat = "admin_app";
+                else if (arg.includes("user") && arg.includes("bot")) cat = "user_bot";
+                else if (arg.includes("user") && arg.includes("app")) cat = "user_app";
+                else if (arg.includes("err")) cat = "error";
+                else if (arg.includes("server") || arg.includes("out")) cat = "server";
+                return renderOrEdit(ctx, getLogsPayload(cat));
+            }
+            return renderOrEdit(ctx, getLogsCategoryMenuPayload());
         });
 
         // Command: /pending
@@ -1050,19 +1193,20 @@ function setupBot(bot, adminBot) {
                     });
                 }
                 const stats = statsDoc.data() || {};
-                const entries = Object.values(stats).filter(s => s && typeof s.count === 'number' && s.count > 0);
+                const entries = Object.values(stats).filter(s => s && (typeof s.count === 'number' || typeof s.fulfillments === 'number') && (s.name || '').toLowerCase() !== 'admin');
                 if (entries.length === 0) {
                     return ctx.reply("📊 <b>No fulfillment statistics recorded yet.</b>", {
                         parse_mode: "HTML",
                         reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
                     });
                 }
-                entries.sort((a, b) => b.count - a.count);
+                entries.sort((a, b) => (b.fulfillments || b.count || 0) - (a.fulfillments || a.count || 0));
                 let text = "🏆 <b>Film House Admin Leaderboard</b> 🏆\n\n<i>Most Requests Fulfilled:</i>\n\n";
                 const medals = ["🥇", "🥈", "🥉"];
                 entries.forEach((e, idx) => {
                     const medal = medals[idx] || `<b>#${idx + 1}</b>`;
-                    text += `${medal} <b>${escapeHtml(e.name || 'Admin')}</b>: <code>${e.count}</code> fulfilled\n`;
+                    const count = e.fulfillments || e.count || 0;
+                    text += `${medal} <b>${escapeHtml(e.name || 'Admin')}</b>: <code>${count}</code> fulfilled\n`;
                 });
                 text += `\n⚡ <i>Keep up the great work keeping the queue clean!</i>`;
                 return ctx.reply(text, {
@@ -1081,12 +1225,17 @@ function setupBot(bot, adminBot) {
             return renderOrEdit(ctx, getAdminMenuPayload(adminName, adminId));
         });
 
-        adminBot.action('admin_logs', async (ctx) => {
-            return renderOrEdit(ctx, getLogsPayload("out"));
+        adminBot.action(['admin_logs', 'admin_logs_menu'], async (ctx) => {
+            return renderOrEdit(ctx, getLogsCategoryMenuPayload());
+        });
+
+        adminBot.action(/^admin_log_cat_([a-z_]+)$/, async (ctx) => {
+            const cat = ctx.match[1] || "server";
+            return renderOrEdit(ctx, getLogsPayload(cat));
         });
 
         adminBot.action('admin_logs_out', async (ctx) => {
-            return renderOrEdit(ctx, getLogsPayload("out"));
+            return renderOrEdit(ctx, getLogsPayload("server"));
         });
 
         adminBot.action('admin_logs_error', async (ctx) => {
@@ -2562,12 +2711,50 @@ async function init() {
 
         const secretPath = `/telegraf/${crypto.createHash('sha256').update(botToken || "filmhouse_bot_token").digest('hex')}`;
 
+        const handleApiLogRequest = (req, res) => {
+            if (req.method === 'OPTIONS') {
+                res.writeHead(204, {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': '*'
+                });
+                res.end();
+                return true;
+            }
+            if (req.method === 'POST') {
+                let body = '';
+                req.on('data', chunk => { body += chunk; });
+                req.on('end', () => {
+                    try {
+                        const payload = JSON.parse(body || '{}');
+                        const category = payload.category === 'admin_app' ? 'admin_app' : 'user_app';
+                        const user = payload.user || payload.admin || 'Anonymous';
+                        const msg = `[${user}] ${payload.message || payload.action || JSON.stringify(payload)}`;
+                        recordLog(category, msg);
+                        res.writeHead(200, {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Headers': '*'
+                        });
+                        res.end(JSON.stringify({ ok: true }));
+                    } catch (e) {
+                        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+                        res.end(JSON.stringify({ error: e.message }));
+                    }
+                });
+                return true;
+            }
+            return false;
+        };
+
         if (webhookUrl) {
             console.log(`Configuring Webhook mode with base URL: ${webhookUrl}`);
             const webhookCallback = bot.webhookCallback(secretPath);
             
             server = http.createServer((req, res) => {
-                if (req.url === secretPath) {
+                if (req.url === '/api/log') {
+                    if (handleApiLogRequest(req, res)) return;
+                } else if (req.url === secretPath) {
                     webhookCallback(req, res);
                 } else if (req.url === '/debug-info') {
                     res.writeHead(200, { "Content-Type": "application/json" });
@@ -2620,7 +2807,9 @@ async function init() {
             }
 
             server = http.createServer((req, res) => {
-                if (req.url === '/debug-info') {
+                if (req.url === '/api/log') {
+                    if (handleApiLogRequest(req, res)) return;
+                } else if (req.url === '/debug-info') {
                     res.writeHead(200, { "Content-Type": "application/json" });
                     res.end(JSON.stringify({
                         tokenPrefix: botToken ? botToken.substring(0, 12) : "missing",
@@ -3134,23 +3323,33 @@ async function init() {
                                 const cleanReqUser = escapeHtml(username || `User ${userId}`);
                                 const displayUser = cleanReqUser.startsWith('@') ? cleanReqUser : `@${cleanReqUser}`;
 
-                                // Track fulfillment counts per admin in Firestore safely
+                                // Track fulfillment counts per admin in Firestore safely (verified admin only)
                                 let adminTotalFulfillCount = 0;
-                                const adminIdKey = String(data.fulfilledById || fulfilledBy || "admin").replace(/[^a-zA-Z0-9_]/g, "_");
-                                try {
-                                    const statsDocRef = db.collection("settings").doc("admin_stats");
-                                    const statsDoc = await statsDocRef.get();
-                                    let currentStats = statsDoc && statsDoc.exists ? statsDoc.data() || {} : {};
-                                    const adminStat = currentStats[adminIdKey] || { count: 0, name: fulfilledBy };
-                                    adminStat.count = (adminStat.count || 0) + 1;
-                                    adminStat.name = fulfilledBy || adminStat.name;
-                                    adminStat.lastFulfilledAt = Date.now();
-                                    adminTotalFulfillCount = adminStat.count;
-                                    currentStats[adminIdKey] = adminStat;
-                                    await statsDocRef.set(currentStats, { merge: true });
-                                } catch (statErr) {
-                                    console.warn("Could not update admin fulfillment stats:", statErr.message);
+                                const rawAdminId = data.fulfilledById || (fulfilledBy && fulfilledBy.toLowerCase() !== 'admin' ? fulfilledBy : null);
+                                if (rawAdminId) {
+                                    const adminIdKey = String(rawAdminId).replace(/[^a-zA-Z0-9_]/g, "_");
+                                    try {
+                                        const statsDocRef = db.collection("settings").doc("admin_stats");
+                                        const statsDoc = await statsDocRef.get();
+                                        let currentStats = statsDoc && statsDoc.exists ? statsDoc.data() || {} : {};
+                                        // Purge fake legacy "admin" or "Admin" key if present
+                                        delete currentStats.admin;
+                                        delete currentStats.Admin;
+                                        const adminStat = currentStats[adminIdKey] || { count: 0, fulfillments: 0, name: fulfilledBy };
+                                        adminStat.count = (adminStat.count || 0) + 1;
+                                        adminStat.fulfillments = (adminStat.fulfillments || 0) + 1;
+                                        adminStat.name = fulfilledBy || adminStat.name;
+                                        adminStat.lastFulfilledAt = Date.now();
+                                        adminStat.lastActiveAt = Date.now();
+                                        adminTotalFulfillCount = adminStat.fulfillments || adminStat.count;
+                                        currentStats[adminIdKey] = adminStat;
+                                        await statsDocRef.set(currentStats, { merge: true });
+                                    } catch (statErr) {
+                                        console.warn("Could not update admin fulfillment stats:", statErr.message);
+                                    }
                                 }
+
+                                recordLog("admin_app", `Request fulfilled: "${cleanAdminTitle}" by ${cleanFulfilledBy}`);
 
                                 const countBadge = adminTotalFulfillCount > 0 ? ` (${adminTotalFulfillCount} Fulfilled 🏆)` : "";
                                 const adminNotifyText = `✅ <b>Request Fulfilled!</b>\n\n` +
