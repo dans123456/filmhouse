@@ -4193,10 +4193,27 @@ function openDownloadModal(movie) {
             const has1080p = uploadedQualities.some(q => q.includes("1080"));
             const has4K = uploadedQualities.some(q => q.includes("4k") || q.includes("2160"));
 
+            // Determine movie release year
+            let movieReleaseYear = 0;
+            if (movie.release_date && String(movie.release_date).length >= 4) {
+                movieReleaseYear = parseInt(String(movie.release_date).substring(0, 4), 10);
+            }
+            if ((!movieReleaseYear || isNaN(movieReleaseYear)) && movie.year) {
+                movieReleaseYear = parseInt(String(movie.year).replace(/\D/g, '').slice(0, 4), 10);
+            }
+            if ((!movieReleaseYear || isNaN(movieReleaseYear)) && movie.title) {
+                const yearMatch = String(movie.title).match(/\b(19\d{2}|20\d{2})\b/);
+                if (yearMatch) movieReleaseYear = parseInt(yearMatch[1], 10);
+            }
+
+            // 4K Ultra HD Blu-ray standard launched in 2016. Movies released before 2017 do not have 2160p releases online.
+            // Only allow 2160p request if the movie was released in 2017 or later (or if release year is unknown).
+            const allows4KRequest = !movieReleaseYear || isNaN(movieReleaseYear) || movieReleaseYear >= 2017;
+
             const missingQualities = [];
             if (!has720p) missingQualities.push({ label: "720p HD", badge: "🎬 720p", code: "720p" });
             if (!has1080p) missingQualities.push({ label: "1080p Full HD", badge: "🎥 1080p", code: "1080p" });
-            if (!has4K) missingQualities.push({ label: "4K Ultra HD", badge: "✨ 2160p", code: "2160p" });
+            if (!has4K && allows4KRequest) missingQualities.push({ label: "4K Ultra HD", badge: "✨ 2160p", code: "2160p" });
 
             if (missingQualities.length > 0) {
                 const qWrapper = document.createElement("div");
@@ -6724,12 +6741,33 @@ function logMovieRequestToFirestore(movie, specs = "") {
     if (!movie) return;
     const isTVShow = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
     
+    // Determine release year reliably
+    let movieReleaseYear = 0;
+    if (movie.release_date && String(movie.release_date).length >= 4) {
+        movieReleaseYear = parseInt(String(movie.release_date).substring(0, 4), 10);
+    }
+    if ((!movieReleaseYear || isNaN(movieReleaseYear)) && movie.year) {
+        movieReleaseYear = parseInt(String(movie.year).replace(/\D/g, '').slice(0, 4), 10);
+    }
+    if ((!movieReleaseYear || isNaN(movieReleaseYear)) && movie.title) {
+        const yearMatch = String(movie.title).match(/\b(19\d{2}|20\d{2})\b/);
+        if (yearMatch) movieReleaseYear = parseInt(yearMatch[1], 10);
+    }
+
+    // Safety guard: Movies released before 2017 should not allow requesting 2160p / 4K
+    if (!isTVShow && movieReleaseYear > 0 && movieReleaseYear < 2017) {
+        if (specs && (specs.includes("2160") || specs.toLowerCase().includes("4k"))) {
+            specs = "1080p Quality";
+        }
+    }
+
     // Default quality for requested movies is 720p unless a specific quality was chosen
     if (!isTVShow && !specs) {
         specs = "720p Quality";
     }
 
     const requestTitle = specs ? `${movie.title || "Unknown Title"} (${specs})` : (movie.title || "Unknown Title");
+    const yearStr = movieReleaseYear > 0 ? String(movieReleaseYear) : (movie.release_date ? movie.release_date.substring(0, 4) : (movie.year ? String(movie.year) : ""));
     
     // 1. Immediately store in local currentUserRequests array and persist to localStorage
     const reqObj = {
@@ -6739,7 +6777,7 @@ function logMovieRequestToFirestore(movie, specs = "") {
         tmdb_id: movie.tmdb_id || null,
         csv_id: movie.csv_id || "",
         type: movie.type || "Movie",
-        year: movie.release_date ? movie.release_date.substring(0, 4) : "",
+        year: yearStr,
         requestedBy: state.user.username || state.user.fullName || state.user.firstName || `User ${state.user.id || 'Guest'}`,
         requestedById: state.user.id || "",
         fullName: state.user.fullName || state.user.firstName || ""
@@ -6803,7 +6841,7 @@ function logMovieRequestToFirestore(movie, specs = "") {
             tmdb_id: movie.tmdb_id || null,
             csv_id: movie.csv_id || "",
             type: movie.type || "Movie",
-            year: movie.release_date ? movie.release_date.substring(0, 4) : "",
+            year: yearStr,
             requestedBy: state.user.username || state.user.fullName || state.user.firstName || `User ${state.user.id || 'Guest'}`,
             requestedById: state.user.id || "",
             fullName: state.user.fullName || state.user.firstName || "",
