@@ -3218,9 +3218,17 @@ async function init() {
         const checkNewEpisodeReleasesForAdmins = async () => {
             try {
                 const defaultAdmins = ["1329840839", "1175336733"];
-                const adminDoc = await db.collection("settings").doc("admins").get();
-                const adminList = adminDoc.exists ? adminDoc.data().ids || [] : [];
-                const masterList = adminDoc.exists ? adminDoc.data().masters || [] : [];
+                let adminList = [];
+                let masterList = [];
+                try {
+                    const adminDoc = await db.collection("settings").doc("admins").get();
+                    if (adminDoc && adminDoc.exists) {
+                        adminList = adminDoc.data().ids || [];
+                        masterList = adminDoc.data().masters || [];
+                    }
+                } catch (e) {
+                    // Quota fallback to default admins
+                }
                 const allAdmins = Array.from(new Set([...defaultAdmins, ...adminList, ...masterList]));
 
                 // Load notified episodes from local disk cache to eliminate ~20,000 Firestore operations per day!
