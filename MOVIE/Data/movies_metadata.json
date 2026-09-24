@@ -1,25 +1,22 @@
 [
   {
-    "csv_id": "60726-forever",
-    "tmdb_id": 60726,
+    "csv_id": "248394-forever",
+    "tmdb_id": 248394,
     "imdb_id": "",
-    "title": "Forever",
+    "title": "FOREVER",
     "type": "Series",
     "categories": [
       "Main",
       "Hollywood/British Series"
     ],
     "genres": [
-      "Drama",
-      "Crime",
-      "Mystery",
-      "Sci-Fi & Fantasy"
+      "Drama"
     ],
-    "overview": "Doctor Henry Morgan, New York City’s star medical examiner, has a secret. He doesn't just study the dead to solve criminal cases, he does it to solve the mystery that has eluded him for 200 years—the answer to his own inexplicable immortality. This long life has given Henry remarkable observation skills which impresses his new partner, Detective Jo Martinez. Each week, a new case and their budding friendship will reveal layers of Henry’s long and colorful past. Only his best friend and confidant, Abe knows Henry’s secret.",
-    "poster": "https://image.tmdb.org/t/p/w500/4OnnU4j2tQEOnsPnRZswW91v9vr.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/5ziXtCZye3NowgFJCBrK3kTd7vn.jpg",
-    "rating": 7.8,
-    "release_date": "2014-09-22",
+    "overview": "Reunited as teens, childhood friends Keisha and Justin fall deeply in love, experiencing the joy and heartache of a first romance that will change their lives forever.",
+    "poster": "https://image.tmdb.org/t/p/w500/twlp0YMmuKmn4cKAInAL3zde59W.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lhbT6Kmv8yi4QJzyshTRCdoNhfV.jpg",
+    "rating": 6.8,
+    "release_date": "2025-05-08",
     "language": "en",
     "cast": [],
     "director": "",

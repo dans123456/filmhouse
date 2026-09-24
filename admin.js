@@ -1088,6 +1088,7 @@ function fulfillMovieTitleRequests(title, docIds) {
                 const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === title.toLowerCase().trim()) ||
                                    allRequests.find(r => docIds.includes(r.docId)) ||
                                    allRequests.find(r => r.title.toLowerCase().trim().startsWith(cleanTitle));
+                currentFulfillReq = matchedReq;
                 const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : (existingMovie ? (existingMovie.type || "").toLowerCase() === 'series' : false);
                 
                 let reqSpec = matchedReq ? (matchedReq.seasonOrPart || "") : "";
@@ -4162,6 +4163,7 @@ window.addEventListener("beforeunload", (e) => {
 // Fulfill Request Modal Event Listeners
 let currentFulfillTitle = "";
 let currentFulfillDocIds = [];
+let currentFulfillReq = null;
 
 const fulfillForm = document.getElementById("fulfill-request-form");
 const fulfillRequestModal = document.getElementById("fulfill-request-modal");
@@ -4174,6 +4176,7 @@ window.closeFulfillRequestModal = function() {
     }
     currentFulfillTitle = "";
     currentFulfillDocIds = [];
+    currentFulfillReq = null;
 };
 
 if (closeFulfillModalBtn) {
@@ -4222,6 +4225,45 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
         seasonOrQualityText = "Complete Series | All Seasons";
     }
 
+    if (!movieInfo.overview || !movieInfo.genres || !movieInfo.backdrop) {
+        try {
+            const numericId = parseInt(String(movieInfo.tmdb_id || movieInfo.csv_id || movieInfo.id || "").split("-")[0]);
+            const mediaType = isSeries ? 'tv' : 'movie';
+            let tmdbResult = null;
+            if (!isNaN(numericId) && numericId > 0) {
+                const res = await fetch(`https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${TMDB_API_KEY}`);
+                if (res.ok) tmdbResult = await res.json();
+            }
+            if (!tmdbResult) {
+                const yearParam = movieInfo.year ? (isSeries ? `&first_air_date_year=${movieInfo.year}` : `&primary_release_year=${movieInfo.year}`) : '';
+                const searchRes = await fetch(`https://api.themoviedb.org/3/search/${mediaType}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}${yearParam}`);
+                if (searchRes.ok) {
+                    const searchData = await searchRes.json();
+                    if (searchData.results && searchData.results.length > 0) {
+                        tmdbResult = searchData.results[0];
+                    }
+                }
+            }
+            if (tmdbResult) {
+                if (!movieInfo.overview && tmdbResult.overview) movieInfo.overview = tmdbResult.overview;
+                if ((!movieInfo.genres || movieInfo.genres.length === 0) && tmdbResult.genres) {
+                    movieInfo.genres = tmdbResult.genres.map(g => (g && g.name) ? g.name : g);
+                }
+                if (!movieInfo.rating && tmdbResult.vote_average) {
+                    movieInfo.rating = Math.round(tmdbResult.vote_average * 10) / 10;
+                }
+                if (!movieInfo.backdrop && tmdbResult.backdrop_path) {
+                    movieInfo.backdrop = `https://image.tmdb.org/t/p/w1280${tmdbResult.backdrop_path}`;
+                }
+                if (!movieInfo.poster && tmdbResult.poster_path) {
+                    movieInfo.poster = `https://image.tmdb.org/t/p/w1280${tmdbResult.poster_path}`;
+                }
+            }
+        } catch (enrichErr) {
+            console.warn("[MAIN CHANNEL POST] TMDB enrichment warning:", enrichErr);
+        }
+    }
+
     const rawGenres = Array.isArray(movieInfo.genres) ? movieInfo.genres : (Array.isArray(movieInfo.categories) ? movieInfo.categories : []);
     const genresText = rawGenres.filter(g => g && g !== "Main").slice(0, 3).join(", ");
     const ratingVal = movieInfo.rating || movieInfo.vote_average || "";
@@ -4265,14 +4307,6 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
         overviewLine +
         `👉 <a href="${deepLinkUrl}">CLICK HERE TO DOWNLOAD</a> ✔️`;
 
-    const replyMarkup = {
-        inline_keyboard: [
-            [
-                { text: "📥 Download on Film House 🍿", url: deepLinkUrl }
-            ]
-        ]
-    };
-
     let bannerUrl = "";
     const lPoster = movieInfo.landscape_poster || movieInfo.landscapePoster || movieInfo.landscape;
     if (lPoster && String(lPoster).startsWith("http")) {
@@ -4282,7 +4316,7 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
     } else if (movieInfo.poster && String(movieInfo.poster).startsWith("http")) {
         bannerUrl = movieInfo.poster;
     } else {
-        bannerUrl = "https://dans123456.github.io/filmhouse/img/FilmHouse.png";
+        bannerUrl = "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png";
     }
 
     if (bannerUrl.includes("image.tmdb.org/t/p/w500") || bannerUrl.includes("image.tmdb.org/t/p/w300") || bannerUrl.includes("image.tmdb.org/t/p/w780")) {
@@ -4910,8 +4944,9 @@ if (fulfillForm && fulfillRequestModal) {
         
         // 1. Sync to local CSV catalog
         const matchTitle = currentFulfillTitle.toLowerCase().trim();
-        const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === matchTitle);
-        const reqTmdbId = matchedReq ? matchedReq.tmdb_id : null;
+        const matchedReq = (currentFulfillReq && currentFulfillReq.title) ? currentFulfillReq : (allRequests.find(r => r.title.toLowerCase().trim() === matchTitle) || allRequests.find(r => (currentFulfillDocIds || []).includes(r.docId)));
+        const reqTmdbId = matchedReq ? (matchedReq.tmdb_id || matchedReq.tmdbId) : null;
+        const reqYear = matchedReq ? (matchedReq.year || (matchedReq.release_date ? matchedReq.release_date.substring(0, 4) : "")) : "";
         const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
 
         const cleanTitle = currentFulfillTitle.replace(/\s*\([^)]+\)\s*$/g, "").trim();
@@ -4959,19 +4994,52 @@ if (fulfillForm && fulfillRequestModal) {
             });
 
             const mediaType = isSeries ? 'tv' : 'movie';
-            const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}`;
-            
             let tmdbData = null;
             try {
-                const searchRes = await fetch(searchUrl);
-                if (searchRes.ok) {
-                    const searchObj = await searchRes.json();
-                    if (searchObj.results && searchObj.results.length > 0) {
-                        const firstMatch = searchObj.results[0];
-                        const detailsUrl = `https://api.themoviedb.org/3/${firstMatch.media_type || mediaType}/${firstMatch.id}?api_key=${TMDB_API_KEY}&append_to_response=videos`;
-                        const detailsRes = await fetch(detailsUrl);
-                        if (detailsRes.ok) {
-                            tmdbData = await detailsRes.json();
+                // Priority 1: Direct fetch by tmdb_id if provided on the request
+                if (reqTmdbId) {
+                    const detailsUrl = `https://api.themoviedb.org/3/${mediaType}/${reqTmdbId}?api_key=${TMDB_API_KEY}&append_to_response=videos`;
+                    const detailsRes = await fetch(detailsUrl);
+                    if (detailsRes.ok) {
+                        tmdbData = await detailsRes.json();
+                    }
+                }
+
+                // Priority 2: Search with specific mediaType and year to avoid mismatched series/movies
+                if (!tmdbData) {
+                    const yearParam = reqYear ? (isSeries ? `&first_air_date_year=${reqYear}` : `&primary_release_year=${reqYear}`) : '';
+                    const searchUrl = `https://api.themoviedb.org/3/search/${mediaType}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}${yearParam}`;
+                    const searchRes = await fetch(searchUrl);
+                    if (searchRes.ok) {
+                        const searchObj = await searchRes.json();
+                        if (searchObj.results && searchObj.results.length > 0) {
+                            const bestMatch = searchObj.results[0];
+                            const detailsUrl = `https://api.themoviedb.org/3/${mediaType}/${bestMatch.id}?api_key=${TMDB_API_KEY}&append_to_response=videos`;
+                            const detailsRes = await fetch(detailsUrl);
+                            if (detailsRes.ok) {
+                                tmdbData = await detailsRes.json();
+                            }
+                        }
+                    }
+                }
+
+                // Priority 3: Fallback search without year filter if no exact year match
+                if (!tmdbData) {
+                    const searchUrl = `https://api.themoviedb.org/3/search/${mediaType}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}`;
+                    const searchRes = await fetch(searchUrl);
+                    if (searchRes.ok) {
+                        const searchObj = await searchRes.json();
+                        if (searchObj.results && searchObj.results.length > 0) {
+                            let bestMatch = searchObj.results[0];
+                            if (reqYear) {
+                                const yearMatch = searchObj.results.find(r => (r.first_air_date || r.release_date || "").startsWith(reqYear));
+                                if (yearMatch) bestMatch = yearMatch;
+                            }
+                            const detailsUrl = `https://api.themoviedb.org/3/${mediaType}/${bestMatch.id}?api_key=${TMDB_API_KEY}&append_to_response=videos`;
+                            const detailsRes = await fetch(detailsUrl);
+                            if (detailsRes.ok) {
+                                tmdbData = await detailsRes.json();
+                            }
                         }
                     }
                 }

@@ -83,6 +83,7 @@ function escapeMarkdown(str) {
 let callTelegramWithRetry = async () => {};
 let callAdminTelegramWithRetry = async () => {};
 let publishMovieToChannel = async () => {};
+let getAllAdminIds = async () => ["1329840839", "1175336733"];
 const PENDING_FILE = path.join(__dirname, "data", "pending_requests.json");
 let cachedPendingRequests = [];
 const _channelPostingLocks = new Set();
@@ -269,7 +270,7 @@ function setupBot(bot, adminBot) {
     }
 
     // Helper: Get all active admin Telegram IDs safely with zero-dependency quota fallback
-    const getAllAdminIds = async () => {
+    getAllAdminIds = async () => {
         await refreshAdminCache().catch(() => {});
         return cachedAdmins.map(String).filter(Boolean);
     };
@@ -370,9 +371,9 @@ function setupBot(bot, adminBot) {
                 seasonOrQualityText = "Complete Series | All Seasons";
             }
 
-            // Enrich with metadata if missing using in-memory cache (0 Firestore reads)
-            if ((!movieInfo.overview || !movieInfo.genres || !movieInfo.categories) && (movieInfo.csv_id || movieInfo.id)) {
-                const lookupId = String(movieInfo.csv_id || movieInfo.id).toLowerCase();
+            // Enrich with metadata if missing using in-memory cache first, then TMDB API (0 Firestore reads)
+            if ((!movieInfo.overview || !movieInfo.genres || !movieInfo.categories || !movieInfo.poster || !movieInfo.backdrop) && (movieInfo.csv_id || movieInfo.id || movieInfo.tmdb_id)) {
+                const lookupId = String(movieInfo.csv_id || movieInfo.id || movieInfo.tmdb_id || "").toLowerCase();
                 const localMatch = cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)
                     ? cachedMoviesMetadata.find(m => String(m.csv_id || "").toLowerCase() === lookupId || String(m.tmdb_id) === lookupId)
                     : null;
@@ -383,6 +384,57 @@ function setupBot(bot, adminBot) {
                     movieInfo.year = movieInfo.year || (localMatch.release_date ? localMatch.release_date.substring(0, 4) : localMatch.year);
                     movieInfo.poster = movieInfo.poster || localMatch.poster;
                     movieInfo.backdrop = movieInfo.backdrop || localMatch.backdrop;
+                }
+            }
+
+            // If still missing overview, genres, or image, fetch directly from TMDB (zero Firestore reads, 100% reliable)
+            if (!movieInfo.overview || !movieInfo.genres || !movieInfo.poster || !movieInfo.backdrop) {
+                try {
+                    const fetchModule = await import('node-fetch').catch(() => null);
+                    const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
+                    if (fetchFn) {
+                        const tmdbApiKey = process.env.TMDB_API_KEY || "d638f7775bfa1b8d456dfd028ccbef19";
+                        let tmdbResult = null;
+                        const numericId = parseInt(String(movieInfo.tmdb_id || movieInfo.csv_id || movieInfo.id || "").split("-")[0]);
+                        const mediaEndpoint = isSeries ? 'tv' : 'movie';
+                        
+                        if (!isNaN(numericId) && numericId > 0) {
+                            const res = await fetchFn(`https://api.themoviedb.org/3/${mediaEndpoint}/${numericId}?api_key=${tmdbApiKey}`);
+                            if (res.ok) tmdbResult = await res.json();
+                        }
+                        
+                        if (!tmdbResult) {
+                            const yearParam = movieInfo.year ? (isSeries ? `&first_air_date_year=${movieInfo.year}` : `&primary_release_year=${movieInfo.year}`) : '';
+                            const searchRes = await fetchFn(`https://api.themoviedb.org/3/search/${mediaEndpoint}?api_key=${tmdbApiKey}&query=${encodeURIComponent(cleanTitle)}${yearParam}`);
+                            if (searchRes.ok) {
+                                const searchData = await searchRes.json();
+                                if (searchData.results && searchData.results.length > 0) {
+                                    tmdbResult = searchData.results[0];
+                                }
+                            }
+                        }
+
+                        if (tmdbResult) {
+                            if (!movieInfo.overview && tmdbResult.overview) movieInfo.overview = tmdbResult.overview;
+                            if ((!movieInfo.genres || movieInfo.genres.length === 0) && tmdbResult.genres) {
+                                movieInfo.genres = tmdbResult.genres.map(g => (g && g.name) ? g.name : g);
+                            }
+                            if (!movieInfo.rating && tmdbResult.vote_average) {
+                                movieInfo.rating = Math.round(tmdbResult.vote_average * 10) / 10;
+                            }
+                            if (!movieInfo.year && (tmdbResult.first_air_date || tmdbResult.release_date)) {
+                                movieInfo.year = (tmdbResult.first_air_date || tmdbResult.release_date).substring(0, 4);
+                            }
+                            if (!movieInfo.backdrop && tmdbResult.backdrop_path) {
+                                movieInfo.backdrop = `https://image.tmdb.org/t/p/w1280${tmdbResult.backdrop_path}`;
+                            }
+                            if (!movieInfo.poster && tmdbResult.poster_path) {
+                                movieInfo.poster = `https://image.tmdb.org/t/p/w1280${tmdbResult.poster_path}`;
+                            }
+                        }
+                    }
+                } catch (tmdbEnrichErr) {
+                    console.warn("[CHANNEL PUBLISH] TMDB enrichment warning:", tmdbEnrichErr.message);
                 }
             }
 
@@ -429,15 +481,7 @@ function setupBot(bot, adminBot) {
                 overviewLine +
                 `👉 <a href="${deepLinkUrl}">CLICK HERE TO DOWNLOAD</a> ✔️`;
 
-            const replyMarkup = {
-                inline_keyboard: [
-                    [
-                        { text: "📥 Download on Film House 🍿", url: deepLinkUrl }
-                    ]
-                ]
-            };
-
-            // Prioritize landscape poster, fallback to backdrop, then vertical poster
+            // Prioritize landscape poster, fallback to backdrop, then vertical poster, then working GitHub raw banner
             let bannerUrl = "";
             const lPoster = movieInfo.landscape_poster || movieInfo.landscapePoster || movieInfo.landscape;
             if (lPoster && String(lPoster).startsWith("http")) {
@@ -447,7 +491,7 @@ function setupBot(bot, adminBot) {
             } else if (movieInfo.poster && String(movieInfo.poster).startsWith("http")) {
                 bannerUrl = movieInfo.poster;
             } else {
-                bannerUrl = "https://dans123456.github.io/filmhouse/img/FilmHouse.png";
+                bannerUrl = "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png";
             }
 
             if (bannerUrl.includes("image.tmdb.org/t/p/w500") || bannerUrl.includes("image.tmdb.org/t/p/w300") || bannerUrl.includes("image.tmdb.org/t/p/w780")) {
@@ -485,15 +529,13 @@ function setupBot(bot, adminBot) {
 
                     return await botInstance.telegram.sendPhoto(target, photoPayload, {
                         caption: caption,
-                        parse_mode: "HTML",
-                        reply_markup: replyMarkup
+                        parse_mode: "HTML"
                     });
                 } catch (photoErr) {
                     if (photoErr.message && (photoErr.message.includes("photo") || photoErr.message.includes("IMAGE") || photoErr.message.includes("wrong file") || photoErr.message.includes("HTTP") || photoErr.message.includes("failed to get http"))) {
                         console.warn(`[CHANNEL PUBLISH] Photo send failed (${photoErr.message}), falling back to sendMessage...`);
                         return await botInstance.telegram.sendMessage(target, caption, {
                             parse_mode: "HTML",
-                            reply_markup: replyMarkup,
                             disable_web_page_preview: true
                         });
                     }
@@ -1330,17 +1372,73 @@ function setupBot(bot, adminBot) {
                     );
                 }
 
-                // 2. Fallback to Firestore movies collection if not found locally
+                // 2. Safe fallback to Firestore movies collection if not found locally
                 if (!movieData) {
-                    const movieDoc = await db.collection("movies").doc(movieId).get();
-                    if (movieDoc.exists) {
-                        movieData = movieDoc.data();
-                    } else {
-                        const numericId = parseInt(movieId.split("-")[0]);
-                        if (!isNaN(numericId)) {
-                            const snap = await db.collection("movies").where("tmdb_id", "==", numericId).limit(1).get();
-                            if (!snap.empty) movieData = snap.docs[0].data();
+                    try {
+                        const movieDoc = await Promise.race([
+                            db.collection("movies").doc(movieId).get(),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1000))
+                        ]);
+                        if (movieDoc && movieDoc.exists) {
+                            movieData = movieDoc.data();
+                        } else {
+                            const numericId = parseInt(movieId.split("-")[0]);
+                            if (!isNaN(numericId)) {
+                                const snap = await Promise.race([
+                                    db.collection("movies").where("tmdb_id", "==", numericId).limit(1).get(),
+                                    new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1000))
+                                ]);
+                                if (snap && !snap.empty) movieData = snap.docs[0].data();
+                            }
                         }
+                    } catch (fsErr) {
+                        console.warn("[DL CARD] Firestore lookup skipped/quota exceeded:", fsErr.message);
+                    }
+                }
+
+                // 3. Fallback to direct TMDB API lookup if not in Firestore/memory (0 Firestore reads, instant delivery)
+                if (!movieData) {
+                    try {
+                        const fetchModule = await import('node-fetch').catch(() => null);
+                        const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
+                        if (fetchFn) {
+                            const tmdbApiKey = process.env.TMDB_API_KEY || "d638f7775bfa1b8d456dfd028ccbef19";
+                            const numericId = parseInt(movieId.split("-")[0]);
+                            let tmdbObj = null;
+                            let isTv = false;
+
+                            if (!isNaN(numericId) && numericId > 0) {
+                                const tvRes = await fetchFn(`https://api.themoviedb.org/3/tv/${numericId}?api_key=${tmdbApiKey}`);
+                                if (tvRes.ok) {
+                                    tmdbObj = await tvRes.json();
+                                    isTv = true;
+                                } else {
+                                    const movRes = await fetchFn(`https://api.themoviedb.org/3/movie/${numericId}?api_key=${tmdbApiKey}`);
+                                    if (movRes.ok) {
+                                        tmdbObj = await movRes.json();
+                                        isTv = false;
+                                    }
+                                }
+                            }
+
+                            if (tmdbObj) {
+                                movieData = {
+                                    csv_id: movieId,
+                                    tmdb_id: tmdbObj.id,
+                                    title: tmdbObj.name || tmdbObj.title || "Movie",
+                                    type: isTv ? "Series" : "Movie",
+                                    overview: tmdbObj.overview || "",
+                                    genres: (tmdbObj.genres || []).map(g => (g && g.name) ? g.name : g),
+                                    rating: tmdbObj.vote_average ? Math.round(tmdbObj.vote_average * 10) / 10 : 0,
+                                    release_date: tmdbObj.first_air_date || tmdbObj.release_date || "",
+                                    year: (tmdbObj.first_air_date || tmdbObj.release_date || "").substring(0, 4),
+                                    poster: tmdbObj.poster_path ? `https://image.tmdb.org/t/p/w1280${tmdbObj.poster_path}` : null,
+                                    backdrop: tmdbObj.backdrop_path ? `https://image.tmdb.org/t/p/w1280${tmdbObj.backdrop_path}` : null
+                                };
+                            }
+                        }
+                    } catch (tmdbErr) {
+                        console.warn("[DL CARD] TMDB direct fallback error:", tmdbErr.message);
                     }
                 }
 
@@ -1399,7 +1497,7 @@ function setupBot(bot, adminBot) {
 
                     let cardImage = (movieData.backdrop && String(movieData.backdrop).startsWith("http"))
                         ? movieData.backdrop
-                        : ((movieData.poster && String(movieData.poster).startsWith("http")) ? movieData.poster : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
+                        : ((movieData.poster && String(movieData.poster).startsWith("http")) ? movieData.poster : "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png");
 
                     if (cardImage.includes("image.tmdb.org/t/p/w500") || cardImage.includes("image.tmdb.org/t/p/w300") || cardImage.includes("image.tmdb.org/t/p/w780")) {
                         cardImage = cardImage.replace(/\/w(300|500|780)\//, "/w1280/");
@@ -2790,83 +2888,78 @@ async function init() {
                 const data = change.doc.data();
                 const docId = change.doc.id;
                 
-                let userId = data.userId || data.requestedById;
-                if (userId === "undefined" || !userId) {
-                    userId = data.requestedById;
+                let userId = data.userId || data.requestedById || "";
+                if (userId === "undefined") {
+                    userId = "";
                 }
                 
                 const title = data.title;
                 const type = data.type;
                 const year = data.year || "";
-                const rawUser = (data.requestedBy && data.requestedBy !== "guest") ? data.requestedBy : (data.fullName || data.user || `User ${userId}`);
+                const rawUser = (data.requestedBy && data.requestedBy !== "guest") ? data.requestedBy : (data.fullName || data.user || (userId ? `User ${userId}` : "Guest User"));
                 const username = (rawUser && rawUser !== "guest" && rawUser !== "None" && !rawUser.includes(" ") && !rawUser.startsWith("User ")) ? `@${rawUser.replace(/^@/, '')}` : rawUser;
                 const downloadLink = data.downloadLink;
                 const timestamp = data.timestamp || data.requestedAt;
-
-                if (userId === "undefined" || !userId) return;
 
                 const yearSuffix = year ? ` (${year})` : "";
 
                 if (change.type === "added") {
                     if (timestamp) {
                         const docMs = timestamp.toMillis ? timestamp.toMillis() : new Date(timestamp).getTime();
-                        if (Date.now() - docMs > 15000) return; // skip historical
+                        if (Date.now() - docMs > 60000) return; // skip historical
                     }
-
-                    // 1. Send confirmation to requesting user
-                    const canBoost = !data.boosted;
-                    const text = `🍿 *Request Received!*\n\nYour request for *${title}*${yearSuffix} (${type}) has been logged in our queue.\n\n` +
-                        (canBoost 
-                            ? `💡 *Boost Available!* You can boost this request to *High Priority* for 1,000 points to get it faster! 🚀`
-                            : `We will notify you here as soon as it is fulfilled! 🚀`);
-
-                    const replyMarkup = canBoost ? {
-                        inline_keyboard: [
-                            [
-                                {
-                                    text: "Boost Request 🚀 (1,000 pts)",
-                                    url: `https://t.me/Filmhouseappbot/filmhouseapp?startapp=boost_${docId}`
-                                }
-                            ]
-                        ]
-                    } : undefined;
 
                     const cleanTitle = escapeHtml(String(title || "Movie").replace(/[*_`~]/g, '').trim());
                     const cleanYear = year ? ` (${escapeHtml(String(year).replace(/[*_`~()]/g, '').trim())})` : "";
                     const cleanType = escapeHtml(String(type || "Movie").replace(/[*_`~]/g, '').trim());
                     const cleanSeason = data.seasonOrPart ? `\n📌 <b>Season/Part:</b> ${escapeHtml(String(data.seasonOrPart).replace(/[*_`~]/g, '').trim())}` : '';
-                    const cleanUser = escapeHtml(String(username || `User ${userId}`).replace(/[*_`~]/g, '').trim());
+                    const cleanUser = escapeHtml(String(username || (userId ? `User ${userId}` : "Guest User")).replace(/[*_`~]/g, '').trim());
 
-                    const userReqText = `🍿 <b>Request Received!</b>\n\nYour request for <b>${cleanTitle}</b>${cleanYear} (${cleanType}) has been logged in our queue.\n\n` +
-                        (canBoost 
-                            ? `💡 <b>Boost Available!</b> You can boost this request to <b>High Priority</b> for 1,000 points to get it faster! 🚀`
-                            : `We will notify you here as soon as it is fulfilled! 🚀`);
+                    // 1. Send confirmation to requesting user if userId is available
+                    if (userId) {
+                        const canBoost = !data.boosted;
+                        const replyMarkup = canBoost ? {
+                            inline_keyboard: [
+                                [
+                                    {
+                                        text: "Boost Request 🚀 (1,000 pts)",
+                                        url: `https://t.me/Filmhouseappbot/filmhouseapp?startapp=boost_${docId}`
+                                    }
+                                ]
+                            ]
+                        } : undefined;
 
-                    try {
-                        await callTelegramWithRetry('sendMessage', userId, userReqText, {
-                            parse_mode: "HTML",
-                            reply_markup: replyMarkup
-                        });
-                    } catch (e) {
-                        if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
-                            await db.collection("users").doc(userId).update({ blockedBot: true });
+                        const userReqText = `🍿 <b>Request Received!</b>\n\nYour request for <b>${cleanTitle}</b>${cleanYear} (${cleanType}) has been logged in our queue.\n\n` +
+                            (canBoost 
+                                ? `💡 <b>Boost Available!</b> You can boost this request to <b>High Priority</b> for 1,000 points to get it faster! 🚀`
+                                : `We will notify you here as soon as it is fulfilled! 🚀`);
+
+                        try {
+                            await callTelegramWithRetry('sendMessage', userId, userReqText, {
+                                parse_mode: "HTML",
+                                reply_markup: replyMarkup
+                            });
+                        } catch (e) {
+                            if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
+                                await db.collection("users").doc(userId).update({ blockedBot: true }).catch(() => {});
+                            }
+                            console.warn(`Failed to send request confirmation to ${userId}:`, e.message);
                         }
-                        console.warn(`Failed to send request confirmation to ${userId}:`, e.message);
                     }
 
-                    // 2. Notify admins
+                    // 2. Notify admins (Always runs unconditionally)
                     const isDirectPriority = (data.status === "priority" || data.boosted === true);
                     const adminText = isDirectPriority
                         ? `🚀🔥 <b>NEW MOVIE REQUEST (HIGH PRIORITY)!</b> 🔥🚀\n\n` +
                           `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
                           `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
-                          `👤 <b>Requested By:</b> ${cleanUser} (ID: <code>${userId}</code>)\n` +
+                          `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
                           `🔥 <b>Priority:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
                           `💡 <i>Action Required: Please expedite this request in the Admin Panel or channel!</i>`
                         : `🍿 <b>New Movie Request!</b>\n\n` +
                           `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
                           `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
-                          `👤 <b>Requested By:</b> ${cleanUser} (ID: <code>${userId}</code>)`;
+                          `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}`;
 
                     try {
                         const allAdmins = await getAllAdminIds();
@@ -3122,6 +3215,9 @@ async function init() {
                                                 seasonOrPart: data.seasonOrPart,
                                                 csv_id: data.csv_id || "",
                                                 tmdb_id: data.tmdb_id || null,
+                                                overview: data.overview || "",
+                                                genres: data.genres || data.categories || [],
+                                                rating: data.rating || data.vote_average || "",
                                                 poster: data.poster || null,
                                                 backdrop: data.backdrop || null
                                             };
