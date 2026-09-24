@@ -1,5 +1,48 @@
 [
   {
+    "csv_id": "62560-mr-robot",
+    "tmdb_id": 62560,
+    "imdb_id": "",
+    "title": "Mr. Robot",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Crime",
+      "Drama"
+    ],
+    "overview": "A young programmer, Elliot, suffers from a debilitating anti-social disorder and decides that he can only connect to people by hacking them. He wields his skills as a weapon to protect the people that he cares about. Elliot finds himself in the intersection between a cybersecurity firm he works for and the underworld organizations that are recruiting him to bring down corporate America.",
+    "poster": "https://image.tmdb.org/t/p/w500/kv1nRqgebSsREnd7vdC2pSGjpLo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/uJUe985oIuRiD3hmHQYskIMc2WU.jpg",
+    "rating": 8.3,
+    "release_date": "2015-06-24",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "N6HGuJC--rk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADpBcAArgzqEXsyyfb63p2MRYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADpRcAArgzqEWMImacHszA_xYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADpxcAArgzqEVQLcR-5huqehYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADqBcAArgzqEWzOeStIPIuhhYE",
+        "season": "Season 4"
+      }
+    ]
+  },
+  {
     "csv_id": "259909-dexter-resurrection",
     "tmdb_id": 259909,
     "imdb_id": "",
