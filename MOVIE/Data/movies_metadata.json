@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "6869-dyesebel",
+    "tmdb_id": 6869,
+    "imdb_id": "",
+    "title": "Dyesebel",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Drama",
+      "Comedy"
+    ],
+    "overview": "Dyesebel is a fantasy Philippine drama that aired on GMA Network. It is an adaptation of a famous graphic novel about a mermaid created by Mars Ravelo.\n\nThe series premiered on April 28, 2008 and was expected to air for 25 weeks or 125 episodes, with Marian Rivera and Dingdong Dantes in the lead roles, and Joyce E. Bernal at the helm. The series ended on October 17, 2008. It was internationally aired on GMA Pinoy TV, which became a huge success to viewers abroad.\n\nDyesebel is a popular mermaid character created by renowned graphic novelist Mars Ravelo. The story has been adapted into five films and a spin-off, throughout the timeline of 1953 to 1996.\n\nEdna Luna, Vilma Santos, Alma Moreno, Alice Dixson, and Charlene Gonzales had all played the lead role in the big screen, and all of them reached greater heights after playing the role. Ara Mina played a cameo role in this character in the television series Darna.",
+    "poster": "https://image.tmdb.org/t/p/w500/v46Ag3r8uoPXjVPzliU0PhOdjqH.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dW8OAvRvbq9ZZB1dWOvei1XKtpe.jpg",
+    "rating": 7,
+    "release_date": "2008-04-28",
+    "language": "tl",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADGggAArgzqEWi3uYkM74MIxYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "248394-forever",
     "tmdb_id": 248394,
     "imdb_id": "",
