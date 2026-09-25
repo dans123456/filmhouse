@@ -1,35 +1,5 @@
 [
   {
-    "title": "What's Wrong with Secretary Kim",
-    "csv_id": "79434-what-s-wrong-with-secretary-kim",
-    "type": "Series",
-    "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD8hcAArFaIUat2A2IQ4vU0RYE"
-    ],
-    "poster": "https://image.tmdb.org/t/p/w500/w6muIYgrx1XZFombs3N8owfgLwf.jpg",
-    "rating": 8.3,
-    "release_date": "2018-06-06",
-    "genres": [
-      "Comedy",
-      "Drama"
-    ],
-    "categories": [
-      "Main",
-      "K-Drama Series"
-    ],
-    "tmdb_id": 79434,
-    "overview": "When his secretary unexpectedly quits, an arrogant executive will do anything to bring her back.",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/kKlzA0owtx63wxpiYxgzSXrx6yz.jpg",
-    "language": "ko",
-    "cast": [
-      "Park Seo-jun",
-      "Park Min-young",
-      "Lee Tae-hwan",
-      "Pyo Ye-jin",
-      "Kim Hye-ok"
-    ]
-  },
-  {
     "csv_id": "Secret_Lives_2026",
     "tmdb_id": null,
     "imdb_id": "",
@@ -54730,7 +54700,12 @@
     "title": "The Secretary",
     "csv_id": "1723794-the-secretary",
     "type": "Movie",
-    "links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADFA0AAp_ruEVuupxNkfqaExYE",
+        "quality": "720p"
+      }
+    ],
     "poster": "https://image.tmdb.org/t/p/w500/urk4BPSPhRTggZQ4lHNmu1ugmhi.jpg",
     "rating": 0,
     "release_date": "2026-01-26",
@@ -54743,7 +54718,8 @@
     "overview": "Vanessa has beauty and brains but due to her geeky exterior, she can't seem to get noticed by her crush.",
     "backdrop": "img/FilmHouse.png",
     "language": "en",
-    "cast": []
+    "cast": [],
+    "trailer": ""
   },
   {
     "title": "The Sex Lives of College Girls",
