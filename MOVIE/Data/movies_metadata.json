@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "247569-an-k-l-p-rise-of-the-spectre",
+    "tmdb_id": 247569,
+    "imdb_id": "",
+    "title": "Aníkúlápó: Rise of the Spectre",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "In a race against time to avoid a dismal fate, traveler Saro returns to Ojumo with orders to complete a nearly impossible task.",
+    "poster": "https://image.tmdb.org/t/p/w500/3HO233WHsznGviXEVOGMozSa996.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2tQ5jSU5ECydgJUJZjYyDDKUmsd.jpg",
+    "rating": 7,
+    "release_date": "2024-03-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "CBnIpwSOWEg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADshkAAp_rsEVUX7-PdZJTjRYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADthkAAp_rsEUXvxPqwjR3mRYE",
+        "season": "Season 2"
+      }
+    ]
+  },
+  {
     "csv_id": "The_Covenant_2025",
     "tmdb_id": null,
     "imdb_id": "",
