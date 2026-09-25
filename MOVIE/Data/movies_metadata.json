@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "301040-reverend-titus",
+    "tmdb_id": 301040,
+    "imdb_id": "",
+    "title": "Reverend Titus",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Dive into \"Reverend Titus,\" where a Reverend grapples with his faith and ambition. Follow his heartfelt journey toward redemption amid complex family and church dynamics.",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMzIzNDNjY2UtZTVkMC00ZGYzLWJkYjAtMDljNjBkNzg4YWU1XkEyXkFqcGc@._V1_.jpg",
+    "backdrop": "https://m.media-amazon.com/images/M/MV5BMzIzNDNjY2UtZTVkMC00ZGYzLWJkYjAtMDljNjBkNzg4YWU1XkEyXkFqcGc@._V1_.jpg",
+    "rating": 0,
+    "release_date": "2025-09-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADfRgAAp_rsEVKnkEpOBfOPBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "House_Job_2025",
     "tmdb_id": null,
     "imdb_id": "",
