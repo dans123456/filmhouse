@@ -3697,10 +3697,14 @@ if (addMovieForm) {
         updatePublishButtonState();
         renderCatalogList();
         
-        // Auto-post release announcement to Main Channel if checked
+        // Auto-post release announcement to Main Channel if checked and has links
         const postAddMovieToChan = document.getElementById("add-movie-post-to-channel");
         if (postAddMovieToChan && postAddMovieToChan.checked && typeof window.broadcastMovieToMainChannel === 'function') {
-            window.broadcastMovieToMainChannel(newMovie);
+            if (newMovie.links && newMovie.links.length > 0) {
+                window.broadcastMovieToMainChannel(newMovie).then(() => {
+                    newMovie.channelBroadcasted = true;
+                }).catch(err => console.warn("Failed channel broadcast on add:", err));
+            }
         }
         // Always record publication duty activity for the admin adding the movie to catalog
         if (typeof window.recordAdminActivity === 'function') {
@@ -3919,6 +3923,23 @@ if (publishBtn) {
                     await Promise.all(fsPromises);
                 } catch (fsErr) {
                     console.warn("Failed to commit Firestore movie catalog changes:", fsErr);
+                }
+            }
+
+            // Auto-broadcast any newly published titles to Main Channel (@filmhouse_main)
+            if (typeof window.broadcastMovieToMainChannel === 'function' && Array.isArray(newlyAddedIds) && newlyAddedIds.length > 0) {
+                const candidatesToBroadcast = allCatalogMovies.filter(m => 
+                    newlyAddedIds.includes(m.csv_id) && 
+                    Array.isArray(m.links) && m.links.length > 0 &&
+                    !m.channelBroadcasted
+                );
+                for (const movieToBroadcast of candidatesToBroadcast) {
+                    try {
+                        await window.broadcastMovieToMainChannel(movieToBroadcast);
+                        movieToBroadcast.channelBroadcasted = true;
+                    } catch (broadcastErr) {
+                        console.warn("[PUBLISH AUTO-BROADCAST] Warning broadcasting to channel:", broadcastErr);
+                    }
                 }
             }
             
@@ -4451,9 +4472,11 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
         ? `https://t.me/Filmhouseappbot?start=dl_${movieId}` 
         : `https://t.me/Filmhouseappbot`;
 
+    const escapeTg = (s) => (s ? String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "");
+
     const caption = 
-        `<b>${escapeHTML(cleanTitle)}</b>${escapeHTML(yearText)}\n` +
-        `${escapeHTML(seasonOrQualityText)}\n\n` +
+        `<b>${escapeTg(cleanTitle)}</b>${escapeTg(yearText)}\n` +
+        `${escapeTg(seasonOrQualityText)}\n\n` +
         metaLine +
         overviewLine +
         `👉 <a href="${deepLinkUrl}">CLICK HERE TO DOWNLOAD</a> ✔️`;
@@ -4476,6 +4499,12 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
 
     console.log(`[MAIN CHANNEL POST] Broadcasting "${cleanTitle}" announcement to @filmhouse_main...`);
 
+    const replyMarkup = {
+        inline_keyboard: [
+            [{ text: "📥 Download on Film House 🍿", url: deepLinkUrl }]
+        ]
+    };
+
     try {
         const sendPhotoUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
         const res = await fetch(sendPhotoUrl, {
@@ -4485,7 +4514,8 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
                 chat_id: targetChannel,
                 photo: bannerUrl,
                 caption: caption,
-                parse_mode: "HTML"
+                parse_mode: "HTML",
+                reply_markup: replyMarkup
             })
         });
         const result = await res.json();
@@ -4506,7 +4536,8 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
                     chat_id: targetChannel,
                     text: caption,
                     parse_mode: "HTML",
-                    disable_web_page_preview: true
+                    disable_web_page_preview: true,
+                    reply_markup: replyMarkup
                 })
             });
             const msgResult = await msgRes.json();

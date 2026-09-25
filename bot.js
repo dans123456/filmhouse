@@ -841,7 +841,7 @@ function setupBot(bot, adminBot) {
                 `• 👑 <b>Admin Bot:</b> Active & Listening\n\n` +
                 `🛠 <b>Available Commands:</b>\n` +
                 `• /help — Admin tutorials & duty workflows\n` +
-                `• <code>/post [Title]</code> — Publish title announcement to @filmhouse_main\n` +
+                `• /post [Title] — Publish title announcement to @filmhouse_main\n` +
                 `• /logs — View live server & bot logs\n` +
                 `• /pending — View pending movie requests\n` +
                 `• /backup — Download weekly CSV catalog backup\n` +
@@ -1103,7 +1103,7 @@ function setupBot(bot, adminBot) {
                 `• Paste the stream/download link. The bot automatically delivers direct fulfillment to the user with no ads and credits your account!\n\n` +
                 `📢 <b>2. Publishing Titles as Duty (/post):</b>\n` +
                 `• Admins also publish movies and series as regular duty (not just on request).\n` +
-                `• Use <code>/post &lt;Title&gt;</code> (e.g. <code>/post Inception</code>) in this chat to generate a poster announcement with deep link in @filmhouse_main.\n` +
+                `• Use /post [Title] (e.g. /post Inception) in this chat to generate a poster announcement with deep link in @filmhouse_main.\n` +
                 `• Or add titles directly in the Admin Panel. Every title you publish counts toward your team Work Share!\n\n` +
                 `🏆 <b>3. Work Share Rankings (% vs Points):</b>\n` +
                 `• Rankings show your percentage share of total team output (fulfillments + duty publications).\n` +
@@ -1251,19 +1251,69 @@ function setupBot(bot, adminBot) {
             await ctx.reply(`🔍 Searching for "${escapeHtml(query)}" to publish...`, { parse_mode: "HTML" });
             try {
                 let foundMovie = null;
-                const qSnap = await db.collection("movies").where("title", "==", query).limit(1).get();
-                if (!qSnap.empty) {
-                    foundMovie = qSnap.docs[0].data();
-                } else {
-                    const allSnap = await db.collection("movies").limit(100).get();
-                    for (const doc of allSnap.docs) {
-                        const m = doc.data();
-                        if (m.title && m.title.toLowerCase().includes(query.toLowerCase())) {
-                            foundMovie = m;
-                            break;
+                const cleanQuery = query.toLowerCase().trim();
+
+                // 1. Search in local in-memory catalog cache (fastest & most accurate)
+                if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                    // Exact title match
+                    foundMovie = cachedMoviesMetadata.find(m => String(m.title || "").toLowerCase().trim() === cleanQuery);
+                    // Symbol/punctuation-insensitive match
+                    if (!foundMovie) {
+                        foundMovie = cachedMoviesMetadata.find(m => m.title && titlesMatch(m.title, query));
+                    }
+                    // Substring match
+                    if (!foundMovie) {
+                        foundMovie = cachedMoviesMetadata.find(m => m.title && String(m.title).toLowerCase().includes(cleanQuery));
+                    }
+                    // csv_id match
+                    if (!foundMovie) {
+                        foundMovie = cachedMoviesMetadata.find(m => String(m.csv_id || "").toLowerCase() === cleanQuery);
+                    }
+                }
+
+                // 2. Fallback to Firestore movies collection if not found in memory
+                if (!foundMovie) {
+                    const qSnap = await db.collection("movies").where("title", "==", query).limit(1).get();
+                    if (!qSnap.empty) {
+                        foundMovie = qSnap.docs[0].data();
+                    } else {
+                        const allSnap = await db.collection("movies").limit(500).get();
+                        for (const doc of allSnap.docs) {
+                            const m = doc.data();
+                            if (m.title && (titlesMatch(m.title, query) || String(m.title).toLowerCase().includes(cleanQuery))) {
+                                foundMovie = m;
+                                break;
+                            }
                         }
                     }
                 }
+
+                // 3. Fallback to TMDB enrichment search if completely new title
+                if (!foundMovie) {
+                    try {
+                        const searchRes = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
+                        if (searchRes.ok) {
+                            const searchData = await searchRes.json();
+                            if (searchData.results && searchData.results.length > 0) {
+                                const tmdb = searchData.results[0];
+                                const isTv = tmdb.media_type === 'tv';
+                                foundMovie = {
+                                    title: tmdb.title || tmdb.name || query,
+                                    type: isTv ? 'Series' : 'Movie',
+                                    seasonOrPart: isTv ? 'Complete Series' : 'Full Movie',
+                                    overview: tmdb.overview || '',
+                                    rating: tmdb.vote_average ? Math.round(tmdb.vote_average * 10) / 10 : '',
+                                    backdrop: tmdb.backdrop_path ? `https://image.tmdb.org/t/p/w1280${tmdb.backdrop_path}` : null,
+                                    poster: tmdb.poster_path ? `https://image.tmdb.org/t/p/w1280${tmdb.poster_path}` : null,
+                                    tmdb_id: tmdb.id
+                                };
+                            }
+                        }
+                    } catch (tmdbErr) {
+                        console.warn("[/post TMDB enrich warning]:", tmdbErr.message);
+                    }
+                }
+
                 if (!foundMovie) {
                     foundMovie = {
                         title: query,
