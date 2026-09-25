@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "112833-juvenile-justice",
+    "tmdb_id": 112833,
+    "imdb_id": "",
+    "title": "Juvenile Justice",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama",
+      "Crime"
+    ],
+    "overview": "A tough judge balances her aversion to minor offenders with firm beliefs on justice and punishment as she tackles complex cases inside a juvenile court.",
+    "poster": "https://image.tmdb.org/t/p/w500/xH2wTVlsUlYeFEOVGFDaamHkMCm.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/eW6CqrGSRUk6xMbdCjreMQiP5W8.jpg",
+    "rating": 8.1,
+    "release_date": "2022-02-25",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "yGcmgNGDAAk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADaggAAp_ruEUwjjdLeENTtBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "Low_Priest_2025",
     "tmdb_id": null,
     "imdb_id": "",
