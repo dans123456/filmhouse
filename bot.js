@@ -935,14 +935,20 @@ function setupBot(bot, adminBot) {
 
         // View 2: Pending Requests (Grouped with Pagination)
         const getPendingRequestsPayload = (requests = [], page = 0) => {
-            // Group requests by Title
+            // Group requests by Title + TMDB ID / Year + Season
             const groupedMap = {};
             requests.forEach(r => {
                 const rawTitle = r.title || "Movie";
                 const cleanTitleKey = rawTitle.toLowerCase().trim();
+                const tmdbPart = r.tmdb_id || r.tmdbId || "";
+                const yearPart = r.year || "";
+                const seasonPart = (r.seasonOrPart || "").toLowerCase().trim();
+                const groupKey = tmdbPart 
+                    ? `${cleanTitleKey}_tmdb_${tmdbPart}_${seasonPart}` 
+                    : (yearPart ? `${cleanTitleKey}_year_${yearPart}_${seasonPart}` : `${cleanTitleKey}_${seasonPart}`);
                 
-                if (!groupedMap[cleanTitleKey]) {
-                    groupedMap[cleanTitleKey] = {
+                if (!groupedMap[groupKey]) {
+                    groupedMap[groupKey] = {
                         title: rawTitle,
                         year: r.year || "",
                         type: r.type || "Movie",
@@ -952,13 +958,13 @@ function setupBot(bot, adminBot) {
                     };
                 }
                 if (r.status === "priority" || r.boosted) {
-                    groupedMap[cleanTitleKey].isPriority = true;
+                    groupedMap[groupKey].isPriority = true;
                 }
                 
                 const reqUser = r.requestedBy || r.user || r.userId || 'guest';
                 const userDisplay = String(reqUser).startsWith('@') ? reqUser : `@${reqUser}`;
-                if (!groupedMap[cleanTitleKey].requesters.includes(userDisplay)) {
-                    groupedMap[cleanTitleKey].requesters.push(userDisplay);
+                if (!groupedMap[groupKey].requesters.includes(userDisplay)) {
+                    groupedMap[groupKey].requesters.push(userDisplay);
                 }
             });
 
@@ -988,7 +994,8 @@ function setupBot(bot, adminBot) {
                 pageItems.forEach((item, idx) => {
                     const globalIdx = currentPage * pageSize + idx + 1;
                     const prioBadge = item.isPriority ? " 🔥 <b>[HIGH PRIORITY]</b>" : "";
-                    const year = item.year ? ` (${escapeHtml(item.year)})` : "";
+                    const year = item.year && !item.title.includes(item.year) ? ` (${escapeHtml(item.year)})` : "";
+                    const season = item.seasonOrPart ? ` [${escapeHtml(item.seasonOrPart)}]` : "";
                     const cleanTitle = escapeHtml(item.title);
                     const cleanType = escapeHtml(item.type);
                     
@@ -999,7 +1006,7 @@ function setupBot(bot, adminBot) {
                         requestersStr = `Requesters (${item.requesters.length}): ` + item.requesters.map(u => escapeHtml(u)).join(", ");
                     }
                     
-                    msg += `${globalIdx}. <b>${cleanTitle}</b>${year}${prioBadge}\n   • 📁 <i>${cleanType}</i> | 👤 ${requestersStr}\n\n`;
+                    msg += `${globalIdx}. <b>${cleanTitle}</b>${year}${season}${prioBadge}\n   • 📁 <i>${cleanType}</i> | 👤 ${requestersStr}\n\n`;
                 });
 
                 msg += `💡 Open the Admin Web App to fulfill these requests with download links!\n`;

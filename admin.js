@@ -764,12 +764,25 @@ function renderRequestsList() {
     const reqSearchEl = document.getElementById("request-search-input") || document.getElementById("requests-search");
     const searchQuery = reqSearchEl ? reqSearchEl.value.toLowerCase().trim() : "";
     allRequests.forEach(r => {
-        const key = r.title.toLowerCase().trim();
+        const rawTitle = r.title || "Untitled";
+        const cleanTitle = rawTitle.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "");
+        const yearPart = r.year ? String(r.year).trim() : (rawTitle.match(/\((\d{4})\)/) ? rawTitle.match(/\((\d{4})\)/)[1] : "");
+        const tmdbPart = r.tmdb_id ? String(r.tmdb_id).trim() : (r.csv_id ? String(r.csv_id).trim() : "");
+        const seasonPart = r.seasonOrPart ? String(r.seasonOrPart).toLowerCase().trim() : "";
+
+        // Key distinguishes distinct media releases, remakes, and seasons
+        const key = tmdbPart 
+            ? `${cleanTitle}_tmdb_${tmdbPart}_${seasonPart}` 
+            : (yearPart ? `${cleanTitle}_year_${yearPart}_${seasonPart}` : `${cleanTitle}_${seasonPart}`);
+
         if (!counts[key]) {
             counts[key] = { 
-                title: r.title, 
-                type: r.type, 
-                year: r.year || "",
+                title: rawTitle, 
+                type: r.type || "Movie", 
+                year: yearPart,
+                tmdb_id: r.tmdb_id || null,
+                csv_id: r.csv_id || null,
+                seasonOrPart: r.seasonOrPart || "",
                 count: 0, 
                 isPriority: false, 
                 isFulfilled: true,
@@ -860,9 +873,11 @@ function renderRequestsList() {
     let filteredRequests = Object.values(counts).filter(r => {
         if (!searchQuery) return true;
         const rawTitle = (r.title || "").toLowerCase();
-        if (rawTitle.includes(searchQuery)) return true;
-        const norm = normalizeTitleForComparison(rawTitle);
-        const col = getCollapsedTitle(rawTitle);
+        const yearPart = r.year ? String(r.year) : "";
+        const fullDisplay = `${rawTitle} ${yearPart}`;
+        if (fullDisplay.includes(searchQuery)) return true;
+        const norm = normalizeTitleForComparison(fullDisplay);
+        const col = getCollapsedTitle(fullDisplay);
         if (colReqQ && col && col.includes(colReqQ)) return true;
         if (cleanReqQ && norm && norm.includes(cleanReqQ)) return true;
         return false;
@@ -1009,7 +1024,7 @@ function renderRequestsList() {
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <div class="user-details" style="flex: 1;">
                     <h5 style="margin: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
-                        ${escapeHTML(req.title)}${req.year ? ` (${req.year})` : ""}
+                        ${escapeHTML(req.title)}${req.year && !req.title.includes(req.year) ? ` (${escapeHTML(req.year)})` : ""}${req.seasonOrPart ? ` [${escapeHTML(req.seasonOrPart)}]` : ""}
                         ${badgeMarkup}
                         ${claimBadgeMarkup}
                     </h5>
@@ -1040,7 +1055,7 @@ function renderRequestsList() {
         const fulfillBtn = row.querySelector(".btn-fulfill-request");
         if (fulfillBtn) {
             fulfillBtn.addEventListener("click", () => {
-                fulfillMovieTitleRequests(req.title, req.docIds);
+                fulfillMovieTitleRequests(req.title, req.docIds, req);
             });
         }
 
@@ -1101,21 +1116,26 @@ function deleteMovieTitleRequests(title, docIds) {
     });
 }
 
-function fulfillMovieTitleRequests(title, docIds) {
+function fulfillMovieTitleRequests(title, docIds, reqMeta = null) {
     if (typeof firebase === "undefined" || !db) return;
     
+    const targetDocIds = Array.isArray(docIds) && docIds.length > 0 ? docIds : [];
+    if (targetDocIds.length === 0) return;
+
     // Check if already claimed by another admin
     const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
     const currentAdminId = String(tgUser ? tgUser.id : (new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || "test-admin"));
     const currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : "Admin";
 
-    // Query Firestore for these request documents to check for active claims by other admins
-    db.collection("requests").where("title", "==", title).get().then(snapshot => {
+    // Query Firestore ONLY for these exact request documents
+    const docPromises = targetDocIds.map(id => db.collection("requests").doc(id).get());
+    Promise.all(docPromises).then(snapshots => {
         let alreadyClaimed = false;
         let claimerName = "";
 
-        snapshot.forEach(doc => {
-            const data = doc.data();
+        snapshots.forEach(docSnap => {
+            if (!docSnap.exists) return;
+            const data = docSnap.data();
             const claimTime = data.adminClaimTime && typeof data.adminClaimTime.toDate === 'function' ? data.adminClaimTime.toDate() : null;
             const isExpired = claimTime ? (Date.now() - claimTime.getTime() > 15 * 60 * 1000) : false;
             // A claim is active if adminClaimId is present, not expired, status is not fulfilled, and it's not by current admin
@@ -1133,10 +1153,11 @@ function fulfillMovieTitleRequests(title, docIds) {
         // Set the lock claim for current admin in a batch update
         const batch = db.batch();
         let count = 0;
-        snapshot.forEach(doc => {
-            const data = doc.data();
+        snapshots.forEach(docSnap => {
+            if (!docSnap.exists) return;
+            const data = docSnap.data();
             if (data.status !== "fulfilled" && data.status !== "claimed") {
-                batch.update(doc.ref, {
+                batch.update(docSnap.ref, {
                     adminClaimId: currentAdminId,
                     adminClaimName: currentAdminName,
                     adminClaimTime: firebase.firestore.FieldValue.serverTimestamp()
@@ -1145,55 +1166,81 @@ function fulfillMovieTitleRequests(title, docIds) {
             }
         });
 
-        if (count > 0) {
-            batch.commit().then(() => {
-                const modal = document.getElementById("fulfill-request-modal");
-                const titleEl = document.getElementById("fulfill-modal-title");
-                
-                if (!modal || !titleEl) return;
-                
-                currentFulfillTitle = title;
-                currentFulfillDocIds = Array.from(new Set([...(docIds || []), ...snapshot.docs.map(d => d.id)]));
-                
-                titleEl.textContent = `Fulfill Request: "${title}"`;
-                
-                const cleanTitle = title.replace(/\s*\([^)]+\)\s*$/g, "").trim().toLowerCase();
-                const existingMovie = allCatalogMovies.find(m => titlesMatch(m.title, title));
-                const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === title.toLowerCase().trim()) ||
-                                   allRequests.find(r => docIds.includes(r.docId)) ||
-                                   allRequests.find(r => r.title.toLowerCase().trim().startsWith(cleanTitle));
-                currentFulfillReq = matchedReq;
-                const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : (existingMovie ? (existingMovie.type || "").toLowerCase() === 'series' : false);
-                
-                let reqSpec = matchedReq ? (matchedReq.seasonOrPart || "") : "";
-                if (!reqSpec && title) {
-                    const qMatch = title.match(/\(([^)]+)\)$/);
-                    if (qMatch) {
-                        reqSpec = qMatch[1].trim();
-                    }
+        const proceedToModal = () => {
+            const modal = document.getElementById("fulfill-request-modal");
+            const titleEl = document.getElementById("fulfill-modal-title");
+            
+            if (!modal || !titleEl) return;
+            
+            const yearStr = reqMeta && reqMeta.year ? String(reqMeta.year).trim() : "";
+            currentFulfillTitle = title;
+            currentFulfillDocIds = targetDocIds;
+            
+            titleEl.textContent = `Fulfill Request: "${title}${yearStr && !title.includes(yearStr) ? ` (${yearStr})` : ''}"`;
+            
+            const cleanTitle = title.replace(/\s*\([^)]+\)\s*$/g, "").trim().toLowerCase();
+            const existingMovie = allCatalogMovies.find(m => {
+                if (reqMeta && reqMeta.tmdb_id && (m.tmdb_id == reqMeta.tmdb_id || m.csv_id == reqMeta.tmdb_id)) return true;
+                if (titlesMatch(m.title, title)) {
+                    if (yearStr && m.year && String(m.year) === yearStr) return true;
+                    if (!yearStr) return true;
                 }
-                renderFulfillLinksInputs(existingMovie, isSeries, reqSpec);
-                modal.classList.add("active");
-            }).catch(err => {
+                return false;
+            }) || allCatalogMovies.find(m => titlesMatch(m.title, title));
+
+            const matchedReq = (reqMeta && reqMeta.title) ? reqMeta : (allRequests.find(r => targetDocIds.includes(r.docId)) || allRequests.find(r => r.title.toLowerCase().trim() === title.toLowerCase().trim()));
+            currentFulfillReq = matchedReq;
+            const isSeries = matchedReq ? ((matchedReq.type || "").toLowerCase() === 'series' || (matchedReq.type || "").toLowerCase() === 'tv') : (existingMovie ? (existingMovie.type || "").toLowerCase() === 'series' : false);
+            
+            let reqSpec = matchedReq ? (matchedReq.seasonOrPart || "") : "";
+            if (!reqSpec && title) {
+                const qMatch = title.match(/\(([^)]+)\)$/);
+                if (qMatch) {
+                    reqSpec = qMatch[1].trim();
+                }
+            }
+            renderFulfillLinksInputs(existingMovie, isSeries, reqSpec);
+            modal.classList.add("active");
+        };
+
+        if (count > 0) {
+            batch.commit().then(proceedToModal).catch(err => {
                 console.error("Error setting claim lock batch:", err);
-                showToast("Failed to lock request for processing.", "error");
+                proceedToModal();
             });
         } else {
-            // Already fulfilled
-            showToast("This request has already been resolved.", "info");
+            proceedToModal();
         }
     }).catch(err => {
-        console.error("Error checking claim lock status:", err);
+        console.error("Error checking request status:", err);
         showToast("Error checking request status.", "error");
     });
 }
 
-function releaseClaimLock(title) {
-    if (typeof firebase === "undefined" || !db || !title) return;
+function releaseClaimLock(title, docIds = []) {
+    if (typeof firebase === "undefined" || !db) return;
     
     const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
     const currentAdminId = String(tgUser ? tgUser.id : (new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || "test-admin"));
     
+    if (Array.isArray(docIds) && docIds.length > 0) {
+        const batch = db.batch();
+        let count = 0;
+        docIds.forEach(id => {
+            batch.update(db.collection("requests").doc(id), {
+                adminClaimId: firebase.firestore.FieldValue.delete(),
+                adminClaimName: firebase.firestore.FieldValue.delete(),
+                adminClaimTime: firebase.firestore.FieldValue.delete()
+            });
+            count++;
+        });
+        if (count > 0) {
+            batch.commit().catch(err => console.error("Error releasing claim lock:", err));
+        }
+        return;
+    }
+
+    if (!title) return;
     db.collection("requests").where("title", "==", title).get().then(snapshot => {
         const batch = db.batch();
         let count = 0;
@@ -4337,6 +4384,9 @@ const fulfillRequestModal = document.getElementById("fulfill-request-modal");
 const closeFulfillModalBtn = document.getElementById("btn-close-fulfill-modal");
 
 window.closeFulfillRequestModal = function() {
+    if (currentFulfillDocIds && currentFulfillDocIds.length > 0) {
+        releaseClaimLock(currentFulfillTitle, currentFulfillDocIds);
+    }
     const modal = document.getElementById("fulfill-request-modal");
     if (modal) {
         modal.classList.remove("active");
@@ -5206,8 +5256,12 @@ if (fulfillForm && fulfillRequestModal) {
             if (reqTmdbId && m.tmdb_id && String(reqTmdbId) === String(m.tmdb_id)) {
                 return true;
             }
-            return titlesMatch(m.title, currentFulfillTitle);
-        });
+            if (titlesMatch(m.title, currentFulfillTitle)) {
+                if (reqYear && m.year && String(m.year) === String(reqYear)) return true;
+                if (!reqYear) return true;
+            }
+            return false;
+        }) || allCatalogMovies.find(m => titlesMatch(m.title, currentFulfillTitle));
 
         let movieToSync = null;
 
@@ -5446,6 +5500,7 @@ if (fulfillForm && fulfillRequestModal) {
             if (shouldPostToChannel && typeof window.broadcastMovieToMainChannel === 'function') {
                 const titleToBroadcast = movieToSync || {
                     title: currentFulfillTitle,
+                    year: reqYear || "",
                     type: isSeries ? 'Series' : 'Movie',
                     seasonOrPart: matchedReq ? (matchedReq.seasonOrPart || "") : "",
                     csv_id: movieToSync ? movieToSync.csv_id : "",
