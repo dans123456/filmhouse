@@ -1,5 +1,32 @@
 [
   {
+    "csv_id": "Hallelujah_2026",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Hallelujah",
+    "type": "Movie",
+    "categories": [
+      "Main"
+    ],
+    "genres": [],
+    "overview": "As Halle rises to superstardom, she must navigate the temptations of sudden wealth, the politics of mega-churches, and a scandalous rivalry with the industry's reigning queen, Sister Grace. The series serves as a bold critique of the commercialization of religion while celebrating the redemptive power of music and authentic faith.",
+    "poster": "https://i.postimg.cc/Fs1dwFPR/IMG-20260925-113848-109.jpg",
+    "backdrop": "https://i.postimg.cc/Fs1dwFPR/IMG-20260925-113848-109.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADdxQAAp_rsEXT-a6m7GRT9BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "279349-roses-and-ivy",
     "tmdb_id": 279349,
     "imdb_id": "",
