@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "Kukoyi_2025",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Kukoyi",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Caught in between saving his beloved wife or his unborn child, Aremu makes a tough decision and does everything to stand by it.",
+    "poster": "https://m.media-amazon.com/images/M/MV5BZjVhZjhjM2QtNDg5NS00YjA4LTg4NWYtNzJhZTQzMWYzZDVkXkEyXkFqcGc@._V1_.jpg",
+    "backdrop": "https://m.media-amazon.com/images/M/MV5BZjVhZjhjM2QtNDg5NS00YjA4LTg4NWYtNzJhZTQzMWYzZDVkXkEyXkFqcGc@._V1_.jpg",
+    "rating": 0,
+    "release_date": "2025",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADNhYAAp_rsEXSP6Swm7OwAhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "Ordinary_People_2017",
     "tmdb_id": null,
     "imdb_id": "",
@@ -389,10 +419,6 @@
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADbxMAAp_rsEVhyP90bb5PXBYE",
         "season": "Season 1"
-      },
-      {
-        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADBxYAAp_rsEXiMahZk8iZBRYE",
-        "season": "Season 2"
       }
     ]
   },
