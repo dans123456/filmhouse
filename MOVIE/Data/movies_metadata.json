@@ -4,7 +4,7 @@
     "tmdb_id": null,
     "imdb_id": "",
     "title": "Low Priest",
-    "type": "Movie",
+    "type": "Series",
     "categories": [
       "Main",
       "African"
@@ -25,7 +25,7 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADiAgAAp_ruEVMtq38tuSw2BYE",
-        "quality": "720p"
+        "season": "Season 1"
       }
     ]
   },
