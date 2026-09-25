@@ -35502,9 +35502,12 @@
     "csv_id": "1722070-better-half",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD2REAAh50AAFGQokojT4gMYoWBA"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD2REAAh50AAFGQokojT4gMYoWBA",
+        "quality": "720p"
+      }
     ],
-    "poster": "img/FilmHouse3_nobg.png",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNDQ2YzcyM2MtNGZiMC00ZDI2LWI4ZDMtNzYwOWMxN2YyZmNmXkEyXkFqcGc@._V1_.jpg",
     "rating": 0,
     "release_date": "2023-07-13",
     "genres": [
@@ -35517,7 +35520,7 @@
     ],
     "tmdb_id": 1722070,
     "overview": "A young university student falls head over heels with his lecturer and vows to make her his wife.",
-    "backdrop": "img/FilmHouse.png",
+    "backdrop": "https://m.media-amazon.com/images/M/MV5BNDQ2YzcyM2MtNGZiMC00ZDI2LWI4ZDMtNzYwOWMxN2YyZmNmXkEyXkFqcGc@._V1_.jpg",
     "language": "en",
     "cast": [],
     "trailer": "_Dz_6uUP39k",
