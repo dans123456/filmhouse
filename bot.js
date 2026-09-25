@@ -785,17 +785,36 @@ function setupBot(bot, adminBot) {
                 }
             };
 
-            if (ctx.callbackQuery && ctx.callbackQuery.message) {
-                try {
-                    return await ctx.editMessageText(payload.text, options);
-                } catch (err) {
-                    if (err.message && err.message.includes("message is not modified")) {
-                        return;
+            const sendOrEdit = async (text, opts) => {
+                if (ctx.callbackQuery && ctx.callbackQuery.message) {
+                    try {
+                        return await ctx.editMessageText(text, opts);
+                    } catch (err) {
+                        if (err.message && err.message.includes("message is not modified")) {
+                            return;
+                        }
+                        return await ctx.reply(text, opts);
                     }
-                    return await ctx.reply(payload.text, options);
+                } else {
+                    return await ctx.reply(text, opts);
                 }
-            } else {
-                return await ctx.reply(payload.text, options);
+            };
+
+            try {
+                return await sendOrEdit(payload.text, options);
+            } catch (err) {
+                if (err.message && (err.message.includes("can't parse entities") || err.message.includes("entity"))) {
+                    console.warn(`[AdminBot] HTML parse failed (${err.message}). Retrying plain text fallback...`);
+                    const fallbackOpts = { ...options };
+                    delete fallbackOpts.parse_mode;
+                    const plainText = String(payload.text || "")
+                        .replace(/<[^>]+>/g, "")
+                        .replace(/&amp;/g, "&")
+                        .replace(/&lt;/g, "<")
+                        .replace(/&gt;/g, ">");
+                    return await sendOrEdit(plainText, fallbackOpts);
+                }
+                throw err;
             }
         };
 
@@ -822,7 +841,7 @@ function setupBot(bot, adminBot) {
                 `• 👑 <b>Admin Bot:</b> Active & Listening\n\n` +
                 `🛠 <b>Available Commands:</b>\n` +
                 `• /help — Admin tutorials & duty workflows\n` +
-                `• /post <Title> — Publish title announcement to @filmhouse_main\n` +
+                `• <code>/post [Title]</code> — Publish title announcement to @filmhouse_main\n` +
                 `• /logs — View live server & bot logs\n` +
                 `• /pending — View pending movie requests\n` +
                 `• /backup — Download weekly CSV catalog backup\n` +
@@ -1791,8 +1810,8 @@ function setupBot(bot, adminBot) {
                         `📦 <b>Type:</b> ${isSeries ? "TV Series" : "Full Movie"}\n` +
                         metaLine +
                         overviewLine +
-                        `\n<blockquote>⏳ <b>Auto-Delete Notice:</b>\n` +
-                        `This message will self-destruct in <b>5 minutes</b> to protect server links. Please download or save now!</blockquote>`;
+                        `\n<i>⏳ <b>Auto-Delete Notice:</b>\n` +
+                        `This message will self-destruct in <b>5 minutes</b> to protect server links. Please download or save now!</i>`;
 
                     // Single primary button only
                     const inlineButtons = [
@@ -2235,6 +2254,11 @@ function setupBot(bot, adminBot) {
 
     bot.command('broadcast', handleSeamlessBroadcast);
     if (adminBot) adminBot.command('broadcast', handleSeamlessBroadcast);
+    if (adminBot) {
+        adminBot.command('ban', async (ctx) => bot.handleUpdate(ctx.update));
+        adminBot.command('unban', async (ctx) => bot.handleUpdate(ctx.update));
+        adminBot.command('setwelcomecaption', async (ctx) => bot.handleUpdate(ctx.update));
+    }
 
     // Command: /ban <user_id> (Admin Only)
     bot.command('ban', async (ctx) => {
@@ -3192,11 +3216,11 @@ async function init() {
                         const docMs = data.timestamp.toMillis ? data.timestamp.toMillis() : new Date(data.timestamp).getTime();
                         if (Date.now() - docMs > 15000) return;
                     }
-                    const cleanUser = escapeHtml(user);
-                    const cleanUserId = escapeHtml(userId);
-                    const cleanCategory = escapeHtml(category);
-                    const cleanSubject = escapeHtml(subject);
-                    const cleanMsg = escapeHtml(msg);
+                    const cleanUser = escapeHtml(data.user || data.username || "guest");
+                    const cleanUserId = escapeHtml(data.userId || data.user_id || "");
+                    const cleanCategory = escapeHtml(data.category || data.type || "General");
+                    const cleanSubject = escapeHtml(data.subject || "No Subject");
+                    const cleanMsg = escapeHtml(data.msg || data.message || "");
 
                     const adminText = `📝 <b>New Feedback Submitted!</b>\n\n` +
                                       `👤 <b>User:</b> @${cleanUser} (ID: <code>${cleanUserId}</code>)\n` +

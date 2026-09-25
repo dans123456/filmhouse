@@ -761,7 +761,8 @@ function renderRequestsList() {
     listContainer.replaceChildren();
 
     const counts = {};
-    const searchQuery = document.getElementById("requests-search") ? document.getElementById("requests-search").value.toLowerCase().trim() : "";
+    const reqSearchEl = document.getElementById("request-search-input") || document.getElementById("requests-search");
+    const searchQuery = reqSearchEl ? reqSearchEl.value.toLowerCase().trim() : "";
     allRequests.forEach(r => {
         const key = r.title.toLowerCase().trim();
         if (!counts[key]) {
@@ -854,8 +855,18 @@ function renderRequestsList() {
         }
     });
 
-    let filteredRequests = Object.values(counts)
-        .filter(r => r.title.toLowerCase().includes(searchQuery));
+    const cleanReqQ = normalizeTitleForComparison(searchQuery);
+    const colReqQ = getCollapsedTitle(searchQuery);
+    let filteredRequests = Object.values(counts).filter(r => {
+        if (!searchQuery) return true;
+        const rawTitle = (r.title || "").toLowerCase();
+        if (rawTitle.includes(searchQuery)) return true;
+        const norm = normalizeTitleForComparison(rawTitle);
+        const col = getCollapsedTitle(rawTitle);
+        if (colReqQ && col && col.includes(colReqQ)) return true;
+        if (cleanReqQ && norm && norm.includes(cleanReqQ)) return true;
+        return false;
+    });
     
     // Apply tab filter
     const fulfilledCount = filteredRequests.filter(r => r.isFulfilled).length;
@@ -2754,11 +2765,19 @@ function renderCatalogList() {
     listContainer.replaceChildren();
 
     const searchQuery = (document.getElementById("catalog-search-input")?.value || "").toLowerCase().trim();
+    const cleanCatQ = normalizeTitleForComparison(searchQuery);
+    const colCatQ = getCollapsedTitle(searchQuery);
     const filtered = allCatalogMovies.filter(m => {
+        if (!searchQuery) return true;
         const title = (m.title || "").toLowerCase();
         const id = (m.csv_id || "").toLowerCase();
         const type = (m.type || "").toLowerCase();
-        return title.includes(searchQuery) || id.includes(searchQuery) || type.includes(searchQuery);
+        if (title.includes(searchQuery) || id.includes(searchQuery) || type.includes(searchQuery)) return true;
+        const normTitle = normalizeTitleForComparison(title);
+        const colTitle = getCollapsedTitle(title);
+        if (colCatQ && colTitle && colTitle.includes(colCatQ)) return true;
+        if (cleanCatQ && normTitle && normTitle.includes(cleanCatQ)) return true;
+        return false;
     });
 
     if (filtered.length === 0) {
