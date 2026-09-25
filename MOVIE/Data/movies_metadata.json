@@ -4050,7 +4050,8 @@
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjQoAAp_ruEXTQB-I4URA7BYE",
         "season": "Season 3"
       }
-    ]
+    ],
+    "channelBroadcasted": true
   },
   {
     "csv_id": "27205-inception",
@@ -19330,7 +19331,11 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADTw0AAtgh2EZpt4V005KP7BYE",
-        "quality": "720p"
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjwoAAp_ruEVq0z3VRElNuBYE",
+        "season": "Season 2"
       }
     ]
   },
