@@ -1,5 +1,67 @@
 [
   {
+    "csv_id": "Secret_Lives_2026",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Secret  Lives",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Zee’s life takes a dramatic and unexpected turn when a shocking revelation threatens her future with the man she loves. As deeply hidden family secrets come to light, she is forced to navigate heartbreak, betrayal, and unexpected alliances in a desperate fight to protect both her future and those she holds dear. Blending romance, high-stakes drama, and suspense, this emotional series explores how generational wounds and long-buried truths shape a family's destiny",
+    "poster": "https://i.postimg.cc/k4xsh236/IMG-20260925-174412-178.jpg",
+    "backdrop": "https://i.postimg.cc/k4xsh236/IMG-20260925-174412-178.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD7AsAAp_ruEXY2LAi-kbvqRYE",
+        "season": "Season 1"
+      }
+    ],
+    "channelBroadcasted": true
+  },
+  {
+    "csv_id": "Hello_Future_Me_2026",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Hello Future Me",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Serving as the 26-episode sequel to the romantic drama Dear Future Me, the story picks up when Adele's dream of studying abroad is shattered by financial hardship, forcing her to return home to Nigeria and move into her father Boma's newly blended household. Living under the same roof with her stepmother Dayo and her former love interest-turned-stepbrother Banky creates an emotionally charged atmosphere where old feelings and family tensions collide. While Adele attempts to reinvent herself",
+    "poster": "https://i.postimg.cc/TYXMwbYQ/IMG-20260925-174635-813.jpg",
+    "backdrop": "https://i.postimg.cc/TYXMwbYQ/IMG-20260925-174635-813.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD5wsAAp_ruEVwzW3OgOTLSBYE",
+        "season": "Season 1"
+      }
+    ],
+    "channelBroadcasted": true
+  },
+  {
     "csv_id": "Wings_Innovative_2025",
     "tmdb_id": null,
     "imdb_id": "",
