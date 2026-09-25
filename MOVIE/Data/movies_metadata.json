@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "330124-stripped",
+    "tmdb_id": 330124,
+    "imdb_id": "",
+    "title": "Stripped",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "The series follows five friends who, facing severe financial ruin, turn to stripping to survive. It explores themes of friendship, desperate financial decisions, and the complex lives of Nigerian men.",
+    "poster": "https://image.tmdb.org/t/p/w500/p6icCVUo6PinfACmjH7VUjeWPYH.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lgqWIOTXrHlxCC4eEqwOu8Md8kj.jpg",
+    "rating": 0,
+    "release_date": "2026-04-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADKBUAAp_rsEVmgwegMoxOshYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "303085-mother-of-the-brides",
     "tmdb_id": 303085,
     "imdb_id": "",
