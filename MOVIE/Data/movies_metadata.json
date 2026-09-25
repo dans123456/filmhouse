@@ -1,30 +1,32 @@
 [
   {
-    "csv_id": "Koleoso_2025",
-    "tmdb_id": null,
+    "csv_id": "296206-agent-kim-reactivated",
+    "tmdb_id": 296206,
     "imdb_id": "",
-    "title": "Koleoso",
+    "title": "Agent Kim Reactivated",
     "type": "Series",
     "categories": [
       "Main",
-      "African"
+      "Asian Drama"
     ],
     "genres": [
-      "African"
+      "Action & Adventure",
+      "Crime",
+      "Drama"
     ],
-    "overview": "A hardened father raises his three children under the unshakable belief that charms are the true source of strength. To him, no man, no force, and no god holds more power than magic.",
-    "poster": "https://m.media-amazon.com/images/M/MV5BY2JmYWQzMWYtN2VhOC00YmU5LWI4NjgtMzg3YWNjOGI2ODRlXkEyXkFqcGc@._V1_.jpg",
-    "backdrop": "https://m.media-amazon.com/images/M/MV5BY2JmYWQzMWYtN2VhOC00YmU5LWI4NjgtMzg3YWNjOGI2ODRlXkEyXkFqcGc@._V1_.jpg",
-    "rating": 0,
-    "release_date": "2025",
-    "language": "en",
+    "overview": "When an unassuming dad's daughter goes missing, he dusts off his old black-ops skills to track her down — only to attract the wrong kind of attention.",
+    "poster": "https://image.tmdb.org/t/p/w500/mxa7YxVln3Rwnd2Va82PoclTznj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/g1LJLlmWP74zv9yXKEXm7g9p10O.jpg",
+    "rating": 8.5,
+    "release_date": "2026-06-26",
+    "language": "ko",
     "cast": [],
     "director": "",
-    "trailer": "",
+    "trailer": "k5IDEniQNEk",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADJxoAAp_rsEUbq13NwEnUbRYE",
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADSBoAAp_rsEXG7IGg35EmJxYE",
         "season": "Season 1"
       }
     ]
