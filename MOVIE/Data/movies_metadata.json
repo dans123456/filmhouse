@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "303085-mother-of-the-brides",
+    "tmdb_id": 303085,
+    "imdb_id": "",
+    "title": "Mother of the Brides",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "After her husband dies without a will, a Lagos socialite has 45 days to marry off a daughter, or lose everything. She’ll protect her legacy at any cost.",
+    "poster": "https://image.tmdb.org/t/p/w500/8Tj7Oc4DVjQ29HDaBllvieUgDp1.jpg",
+    "backdrop": "",
+    "rating": 10,
+    "release_date": "2025-10-13",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "XQKOGOdP9f8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD-RQAAp_rsEVoiG0HrFkmmBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "Hallelujah_2026",
     "tmdb_id": null,
     "imdb_id": "",
