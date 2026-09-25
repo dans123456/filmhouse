@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "93653-in-spectre",
+    "tmdb_id": 93653,
+    "imdb_id": "",
+    "title": "In/Spectre",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Comedy",
+      "Mystery",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Kotoko Iwanaga became the god of wisdom to the supernatural beings and spends her days solving problems for them. However, the boy who she fell head over heels for, Kuro Sakuragawa, is someone that is feared by all supernatural creatures. The two of them face various mysterious incidents involving the supernatural in this love x romance x mystery series. Where will these fantastical incidents lead them and what will happen with Kotoko’s crush?",
+    "poster": "https://image.tmdb.org/t/p/w500/dr19QEizMPDxpWtneSd9Mgp0RXE.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ujypWFhRcrb4KXjsp1edGomN2RI.jpg",
+    "rating": 7.8,
+    "release_date": "2020-01-12",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "b3FxIprDc0I",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADbxMAAp_rsEVhyP90bb5PXBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1269427-ajosepo",
     "tmdb_id": 1269427,
     "imdb_id": "",
