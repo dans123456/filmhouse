@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "1695381-ajosepo-2-the-gathering",
+    "tmdb_id": 1695381,
+    "imdb_id": "",
+    "title": "Ajosepo 2: The Gathering",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "Drama",
+      "Comedy",
+      "Romance"
+    ],
+    "overview": "Two families reunite for a lavish Yoruba wedding after a past scandal nearly tore them apart. As Mary and Jide prepare to marry, unresolved tensions, family pressure, and reputation fears threaten their union. Meanwhile, new parents Dapo and Tani battle constant clashes between their feuding mothers. Amid tradition, church politics, and romantic distractions, both couples must choose honesty and commitment before the celebration unravels.",
+    "poster": "https://image.tmdb.org/t/p/w500/te3qUdNxsVmeGuax0aQBRHNhPjk.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bvbkA2YWR7TsPNYQdbVt9tZYFsS.jpg",
+    "rating": 0,
+    "release_date": "2026-05-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "lTcFot8E8Q4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADhhMAAp_rsEWTj3-y1LAr9BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "93653-in-spectre",
     "tmdb_id": 93653,
     "imdb_id": "",
