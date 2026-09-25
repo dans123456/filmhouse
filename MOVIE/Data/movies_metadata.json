@@ -1,10 +1,41 @@
 [
   {
+    "csv_id": "Wings_Innovative_2025",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Wings",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Every flight has a route. Every secret leaves a trail. When an investigative journalist stumbles upon a web of hidden connections, she must piece it all together before the truth is buried forever. But with powerful forces-and a dangerous love-pulling her in different directions, will she expose the story or become part of the cover-up?",
+    "poster": "https://m.media-amazon.com/images/M/MV5BY2UwYTQ1ODItMzgyMy00MzQyLWFkMzEtODY1ZTg5NjFiZDFkXkEyXkFqcGc@._V1_.jpg",
+    "backdrop": "https://m.media-amazon.com/images/M/MV5BY2UwYTQ1ODItMzgyMy00MzQyLWFkMzEtODY1ZTg5NjFiZDFkXkEyXkFqcGc@._V1_.jpg",
+    "rating": 0,
+    "release_date": "2025",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD9goAAp_ruEVqh3u2MswqAhYE",
+        "season": "Season 1"
+      }
+    ],
+    "channelBroadcasted": true
+  },
+  {
     "csv_id": "Daughters_of_Water_2025",
     "tmdb_id": null,
     "imdb_id": "",
     "title": "Daughters of Water",
-    "type": "Movie",
+    "type": "Series",
     "categories": [
       "Main",
       "African"
@@ -25,7 +56,7 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADuwoAAp_ruEWM_p4c5rZJfhYE",
-        "quality": "720p"
+        "season": "Season 1"
       }
     ],
     "channelBroadcasted": true
