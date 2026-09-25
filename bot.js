@@ -1860,8 +1860,8 @@ function setupBot(bot, adminBot) {
                         `📦 <b>Type:</b> ${isSeries ? "TV Series" : "Full Movie"}\n` +
                         metaLine +
                         overviewLine +
-                        `\n<i>⏳ <b>Auto-Delete Notice:</b>\n` +
-                        `This message will self-destruct in <b>5 minutes</b> to protect server links. Please download or save now!</i>`;
+                        `\n<blockquote>⏳ <b>Auto-Delete Notice:</b>\n` +
+                        `This message will self-destruct in <b>5 minutes</b> to protect server links. Please download or save now!</blockquote>`;
 
                     // Single primary button only
                     const inlineButtons = [
