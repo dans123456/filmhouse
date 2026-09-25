@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "293479-the-party",
+    "tmdb_id": 293479,
+    "imdb_id": "",
+    "title": "The Party",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "Mystery"
+    ],
+    "overview": "A young man's mysterious death at a lavish Lagos party triggers an investigation that uncovers hidden truths and intricate motives.",
+    "poster": "https://image.tmdb.org/t/p/w500/kvVJ5o2G1OZM6ddyTgeppUXsez0.jpg",
+    "backdrop": "",
+    "rating": 5.5,
+    "release_date": "2025-05-30",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADJBQAAp_rsEUmcEjVZUqehRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1461596-the-masked-king",
     "tmdb_id": 1461596,
     "imdb_id": "",
