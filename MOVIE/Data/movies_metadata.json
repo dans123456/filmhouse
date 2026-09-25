@@ -1,33 +1,64 @@
 [
   {
-    "csv_id": "1695381-ajosepo-2-the-gathering",
-    "tmdb_id": 1695381,
+    "csv_id": "90787-aiyetoro-town",
+    "tmdb_id": 90787,
     "imdb_id": "",
-    "title": "Ajosepo 2: The Gathering",
-    "type": "Movie",
+    "title": "Aiyetoro Town",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [],
+    "overview": "Having lived in Edinburgh and experienced civilization, The Baale of Aiyetoro village takes on the journey to upgrade Aiyetoro to a town as well as it’s occupants without altering its traditional heritage, customs and traditions.",
+    "poster": "https://i.postimg.cc/FRC86KBM/Screenshot-20260925-104454-IMDb.jpg",
+    "backdrop": "https://i.postimg.cc/FRC86KBM/Screenshot-20260925-104454-IMDb.jpg",
+    "rating": 0,
+    "release_date": "2019-06-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADQhMAAp_rsEWn1SM-Uq_V7hYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADRRMAAp_rsEWH1n7TfrTANRYE",
+        "season": "Season 2"
+      }
+    ]
+  },
+  {
+    "csv_id": "303978-etiti",
+    "tmdb_id": 303978,
+    "imdb_id": "",
+    "title": "ETiTi",
+    "type": "Series",
     "categories": [
       "Main",
       "African"
     ],
     "genres": [
       "Drama",
-      "Comedy",
-      "Romance"
+      "Mystery"
     ],
-    "overview": "Two families reunite for a lavish Yoruba wedding after a past scandal nearly tore them apart. As Mary and Jide prepare to marry, unresolved tensions, family pressure, and reputation fears threaten their union. Meanwhile, new parents Dapo and Tani battle constant clashes between their feuding mothers. Amid tradition, church politics, and romantic distractions, both couples must choose honesty and commitment before the celebration unravels.",
-    "poster": "https://image.tmdb.org/t/p/w500/te3qUdNxsVmeGuax0aQBRHNhPjk.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/bvbkA2YWR7TsPNYQdbVt9tZYFsS.jpg",
+    "overview": "A fearless warrior is trapped between the world of the living and the afterlife. He must work with a goddess (Nwa Ala) to protect his bride, uncover who killed him, and reclaim his soul — failing which he may be lost forever.",
+    "poster": "https://image.tmdb.org/t/p/w500/wFRwXZzCfSwwfQQEEq3TTNfVBWC.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fxjoX4OghA07710b264nXudISXJ.jpg",
     "rating": 0,
-    "release_date": "2026-05-28",
+    "release_date": "2025-10-02",
     "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "lTcFot8E8Q4",
+    "trailer": "",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADQRMAAp_rsEXurkTDoTGvvRYE",
-        "quality": "720p"
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADPRMAAp_rsEXrrNqBkYnukRYE",
+        "season": "Season 1"
       }
     ]
   },
