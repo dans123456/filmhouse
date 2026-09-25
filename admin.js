@@ -3619,7 +3619,9 @@ if (addMovieForm) {
         const postAddMovieToChan = document.getElementById("add-movie-post-to-channel");
         if (postAddMovieToChan && postAddMovieToChan.checked && typeof window.broadcastMovieToMainChannel === 'function') {
             window.broadcastMovieToMainChannel(newMovie);
-        } else if (typeof window.recordAdminActivity === 'function') {
+        }
+        // Always record publication duty activity for the admin adding the movie to catalog
+        if (typeof window.recordAdminActivity === 'function') {
             window.recordAdminActivity("publication", title);
         }
         
@@ -4465,8 +4467,19 @@ function initAdminLeaderboardListener() {
 // Track Admin Activity (Fulfillments & Publications)
 window.recordAdminActivity = function(type, title) {
     const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-    const currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : (localStorage.getItem("filmhouse_admin_name") || "");
-    const currentAdminId = String(tgUser ? tgUser.id : (sessionStorage.getItem("admin_auth_id") || ""));
+    let currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : (localStorage.getItem("filmhouse_admin_name") || "");
+    let currentAdminId = String(tgUser ? tgUser.id : (sessionStorage.getItem("admin_auth_id") || new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || localStorage.getItem("filmhouse_admin_id") || ""));
+
+    if (!currentAdminId) {
+        const savedName = (currentAdminName || "").toLowerCase();
+        if (savedName.includes("joel")) {
+            currentAdminId = "1175336733";
+            currentAdminName = "@damnitzjoel";
+        } else if (savedName.includes("siaw")) {
+            currentAdminId = "1329840839";
+            currentAdminName = "@Siawblaze";
+        }
+    }
 
     // Guard: Never record unauthenticated generic "admin"
     if (!currentAdminId || currentAdminId.toLowerCase() === "admin") return;
@@ -4694,7 +4707,7 @@ function getComputedAdminRankings() {
         });
     }
 
-    // 4. Calculate total score strictly from verified titles list (Guarantees fulfillments === titles length)
+    // 4. Calculate total score and relative Work Share Percentage from verified titles list
     const now = Date.now();
     const oneDayMs = 24 * 60 * 60 * 1000;
     const adminList = Object.values(adminMap)
@@ -4708,17 +4721,26 @@ function getComputedAdminRankings() {
             const fulfillmentTitles = (adm.titles || []).filter(t => t.type === 'fulfillment' || !t.type);
             const publicationTitles = (adm.titles || []).filter(t => t.type === 'publication');
 
-            // Fulfillments count strictly equals verified titles list
             adm.fulfillments = fulfillmentTitles.length;
             adm.publications = publicationTitles.length;
+            adm.workUnits = adm.fulfillments + adm.publications;
             adm.score = (adm.fulfillments * 10) + (adm.publications * 10);
             adm.isActive24h = adm.lastActiveAt ? (now - adm.lastActiveAt <= oneDayMs) : false;
             return adm;
         });
 
-    // Sort by score descending, then lastActiveAt descending
+    // Calculate team total work units
+    const totalTeamWorkUnits = adminList.reduce((sum, adm) => sum + (adm.workUnits || 0), 0);
+
+    adminList.forEach(adm => {
+        adm.workSharePercent = totalTeamWorkUnits > 0
+            ? Math.round((adm.workUnits / totalTeamWorkUnits) * 100)
+            : 0;
+    });
+
+    // Sort by workUnits descending, then lastActiveAt descending
     adminList.sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
+        if (b.workUnits !== a.workUnits) return b.workUnits - a.workUnits;
         return (b.lastActiveAt || 0) - (a.lastActiveAt || 0);
     });
 
@@ -4738,9 +4760,9 @@ function renderAdminLeaderboard() {
 
     const topSubEl = document.getElementById("stat-top-admin-sub");
     if (topSubEl) {
-        const topAdmin = adminList.find(a => a.score > 0);
+        const topAdmin = adminList.find(a => a.workUnits > 0);
         if (topAdmin) {
-            topSubEl.textContent = `Top: ${escapeHTML(topAdmin.name)} (${topAdmin.score} pts)`;
+            topSubEl.textContent = `Top: ${escapeHTML(topAdmin.name)} (${topAdmin.workSharePercent}% Work Share)`;
         } else {
             topSubEl.textContent = `${activeCount} active in last 24h`;
         }
@@ -4767,7 +4789,7 @@ window.openAdminRankingsModal = function(filter = 'active') {
             <div style="padding: 28px 16px; text-align: center; color: var(--text-muted); font-size: 13px;">
                 ${filter === 'active' 
                     ? '😴 No admins active in the last 24 hours. Fulfill a request or publish a movie to get ranked!' 
-                    : '🎯 Rankings start fresh today! Fulfill movie requests or publish titles to claim the #1 spot!'}
+                    : '🎯 Rankings start fresh today! Fulfill movie requests or publish duty titles to lead the team!'}
             </div>
         `;
     } else {
@@ -4809,8 +4831,12 @@ window.openAdminRankingsModal = function(filter = 'active') {
                             </div>
                         </div>
                         <div style="text-align: right; flex-shrink: 0;">
-                            <div style="font-size: 16px; font-weight: 800; color: #ffbc00; font-family: var(--font-heading);">${adm.score} <span style="font-size: 10px; color: rgba(255,255,255,0.6); font-family: inherit;">pts</span></div>
+                            <div style="font-size: 16px; font-weight: 800; color: #ffbc00; font-family: var(--font-heading);">${adm.workSharePercent}% <span style="font-size: 10px; color: rgba(255,255,255,0.6); font-family: inherit;">Work Share</span></div>
+                            <div style="font-size: 9px; color: var(--text-muted); margin-top: 1px;">${adm.workUnits || 0} total tasks</div>
                         </div>
+                    </div>
+                    <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-top: 8px; overflow: hidden;">
+                        <div style="width: ${adm.workSharePercent}%; height: 100%; background: linear-gradient(90deg, #ffbc00, #ff5722); border-radius: 2px; transition: width 0.4s ease;"></div>
                     </div>
                     <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.04); flex-wrap: wrap; align-items: center;">
                         <span style="font-size: 10px; background: rgba(255, 188, 0, 0.12); color: #ffbc00; padding: 2px 8px; border-radius: 10px; font-weight: 700;">📥 ${adm.fulfillments || 0} Fulfilled</span>
@@ -4828,7 +4854,7 @@ window.openAdminRankingsModal = function(filter = 'active') {
             <button class="btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-secondary'}" onclick="openAdminRankingsModal('all')" style="flex: 1; height: 32px; font-size: 11px; font-weight: 700;">🏆 All Ranked (${adminList.length})</button>
         </div>
         <p style="font-size: 11px; color: var(--text-secondary); margin: 0 0 12px 0; line-height: 1.4;">
-            ✨ <i>Rankings start fresh today. Admins earn 10 points per request fulfilled and 10 points per movie/series published.</i>
+            📊 <i>Rankings allocate percentages rather than points to measure each admin's relative share of total team work (fulfillments + duty publications).</i>
         </p>
         <div style="max-height: 340px; overflow-y: auto; padding-right: 4px;">
             ${listHtml}

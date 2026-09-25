@@ -4173,7 +4173,7 @@ function openDownloadModal(movie) {
 
             const actionLabel = document.createElement("span");
             actionLabel.className = "download-link-action-label";
-            actionLabel.textContent = isTVShow ? "Download 📥" : "Download 📥";
+            actionLabel.innerHTML = `<span>DOWNLOAD</span> 📥`;
             actionLabel.appendChild(createSvgIcon("icon-download"));
             anchor.appendChild(actionLabel);
 
@@ -4207,8 +4207,9 @@ function openDownloadModal(movie) {
             }
 
             // 4K Ultra HD Blu-ray standard launched in 2016. Movies released before 2017 do not have 2160p releases online.
-            // Only allow 2160p request if the movie was released in 2017 or later (or if release year is unknown).
-            const allows4KRequest = !movieReleaseYear || isNaN(movieReleaseYear) || movieReleaseYear >= 2017;
+            // Strictly exclude 2160p for any movie released before 2017.
+            const isPre2017 = movieReleaseYear > 0 && movieReleaseYear < 2017;
+            const allows4KRequest = !isPre2017 && movieReleaseYear >= 2017;
 
             const missingQualities = [];
             if (!has720p) missingQualities.push({ label: "720p HD", badge: "🎬 720p", code: "720p" });
@@ -4220,34 +4221,34 @@ function openDownloadModal(movie) {
                 qWrapper.className = "missing-quality-wrapper";
 
                 const divider = document.createElement("div");
-                divider.style.cssText = "margin: 16px 0 10px 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; font-weight: 800; text-transform: uppercase; color: #00c6ff; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;";
-                divider.innerHTML = `<span>⚡</span><span>Request Other Qualities</span>`;
+                divider.style.cssText = "margin: 18px 0 8px 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.45); letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;";
+                divider.innerHTML = `<span style="opacity:0.6;">⚡</span><span>Request Other Qualities</span>`;
                 qWrapper.appendChild(divider);
 
                 missingQualities.forEach(qItem => {
                     const qItemEl = document.createElement("div");
-                    qItemEl.className = "download-link-item missing-quality-item";
-                    qItemEl.style.cssText = "border: 1px dashed rgba(0, 198, 255, 0.4); background: rgba(0, 198, 255, 0.05); display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: var(--border-radius-sm); margin-bottom: 8px;";
+                    qItemEl.className = "missing-quality-item";
+                    qItemEl.style.cssText = "border: 1px solid rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.02); display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 8px; margin-bottom: 6px;";
 
                     const badge = document.createElement("span");
                     badge.className = "download-link-badge quality-badge";
-                    badge.style.cssText = "background: rgba(0, 198, 255, 0.2); color: #00c6ff; border: 1px solid rgba(0, 198, 255, 0.4); font-weight: 800; font-size: 11px; padding: 4px 8px; border-radius: 4px;";
+                    badge.style.cssText = "background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); font-weight: 700; font-size: 10px; padding: 3px 6px; border-radius: 4px; min-width: 44px; text-align: center;";
                     badge.textContent = qItem.badge;
                     qItemEl.appendChild(badge);
 
                     const labelWrap = document.createElement("div");
                     labelWrap.className = "download-link-label-wrap";
-                    labelWrap.style.cssText = "flex: 1; margin-left: 12px; display: flex; flex-direction: column; gap: 2px;";
+                    labelWrap.style.cssText = "flex: 1; margin-left: 10px; display: flex; flex-direction: column; gap: 1px;";
                     
                     const label = document.createElement("span");
                     label.className = "download-link-label";
-                    label.style.cssText = "font-weight: 700; color: #ffffff; font-size: 14px;";
+                    label.style.cssText = "font-weight: 600; color: rgba(255, 255, 255, 0.85); font-size: 12px;";
                     label.textContent = qItem.label;
                     
                     const sublabel = document.createElement("span");
                     sublabel.className = "download-link-sublabel";
-                    sublabel.style.cssText = "font-size: 11px; color: var(--text-secondary);";
-                    sublabel.textContent = `Not Uploaded Yet • Tap to Request ${qItem.code}`;
+                    sublabel.style.cssText = "font-size: 9px; color: var(--text-muted); opacity: 0.75;";
+                    sublabel.textContent = `Not uploaded • Tap to request`;
 
                     labelWrap.appendChild(label);
                     labelWrap.appendChild(sublabel);
@@ -4267,19 +4268,29 @@ function openDownloadModal(movie) {
                     });
 
                     if (isAlreadyReq) {
-                        reqActionBtn.textContent = `Requested ${qItem.code} ⏳`;
-                        reqActionBtn.style.cssText = "background: rgba(0, 198, 255, 0.15); color: #00c6ff; border: 1px solid rgba(0, 198, 255, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
-                        sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
+                        reqActionBtn.textContent = `Requested ⏳`;
+                        reqActionBtn.style.cssText = "background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: default;";
+                        sublabel.textContent = "Pending Admin Fulfillment ⏳";
                     } else {
-                        reqActionBtn.textContent = `REQUEST ${qItem.code} ⚡`;
-                        reqActionBtn.style.cssText = "background: linear-gradient(135deg, #00c6ff, #0072ff); color: #ffffff; border: none; font-size: 11px; font-weight: 800; padding: 7px 13px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,198,255,0.3); transition: transform 0.15s ease;";
+                        reqActionBtn.textContent = `Request ${qItem.code}`;
+                        reqActionBtn.style.cssText = "background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.75); border: 1px solid rgba(255, 255, 255, 0.12); font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;";
                         
+                        reqActionBtn.addEventListener("mouseenter", () => {
+                            reqActionBtn.style.background = "rgba(255, 255, 255, 0.14)";
+                            reqActionBtn.style.color = "#ffffff";
+                        });
+                        reqActionBtn.addEventListener("mouseleave", () => {
+                            if (reqActionBtn.textContent.includes("Requested")) return;
+                            reqActionBtn.style.background = "rgba(255, 255, 255, 0.07)";
+                            reqActionBtn.style.color = "rgba(255, 255, 255, 0.75)";
+                        });
+
                         reqActionBtn.addEventListener("click", (e) => {
                             e.stopPropagation();
                             logMovieRequestToFirestore(movie, reqQualityStr);
-                            reqActionBtn.textContent = `Requested ${qItem.code} ⏳`;
-                            reqActionBtn.style.cssText = "background: rgba(0, 198, 255, 0.15); color: #00c6ff; border: 1px solid rgba(0, 198, 255, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
-                            sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
+                            reqActionBtn.textContent = `Requested ⏳`;
+                            reqActionBtn.style.cssText = "background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: default;";
+                            sublabel.textContent = "Pending Admin Fulfillment ⏳";
                         });
                     }
 
@@ -4306,35 +4317,35 @@ function openDownloadModal(movie) {
             wrapper.className = "missing-season-wrapper";
 
             const divider = document.createElement("div");
-            divider.style.cssText = "margin: 16px 0 10px 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; font-weight: 800; text-transform: uppercase; color: #ffbc00; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;";
-            divider.innerHTML = `<span>⚡</span><span>Request Missing Released Seasons</span>`;
+            divider.style.cssText = "margin: 18px 0 8px 0; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.45); letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;";
+            divider.innerHTML = `<span style="opacity:0.6;">⚡</span><span>Request Missing Released Seasons</span>`;
             wrapper.appendChild(divider);
 
             missingReleasedSeasons.forEach(sObj => {
                 const seasonNum = sObj.season_number;
                 const missingItem = document.createElement("div");
-                missingItem.className = "download-link-item missing-season-item";
-                missingItem.style.cssText = "border: 1px dashed rgba(255, 188, 0, 0.4); background: rgba(255, 188, 0, 0.05); display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: var(--border-radius-sm); margin-bottom: 8px;";
+                missingItem.className = "missing-season-item";
+                missingItem.style.cssText = "border: 1px solid rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.02); display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 8px; margin-bottom: 6px;";
 
                 const badge = document.createElement("span");
                 badge.className = "download-link-badge season-badge";
-                badge.style.cssText = "background: rgba(255, 188, 0, 0.2); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.4); font-weight: 800; font-size: 11px; padding: 4px 8px; border-radius: 4px;";
+                badge.style.cssText = "background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); font-weight: 700; font-size: 10px; padding: 3px 6px; border-radius: 4px;";
                 badge.textContent = `S${seasonNum}`;
                 missingItem.appendChild(badge);
 
                 const labelWrap = document.createElement("div");
                 labelWrap.className = "download-link-label-wrap";
-                labelWrap.style.cssText = "flex: 1; margin-left: 12px; display: flex; flex-direction: column; gap: 2px;";
+                labelWrap.style.cssText = "flex: 1; margin-left: 10px; display: flex; flex-direction: column; gap: 1px;";
                 
                 const label = document.createElement("span");
                 label.className = "download-link-label";
-                label.style.cssText = "font-weight: 700; color: #ffffff; font-size: 14px;";
+                label.style.cssText = "font-weight: 600; color: rgba(255, 255, 255, 0.85); font-size: 12px;";
                 label.textContent = `Season ${seasonNum}`;
                 
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
-                sublabel.style.cssText = "font-size: 11px; color: var(--text-secondary);";
-                sublabel.textContent = "Tap to Request Season Upload";
+                sublabel.style.cssText = "font-size: 9px; color: var(--text-muted); opacity: 0.75;";
+                sublabel.textContent = "Tap to Request Season";
 
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
@@ -4356,18 +4367,28 @@ function openDownloadModal(movie) {
 
                 if (isAlreadyReq) {
                     reqActionBtn.textContent = `Requested S${seasonNum} ⏳`;
-                    reqActionBtn.style.cssText = "background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
-                    sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
+                    reqActionBtn.style.cssText = "background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: default;";
+                    sublabel.textContent = "Pending Admin Fulfillment ⏳";
                 } else {
-                    reqActionBtn.textContent = `REQUEST S${seasonNum} ⚡`;
-                    reqActionBtn.style.cssText = "background: linear-gradient(135deg, #ffbc00, #ff8c00); color: #000000; border: none; font-size: 11px; font-weight: 800; padding: 7px 13px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(255,188,0,0.3); transition: transform 0.15s ease;";
+                    reqActionBtn.textContent = `Request S${seasonNum}`;
+                    reqActionBtn.style.cssText = "background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.75); border: 1px solid rgba(255, 255, 255, 0.12); font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;";
                     
+                    reqActionBtn.addEventListener("mouseenter", () => {
+                        reqActionBtn.style.background = "rgba(255, 255, 255, 0.14)";
+                        reqActionBtn.style.color = "#ffffff";
+                    });
+                    reqActionBtn.addEventListener("mouseleave", () => {
+                        if (reqActionBtn.textContent.includes("Requested")) return;
+                        reqActionBtn.style.background = "rgba(255, 255, 255, 0.07)";
+                        reqActionBtn.style.color = "rgba(255, 255, 255, 0.75)";
+                    });
+
                     reqActionBtn.addEventListener("click", (e) => {
                         e.stopPropagation();
                         logMovieRequestToFirestore(movie, `Season ${seasonNum}`);
                         reqActionBtn.textContent = `Requested S${seasonNum} ⏳`;
-                        reqActionBtn.style.cssText = "background: rgba(255, 188, 0, 0.15); color: #ffbc00; border: 1px solid rgba(255, 188, 0, 0.4); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: default;";
-                        sublabel.textContent = "Request Status: Pending Admin Fulfillment 📌";
+                        reqActionBtn.style.cssText = "background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: default;";
+                        sublabel.textContent = "Pending Admin Fulfillment ⏳";
                     });
                 }
 
@@ -5411,32 +5432,6 @@ function bindEvents() {
                 document.body.classList.remove("search-active");
                 renderFeaturedGrid();
                 searchInput.focus();
-            });
-        }
-
-        const pasteBtn = document.getElementById("search-paste-btn");
-        if (pasteBtn) {
-            pasteBtn.addEventListener("click", async (e) => {
-                e.stopPropagation();
-                try {
-                    let text = "";
-                    if (navigator.clipboard && navigator.clipboard.readText) {
-                        text = await navigator.clipboard.readText();
-                    }
-                    if (!text) {
-                        text = prompt("Paste your search text:") || "";
-                    }
-                    if (text) {
-                        searchInput.value = text;
-                        searchInput.dispatchEvent(new Event("input", { bubbles: true }));
-                    }
-                } catch (err) {
-                    const text = prompt("Paste your search text:") || "";
-                    if (text) {
-                        searchInput.value = text;
-                        searchInput.dispatchEvent(new Event("input", { bubbles: true }));
-                    }
-                }
             });
         }
 
@@ -8514,33 +8509,6 @@ function initPremiumSearchOverlay() {
             overlayInput.value = "";
             triggerOverlaySearch("");
             overlayInput.focus();
-        });
-    }
-
-    // 1-tap paste button
-    const overlayPasteBtn = document.getElementById("overlay-search-paste");
-    if (overlayPasteBtn) {
-        overlayPasteBtn.addEventListener("click", async (e) => {
-            e.stopPropagation();
-            try {
-                let text = "";
-                if (navigator.clipboard && navigator.clipboard.readText) {
-                    text = await navigator.clipboard.readText();
-                }
-                if (!text) {
-                    text = prompt("Paste your search text:") || "";
-                }
-                if (text) {
-                    overlayInput.value = text;
-                    triggerOverlaySearch(text);
-                }
-            } catch (err) {
-                const text = prompt("Paste your search text:") || "";
-                if (text) {
-                    overlayInput.value = text;
-                    triggerOverlaySearch(text);
-                }
-            }
         });
     }
 

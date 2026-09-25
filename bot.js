@@ -778,11 +778,13 @@ function setupBot(bot, adminBot) {
                 `• 🛡 <b>Public Bot:</b> Online & Polling\n` +
                 `• 👑 <b>Admin Bot:</b> Active & Listening\n\n` +
                 `🛠 <b>Available Commands:</b>\n` +
+                `• /help — Admin tutorials & duty workflows\n` +
+                `• /post <Title> — Publish title announcement to @filmhouse_main\n` +
                 `• /logs — View live server & bot logs\n` +
                 `• /pending — View pending movie requests\n` +
                 `• /backup — Download weekly CSV catalog backup\n` +
                 `• /sync_catalog — Sync movies catalog from GitHub\n` +
-                `• /topadmins — View admin leaderboard\n` +
+                `• /topadmins — View admin Work Share leaderboard\n` +
                 `• /stats — Detailed server & subscriber metrics`;
 
             const keyboard = [
@@ -794,10 +796,11 @@ function setupBot(bot, adminBot) {
                     { text: "📜 Server Logs", callback_data: "admin_logs" }
                 ],
                 [
-                    { text: "💾 Download Backup", callback_data: "admin_backup" },
+                    { text: "❓ Help & Tutorials", callback_data: "admin_help" },
                     { text: "📊 System Stats", callback_data: "admin_stats" }
                 ],
                 [
+                    { text: "💾 Download Backup", callback_data: "admin_backup" },
                     { text: "🔄 Refresh Overview", callback_data: "admin_menu" }
                 ]
             ];
@@ -1026,6 +1029,57 @@ function setupBot(bot, adminBot) {
             return { text: msg, keyboard, parse_mode: "HTML" };
         };
 
+        // View 5: Admin Tutorials & Help Guide
+        const getAdminHelpPayload = () => {
+            const text = 
+                `📚 <b>Film House Admin Tutorials & Operational Guide</b>\n\n` +
+                `Here is a quick guide to common admin duties and tools:\n\n` +
+                `📥 <b>1. Fulfilling Movie & Series Requests:</b>\n` +
+                `• Users submit movie and season requests inside the Film House app.\n` +
+                `• Tap <b>Pending Requests</b> below or run <code>/pending</code> to inspect the queue.\n` +
+                `• Open the <b>Admin Panel</b> (button above), search for the requested title, and click <b>Claim & Fulfill</b>.\n` +
+                `• Paste the stream/download link. The bot automatically delivers direct fulfillment to the user with no ads and credits your account!\n\n` +
+                `📢 <b>2. Publishing Titles as Duty (/post):</b>\n` +
+                `• Admins also publish movies and series as regular duty (not just on request).\n` +
+                `• Use <code>/post &lt;Title&gt;</code> (e.g. <code>/post Inception</code>) in this chat to generate a poster announcement with deep link in @filmhouse_main.\n` +
+                `• Or add titles directly in the Admin Panel. Every title you publish counts toward your team Work Share!\n\n` +
+                `🏆 <b>3. Work Share Rankings (% vs Points):</b>\n` +
+                `• Rankings show your percentage share of total team output (fulfillments + duty publications).\n` +
+                `• Run <code>/topadmins</code> to view the live team contribution leaderboard.\n\n` +
+                `📜 <b>4. Live Server Logs & Diagnostics:</b>\n` +
+                `• Tap <b>Server Logs</b> or type <code>/logs</code> to inspect live streams by category:\n` +
+                `  - 🖥 <code>/logs server</code> — General backend process logs\n` +
+                `  - 👑 <code>/logs admin_bot</code> — Admin bot traces & commands\n` +
+                `  - 🤖 <code>/logs user_bot</code> — User bot commands & requests\n` +
+                `  - 📱 <code>/logs user_app</code> — User web app traffic\n` +
+                `  - 💼 <code>/logs admin_app</code> — Admin web app catalog actions\n` +
+                `  - ⚠️ <code>/logs error</code> — Error exceptions\n\n` +
+                `🔄 <b>5. Catalog Sync & Backups:</b>\n` +
+                `• <code>/sync_catalog</code> — Syncs the movie metadata from GitHub into local server memory.\n` +
+                `• <code>/backup</code> — Generates and downloads a complete CSV snapshot of the database.\n\n` +
+                `💡 <i>Tap "Back to Menu" below to return to the Command Center.</i>`;
+
+            const keyboard = [
+                [
+                    { text: "👑 Open Admin Panel 🚀", web_app: { url: "https://dans123456.github.io/filmhouse/admin.html" } }
+                ],
+                [
+                    { text: "📋 Pending Requests", callback_data: "admin_pending" },
+                    { text: "📜 Server Logs", callback_data: "admin_logs" }
+                ],
+                [
+                    { text: "« Back to Menu", callback_data: "admin_menu" }
+                ]
+            ];
+
+            return { text, keyboard, parse_mode: "HTML" };
+        };
+
+        // Command: /help - Admin tutorials and workflow guide
+        adminBot.command('help', async (ctx) => {
+            return renderOrEdit(ctx, getAdminHelpPayload());
+        });
+
         // Command: /start and /menu
         adminBot.command(['start', 'menu'], async (ctx) => {
             const adminName = ctx.from && ctx.from.first_name ? ctx.from.first_name : 'Admin';
@@ -1158,7 +1212,50 @@ function setupBot(bot, adminBot) {
                 }
                 const res = await publishMovieToChannel(foundMovie);
                 if (res && res.message_id) {
-                    return ctx.reply(`✅ <b>Published to @filmhouse_main!</b>\n\n🎬 <b>Title:</b> ${escapeHtml(foundMovie.title)}\n🔗 <b>Message ID:</b> <code>${res.message_id}</code>`, {
+                    try {
+                        const adminId = ctx.from && ctx.from.id ? String(ctx.from.id) : "";
+                        let adminName = ctx.from ? (ctx.from.username ? `@${ctx.from.username}` : ctx.from.first_name || "Admin") : "Admin";
+                        if (adminId) {
+                            const adminKey = adminId.replace(/[^a-zA-Z0-9_]/g, "_");
+                            const statsRef = db.collection("settings").doc("admin_stats");
+                            const statsDoc = await statsRef.get();
+                            const currentStats = statsDoc.exists ? statsDoc.data() : {};
+                            
+                            const adm = currentStats[adminKey] || {
+                                id: adminId,
+                                name: adminName,
+                                fulfillments: 0,
+                                publications: 0,
+                                titles: []
+                            };
+                            
+                            adm.name = adminName;
+                            adm.titles = adm.titles || [];
+                            const cleanT = (foundMovie.title || query).trim();
+                            const exists = adm.titles.some(t => t.title && t.title.toLowerCase() === cleanT.toLowerCase());
+                            if (!exists) {
+                                adm.titles.unshift({
+                                    type: "publication",
+                                    title: cleanT,
+                                    date: new Date().toISOString()
+                                });
+                            }
+                            if (adm.titles.length > 30) adm.titles = adm.titles.slice(0, 30);
+                            
+                            const fCount = adm.titles.filter(t => t.type === "fulfillment" || !t.type).length;
+                            const pCount = adm.titles.filter(t => t.type === "publication").length;
+                            adm.fulfillments = fCount;
+                            adm.publications = pCount;
+                            adm.lastActiveAt = Date.now();
+                            
+                            currentStats[adminKey] = adm;
+                            await statsRef.set(currentStats, { merge: true });
+                        }
+                    } catch (statErr) {
+                        console.warn("Could not record publication stat in /post:", statErr.message);
+                    }
+
+                    return ctx.reply(`✅ <b>Published to @filmhouse_main!</b>\n\n🎬 <b>Title:</b> ${escapeHtml(foundMovie.title)}\n🔗 <b>Message ID:</b> <code>${res.message_id}</code>\n📊 <i>Publication duty successfully credited to your Work Share!</i>`, {
                         parse_mode: "HTML",
                         reply_markup: {
                             inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
@@ -1182,33 +1279,49 @@ function setupBot(bot, adminBot) {
             }
         });
 
-        // Command: /topadmins or /adminstats - View fulfillment leaderboard
+        // Command: /topadmins or /adminstats - View Work Share percentage leaderboard
         adminBot.command(['topadmins', 'adminstats'], async (ctx) => {
             try {
                 const statsDoc = await db.collection("settings").doc("admin_stats").get();
                 if (!statsDoc.exists) {
-                    return ctx.reply("📊 <b>No fulfillment statistics recorded yet.</b>", {
+                    return ctx.reply("📊 <b>No admin performance statistics recorded yet.</b>", {
                         parse_mode: "HTML",
                         reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
                     });
                 }
                 const stats = statsDoc.data() || {};
-                const entries = Object.values(stats).filter(s => s && (typeof s.count === 'number' || typeof s.fulfillments === 'number') && (s.name || '').toLowerCase() !== 'admin');
+                const entries = Object.values(stats).filter(s => s && (typeof s.count === 'number' || typeof s.fulfillments === 'number' || typeof s.publications === 'number') && (s.name || '').toLowerCase() !== 'admin');
                 if (entries.length === 0) {
-                    return ctx.reply("📊 <b>No fulfillment statistics recorded yet.</b>", {
+                    return ctx.reply("📊 <b>No admin performance statistics recorded yet.</b>", {
                         parse_mode: "HTML",
                         reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
                     });
                 }
-                entries.sort((a, b) => (b.fulfillments || b.count || 0) - (a.fulfillments || a.count || 0));
-                let text = "🏆 <b>Film House Admin Leaderboard</b> 🏆\n\n<i>Most Requests Fulfilled:</i>\n\n";
+
+                entries.forEach(e => {
+                    const f = e.fulfillments || e.count || 0;
+                    const p = e.publications || 0;
+                    e.totalWork = f + p;
+                    e.fulfillments = f;
+                    e.publications = p;
+                });
+
+                const totalTeamWork = entries.reduce((acc, e) => acc + e.totalWork, 0);
+
+                entries.forEach(e => {
+                    e.workShare = totalTeamWork > 0 ? Math.round((e.totalWork / totalTeamWork) * 100) : 0;
+                });
+
+                entries.sort((a, b) => b.totalWork - a.totalWork);
+
+                let text = "🏆 <b>Film House Admin Work Share Leaderboard</b> 🏆\n\n<i>Relative workload share (% of total team tasks):</i>\n\n";
                 const medals = ["🥇", "🥈", "🥉"];
                 entries.forEach((e, idx) => {
                     const medal = medals[idx] || `<b>#${idx + 1}</b>`;
-                    const count = e.fulfillments || e.count || 0;
-                    text += `${medal} <b>${escapeHtml(e.name || 'Admin')}</b>: <code>${count}</code> fulfilled\n`;
+                    text += `${medal} <b>${escapeHtml(e.name || 'Admin')}</b>: <b>${e.workShare}% Work Share</b>\n`;
+                    text += `   • 📥 <code>${e.fulfillments}</code> Fulfilled | 🎬 <code>${e.publications}</code> Published (${e.totalWork} tasks)\n\n`;
                 });
-                text += `\n⚡ <i>Keep up the great work keeping the queue clean!</i>`;
+                text += `📊 <i>Work share reflects team duty contributions and request fulfillments combined!</i>`;
                 return ctx.reply(text, {
                     parse_mode: "HTML",
                     reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
@@ -1223,6 +1336,10 @@ function setupBot(bot, adminBot) {
             const adminName = ctx.from && ctx.from.first_name ? ctx.from.first_name : 'Admin';
             const adminId = ctx.from && ctx.from.id ? String(ctx.from.id) : '';
             return renderOrEdit(ctx, getAdminMenuPayload(adminName, adminId));
+        });
+
+        adminBot.action('admin_help', async (ctx) => {
+            return renderOrEdit(ctx, getAdminHelpPayload());
         });
 
         adminBot.action(['admin_logs', 'admin_logs_menu'], async (ctx) => {
