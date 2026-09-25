@@ -1,5 +1,126 @@
 [
   {
+    "csv_id": "1461596-the-masked-king",
+    "tmdb_id": 1461596,
+    "imdb_id": "",
+    "title": "The Masked King",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "Drama",
+      "History"
+    ],
+    "overview": "When King Ansa betrayed his subjects, his mother is left with one choice only: love her son and look away or twist the fate of her son for the good of the people Will the kingdom crumble, or will a hidden truth change everything?",
+    "poster": "https://image.tmdb.org/t/p/w500/kD9EAY60XCyrWuXfSmm6vdhnhjt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/yf99aK2M9FtBaDxtcokwijHoyZq.jpg",
+    "rating": 0,
+    "release_date": "2025-03-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "lTuaz3vFwGo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADIBQAAp_rsEXY2ai8iob0-hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1695378-okanjuwa",
+    "tmdb_id": 1695378,
+    "imdb_id": "",
+    "title": "Okanjuwa",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "The romantic comedy follows Soluchi, a hopeless romantic still healing from being jilted by her former lover, Kalu. When a regular work call puts her in touch with the charming Eli, Soluchi begins to see the possibility of the love story she has always wanted.",
+    "poster": "https://image.tmdb.org/t/p/w500/e1T9aiqOhrEtFhFkB2fijd9AAS0.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/4HspNggPQobYgYg0Gztm63oCcQy.jpg",
+    "rating": 10,
+    "release_date": "2026-05-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "lTcFot8E8Q4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADHxQAAp_rsEWkfikaHpVo0BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "Colors_of_fire_2026",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Colors of Fire",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Every colour tells a story.",
+    "poster": "https://i.postimg.cc/cJFtVqB8/IMG-20260925-111418-844.jpg",
+    "backdrop": "https://i.postimg.cc/cJFtVqB8/IMG-20260925-111418-844.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADHhQAAp_rsEX65vNLOcMoUhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1495726-abujaa",
+    "tmdb_id": 1495726,
+    "imdb_id": "",
+    "title": "Abujaa",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "When the heir apparent of Ilupeju village learns through prophecy that he will not ascend the throne, he and his fiancée defy fate, employing dark rituals to secure power—only to face devastating consequences.",
+    "poster": "https://image.tmdb.org/t/p/w500/mBKM7PCpsz2mySSQBpx6NA40ym8.jpg",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "U0a6WiaxYM8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADDxQAAp_rsEUpLmixEoYuTxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1520588-ab-nis-t-the-ancestor",
     "tmdb_id": 1520588,
     "imdb_id": "",
