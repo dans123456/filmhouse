@@ -2706,12 +2706,6 @@ function showMovieDetails(movie) {
                     bannerUrl = bannerUrl.replace(/\/w(300|500|780)\//, "/w1280/");
                 }
 
-                const replyMarkup = {
-                    inline_keyboard: [
-                        [{ text: "📥 Download on Film House 🍿", url: dlLink }]
-                    ]
-                };
-
                 let res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -2719,8 +2713,7 @@ function showMovieDetails(movie) {
                         chat_id: "-1002098683402",
                         photo: bannerUrl,
                         caption: caption,
-                        parse_mode: "HTML",
-                        reply_markup: replyMarkup
+                        parse_mode: "HTML"
                     })
                 });
                 let resData = await res.json();
@@ -2734,8 +2727,7 @@ function showMovieDetails(movie) {
                             chat_id: "-1002098683402",
                             text: caption,
                             parse_mode: "HTML",
-                            disable_web_page_preview: true,
-                            reply_markup: replyMarkup
+                            disable_web_page_preview: true
                         })
                     });
                     resData = await res.json();
@@ -3926,19 +3918,22 @@ if (publishBtn) {
                 }
             }
 
-            // Auto-broadcast any newly published titles to Main Channel (@filmhouse_main)
-            if (typeof window.broadcastMovieToMainChannel === 'function' && Array.isArray(newlyAddedIds) && newlyAddedIds.length > 0) {
-                const candidatesToBroadcast = allCatalogMovies.filter(m => 
-                    newlyAddedIds.includes(m.csv_id) && 
-                    Array.isArray(m.links) && m.links.length > 0 &&
-                    !m.channelBroadcasted
-                );
-                for (const movieToBroadcast of candidatesToBroadcast) {
-                    try {
-                        await window.broadcastMovieToMainChannel(movieToBroadcast);
-                        movieToBroadcast.channelBroadcasted = true;
-                    } catch (broadcastErr) {
-                        console.warn("[PUBLISH AUTO-BROADCAST] Warning broadcasting to channel:", broadcastErr);
+            // Auto-broadcast any newly published or updated titles with links to Main Channel (@filmhouse_main)
+            if (typeof window.broadcastMovieToMainChannel === 'function') {
+                const affectedIds = new Set([...(newlyAddedIds || []), ...(newlyUpdatedIds || [])]);
+                if (affectedIds.size > 0) {
+                    const candidatesToBroadcast = allCatalogMovies.filter(m => 
+                        affectedIds.has(m.csv_id) && 
+                        Array.isArray(m.links) && m.links.length > 0 &&
+                        !m.channelBroadcasted
+                    );
+                    for (const movieToBroadcast of candidatesToBroadcast) {
+                        try {
+                            await window.broadcastMovieToMainChannel(movieToBroadcast);
+                            movieToBroadcast.channelBroadcasted = true;
+                        } catch (broadcastErr) {
+                            console.warn("[PUBLISH AUTO-BROADCAST] Warning broadcasting to channel:", broadcastErr);
+                        }
                     }
                 }
             }
@@ -4499,12 +4494,6 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
 
     console.log(`[MAIN CHANNEL POST] Broadcasting "${cleanTitle}" announcement to @filmhouse_main...`);
 
-    const replyMarkup = {
-        inline_keyboard: [
-            [{ text: "📥 Download on Film House 🍿", url: deepLinkUrl }]
-        ]
-    };
-
     try {
         const sendPhotoUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
         const res = await fetch(sendPhotoUrl, {
@@ -4514,8 +4503,7 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
                 chat_id: targetChannel,
                 photo: bannerUrl,
                 caption: caption,
-                parse_mode: "HTML",
-                reply_markup: replyMarkup
+                parse_mode: "HTML"
             })
         });
         const result = await res.json();
@@ -4536,8 +4524,7 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
                     chat_id: targetChannel,
                     text: caption,
                     parse_mode: "HTML",
-                    disable_web_page_preview: true,
-                    reply_markup: replyMarkup
+                    disable_web_page_preview: true
                 })
             });
             const msgResult = await msgRes.json();

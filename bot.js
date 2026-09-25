@@ -238,6 +238,32 @@ async function fetchJsonFromUrl(url) {
     });
 }
 
+const BROADCASTED_CATALOG_FILE = path.resolve(__dirname, "./data/broadcasted_catalog.json");
+let broadcastedCatalogIds = new Set();
+
+try {
+    if (fs.existsSync(BROADCASTED_CATALOG_FILE)) {
+        const raw = fs.readFileSync(BROADCASTED_CATALOG_FILE, "utf8");
+        const list = JSON.parse(raw);
+        if (Array.isArray(list)) {
+            broadcastedCatalogIds = new Set(list.map(id => String(id).toLowerCase().trim()));
+        }
+    } else {
+        if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+            cachedMoviesMetadata.forEach(m => {
+                if (m.csv_id) broadcastedCatalogIds.add(String(m.csv_id).toLowerCase().trim());
+                if (m.title) broadcastedCatalogIds.add(String(m.title).toLowerCase().trim());
+            });
+            const dir = path.dirname(BROADCASTED_CATALOG_FILE);
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+            fs.writeFileSync(BROADCASTED_CATALOG_FILE, JSON.stringify(Array.from(broadcastedCatalogIds)), "utf8");
+            console.log(`[CatalogAutoPublish] Initialized broadcast tracker with ${broadcastedCatalogIds.size} existing items.`);
+        }
+    }
+} catch (bErr) {
+    console.warn("[CatalogAutoPublish] Error loading broadcast tracker:", bErr.message);
+}
+
 // Automatically sync movies_metadata.json from GitHub to Ubuntu disk and update in-memory cache
 async function syncCatalogFromGitHub() {
     try {
@@ -255,12 +281,49 @@ async function syncCatalogFromGitHub() {
                 fs.writeFileSync(localMetaPath, JSON.stringify(data, null, 2), "utf8");
                 cachedMoviesMetadata = data;
                 console.log(`[GitHubSync] Successfully synchronized ${data.length} movies from GitHub main to Ubuntu disk! (Previous in-memory: ${currentCount})`);
-                return { success: true, count: data.length, updated: true };
             } else {
                 if (!cachedMoviesMetadata) cachedMoviesMetadata = data;
                 console.log(`[GitHubSync] Catalog is already up to date (${data.length} movies).`);
-                return { success: true, count: data.length, updated: false };
             }
+
+            // Auto-broadcast any newly published titles with stream/download links
+            if (currentCount > 0 && typeof publishMovieToChannel === 'function') {
+                const newTitlesToBroadcast = [];
+                for (const m of data) {
+                    const idKey = String(m.csv_id || "").toLowerCase().trim();
+                    const titleKey = String(m.title || "").toLowerCase().trim();
+                    const hasLinks = Array.isArray(m.links) && m.links.length > 0 && m.links.some(l => l && (l.url || l.link));
+
+                    if (hasLinks && idKey && !broadcastedCatalogIds.has(idKey) && (!titleKey || !broadcastedCatalogIds.has(titleKey))) {
+                        newTitlesToBroadcast.push(m);
+                    }
+                }
+
+                if (newTitlesToBroadcast.length > 0) {
+                    console.log(`[CatalogAutoPublish] Found ${newTitlesToBroadcast.length} newly published title(s) to announce to @filmhouse_main!`);
+                    for (const m of newTitlesToBroadcast) {
+                        try {
+                            const res = await publishMovieToChannel(m);
+                            if (res && res.message_id) {
+                                console.log(`[CatalogAutoPublish] Successfully announced "${m.title}" to @filmhouse_main (msg_id: ${res.message_id})`);
+                            }
+                        } catch (pErr) {
+                            console.warn(`[CatalogAutoPublish] Error broadcasting "${m.title}":`, pErr.message);
+                        }
+                        const idKey = String(m.csv_id || "").toLowerCase().trim();
+                        const titleKey = String(m.title || "").toLowerCase().trim();
+                        if (idKey) broadcastedCatalogIds.add(idKey);
+                        if (titleKey) broadcastedCatalogIds.add(titleKey);
+                    }
+                    try {
+                        const dir = path.dirname(BROADCASTED_CATALOG_FILE);
+                        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+                        fs.writeFileSync(BROADCASTED_CATALOG_FILE, JSON.stringify(Array.from(broadcastedCatalogIds)), "utf8");
+                    } catch (saveErr) {}
+                }
+            }
+
+            return { success: true, count: data.length, updated: data.length !== currentCount };
         }
     } catch (err) {
         console.warn("[GitHubSync] Sync failed or timed out:", err.message);
@@ -269,13 +332,13 @@ async function syncCatalogFromGitHub() {
     return { success: false, error: "Empty or invalid catalog data received" };
 }
 
-// Run initial catalog sync 5 seconds after startup, then poll every 15 minutes
+// Run initial catalog sync 5 seconds after startup, then poll every 60 seconds
 setTimeout(() => {
     syncCatalogFromGitHub().catch(() => {});
 }, 5000);
 setInterval(() => {
     syncCatalogFromGitHub().catch(() => {});
-}, 15 * 60 * 1000);
+}, 60 * 1000);
 
 // Load persisted pending requests from disk (immune to Firestore quota)
 try {
