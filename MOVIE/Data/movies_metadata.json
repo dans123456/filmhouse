@@ -1,5 +1,66 @@
 [
   {
+    "csv_id": "Bro_Code_2025",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Bro Code",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "Three men. One sacred code. In a world of power, lust, and loyalty, how far will they go to protect what binds them?",
+    "poster": "https://m.media-amazon.com/images/M/MV5BM2QxOTljNmItZDFkYi00MjNhLWI1N2UtNDgzZGVjNjkwNmJmXkEyXkFqcGc@._V1_.jpg",
+    "backdrop": "https://m.media-amazon.com/images/M/MV5BM2QxOTljNmItZDFkYi00MjNhLWI1N2UtNDgzZGVjNjkwNmJmXkEyXkFqcGc@._V1_.jpg",
+    "rating": 0,
+    "release_date": "2025",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADjBYAAp_rsEXC7Mr_1kbnehYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1257629-insecure",
+    "tmdb_id": 1257629,
+    "imdb_id": "",
+    "title": "Insecure",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "\"Insecure\" is an evocative psychological drama that explores the fragile dynamics of love, betrayal, and self-discovery. When Mabel, a devoted wife, helps her husband build a flourishing art gallery, their seemingly perfect life takes an unexpected turn when he becomes infatuated with an enchanting woman named Amara. As Mabel grapples with the heartbreak of betrayal, she embarks on a gripping quest for justice and confronts her own insecurities along the way. \"Insecure\" delves into the depths of human desire, examining the fragility of relationships, the complexities of marriage and infidelity, offering a captivating narrative that examines the thin line between trust and deceit. Through compelling performances and a captivating storyline, the film invites audiences to question the boundaries of love, loyalty, and the masks we wear to protect our deepest secrets.",
+    "poster": "https://image.tmdb.org/t/p/w500/xg0INkBSrNbtbuEnmGJlaUJnjfL.jpg",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2024-03-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADjRYAAp_rsEU-qJr6y0-41hYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "Kukoyi_2025",
     "tmdb_id": null,
     "imdb_id": "",
