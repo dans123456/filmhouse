@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "Koleoso_2025",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Koleoso",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "A hardened father raises his three children under the unshakable belief that charms are the true source of strength. To him, no man, no force, and no god holds more power than magic.",
+    "poster": "https://m.media-amazon.com/images/M/MV5BY2JmYWQzMWYtN2VhOC00YmU5LWI4NjgtMzg3YWNjOGI2ODRlXkEyXkFqcGc@._V1_.jpg",
+    "backdrop": "https://m.media-amazon.com/images/M/MV5BY2JmYWQzMWYtN2VhOC00YmU5LWI4NjgtMzg3YWNjOGI2ODRlXkEyXkFqcGc@._V1_.jpg",
+    "rating": 0,
+    "release_date": "2025",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADJxoAAp_rsEUbq13NwEnUbRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "247569-an-k-l-p-rise-of-the-spectre",
     "tmdb_id": 247569,
     "imdb_id": "",
