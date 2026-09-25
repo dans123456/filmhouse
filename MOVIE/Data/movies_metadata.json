@@ -1,32 +1,60 @@
 [
   {
-    "csv_id": "296206-agent-kim-reactivated",
-    "tmdb_id": 296206,
+    "csv_id": "Low_Priest_2025",
+    "tmdb_id": null,
     "imdb_id": "",
-    "title": "Agent Kim Reactivated",
-    "type": "Series",
+    "title": "Low Priest",
+    "type": "Movie",
     "categories": [
       "Main",
-      "Asian Drama"
+      "African"
     ],
     "genres": [
-      "Action & Adventure",
-      "Crime",
-      "Drama"
+      "African"
     ],
-    "overview": "When an unassuming dad's daughter goes missing, he dusts off his old black-ops skills to track her down — only to attract the wrong kind of attention.",
-    "poster": "https://image.tmdb.org/t/p/w500/mxa7YxVln3Rwnd2Va82PoclTznj.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/g1LJLlmWP74zv9yXKEXm7g9p10O.jpg",
-    "rating": 8.5,
-    "release_date": "2026-06-26",
-    "language": "ko",
+    "overview": "A warrior trapped between worlds must expose his killer with a goddess’s help to save his bride from a dark ritual, or lose his soul forever.” It’s a supernatural drama that blends folklore, spiritual elements, and tension between the earthly and divine.",
+    "poster": "https://i.postimg.cc/KcC0J5hQ/IMG-20260925-155211-345.jpg",
+    "backdrop": "https://i.postimg.cc/KcC0J5hQ/IMG-20260925-155211-345.jpg",
+    "rating": 0,
+    "release_date": "2025",
+    "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "k5IDEniQNEk",
+    "trailer": "",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADSBoAAp_rsEXG7IGg35EmJxYE",
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADiAgAAp_ruEVMtq38tuSw2BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "Koleoso_2025",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "Koleoso",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "A hardened father raises his three children under the unshakable belief that charms are the true source of strength. To him, no man, no force, and no god holds more power than magic.",
+    "poster": "https://m.media-amazon.com/images/M/MV5BY2JmYWQzMWYtN2VhOC00YmU5LWI4NjgtMzg3YWNjOGI2ODRlXkEyXkFqcGc@._V1_.jpg",
+    "backdrop": "https://m.media-amazon.com/images/M/MV5BY2JmYWQzMWYtN2VhOC00YmU5LWI4NjgtMzg3YWNjOGI2ODRlXkEyXkFqcGc@._V1_.jpg",
+    "rating": 0,
+    "release_date": "2025",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADJxoAAp_rsEUbq13NwEnUbRYE",
         "season": "Season 1"
       }
     ]
