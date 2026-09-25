@@ -29,6 +29,49 @@ const crypto = require("crypto");
 const LocalUserStore = require("./localStore");
 const localStore = new LocalUserStore();
 
+// Normalize titles for comparison, matching and search: strips symbols, leading articles, handles plurals
+function normalizeTitleForComparison(title) {
+    if (!title) return "";
+    let s = String(title).toLowerCase();
+    s = s.replace(/\s*\([^)]+\)\s*$/g, "").trim();
+    s = s.replace(/&/g, " and ");
+    s = s.replace(/^(the|a|an)\s+/i, "");
+    s = s.replace(/\bthe\b/gi, " ");
+    s = s.replace(/[^\p{L}\p{N}\s]/gu, " ");
+    s = s.replace(/\b([a-z]{3,})s\b/gi, "$1");
+    s = s.replace(/\s+/g, " ").trim();
+    return s;
+}
+
+function getCollapsedTitle(title) {
+    if (!title) return "";
+    const clean = normalizeTitleForComparison(title);
+    return clean.replace(/[^a-z0-9]/gi, "");
+}
+
+function titlesMatch(titleA, titleB) {
+    if (!titleA || !titleB) return false;
+    const normA = normalizeTitleForComparison(titleA);
+    const normB = normalizeTitleForComparison(titleB);
+    if (!normA || !normB) return false;
+    if (normA === normB) return true;
+    const colA = getCollapsedTitle(titleA);
+    const colB = getCollapsedTitle(titleB);
+    if (colA && colB && colA === colB) return true;
+    if (colA.length >= 4 && colB.length >= 4) {
+        if (colA.includes(colB) || colB.includes(colA)) return true;
+    }
+    const toksA = normA.split(" ").filter(t => t.length > 1);
+    const toksB = normB.split(" ").filter(t => t.length > 1);
+    if (toksA.length > 0 && toksB.length > 0) {
+        const intersection = toksA.filter(t => toksB.includes(t));
+        const minLen = Math.min(toksA.length, toksB.length);
+        if (intersection.length === minLen && minLen >= 1) return true;
+    }
+    return false;
+}
+
+
 // Server PORT will be initialized dynamically in the init() function based on Webhook/Polling mode.
 
 // Initialize Firebase Admin
@@ -3519,7 +3562,7 @@ async function init() {
                                             movieDataForChannel = cachedMoviesMetadata.find(m => 
                                                 (lookupCsvId && String(m.csv_id || "").toLowerCase().trim() === lookupCsvId) ||
                                                 (lookupTmdbId && String(m.tmdb_id || "").trim() === lookupTmdbId) ||
-                                                (lookupTitle && String(m.title || "").toLowerCase().trim() === lookupTitle)
+                                                (lookupTitle && (String(m.title || "").toLowerCase().trim() === lookupTitle || titlesMatch(m.title, lookupTitle)))
                                             );
                                         }
 

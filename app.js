@@ -26,10 +26,70 @@ function triggerHaptic(type = "light") {
     }
 }
 
-// Clean request/catalog titles by stripping trailing parenthesis groups (e.g. season or custom version suffixes)
+// Normalize titles for comparison, matching and search: strips symbols, leading articles, handles plurals
+function normalizeTitleForComparison(title) {
+    if (!title) return "";
+    let s = String(title).toLowerCase();
+    // 1. Strip trailing parentheses (e.g. "(Season 1)", "(2024)", "(1080p Quality)")
+    s = s.replace(/\s*\([^)]+\)\s*$/g, "").trim();
+    // 2. Replace & with and
+    s = s.replace(/&/g, " and ");
+    // 3. Remove leading articles: "the ", "a ", "an "
+    s = s.replace(/^(the|a|an)\s+/i, "");
+    // 4. Remove internal " the " (e.g. "House of the Dragon" vs "House of Dragon")
+    s = s.replace(/\bthe\b/gi, " ");
+    // 5. Replace all symbols and punctuation with spaces
+    s = s.replace(/[^\p{L}\p{N}\s]/gu, " ");
+    // 6. Handle common plurals at word boundaries: "dragons" -> "dragon"
+    s = s.replace(/\b([a-z]{3,})s\b/gi, "$1");
+    // 7. Collapse spaces
+    s = s.replace(/\s+/g, " ").trim();
+    return s;
+}
+
+// Alphanumeric collapsed representation with zero spaces/punctuation (e.g. "S.W.A.T." -> "swat")
+function getCollapsedTitle(title) {
+    if (!title) return "";
+    const clean = normalizeTitleForComparison(title);
+    return clean.replace(/[^a-z0-9]/gi, "");
+}
+
+// Robust fuzzy & punctuation-insensitive title matcher
+function titlesMatch(titleA, titleB) {
+    if (!titleA || !titleB) return false;
+    const normA = normalizeTitleForComparison(titleA);
+    const normB = normalizeTitleForComparison(titleB);
+    if (!normA || !normB) return false;
+
+    // 1. Exact normalized match
+    if (normA === normB) return true;
+
+    // 2. Collapsed alphanumeric match (e.g. "S.W.A.T." and "SWAT" -> "swat" === "swat")
+    const colA = getCollapsedTitle(titleA);
+    const colB = getCollapsedTitle(titleB);
+    if (colA && colB && colA === colB) return true;
+
+    // 3. Significant substring match (e.g. "House of Dragon" in "The House of Dragon: Season 1")
+    if (colA.length >= 4 && colB.length >= 4) {
+        if (colA.includes(colB) || colB.includes(colA)) return true;
+    }
+
+    // 4. Token overlap comparison
+    const toksA = normA.split(" ").filter(t => t.length > 1);
+    const toksB = normB.split(" ").filter(t => t.length > 1);
+    if (toksA.length > 0 && toksB.length > 0) {
+        const intersection = toksA.filter(t => toksB.includes(t));
+        const minLen = Math.min(toksA.length, toksB.length);
+        if (intersection.length === minLen && minLen >= 1) return true;
+    }
+
+    return false;
+}
+
+// Clean request/catalog titles by stripping trailing parenthesis groups and symbols
 function getCleanRequestTitle(title) {
     if (!title) return "";
-    return title.replace(/\s*\([^)]+\)\s*$/g, "").trim();
+    return normalizeTitleForComparison(title);
 }
 
 // Helper to generate floating CINEMA CUT / HDCAM badge element for movie posters
@@ -231,7 +291,7 @@ function normalizeTargetString(str) {
 
 // Universal search query normalizer: strips symbols ( , & : ; ? - ! ( ) etc. ), extracts year, strips junk tags
 function sanitizeSearchQuery(query) {
-    if (!query) return { cleanTokens: [], titleOnlyTokens: [], searchTitleStr: "", targetYear: null, cleanFullStr: "" };
+    if (!query) return { cleanTokens: [], titleOnlyTokens: [], searchTitleStr: "", targetYear: null, cleanFullStr: "", collapsedQuery: "" };
     
     let raw = String(query).toLowerCase();
     raw = raw.replace(/&/g, " and ");
@@ -249,8 +309,9 @@ function sanitizeSearchQuery(query) {
     const titleOnlyTokens = cleanTokens.filter(t => t !== targetYear);
     const searchTitleStr = titleOnlyTokens.join(" ").trim();
     const cleanFullStr = cleanTokens.join(" ").trim();
+    const collapsedQuery = cleanTokens.join("").replace(/[^a-z0-9]/gi, "");
     
-    return { cleanTokens, titleOnlyTokens, searchTitleStr, targetYear, cleanFullStr };
+    return { cleanTokens, titleOnlyTokens, searchTitleStr, targetYear, cleanFullStr, collapsedQuery };
 }
 
 // Centralized search string generator with full title, year, release date, genres, and metadata
@@ -272,6 +333,116 @@ function buildMovieSearchStr(m) {
         m.language
     ].filter(Boolean).join(" ");
     return normalizeTargetString(base);
+}
+
+// High-precision Multi-Tier Search Relevance Scorer (Prioritizes Title matches over Synopsis)
+function calculateSearchScore(movie, queryInfo) {
+    if (!movie) return -1;
+    const { cleanTokens, searchTitleStr, targetYear, cleanFullStr, collapsedQuery } = queryInfo;
+    if (!cleanTokens || cleanTokens.length === 0) return -1;
+
+    const rawTitle = movie.title || "";
+    const normTitle = normalizeTitleForComparison(rawTitle);
+    const colTitle = getCollapsedTitle(rawTitle);
+    const colQuery = collapsedQuery || getCollapsedTitle(searchTitleStr || cleanFullStr);
+
+    const releaseYear = movie.release_date ? String(movie.release_date).substring(0, 4) : (movie.year ? String(movie.year) : "");
+    const hasLinks = Boolean(movie.links && movie.links.length > 0);
+
+    let score = 0;
+    let matchedTitleTokens = 0;
+
+    // Check which search tokens exist in the TITLE
+    cleanTokens.forEach(tok => {
+        if (normTitle.includes(tok) || colTitle.includes(tok)) {
+            matchedTitleTokens++;
+        }
+    });
+
+    const titleTokenMatchRatio = matchedTitleTokens / cleanTokens.length;
+
+    // 1. EXACT TITLE MATCH (10,000 pts)
+    if (colQuery && colTitle && colTitle === colQuery) {
+        score = 10000;
+    }
+    // 2. TITLE STARTS WITH QUERY (8,500 pts)
+    else if (colQuery && colTitle && colTitle.startsWith(colQuery)) {
+        score = 8500;
+    }
+    // 3. COLLAPSED TITLE CONTAINS COLLAPSED QUERY (e.g. "Avengers: Endgame" contains "endgame") (7,500 pts)
+    else if (colQuery && colQuery.length >= 3 && colTitle && colTitle.includes(colQuery)) {
+        score = 7500;
+    }
+    // 4. ALL QUERY TOKENS IN TITLE (e.g. "House of the Dragon" has both "house" and "dragon") (6,500 pts)
+    else if (titleTokenMatchRatio === 1) {
+        score = 6500;
+    }
+    // 5. MAJORITY OF QUERY TOKENS IN TITLE (4,000 pts * ratio)
+    else if (titleTokenMatchRatio >= 0.5) {
+        score = 4000 * titleTokenMatchRatio;
+    }
+    // 6. AT LEAST ONE TOKEN IN TITLE (2,000 pts * ratio)
+    else if (matchedTitleTokens > 0) {
+        score = 2000 * titleTokenMatchRatio;
+    }
+    // 7. TITLE DOES NOT MATCH -> Check Overview, Genres, Cast (FALLBACK ONLY!) (300 pts)
+    else {
+        const searchTarget = movie._searchStr || buildMovieSearchStr(movie);
+        const matchesAllInMeta = cleanTokens.every(tok => searchTarget.includes(tok));
+        if (matchesAllInMeta) {
+            score = 300; // Synopsis mention only (e.g. GTA mentioning 'end' and 'game')
+        } else {
+            return -1; // No match
+        }
+    }
+
+    // BONUS 1: Exact Year Match (+2,000 pts)
+    if (targetYear && releaseYear === targetYear) {
+        score += 2000;
+    }
+
+    // BONUS 2: Library Movie with Uploaded Download Links (+500 pts)
+    if (hasLinks) {
+        score += 500;
+    }
+
+    // BONUS 3: Title Conciseness (Shorter titles matching query are more relevant)
+    if (score >= 4000) {
+        const lengthDiff = Math.max(0, 35 - normTitle.length);
+        score += lengthDiff * 5;
+    }
+
+    // TIEBREAKER ONLY: Rating (+1 to +90 pts max, will NEVER override a title match!)
+    const ratingVal = parseFloat(movie.rating) || 0;
+    score += Math.min(90, ratingVal * 9);
+
+    return score;
+}
+
+// Centralized precision search filter and ranking function
+function getPrecisionSearchResults(moviesList, query) {
+    if (!query || !query.trim()) return moviesList;
+    const queryInfo = sanitizeSearchQuery(query);
+    if (!queryInfo.cleanTokens || queryInfo.cleanTokens.length === 0) return moviesList;
+
+    const scored = [];
+    moviesList.forEach(m => {
+        const score = calculateSearchScore(m, queryInfo);
+        if (score > 0) {
+            scored.push({ movie: m, score: score });
+        }
+    });
+
+    // Sort strictly by relevance score descending
+    scored.sort((a, b) => b.score - a.score);
+
+    // If we have strong title matches (score >= 1000), filter out weak synopsis-only matches to prevent junk results
+    const strongTitleMatches = scored.filter(s => s.score >= 1000);
+    if (strongTitleMatches.length >= 1) {
+        return strongTitleMatches.map(s => s.movie);
+    }
+
+    return scored.map(s => s.movie);
 }
 
 // Adsgram Ad Placement Configuration
@@ -1904,9 +2075,9 @@ function renderNotificationsList() {
 // Requested Badge Generator Helper
 function getRequestedBadgeElement(movie) {
     if (!movie || typeof currentUserRequests === 'undefined' || !currentUserRequests || currentUserRequests.length === 0) return null;
-    const cleanTitle = getCleanRequestTitle(movie.title).toLowerCase();
+    if (movie.links && movie.links.length > 0) return null;
     const userReq = currentUserRequests.find(r => 
-        r.title && getCleanRequestTitle(r.title).toLowerCase() === cleanTitle &&
+        r.title && titlesMatch(r.title, movie.title) &&
         r.status !== "fulfilled"
     );
     if (!userReq) return null;
@@ -2435,54 +2606,9 @@ function renderFeaturedGrid(preservePagination = false) {
         }
     }
 
-    // Apply Search Term with tokenized multi-word and year matching
+    // Apply Search Term with precision multi-tier ranking
     if (state.searchQuery) {
-        const { cleanTokens, searchTitleStr, targetYear } = sanitizeSearchQuery(state.searchQuery);
-
-        list = list.filter(m => {
-            const searchTarget = m._searchStr || buildMovieSearchStr(m);
-            return cleanTokens.every(tok => searchTarget.includes(tok));
-        });
-
-        // Re-score and sort matches so most relevant matches (exact title / year) appear first
-        list.sort((a, b) => {
-            const aTitle = (a.title || "").toLowerCase().trim();
-            const bTitle = (b.title || "").toLowerCase().trim();
-            const aYear = a.release_date ? String(a.release_date).substring(0, 4) : (a.year ? String(a.year) : "");
-            const bYear = b.release_date ? String(b.release_date).substring(0, 4) : (b.year ? String(b.year) : "");
-
-            // 1. Exact title + exact year match
-            if (targetYear && searchTitleStr) {
-                const aExactBoth = aTitle === searchTitleStr && aYear === targetYear;
-                const bExactBoth = bTitle === searchTitleStr && bYear === targetYear;
-                if (aExactBoth && !bExactBoth) return -1;
-                if (!aExactBoth && bExactBoth) return 1;
-            }
-
-            // 2. Exact title match
-            if (searchTitleStr) {
-                const aExactTitle = aTitle === searchTitleStr;
-                const bExactTitle = bTitle === searchTitleStr;
-                if (aExactTitle && !bExactTitle) return -1;
-                if (!aExactTitle && bExactTitle) return 1;
-
-                // 3. Title starts with search title
-                const aStarts = aTitle.startsWith(searchTitleStr);
-                const bStarts = bTitle.startsWith(searchTitleStr);
-                if (aStarts && !bStarts) return -1;
-                if (!aStarts && bStarts) return 1;
-            }
-
-            // 4. Exact year match
-            if (targetYear) {
-                const aYearMatch = aYear === targetYear;
-                const bYearMatch = bYear === targetYear;
-                if (aYearMatch && !bYearMatch) return -1;
-                if (!aYearMatch && bYearMatch) return 1;
-            }
-
-            return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
-        });
+        list = getPrecisionSearchResults(list, state.searchQuery);
 
         if (state.externalSearchResults && state.externalSearchResults.length > 0) {
             const localTmdbIds = new Set(list.map(m => m.tmdb_id).filter(id => id));
@@ -3433,7 +3559,7 @@ function openDetailModal(movie) {
     // Download or Request Button
     if (!movie.links || movie.links.length === 0) {
         const existingReq = currentUserRequests && currentUserRequests.find(r => 
-            r.title && getCleanRequestTitle(r.title).toLowerCase() === getCleanRequestTitle(movie.title).toLowerCase() &&
+            r.title && titlesMatch(r.title, movie.title) &&
             r.status !== "fulfilled"
         );
 
@@ -4057,7 +4183,7 @@ function openDownloadModal(movie) {
             anchor.className = "download-link-item";
             
             const matchingRequest = currentUserRequests && currentUserRequests.find(r => 
-                r.title && getCleanRequestTitle(r.title).toLowerCase() === getCleanRequestTitle(movie.title).toLowerCase() &&
+                r.title && titlesMatch(r.title, movie.title) &&
                 r.status === "fulfilled"
             );
 
@@ -4261,8 +4387,7 @@ function openDownloadModal(movie) {
                     const cleanMovieTitle = getCleanRequestTitle(movie.title).toLowerCase();
                     
                     const isAlreadyReq = currentUserRequests && currentUserRequests.some(r => {
-                        const rClean = getCleanRequestTitle(r.title).toLowerCase();
-                        const matchesTitle = rClean === cleanMovieTitle;
+                        const matchesTitle = titlesMatch(r.title, movie.title);
                         const matchesQuality = r.title && r.title.toLowerCase().includes(qItem.code.toLowerCase());
                         return matchesTitle && matchesQuality && r.status !== "fulfilled";
                     });
@@ -4358,8 +4483,7 @@ function openDownloadModal(movie) {
                 const cleanMovieTitle = getCleanRequestTitle(movie.title).toLowerCase();
                 
                 const isAlreadyReq = currentUserRequests && currentUserRequests.some(r => {
-                    const rClean = getCleanRequestTitle(r.title).toLowerCase();
-                    const matchesTitle = rClean === cleanMovieTitle;
+                    const matchesTitle = titlesMatch(r.title, movie.title);
                     const matchesSeason = (r.seasonOrPart && r.seasonOrPart.toLowerCase() === reqSeasonStr.toLowerCase()) || 
                                           (r.title && r.title.toLowerCase().includes(`season ${seasonNum}`));
                     return matchesTitle && matchesSeason && r.status !== "fulfilled";
@@ -5304,43 +5428,8 @@ function bindEvents() {
                 return;
             }
             
-            // Filter local library movies with multi-word token and year support
-            const { cleanTokens, searchTitleStr, targetYear } = sanitizeSearchQuery(q);
-
-            const matches = state.movies.filter(m => {
-                const searchTarget = m._searchStr || buildMovieSearchStr(m);
-                return cleanTokens.every(tok => searchTarget.includes(tok));
-            });
-
-            matches.sort((a, b) => {
-                const aTitle = (a.title || "").toLowerCase().trim();
-                const bTitle = (b.title || "").toLowerCase().trim();
-                const aYear = a.release_date ? String(a.release_date).substring(0, 4) : (a.year ? String(a.year) : "");
-                const bYear = b.release_date ? String(b.release_date).substring(0, 4) : (b.year ? String(b.year) : "");
-
-                if (targetYear && searchTitleStr) {
-                    const aExactBoth = aTitle === searchTitleStr && aYear === targetYear;
-                    const bExactBoth = bTitle === searchTitleStr && bYear === targetYear;
-                    if (aExactBoth && !bExactBoth) return -1;
-                    if (!aExactBoth && bExactBoth) return 1;
-                }
-                if (searchTitleStr) {
-                    const aExactTitle = aTitle === searchTitleStr;
-                    const bExactTitle = bTitle === searchTitleStr;
-                    if (aExactTitle && !bExactTitle) return -1;
-                    if (!aExactTitle && bExactTitle) return 1;
-
-                    const aStarts = aTitle.startsWith(searchTitleStr);
-                    const bStarts = bTitle.startsWith(searchTitleStr);
-                    if (aStarts && !bStarts) return -1;
-                    if (!aStarts && bStarts) return 1;
-                }
-                if (targetYear) {
-                    if (aYear === targetYear && bYear !== targetYear) return -1;
-                    if (aYear !== targetYear && bYear === targetYear) return 1;
-                }
-                return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
-            });
+            // Filter and score local library movies with precision ranking
+            const matches = getPrecisionSearchResults(state.movies, q);
 
             const topMatches = matches.slice(0, 5);
 
@@ -6383,7 +6472,7 @@ function renderUserRequests(requests) {
             if (rId && mId) {
                 return rId === mId;
             }
-            return (m.title && getCleanRequestTitle(m.title).toLowerCase() === getCleanRequestTitle(r.title).toLowerCase()) || 
+            return (m.title && titlesMatch(m.title, r.title)) || 
                    (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
         });
         const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
@@ -6599,7 +6688,7 @@ function updateHomeFulfillmentBanner() {
     
     const unacknowledgedFulfilled = currentUserRequests.filter(r => {
         const matchingMovie = state.movies.find(m => 
-            (m.title && getCleanRequestTitle(m.title).toLowerCase() === getCleanRequestTitle(r.title).toLowerCase()) || 
+            (m.title && titlesMatch(m.title, r.title)) || 
             (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
         );
         const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
@@ -6715,7 +6804,7 @@ function updateHeaderNotificationDot() {
                 const docId = doc.id;
                 
                 const matchingMovie = state.movies.find(m => 
-                    (m.title && getCleanRequestTitle(m.title).toLowerCase() === getCleanRequestTitle(r.title).toLowerCase()) || 
+                    (m.title && titlesMatch(m.title, r.title)) || 
                     (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
                 );
                 
@@ -6779,9 +6868,8 @@ function logMovieRequestToFirestore(movie, specs = "") {
     };
 
     if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
-        const cleanT = getCleanRequestTitle(movie.title).toLowerCase();
         const exists = currentUserRequests.some(r => 
-            r.title && getCleanRequestTitle(r.title).toLowerCase() === cleanT
+            r.title && titlesMatch(r.title, movie.title)
         );
         if (!exists) {
             currentUserRequests.unshift(reqObj);
@@ -8553,42 +8641,8 @@ function triggerOverlaySearch(query) {
     // Tokenize search query and extract year for precise matching
     const { cleanTokens, searchTitleStr, targetYear } = sanitizeSearchQuery(q);
 
-    // Filter local movies
-    let filtered = state.movies.filter(m => {
-        const searchTarget = m._searchStr || buildMovieSearchStr(m);
-        return cleanTokens.every(tok => searchTarget.includes(tok));
-    });
-
-    // Score and sort local matches
-    filtered.sort((a, b) => {
-        const aTitle = (a.title || "").toLowerCase().trim();
-        const bTitle = (b.title || "").toLowerCase().trim();
-        const aYear = a.release_date ? String(a.release_date).substring(0, 4) : (a.year ? String(a.year) : "");
-        const bYear = b.release_date ? String(b.release_date).substring(0, 4) : (b.year ? String(b.year) : "");
-
-        if (targetYear && searchTitleStr) {
-            const aExactBoth = aTitle === searchTitleStr && aYear === targetYear;
-            const bExactBoth = bTitle === searchTitleStr && bYear === targetYear;
-            if (aExactBoth && !bExactBoth) return -1;
-            if (!aExactBoth && bExactBoth) return 1;
-        }
-        if (searchTitleStr) {
-            const aExactTitle = aTitle === searchTitleStr;
-            const bExactTitle = bTitle === searchTitleStr;
-            if (aExactTitle && !bExactTitle) return -1;
-            if (!aExactTitle && bExactTitle) return 1;
-
-            const aStarts = aTitle.startsWith(searchTitleStr);
-            const bStarts = bTitle.startsWith(searchTitleStr);
-            if (aStarts && !bStarts) return -1;
-            if (!aStarts && bStarts) return 1;
-        }
-        if (targetYear) {
-            if (aYear === targetYear && bYear !== targetYear) return -1;
-            if (aYear !== targetYear && bYear === targetYear) return 1;
-        }
-        return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
-    });
+    // Filter local movies with precision multi-tier ranking
+    let filtered = getPrecisionSearchResults(state.movies, q);
 
     // Apply scope filtering (case-insensitive checks to support capitalized type schemas like "Series" and "Movie")
     if (scope === "movies") {

@@ -34,6 +34,71 @@ const safeStorage = (() => {
 })();
 const localStorage = safeStorage;
 
+// Normalize titles for comparison, matching and search: strips symbols, leading articles, handles plurals
+function normalizeTitleForComparison(title) {
+    if (!title) return "";
+    let s = String(title).toLowerCase();
+    // 1. Strip trailing parentheses (e.g. "(Season 1)", "(2024)", "(1080p Quality)")
+    s = s.replace(/\s*\([^)]+\)\s*$/g, "").trim();
+    // 2. Replace & with and
+    s = s.replace(/&/g, " and ");
+    // 3. Remove leading articles: "the ", "a ", "an "
+    s = s.replace(/^(the|a|an)\s+/i, "");
+    // 4. Remove internal " the " (e.g. "House of the Dragon" vs "House of Dragon")
+    s = s.replace(/\bthe\b/gi, " ");
+    // 5. Replace all symbols and punctuation with spaces
+    s = s.replace(/[^\p{L}\p{N}\s]/gu, " ");
+    // 6. Handle common plurals at word boundaries: "dragons" -> "dragon"
+    s = s.replace(/\b([a-z]{3,})s\b/gi, "$1");
+    // 7. Collapse spaces
+    s = s.replace(/\s+/g, " ").trim();
+    return s;
+}
+
+// Alphanumeric collapsed representation with zero spaces/punctuation (e.g. "S.W.A.T." -> "swat")
+function getCollapsedTitle(title) {
+    if (!title) return "";
+    const clean = normalizeTitleForComparison(title);
+    return clean.replace(/[^a-z0-9]/gi, "");
+}
+
+// Robust fuzzy & punctuation-insensitive title matcher
+function titlesMatch(titleA, titleB) {
+    if (!titleA || !titleB) return false;
+    const normA = normalizeTitleForComparison(titleA);
+    const normB = normalizeTitleForComparison(titleB);
+    if (!normA || !normB) return false;
+
+    // 1. Exact normalized match
+    if (normA === normB) return true;
+
+    // 2. Collapsed alphanumeric match (e.g. "S.W.A.T." and "SWAT" -> "swat" === "swat")
+    const colA = getCollapsedTitle(titleA);
+    const colB = getCollapsedTitle(titleB);
+    if (colA && colB && colA === colB) return true;
+
+    // 3. Significant substring match (e.g. "House of Dragon" in "The House of Dragon: Season 1")
+    if (colA.length >= 4 && colB.length >= 4) {
+        if (colA.includes(colB) || colB.includes(colA)) return true;
+    }
+
+    // 4. Token overlap comparison
+    const toksA = normA.split(" ").filter(t => t.length > 1);
+    const toksB = normB.split(" ").filter(t => t.length > 1);
+    if (toksA.length > 0 && toksB.length > 0) {
+        const intersection = toksA.filter(t => toksB.includes(t));
+        const minLen = Math.min(toksA.length, toksB.length);
+        if (intersection.length === minLen && minLen >= 1) return true;
+    }
+
+    return false;
+}
+
+function getCleanRequestTitle(title) {
+    if (!title) return "";
+    return normalizeTitleForComparison(title);
+}
+
 let isCurrentUserSlaveAdmin = false;
 
 // Premium Floating Toast Notification Helper
@@ -391,7 +456,7 @@ function updateStatsCounters() {
             if (rId && mId) {
                 return rId === mId;
             }
-            return m.title && m.title.toLowerCase().trim() === r.title.toLowerCase().trim();
+            return m.title && titlesMatch(m.title, r.title);
         });
         return r.status === "fulfilled" || r.status === "claimed" || r.claimed === true || inCatalog;
     }).length;
@@ -771,9 +836,7 @@ function renderRequestsList() {
                 return rId === mId;
             }
             
-            const cleanReqTitle = r.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
-            const cleanCatalogTitle = m.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
-            if (cleanCatalogTitle !== cleanReqTitle) return false;
+            if (!titlesMatch(m.title, r.title)) return false;
             if (r.seasonOrPart) {
                 const cleanReqSeason = r.seasonOrPart.toLowerCase().trim();
                 return m.links && m.links.some(link => {
@@ -1084,7 +1147,7 @@ function fulfillMovieTitleRequests(title, docIds) {
                 titleEl.textContent = `Fulfill Request: "${title}"`;
                 
                 const cleanTitle = title.replace(/\s*\([^)]+\)\s*$/g, "").trim().toLowerCase();
-                const existingMovie = allCatalogMovies.find(m => m.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim() === cleanTitle);
+                const existingMovie = allCatalogMovies.find(m => titlesMatch(m.title, title));
                 const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === title.toLowerCase().trim()) ||
                                    allRequests.find(r => docIds.includes(r.docId)) ||
                                    allRequests.find(r => r.title.toLowerCase().trim().startsWith(cleanTitle));
@@ -5106,8 +5169,7 @@ if (fulfillForm && fulfillRequestModal) {
             if (reqTmdbId && m.tmdb_id && String(reqTmdbId) === String(m.tmdb_id)) {
                 return true;
             }
-            const cleanCatalogTitle = m.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
-            return cleanCatalogTitle === cleanMatchTitle;
+            return titlesMatch(m.title, currentFulfillTitle);
         });
 
         let movieToSync = null;
