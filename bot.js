@@ -58,15 +58,16 @@ function titlesMatch(titleA, titleB) {
     const colA = getCollapsedTitle(titleA);
     const colB = getCollapsedTitle(titleB);
     if (colA && colB && colA === colB) return true;
-    if (colA.length >= 4 && colB.length >= 4) {
-        if (colA.includes(colB) || colB.includes(colA)) return true;
-    }
-    const toksA = normA.split(" ").filter(t => t.length > 1);
-    const toksB = normB.split(" ").filter(t => t.length > 1);
+
+    // Token overlap comparison - require high similarity across both titles (>= 80% or 100% token coverage)
+    const toksA = normA.split(" ").filter(t => t.length > 0);
+    const toksB = normB.split(" ").filter(t => t.length > 0);
     if (toksA.length > 0 && toksB.length > 0) {
         const intersection = toksA.filter(t => toksB.includes(t));
-        const minLen = Math.min(toksA.length, toksB.length);
-        if (intersection.length === minLen && minLen >= 1) return true;
+        const maxLen = Math.max(toksA.length, toksB.length);
+        const ratio = intersection.length / maxLen;
+        if (ratio >= 0.8 && intersection.length >= 2) return true;
+        if (intersection.length === maxLen && maxLen > 0) return true;
     }
     return false;
 }
