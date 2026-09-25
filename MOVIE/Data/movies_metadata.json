@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "House_Job_2025",
+    "tmdb_id": null,
+    "imdb_id": "",
+    "title": "House Job",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "African"
+    ],
+    "overview": "After a scandal destroys her reputation, an influencer is forced to rebuild her life by starting over as a medical house officer",
+    "poster": "https://i.postimg.cc/26VMPXKs/IMG-20260925-130459-518.jpg",
+    "backdrop": "https://i.postimg.cc/26VMPXKs/IMG-20260925-130459-518.jpg",
+    "rating": 0,
+    "release_date": "2026",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADSxgAAp_rsEVchecjPgABaWUWBA",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "253833-how-to-ruin-love",
     "tmdb_id": 253833,
     "imdb_id": "",
