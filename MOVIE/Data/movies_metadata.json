@@ -65,7 +65,7 @@
     "tmdb_id": null,
     "imdb_id": "",
     "title": "Kukoyi",
-    "type": "Movie",
+    "type": "Series",
     "categories": [
       "Main",
       "African"
@@ -86,7 +86,7 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADNhYAAp_rsEXSP6Swm7OwAhYE",
-        "quality": "720p"
+        "season": "Season 1"
       }
     ]
   },
@@ -95,7 +95,7 @@
     "tmdb_id": null,
     "imdb_id": "",
     "title": "Ordinary People 2017",
-    "type": "Movie",
+    "type": "Series",
     "categories": [
       "Main",
       "African"
@@ -116,7 +116,7 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADgRUAAp_rsEVDqDyNoZGRmhYE",
-        "quality": "720p"
+        "season": "Season 1"
       }
     ]
   },
@@ -185,7 +185,7 @@
     "tmdb_id": null,
     "imdb_id": "",
     "title": "Hallelujah",
-    "type": "Movie",
+    "type": "Series",
     "categories": [
       "Main"
     ],
@@ -203,7 +203,7 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADdxQAAp_rsEXT-a6m7GRT9BYE",
-        "quality": "720p"
+        "season": "Season 1"
       }
     ]
   },
