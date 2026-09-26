@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "68018-the-blacklist-redemption",
+    "tmdb_id": 68018,
+    "imdb_id": "",
+    "title": "The Blacklist: Redemption",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Crime",
+      "Drama"
+    ],
+    "overview": "Covert operative Tom Keen joins forces with Susan \"Scottie\" Hargrave, the brilliant and cunning chief of a covert mercenary organization that solves problems that are too dangerous for the government.",
+    "poster": "https://image.tmdb.org/t/p/w500/cEyPdB8KFolsfhXJYZHI9fIV86H.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dOfVmmvq2yprPrRfwV2mFEpPhps.jpg",
+    "rating": 6.6,
+    "release_date": "2017-02-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADGgwAAmQFuUWtJaXjoGE_0xYE",
+        "season": "Season 1"
+      }
+    ],
+    "channelBroadcasted": true
+  },
+  {
     "csv_id": "46952-the-blacklist",
     "tmdb_id": 46952,
     "imdb_id": "",
