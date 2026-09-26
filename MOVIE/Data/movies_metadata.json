@@ -1,5 +1,135 @@
 [
   {
+    "csv_id": "1412598-killer-whale",
+    "tmdb_id": 1412598,
+    "imdb_id": "",
+    "title": "Killer Whale",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Thriller",
+      "Horror",
+      "Action"
+    ],
+    "overview": "Follows best friends Maddie and Trish as they find themselves trapped in a remote lagoon with the dangerous killer whale named Ceto.",
+    "poster": "https://image.tmdb.org/t/p/w500/xC6zdIoIHjhOIFmjNyGgtzhuhiF.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ykigHs1OIyqqV04zfFqIlSHp546.jpg",
+    "rating": 5.3,
+    "release_date": "2026-01-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "lyfrcbIaTEE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADcg0AAmQFwUWGdwNhGos4cRYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": true
+  },
+  {
+    "csv_id": "1305781-blades-of-the-guardians",
+    "tmdb_id": 1305781,
+    "imdb_id": "",
+    "title": "Blades of the Guardians",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies"
+    ],
+    "genres": [
+      "Action",
+      "Adventure"
+    ],
+    "overview": "Dao Ma, the \"second most wanted fugitive,\" is entrusted by his benefactor, the chief of Mo family clan, to take on a mysterious escort mission-escorting the \"most wanted fugitive\" to Chang'an.",
+    "poster": "https://image.tmdb.org/t/p/w500/R84km7PJ0frFSNPmvIjG6LV1kg.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/29pJrsosphUdOMRDm4gCdhSkluI.jpg",
+    "rating": 8.2,
+    "release_date": "2026-02-17",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "7jkL4-uYriY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADZQ0AAmQFwUU1UgWax86FUhYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": true
+  },
+  {
+    "csv_id": "1168190-the-wrecking-crew",
+    "tmdb_id": 1168190,
+    "imdb_id": "",
+    "title": "The Wrecking Crew",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Comedy",
+      "Crime",
+      "Mystery"
+    ],
+    "overview": "Estranged half-brothers Jonny and James reunite after their father's mysterious death. As they search for the truth, buried secrets reveal a conspiracy threatening to tear their family apart.",
+    "poster": "https://image.tmdb.org/t/p/w500/gbVwHl4YPSq6BcC92TQpe7qUTh6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/cz4vLJrmaV1zJlRYbxqtvLzeLWB.jpg",
+    "rating": 7.1,
+    "release_date": "2026-01-28",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "v8R0xDczERo",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADWA0AAmQFwUU60-o-ruDJNxYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": true
+  },
+  {
+    "csv_id": "1607596-fist-to-fist",
+    "tmdb_id": 1607596,
+    "imdb_id": "",
+    "title": "Fist to Fist",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies"
+    ],
+    "genres": [
+      "Action"
+    ],
+    "overview": "In 2006, anti-narcotics chief He Guangchen targets the notorious “General” drug syndicate, but the operation is sabotaged by a masked rogue and a trusted ally’s betrayal. Facing loss and deception, He Guangchen races against time to close the case.",
+    "poster": "https://image.tmdb.org/t/p/w500/n6B5LbQ79WgPBaVjmPGFc2I6OJS.jpg",
+    "backdrop": "",
+    "rating": 5.4,
+    "release_date": "2026-01-10",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADVQ0AAmQFwUVN1YWWHtxfMxYE",
+        "quality": "1080p"
+      }
+    ],
+    "channelBroadcasted": true
+  },
+  {
     "csv_id": "2734-law-order-special-victims-unit",
     "tmdb_id": 2734,
     "imdb_id": "",
