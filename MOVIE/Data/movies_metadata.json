@@ -1,53 +1,35 @@
 [
   {
-    "csv_id": "46952-the-blacklist",
-    "tmdb_id": 46952,
+    "csv_id": "66203-soy-luna",
+    "tmdb_id": 66203,
     "imdb_id": "",
-    "title": "The Blacklist",
+    "title": "Soy Luna",
     "type": "Series",
     "categories": [
       "Main",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
       "Hollywood/British Series"
     ],
     "genres": [
-      "Drama",
-      "Crime",
-      "Mystery"
+      "Soap",
+      "Family",
+      "Mystery",
+      "Comedy"
     ],
-    "overview": "Raymond \"Red\" Reddington, one of the FBI's most wanted fugitives, surrenders in person at FBI Headquarters in Washington, D.C. He claims that he and the FBI have the same interests: bringing down dangerous criminals and terrorists. In the last two decades, he's made a list of criminals and terrorists that matter the most but the FBI cannot find because it does not know they exist. Reddington calls this \"The Blacklist\". Reddington will co-operate, but insists that he will speak only to Elizabeth Keen, a rookie FBI profiler.",
-    "poster": "https://image.tmdb.org/t/p/w500/4HTfd1PhgFUenJxVuBDNdLmdr0c.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/2eIlCirgcvEwmCSYh2wDfz5Sxvz.jpg",
-    "rating": 7.6,
-    "release_date": "2013-09-23",
-    "language": "en",
+    "overview": "Luna Valente lives with her family in Cancún, Mexico. She goes to school, has her own group of friends, has a job, and loves to skate. However, her life changes when her parents are given a job offer that moves them to Buenos Aires, Argentina. There she finds a new skating rink (named Jam & Roller), learns freestyling, makes new friends, and even falls in love.",
+    "poster": "https://image.tmdb.org/t/p/w500/4JDmIzhNF7aMsDGlxVwkQ9kv9E6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mXVr88l7877i0P4cLQl1mUvaXGJ.jpg",
+    "rating": 8,
+    "release_date": "2016-03-14",
+    "language": "es",
     "cast": [],
     "director": "",
-    "trailer": "JGBIimq1I3A",
+    "trailer": "naiCwvOhjc0",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADfQ8AAp_ruEVch0469RTa7hYE",
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADUA8AAp_ruEV9zqfrMiopgxYE",
         "season": "Season 1"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADfg8AAp_ruEVoY_S-VVrujhYE",
-        "season": "Season 2"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADfw8AAp_ruEWbukXxelv4BhYE",
-        "season": "Season 3"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADgA8AAp_ruEXj_LvSI5_DjRYE",
-        "season": "Season 4"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADgQ8AAp_ruEWXdyrR81ozYRYE",
-        "season": "Season 5"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADgg8AAp_ruEWCWwRFNNi0xxYE",
-        "season": "Season 6"
       }
     ]
   },
