@@ -47248,7 +47248,14 @@
     "csv_id": "277834-moana",
     "type": "Movie",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADXREAAi85WUccXzLJvtRz_RYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADXREAAi85WUccXzLJvtRz_RYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADqQsAAmQFwUXaZx62w6bULhYE",
+        "quality": "1080p"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/9tzN8sPbyod2dsa0lwuvrwBDWra.jpg",
     "rating": 7.6,
