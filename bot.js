@@ -295,6 +295,13 @@ async function syncCatalogFromGitHub() {
                     const titleKey = String(m.title || "").toLowerCase().trim();
                     const hasLinks = Array.isArray(m.links) && m.links.length > 0 && m.links.some(l => l && (l.url || l.link));
 
+                    // If already broadcasted according to metadata flag, record in tracker and skip
+                    if (m.channelBroadcasted === true) {
+                        if (idKey) broadcastedCatalogIds.add(idKey);
+                        if (titleKey) broadcastedCatalogIds.add(titleKey);
+                        continue;
+                    }
+
                     if (hasLinks && idKey && !broadcastedCatalogIds.has(idKey) && (!titleKey || !broadcastedCatalogIds.has(titleKey))) {
                         newTitlesToBroadcast.push(m);
                     }
@@ -302,7 +309,8 @@ async function syncCatalogFromGitHub() {
 
                 if (newTitlesToBroadcast.length > 0) {
                     console.log(`[CatalogAutoPublish] Found ${newTitlesToBroadcast.length} newly published title(s) to announce to @filmhouse_main!`);
-                    for (const m of newTitlesToBroadcast) {
+                    for (let idx = 0; idx < newTitlesToBroadcast.length; idx++) {
+                        const m = newTitlesToBroadcast[idx];
                         try {
                             const res = await publishMovieToChannel(m);
                             if (res && res.message_id) {
@@ -315,6 +323,12 @@ async function syncCatalogFromGitHub() {
                         const titleKey = String(m.title || "").toLowerCase().trim();
                         if (idKey) broadcastedCatalogIds.add(idKey);
                         if (titleKey) broadcastedCatalogIds.add(titleKey);
+
+                        // Pacing delay between consecutive broadcasts to prevent Telegram rate limit (429)
+                        // and ensure Telegram's linked discussion group forwarder doesn't drop group comment threads
+                        if (idx < newTitlesToBroadcast.length - 1) {
+                            await new Promise(r => setTimeout(r, 3500));
+                        }
                     }
                     try {
                         const dir = path.dirname(BROADCASTED_CATALOG_FILE);
@@ -3504,7 +3518,7 @@ async function init() {
                             await callTelegramWithRetry('sendMessage', userId, text, { parse_mode: "HTML" });
                         } catch (e) {
                             if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
-                                await db.collection("users").doc(userId).update({ blockedBot: true });
+                                await db.collection("users").doc(userId).update({ blockedBot: true }).catch(() => {});
                             }
                             console.warn(`Failed to send boost confirmation to ${userId}:`, e.message);
                         }

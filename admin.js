@@ -3733,14 +3733,10 @@ if (addMovieForm) {
         updatePublishButtonState();
         renderCatalogList();
         
-        // Auto-post release announcement to Main Channel if checked and has links
+        // Configure whether this new title should be broadcasted upon Publish Changes
         const postAddMovieToChan = document.getElementById("add-movie-post-to-channel");
-        if (postAddMovieToChan && postAddMovieToChan.checked && typeof window.broadcastMovieToMainChannel === 'function') {
-            if (newMovie.links && newMovie.links.length > 0) {
-                window.broadcastMovieToMainChannel(newMovie).then(() => {
-                    newMovie.channelBroadcasted = true;
-                }).catch(err => console.warn("Failed channel broadcast on add:", err));
-            }
+        if (postAddMovieToChan && !postAddMovieToChan.checked) {
+            newMovie.channelBroadcasted = true; // Admin opted out of broadcast
         }
         // Always record publication duty activity for the admin adding the movie to catalog
         if (typeof window.recordAdminActivity === 'function') {
@@ -3971,10 +3967,15 @@ if (publishBtn) {
                         Array.isArray(m.links) && m.links.length > 0 &&
                         !m.channelBroadcasted
                     );
-                    for (const movieToBroadcast of candidatesToBroadcast) {
+                    for (let bIdx = 0; bIdx < candidatesToBroadcast.length; bIdx++) {
+                        const movieToBroadcast = candidatesToBroadcast[bIdx];
                         try {
                             await window.broadcastMovieToMainChannel(movieToBroadcast);
                             movieToBroadcast.channelBroadcasted = true;
+                            // Add 3.5s delay between consecutive broadcasts to avoid 429 flood and dropped linked group forwards
+                            if (bIdx < candidatesToBroadcast.length - 1) {
+                                await new Promise(r => setTimeout(r, 3500));
+                            }
                         } catch (broadcastErr) {
                             console.warn("[PUBLISH AUTO-BROADCAST] Warning broadcasting to channel:", broadcastErr);
                         }
