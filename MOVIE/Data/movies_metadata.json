@@ -49891,14 +49891,42 @@
     "csv_id": "60625-rick-and-morty",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADBAAD9w8AAhnFwFH0gqSh8REx3xYE",
-      "https://t.me/FilmHouseFilebot?start=BQADBAAD-A8AAhnFwFHIgxwMRy8btBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADBAAD-g8AAhnFwFHmMf96rzhPbRYE",
-      "https://t.me/FilmHouseFilebot?start=BQADBAAD_Q8AAhnFwFF88_q-O40c7RYE",
-      "https://t.me/FilmHouseFilebot?start=BQADBAADAhAAAhnFwFFA7w_VlATwaBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADBAADAxAAAhnFwFGY-l92ojf5iRYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD5wQAAvt7aEaSYFc0Gl696RYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADhB4AAh-4UEasqAoVylNiFRYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADBAAD9w8AAhnFwFH0gqSh8REx3xYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADBAAD-A8AAhnFwFHIgxwMRy8btBYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADBAAD-g8AAhnFwFHmMf96rzhPbRYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADBAAD_Q8AAhnFwFF88_q-O40c7RYE",
+        "season": "Season 4"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADBAADAhAAAhnFwFFA7w_VlATwaBYE",
+        "season": "Season 5"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADBAADAxAAAhnFwFGY-l92ojf5iRYE",
+        "season": "Season 6"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD5wQAAvt7aEaSYFc0Gl696RYE",
+        "season": "Season 7"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhB4AAh-4UEasqAoVylNiFRYE",
+        "season": "Season 8"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADmgsAAmQFuUUAAfKCghV9t0QWBA",
+        "season": "Season 9"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/owhkU6KRqdXoUQpjV8uyZGPtX58.jpg",
     "rating": 8.7,
