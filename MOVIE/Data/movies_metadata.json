@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "22538-scott-pilgrim-vs-the-world",
+    "tmdb_id": 22538,
+    "imdb_id": "",
+    "title": "Scott Pilgrim vs. the World",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies"
+    ],
+    "genres": [
+      "Action",
+      "Comedy",
+      "Romance"
+    ],
+    "overview": "As bass guitarist for a garage-rock band, Scott Pilgrim has never had trouble getting a girlfriend; usually, the problem is getting rid of them. But when Ramona Flowers skates into his heart, he finds she has the most troublesome baggage of all: an army of ex-boyfriends who will stop at nothing to eliminate him from her list of suitors.",
+    "poster": "https://image.tmdb.org/t/p/w500/g5IoYeudx9XBEfwNL0fHvSckLBz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6R9nT6m8wmzayV5XOQq3TRA6yZw.jpg",
+    "rating": 7.5,
+    "release_date": "2010-08-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "5wL2I_JVzgw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADKBYAAp_ruEWaS85SDCnpERYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "66203-soy-luna",
     "tmdb_id": 66203,
     "imdb_id": "",
@@ -31,7 +63,8 @@
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADUA8AAp_ruEV9zqfrMiopgxYE",
         "season": "Season 1"
       }
-    ]
+    ],
+    "channelBroadcasted": true
   },
   {
     "csv_id": "Secret_Lives_2026",
