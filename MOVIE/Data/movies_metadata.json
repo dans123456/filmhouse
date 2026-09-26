@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "239993-what-s-wrong-with-secretary-kim",
+    "tmdb_id": 239993,
+    "imdb_id": "",
+    "title": "What's Wrong With Secretary Kim",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "A competent secretary and a narcissistic boss fall in love while uncovering a traumatic past that causes them to question whether their feelings are real or the result of a shared trauma.",
+    "poster": "https://image.tmdb.org/t/p/w500/2NUtA4ODZphAknsXna84Nk9rq6F.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wvCF59w0fRTmPg3sJUxY3sf5p2C.jpg",
+    "rating": 8.3,
+    "release_date": "2024-03-18",
+    "language": "tl",
+    "cast": [],
+    "director": "",
+    "trailer": "kcVYwdufwBI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADJQwAAmQFuUUIZd-48oeImRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "68018-the-blacklist-redemption",
     "tmdb_id": 68018,
     "imdb_id": "",
