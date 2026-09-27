@@ -3827,10 +3827,26 @@ if (publishBtn) {
             ]);
 
             if (!getCSVResponse.ok) {
-                throw new Error(`Failed to fetch datafile.csv details from GitHub: ${getCSVResponse.statusText}`);
+                let errMsg = getCSVResponse.statusText;
+                try {
+                    const errData = await getCSVResponse.json();
+                    if (errData && errData.message) errMsg = errData.message;
+                } catch (_) {}
+                if (getCSVResponse.status === 401 || getCSVResponse.status === 403) {
+                    throw new Error(`GitHub Authentication Failed (HTTP ${getCSVResponse.status}: ${errMsg}). Your Personal Access Token (PAT) is invalid, revoked, or expired. Please update it in ⚙️ System Configuration.`);
+                }
+                throw new Error(`GitHub API error fetching datafile.csv (${getCSVResponse.status}): ${errMsg}`);
             }
             if (!getJSONResponse.ok) {
-                throw new Error(`Failed to fetch movies_metadata.json details from GitHub: ${getJSONResponse.statusText}`);
+                let errMsg = getJSONResponse.statusText;
+                try {
+                    const errData = await getJSONResponse.json();
+                    if (errData && errData.message) errMsg = errData.message;
+                } catch (_) {}
+                if (getJSONResponse.status === 401 || getJSONResponse.status === 403) {
+                    throw new Error(`GitHub Authentication Failed (HTTP ${getJSONResponse.status}: ${errMsg}). Your Personal Access Token (PAT) is invalid, revoked, or expired. Please update it in ⚙️ System Configuration.`);
+                }
+                throw new Error(`GitHub API error fetching movies_metadata.json (${getJSONResponse.status}): ${errMsg}`);
             }
 
             const [csvData, jsonData] = await Promise.all([
@@ -3891,8 +3907,15 @@ if (publishBtn) {
             });
 
             if (!putCSVResponse.ok) {
-                const errData = await putCSVResponse.json();
-                throw new Error(`CSV update failed: ${errData.message || putCSVResponse.statusText}`);
+                let errMsg = putCSVResponse.statusText;
+                try {
+                    const errData = await putCSVResponse.json();
+                    if (errData && errData.message) errMsg = errData.message;
+                } catch (_) {}
+                if (putCSVResponse.status === 401 || putCSVResponse.status === 403) {
+                    throw new Error(`GitHub Authentication Failed (HTTP ${putCSVResponse.status}: ${errMsg}). Your Personal Access Token (PAT) is invalid, revoked, or expired. Please update it in ⚙️ System Configuration.`);
+                }
+                throw new Error(`CSV update failed: ${errMsg}`);
             }
 
             // Upload movies_metadata.json second
@@ -3911,8 +3934,15 @@ if (publishBtn) {
             });
 
             if (!putJSONResponse.ok) {
-                const errData = await putJSONResponse.json();
-                throw new Error(`JSON update failed: ${errData.message || putJSONResponse.statusText}`);
+                let errMsg = putJSONResponse.statusText;
+                try {
+                    const errData = await putJSONResponse.json();
+                    if (errData && errData.message) errMsg = errData.message;
+                } catch (_) {}
+                if (putJSONResponse.status === 401 || putJSONResponse.status === 403) {
+                    throw new Error(`GitHub Authentication Failed (HTTP ${putJSONResponse.status}: ${errMsg}). Your Personal Access Token (PAT) is invalid, revoked, or expired. Please update it in ⚙️ System Configuration.`);
+                }
+                throw new Error(`JSON update failed: ${errMsg}`);
             }
             
             // Update local check SHA from JSON commit response to avoid self-triggering updates dialog
@@ -3993,10 +4023,10 @@ if (publishBtn) {
             renderCatalogList();
         } catch (error) {
             console.error("Publishing error:", error);
-            if (error.message && (error.message.includes("Failed to fetch") || error.message.includes("fetch failed"))) {
+            if (error.name === "TypeError" && (error.message.includes("fetch") || error.message.includes("NetworkError"))) {
                 alert("Network Connection Error: Could not reach GitHub. Please check your mobile signal/internet connection and try again.");
             } else {
-                alert(`Failed to publish changes: ${error.message}`);
+                alert(`Failed to publish changes:\n\n${error.message}`);
             }
         } finally {
             publishBtn.disabled = false;
@@ -5553,73 +5583,101 @@ if (fulfillForm && fulfillRequestModal) {
                         })
                     ]);
                     
-                    if (getCSVResponse.ok && getJSONResponse.ok) {
-                        const csvData = await getCSVResponse.json();
-                        const jsonData = await getJSONResponse.json();
-                        const shaCSV = csvData.sha;
-                        const shaJSON = jsonData.sha;
-                        
-                        const csvContent = generateCSVContent();
-                        const jsonContent = JSON.stringify(allCatalogMovies, null, 2);
-                        
-                        const base64CSV = btoa(unescape(encodeURIComponent(csvContent)));
-                        const base64JSON = btoa(unescape(encodeURIComponent(jsonContent)));
-                        
-                        // Push CSV
-                        const putCSVResponse = await fetch(apiCSVUrl, {
-                            method: "PUT",
-                            headers: {
-                                "Authorization": `token ${token}`,
-                                "Content-Type": "application/json",
-                                "Accept": "application/vnd.github.v3+json"
-                            },
-                            body: JSON.stringify({
-                                message: `Auto-update catalog (datafile.csv) on request fulfill: ${currentFulfillTitle}`,
-                                content: base64CSV,
-                                sha: shaCSV
-                            })
-                        });
-                        
-                        // Push JSON
-                        if (putCSVResponse.ok) {
-                            const putJSONResponse = await fetch(apiJSONUrl, {
-                                method: "PUT",
-                                headers: {
-                                    "Authorization": `token ${token}`,
-                                    "Content-Type": "application/json",
-                                    "Accept": "application/vnd.github.v3+json"
-                                },
-                                body: JSON.stringify({
-                                    message: `Auto-update metadata (movies_metadata.json) on request fulfill: ${currentFulfillTitle}`,
-                                    content: base64JSON,
-                                    sha: shaJSON
-                                })
-                            });
-                            
-                            if (putJSONResponse.ok) {
-                                const jsonResData = await putJSONResponse.json();
-                                if (jsonResData && jsonResData.content) {
-                                    lastKnownJsonSha = jsonResData.content.sha;
-                                }
-                                catalogChangesMade = false;
-                                newlyAddedIds = [];
-                                newlyUpdatedIds = [];
-                                localStorage.removeItem("filmhouse_unpublished_catalog");
-                                
-                                if (submitBtn) {
-                                    submitBtn.disabled = false;
-                                    submitBtn.textContent = "Fulfill Request";
-                                }
-                                
-                                renderCatalogList();
-                                updatePublishButtonState();
-                                fulfillRequestModal.classList.remove("active");
-                                showToast(`Successfully fulfilled requests and published "${currentFulfillTitle}" directly live to GitHub! 🚀`, "success");
-                                return;
-                            }
+                    if (!getCSVResponse.ok) {
+                        let errMsg = getCSVResponse.statusText;
+                        try { const d = await getCSVResponse.json(); if (d && d.message) errMsg = d.message; } catch (_) {}
+                        if (getCSVResponse.status === 401 || getCSVResponse.status === 403) {
+                            throw new Error(`GitHub PAT invalid or expired (${getCSVResponse.status}: ${errMsg})`);
                         }
+                        throw new Error(`Failed to fetch CSV: ${errMsg}`);
                     }
-                    throw new Error("GitHub API transaction failed");
+                    if (!getJSONResponse.ok) {
+                        let errMsg = getJSONResponse.statusText;
+                        try { const d = await getJSONResponse.json(); if (d && d.message) errMsg = d.message; } catch (_) {}
+                        if (getJSONResponse.status === 401 || getJSONResponse.status === 403) {
+                            throw new Error(`GitHub PAT invalid or expired (${getJSONResponse.status}: ${errMsg})`);
+                        }
+                        throw new Error(`Failed to fetch JSON: ${errMsg}`);
+                    }
+
+                    const csvData = await getCSVResponse.json();
+                    const jsonData = await getJSONResponse.json();
+                    const shaCSV = csvData.sha;
+                    const shaJSON = jsonData.sha;
+                    
+                    const csvContent = generateCSVContent();
+                    const jsonContent = JSON.stringify(allCatalogMovies, null, 2);
+                    
+                    const base64CSV = btoa(unescape(encodeURIComponent(csvContent)));
+                    const base64JSON = btoa(unescape(encodeURIComponent(jsonContent)));
+                    
+                    // Push CSV
+                    const putCSVResponse = await fetch(apiCSVUrl, {
+                        method: "PUT",
+                        headers: {
+                            "Authorization": `token ${token}`,
+                            "Content-Type": "application/json",
+                            "Accept": "application/vnd.github.v3+json"
+                        },
+                        body: JSON.stringify({
+                            message: `Auto-update catalog (datafile.csv) on request fulfill: ${currentFulfillTitle}`,
+                            content: base64CSV,
+                            sha: shaCSV
+                        })
+                    });
+                    
+                    if (!putCSVResponse.ok) {
+                        let errMsg = putCSVResponse.statusText;
+                        try { const d = await putCSVResponse.json(); if (d && d.message) errMsg = d.message; } catch (_) {}
+                        if (putCSVResponse.status === 401 || putCSVResponse.status === 403) {
+                            throw new Error(`GitHub PAT invalid or expired (${putCSVResponse.status}: ${errMsg})`);
+                        }
+                        throw new Error(`CSV update failed: ${errMsg}`);
+                    }
+
+                    // Push JSON
+                    const putJSONResponse = await fetch(apiJSONUrl, {
+                        method: "PUT",
+                        headers: {
+                            "Authorization": `token ${token}`,
+                            "Content-Type": "application/json",
+                            "Accept": "application/vnd.github.v3+json"
+                        },
+                        body: JSON.stringify({
+                            message: `Auto-update metadata (movies_metadata.json) on request fulfill: ${currentFulfillTitle}`,
+                            content: base64JSON,
+                            sha: shaJSON
+                        })
+                    });
+                    
+                    if (!putJSONResponse.ok) {
+                        let errMsg = putJSONResponse.statusText;
+                        try { const d = await putJSONResponse.json(); if (d && d.message) errMsg = d.message; } catch (_) {}
+                        if (putJSONResponse.status === 401 || putJSONResponse.status === 403) {
+                            throw new Error(`GitHub PAT invalid or expired (${putJSONResponse.status}: ${errMsg})`);
+                        }
+                        throw new Error(`JSON update failed: ${errMsg}`);
+                    }
+
+                    const jsonResData = await putJSONResponse.json();
+                    if (jsonResData && jsonResData.content) {
+                        lastKnownJsonSha = jsonResData.content.sha;
+                    }
+                    catalogChangesMade = false;
+                    newlyAddedIds = [];
+                    newlyUpdatedIds = [];
+                    localStorage.removeItem("filmhouse_unpublished_catalog");
+                    
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Fulfill Request";
+                    }
+                    
+                    renderCatalogList();
+                    updatePublishButtonState();
+                    fulfillRequestModal.classList.remove("active");
+                    showToast(`Successfully fulfilled requests and published "${currentFulfillTitle}" directly live to GitHub! 🚀`, "success");
+                    return;
                 } catch (publishErr) {
                     console.error("Auto-publishing failed:", publishErr);
                     if (submitBtn) {
@@ -5629,7 +5687,7 @@ if (fulfillForm && fulfillRequestModal) {
                     renderCatalogList();
                     updatePublishButtonState();
                     fulfillRequestModal.classList.remove("active");
-                    showToast(`Firestore updated! Note: GitHub publish failed. Use 'Publish Changes' in the header to retry.`, "warning");
+                    showToast(`Firestore updated! Note: GitHub publish failed (${publishErr.message}). Update token in Settings or use 'Publish Changes' in header to retry.`, "warning");
                 }
             } else {
                 if (submitBtn) {
