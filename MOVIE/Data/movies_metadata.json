@@ -1,5 +1,68 @@
 [
   {
+    "csv_id": "254420-elle",
+    "tmdb_id": 254420,
+    "imdb_id": "",
+    "title": "Elle",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "Before Elle Woods was a fish-out-of-water at Harvard, we meet her in 1995 in the tumultuous waters of high school where she encounters tricky friendships, forbidden romance, and questionable fashion choices. In this unexpected chapter of her adolescence, we learn about the experiences that shaped Elle into the iconic young woman we've come to know and love.",
+    "poster": "https://image.tmdb.org/t/p/w500/dpH7Lyrs7z7MlTGgfeibryGnWAv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/truh4rtTUdRVYGeT0n17dxvdv41.jpg",
+    "rating": 7.8,
+    "release_date": "2026-07-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "6KsT3K5ynrU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADwhcAAmQFwUWQrYYP4Db5WRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
+    "csv_id": "1477317-your-fault-london",
+    "tmdb_id": 1477317,
+    "imdb_id": "",
+    "title": "Your Fault: London",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Romance",
+      "Drama"
+    ],
+    "overview": "Nick and Noah are both embarking on life-changing adventures that are threatening to pull them apart—Nick in business with his father and Noah starting a fresh chapter at Oxford University. Now living separate lives, and meeting new people, they find themselves entangled in temptations, rivalries, and betrayals and their bond is tested like never before. As secrets unravel and temptation rises, they must fight to hold onto each other—or risk losing everything.",
+    "poster": "https://image.tmdb.org/t/p/w500/nLxu237EJAisFCYKK48hN9Plobx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wQOhbCP6H8bO5ddlXDZT207orew.jpg",
+    "rating": 7.4,
+    "release_date": "2026-06-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "A3ZbjkDxYUs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADsBcAAmQFwUVUqqNtp5GyExYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1412598-killer-whale",
     "tmdb_id": 1412598,
     "imdb_id": "",
