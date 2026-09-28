@@ -42261,7 +42261,14 @@
     "csv_id": "243875-georgie-mandy-s-first-marriage",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADuQkAAp3eOEYRuyg8YUtzRRYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADuQkAAp3eOEYRuyg8YUtzRRYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADBg0AAjRm0UVyIARHhm3QfRYE",
+        "season": "Season 2"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/3z2mYFxUkzanb2eeIcVyfJq0G3q.jpg",
     "rating": 7.9,
