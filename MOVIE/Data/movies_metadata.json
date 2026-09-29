@@ -43762,8 +43762,18 @@
     "csv_id": "94997-house-of-the-dragon",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADRgoAArCt0UUhqaSHiqNxHBYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD9xgAAp4PiEaWOJj1kOxcoxYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADRgoAArCt0UUhqaSHiqNxHBYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD9xgAAp4PiEaWOJj1kOxcoxYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADbAkAAjRm4UWZ7fiTgn-NfhYE",
+        "season": "Season 3"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/7V0Ebks0GgpKvQ7QbLAIdX5dos4.jpg",
     "rating": 8.4,
