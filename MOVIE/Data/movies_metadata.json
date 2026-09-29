@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "299365-reborn-rookie",
+    "tmdb_id": 299365,
+    "imdb_id": "",
+    "title": "Reborn Rookie",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "After a powerful conglomerate chairman is betrayed by his children and wakes up in the body of a young soccer player, he uses his business genius and athletic physique to seek ultimate revenge against his family.",
+    "poster": "https://image.tmdb.org/t/p/w500/kPHv37XVpyWCsae3gtHujw1wPyW.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nxOsQE8UrifZpQ9hcZ7xjMHEbmn.jpg",
+    "rating": 8.2,
+    "release_date": "2026-05-30",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "C1Dipc12CtY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADcAkAAjSf4UWvb4ic6LWTphYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1522689-why-did-i-get-married-again",
     "tmdb_id": 1522689,
     "imdb_id": "",
