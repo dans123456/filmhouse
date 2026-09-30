@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "278573-perfect-crown",
+    "tmdb_id": 278573,
+    "imdb_id": "",
+    "title": "Perfect Crown",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "In 21st-century Korea under a constitutional monarchy, a chaebol heiress with everything but status tries to take control of her future after crossing paths with a lonely prince with nothing but his title. Together, bound by a contract marriage, they begin a class-defying romance to rewrite destiny.",
+    "poster": "https://image.tmdb.org/t/p/w500/ocXkHSslrSWMz2ZJGl5MjF6dQr3.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6ekykPwvAywJRjFEnUoCFWTO9O3.jpg",
+    "rating": 9,
+    "release_date": "2026-04-10",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "MOXFNE9x1G4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADyxwAAjSf6UVawldsRsK4xRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1781286-wrong-one",
     "tmdb_id": 1781286,
     "imdb_id": "",
@@ -25,7 +56,8 @@
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADhxwAAjSf6UWGmbV4mnC0dRYE",
         "quality": "720p"
       }
-    ]
+    ],
+    "channelBroadcasted": true
   },
   {
     "csv_id": "1764980-worth-more-than-gold",
@@ -55,7 +87,8 @@
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADhhwAAjSf6UXqw0_RBz60RBYE",
         "quality": "720p"
       }
-    ]
+    ],
+    "channelBroadcasted": true
   },
   {
     "csv_id": "1314235-triumph-of-the-heart",
@@ -86,7 +119,8 @@
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADhRwAAjSf6UUq2dhzx1K7lRYE",
         "quality": "720p"
       }
-    ]
+    ],
+    "channelBroadcasted": true
   },
   {
     "csv_id": "1515138-trango",
@@ -119,7 +153,8 @@
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADhBwAAjSf6UUvkj538ka1jRYE",
         "quality": "720p"
       }
-    ]
+    ],
+    "channelBroadcasted": true
   },
   {
     "csv_id": "1781284-the-paper-trap",
