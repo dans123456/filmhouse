@@ -1,5 +1,197 @@
 [
   {
+    "csv_id": "1510055-the-furious-pertaruhan-maruah",
+    "tmdb_id": 1510055,
+    "imdb_id": "",
+    "title": "The Furious: Pertaruhan Maruah",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Drama"
+    ],
+    "overview": "When YouTuber-boxer Danial insults their late father's name, brothers Firdaus and Hakim reunite - one fighting for redemption, the other for revenge - in a battle that will decide not just who wins, but what remains of The Furious legacy.",
+    "poster": "https://image.tmdb.org/t/p/w500/vbWGR2d7tojUgXyTRExB8UXDV2u.jpg",
+    "backdrop": "",
+    "rating": 7.5,
+    "release_date": "2026-05-28",
+    "language": "ms",
+    "cast": [],
+    "director": "",
+    "trailer": "hBuvr3hsJ7o",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADuQsAAhf6-EXxW-w6VWZ9tRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1492640-unabomber",
+    "tmdb_id": 1492640,
+    "imdb_id": "",
+    "title": "UNABOMBER",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Thriller",
+      "Drama",
+      "Crime"
+    ],
+    "overview": "Follow Ted Kaczynski's transformation from Harvard prodigy into the infamous Unabomber. Subjected to controversial psychological experiments by Professor Henry Murray, Kaczynski's troubled past resurfaces decades later when his manhunt, led by FBI agent Joanne Miller, brings to light the chilling consequences of ambition and isolation.",
+    "poster": "https://image.tmdb.org/t/p/w500/39aMkR8Y5vhCG9dTkjiqRl8AVqp.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/58D9nalUYW5L5K0guw7hcpsEJBH.jpg",
+    "rating": 6.7,
+    "release_date": "2026-09-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "B3tR6qQjbgI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADuwsAAhf6-EVMiDelM6RtoBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1294189-the-mongoose",
+    "tmdb_id": 1294189,
+    "imdb_id": "",
+    "title": "The Mongoose",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Thriller"
+    ],
+    "overview": "A falsely accused war hero with nothing to lose leads police on an epic televised cross-country car chase, helped by members of his former Special Forces Army battalion and closely monitored by a fascinated public rooting for his safe getaway.",
+    "poster": "https://image.tmdb.org/t/p/w500/eSS5mvSG84UUuvtbHel5Yu3Wik4.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/iRIhPqqoUHiFBxn8oYf3gCQnaKk.jpg",
+    "rating": 0,
+    "release_date": "2026-10-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "aHrMFtt40_Q",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADvQsAAhf6-EUXbDEvM8xAvRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1242876-500-miles",
+    "tmdb_id": 1242876,
+    "imdb_id": "",
+    "title": "500 Miles",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "A broken family is forced to come together when 16-year-old Finn and his livewire younger brother Charlie run away from trouble at home in England to reach their estranged grandfather on Ireland’s stunning and wild west coast.",
+    "poster": "https://image.tmdb.org/t/p/w500/FhRosui9MSdxdyD3h0skOFhqED.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/smTYZM6iSRwB9BJXFkOTQ0rG1VM.jpg",
+    "rating": 6.4,
+    "release_date": "2026-05-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "M0pP7xKvFJ0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADvgsAAhf6-EVKEQJmcdL5cBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1323244-rage-of-stars",
+    "tmdb_id": 1323244,
+    "imdb_id": "",
+    "title": "Rage of Stars",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Science Fiction",
+      "Thriller"
+    ],
+    "overview": "A story about a woman from the International Special Forces Unit, who has a premonition about the impending end of humanity.",
+    "poster": "https://image.tmdb.org/t/p/w500/oLld47ZT1I3iecM3OWhIphohQUJ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/z7lZgL5tzefTfhyRtouThFhsuUS.jpg",
+    "rating": 6.6,
+    "release_date": "2026-08-06",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "F5bYhuO2Rkg",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADwQsAAhf6-EVMs5MEtUL_LBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "9837-the-prince-of-egypt",
+    "tmdb_id": 9837,
+    "imdb_id": "",
+    "title": "The Prince of Egypt",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Classic Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Adventure",
+      "Animation",
+      "Drama",
+      "Family"
+    ],
+    "overview": "The strong bond between two Royal Egyptian brothers is challenged when their chosen responsibilities set them at odds, with extraordinary consequences.",
+    "poster": "https://image.tmdb.org/t/p/w500/2xUjYwL6Ol7TLJPPKs7sYW5PWLX.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/565DYYXgdRYMiETLi2EDx4p7s92.jpg",
+    "rating": 7.3,
+    "release_date": "1998-12-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "gGB1bCrJnL4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADwwsAAhf6-EWLGe5WYYMNwBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1204680-coyote-vs-acme",
     "tmdb_id": 1204680,
     "imdb_id": "",
