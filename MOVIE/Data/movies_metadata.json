@@ -29,7 +29,8 @@
         "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADaxwAAhf6-EWZKjUBAgcVIhYE",
         "season": "Season 1"
       }
-    ]
+    ],
+    "channelBroadcasted": true
   },
   {
     "csv_id": "1510055-the-furious-pertaruhan-maruah",
@@ -5170,6 +5171,10 @@
       {
         "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADFhEAAo5qiEVWEPtiNA0VfxYE",
         "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADbRwAAhf6-EVqP-Cm9QvMiRYE",
+        "quality": "1080p"
       }
     ]
   },
