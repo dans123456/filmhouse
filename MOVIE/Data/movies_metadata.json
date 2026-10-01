@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "306215-the-one-i-love",
+    "tmdb_id": 306215,
+    "imdb_id": "",
+    "title": "The One I Love",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
+    ],
+    "genres": [
+      "Family",
+      "Drama"
+    ],
+    "overview": "Erkan Aldur, a young man from a wealthy Istanbul family, is stationed in eastern Turkey to complete his mandatory military service in a remote, earthquake-stricken region. In this harsh and unfamiliar landscape, he meets Dicle, a young woman who has lived her entire life in the village and whose world is shaped by tradition, family, and community. Their encounter brings together two very different worlds, setting in motion a journey of change, resilience, and unexpected connection. As Dicle steps into the unfamiliar and Erkan faces new responsibilities, their story unfolds into a heartfelt and transformative tale of love and courage, that bridges even the widest divides",
+    "poster": "https://image.tmdb.org/t/p/w500/eVMb930nCNRYGhPlAVRI5hsMdAz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jlIKAoJNn5lLF2vXMcWSEMkOAnN.jpg",
+    "rating": 7.2,
+    "release_date": "2026-02-12",
+    "language": "tr",
+    "cast": [],
+    "director": "",
+    "trailer": "Yji8l5MhIkE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADYRwAAhf6-EVRU6TrZNUuJBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1510055-the-furious-pertaruhan-maruah",
     "tmdb_id": 1510055,
     "imdb_id": "",
