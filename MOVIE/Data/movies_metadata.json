@@ -1,5 +1,52 @@
 [
   {
+    "csv_id": "66676-queen-of-the-south",
+    "tmdb_id": 66676,
+    "imdb_id": "",
+    "title": "Queen of the South",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Crime",
+      "Drama"
+    ],
+    "overview": "Teresa flees Mexico after her drug-runner boyfriend is murdered. Settling in Dallas, she looks to become the country's reigning drug smuggler and to avenge her lover's murder.",
+    "poster": "https://image.tmdb.org/t/p/w500/rzdC5EHkkKJE6OPVdh6gT1pR1c9.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3NVXTxrzxm5x7MBaQlzeLZk9pRD.jpg",
+    "rating": 7.6,
+    "release_date": "2016-06-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "txqu2WoiqT8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADghwAAhf6-EWrQfx5r9A80hYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADgxwAAhf6-EVKsSnBQPIqvRYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADhBwAAhf6-EVLtlfBDvV8KRYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADhRwAAhf6-EX8gw0g9BDoVhYE",
+        "season": "Season 4"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADixwAAhf6-EUzjuTnUoeSYxYE",
+        "season": "Season 5"
+      }
+    ]
+  },
+  {
     "csv_id": "306215-the-one-i-love",
     "tmdb_id": 306215,
     "imdb_id": "",
