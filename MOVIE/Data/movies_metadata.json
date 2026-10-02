@@ -20506,15 +20506,19 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADqAYAAvCwAUdjYFLdtMW5yxYE",
-        "quality": "720p"
+        "season": "Season 1"
       },
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADrAYAAvCwAUceERlIUlLYExYE",
-        "quality": "720p"
+        "season": "Season 2"
       },
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADsQYAAvCwAUfGUKVq2Z4x-hYE",
-        "quality": "720p"
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADxA0AAv8mAAFGuBGE5z4L-ygWBA",
+        "season": "Season 4"
       }
     ]
   },
