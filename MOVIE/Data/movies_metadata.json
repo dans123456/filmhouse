@@ -37633,9 +37633,22 @@
     "csv_id": "107365-bel-air",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD0wQAAhZJEUfXwGRCRS6h8xYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQAD1AQAAhZJEUeN3YpD9f2wBxYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADmQQAAvt7aEanS8iWvp_FlRYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD0wQAAhZJEUfXwGRCRS6h8xYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD1AQAAhZJEUeN3YpD9f2wBxYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADmQQAAvt7aEanS8iWvp_FlRYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADbhcAAv8mCEaz8QVpYFq2wxYE",
+        "season": "Season 4"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/j8tbXWXrL15RucA6H4khq87dEXa.jpg",
     "rating": 7.7,
