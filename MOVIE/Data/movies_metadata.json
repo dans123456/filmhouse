@@ -9934,8 +9934,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Animated Movies",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Animated Movies"
     ],
     "genres": [
       "Animation",
@@ -9955,7 +9955,11 @@
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADdg0AAuOS4ERn3RRnIp-FnhYE",
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADWg8AAv8mCEbVYfxEKVsowxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADWw8AAv8mCEa6yvsgJtgWkBYE",
         "quality": "720p"
       }
     ]
