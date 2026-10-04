@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "197828-stock-struck",
+    "tmdb_id": 197828,
+    "imdb_id": "",
+    "title": "Stock Struck",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama",
+      "Comedy"
+    ],
+    "overview": "Five people, who invested in the stock market, take part in a mysterious stock meeting. There, they learn about life, love, and friendships through investing in stocks.",
+    "poster": "https://image.tmdb.org/t/p/w500/vnMBN03rx1sFYL9Q3gesA2ZRQrz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/f1xdJN7tmujY3A60xjCSpIs7u7h.jpg",
+    "rating": 6.8,
+    "release_date": "2022-08-12",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADRwcAAqBWEEZO844rbkqCbBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "373571-godzilla-king-of-the-monsters",
     "tmdb_id": 373571,
     "imdb_id": "",
