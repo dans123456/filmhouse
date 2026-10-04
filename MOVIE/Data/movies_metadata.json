@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "300507-crew-girl",
+    "tmdb_id": 300507,
+    "imdb_id": "",
+    "title": "Crew Girl",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "After a family scandal, teen rower Teagan Tao moves to a small town and joins an elite prep school's all-boys crew, sparking rivalry and attraction.",
+    "poster": "https://image.tmdb.org/t/p/w500/jkPZW1iHNvlI6077NxSxwITa1tj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lmtTtOjsIBxwKD7LsAD5eeyhq1g.jpg",
+    "rating": 8.3,
+    "release_date": "2026-09-10",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Xs5qsfqp-tA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADVwcAAqBWEEYVc6s_5cPh2BYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1241634-saiyaara",
     "tmdb_id": 1241634,
     "imdb_id": "",
