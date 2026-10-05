@@ -7,8 +7,8 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Teen/High-School",
-      "Hollywood/British Series"
+      "Hollywood/British Series",
+      "Teen/High-School"
     ],
     "genres": [
       "Drama"
@@ -47,6 +47,10 @@
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADkhEAAmZyIUbO3cdPux9xERYE",
         "season": "Season 6"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmBEAAmZyIUY93sCFsJCWzBYE",
+        "season": "Season 7"
       }
     ]
   },
