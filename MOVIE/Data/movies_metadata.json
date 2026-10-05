@@ -1,5 +1,56 @@
 [
   {
+    "csv_id": "72071-the-chi",
+    "tmdb_id": 72071,
+    "imdb_id": "",
+    "title": "The Chi",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "A relevant, timely and distinctive coming-of-age story following a half dozen interrelated characters in the South Side of Chicago. The story centers on Brandon, an ambitious and confident young man who dreams about opening a restaurant of his own someday, but is conflicted between the promise of a new life and his responsibility to his mother and teenage brother back in the South Side.",
+    "poster": "https://image.tmdb.org/t/p/w500/niD8X5pEXpmRUDhSPdDOgI3Gw5Q.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ulXewCeBreYuw1fpjpibYQ66RRv.jpg",
+    "rating": 7.9,
+    "release_date": "2018-01-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "22if69BjkPI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADihEAAmZyIUbXZnbMZXXxVBYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjhEAAmZyIUaJ6kkt4F9W1xYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjxEAAmZyIUbVgyo0OpwDDBYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADkBEAAmZyIUaJK2I0u9Hn5xYE",
+        "season": "Season 4"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADkREAAmZyIUZ75AqVjP7Z8xYE",
+        "season": "Season 5"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADkhEAAmZyIUbO3cdPux9xERYE",
+        "season": "Season 6"
+      }
+    ]
+  },
+  {
     "csv_id": "312849-rich-girl-caretaker-i-m-secretly-the-caregiver-of-the-most-popular-girl-in-this-rich-kid-school",
     "tmdb_id": 312849,
     "imdb_id": "",
