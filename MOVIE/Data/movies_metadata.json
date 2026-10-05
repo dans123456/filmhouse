@@ -51,8 +51,13 @@
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADmBEAAmZyIUY93sCFsJCWzBYE",
         "season": "Season 7"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD0xEAAmZyIUapqmxiRTs80RYE",
+        "season": "Season 8"
       }
-    ]
+    ],
+    "channelBroadcasted": true
   },
   {
     "csv_id": "312849-rich-girl-caretaker-i-m-secretly-the-caregiver-of-the-most-popular-girl-in-this-rich-kid-school",
