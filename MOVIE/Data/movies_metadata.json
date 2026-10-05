@@ -180,8 +180,8 @@
     "type": "Movie",
     "categories": [
       "Main",
-      "Comic",
-      "Hollywood/British Movies"
+      "Hollywood/British Movies",
+      "Comic"
     ],
     "genres": [
       "Science Fiction",
