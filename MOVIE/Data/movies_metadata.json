@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "296756-president-curtis",
+    "tmdb_id": 296756,
+    "imdb_id": "",
+    "title": "President Curtis",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation",
+      "Comedy"
+    ],
+    "overview": "Follow the Commander-in-Chief and his eccentric staff as they tackle the kind of crises that Rick Sanchez could never be bothered with - from interdimensional diplomacy to paranormal investigations and unexplained phenomena.",
+    "poster": "https://image.tmdb.org/t/p/w500/lc9riW73Oee2pBxi1UrDPgyQjEr.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/yoTP91XZZjSvE2gZgGvwNxVW96w.jpg",
+    "rating": 6.8,
+    "release_date": "2026-07-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "KuSbjxrKvUc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADHA4AAmZyIUY1vMAmfBuXNBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "969681-spider-man-brand-new-day",
     "tmdb_id": 969681,
     "imdb_id": "",
