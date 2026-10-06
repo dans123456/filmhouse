@@ -765,7 +765,8 @@ function renderRequestsList() {
         const cleanTitle = rawTitle.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "");
         const yearPart = r.year ? String(r.year).trim() : (rawTitle.match(/\((\d{4})\)/) ? rawTitle.match(/\((\d{4})\)/)[1] : "");
         const tmdbPart = r.tmdb_id ? String(r.tmdb_id).trim() : (r.csv_id ? String(r.csv_id).trim() : "");
-        const seasonPart = r.seasonOrPart ? String(r.seasonOrPart).toLowerCase().trim() : "";
+        const isReqSeries = (r.type || "").toLowerCase() === 'series' || (r.type || "").toLowerCase() === 'tv';
+        const seasonPart = (isReqSeries && r.seasonOrPart) ? String(r.seasonOrPart).toLowerCase().trim() : "";
 
         // Key distinguishes distinct media releases, remakes, and seasons
         const key = tmdbPart 
@@ -834,23 +835,31 @@ function renderRequestsList() {
         }
         
         const inCatalog = allCatalogMovies && allCatalogMovies.some(m => {
+            const hasLinks = Array.isArray(m.links) && m.links.length > 0 && m.links.some(l => {
+                const url = typeof l === 'object' && l !== null ? l.url : l;
+                return url && String(url).trim() !== "";
+            });
+            if (!hasLinks) return false;
+
             const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
             const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
-            if (rId && mId) {
-                if (r.seasonOrPart) {
+            const isSeriesMedia = isReqSeries || (m.type || "").toLowerCase() === 'series' || (m.type || "").toLowerCase() === 'tv';
+
+            if (rId && mId && rId === mId) {
+                if (isSeriesMedia && r.seasonOrPart && String(r.seasonOrPart).toLowerCase().includes("season")) {
                     const cleanReqSeason = r.seasonOrPart.toLowerCase().trim();
-                    return rId === mId && m.links && m.links.some(link => {
+                    return m.links.some(link => {
                         const sLabel = typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "";
                         return sLabel.toLowerCase().trim() === cleanReqSeason;
                     });
                 }
-                return rId === mId;
+                return true;
             }
             
             if (!titlesMatch(m.title, r.title)) return false;
-            if (r.seasonOrPart) {
+            if (isSeriesMedia && r.seasonOrPart && String(r.seasonOrPart).toLowerCase().includes("season")) {
                 const cleanReqSeason = r.seasonOrPart.toLowerCase().trim();
-                return m.links && m.links.some(link => {
+                return m.links.some(link => {
                     const sLabel = typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "";
                     const lUrl = typeof link === 'object' && link !== null ? link.url : link;
                     return sLabel.toLowerCase().trim() === cleanReqSeason && lUrl && String(lUrl).trim() !== "";
@@ -3988,30 +3997,7 @@ if (publishBtn) {
                 }
             }
 
-            // Auto-broadcast any newly published or updated titles with links to Main Channel (@filmhouse_main)
-            if (typeof window.broadcastMovieToMainChannel === 'function') {
-                const affectedIds = new Set([...(newlyAddedIds || []), ...(newlyUpdatedIds || [])]);
-                if (affectedIds.size > 0) {
-                    const candidatesToBroadcast = allCatalogMovies.filter(m => 
-                        affectedIds.has(m.csv_id) && 
-                        Array.isArray(m.links) && m.links.length > 0 &&
-                        !m.channelBroadcasted
-                    );
-                    for (let bIdx = 0; bIdx < candidatesToBroadcast.length; bIdx++) {
-                        const movieToBroadcast = candidatesToBroadcast[bIdx];
-                        try {
-                            await window.broadcastMovieToMainChannel(movieToBroadcast);
-                            movieToBroadcast.channelBroadcasted = true;
-                            // Add 3.5s delay between consecutive broadcasts to avoid 429 flood and dropped linked group forwards
-                            if (bIdx < candidatesToBroadcast.length - 1) {
-                                await new Promise(r => setTimeout(r, 3500));
-                            }
-                        } catch (broadcastErr) {
-                            console.warn("[PUBLISH AUTO-BROADCAST] Warning broadcasting to channel:", broadcastErr);
-                        }
-                    }
-                }
-            }
+            // Channel publication of newly added titles is handled centrally with full deduplication by bot.js on the server
             
             alert("Catalog CSV and enriched JSON database successfully published directly to GitHub! Updates are live instantly.");
             catalogChangesMade = false;
@@ -5456,14 +5442,23 @@ if (fulfillForm && fulfillRequestModal) {
         
         // 2. Commit Firestore batch update (chunked into groups of 450 to avoid Firestore limits)
         let targetDocIds = Array.isArray(currentFulfillDocIds) && currentFulfillDocIds.length > 0 ? [...currentFulfillDocIds] : [];
-        if (targetDocIds.length === 0 && currentFulfillTitle) {
-            const cleanT = currentFulfillTitle.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
-            allRequests.forEach(r => {
-                if (r.docId && r.title && r.title.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim() === cleanT) {
-                    targetDocIds.push(r.docId);
+        const cleanT = currentFulfillTitle.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+        allRequests.forEach(r => {
+            if (r.docId && !targetDocIds.includes(r.docId)) {
+                const rClean = (r.title || "").toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                const sameTmdb = reqTmdbId && r.tmdb_id && String(reqTmdbId) === String(r.tmdb_id);
+                const sameTitle = rClean && (rClean === cleanT || titlesMatch(r.title, currentFulfillTitle));
+                if ((sameTmdb || sameTitle) && r.status !== "fulfilled" && r.status !== "claimed") {
+                    if (isSeries && matchedReq && matchedReq.seasonOrPart && String(matchedReq.seasonOrPart).toLowerCase().includes("season")) {
+                        if (!r.seasonOrPart || r.seasonOrPart.toLowerCase().trim() === matchedReq.seasonOrPart.toLowerCase().trim()) {
+                            targetDocIds.push(r.docId);
+                        }
+                    } else {
+                        targetDocIds.push(r.docId);
+                    }
                 }
-            });
-        }
+            }
+        });
 
         const requestChunks = [];
         for (let i = 0; i < targetDocIds.length; i += 450) {
@@ -5524,18 +5519,7 @@ if (fulfillForm && fulfillRequestModal) {
             if (typeof window.recordAdminActivity === 'function') {
                 window.recordAdminActivity("fulfillment", currentFulfillTitle);
             }
-            // Auto-post release announcement directly to Main Channel if checked
-            if (shouldPostToChannel && typeof window.broadcastMovieToMainChannel === 'function') {
-                const titleToBroadcast = movieToSync || {
-                    title: currentFulfillTitle,
-                    year: reqYear || "",
-                    type: isSeries ? 'Series' : 'Movie',
-                    seasonOrPart: matchedReq ? (matchedReq.seasonOrPart || "") : "",
-                    csv_id: movieToSync ? movieToSync.csv_id : "",
-                    tmdb_id: reqTmdbId || (movieToSync ? movieToSync.tmdb_id : null)
-                };
-                window.broadcastMovieToMainChannel(titleToBroadcast);
-            }
+            // Channel announcement and requester notifications are handled centrally by bot.js via Firestore listener
 
             const requesters = [];
             currentFulfillDocIds.forEach(id => {

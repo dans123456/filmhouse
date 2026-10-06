@@ -292,17 +292,17 @@ async function syncCatalogFromGitHub() {
                 const newTitlesToBroadcast = [];
                 for (const m of data) {
                     const idKey = String(m.csv_id || "").toLowerCase().trim();
-                    const titleKey = String(m.title || "").toLowerCase().trim();
-                    const hasLinks = Array.isArray(m.links) && m.links.length > 0 && m.links.some(l => l && (l.url || l.link));
+                    const titleKey = String(m.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                    const hasLinks = Array.isArray(m.links) && m.links.length > 0 && m.links.some(l => (typeof l === 'object' && l !== null ? (l.url || l.link) : (l && String(l).trim() !== "")));
 
-                    // If already broadcasted according to metadata flag, record in tracker and skip
-                    if (m.channelBroadcasted === true) {
+                    // If already broadcasted according to metadata flag or tracker, record and skip
+                    if (m.channelBroadcasted === true || (idKey && broadcastedCatalogIds.has(idKey)) || (titleKey && broadcastedCatalogIds.has(titleKey))) {
                         if (idKey) broadcastedCatalogIds.add(idKey);
                         if (titleKey) broadcastedCatalogIds.add(titleKey);
                         continue;
                     }
 
-                    if (hasLinks && idKey && !broadcastedCatalogIds.has(idKey) && (!titleKey || !broadcastedCatalogIds.has(titleKey))) {
+                    if (hasLinks && idKey && !broadcastedCatalogIds.has(idKey) && !broadcastedCatalogIds.has(titleKey)) {
                         newTitlesToBroadcast.push(m);
                     }
                 }
@@ -540,14 +540,29 @@ function setupBot(bot, adminBot) {
         }
     };
 
+    // Global in-memory set to prevent duplicate channel broadcasts within session
+    const _recentlyBroadcastedKeys = new Set();
+
     // Engine: Publish new movie/series release update to Film House Main Channel (@filmhouse_main)
     publishMovieToChannel = async function(movieInfo) {
         const channelTarget = "-1002098683402"; // Film House Main Channel (@filmhouse_main)
         try {
             const rawTitle = movieInfo.title || "Movie Update";
             const cleanTitle = String(rawTitle).replace(/\s*\([^)]+\)\s*$/g, "").replace(/[*_`~]/g, "").trim();
-            const yearText = movieInfo.year ? ` (${movieInfo.year})` : "";
+            const cleanKey = cleanTitle.toLowerCase();
+            const normId = String(movieInfo.csv_id || movieInfo.id || movieInfo.tmdb_id || "").toLowerCase().trim();
             const isSeries = (movieInfo.type || "").toLowerCase() === "series" || (movieInfo.type || "").toLowerCase() === "tv";
+            const seasonKey = (isSeries && movieInfo.seasonOrPart) ? String(movieInfo.seasonOrPart).toLowerCase().trim() : "";
+            const dedupeKey = normId ? `${normId}_${seasonKey}` : `${cleanKey}_${seasonKey}`;
+
+            // Deduplication guard: Never post the same title twice
+            if (_recentlyBroadcastedKeys.has(dedupeKey) || (normId && broadcastedCatalogIds.has(normId)) || broadcastedCatalogIds.has(cleanKey)) {
+                console.log(`[CHANNEL PUBLISH] Skipping duplicate announcement for "${cleanTitle}" (Key: ${dedupeKey}). Already published.`);
+                return { message_id: null, skipped: true };
+            }
+            _recentlyBroadcastedKeys.add(dedupeKey);
+
+            const yearText = movieInfo.year ? ` (${movieInfo.year})` : "";
             const rawSeason = movieInfo.seasonOrPart || (isSeries ? "Complete Series" : "Full Movie");
 
             let seasonOrQualityText = isSeries 
@@ -754,6 +769,16 @@ function setupBot(bot, adminBot) {
                         lastError = aErr;
                     }
                 }
+            }
+
+            if (result && result.message_id) {
+                if (normId) broadcastedCatalogIds.add(normId);
+                if (cleanKey) broadcastedCatalogIds.add(cleanKey);
+                try {
+                    const dir = path.dirname(BROADCASTED_CATALOG_FILE);
+                    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+                    fs.writeFileSync(BROADCASTED_CATALOG_FILE, JSON.stringify(Array.from(broadcastedCatalogIds)), "utf8");
+                } catch (saveErr) {}
             }
 
             if (!result && lastError) {
@@ -3705,9 +3730,11 @@ async function init() {
                         // Auto-publish release announcement to Main Channel (@filmhouse_main)
                         // Evaluated independently from user DM flag so channel posts are never skipped or blocked
                         if (data.status === "fulfilled" && data.publishToChannel !== false && !data.channelMessageId) {
-                            const movieKey = String(data.csv_id || data.tmdb_id || title || docId).toLowerCase().trim();
-                            if (movieKey && !_channelPostingLocks.has(movieKey)) {
+                            const rawClean = String(title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                            const movieKey = String(data.csv_id || data.tmdb_id || rawClean || docId).toLowerCase().trim();
+                            if (movieKey && !_channelPostingLocks.has(movieKey) && !_channelPostingLocks.has(rawClean) && !broadcastedCatalogIds.has(movieKey) && !broadcastedCatalogIds.has(rawClean)) {
                                 _channelPostingLocks.add(movieKey);
+                                _channelPostingLocks.add(rawClean);
                                 (async () => {
                                     try {
                                         console.log(`[CHANNEL PUBLISH] Initiating auto-publish for fulfilled request "${title}" (Key: ${movieKey})...`);
@@ -3715,13 +3742,13 @@ async function init() {
                                         let movieDataForChannel = null;
                                         const lookupCsvId = String(data.csv_id || "").toLowerCase().trim();
                                         const lookupTmdbId = String(data.tmdb_id || "").trim();
-                                        const lookupTitle = String(title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                                        const lookupTitle = rawClean;
 
                                         if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
                                             movieDataForChannel = cachedMoviesMetadata.find(m => 
                                                 (lookupCsvId && String(m.csv_id || "").toLowerCase().trim() === lookupCsvId) ||
                                                 (lookupTmdbId && String(m.tmdb_id || "").trim() === lookupTmdbId) ||
-                                                (lookupTitle && (String(m.title || "").toLowerCase().trim() === lookupTitle || titlesMatch(m.title, lookupTitle)))
+                                                (lookupTitle && (String(m.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim() === lookupTitle || titlesMatch(m.title, lookupTitle)))
                                             );
                                         }
 
@@ -3744,18 +3771,32 @@ async function init() {
                                         const pubResult = await publishMovieToChannel(movieDataForChannel);
                                         if (pubResult && pubResult.message_id) {
                                             console.log(`[CHANNEL PUBLISH] Successfully published announcement for "${title}" to @filmhouse_main (msg_id: ${pubResult.message_id})`);
+                                            
+                                            // Register in broadcasted catalog tracker to prevent duplicate repost when GitHub syncs!
+                                            const bcIdKey = String(movieDataForChannel.csv_id || data.csv_id || "").toLowerCase().trim();
+                                            const bcTitleKey = String(movieDataForChannel.title || title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                                            if (bcIdKey) broadcastedCatalogIds.add(bcIdKey);
+                                            if (bcTitleKey) broadcastedCatalogIds.add(bcTitleKey);
+                                            try {
+                                                const bDir = path.dirname(BROADCASTED_CATALOG_FILE);
+                                                if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
+                                                fs.writeFileSync(BROADCASTED_CATALOG_FILE, JSON.stringify(Array.from(broadcastedCatalogIds)), "utf8");
+                                            } catch (sErr) {}
+
                                             await db.collection("requests").doc(docId).update({
                                                 channelPosted: true,
                                                 channelMessageId: pubResult.message_id,
                                                 channelPostedAt: admin.firestore.FieldValue.serverTimestamp()
                                             }).catch(() => {});
                                         } else {
-                                            console.warn(`[CHANNEL PUBLISH] publishMovieToChannel returned null for "${title}".`);
+                                            console.warn(`[CHANNEL PUBLISH] publishMovieToChannel returned null/skipped for "${title}".`);
                                             _channelPostingLocks.delete(movieKey);
+                                            _channelPostingLocks.delete(rawClean);
                                         }
                                     } catch (pubErr) {
                                         console.warn(`[CHANNEL PUBLISH] Error auto-publishing "${title}" to channel:`, pubErr.message);
                                         _channelPostingLocks.delete(movieKey);
+                                        _channelPostingLocks.delete(rawClean);
                                     }
                                 })();
                             }
