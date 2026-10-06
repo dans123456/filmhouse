@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "1788735-family-guy-happy-hell-o-ween",
+    "tmdb_id": 1788735,
+    "imdb_id": "",
+    "title": "Family Guy Happy Hell-o-ween",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Animation",
+      "Horror"
+    ],
+    "overview": "After unexpectedly dying and being sent to Hell, Stewie and Brian’s constant nagging leads The Devil to quit, passing control of Hell to them.",
+    "poster": "https://image.tmdb.org/t/p/w500/smjL4kHnN2uZuMy4T30AJxUAWsk.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ebpqd1Us0CDUJUWOqRFNuLY28vJ.jpg",
+    "rating": 6.4,
+    "release_date": "2026-10-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "dqCtpH7muKA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD7wkAAmZyKUaKDDCPrKe95xYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "72071-the-chi",
     "tmdb_id": 72071,
     "imdb_id": "",
