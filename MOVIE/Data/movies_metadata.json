@@ -215,7 +215,8 @@
         "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADdhMAAmZyIUabh_Io1am2ihYE",
         "quality": "480p"
       }
-    ]
+    ],
+    "channelBroadcasted": true
   },
   {
     "csv_id": "44217-vikings",
@@ -36895,12 +36896,38 @@
     "csv_id": "82428-all-american",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADVA8AAgiQKETmC9JqwRuhTBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADNwQAAgiQMER8mcjQ28_DuhYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADOAQAAgiQMEQanB1xm3YREBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADOQQAAgiQMERWMp_GRgPVNxYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADgwQAAgiQMEQ7N3K6F9_g0RYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADWBkAAp4PiEYpKxWBo8ycVhYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADVA8AAgiQKETmC9JqwRuhTBYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADNwQAAgiQMER8mcjQ28_DuhYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADOAQAAgiQMEQanB1xm3YREBYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADOQQAAgiQMERWMp_GRgPVNxYE",
+        "season": "Season 4"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADgwQAAgiQMEQ7N3K6F9_g0RYE",
+        "season": "Season 5"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADWBkAAp4PiEYpKxWBo8ycVhYE",
+        "season": "Season 6"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_hIAAmZyIUYPfgXIjnGsgBYE",
+        "season": "Season 7"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADchIAAmZyIUa1URYlKummJRYE",
+        "season": "Season 8"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/c8FTtjQcQfqSI0McmVc1OOOf7Z7.jpg",
     "rating": 8.1,
