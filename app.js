@@ -54,6 +54,12 @@ function getCollapsedTitle(title) {
     return clean.replace(/[^a-z0-9]/gi, "");
 }
 
+// Raw alphanumeric collapsed representation without article stripping for exact full-string match
+function getRawCollapsed(str) {
+    if (!str) return "";
+    return String(str).toLowerCase().replace(/[^a-z0-9]/gi, "");
+}
+
 // Robust fuzzy & punctuation-insensitive title matcher
 function titlesMatch(titleA, titleB) {
     if (!titleA || !titleB) return false;
@@ -289,9 +295,12 @@ function normalizeTargetString(str) {
     return String(str).toLowerCase().replace(/&/g, " and ").replace(/[^\p{L}\p{N}\s]/gu, " ");
 }
 
-// Universal search query normalizer: strips symbols ( , & : ; ? - ! ( ) etc. ), extracts year, strips junk tags
+// Stop words to prevent common function words ("of", "the") from dominating search relevance
+const SEARCH_STOP_WORDS = new Set(['the', 'a', 'an', 'of', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'with', 'from', 'by', 'is', 'it']);
+
+// Universal search query normalizer: strips symbols, extracts year, strips video tags, isolates keywords
 function sanitizeSearchQuery(query) {
-    if (!query) return { cleanTokens: [], titleOnlyTokens: [], searchTitleStr: "", targetYear: null, cleanFullStr: "", collapsedQuery: "" };
+    if (!query) return { cleanTokens: [], significantTokens: [], titleOnlyTokens: [], searchTitleStr: "", targetYear: null, cleanFullStr: "", collapsedQuery: "", rawCollapsedQuery: "" };
     
     let raw = String(query).toLowerCase();
     raw = raw.replace(/&/g, " and ");
@@ -309,9 +318,18 @@ function sanitizeSearchQuery(query) {
     const titleOnlyTokens = cleanTokens.filter(t => t !== targetYear);
     const searchTitleStr = titleOnlyTokens.join(" ").trim();
     const cleanFullStr = cleanTokens.join(" ").trim();
-    const collapsedQuery = cleanTokens.join("").replace(/[^a-z0-9]/gi, "");
     
-    return { cleanTokens, titleOnlyTokens, searchTitleStr, targetYear, cleanFullStr, collapsedQuery };
+    // Normalized collapsed representation aligns with normalizeTitleForComparison (removes internal "the" and articles)
+    const normCleanStr = normalizeTitleForComparison(searchTitleStr || cleanFullStr);
+    const collapsedQuery = normCleanStr.replace(/[^a-z0-9]/gi, "");
+    
+    // Raw collapsed preserves all characters for exact full-string comparison
+    const rawCollapsedQuery = cleanTokens.join("").replace(/[^a-z0-9]/gi, "");
+    
+    // Filter significant keyword tokens (excluding stop words and target year)
+    const significantTokens = cleanTokens.filter(t => t !== targetYear && !SEARCH_STOP_WORDS.has(t));
+    
+    return { cleanTokens, significantTokens, titleOnlyTokens, searchTitleStr, targetYear, cleanFullStr, collapsedQuery, rawCollapsedQuery };
 }
 
 // Centralized search string generator with full title, year, release date, genres, and metadata
@@ -335,64 +353,93 @@ function buildMovieSearchStr(m) {
     return normalizeTargetString(base);
 }
 
-// High-precision Multi-Tier Search Relevance Scorer (Prioritizes Title matches over Synopsis)
+// High-precision Multi-Tier Search Relevance Scorer
+// Prioritizes Exact matches, Word-Boundary Keyword matches, and Suppresses Stop-Word False Positives
 function calculateSearchScore(movie, queryInfo) {
     if (!movie) return -1;
-    const { cleanTokens, searchTitleStr, targetYear, cleanFullStr, collapsedQuery } = queryInfo;
+    const { cleanTokens, significantTokens, targetYear, collapsedQuery, rawCollapsedQuery } = queryInfo;
     if (!cleanTokens || cleanTokens.length === 0) return -1;
 
     const rawTitle = movie.title || "";
+    const rawColTitle = getRawCollapsed(rawTitle);
     const normTitle = normalizeTitleForComparison(rawTitle);
     const colTitle = getCollapsedTitle(rawTitle);
-    const colQuery = collapsedQuery || getCollapsedTitle(searchTitleStr || cleanFullStr);
+
+    const titleTokens = normTitle.split(/\s+/).filter(Boolean);
+    const titleTokenSet = new Set(titleTokens);
 
     const releaseYear = movie.release_date ? String(movie.release_date).substring(0, 4) : (movie.year ? String(movie.year) : "");
     const hasLinks = Boolean(movie.links && movie.links.length > 0);
 
     let score = 0;
-    let matchedTitleTokens = 0;
 
-    // Check which search tokens exist in the TITLE
-    cleanTokens.forEach(tok => {
-        if (normTitle.includes(tok) || colTitle.includes(tok)) {
-            matchedTitleTokens++;
-        }
-    });
-
-    const titleTokenMatchRatio = matchedTitleTokens / cleanTokens.length;
-
-    // 1. EXACT TITLE MATCH (10,000 pts)
-    if (colQuery && colTitle && colTitle === colQuery) {
+    // 1. EXACT TITLE MATCH (10,000 pts) - checks both normalized and raw collapsed to guarantee exact hits
+    if ((colTitle && collapsedQuery && colTitle === collapsedQuery) ||
+        (rawColTitle && rawCollapsedQuery && rawColTitle === rawCollapsedQuery)) {
         score = 10000;
     }
     // 2. TITLE STARTS WITH QUERY (8,500 pts)
-    else if (colQuery && colTitle && colTitle.startsWith(colQuery)) {
+    else if ((colTitle && collapsedQuery && colTitle.startsWith(collapsedQuery)) ||
+             (rawColTitle && rawCollapsedQuery && rawColTitle.startsWith(rawCollapsedQuery))) {
         score = 8500;
     }
-    // 3. COLLAPSED TITLE CONTAINS COLLAPSED QUERY (e.g. "Avengers: Endgame" contains "endgame") (7,500 pts)
-    else if (colQuery && colQuery.length >= 3 && colTitle && colTitle.includes(colQuery)) {
+    // 3. COLLAPSED TITLE CONTAINS QUERY (7,500 pts)
+    else if ((colTitle && collapsedQuery && collapsedQuery.length >= 3 && colTitle.includes(collapsedQuery)) ||
+             (rawColTitle && rawCollapsedQuery && rawCollapsedQuery.length >= 3 && rawColTitle.includes(rawCollapsedQuery))) {
         score = 7500;
     }
-    // 4. ALL QUERY TOKENS IN TITLE (e.g. "House of the Dragon" has both "house" and "dragon") (6,500 pts)
-    else if (titleTokenMatchRatio === 1) {
-        score = 6500;
-    }
-    // 5. MAJORITY OF QUERY TOKENS IN TITLE (4,000 pts * ratio)
-    else if (titleTokenMatchRatio >= 0.5) {
-        score = 4000 * titleTokenMatchRatio;
-    }
-    // 6. AT LEAST ONE TOKEN IN TITLE (2,000 pts * ratio)
-    else if (matchedTitleTokens > 0) {
-        score = 2000 * titleTokenMatchRatio;
-    }
-    // 7. TITLE DOES NOT MATCH -> Check Overview, Genres, Cast (FALLBACK ONLY!) (300 pts)
     else {
-        const searchTarget = movie._searchStr || buildMovieSearchStr(movie);
-        const matchesAllInMeta = cleanTokens.every(tok => searchTarget.includes(tok));
-        if (matchesAllInMeta) {
-            score = 300; // Synopsis mention only (e.g. GTA mentioning 'end' and 'game')
-        } else {
-            return -1; // No match
+        // TOKEN MATCHING WITH WORD BOUNDARIES & SIGNIFICANT KEYWORD REQUIREMENTS
+        let matchedSigTokens = 0;
+        let matchedAllTokens = 0;
+
+        cleanTokens.forEach(tok => {
+            // Whole-word regex matching prevents "the" from matching inside "theft" or "of" inside "off"
+            const wordRegex = new RegExp(`\\b${tok}\\b`, 'i');
+            if (wordRegex.test(rawTitle) || wordRegex.test(normTitle) || titleTokenSet.has(tok)) {
+                matchedAllTokens++;
+                if (!SEARCH_STOP_WORDS.has(tok)) {
+                    matchedSigTokens++;
+                }
+            } else if (tok.length >= 3 && (normTitle.includes(tok) || colTitle.includes(tok))) {
+                // Partial token match (min 3 chars to prevent 2-letter stop words matching)
+                matchedAllTokens += 0.8;
+                if (!SEARCH_STOP_WORDS.has(tok)) {
+                    matchedSigTokens += 0.8;
+                }
+            }
+        });
+
+        const sigTokenCount = significantTokens.length > 0 ? significantTokens.length : cleanTokens.length;
+        const sigMatchRatio = matchedSigTokens / sigTokenCount;
+
+        // CRITICAL: If there are significant tokens in the query, the title MUST match at least one significant token!
+        // Matching only stop words ("the", "of") is REJECTED.
+        if (significantTokens.length > 0 && matchedSigTokens === 0) {
+            return -1;
+        }
+
+        // 4. ALL SIGNIFICANT QUERY TOKENS IN TITLE (6,500 pts)
+        if (sigMatchRatio >= 1) {
+            score = 6500;
+        }
+        // 5. MAJORITY OF SIGNIFICANT TOKENS IN TITLE (4,000 pts * ratio)
+        else if (sigMatchRatio >= 0.5) {
+            score = 4000 * sigMatchRatio;
+        }
+        // 6. AT LEAST ONE SIGNIFICANT TOKEN (2,000 pts * ratio)
+        else if (matchedSigTokens > 0) {
+            score = 2000 * sigMatchRatio;
+        }
+        // 7. TITLE DOES NOT MATCH -> Check Overview, Genres, Cast (FALLBACK ONLY!) (300 pts)
+        else {
+            const searchTarget = (movie._searchStr || "").toLowerCase();
+            const matchesAllSigInMeta = significantTokens.length > 0 && significantTokens.every(tok => searchTarget.includes(tok));
+            if (matchesAllSigInMeta) {
+                score = 300;
+            } else {
+                return -1;
+            }
         }
     }
 
@@ -436,7 +483,15 @@ function getPrecisionSearchResults(moviesList, query) {
     // Sort strictly by relevance score descending
     scored.sort((a, b) => b.score - a.score);
 
-    // If we have strong title matches (score >= 1000), filter out weak synopsis-only matches to prevent junk results
+    // If we have Tier 1 or Tier 2 exact/prefix/phrase matches (score >= 6000),
+    // only return high quality matches (score >= 4000) and prune weak single-token noise!
+    const topScore = scored.length > 0 ? scored[0].score : 0;
+    if (topScore >= 6000) {
+        const highQuality = scored.filter(s => s.score >= 4000);
+        return highQuality.map(s => s.movie);
+    }
+
+    // Otherwise if strong title matches exist (score >= 1000), filter out weak synopsis-only matches
     const strongTitleMatches = scored.filter(s => s.score >= 1000);
     if (strongTitleMatches.length >= 1) {
         return strongTitleMatches.map(s => s.movie);
@@ -6417,19 +6472,29 @@ function startUserRequestsListener() {
                 return tB - tA;
             });
 
-            // Merge local unsaved requests with remote snapshot
-            currentUserRequests.forEach(localReq => {
-                const localClean = getCleanRequestTitle(localReq.title).toLowerCase();
-                if (!requests.some(r => r.title && getCleanRequestTitle(r.title).toLowerCase() === localClean)) {
-                    requests.push(localReq);
-                }
+            // Snapshot from Firestore represents all authoritative server-side requests.
+            // Any request that had a docId but is missing from this snapshot has been deleted by an admin.
+            // Only preserve fresh optimistic requests that have NO docId and were created locally within the last 60 seconds.
+            const now = Date.now();
+            const recentOptimistic = currentUserRequests.filter(localReq => {
+                if (localReq.docId) return false; // Was synced to Firestore; absent from snapshot means deleted by admin!
+                const reqTime = localReq._localTime || (localReq.requestedAt ? new Date(localReq.requestedAt).getTime() : 0);
+                const isFresh = reqTime && (now - reqTime < 60000);
+                const localClean = getCleanRequestTitle(localReq.title || "").toLowerCase();
+                const alreadyInSnapshot = requests.some(r => r.title && getCleanRequestTitle(r.title || "").toLowerCase() === localClean);
+                return isFresh && !alreadyInSnapshot;
             });
+
+            requests.push(...recentOptimistic);
 
             currentUserRequests = requests;
             try {
                 localStorage.setItem("filmhouse_my_requests", JSON.stringify(currentUserRequests));
             } catch (e) {}
             renderUserRequests(requests);
+            if (typeof renderFeaturedGrid === "function") {
+                renderFeaturedGrid(true);
+            }
         }, err => {
             console.error("User requests sync issue:", err);
         });
@@ -6858,6 +6923,7 @@ function logMovieRequestToFirestore(movie, specs = "") {
         title: requestTitle,
         seasonOrPart: specs || "",
         status: "pending",
+        _localTime: Date.now(),
         tmdb_id: movie.tmdb_id || null,
         csv_id: movie.csv_id || "",
         type: movie.type || "Movie",
