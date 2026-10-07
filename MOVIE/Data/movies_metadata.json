@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "288673-carrie",
+    "tmdb_id": 288673,
+    "imdb_id": "",
+    "title": "Carrie",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Mystery",
+      "Drama"
+    ],
+    "overview": "Misfit teenager Carrie White has spent her life in seclusion with her domineering mother, Margaret. After her father's sudden death, Carrie finds herself contending with the challenges of attending public high school, a bullying scandal, and the emergence of mysterious telekinetic powers.",
+    "poster": "https://image.tmdb.org/t/p/w500/eXjk4W4robXs7l1YXwaXMv4f2qb.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vVaNTaRHlL1i8JVsZsNtRHGBhPm.jpg",
+    "rating": 7.8,
+    "release_date": "2026-10-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "jkUw2nh6fT0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD-AsAAkpMOUZ94oQwqyni4hYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1198899-agent-recon",
     "tmdb_id": 1198899,
     "imdb_id": "",
