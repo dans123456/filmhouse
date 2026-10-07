@@ -1,39 +1,32 @@
 [
   {
-    "csv_id": "125910-young-royals",
-    "tmdb_id": 125910,
+    "csv_id": "1198899-agent-recon",
+    "tmdb_id": 1198899,
     "imdb_id": "",
-    "title": "Young Royals",
-    "type": "Series",
+    "title": "Agent Recon",
+    "type": "Movie",
     "categories": [
       "Main",
-      "Hollywood/British Series"
+      "Hollywood/British Movies"
     ],
     "genres": [
-      "Drama"
+      "Action",
+      "Science Fiction"
     ],
-    "overview": "Prince Wilhelm adjusts to life at his prestigious new boarding school, Hillerska, but following his heart proves more challenging than anticipated.",
-    "poster": "https://image.tmdb.org/t/p/w500/qiSYSGYuF7sEwWmtISh1sWhnyBK.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/lWkS3ygISl4tRHpcvWHWySG1Uxz.jpg",
-    "rating": 8.5,
-    "release_date": "2021-07-01",
-    "language": "sv",
+    "overview": "A covert military task force tracks a mysterious energy disturbance at a secret base in New Mexico that is suspected of experimenting on alien technology. Once there, the team encounters an unknown being of extraordinary strength and speed, and the ability to control an army of mindless warriors. The trio must fight through the unstoppable hordes to prevent humanity's demise.",
+    "poster": "https://image.tmdb.org/t/p/w500/fxxPAowtYuGj4WHrNqbPTfLHRLF.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lYLDLB9iD8tStFjlPS9QS2uQWpe.jpg",
+    "rating": 3.9,
+    "release_date": "2024-06-21",
+    "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "rHmw87EpGIM",
+    "trailer": "X3qvuTsxmiQ",
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADshgAAkpMMUZ25UYlzCABRxYE",
-        "season": "Season 1"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD2hgAAkpMMUYOeecAARR_tyQWBA",
-        "season": "Season 2"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD9BgAAkpMMUa9R_rH80bP9xYE",
-        "season": "Season 3"
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADlQsAAkpMOUbanomYmk-HBRYE",
+        "quality": "720p"
       }
     ]
   },
