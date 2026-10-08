@@ -1,5 +1,51 @@
 [
   {
+    "csv_id": "100575-tyler-perry-s-ruthless",
+    "tmdb_id": 100575,
+    "imdb_id": "",
+    "title": "Tyler Perry's Ruthless",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "A spinoff of \"The Oval,\" follows Ruth Truesdale as she's forced to play nice with a scandalous religious cult of powerful sex crazed fanatics in the hopes of freeing herself and her daughter.",
+    "poster": "https://image.tmdb.org/t/p/w500/c2sBZga1A6cQnKfsDjSXddhmkad.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/w9jIdhlDrMcW2VcJ7oKFRAuAxpY.jpg",
+    "rating": 8.4,
+    "release_date": "2020-03-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "qQcL-Xj87tw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD4hUAAkpMOUZ74r9N3bdyRhYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD4xUAAkpMOUYYfdVAB0vovhYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD5xUAAkpMOUYeYZWjMTIhhRYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD6BUAAkpMOUZ5Z7c6hs8lzhYE",
+        "season": "Season 4"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD6RUAAkpMOUZFEvbjpv0inhYE",
+        "season": "Season 5"
+      }
+    ]
+  },
+  {
     "csv_id": "288673-carrie",
     "tmdb_id": 288673,
     "imdb_id": "",
