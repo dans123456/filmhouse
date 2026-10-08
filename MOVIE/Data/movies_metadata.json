@@ -1,5 +1,68 @@
 [
   {
+    "csv_id": "37680-suits",
+    "tmdb_id": 37680,
+    "imdb_id": "",
+    "title": "Suits",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "While running from a drug deal gone bad, Mike Ross, a brilliant young college-dropout, slips into a job interview with one of New York City's best legal closers, Harvey Specter. Tired of cookie-cutter law school grads, Harvey takes a gamble by hiring Mike on the spot after he recognizes his raw talent and photographic memory.",
+    "poster": "https://image.tmdb.org/t/p/w500/vQiryp6LioFxQThywxbC6TuoDjy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/or0E36KfzJYZwqXeiCfm1JgepKF.jpg",
+    "rating": 8.2,
+    "release_date": "2011-06-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "cUnkjEIW2-o",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD9QoAAtI1OUZOUMopbxKnLBYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD9woAAtI1OUZHLb8O8QdjbBYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD-QoAAtI1OUYyjVi2fIykoRYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_AoAAtI1OUZQmZ4HabL4CRYE",
+        "season": "Season 4"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_QoAAtI1OUZ_TkQeW72zBhYE",
+        "season": "Season 5"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_woAAtI1OUboVCpEMBoNaRYE",
+        "season": "Season 6"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAECwAC0jU5Rqgvt1Lqw4zdFgQ",
+        "season": "Season 7"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADAgsAAtI1OUb78hgIxJcJOhYE",
+        "season": "Season 8"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADAwsAAtI1OUbYCpqotdCLyhYE",
+        "season": "Season 9"
+      }
+    ]
+  },
+  {
     "csv_id": "1458857-doing-life",
     "tmdb_id": 1458857,
     "imdb_id": "",
