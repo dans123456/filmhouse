@@ -3798,6 +3798,61 @@ function generateCSVContent() {
     return [headers, ...rows].join('\n');
 }
 
+// Robust GitHub API PUT helper with automatic retry for transient rule evaluation timeouts and network hiccups
+async function putGitHubFileWithRetry(url, token, bodyObj, maxRetries = 3) {
+    let lastErr = null;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json",
+                    "Accept": "application/vnd.github.v3+json"
+                },
+                body: JSON.stringify(bodyObj)
+            });
+
+            if (response.ok) {
+                return response;
+            }
+
+            let errMsg = response.statusText;
+            try {
+                const errData = await response.json();
+                if (errData && errData.message) errMsg = errData.message;
+            } catch (_) {}
+
+            const isRuleTimeout = response.status === 403 && /timeout|rule/i.test(errMsg);
+            const isServerError = response.status >= 500;
+
+            if ((isRuleTimeout || isServerError) && attempt < maxRetries) {
+                console.warn(`[Publish Debug] GitHub commit hit transient error (${errMsg}). Retrying attempt ${attempt + 1}/${maxRetries} in 2.5s...`);
+                await new Promise(r => setTimeout(r, 2500));
+                continue;
+            }
+
+            if (response.status === 401 || (response.status === 403 && !isRuleTimeout)) {
+                throw new Error(`GitHub Authentication Failed (HTTP ${response.status}: ${errMsg}). Your Personal Access Token (PAT) is invalid, revoked, or expired. Please update it in ⚙️ System Configuration.`);
+            }
+
+            if (isRuleTimeout) {
+                throw new Error(`GitHub automated rule evaluation timed out (HTTP 403: ${errMsg}). This is a temporary server load issue on GitHub's side (your token is valid). Please wait 10-15 seconds and try clicking 'Publish Changes' again.`);
+            }
+
+            throw new Error(`GitHub update failed (${response.status}): ${errMsg}`);
+        } catch (err) {
+            lastErr = err;
+            if (attempt >= maxRetries || !/timeout|fetch|network/i.test(err.message)) {
+                throw err;
+            }
+            console.warn(`[Publish Debug] Network/fetch error: ${err.message}. Retrying attempt ${attempt + 1}/${maxRetries}...`);
+            await new Promise(r => setTimeout(r, 2000));
+        }
+    }
+    throw lastErr;
+}
+
 // Publish Changes to GitHub
 const publishBtn = document.getElementById("btn-publish-catalog");
 if (publishBtn) {
@@ -3901,58 +3956,18 @@ if (publishBtn) {
             const base64JSON = btoa(unescape(encodeURIComponent(jsonContent)));
             
             // Upload datafile.csv first
-            const putCSVResponse = await fetch(apiCSVUrl, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `token ${token}`,
-                    "Content-Type": "application/json",
-                    "Accept": "application/vnd.github.v3+json"
-                },
-                body: JSON.stringify({
-                    message: "Update catalog (datafile.csv) from Film House Admin Panel",
-                    content: base64CSV,
-                    sha: shaCSV
-                })
+            const putCSVResponse = await putGitHubFileWithRetry(apiCSVUrl, token, {
+                message: "Update catalog (datafile.csv) from Film House Admin Panel",
+                content: base64CSV,
+                sha: shaCSV
             });
-
-            if (!putCSVResponse.ok) {
-                let errMsg = putCSVResponse.statusText;
-                try {
-                    const errData = await putCSVResponse.json();
-                    if (errData && errData.message) errMsg = errData.message;
-                } catch (_) {}
-                if (putCSVResponse.status === 401 || putCSVResponse.status === 403) {
-                    throw new Error(`GitHub Authentication Failed (HTTP ${putCSVResponse.status}: ${errMsg}). Your Personal Access Token (PAT) is invalid, revoked, or expired. Please update it in ⚙️ System Configuration.`);
-                }
-                throw new Error(`CSV update failed: ${errMsg}`);
-            }
 
             // Upload movies_metadata.json second
-            const putJSONResponse = await fetch(apiJSONUrl, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `token ${token}`,
-                    "Content-Type": "application/json",
-                    "Accept": "application/vnd.github.v3+json"
-                },
-                body: JSON.stringify({
-                    message: "Update catalog metadata (movies_metadata.json) from Film House Admin Panel",
-                    content: base64JSON,
-                    sha: shaJSON
-                })
+            const putJSONResponse = await putGitHubFileWithRetry(apiJSONUrl, token, {
+                message: "Update catalog metadata (movies_metadata.json) from Film House Admin Panel",
+                content: base64JSON,
+                sha: shaJSON
             });
-
-            if (!putJSONResponse.ok) {
-                let errMsg = putJSONResponse.statusText;
-                try {
-                    const errData = await putJSONResponse.json();
-                    if (errData && errData.message) errMsg = errData.message;
-                } catch (_) {}
-                if (putJSONResponse.status === 401 || putJSONResponse.status === 403) {
-                    throw new Error(`GitHub Authentication Failed (HTTP ${putJSONResponse.status}: ${errMsg}). Your Personal Access Token (PAT) is invalid, revoked, or expired. Please update it in ⚙️ System Configuration.`);
-                }
-                throw new Error(`JSON update failed: ${errMsg}`);
-            }
             
             // Update local check SHA from JSON commit response to avoid self-triggering updates dialog
             const jsonResData = await putJSONResponse.json();
@@ -5596,52 +5611,18 @@ if (fulfillForm && fulfillRequestModal) {
                     const base64JSON = btoa(unescape(encodeURIComponent(jsonContent)));
                     
                     // Push CSV
-                    const putCSVResponse = await fetch(apiCSVUrl, {
-                        method: "PUT",
-                        headers: {
-                            "Authorization": `token ${token}`,
-                            "Content-Type": "application/json",
-                            "Accept": "application/vnd.github.v3+json"
-                        },
-                        body: JSON.stringify({
-                            message: `Auto-update catalog (datafile.csv) on request fulfill: ${currentFulfillTitle}`,
-                            content: base64CSV,
-                            sha: shaCSV
-                        })
+                    const putCSVResponse = await putGitHubFileWithRetry(apiCSVUrl, token, {
+                        message: `Auto-update catalog (datafile.csv) on request fulfill: ${currentFulfillTitle}`,
+                        content: base64CSV,
+                        sha: shaCSV
                     });
-                    
-                    if (!putCSVResponse.ok) {
-                        let errMsg = putCSVResponse.statusText;
-                        try { const d = await putCSVResponse.json(); if (d && d.message) errMsg = d.message; } catch (_) {}
-                        if (putCSVResponse.status === 401 || putCSVResponse.status === 403) {
-                            throw new Error(`GitHub PAT invalid or expired (${putCSVResponse.status}: ${errMsg})`);
-                        }
-                        throw new Error(`CSV update failed: ${errMsg}`);
-                    }
 
                     // Push JSON
-                    const putJSONResponse = await fetch(apiJSONUrl, {
-                        method: "PUT",
-                        headers: {
-                            "Authorization": `token ${token}`,
-                            "Content-Type": "application/json",
-                            "Accept": "application/vnd.github.v3+json"
-                        },
-                        body: JSON.stringify({
-                            message: `Auto-update metadata (movies_metadata.json) on request fulfill: ${currentFulfillTitle}`,
-                            content: base64JSON,
-                            sha: shaJSON
-                        })
+                    const putJSONResponse = await putGitHubFileWithRetry(apiJSONUrl, token, {
+                        message: `Auto-update metadata (movies_metadata.json) on request fulfill: ${currentFulfillTitle}`,
+                        content: base64JSON,
+                        sha: shaJSON
                     });
-                    
-                    if (!putJSONResponse.ok) {
-                        let errMsg = putJSONResponse.statusText;
-                        try { const d = await putJSONResponse.json(); if (d && d.message) errMsg = d.message; } catch (_) {}
-                        if (putJSONResponse.status === 401 || putJSONResponse.status === 403) {
-                            throw new Error(`GitHub PAT invalid or expired (${putJSONResponse.status}: ${errMsg})`);
-                        }
-                        throw new Error(`JSON update failed: ${errMsg}`);
-                    }
 
                     const jsonResData = await putJSONResponse.json();
                     if (jsonResData && jsonResData.content) {
