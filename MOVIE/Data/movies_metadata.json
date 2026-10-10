@@ -36305,7 +36305,14 @@
     "trailer": "nAdH1yyUAbc",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADcRoAAp4PiEbLHWbZVaXOVBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADcRoAAp4PiEbLHWbZVaXOVBYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD_CAAAjAeUEZ2EFWcYqHvixYE",
+        "season": "Season 2"
+      }
     ]
   },
   {
