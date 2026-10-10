@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "298505-coven-academy",
+    "tmdb_id": 298505,
+    "imdb_id": "",
+    "title": "Coven Academy",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Mystery",
+      "Drama",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "A coven protects their magic school from a dark fate.",
+    "poster": "https://image.tmdb.org/t/p/w500/f4R4YGeMQrXEu6jm3oAbSPeGC3M.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mGFtH5pUXDd4hSXUfl8HnHlRWJV.jpg",
+    "rating": 7.2,
+    "release_date": "2026-10-01",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "zz9nAM9qa3c",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADzAgAAjAeSEZG0AuunvKFuRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "37680-suits",
     "tmdb_id": 37680,
     "imdb_id": "",
