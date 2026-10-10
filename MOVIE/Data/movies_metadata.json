@@ -44680,7 +44680,7 @@
     "type": "Series",
     "categories": [
       "Main",
-      "Korean Drama"
+      "Asian Drama"
     ],
     "genres": [
       "Korean Drama"
@@ -44696,7 +44696,14 @@
     "trailer": "fsRLcPlGsxE",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAEHwACng-ARkEK6Def6bhpFgQ"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAEHwACng-ARkEK6Def6bhpFgQ",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADjQwAAjAeUEayHqZP7BfOhRYE",
+        "season": "Season 2"
+      }
     ]
   },
   {
