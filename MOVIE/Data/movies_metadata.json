@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "467905-how-to-make-a-killing",
+    "tmdb_id": 467905,
+    "imdb_id": "",
+    "title": "How to Make a Killing",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Thriller"
+    ],
+    "overview": "Disowned at birth by his obscenely wealthy family, blue-collar Becket Redfellow will stop at nothing to reclaim his inheritance, no matter how many relatives stand in his way.",
+    "poster": "https://image.tmdb.org/t/p/w500/vxMeKC7o5Gi8IHMi6lUgsdprTqv.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/bkUa5ZDqjQPx6rkxs0hM87vaWVa.jpg",
+    "rating": 6.9,
+    "release_date": "2026-02-16",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "B7RslMKZ2Yc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADsQcAAjAeUEY41RJaaLfmPRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1320039-stranglehold",
     "tmdb_id": 1320039,
     "imdb_id": "",
