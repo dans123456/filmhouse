@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "284558-kill-jackie",
+    "tmdb_id": 284558,
+    "imdb_id": "",
+    "title": "Kill Jackie",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama",
+      "Crime"
+    ],
+    "overview": "Jackie Price has been living a wealthy, luxurious life for the past 20 years after escaping a dangerous past as an international cocaine dealer. But just as life begins to feel a little boring, she discovers that The Seven Demons, a group of the world’s most terrifying hitmen, have been hired to kill her.",
+    "poster": "https://image.tmdb.org/t/p/w500/3tjZspkqquE24iK1rc0nvnJwdEZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/twc2YYBXTjdv52TShVumB1voT3Q.jpg",
+    "rating": 7.1,
+    "release_date": "2026-10-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "dKgTyq2-4w0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADLgkAAjAeSEYpF46GmsoeTBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1610703-infirmary",
     "tmdb_id": 1610703,
     "imdb_id": "",
