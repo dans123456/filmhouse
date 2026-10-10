@@ -1,5 +1,41 @@
 [
   {
+    "csv_id": "1174188-it-s-okay",
+    "tmdb_id": 1174188,
+    "imdb_id": "",
+    "title": "It's Okay!",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Drama",
+      "Comedy"
+    ],
+    "overview": "In-young, a high school student who is alone due to her parents' sudden death, is forced out because of her overdue rent and stays hidden in the Korean Dance Art Troupe where she belongs. In-young, who is still living bravely and brightly despite the sad situation, is caught by the director of the art troupe who is known for being rough, and the director who could not put In-young in the art troupe eventually begins to live with her.",
+    "poster": "https://image.tmdb.org/t/p/w500/dmgJPkwSQOzNWVaM2grAqQvP1AY.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xcsoHMxB73fSwAH1h07RA9u6Oec.jpg",
+    "rating": 7.3,
+    "release_date": "2025-02-26",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "5qlD3WEW7O4",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADOh4AAjAeUEY1TDZwJCrlvhYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADWR4AAjAeUEYg2fv61SAj1hYE",
+        "quality": "1080p"
+      }
+    ]
+  },
+  {
     "csv_id": "1318447-apex",
     "tmdb_id": 1318447,
     "imdb_id": "",
