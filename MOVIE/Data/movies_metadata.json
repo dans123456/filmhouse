@@ -1,5 +1,68 @@
 [
   {
+    "csv_id": "1320039-stranglehold",
+    "tmdb_id": 1320039,
+    "imdb_id": "",
+    "title": "Stranglehold",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Thriller",
+      "Crime"
+    ],
+    "overview": "Bailey is an exotic dancer with big dreams. She and her Army vet husband Tim are fed up with their lives of barely getting by in small-town Arkansas, so they decide to rob the strip club that employs her.",
+    "poster": "https://image.tmdb.org/t/p/w500/eTWcOmwSqC8Xr5o5VKFj7BFHKSI.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dBziuJUx0tteX1eSzKj05twjDJi.jpg",
+    "rating": 7.2,
+    "release_date": "2026-10-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "5YPh1loDZNc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADOAkAAjAeSEbt65CE66HCVRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "1317288-marty-supreme",
+    "tmdb_id": 1317288,
+    "imdb_id": "",
+    "title": "Marty Supreme",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama",
+      "Thriller"
+    ],
+    "overview": "Marty Mauser, a young man with a dream no one respects, goes to hell and back in pursuit of greatness.",
+    "poster": "https://image.tmdb.org/t/p/w500/lYWEXbQgRTR4ZQleSXAgRbxAjvq.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6h7w8R4BA7vubEmEEW5vYEjuoz6.jpg",
+    "rating": 7.4,
+    "release_date": "2025-12-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "s9gSuKaKcqM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADNgkAAjAeSEZU41ndXw8zTxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "284558-kill-jackie",
     "tmdb_id": 284558,
     "imdb_id": "",
