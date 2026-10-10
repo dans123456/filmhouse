@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "289078-a-prophet",
+    "tmdb_id": 289078,
+    "imdb_id": "",
+    "title": "A Prophet",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama",
+      "Mystery"
+    ],
+    "overview": "After his family is wiped out by the Tianxiang Sect, Shangguan Chengming goes undercover to take revenge. With the help of Jiang Feiyan, they use a series of scams to expose corruption and fight for justice.",
+    "poster": "https://image.tmdb.org/t/p/w500/giSXBUuCfCXV9ALQAmcZd659J0r.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/eTlMy2amueTqJBFZm5x14GGhZxH.jpg",
+    "rating": 6.8,
+    "release_date": "2026-09-24",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADwwkAAjAeUEb4iQMnE-8mURYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1610936-haunted-universities-4",
     "tmdb_id": 1610936,
     "imdb_id": "",
