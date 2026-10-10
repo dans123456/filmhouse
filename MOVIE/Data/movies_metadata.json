@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "1585089-trap-48",
+    "tmdb_id": 1585089,
+    "imdb_id": "",
+    "title": "Trap 48",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama",
+      "Thriller",
+      "Crime"
+    ],
+    "overview": "Rick, the pharmacist, is driven by vengeance after his sister dies from counterfeit drugs sold by Eddie. He is torn between his desire for revenge and a newfound purpose as he returns to school to become a legitimate pharmacist.",
+    "poster": "https://image.tmdb.org/t/p/w500/r5qjL403BHDrqnva3J8iBvXrQo5.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/5XgaDZcvowEGzGgMBYUi6UkUXIM.jpg",
+    "rating": 0,
+    "release_date": "2025-10-30",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADqCEAAjAeUEZ-yaVpamggIhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1423191-resident-evil",
     "tmdb_id": 1423191,
     "imdb_id": "",
