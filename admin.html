@@ -703,13 +703,24 @@
             </div>
         </div>
 
-        <!-- Filter Tabs -->
-        <div id="request-filter-tabs" style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
-            <button class="req-filter-tab active" data-filter="actionable" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: var(--primary-gradient); color: #000; cursor: pointer; transition: all 0.2s;">⚡ Actionable</button>
-            <button class="req-filter-tab" data-filter="priority" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">🔥 Priority</button>
-            <button class="req-filter-tab" data-filter="pending" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">🟠 Pending</button>
-            <button class="req-filter-tab" data-filter="fulfilled" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">🟢 Fulfilled</button>
-            <button class="req-filter-tab" data-filter="all" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">All</button>
+        <!-- Filter Tabs & Sort Controls -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap;">
+            <div id="request-filter-tabs" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <button class="req-filter-tab active" data-filter="actionable" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: var(--primary-gradient); color: #000; cursor: pointer; transition: all 0.2s;">⚡ Actionable</button>
+                <button class="req-filter-tab" data-filter="priority" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">🔥 Priority</button>
+                <button class="req-filter-tab" data-filter="pending" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">🟠 Pending</button>
+                <button class="req-filter-tab" data-filter="fulfilled" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">🟢 Fulfilled</button>
+                <button class="req-filter-tab" data-filter="all" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">All</button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <label for="requests-sort-select" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Sort:</label>
+                <select id="requests-sort-select" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11px; padding: 4px 8px; border-radius: 6px; font-weight: 600; outline: none; cursor: pointer;">
+                    <option value="count">🔢 Most Requested</option>
+                    <option value="newest">⏱️ Newest First</option>
+                    <option value="oldest">⏳ Oldest First</option>
+                    <option value="priority">🔥 Priority First</option>
+                </select>
+            </div>
         </div>
         
         <div class="search-container">

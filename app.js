@@ -6437,6 +6437,66 @@ function applyThemeAccent(themeName) {
 }
 
 // Loyalty Reward Center & Requests Tracker Logic
+// Robust Firestore/Timestamp/ISO/Date parser
+function parseRequestDate(val) {
+    if (!val) return null;
+    if (typeof val.toDate === 'function') {
+        try { return val.toDate(); } catch(e) {}
+    }
+    if (val && typeof val.seconds === 'number') {
+        return new Date(val.seconds * 1000);
+    }
+    if (val && typeof val._seconds === 'number') {
+        return new Date(val._seconds * 1000);
+    }
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+// Formats full date, day of week, and time: e.g. "Saturday, Oct 10, 2026 • 04:15 AM"
+function formatRequestDateTime(date, includeYear = true) {
+    if (!date) return "";
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    const dayName = days[date.getDay()];
+    const monthName = months[date.getMonth()];
+    const dayNum = date.getDate();
+    const year = date.getFullYear();
+    
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hoursStr = String(hours).padStart(2, '0');
+    
+    const timeStr = `${hoursStr}:${minutes} ${ampm}`;
+    const yearStr = includeYear ? `, ${year}` : '';
+    return `${dayName}, ${monthName} ${dayNum}${yearStr} • ${timeStr}`;
+}
+
+// Compact friendly relative time: e.g. "Just now", "5m ago", "2h ago", "Yesterday", "3d ago"
+function getRelativeTimeAgo(date) {
+    if (!date) return "";
+    const now = Date.now();
+    const diffMs = now - date.getTime();
+    if (diffMs < 0) return "Just now";
+    
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffSecs < 60) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+    return `${Math.floor(diffDays / 30)}mo ago`;
+}
+
 let userRequestsUnsubscribe = null;
 let currentUserRequests = [];
 
@@ -6572,6 +6632,10 @@ function renderUserRequests(requests) {
             item.className = "user-request-item";
             item.style.cssText = "background: rgba(255,255,255,0.025); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; display: flex; flex-direction: column; gap: 12px;";
             
+            const reqDate = parseRequestDate(r.requestedAt || r._localTime || r.createdAt || r.timestamp);
+            const reqDateFormatted = reqDate ? formatRequestDateTime(reqDate, false) : "";
+            const reqTimeAgo = reqDate ? getRelativeTimeAgo(reqDate) : "";
+
             let actionBtn = "";
             let step = 1;
             let progressPct = 0;
@@ -6642,11 +6706,22 @@ function renderUserRequests(requests) {
                 </div>
             `;
             
+            const dateBadgeHTML = reqDateFormatted ? `
+                <div style="font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; margin-top: 4px; flex-wrap: wrap;">
+                    <span>📅</span>
+                    <span>Requested: <strong style="color: var(--text-secondary); font-weight: 600;">${escapeHTML(reqDateFormatted)}</strong></span>
+                    ${reqTimeAgo ? `<span style="color: var(--primary-color); font-weight: 600;">(${escapeHTML(reqTimeAgo)})</span>` : ""}
+                </div>
+            ` : "";
+
             item.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px;">
-                    <div>
+                    <div style="flex: 1;">
                         <h5 style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; font-family: var(--font-heading);">${escapeHTML(r.title)}${r.year ? ` (${r.year})` : ""}</h5>
-                        <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">${escapeHTML(r.type)}</span>
+                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                            <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">${escapeHTML(r.type || "Movie")}</span>
+                        </div>
+                        ${dateBadgeHTML}
                     </div>
                     <div style="display: flex; align-items: center;">
                         ${actionBtn}
@@ -6702,12 +6777,17 @@ function renderUserRequests(requests) {
             
             historyList.innerHTML = "";
             historyRequests.forEach(r => {
+                const reqDate = parseRequestDate(r.requestedAt || r._localTime || r.createdAt || r.timestamp);
+                const reqDateFormatted = reqDate ? formatRequestDateTime(reqDate, false) : "";
                 const item = document.createElement("div");
                 item.style.cssText = "background: rgba(255,255,255,0.015); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px;";
                 item.innerHTML = `
                     <div style="flex: 1;">
                         <h5 style="margin: 0 0 2px 0; font-size: 11px; font-weight: 600; color: var(--text-secondary);">${escapeHTML(r.title)}${r.year ? ` (${r.year})` : ""}</h5>
-                        <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">${escapeHTML(r.type)}</span>
+                        <div style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-muted); flex-wrap: wrap;">
+                            <span style="text-transform: uppercase;">${escapeHTML(r.type || "Movie")}</span>
+                            ${reqDateFormatted ? `<span>•</span><span>📅 ${escapeHTML(reqDateFormatted)}</span>` : ""}
+                        </div>
                     </div>
                     <span style="font-size: 10px; background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.2); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700;">✅ Claimed</span>
                 `;
@@ -6924,6 +7004,7 @@ function logMovieRequestToFirestore(movie, specs = "") {
         seasonOrPart: specs || "",
         status: "pending",
         _localTime: Date.now(),
+        requestedAt: new Date().toISOString(),
         tmdb_id: movie.tmdb_id || null,
         csv_id: movie.csv_id || "",
         type: movie.type || "Movie",

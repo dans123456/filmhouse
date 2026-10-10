@@ -750,6 +750,66 @@ function deleteUserFromFirestore(userId) {
         });
 }
 
+// Robust Firestore/Timestamp/ISO/Date parser
+function parseRequestDate(val) {
+    if (!val) return null;
+    if (typeof val.toDate === 'function') {
+        try { return val.toDate(); } catch(e) {}
+    }
+    if (val && typeof val.seconds === 'number') {
+        return new Date(val.seconds * 1000);
+    }
+    if (val && typeof val._seconds === 'number') {
+        return new Date(val._seconds * 1000);
+    }
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+// Formats full date, day of week, and time: e.g. "Saturday, Oct 10, 2026 • 04:15 AM"
+function formatRequestDateTime(date, includeYear = true) {
+    if (!date) return "";
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    const dayName = days[date.getDay()];
+    const monthName = months[date.getMonth()];
+    const dayNum = date.getDate();
+    const year = date.getFullYear();
+    
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hoursStr = String(hours).padStart(2, '0');
+    
+    const timeStr = `${hoursStr}:${minutes} ${ampm}`;
+    const yearStr = includeYear ? `, ${year}` : '';
+    return `${dayName}, ${monthName} ${dayNum}${yearStr} • ${timeStr}`;
+}
+
+// Compact friendly relative time: e.g. "Just now", "5m ago", "2h ago", "Yesterday", "3d ago"
+function getRelativeTimeAgo(date) {
+    if (!date) return "";
+    const now = Date.now();
+    const diffMs = now - date.getTime();
+    if (diffMs < 0) return "Just now";
+    
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffSecs < 60) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+    return `${Math.floor(diffDays / 30)}mo ago`;
+}
+
 // Render Requests List with Aggregation, Tab Filtering, and Sorting
 function renderRequestsList() {
     const listContainer = document.getElementById("requests-list");
@@ -773,6 +833,9 @@ function renderRequestsList() {
             ? `${cleanTitle}_tmdb_${tmdbPart}_${seasonPart}` 
             : (yearPart ? `${cleanTitle}_year_${yearPart}_${seasonPart}` : `${cleanTitle}_${seasonPart}`);
 
+        const reqDate = parseRequestDate(r.requestedAt || r._localTime || r.createdAt || r.timestamp);
+        const reqTime = reqDate ? reqDate.getTime() : 0;
+
         if (!counts[key]) {
             counts[key] = { 
                 title: rawTitle, 
@@ -791,9 +854,25 @@ function renderRequestsList() {
                 requesters: [],
                 requesterDetails: [],
                 adminClaimId: null,
-                adminClaimName: null
+                adminClaimName: null,
+                earliestTimestamp: reqTime > 0 ? reqTime : Infinity,
+                latestTimestamp: reqTime > 0 ? reqTime : 0,
+                earliestDate: reqDate,
+                latestDate: reqDate
             };
+        } else {
+            if (reqTime > 0) {
+                if (reqTime < counts[key].earliestTimestamp) {
+                    counts[key].earliestTimestamp = reqTime;
+                    counts[key].earliestDate = reqDate;
+                }
+                if (reqTime > counts[key].latestTimestamp) {
+                    counts[key].latestTimestamp = reqTime;
+                    counts[key].latestDate = reqDate;
+                }
+            }
         }
+
         if (r.fulfilledBy && !counts[key].fulfilledBy) {
             counts[key].fulfilledBy = r.fulfilledBy;
             counts[key].fulfilledById = r.fulfilledById;
@@ -817,7 +896,10 @@ function renderRequestsList() {
             fulfilledBy: r.fulfilledBy || null,
             notificationStatus: r.notificationStatus || null,
             notificationError: r.notificationError || null,
-            isBlockedUser: r.isBlockedUser || false
+            isBlockedUser: r.isBlockedUser || false,
+            requestedAtDate: reqDate,
+            requestedAtFormatted: reqDate ? formatRequestDateTime(reqDate) : "Unknown date",
+            relativeTime: reqDate ? getRelativeTimeAgo(reqDate) : ""
         });
         
         if (r.status === "priority") {
@@ -907,10 +989,35 @@ function renderRequestsList() {
         // "all" = no filter
     }
     
-    // Sort: Priority first, then by request count descending
+    // Sorting logic based on sort selector dropdown
+    const sortSelect = document.getElementById("requests-sort-select");
+    const sortMode = sortSelect ? sortSelect.value : "count";
+
     filteredRequests.sort((a, b) => {
-        if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
-        return b.count - a.count;
+        if (sortMode === "newest") {
+            const timeA = a.latestTimestamp === Infinity ? 0 : a.latestTimestamp;
+            const timeB = b.latestTimestamp === Infinity ? 0 : b.latestTimestamp;
+            return timeB - timeA;
+        } else if (sortMode === "oldest") {
+            const timeA = a.earliestTimestamp === Infinity ? 0 : a.earliestTimestamp;
+            const timeB = b.earliestTimestamp === Infinity ? 0 : b.earliestTimestamp;
+            if (timeA === 0 && timeB === 0) return 0;
+            if (timeA === 0) return 1;
+            if (timeB === 0) return -1;
+            return timeA - timeB;
+        } else if (sortMode === "priority") {
+            if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
+            const timeA = a.latestTimestamp === Infinity ? 0 : a.latestTimestamp;
+            const timeB = b.latestTimestamp === Infinity ? 0 : b.latestTimestamp;
+            return timeB - timeA;
+        } else {
+            // Default "count": Priority first, then by request count descending, then newest
+            if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
+            if (b.count !== a.count) return b.count - a.count;
+            const timeA = a.latestTimestamp === Infinity ? 0 : a.latestTimestamp;
+            const timeB = b.latestTimestamp === Infinity ? 0 : b.latestTimestamp;
+            return timeB - timeA;
+        }
     });
 
     const badgeEl = document.getElementById("requests-count-badge");
@@ -996,6 +1103,13 @@ function renderRequestsList() {
 
         let detailsHtml = "";
         if (req.requesterDetails && req.requesterDetails.length > 0) {
+            // Sort individual requesters by newest request date first
+            req.requesterDetails.sort((a, b) => {
+                const tA = a.requestedAtDate ? a.requestedAtDate.getTime() : 0;
+                const tB = b.requestedAtDate ? b.requestedAtDate.getTime() : 0;
+                return tB - tA;
+            });
+
             req.requesterDetails.forEach(detail => {
                 let statusBadge = "";
                 const detailFulfiller = detail.fulfilledBy || req.fulfilledBy;
@@ -1015,13 +1129,48 @@ function renderRequestsList() {
                     statusBadge = `<span style="color: #ffbc00; font-weight: bold; background: rgba(255, 188, 0, 0.1); padding: 1px 6px; border-radius: 4px;">🟠 Pending</span>`;
                 }
                 
+                const timeTag = detail.requestedAtFormatted ? `
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 4px;">
+                        <span>📅</span>
+                        <span>${escapeHTML(detail.requestedAtFormatted)}</span>
+                        ${detail.relativeTime ? `<span style="color: var(--primary-color); font-weight: 600;">(${escapeHTML(detail.relativeTime)})</span>` : ''}
+                    </div>
+                ` : "";
+
                 detailsHtml += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 11px; padding: 4px 6px; background: rgba(255,255,255,0.01); border-radius: 4px;">
-                        <span>👤 @${escapeHTML(detail.username)} (ID: <code>${escapeHTML(detail.userId)}</code>)</span>
-                        <span>${statusBadge}</span>
+                    <div style="display: flex; flex-direction: column; margin-bottom: 6px; font-size: 11px; padding: 6px 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>👤 <strong>@${escapeHTML(detail.username)}</strong> (ID: <code>${escapeHTML(detail.userId)}</code>)</span>
+                            <span>${statusBadge}</span>
+                        </div>
+                        ${timeTag}
                     </div>
                 `;
             });
+        }
+
+        let dateDisplayMarkup = "";
+        if (req.latestDate) {
+            const latestFormatted = formatRequestDateTime(req.latestDate, false);
+            const relativeAgo = getRelativeTimeAgo(req.latestDate);
+            if (req.count > 1 && req.earliestDate && req.earliestDate.getTime() !== req.latestDate.getTime()) {
+                const earliestFormatted = formatRequestDateTime(req.earliestDate, false);
+                dateDisplayMarkup = `
+                    <div style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap;">
+                        <span>📅</span>
+                        <span>Latest: <strong style="color: var(--text-primary); font-weight: 600;">${escapeHTML(latestFormatted)}</strong> <span style="color: var(--primary-color); font-weight: 600;">(${escapeHTML(relativeAgo)})</span></span>
+                        <span style="opacity: 0.5;">•</span>
+                        <span>First: <strong style="color: var(--text-secondary);">${escapeHTML(earliestFormatted)}</strong></span>
+                    </div>
+                `;
+            } else {
+                dateDisplayMarkup = `
+                    <div style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap;">
+                        <span>📅</span>
+                        <span><strong style="color: var(--text-primary); font-weight: 600;">${escapeHTML(latestFormatted)}</strong> <span style="color: var(--primary-color); font-weight: 600;">(${escapeHTML(relativeAgo)})</span></span>
+                    </div>
+                `;
+            }
         }
 
         const toggleId = `toggle-${req.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${req.docIds[0]}`;
@@ -1034,6 +1183,7 @@ function renderRequestsList() {
                         ${badgeMarkup}
                         ${claimBadgeMarkup}
                     </h5>
+                    ${dateDisplayMarkup}
                     <p style="margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
                         <span style="text-transform: uppercase; font-weight: bold;">${escapeHTML(req.type)}</span>
                         <span style="color: var(--text-muted);">•</span>
@@ -1304,6 +1454,14 @@ if (filterTabContainer) {
             tab.classList.add("active");
             renderRequestsList();
         });
+    });
+}
+
+// Bind sort selector dropdown change listener
+const requestsSortSelect = document.getElementById("requests-sort-select");
+if (requestsSortSelect) {
+    requestsSortSelect.addEventListener("change", () => {
+        renderRequestsList();
     });
 }
 
