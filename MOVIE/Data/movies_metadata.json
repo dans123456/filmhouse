@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "281009-the-jewel-of-section-e",
+    "tmdb_id": 281009,
+    "imdb_id": "",
+    "title": "The Jewel of Section E",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "Jay-jay, the only girl in the mischievous Section E, hopes for a fresh start in high school but quickly becomes the target of her rowdy male classmates' pranks and schemes to make her leave. Dubbed their \"Mutya\" (muse), she fights back with wit and charm, turning the tables on her tormentors. Amidst the chaos, unexpected friendships blossom, and hilarious misunderstandings lead to heart-fluttering moments. Can Jay-jay survive the madness of Section E, or will she win over their hearts instead?",
+    "poster": "https://image.tmdb.org/t/p/w500/94nv914y2PJqt0jD2CL9whFMoAi.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vyC7bYAd3lPHeg47VDz4iZ97wRP.jpg",
+    "rating": 8.4,
+    "release_date": "2025-01-03",
+    "language": "tl",
+    "cast": [],
+    "director": "",
+    "trailer": "jXlH7fnCHxk",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADqQwAAjAeWEb9PN1BD4xTdRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1008953-incoming",
     "tmdb_id": 1008953,
     "imdb_id": "",
