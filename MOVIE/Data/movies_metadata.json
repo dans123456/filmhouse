@@ -1,5 +1,35 @@
 [
   {
+    "csv_id": "302138-grits",
+    "tmdb_id": 302138,
+    "imdb_id": "",
+    "title": "GRITS",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "Follows Keisha, Ty and Francis, three young women from the unforgiving city of Memphis who are determined to figure out the next chapter in their lives while relishing in the world of their favorite past time, roller skating.",
+    "poster": "https://image.tmdb.org/t/p/w500/vEdQaOEJIlF9bNYge65ziBs6eYM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/nuy33wsIXcLHo0WEMzdPfs1q8Dw.jpg",
+    "rating": 10,
+    "release_date": "2025-10-30",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "UKudXu4zfpU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyAsAAjAeWEbI0T-7AoS5AxYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1585089-trap-48",
     "tmdb_id": 1585089,
     "imdb_id": "",
