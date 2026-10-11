@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "45284-outrage",
+    "tmdb_id": 45284,
+    "imdb_id": "",
+    "title": "Outrage",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies"
+    ],
+    "genres": [
+      "Action",
+      "Crime",
+      "Thriller",
+      "Drama"
+    ],
+    "overview": "When a tough yakuza gangster is betrayed by his bosses, it means all out war. Bodies pile up as he takes out everyone in his way to the top in a brutal quest for revenge.",
+    "poster": "https://image.tmdb.org/t/p/w500/s6VVl5WKuGIDlSAm8hgvTsrzODK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/tNr8lv3OeLD0OCJPUuazBN3DnTT.jpg",
+    "rating": 6.9,
+    "release_date": "2010-06-12",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "3Fj3htxRRHM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADXxUAAjAeWEaNqn9ov-aWORYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "10835-the-killer",
     "tmdb_id": 10835,
     "imdb_id": "",
