@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "41244-a-better-tomorrow-iii-love-and-death-in-saigon",
+    "tmdb_id": 41244,
+    "imdb_id": "",
+    "title": "A Better Tomorrow III: Love and Death in Saigon",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Action",
+      "Crime",
+      "Thriller",
+      "Drama"
+    ],
+    "overview": "Before the events of A Better Tomorrow (1986), Mark 'Gor' Lee heads to Saigon during the Vietnam War to bring home his uncle and cousin, but his task becomes complicated when a well-known criminal tries to help him.",
+    "poster": "https://image.tmdb.org/t/p/w500/cKvP5yunS8HxA66qlxw6AhFuAbN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/mYC9iqowIl2vCH1T7pu8IGmTdyw.jpg",
+    "rating": 6.4,
+    "release_date": "1989-10-20",
+    "language": "cn",
+    "cast": [],
+    "director": "",
+    "trailer": "h_ZaL4iQ3XA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADnhIAAjAeWEZTmV3kjgwUkxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "18305-a-better-tomorrow-ii",
     "tmdb_id": 18305,
     "imdb_id": "",
