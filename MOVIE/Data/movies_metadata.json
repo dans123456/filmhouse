@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "1465943-mandaadi",
+    "tmdb_id": 1465943,
+    "imdb_id": "",
+    "title": "Mandaadi",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Bollywood"
+    ],
+    "genres": [
+      "Action",
+      "Drama"
+    ],
+    "overview": "A fishing captain applies his maritime knowledge in a traditional boat race along Tamil Nadu's coast during a festival, leading a six-person team against other crews.",
+    "poster": "https://image.tmdb.org/t/p/w500/cDFW9BI1PSqrBWu8W0ZoeUQivEM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/dJ4sqrmX2KviF8HBKlLrDedUhnh.jpg",
+    "rating": 7.5,
+    "release_date": "2026-09-10",
+    "language": "ta",
+    "cast": [],
+    "director": "",
+    "trailer": "VOHaf-0DV-U",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD4hEAAjAeWEY46phgRsAuBBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "102651-maleficent",
     "tmdb_id": 102651,
     "imdb_id": "",
