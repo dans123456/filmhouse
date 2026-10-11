@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "326423-barbershop-the-next-cut",
+    "tmdb_id": 326423,
+    "imdb_id": "",
+    "title": "Barbershop: The Next Cut",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "To survive harsh economic times, Calvin and Angie have merged the barbershop and beauty salon into one business. The days of male bonding are gone as Eddie and the crew must now contend with sassy female co-workers and spirited clientele. As the battle of the sexes rages on, a different kind of conflict has taken over Chicago. Crime and gangs are on the rise, leaving Calvin worried about the fate of his son. Together, the friends come up with a bold plan to take back their beloved neighborhood.",
+    "poster": "https://image.tmdb.org/t/p/w500/9mwzidlGgWfr2hcMWUKM86lOqdo.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/iI8okuTbcf6JCyBM3oLcneW6bDF.jpg",
+    "rating": 6.3,
+    "release_date": "2016-04-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "l2vPDGStL4k",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADdhMAAqbcWUazRRonwF90MhYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1400837-other-mommy",
     "tmdb_id": 1400837,
     "imdb_id": "",
