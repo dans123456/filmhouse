@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "7500-sonatine",
+    "tmdb_id": 7500,
+    "imdb_id": "",
+    "title": "Sonatine",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies",
+      "Classic Movies"
+    ],
+    "genres": [
+      "Action",
+      "Crime",
+      "Thriller"
+    ],
+    "overview": "Murakawa, an aging Tokyo yakuza tiring of gangster life, is sent by his boss to Okinawa along with a few of his henchmen to help end a gang war, supposedly as mediators between two warring clans. He finds that the dispute between the clans is insignificant and whilst wondering why he was sent to Okinawa at all, his group is attacked in an ambush. The survivors flee and make a decision to lay low at the beach while they await further instructions.",
+    "poster": "https://image.tmdb.org/t/p/w500/mX9E4fEuG17L2e7bZmhBc0XdRbw.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/wVQbMLpczyxlPKJWo6Qk3A1v2rB.jpg",
+    "rating": 7.5,
+    "release_date": "1993-09-10",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "oLcZFTPZKfc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADLxUAAjAeWEYrXEk1BBNAVRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1103621-how-to-make-millions-before-grandma-dies",
     "tmdb_id": 1103621,
     "imdb_id": "",
