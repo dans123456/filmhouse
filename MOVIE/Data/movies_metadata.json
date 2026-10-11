@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "289423-take-charge-of-my-heart",
+    "tmdb_id": 289423,
+    "imdb_id": "",
+    "title": "Take Charge of My Heart",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Comedy"
+    ],
+    "overview": "A corporate heir with an artificial heart meets a woman who's literally electric. They strike a deal that makes his heart beat — in more ways than one.",
+    "poster": "https://image.tmdb.org/t/p/w500/ecRrKGXfflZmDZBD4irdkybClT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rN9xHDp83kZ3cOr82JR1b4rFIFk.jpg",
+    "rating": 6.6,
+    "release_date": "2026-10-09",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "z_D5uXaDsVU",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADShUAAjAeWEYVK-ibNLrlDxYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "7500-sonatine",
     "tmdb_id": 7500,
     "imdb_id": "",
