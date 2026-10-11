@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "897160-brave-citizen",
+    "tmdb_id": 897160,
+    "imdb_id": "",
+    "title": "Brave Citizen",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies"
+    ],
+    "genres": [
+      "Action",
+      "Drama",
+      "Comedy"
+    ],
+    "overview": "An expelled boxing champion, who now is a high-school teacher, witnesses intolerable violence and throws her first punch to build justice against it, while putting on a mask.",
+    "poster": "https://image.tmdb.org/t/p/w500/ixQoOExnnvIxYvnqGgfhaWqXeXc.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fJRrRn60YzI1hVt4X1BIo6hsM0g.jpg",
+    "rating": 7.6,
+    "release_date": "2023-10-25",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "nLx7YXszBYI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADlREAAjAeWEb0JmUonGfqZxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "129418-brand-new-cherry-flavor",
     "tmdb_id": 129418,
     "imdb_id": "",
