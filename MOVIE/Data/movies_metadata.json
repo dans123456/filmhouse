@@ -1,5 +1,40 @@
 [
   {
+    "csv_id": "284833-avatar-seven-havens",
+    "tmdb_id": 284833,
+    "imdb_id": "",
+    "title": "Avatar: Seven Havens",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy",
+      "Family"
+    ],
+    "overview": "In a world shattered by a devastating cataclysm, a young Earthbender discovers she's the new Avatar after Korra. But in this dangerous era, that title marks her as humanity's destroyer, not its savior. Hunted by both human and spirit enemies, she and her long-lost twin must uncover their mysterious origins and save the Seven Havens before civilization's last strongholds collapse.",
+    "poster": "https://image.tmdb.org/t/p/w500/u62d0BPqsdv2TUDifcMmoePbHPL.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/t2KFGH07Al4XuIZLHRlF1Hj9IJB.jpg",
+    "rating": 8.9,
+    "release_date": "2026-10-09",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "nhdh962_ee0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADTgwAAqbcYUYGgkym7idNDRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "326423-barbershop-the-next-cut",
     "tmdb_id": 326423,
     "imdb_id": "",
