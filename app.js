@@ -7068,6 +7068,7 @@ function logMovieRequestToFirestore(movie, specs = "") {
         db.collection("requests").add({
             title: requestTitle,
             seasonOrPart: specs || "",
+            status: "pending",
             tmdb_id: movie.tmdb_id || null,
             csv_id: movie.csv_id || "",
             type: movie.type || "Movie",

@@ -347,13 +347,13 @@ async function syncCatalogFromGitHub() {
     return { success: false, error: "Empty or invalid catalog data received" };
 }
 
-// Run initial catalog sync 5 seconds after startup, then poll every 60 seconds
+// Run initial catalog sync 5 seconds after startup, then poll every 20 seconds
 setTimeout(() => {
     syncCatalogFromGitHub().catch(() => {});
 }, 5000);
 setInterval(() => {
     syncCatalogFromGitHub().catch(() => {});
-}, 60 * 1000);
+}, 20 * 1000);
 
 // Load persisted pending requests from disk (immune to Firestore quota)
 try {
@@ -711,6 +711,19 @@ function setupBot(bot, adminBot) {
             const sendToTarget = async (botInstance, target) => {
                 if (!botInstance) throw new Error("Bot instance unavailable");
                 try {
+                    // Fast path: Telegram natively downloads image URLs via high-speed CDN directly (instant, 0 node overhead)
+                    if (bannerUrl && String(bannerUrl).startsWith("http")) {
+                        try {
+                            return await botInstance.telegram.sendPhoto(target, bannerUrl, {
+                                caption: caption,
+                                parse_mode: "HTML"
+                            });
+                        } catch (urlSendErr) {
+                            console.warn(`[CHANNEL PUBLISH] Direct URL send failed (${urlSendErr.message}), falling back to buffer download...`);
+                        }
+                    }
+
+                    // Fallback path: Download buffer only if direct URL was rejected
                     let photoPayload = bannerUrl;
                     if (bannerUrl && String(bannerUrl).startsWith("http")) {
                         try {
@@ -3277,6 +3290,27 @@ async function init() {
         pingExternalFileBots();
         setInterval(pingExternalFileBots, 5 * 60 * 1000);
 
+        // Real-time catalog sync trigger from Admin Panel (Instant publish sync)
+        let _lastSyncTimestamp = Date.now();
+        let _syncDebounceTimeout = null;
+        try {
+            db.collection("settings").doc("catalog_sync").onSnapshot(doc => {
+                if (!doc || !doc.exists) return;
+                const data = doc.data() || {};
+                const pubAt = data.lastPublishedAt || 0;
+                if (pubAt > _lastSyncTimestamp && (Date.now() - pubAt < 180000)) {
+                    _lastSyncTimestamp = pubAt;
+                    console.log(`[CATALOG SYNC] Instant publish trigger received from Admin Panel! (Published at: ${new Date(pubAt).toLocaleTimeString()})`);
+                    if (_syncDebounceTimeout) clearTimeout(_syncDebounceTimeout);
+                    _syncDebounceTimeout = setTimeout(() => {
+                        syncCatalogFromGitHub().catch(err => console.warn("[CATALOG SYNC] Instant sync error:", err.message));
+                    }, 2000);
+                }
+            }, err => console.warn("[CATALOG SYNC] Listener error:", err.message));
+        } catch (syncListenErr) {
+            console.warn("[CATALOG SYNC] Could not attach listener:", syncListenErr.message);
+        }
+
         // Real-time listener for admin triggered manual reminders
         db.collection("admin_reminders").onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(async (change) => {
@@ -3586,6 +3620,81 @@ async function init() {
                         }
                     }
 
+                    // Auto-publish release announcement to Main Channel (@filmhouse_main)
+                    // Evaluated immediately and independently so channel posts are never delayed, skipped or blocked
+                    if (data.status === "fulfilled" && data.publishToChannel !== false && !data.channelMessageId) {
+                        const rawClean = String(title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                        const movieKey = String(data.csv_id || data.tmdb_id || rawClean || docId).toLowerCase().trim();
+                        if (movieKey && !_channelPostingLocks.has(movieKey) && !_channelPostingLocks.has(rawClean) && !broadcastedCatalogIds.has(movieKey) && !broadcastedCatalogIds.has(rawClean)) {
+                            _channelPostingLocks.add(movieKey);
+                            _channelPostingLocks.add(rawClean);
+                            (async () => {
+                                try {
+                                    console.log(`[CHANNEL PUBLISH] Initiating immediate auto-publish for fulfilled request "${title}" (Key: ${movieKey})...`);
+
+                                    let movieDataForChannel = null;
+                                    const lookupCsvId = String(data.csv_id || "").toLowerCase().trim();
+                                    const lookupTmdbId = String(data.tmdb_id || "").trim();
+                                    const lookupTitle = rawClean;
+
+                                    if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                                        movieDataForChannel = cachedMoviesMetadata.find(m => 
+                                            (lookupCsvId && String(m.csv_id || "").toLowerCase().trim() === lookupCsvId) ||
+                                            (lookupTmdbId && String(m.tmdb_id || "").trim() === lookupTmdbId) ||
+                                            (lookupTitle && (String(m.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim() === lookupTitle || titlesMatch(m.title, lookupTitle)))
+                                        );
+                                    }
+
+                                    if (!movieDataForChannel) {
+                                        movieDataForChannel = {
+                                            title: title,
+                                            year: year,
+                                            type: data.type,
+                                            seasonOrPart: data.seasonOrPart,
+                                            csv_id: data.csv_id || "",
+                                            tmdb_id: data.tmdb_id || null,
+                                            overview: data.overview || "",
+                                            genres: data.genres || data.categories || [],
+                                            rating: data.rating || data.vote_average || "",
+                                            poster: data.poster || null,
+                                            backdrop: data.backdrop || null
+                                        };
+                                    }
+
+                                    const pubResult = await publishMovieToChannel(movieDataForChannel);
+                                    if (pubResult && pubResult.message_id) {
+                                        console.log(`[CHANNEL PUBLISH] Successfully published announcement for "${title}" to @filmhouse_main (msg_id: ${pubResult.message_id})`);
+                                        
+                                        // Register in broadcasted catalog tracker to prevent duplicate repost when GitHub syncs!
+                                        const bcIdKey = String(movieDataForChannel.csv_id || data.csv_id || "").toLowerCase().trim();
+                                        const bcTitleKey = String(movieDataForChannel.title || title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                                        if (bcIdKey) broadcastedCatalogIds.add(bcIdKey);
+                                        if (bcTitleKey) broadcastedCatalogIds.add(bcTitleKey);
+                                        try {
+                                            const bDir = path.dirname(BROADCASTED_CATALOG_FILE);
+                                            if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
+                                            fs.writeFileSync(BROADCASTED_CATALOG_FILE, JSON.stringify(Array.from(broadcastedCatalogIds)), "utf8");
+                                        } catch (sErr) {}
+
+                                        await db.collection("requests").doc(docId).update({
+                                            channelPosted: true,
+                                            channelMessageId: pubResult.message_id,
+                                            channelPostedAt: admin.firestore.FieldValue.serverTimestamp()
+                                        }).catch(() => {});
+                                    } else {
+                                        console.warn(`[CHANNEL PUBLISH] publishMovieToChannel returned null/skipped for "${title}".`);
+                                        _channelPostingLocks.delete(movieKey);
+                                        _channelPostingLocks.delete(rawClean);
+                                    }
+                                } catch (pubErr) {
+                                    console.warn(`[CHANNEL PUBLISH] Error auto-publishing "${title}" to channel:`, pubErr.message);
+                                    _channelPostingLocks.delete(movieKey);
+                                    _channelPostingLocks.delete(rawClean);
+                                }
+                            })();
+                        }
+                    }
+
                     if (data.status === "fulfilled" && data.notifiedFulfilled !== true && downloadLink) {
                         const cleanUserTitle = escapeHtml(title || "Movie");
                         const cleanYearSuffix = year ? ` (${escapeHtml(year)})` : "";
@@ -3724,81 +3833,6 @@ async function init() {
                                 }
                             } catch (adminErr) {
                                 console.error("Error in admin notification:", adminErr);
-                            }
-                        }
-
-                        // Auto-publish release announcement to Main Channel (@filmhouse_main)
-                        // Evaluated independently from user DM flag so channel posts are never skipped or blocked
-                        if (data.status === "fulfilled" && data.publishToChannel !== false && !data.channelMessageId) {
-                            const rawClean = String(title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
-                            const movieKey = String(data.csv_id || data.tmdb_id || rawClean || docId).toLowerCase().trim();
-                            if (movieKey && !_channelPostingLocks.has(movieKey) && !_channelPostingLocks.has(rawClean) && !broadcastedCatalogIds.has(movieKey) && !broadcastedCatalogIds.has(rawClean)) {
-                                _channelPostingLocks.add(movieKey);
-                                _channelPostingLocks.add(rawClean);
-                                (async () => {
-                                    try {
-                                        console.log(`[CHANNEL PUBLISH] Initiating auto-publish for fulfilled request "${title}" (Key: ${movieKey})...`);
-
-                                        let movieDataForChannel = null;
-                                        const lookupCsvId = String(data.csv_id || "").toLowerCase().trim();
-                                        const lookupTmdbId = String(data.tmdb_id || "").trim();
-                                        const lookupTitle = rawClean;
-
-                                        if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
-                                            movieDataForChannel = cachedMoviesMetadata.find(m => 
-                                                (lookupCsvId && String(m.csv_id || "").toLowerCase().trim() === lookupCsvId) ||
-                                                (lookupTmdbId && String(m.tmdb_id || "").trim() === lookupTmdbId) ||
-                                                (lookupTitle && (String(m.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim() === lookupTitle || titlesMatch(m.title, lookupTitle)))
-                                            );
-                                        }
-
-                                        if (!movieDataForChannel) {
-                                            movieDataForChannel = {
-                                                title: title,
-                                                year: year,
-                                                type: data.type,
-                                                seasonOrPart: data.seasonOrPart,
-                                                csv_id: data.csv_id || "",
-                                                tmdb_id: data.tmdb_id || null,
-                                                overview: data.overview || "",
-                                                genres: data.genres || data.categories || [],
-                                                rating: data.rating || data.vote_average || "",
-                                                poster: data.poster || null,
-                                                backdrop: data.backdrop || null
-                                            };
-                                        }
-
-                                        const pubResult = await publishMovieToChannel(movieDataForChannel);
-                                        if (pubResult && pubResult.message_id) {
-                                            console.log(`[CHANNEL PUBLISH] Successfully published announcement for "${title}" to @filmhouse_main (msg_id: ${pubResult.message_id})`);
-                                            
-                                            // Register in broadcasted catalog tracker to prevent duplicate repost when GitHub syncs!
-                                            const bcIdKey = String(movieDataForChannel.csv_id || data.csv_id || "").toLowerCase().trim();
-                                            const bcTitleKey = String(movieDataForChannel.title || title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
-                                            if (bcIdKey) broadcastedCatalogIds.add(bcIdKey);
-                                            if (bcTitleKey) broadcastedCatalogIds.add(bcTitleKey);
-                                            try {
-                                                const bDir = path.dirname(BROADCASTED_CATALOG_FILE);
-                                                if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
-                                                fs.writeFileSync(BROADCASTED_CATALOG_FILE, JSON.stringify(Array.from(broadcastedCatalogIds)), "utf8");
-                                            } catch (sErr) {}
-
-                                            await db.collection("requests").doc(docId).update({
-                                                channelPosted: true,
-                                                channelMessageId: pubResult.message_id,
-                                                channelPostedAt: admin.firestore.FieldValue.serverTimestamp()
-                                            }).catch(() => {});
-                                        } else {
-                                            console.warn(`[CHANNEL PUBLISH] publishMovieToChannel returned null/skipped for "${title}".`);
-                                            _channelPostingLocks.delete(movieKey);
-                                            _channelPostingLocks.delete(rawClean);
-                                        }
-                                    } catch (pubErr) {
-                                        console.warn(`[CHANNEL PUBLISH] Error auto-publishing "${title}" to channel:`, pubErr.message);
-                                        _channelPostingLocks.delete(movieKey);
-                                        _channelPostingLocks.delete(rawClean);
-                                    }
-                                })();
                             }
                         }
                     }

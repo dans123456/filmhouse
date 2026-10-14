@@ -424,6 +424,65 @@ if (db) {
     });
 }
 
+// Helper: Check if a request doc is fulfilled either by status/link or by exact match in catalog (including season & quality verification)
+function isRequestFulfilled(r) {
+    if (r.status === "fulfilled" || r.status === "claimed" || r.claimed === true || (r.downloadLink && String(r.downloadLink).trim() !== "")) {
+        return true;
+    }
+    if (!allCatalogMovies || allCatalogMovies.length === 0) return false;
+
+    const reqSpecClean = (r.seasonOrPart || "").toLowerCase().trim();
+    const isQualityReq = reqSpecClean.includes("quality") || reqSpecClean.includes("1080") || reqSpecClean.includes("720") || reqSpecClean.includes("2160") || reqSpecClean.includes("4k") || reqSpecClean.includes("480");
+    const isSeasonReq = reqSpecClean.includes("season") || !!reqSpecClean.match(/\bs\d+\b/i);
+    const isReqSeries = (r.type || "").toLowerCase() === 'series' || (r.type || "").toLowerCase() === 'tv';
+
+    return allCatalogMovies.some(m => {
+        const hasLinks = Array.isArray(m.links) && m.links.length > 0 && m.links.some(l => {
+            const url = typeof l === 'object' && l !== null ? (l.url || l.link) : l;
+            return url && String(url).trim() !== "";
+        });
+        if (!hasLinks) return false;
+
+        const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
+        const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
+        const isSeriesMedia = isReqSeries || (m.type || "").toLowerCase() === 'series' || (m.type || "").toLowerCase() === 'tv';
+
+        const isIdMatch = rId && mId && rId === mId;
+        const isTitleMatch = !isIdMatch && titlesMatch(m.title, r.title);
+        if (!isIdMatch && !isTitleMatch) return false;
+
+        // 1. If user requested a specific season for a series, verify the catalog actually has that season
+        if (isSeriesMedia && isSeasonReq) {
+            const sMatch = reqSpecClean.match(/season\s*(\d+)/i) || reqSpecClean.match(/\bs(\d+)\b/i);
+            const sNum = sMatch ? sMatch[1] : null;
+            return m.links.some(link => {
+                const sLabel = (typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "").toLowerCase();
+                const lUrl = typeof link === 'object' && link !== null ? (link.url || link.link) : link;
+                const hasValidUrl = lUrl && String(lUrl).trim() !== "";
+                if (!hasValidUrl) return false;
+                if (sNum) {
+                    return sLabel.includes(`season ${sNum}`) || sLabel.includes(`s${sNum}`);
+                }
+                return sLabel.includes(reqSpecClean);
+            });
+        }
+
+        // 2. If user requested a specific quality for a movie, verify the catalog actually has that quality
+        if (!isSeriesMedia && isQualityReq) {
+            const qMatch = reqSpecClean.match(/(2160p|4k|1080p|720p|480p)/i);
+            const targetQ = qMatch ? qMatch[1].toLowerCase() : reqSpecClean;
+            return m.links.some(link => {
+                const lQuality = (typeof link === 'object' && link !== null ? (link.quality || link.season || "") : "").toLowerCase();
+                const lUrl = typeof link === 'object' && link !== null ? (link.url || link.link) : link;
+                return lQuality.includes(targetQ) && lUrl && String(lUrl).trim() !== "";
+            });
+        }
+
+        // 3. For general requests without specific season/quality, catalog having active links fulfills it
+        return true;
+    });
+}
+
 // Calculate Stats and Update Counters
 function updateStatsCounters() {
     // Total registered users
@@ -446,17 +505,7 @@ function updateStatsCounters() {
 
     // Completed requests fulfillment rate
     const totalReqCount = allRequests.length;
-    const fulfilledReqCount = allRequests.filter(r => {
-        const inCatalog = allCatalogMovies && allCatalogMovies.some(m => {
-            const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
-            const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
-            if (rId && mId) {
-                return rId === mId;
-            }
-            return m.title && titlesMatch(m.title, r.title);
-        });
-        return r.status === "fulfilled" || r.status === "claimed" || r.claimed === true || inCatalog;
-    }).length;
+    const fulfilledReqCount = allRequests.filter(r => isRequestFulfilled(r)).length;
     const fulfillmentRate = totalReqCount > 0 ? Math.round((fulfilledReqCount / totalReqCount) * 100) : 100;
     const statFulfillmentRate = document.getElementById("stat-fulfillment-rate");
     if (statFulfillmentRate) {
@@ -916,42 +965,9 @@ function renderRequestsList() {
             }
         }
         
-        const inCatalog = allCatalogMovies && allCatalogMovies.some(m => {
-            const hasLinks = Array.isArray(m.links) && m.links.length > 0 && m.links.some(l => {
-                const url = typeof l === 'object' && l !== null ? l.url : l;
-                return url && String(url).trim() !== "";
-            });
-            if (!hasLinks) return false;
-
-            const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
-            const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
-            const isSeriesMedia = isReqSeries || (m.type || "").toLowerCase() === 'series' || (m.type || "").toLowerCase() === 'tv';
-
-            if (rId && mId && rId === mId) {
-                if (isSeriesMedia && r.seasonOrPart && String(r.seasonOrPart).toLowerCase().includes("season")) {
-                    const cleanReqSeason = r.seasonOrPart.toLowerCase().trim();
-                    return m.links.some(link => {
-                        const sLabel = typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "";
-                        return sLabel.toLowerCase().trim() === cleanReqSeason;
-                    });
-                }
-                return true;
-            }
-            
-            if (!titlesMatch(m.title, r.title)) return false;
-            if (isSeriesMedia && r.seasonOrPart && String(r.seasonOrPart).toLowerCase().includes("season")) {
-                const cleanReqSeason = r.seasonOrPart.toLowerCase().trim();
-                return m.links.some(link => {
-                    const sLabel = typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "";
-                    const lUrl = typeof link === 'object' && link !== null ? link.url : link;
-                    return sLabel.toLowerCase().trim() === cleanReqSeason && lUrl && String(lUrl).trim() !== "";
-                });
-            }
-            return true;
-        });
-        const fulfilled = r.status === "fulfilled" || r.status === "claimed" || inCatalog;
-        
-        if (!fulfilled) {
+        // A request doc is fulfilled ONLY if it has an explicit fulfilled/claimed status, a download link, or verified exact match in catalog
+        const isDocFulfilled = isRequestFulfilled(r);
+        if (!isDocFulfilled) {
             counts[key].isFulfilled = false;
         }
     });
@@ -978,10 +994,10 @@ function renderRequestsList() {
             filteredRequests = filteredRequests.filter(r => !r.isFulfilled);
             break;
         case "priority":
-            filteredRequests = filteredRequests.filter(r => r.isPriority);
+            filteredRequests = filteredRequests.filter(r => r.isPriority && !r.isFulfilled);
             break;
         case "pending":
-            filteredRequests = filteredRequests.filter(r => !r.isPriority && !r.isFulfilled);
+            filteredRequests = filteredRequests.filter(r => !r.isFulfilled);
             break;
         case "fulfilled":
             filteredRequests = filteredRequests.filter(r => r.isFulfilled);
@@ -2358,6 +2374,8 @@ async function loadCatalog() {
                         updatePublishButtonState();
                         renderCatalogList();
                         renderEditorsChoiceSelectionList();
+                        renderRequestsList();
+                        if (typeof updateStatsCounters === 'function') updateStatsCounters();
                         return;
                     } else {
                         localStorage.removeItem("filmhouse_unpublished_catalog");
@@ -2416,6 +2434,8 @@ async function loadCatalog() {
         originalCatalogCount = allCatalogMovies.length;
         renderCatalogList();
         renderEditorsChoiceSelectionList();
+        renderRequestsList();
+        if (typeof updateStatsCounters === 'function') updateStatsCounters();
     } catch (e) {
         console.error("Failed to load catalog:", e);
         if (listContainer) {
@@ -4170,6 +4190,18 @@ if (publishBtn) {
                 }
             }
 
+            // Trigger instant catalog sync on the server/bot
+            if (typeof db !== "undefined" && db) {
+                try {
+                    await db.collection("settings").doc("catalog_sync").set({
+                        lastPublishedAt: Date.now(),
+                        publishedBy: (typeof currentAdminName !== "undefined" && currentAdminName) ? currentAdminName : "admin"
+                    }, { merge: true });
+                } catch (syncDocErr) {
+                    console.warn("Failed to notify bot of catalog publish:", syncDocErr);
+                }
+            }
+
             // Channel publication of newly added titles is handled centrally with full deduplication by bot.js on the server
             
             alert("Catalog CSV and enriched JSON database successfully published directly to GitHub! Updates are live instantly.");
@@ -5791,6 +5823,14 @@ if (fulfillForm && fulfillRequestModal) {
                     newlyUpdatedIds = [];
                     localStorage.removeItem("filmhouse_unpublished_catalog");
                     
+                    // Trigger instant catalog sync on the server/bot
+                    if (typeof db !== "undefined" && db) {
+                        db.collection("settings").doc("catalog_sync").set({
+                            lastPublishedAt: Date.now(),
+                            publishedBy: currentAdminName || "admin"
+                        }, { merge: true }).catch(() => {});
+                    }
+
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.textContent = "Fulfill Request";
