@@ -412,8 +412,10 @@ if (db) {
             allRequests.push(req);
         });
         allRequests.sort((a, b) => {
-            const tA = (a.requestedAt && a.requestedAt.seconds) || (a.timestamp && a.timestamp.seconds) || (a.fulfilledAt && a.fulfilledAt.seconds) || 0;
-            const tB = (b.requestedAt && b.requestedAt.seconds) || (b.timestamp && b.timestamp.seconds) || (b.fulfilledAt && b.fulfilledAt.seconds) || 0;
+            const dateA = parseRequestDate(a.requestedAt || a.timestamp || a.fulfilledAt || a._localTime);
+            const dateB = parseRequestDate(b.requestedAt || b.timestamp || b.fulfilledAt || b._localTime);
+            const tA = dateA ? dateA.getTime() : 0;
+            const tB = dateB ? dateB.getTime() : 0;
             return tB - tA;
         });
         updateStatsCounters();
@@ -424,12 +426,15 @@ if (db) {
     });
 }
 
-// Helper: Check if a request doc is fulfilled either by status/link or by exact match in catalog (including season & quality verification)
+// Helper: Check if a request doc is fulfilled by explicit status or download link
 function isRequestFulfilled(r) {
-    if (r.status === "fulfilled" || r.status === "claimed" || r.claimed === true || (r.downloadLink && String(r.downloadLink).trim() !== "")) {
-        return true;
-    }
-    if (!allCatalogMovies || allCatalogMovies.length === 0) return false;
+    if (!r) return false;
+    return r.status === "fulfilled" || r.status === "claimed" || r.claimed === true || (r.downloadLink && String(r.downloadLink).trim() !== "");
+}
+
+// Helper: Check if a pending request already has matching content with active links in the catalog (for UI badge and one-click fulfillment)
+function hasCatalogMatch(r) {
+    if (!r || !allCatalogMovies || allCatalogMovies.length === 0) return false;
 
     const reqSpecClean = (r.seasonOrPart || "").toLowerCase().trim();
     const isQualityReq = reqSpecClean.includes("quality") || reqSpecClean.includes("1080") || reqSpecClean.includes("720") || reqSpecClean.includes("2160") || reqSpecClean.includes("4k") || reqSpecClean.includes("480");
@@ -874,13 +879,12 @@ function renderRequestsList() {
         const cleanTitle = rawTitle.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "");
         const yearPart = r.year ? String(r.year).trim() : (rawTitle.match(/\((\d{4})\)/) ? rawTitle.match(/\((\d{4})\)/)[1] : "");
         const tmdbPart = r.tmdb_id ? String(r.tmdb_id).trim() : (r.csv_id ? String(r.csv_id).trim() : "");
-        const isReqSeries = (r.type || "").toLowerCase() === 'series' || (r.type || "").toLowerCase() === 'tv';
-        const seasonPart = (isReqSeries && r.seasonOrPart) ? String(r.seasonOrPart).toLowerCase().trim() : "";
+        const specPart = (r.seasonOrPart || "").toLowerCase().trim();
 
-        // Key distinguishes distinct media releases, remakes, and seasons
+        // Key distinguishes distinct media releases, remakes, seasons, and quality variants
         const key = tmdbPart 
-            ? `${cleanTitle}_tmdb_${tmdbPart}_${seasonPart}` 
-            : (yearPart ? `${cleanTitle}_year_${yearPart}_${seasonPart}` : `${cleanTitle}_${seasonPart}`);
+            ? `${cleanTitle}_tmdb_${tmdbPart}_${specPart}` 
+            : (yearPart ? `${cleanTitle}_year_${yearPart}_${specPart}` : `${cleanTitle}_${specPart}`);
 
         const reqDate = parseRequestDate(r.requestedAt || r._localTime || r.createdAt || r.timestamp);
         const reqTime = reqDate ? reqDate.getTime() : 0;
@@ -1064,6 +1068,7 @@ function renderRequestsList() {
         let badgeMarkup = "";
         let isLockedByOther = false;
         let claimBadgeMarkup = "";
+        let catalogBadgeMarkup = "";
 
         if (req.isPriority) {
             badgeMarkup = `<span style="font-size: 10px; background: rgba(255, 59, 48, 0.15); border: 1px solid rgba(255, 59, 48, 0.3); color: #ff3b30; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🔥 High Priority</span>`;
@@ -1072,6 +1077,9 @@ function renderRequestsList() {
             badgeMarkup = `<span style="font-size: 10px; background: rgba(76, 175, 80, 0.15); border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🟢 Fulfilled${fulfillerText}</span>`;
         } else {
             badgeMarkup = `<span style="font-size: 10px; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🟠 Pending</span>`;
+            if (hasCatalogMatch(req)) {
+                catalogBadgeMarkup = `<span style="font-size: 10px; background: rgba(0, 200, 255, 0.15); border: 1px solid rgba(0, 200, 255, 0.3); color: #00c8ff; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;" title="This title exists in the catalog with active links">✨ In Catalog</span>`;
+            }
         }
 
         if (req.adminClaimId && !req.isFulfilled) {
@@ -1197,6 +1205,7 @@ function renderRequestsList() {
                     <h5 style="margin: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
                         ${escapeHTML(req.title)}${req.year && !req.title.includes(req.year) ? ` (${escapeHTML(req.year)})` : ""}${req.seasonOrPart ? ` [${escapeHTML(req.seasonOrPart)}]` : ""}
                         ${badgeMarkup}
+                        ${catalogBadgeMarkup}
                         ${claimBadgeMarkup}
                     </h5>
                     ${dateDisplayMarkup}
@@ -5510,7 +5519,7 @@ if (fulfillForm && fulfillRequestModal) {
                 const targetIdx = item.index;
                 while (formattedLinksArray.length < targetIdx + 1) {
                     const currentIdx = formattedLinksArray.length;
-                    formattedLinksArray.push({ season: `Season ${currentIdx + 1}`, url: "" });
+                    formattedLinksArray.push(isSeries ? { season: `Season ${currentIdx + 1}`, url: "" } : { quality: "720p", url: "" });
                 }
                 formattedLinksArray[targetIdx] = formattedLink;
             });

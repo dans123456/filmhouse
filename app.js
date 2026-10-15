@@ -6527,8 +6527,10 @@ function startUserRequestsListener() {
             });
             // Sort client-side by requestedAt descending
             requests.sort((a, b) => {
-                const tA = a.requestedAt ? (a.requestedAt.seconds || 0) : 0;
-                const tB = b.requestedAt ? (b.requestedAt.seconds || 0) : 0;
+                const dateA = parseRequestDate(a.requestedAt || a.timestamp || a._localTime);
+                const dateB = parseRequestDate(b.requestedAt || b.timestamp || b._localTime);
+                const tA = dateA ? dateA.getTime() : 0;
+                const tB = dateB ? dateB.getTime() : 0;
                 return tB - tA;
             });
 

@@ -118,7 +118,8 @@ class LocalUserStore {
             snapshot.forEach(doc => {
                 const data = doc.data();
                 const id = String(doc.id);
-                if (!this.users.has(id)) {
+                const existing = this.users.get(id);
+                if (!existing) {
                     this.users.set(id, {
                         id: id,
                         username: data.username || "",
@@ -131,6 +132,25 @@ class LocalUserStore {
                         lastSeen: data.lastSeen ? (data.lastSeen.toMillis ? data.lastSeen.toMillis() : Date.now()) : Date.now()
                     });
                     addedCount++;
+                } else {
+                    let changed = false;
+                    if (data.blockedBot !== undefined && existing.blockedBot !== (data.blockedBot === true)) {
+                        existing.blockedBot = (data.blockedBot === true);
+                        changed = true;
+                    }
+                    if (data.banned !== undefined && existing.banned !== (data.banned === true)) {
+                        existing.banned = (data.banned === true);
+                        changed = true;
+                    }
+                    if (data.username && existing.username !== data.username) {
+                        existing.username = data.username;
+                        changed = true;
+                    }
+                    if (data.points !== undefined && existing.points !== data.points) {
+                        existing.points = data.points;
+                        changed = true;
+                    }
+                    if (changed) addedCount++;
                 }
             });
             if (addedCount > 0) {

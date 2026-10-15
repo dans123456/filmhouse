@@ -123,6 +123,45 @@ function escapeMarkdown(str) {
     return String(str).replace(/([_*\[\]()~`>#+=|{}.!\\-])/g, '\\$1');
 }
 
+// Robust Firestore/Timestamp/ISO/Date parser
+function parseRequestDate(val) {
+    if (!val) return null;
+    if (typeof val.toDate === 'function') {
+        try { return val.toDate(); } catch(e) {}
+    }
+    if (val && typeof val.seconds === 'number') {
+        return new Date(val.seconds * 1000);
+    }
+    if (val && typeof val._seconds === 'number') {
+        return new Date(val._seconds * 1000);
+    }
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+// Formats full date, day of week, and time: e.g. "Mon, Oct 12, 2026 • 04:15 PM"
+function formatRequestDateTime(date, includeYear = true) {
+    if (!date) return "";
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    const dayName = days[date.getDay()];
+    const monthName = months[date.getMonth()];
+    const dayNum = date.getDate();
+    const year = date.getFullYear();
+    
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hoursStr = String(hours).padStart(2, '0');
+    
+    const timeStr = `${hoursStr}:${minutes} ${ampm}`;
+    const yearStr = includeYear ? `, ${year}` : '';
+    return `${dayName}, ${monthName} ${dayNum}${yearStr} • ${timeStr}`;
+}
+
 // Global Telegram helpers and pending requests store (module-scoped for access across setupBot and init)
 let callTelegramWithRetry = async () => {};
 let callAdminTelegramWithRetry = async () => {};
@@ -883,7 +922,7 @@ function setupBot(bot, adminBot) {
                 if (snap && snap.docs) {
                     cachedPendingRequests = snap.docs
                         .map(doc => ({ id: doc.id, ...doc.data() }))
-                        .filter(r => r.status !== "fulfilled" && r.status !== "claimed" && !r.fulfilled && !r.claimed);
+                        .filter(r => r.status !== "fulfilled" && r.status !== "claimed" && !r.fulfilled && !r.claimed && (!r.downloadLink || String(r.downloadLink).trim() === ""));
                     savePendingRequestsToDisk(cachedPendingRequests);
                 }
             } catch (e) {
@@ -992,7 +1031,7 @@ function setupBot(bot, adminBot) {
             const groupedMap = {};
             requests.forEach(r => {
                 const rawTitle = r.title || "Movie";
-                const cleanTitleKey = rawTitle.toLowerCase().trim();
+                const cleanTitleKey = rawTitle.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "");
                 const tmdbPart = r.tmdb_id || r.tmdbId || "";
                 const yearPart = r.year || "";
                 const seasonPart = (r.seasonOrPart || "").toLowerCase().trim();
@@ -1000,6 +1039,8 @@ function setupBot(bot, adminBot) {
                     ? `${cleanTitleKey}_tmdb_${tmdbPart}_${seasonPart}` 
                     : (yearPart ? `${cleanTitleKey}_year_${yearPart}_${seasonPart}` : `${cleanTitleKey}_${seasonPart}`);
                 
+                const reqDate = parseRequestDate(r.requestedAt || r._localTime || r.createdAt || r.timestamp);
+
                 if (!groupedMap[groupKey]) {
                     groupedMap[groupKey] = {
                         title: rawTitle,
@@ -1007,8 +1048,13 @@ function setupBot(bot, adminBot) {
                         type: r.type || "Movie",
                         seasonOrPart: r.seasonOrPart || "",
                         isPriority: (r.status === "priority" || r.boosted || r.isPriority === true),
-                        requesters: []
+                        requesters: [],
+                        latestDate: reqDate
                     };
+                } else {
+                    if (reqDate && (!groupedMap[groupKey].latestDate || reqDate > groupedMap[groupKey].latestDate)) {
+                        groupedMap[groupKey].latestDate = reqDate;
+                    }
                 }
                 if (r.status === "priority" || r.boosted) {
                     groupedMap[groupKey].isPriority = true;
@@ -1023,10 +1069,13 @@ function setupBot(bot, adminBot) {
 
             const groupedList = Object.values(groupedMap);
             
-            // Sort: High priority first, then by requester count descending
+            // Sort: High priority first, then by requester count descending, then newest request
             groupedList.sort((a, b) => {
                 if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
-                return b.requesters.length - a.requesters.length;
+                if (b.requesters.length !== a.requesters.length) return b.requesters.length - a.requesters.length;
+                const timeA = a.latestDate ? a.latestDate.getTime() : 0;
+                const timeB = b.latestDate ? b.latestDate.getTime() : 0;
+                return timeB - timeA;
             });
 
             const pageSize = 10;
@@ -1059,7 +1108,8 @@ function setupBot(bot, adminBot) {
                         requestersStr = `Requesters (${item.requesters.length}): ` + item.requesters.map(u => escapeHtml(u)).join(", ");
                     }
                     
-                    msg += `${globalIdx}. <b>${cleanTitle}</b>${year}${season}${prioBadge}\n   • 📁 <i>${cleanType}</i> | 👤 ${requestersStr}\n\n`;
+                    const dateFormatted = item.latestDate ? ` | 📅 ${formatRequestDateTime(item.latestDate, false)}` : "";
+                    msg += `${globalIdx}. <b>${cleanTitle}</b>${year}${season}${prioBadge}\n   • 📁 <i>${cleanType}</i> | 👤 ${requestersStr}${dateFormatted}\n\n`;
                 });
 
                 msg += `💡 Open the Admin Web App to fulfill these requests with download links!\n`;
@@ -2277,6 +2327,30 @@ function setupBot(bot, adminBot) {
         });
     });
 
+    // Command: /pending & /requests (Admin pending queue lookup on user bot)
+    bot.command(['pending', 'requests'], async (ctx) => {
+        const userId = String(ctx.from?.id);
+        const adminIds = await getAllAdminIds();
+        if (!adminIds.includes(userId)) {
+            return ctx.reply("ℹ️ To request a movie or check your personal requests, please open the Film House App!", {
+                reply_markup: {
+                    inline_keyboard: [[{ text: "🎬 Open Film House App", web_app: { url: "https://dans123456.github.io/filmhouse/" } }]]
+                }
+            });
+        }
+        const list = await getPendingRequestsList();
+        return renderOrEdit(ctx, getPendingRequestsPayload(list, 0));
+    });
+
+    bot.action(/^admin_req_page_(\d+)$/, async (ctx) => {
+        const userId = String(ctx.from?.id);
+        const adminIds = await getAllAdminIds();
+        if (!adminIds.includes(userId)) return;
+        const page = parseInt(ctx.match[1], 10) || 0;
+        const list = await getPendingRequestsList();
+        return renderOrEdit(ctx, getPendingRequestsPayload(list, page));
+    });
+
     // Command: /broadcast (Seamless In-Place Single-Message Editing)
     const handleSeamlessBroadcast = async (ctx) => {
         const userId = String(ctx.from.id);
@@ -3444,7 +3518,7 @@ async function init() {
             try {
                 cachedPendingRequests = snapshot.docs
                     .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .filter(r => r.status !== "fulfilled" && r.status !== "claimed" && !r.fulfilled && !r.claimed);
+                    .filter(r => r.status !== "fulfilled" && r.status !== "claimed" && !r.fulfilled && !r.claimed && (!r.downloadLink || String(r.downloadLink).trim() === ""));
                 savePendingRequestsToDisk(cachedPendingRequests);
                 console.log(`[PendingStore] Synchronized ${cachedPendingRequests.length} pending requests from Firestore.`);
             } catch (e) {
@@ -3515,18 +3589,22 @@ async function init() {
                     }
 
                     // 2. Notify admins (Always runs unconditionally)
+                    const reqDate = parseRequestDate(data.requestedAt || data.createdAt || data.timestamp) || new Date();
+                    const reqDateFormatted = formatRequestDateTime(reqDate, true);
                     const isDirectPriority = (data.status === "priority" || data.boosted === true);
                     const adminText = isDirectPriority
                         ? `🚀🔥 <b>NEW MOVIE REQUEST (HIGH PRIORITY)!</b> 🔥🚀\n\n` +
                           `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
                           `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
                           `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
+                          `📅 <b>Requested:</b> ${reqDateFormatted}\n` +
                           `🔥 <b>Priority:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
                           `💡 <i>Action Required: Please expedite this request in the Admin Panel or channel!</i>`
                         : `🍿 <b>New Movie Request!</b>\n\n` +
                           `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
                           `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
-                          `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}`;
+                          `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
+                          `📅 <b>Requested:</b> ${reqDateFormatted}`;
 
                     try {
                         const allAdmins = await getAllAdminIds();
@@ -3583,11 +3661,13 @@ async function init() {
                         }
 
                         // 2. Notify admins in their DMs with high-visibility HTML alert and Delete Request button
+                        const boostDateFormatted = formatRequestDateTime(new Date(), true);
                         const adminBoostText = `🚀🔥 <b>REQUEST BOOSTED TO HIGH PRIORITY!</b> 🔥🚀\n\n` +
                                               `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
                                               `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
                                               `👤 <b>Requested By:</b> ${cleanUser} (ID: <code>${userId}</code>)\n` +
                                               `⚡ <b>Boosted By:</b> ${cleanBooster}\n` +
+                                              `📅 <b>Boosted:</b> ${boostDateFormatted}\n` +
                                               `🪙 <b>Points Spent:</b> <code>1,000 Loyalty Points</code> ⚡\n` +
                                               `🔥 <b>Priority Level:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
                                               `💡 <i>Action Required: Please expedite this request in the Admin Panel or upload to @filmhouse_main!</i>`;
@@ -3804,11 +3884,13 @@ async function init() {
 
                                 recordLog("admin_app", `Request fulfilled: "${cleanAdminTitle}" by ${cleanFulfilledBy}`);
 
+                                const fulfillDateFormatted = formatRequestDateTime(new Date(), true);
                                 const countBadge = adminTotalFulfillCount > 0 ? ` (${adminTotalFulfillCount} Fulfilled 🏆)` : "";
                                 const adminNotifyText = `✅ <b>Request Fulfilled!</b>\n\n` +
                                                      `🎬 <b>Title:</b> <b>${cleanAdminTitle}</b>${cleanAdminYear}\n` +
                                                      `👤 <b>Fulfilled by:</b> ${cleanFulfilledBy}${countBadge}\n` +
-                                                     `🍿 <b>Requested for:</b> ${displayUser} (ID: <code>${escapeHtml(userId)}</code>)\n\n` +
+                                                     `🍿 <b>Requested for:</b> ${displayUser} (ID: <code>${escapeHtml(userId)}</code>)\n` +
+                                                     `📅 <b>Fulfilled:</b> ${fulfillDateFormatted}\n\n` +
                                                      `⚡ <b>Remaining Queue:</b> <code>${pendingCount}</code> pending request(s) left.`;
 
                                 for (const adminId of allAdmins) {
