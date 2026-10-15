@@ -429,7 +429,15 @@ if (db) {
 // Helper: Check if a request doc is fulfilled by explicit status or download link
 function isRequestFulfilled(r) {
     if (!r) return false;
-    return r.status === "fulfilled" || r.status === "claimed" || r.claimed === true || (r.downloadLink && String(r.downloadLink).trim() !== "");
+    // An active priority or boosted request is ALWAYS pending unless it has an explicit download link!
+    if (r.status === "priority" || r.boosted === true || r.isPriority === true) {
+        return !!(r.downloadLink && String(r.downloadLink).trim() !== "");
+    }
+    // Only fulfilled if status is "fulfilled", or if it was claimed WITH a valid download link
+    if (r.status === "fulfilled") return true;
+    if (r.downloadLink && String(r.downloadLink).trim() !== "") return true;
+    if ((r.status === "claimed" || r.claimed === true) && r.downloadLink && String(r.downloadLink).trim() !== "") return true;
+    return false;
 }
 
 // Helper: Check if a pending request already has matching content with active links in the catalog (for UI badge and one-click fulfillment)
@@ -955,7 +963,7 @@ function renderRequestsList() {
             relativeTime: reqDate ? getRelativeTimeAgo(reqDate) : ""
         });
         
-        if (r.status === "priority") {
+        if (r.status === "priority" || r.boosted === true || r.isPriority === true) {
             counts[key].isPriority = true;
         }
         

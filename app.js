@@ -6562,6 +6562,49 @@ function startUserRequestsListener() {
         });
 }
 
+// Helper: Checks if requested season/quality exists with working links in matching catalog movie
+function isMovieSpecAvailableInCatalog(movie, r) {
+    if (!movie || !Array.isArray(movie.links) || movie.links.length === 0) return false;
+    const hasValidLinks = movie.links.some(l => {
+        const url = typeof l === 'object' && l !== null ? (l.url || l.link) : l;
+        return url && String(url).trim() !== "";
+    });
+    if (!hasValidLinks) return false;
+
+    const reqSpec = (r && r.seasonOrPart ? String(r.seasonOrPart) : "").toLowerCase().trim();
+    if (!reqSpec) return true; // General request with no specific season or quality requirement
+
+    const isReqSeries = (r.type || "").toLowerCase() === 'series' || (r.type || "").toLowerCase() === 'tv' || (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
+    const isSeasonReq = reqSpec.includes("season") || !!reqSpec.match(/\bs\d+\b/i);
+    const isQualityReq = reqSpec.includes("quality") || reqSpec.includes("1080") || reqSpec.includes("720") || reqSpec.includes("2160") || reqSpec.includes("4k") || reqSpec.includes("480");
+
+    if (isReqSeries && isSeasonReq) {
+        const sMatch = reqSpec.match(/season\s*(\d+)/i) || reqSpec.match(/\bs(\d+)\b/i);
+        const sNum = sMatch ? sMatch[1] : null;
+        return movie.links.some(link => {
+            const sLabel = (typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "").toLowerCase();
+            const lUrl = typeof link === 'object' && link !== null ? (link.url || link.link) : link;
+            if (!lUrl || String(lUrl).trim() === "") return false;
+            if (sNum) {
+                return sLabel.includes(`season ${sNum}`) || sLabel.includes(`s${sNum}`);
+            }
+            return sLabel.includes(reqSpec);
+        });
+    }
+
+    if (!isReqSeries && isQualityReq) {
+        const qMatch = reqSpec.match(/(2160p|4k|1080p|720p|480p)/i);
+        const targetQ = qMatch ? qMatch[1].toLowerCase() : reqSpec;
+        return movie.links.some(link => {
+            const lQuality = (typeof link === 'object' && link !== null ? (link.quality || link.season || "") : "").toLowerCase();
+            const lUrl = typeof link === 'object' && link !== null ? (link.url || link.link) : link;
+            return lQuality.includes(targetQ) && lUrl && String(lUrl).trim() !== "";
+        });
+    }
+
+    return true;
+}
+
 function renderUserRequests(requests) {
     const list = document.getElementById("user-requests-list");
     const countBadge = document.getElementById("user-requests-count-badge");
@@ -6602,7 +6645,7 @@ function renderUserRequests(requests) {
             return (m.title && titlesMatch(m.title, r.title)) || 
                    (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
         });
-        const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
+        const isMatched = matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r);
         const isExplicit = (r.status === "fulfilled" || r.status === "claimed") && r.downloadLink;
         const isFulfilled = isMatched || isExplicit;
         const isClaimed = isFulfilled && (r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId));
@@ -6838,7 +6881,7 @@ function updateHomeFulfillmentBanner() {
             (m.title && titlesMatch(m.title, r.title)) || 
             (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
         );
-        const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
+        const isMatched = matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r);
         const isExplicit = (r.status === "fulfilled" || r.status === "claimed") && r.downloadLink;
         const isClaimed = (isMatched || isExplicit) && (r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId));
         return (isMatched || isExplicit) && !isClaimed;
@@ -6881,9 +6924,22 @@ function boostRequestToPriority(docId) {
         boostedAt: firebase.firestore.FieldValue.serverTimestamp(),
         boostedBy: boosterName,
         boostedById: boosterId,
-        notifiedPriority: false
+        notifiedPriority: false,
+        claimed: false,
+        claimedAt: firebase.firestore.FieldValue.delete()
     }).then(() => {
         deductPoints(1000);
+        const ack = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
+        const newAck = ack.filter(id => id !== docId);
+        localStorage.setItem("acknowledged_fulfillments", JSON.stringify(newAck));
+        const localReq = currentUserRequests.find(r => r.docId === docId);
+        if (localReq) {
+            localReq.status = "priority";
+            localReq.boosted = true;
+            localReq.claimed = false;
+            delete localReq.claimedAt;
+        }
+        renderUserRequests(currentUserRequests);
         showToast("Request boosted to High Priority! 🚀", "success");
     }).catch(err => {
         console.error("Error boosting request:", err);
@@ -6955,7 +7011,7 @@ function updateHeaderNotificationDot() {
                     (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
                 );
                 
-                const isMatched = matchingMovie && matchingMovie.links && matchingMovie.links.length > 0;
+                const isMatched = matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r);
                 const isExplicit = r.status === "fulfilled" && r.downloadLink;
                 
                 if ((isMatched || isExplicit) && !acknowledgedFulfillments.includes(docId)) {

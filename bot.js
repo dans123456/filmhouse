@@ -922,7 +922,13 @@ function setupBot(bot, adminBot) {
                 if (snap && snap.docs) {
                     cachedPendingRequests = snap.docs
                         .map(doc => ({ id: doc.id, ...doc.data() }))
-                        .filter(r => r.status !== "fulfilled" && r.status !== "claimed" && !r.fulfilled && !r.claimed && (!r.downloadLink || String(r.downloadLink).trim() === ""));
+                        .filter(r => {
+                            if (r.downloadLink && String(r.downloadLink).trim() !== "") return false;
+                            if (r.status === "fulfilled" || r.fulfilled === true) return false;
+                            if (r.status === "priority" || r.boosted === true || r.isPriority === true) return true;
+                            if (r.status === "claimed" || r.claimed === true) return false;
+                            return true;
+                        });
                     savePendingRequestsToDisk(cachedPendingRequests);
                 }
             } catch (e) {
@@ -1056,7 +1062,7 @@ function setupBot(bot, adminBot) {
                         groupedMap[groupKey].latestDate = reqDate;
                     }
                 }
-                if (r.status === "priority" || r.boosted) {
+                if (r.status === "priority" || r.boosted || r.isPriority === true) {
                     groupedMap[groupKey].isPriority = true;
                 }
                 
@@ -3518,7 +3524,13 @@ async function init() {
             try {
                 cachedPendingRequests = snapshot.docs
                     .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .filter(r => r.status !== "fulfilled" && r.status !== "claimed" && !r.fulfilled && !r.claimed && (!r.downloadLink || String(r.downloadLink).trim() === ""));
+                    .filter(r => {
+                        if (r.downloadLink && String(r.downloadLink).trim() !== "") return false;
+                        if (r.status === "fulfilled" || r.fulfilled === true) return false;
+                        if (r.status === "priority" || r.boosted === true || r.isPriority === true) return true;
+                        if (r.status === "claimed" || r.claimed === true) return false;
+                        return true;
+                    });
                 savePendingRequestsToDisk(cachedPendingRequests);
                 console.log(`[PendingStore] Synchronized ${cachedPendingRequests.length} pending requests from Firestore.`);
             } catch (e) {
