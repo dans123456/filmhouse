@@ -326,46 +326,83 @@ async function syncCatalogFromGitHub() {
                 console.log(`[GitHubSync] Catalog is already up to date (${data.length} movies).`);
             }
 
-            // Auto-broadcast any newly published titles with stream/download links
+            // Auto-broadcast any newly published titles or new seasons/cuts added to existing titles
             if (currentCount > 0 && typeof publishMovieToChannel === 'function') {
-                const newTitlesToBroadcast = [];
+                const newItemsToBroadcast = [];
+                const prevMap = new Map();
+                if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                    cachedMoviesMetadata.forEach(m => {
+                        const k = String(m.csv_id || "").toLowerCase().trim();
+                        if (k) prevMap.set(k, m);
+                    });
+                }
+
                 for (const m of data) {
                     const idKey = String(m.csv_id || "").toLowerCase().trim();
                     const titleKey = String(m.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
                     const hasLinks = Array.isArray(m.links) && m.links.length > 0 && m.links.some(l => (typeof l === 'object' && l !== null ? (l.url || l.link) : (l && String(l).trim() !== "")));
 
-                    // If already broadcasted according to metadata flag or tracker, record and skip
-                    if (m.channelBroadcasted === true || (idKey && broadcastedCatalogIds.has(idKey)) || (titleKey && broadcastedCatalogIds.has(titleKey))) {
-                        if (idKey) broadcastedCatalogIds.add(idKey);
-                        if (titleKey) broadcastedCatalogIds.add(titleKey);
-                        continue;
-                    }
+                    if (!hasLinks || !idKey) continue;
 
-                    if (hasLinks && idKey && !broadcastedCatalogIds.has(idKey) && !broadcastedCatalogIds.has(titleKey)) {
-                        newTitlesToBroadcast.push(m);
+                    const prevM = prevMap.get(idKey);
+                    if (!prevM) {
+                        // Entirely brand-new title
+                        if (!broadcastedCatalogIds.has(idKey) && !broadcastedCatalogIds.has(titleKey)) {
+                            newItemsToBroadcast.push(m);
+                        }
+                    } else {
+                        // Existing title: Check if new seasons or new qualities/cuts were added!
+                        const prevLinks = Array.isArray(prevM.links) ? prevM.links : [];
+                        const prevSpecKeys = new Set(prevLinks.map(l => {
+                            const spec = typeof l === 'object' && l !== null ? (l.season || l.quality || "") : "";
+                            return String(spec).toLowerCase().trim();
+                        }).filter(Boolean));
+
+                        m.links.forEach(l => {
+                            const url = typeof l === 'object' && l !== null ? (l.url || l.link) : l;
+                            if (!url || String(url).trim() === "") return;
+                            const spec = typeof l === 'object' && l !== null ? (l.season || l.quality || "") : "";
+                            const specKey = String(spec).toLowerCase().trim();
+                            if (specKey && !prevSpecKeys.has(specKey)) {
+                                const dedupeKey = `${idKey}_${specKey}`;
+                                if (!broadcastedCatalogIds.has(dedupeKey)) {
+                                    newItemsToBroadcast.push({
+                                        ...m,
+                                        seasonOrPart: spec
+                                    });
+                                }
+                            }
+                        });
                     }
                 }
 
-                if (newTitlesToBroadcast.length > 0) {
-                    console.log(`[CatalogAutoPublish] Found ${newTitlesToBroadcast.length} newly published title(s) to announce to @filmhouse_main!`);
-                    for (let idx = 0; idx < newTitlesToBroadcast.length; idx++) {
-                        const m = newTitlesToBroadcast[idx];
+                if (newItemsToBroadcast.length > 0) {
+                    console.log(`[CatalogAutoPublish] Found ${newItemsToBroadcast.length} newly published release update(s) to announce to @filmhouse_main!`);
+                    for (let idx = 0; idx < newItemsToBroadcast.length; idx++) {
+                        const item = newItemsToBroadcast[idx];
                         try {
-                            const res = await publishMovieToChannel(m);
+                            const res = await publishMovieToChannel(item);
                             if (res && res.message_id) {
-                                console.log(`[CatalogAutoPublish] Successfully announced "${m.title}" to @filmhouse_main (msg_id: ${res.message_id})`);
+                                console.log(`[CatalogAutoPublish] Successfully announced "${item.title}" ${item.seasonOrPart || ""} to @filmhouse_main (msg_id: ${res.message_id})`);
                             }
                         } catch (pErr) {
-                            console.warn(`[CatalogAutoPublish] Error broadcasting "${m.title}":`, pErr.message);
+                            console.warn(`[CatalogAutoPublish] Error broadcasting "${item.title}":`, pErr.message);
                         }
-                        const idKey = String(m.csv_id || "").toLowerCase().trim();
-                        const titleKey = String(m.title || "").toLowerCase().trim();
-                        if (idKey) broadcastedCatalogIds.add(idKey);
-                        if (titleKey) broadcastedCatalogIds.add(titleKey);
+
+                        const idKey = String(item.csv_id || "").toLowerCase().trim();
+                        const titleKey = String(item.title || "").toLowerCase().trim();
+                        const specKey = String(item.seasonOrPart || "").toLowerCase().trim();
+                        if (specKey) {
+                            if (idKey) broadcastedCatalogIds.add(`${idKey}_${specKey}`);
+                            if (titleKey) broadcastedCatalogIds.add(`${titleKey}_${specKey}`);
+                        } else {
+                            if (idKey) broadcastedCatalogIds.add(idKey);
+                            if (titleKey) broadcastedCatalogIds.add(titleKey);
+                        }
 
                         // Pacing delay between consecutive broadcasts to prevent Telegram rate limit (429)
                         // and ensure Telegram's linked discussion group forwarder doesn't drop group comment threads
-                        if (idx < newTitlesToBroadcast.length - 1) {
+                        if (idx < newItemsToBroadcast.length - 1) {
                             await new Promise(r => setTimeout(r, 3500));
                         }
                     }
@@ -591,15 +628,32 @@ function setupBot(bot, adminBot) {
             const cleanKey = cleanTitle.toLowerCase();
             const normId = String(movieInfo.csv_id || movieInfo.id || movieInfo.tmdb_id || "").toLowerCase().trim();
             const isSeries = (movieInfo.type || "").toLowerCase() === "series" || (movieInfo.type || "").toLowerCase() === "tv";
-            const seasonKey = (isSeries && movieInfo.seasonOrPart) ? String(movieInfo.seasonOrPart).toLowerCase().trim() : "";
+            const seasonKey = movieInfo.seasonOrPart ? String(movieInfo.seasonOrPart).toLowerCase().trim() : "";
             const dedupeKey = normId ? `${normId}_${seasonKey}` : `${cleanKey}_${seasonKey}`;
 
-            // Deduplication guard: Never post the same title twice
-            if (_recentlyBroadcastedKeys.has(dedupeKey) || (normId && broadcastedCatalogIds.has(normId)) || broadcastedCatalogIds.has(cleanKey)) {
-                console.log(`[CHANNEL PUBLISH] Skipping duplicate announcement for "${cleanTitle}" (Key: ${dedupeKey}). Already published.`);
-                return { message_id: null, skipped: true };
+            // Deduplication guard:
+            // 1. If explicit forceBroadcast is true, allow broadcast unconditionally
+            // 2. If a specific season or cut is specified (seasonKey), only deduplicate on that specific release
+            // 3. If generic whole-title post (no seasonKey), check base title/ID
+            if (!movieInfo.forceBroadcast) {
+                if (_recentlyBroadcastedKeys.has(dedupeKey)) {
+                    console.log(`[CHANNEL PUBLISH] Skipping duplicate announcement for "${cleanTitle}" (Key: ${dedupeKey}). Already published recently.`);
+                    return { message_id: null, skipped: true };
+                }
+                if (seasonKey) {
+                    if (broadcastedCatalogIds.has(dedupeKey)) {
+                        console.log(`[CHANNEL PUBLISH] Skipping duplicate announcement for "${cleanTitle}" (Key: ${dedupeKey}). Already published.`);
+                        return { message_id: null, skipped: true };
+                    }
+                } else {
+                    if ((normId && broadcastedCatalogIds.has(normId)) || broadcastedCatalogIds.has(cleanKey)) {
+                        console.log(`[CHANNEL PUBLISH] Skipping duplicate announcement for "${cleanTitle}" (Base Key). Already published.`);
+                        return { message_id: null, skipped: true };
+                    }
+                }
             }
             _recentlyBroadcastedKeys.add(dedupeKey);
+            if (normId && seasonKey) _recentlyBroadcastedKeys.add(`${normId}_${seasonKey}`);
 
             const yearText = movieInfo.year ? ` (${movieInfo.year})` : "";
             const rawSeason = movieInfo.seasonOrPart || (isSeries ? "Complete Series" : "Full Movie");
@@ -714,9 +768,57 @@ function setupBot(bot, adminBot) {
                 ? `https://t.me/Filmhouseappbot?start=dl_${movieId}` 
                 : `https://t.me/Filmhouseappbot`;
 
+            // Build high-impact announcement header badge and update callout
+            let headerBadge = "🍿 <b>NEW RELEASE ADDED!</b> 🎬";
+            let updateCallout = "";
+
+            const rawSpec = movieInfo.seasonOrPart || (movieInfo.updateType || "");
+            const specLower = String(rawSpec).toLowerCase().trim();
+
+            if (isSeries) {
+                if (specLower.includes("season") || specLower.match(/\bs\d+\b/i)) {
+                    const sMatch = specLower.match(/season\s*(\d+)/i) || specLower.match(/\bs(\d+)\b/i);
+                    const sNum = sMatch ? sMatch[1] : rawSpec;
+                    headerBadge = "🔥 <b>NEW SEASON RELEASED!</b> 🍿";
+                    updateCallout = `📌 <b>Update:</b> <b>Season ${escapeHtml(sNum)} Now Available!</b> ⚡\n`;
+                } else if (movieInfo.isSeriesComplete || specLower.includes("complete")) {
+                    headerBadge = "🎉 <b>COMPLETE SERIES BATCH!</b> 🎬";
+                    updateCallout = `📌 <b>Update:</b> <b>All Seasons & Episodes Included!</b> ⚡\n`;
+                } else if (rawSpec) {
+                    headerBadge = "⚡ <b>SERIES UPDATE!</b> 🍿";
+                    updateCallout = `📌 <b>Update:</b> <b>${escapeHtml(rawSpec)} Added!</b> ⚡\n`;
+                } else {
+                    headerBadge = "🍿 <b>NEW SERIES ADDED!</b> 🎬";
+                    updateCallout = `📁 <b>Type:</b> Series • Multi-Season\n`;
+                }
+            } else {
+                // Movies
+                if (specLower.includes("cinema") || specLower.includes("cam") || specLower.includes("theatre")) {
+                    headerBadge = "📽️ <b>NEW CINEMA CUT RELEASE!</b> 🔥";
+                    updateCallout = `📌 <b>Update:</b> <b>Cinema Cut (Early Access) Now Available!</b> ⚡\n`;
+                } else if (specLower.includes("director")) {
+                    headerBadge = "🎬 <b>DIRECTOR'S CUT RELEASE!</b> 🔥";
+                    updateCallout = `📌 <b>Update:</b> <b>Director's Cut Added!</b> ⚡\n`;
+                } else if (specLower.includes("extended") || specLower.includes("unrated")) {
+                    headerBadge = "⚡ <b>EXTENDED EDITION RELEASE!</b> 🔥";
+                    updateCallout = `📌 <b>Update:</b> <b>Extended / Unrated Version Added!</b> ⚡\n`;
+                } else if (specLower.includes("quality") || specLower.includes("1080") || specLower.includes("4k") || specLower.includes("2160") || specLower.includes("720")) {
+                    headerBadge = "✨ <b>HIGH DEFINITION UPDATE!</b> 🍿";
+                    updateCallout = `📌 <b>Update:</b> <b>${escapeHtml(rawSpec)} Now Available!</b> ⚡\n`;
+                } else if (rawSpec) {
+                    headerBadge = "🎬 <b>NEW EDITION ADDED!</b> 🔥";
+                    updateCallout = `📌 <b>Update:</b> <b>${escapeHtml(rawSpec)} Now Available!</b> ⚡\n`;
+                } else {
+                    headerBadge = "🍿 <b>NEW MOVIE ADDED!</b> 🎬";
+                    updateCallout = `📁 <b>Type:</b> Full Movie • HD Quality\n`;
+                }
+            }
+
             const caption = 
-                `<b>${escapeHtml(cleanTitle)}</b>${escapeHtml(yearText)}\n` +
-                `${escapeHtml(seasonOrQualityText)}\n\n` +
+                `${headerBadge}\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `🎬 <b>${escapeHtml(cleanTitle)}</b>${escapeHtml(yearText)}\n` +
+                `${updateCallout}\n` +
                 metaLine +
                 overviewLine +
                 `👉 <a href="${deepLinkUrl}">CLICK HERE TO DOWNLOAD</a> ✔️`;
@@ -826,6 +928,7 @@ function setupBot(bot, adminBot) {
             if (result && result.message_id) {
                 if (normId) broadcastedCatalogIds.add(normId);
                 if (cleanKey) broadcastedCatalogIds.add(cleanKey);
+                if (dedupeKey) broadcastedCatalogIds.add(dedupeKey);
                 try {
                     const dir = path.dirname(BROADCASTED_CATALOG_FILE);
                     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -3717,12 +3820,19 @@ async function init() {
                     if (data.status === "fulfilled" && data.publishToChannel !== false && !data.channelMessageId) {
                         const rawClean = String(title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
                         const movieKey = String(data.csv_id || data.tmdb_id || rawClean || docId).toLowerCase().trim();
-                        if (movieKey && !_channelPostingLocks.has(movieKey) && !_channelPostingLocks.has(rawClean) && !broadcastedCatalogIds.has(movieKey) && !broadcastedCatalogIds.has(rawClean)) {
-                            _channelPostingLocks.add(movieKey);
-                            _channelPostingLocks.add(rawClean);
+                        const specKey = String(data.seasonOrPart || "").toLowerCase().trim();
+                        const fullKey = specKey ? `${movieKey}_${specKey}` : movieKey;
+
+                        const isAlreadyBroadcasted = specKey 
+                            ? (broadcastedCatalogIds.has(fullKey) || _channelPostingLocks.has(fullKey))
+                            : (broadcastedCatalogIds.has(movieKey) || broadcastedCatalogIds.has(rawClean) || _channelPostingLocks.has(movieKey) || _channelPostingLocks.has(rawClean));
+
+                        if (!isAlreadyBroadcasted) {
+                            _channelPostingLocks.add(fullKey);
+                            if (!specKey) _channelPostingLocks.add(movieKey);
                             (async () => {
                                 try {
-                                    console.log(`[CHANNEL PUBLISH] Initiating immediate auto-publish for fulfilled request "${title}" (Key: ${movieKey})...`);
+                                    console.log(`[CHANNEL PUBLISH] Initiating immediate auto-publish for fulfilled request "${title}" (Key: ${fullKey})...`);
 
                                     let movieDataForChannel = null;
                                     const lookupCsvId = String(data.csv_id || "").toLowerCase().trim();
@@ -3730,11 +3840,17 @@ async function init() {
                                     const lookupTitle = rawClean;
 
                                     if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
-                                        movieDataForChannel = cachedMoviesMetadata.find(m => 
+                                        const found = cachedMoviesMetadata.find(m => 
                                             (lookupCsvId && String(m.csv_id || "").toLowerCase().trim() === lookupCsvId) ||
                                             (lookupTmdbId && String(m.tmdb_id || "").trim() === lookupTmdbId) ||
                                             (lookupTitle && (String(m.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim() === lookupTitle || titlesMatch(m.title, lookupTitle)))
                                         );
+                                        if (found) {
+                                            movieDataForChannel = {
+                                                ...found,
+                                                seasonOrPart: data.seasonOrPart || found.seasonOrPart || ""
+                                            };
+                                        }
                                     }
 
                                     if (!movieDataForChannel) {
@@ -3760,8 +3876,13 @@ async function init() {
                                         // Register in broadcasted catalog tracker to prevent duplicate repost when GitHub syncs!
                                         const bcIdKey = String(movieDataForChannel.csv_id || data.csv_id || "").toLowerCase().trim();
                                         const bcTitleKey = String(movieDataForChannel.title || title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
-                                        if (bcIdKey) broadcastedCatalogIds.add(bcIdKey);
-                                        if (bcTitleKey) broadcastedCatalogIds.add(bcTitleKey);
+                                        if (specKey) {
+                                            if (bcIdKey) broadcastedCatalogIds.add(`${bcIdKey}_${specKey}`);
+                                            if (bcTitleKey) broadcastedCatalogIds.add(`${bcTitleKey}_${specKey}`);
+                                        } else {
+                                            if (bcIdKey) broadcastedCatalogIds.add(bcIdKey);
+                                            if (bcTitleKey) broadcastedCatalogIds.add(bcTitleKey);
+                                        }
                                         try {
                                             const bDir = path.dirname(BROADCASTED_CATALOG_FILE);
                                             if (!fs.existsSync(bDir)) fs.mkdirSync(bDir, { recursive: true });
@@ -3775,11 +3896,13 @@ async function init() {
                                         }).catch(() => {});
                                     } else {
                                         console.warn(`[CHANNEL PUBLISH] publishMovieToChannel returned null/skipped for "${title}".`);
+                                        _channelPostingLocks.delete(fullKey);
                                         _channelPostingLocks.delete(movieKey);
                                         _channelPostingLocks.delete(rawClean);
                                     }
-                                } catch (pubErr) {
-                                    console.warn(`[CHANNEL PUBLISH] Error auto-publishing "${title}" to channel:`, pubErr.message);
+                                } catch (cpErr) {
+                                    console.error(`[CHANNEL PUBLISH] Failed to auto-publish "${title}" to main channel:`, cpErr);
+                                    _channelPostingLocks.delete(fullKey);
                                     _channelPostingLocks.delete(movieKey);
                                     _channelPostingLocks.delete(rawClean);
                                 }

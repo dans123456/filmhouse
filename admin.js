@@ -2620,9 +2620,40 @@ function showMovieDetails(movie) {
             </div>
         </div>
 
-        <div style="display: flex; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 10px;">
+        <div style="border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <label style="font-size: 11px; font-weight: 700; color: #00c8ff; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;">
+                    📢 Channel Announcement Edition:
+                </label>
+                <span style="font-size: 10px; color: var(--text-muted);">Highlighted in @filmhouse_main</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <select id="details-channel-edition-select" style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; padding: 7px 10px; font-size: 12px;">
+                    ${isSeries ? `
+                        <option value="">Complete Series (All Seasons)</option>
+                        <option value="Season 1">Season 1</option>
+                        <option value="Season 2">Season 2</option>
+                        <option value="Season 3">Season 3</option>
+                        <option value="Season 4">Season 4</option>
+                        <option value="Season 5">Season 5</option>
+                        <option value="New Episodes">New Episodes Added</option>
+                    ` : `
+                        <option value="">Full Movie (Standard)</option>
+                        <option value="Cinema Cut">Cinema Cut (Early Access)</option>
+                        <option value="Director's Cut">Director's Cut</option>
+                        <option value="Extended Edition">Extended Edition</option>
+                        <option value="1080p Quality">1080p HD Quality</option>
+                        <option value="4K UHD Quality">4K UHD Quality</option>
+                        <option value="720p Quality">720p Standard Quality</option>
+                    `}
+                </select>
+                <input type="text" id="details-channel-custom-edition" placeholder="Or custom: e.g. Season 2, Cinema Cut" style="flex: 1.2; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; padding: 7px 10px; font-size: 12px;" />
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
             <button type="button" class="btn btn-secondary" id="btn-details-post-channel" data-csv-id="${movie.csv_id}" style="flex: 1; border-color: rgba(0, 136, 204, 0.4); color: #0088cc; background: rgba(0, 136, 204, 0.08); cursor: pointer; padding: 12px; font-weight: 700; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                📢 Post to Channel
+                📢 Post Announcement to Channel
             </button>
             <button type="button" class="btn btn-secondary" id="btn-details-delete-movie" data-csv-id="${movie.csv_id}" style="flex: 1; border-color: rgba(255, 59, 48, 0.4); color: #ff3b30; background: rgba(255, 59, 48, 0.05); cursor: pointer; padding: 12px; font-weight: 600; transition: all 0.3s;">
                 Delete Title 🗑️
@@ -2899,98 +2930,21 @@ function showMovieDetails(movie) {
             postChannelBtn.disabled = true;
             postChannelBtn.textContent = "Posting to Channel... ⏳";
             try {
-                const dlLink = `https://t.me/Filmhouseappbot?start=dl_${movie.csv_id || movie.tmdb_id}`;
                 const isSeries = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
-                const seasonText = isSeries ? "Complete Series" : "Full Movie";
-                const rawTitle = (movie.title || "Movie Update").replace(/\s*\([^)]+\)\s*$/g, "").trim();
-                const safeTitle = rawTitle.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                const yearText = movie.release_date ? ` (${movie.release_date.substring(0, 4)})` : "";
+                const customEdition = document.getElementById("details-channel-custom-edition")?.value.trim();
+                const selectEdition = document.getElementById("details-channel-edition-select")?.value;
+                const chosenEdition = customEdition || selectEdition || (isSeries ? "Complete Series" : "");
 
-                // Details (genres, rating, short overview)
-                const rawGenres = Array.isArray(movie.categories) ? movie.categories : (Array.isArray(movie.genres) ? movie.genres : []);
-                const genresText = rawGenres.filter(g => g && g !== "Main").slice(0, 3).join(", ");
-                const ratingVal = movie.rating || movie.vote_average || "";
-                const ratingText = ratingVal ? (String(ratingVal).includes("/") ? ratingVal : `${ratingVal}/10`) : "";
-
-                let metaLine = "";
-                if (genresText && ratingText) {
-                    metaLine = `🎭 ${genresText} | ⭐️ ${ratingText}\n`;
-                } else if (genresText) {
-                    metaLine = `🎭 ${genresText}\n`;
-                } else if (ratingText) {
-                    metaLine = `⭐️ ${ratingText}\n`;
-                }
-
-                let overviewText = "";
-                if (movie.overview && typeof movie.overview === 'string' && movie.overview.toLowerCase() !== "no synopsis available.") {
-                    const cleanO = movie.overview.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
-                    if (cleanO.length > 160) {
-                        overviewText = cleanO.substring(0, 157) + "...";
-                    } else {
-                        overviewText = cleanO;
-                    }
-                }
-
-                let overviewLine = "";
-                if (overviewText) {
-                    const safeOverview = overviewText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                    overviewLine = `💬 <i>${safeOverview}</i>\n\n`;
-                } else if (metaLine) {
-                    overviewLine = "\n";
-                }
-
-                const caption = `<b>${safeTitle}</b>${yearText}\n${seasonText}\n\n` +
-                                metaLine +
-                                overviewLine +
-                                `👉 <a href="${dlLink}">CLICK HERE TO DOWNLOAD</a> ✔️`;
-
-                const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAHl73JHfOXQrDGk-DR92XWoVkBMpMKXvYQ";
-                // Prioritize horizontal backdrop (16:9 widescreen landscape)
-                let bannerUrl = (movie.backdrop && String(movie.backdrop).startsWith("http"))
-                    ? movie.backdrop
-                    : ((movie.poster && String(movie.poster).startsWith("http")) ? movie.poster : "https://dans123456.github.io/filmhouse/img/FilmHouse.png");
-
-                if (bannerUrl.includes("w500") || bannerUrl.includes("w300") || bannerUrl.includes("w780")) {
-                    bannerUrl = bannerUrl.replace(/\/w(300|500|780)\//, "/w1280/");
-                }
-
-                let res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        chat_id: "-1002098683402",
-                        photo: bannerUrl,
-                        caption: caption,
-                        parse_mode: "HTML"
-                    })
+                await window.broadcastMovieToMainChannel({
+                    ...movie,
+                    seasonOrPart: chosenEdition,
+                    forceBroadcast: true
                 });
-                let resData = await res.json();
-
-                // If photo send failed due to image URL, fallback to sendMessage without preview
-                if (!resData.ok && ((resData.description || "").toLowerCase().includes("photo") || (resData.description || "").toLowerCase().includes("wrong file") || (resData.description || "").toLowerCase().includes("failed to get http"))) {
-                    res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            chat_id: "-1002098683402",
-                            text: caption,
-                            parse_mode: "HTML",
-                            disable_web_page_preview: true
-                        })
-                    });
-                    resData = await res.json();
-                }
-
-                if (resData.ok) {
-                    showToast(`Successfully published "${movie.title}" announcement to @filmhouse_main! 📢`, "success");
-                } else {
-                    showToast(`Channel post notice: ${resData.description}. (Make sure @Filmhouseappbot is an Admin in @filmhouse_main with Post Messages permission)`, "warning");
-                }
             } catch (e) {
                 showToast("Failed to post to channel: " + e.message, "error");
             } finally {
                 postChannelBtn.disabled = false;
-                postChannelBtn.textContent = "📢 Post to Channel";
+                postChannelBtn.textContent = "📢 Post Announcement to Channel";
             }
         });
     }
@@ -4753,11 +4707,57 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
         ? `https://t.me/Filmhouseappbot?start=dl_${movieId}` 
         : `https://t.me/Filmhouseappbot`;
 
-    const escapeTg = (s) => (s ? String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "");
+    // Build high-impact announcement header badge and update callout
+    let headerBadge = "🍿 <b>NEW RELEASE ADDED!</b> 🎬";
+    let updateCallout = "";
+
+    const rawSpec = movieInfo.seasonOrPart || (movieInfo.updateType || "");
+    const specLower = String(rawSpec).toLowerCase().trim();
+
+    if (isSeries) {
+        if (specLower.includes("season") || specLower.match(/\bs\d+\b/i)) {
+            const sMatch = specLower.match(/season\s*(\d+)/i) || specLower.match(/\bs(\d+)\b/i);
+            const sNum = sMatch ? sMatch[1] : rawSpec;
+            headerBadge = "🔥 <b>NEW SEASON RELEASED!</b> 🍿";
+            updateCallout = `📌 <b>Update:</b> <b>Season ${escapeTg(sNum)} Now Available!</b> ⚡\n`;
+        } else if (movieInfo.isSeriesComplete || specLower.includes("complete")) {
+            headerBadge = "🎉 <b>COMPLETE SERIES BATCH!</b> 🎬";
+            updateCallout = `📌 <b>Update:</b> <b>All Seasons & Episodes Included!</b> ⚡\n`;
+        } else if (rawSpec) {
+            headerBadge = "⚡ <b>SERIES UPDATE!</b> 🍿";
+            updateCallout = `📌 <b>Update:</b> <b>${escapeTg(rawSpec)} Added!</b> ⚡\n`;
+        } else {
+            headerBadge = "🍿 <b>NEW SERIES ADDED!</b> 🎬";
+            updateCallout = `📁 <b>Type:</b> Series • Multi-Season\n`;
+        }
+    } else {
+        // Movies
+        if (specLower.includes("cinema") || specLower.includes("cam") || specLower.includes("theatre")) {
+            headerBadge = "📽️ <b>NEW CINEMA CUT RELEASE!</b> 🔥";
+            updateCallout = `📌 <b>Update:</b> <b>Cinema Cut (Early Access) Now Available!</b> ⚡\n`;
+        } else if (specLower.includes("director")) {
+            headerBadge = "🎬 <b>DIRECTOR'S CUT RELEASE!</b> 🔥";
+            updateCallout = `📌 <b>Update:</b> <b>Director's Cut Added!</b> ⚡\n`;
+        } else if (specLower.includes("extended") || specLower.includes("unrated")) {
+            headerBadge = "⚡ <b>EXTENDED EDITION RELEASE!</b> 🔥";
+            updateCallout = `📌 <b>Update:</b> <b>Extended / Unrated Version Added!</b> ⚡\n`;
+        } else if (specLower.includes("quality") || specLower.includes("1080") || specLower.includes("4k") || specLower.includes("2160") || specLower.includes("720")) {
+            headerBadge = "✨ <b>HIGH DEFINITION UPDATE!</b> 🍿";
+            updateCallout = `📌 <b>Update:</b> <b>${escapeTg(rawSpec)} Now Available!</b> ⚡\n`;
+        } else if (rawSpec) {
+            headerBadge = "🎬 <b>NEW EDITION ADDED!</b> 🔥";
+            updateCallout = `📌 <b>Update:</b> <b>${escapeTg(rawSpec)} Now Available!</b> ⚡\n`;
+        } else {
+            headerBadge = "🍿 <b>NEW MOVIE ADDED!</b> 🎬";
+            updateCallout = `📁 <b>Type:</b> Full Movie • HD Quality\n`;
+        }
+    }
 
     const caption = 
-        `<b>${escapeTg(cleanTitle)}</b>${escapeTg(yearText)}\n` +
-        `${escapeTg(seasonOrQualityText)}\n\n` +
+        `${headerBadge}\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `🎬 <b>${escapeTg(cleanTitle)}</b>${escapeTg(yearText)}\n` +
+        `${updateCallout}\n` +
         metaLine +
         overviewLine +
         `👉 <a href="${deepLinkUrl}">CLICK HERE TO DOWNLOAD</a> ✔️`;
@@ -5509,7 +5509,7 @@ if (fulfillForm && fulfillRequestModal) {
                 const targetIdx = item.index;
                 while (existingMovie.links.length < targetIdx + 1) {
                     const currentIdx = existingMovie.links.length;
-                    existingMovie.links.push({ season: `Season ${currentIdx + 1}`, url: "" });
+                    existingMovie.links.push(isSeries ? { season: `Season ${currentIdx + 1}`, url: "" } : { quality: "720p", url: "" });
                 }
                 existingMovie.links[targetIdx] = formattedLink;
             });
