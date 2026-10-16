@@ -377,13 +377,13 @@ async function syncCatalogFromGitHub() {
                 }
 
                 if (newItemsToBroadcast.length > 0) {
-                    console.log(`[CatalogAutoPublish] Found ${newItemsToBroadcast.length} newly published release update(s) to announce to @filmhouse_main!`);
+                    console.log(`[CatalogAutoPublish] Found ${newItemsToBroadcast.length} newly published release update(s) to announce to Updates Channel!`);
                     for (let idx = 0; idx < newItemsToBroadcast.length; idx++) {
                         const item = newItemsToBroadcast[idx];
                         try {
                             const res = await publishMovieToChannel(item);
                             if (res && res.message_id) {
-                                console.log(`[CatalogAutoPublish] Successfully announced "${item.title}" ${item.seasonOrPart || ""} to @filmhouse_main (msg_id: ${res.message_id})`);
+                                console.log(`[CatalogAutoPublish] Successfully announced "${item.title}" ${item.seasonOrPart || ""} to Updates Channel (msg_id: ${res.message_id})`);
                             }
                         } catch (pErr) {
                             console.warn(`[CatalogAutoPublish] Error broadcasting "${item.title}":`, pErr.message);
@@ -619,9 +619,9 @@ function setupBot(bot, adminBot) {
     // Global in-memory set to prevent duplicate channel broadcasts within session
     const _recentlyBroadcastedKeys = new Set();
 
-    // Engine: Publish new movie/series release update to Film House Main Channel (@filmhouse_main)
+    // Engine: Publish new movie/series release update to Film House Updates Channel (with 5-day auto-delete timer)
     publishMovieToChannel = async function(movieInfo) {
-        const channelTarget = "-1002098683402"; // Film House Main Channel (@filmhouse_main)
+        const channelTarget = process.env.UPDATES_CHANNEL_ID || process.env.CHANNEL_TARGET || "-1004272961286"; // Film House Updates Channel (with 5-day auto-delete timer)
         try {
             const rawTitle = movieInfo.title || "Movie Update";
             const cleanTitle = String(rawTitle).replace(/\s*\([^)]+\)\s*$/g, "").replace(/[*_`~]/g, "").trim();
@@ -841,10 +841,10 @@ function setupBot(bot, adminBot) {
             }
 
             const candidateTargets = Array.from(new Set([
-                process.env.MAIN_CHANNEL_ID,
+                process.env.UPDATES_CHANNEL_ID,
                 process.env.CHANNEL_ID,
-                "-1002098683402",
-                "@filmhouse_main"
+                "-1004272961286",
+                channelTarget
             ].filter(Boolean)));
 
             console.log(`[CHANNEL PUBLISH] Publishing "${cleanTitle}" announcement to channel...`);
@@ -941,7 +941,7 @@ function setupBot(bot, adminBot) {
             }
             return result;
         } catch (err) {
-            console.warn(`[CHANNEL PUBLISH] Notice: Could not post to channel: ${err.message}. (Ensure @Filmhouseappbot is an Administrator in @filmhouse_main with 'Post Messages' permission enabled)`);
+            console.warn(`[CHANNEL PUBLISH] Notice: Could not post to channel: ${err.message}. (Ensure @Filmhouseappbot is an Administrator in Updates Channel with 'Post Messages' permission enabled)`);
             return null;
         }
     };
@@ -958,7 +958,7 @@ function setupBot(bot, adminBot) {
             { command: 'topadmins', description: '🏆 Top Admin Fulfillers Leaderboard' },
             { command: 'logs', description: '📜 View live server logs' },
             { command: 'pending', description: '📋 View pending movie requests' },
-            { command: 'post', description: '📢 Post title announcement to @filmhouse_main' },
+            { command: 'post', description: '📢 Post title announcement to Updates Channel' },
             { command: 'backup', description: '💾 Download weekly CSV backup' },
             { command: 'stats', description: '📊 Detailed server metrics' }
         ]).catch(err => console.warn('Could not set admin bot commands:', err.message));
@@ -1105,7 +1105,7 @@ function setupBot(bot, adminBot) {
                 `• 👑 <b>Admin Bot:</b> Active & Listening\n\n` +
                 `🛠 <b>Available Commands:</b>\n` +
                 `• /help — Admin tutorials & duty workflows\n` +
-                `• /post [Title] — Publish title announcement to @filmhouse_main\n` +
+                `• /post [Title] — Publish title announcement to Updates Channel\n` +
                 `• /logs — View live server & bot logs\n` +
                 `• /pending — View pending movie requests\n` +
                 `• /backup — Download weekly CSV catalog backup\n` +
@@ -1385,7 +1385,7 @@ function setupBot(bot, adminBot) {
                 `• Paste the stream/download link. The bot automatically delivers direct fulfillment to the user with no ads and credits your account!\n\n` +
                 `📢 <b>2. Publishing Titles as Duty (/post):</b>\n` +
                 `• Admins also publish movies and series as regular duty (not just on request).\n` +
-                `• Use /post [Title] (e.g. /post Inception) in this chat to generate a poster announcement with deep link in @filmhouse_main.\n` +
+                `• Use /post [Title] (e.g. /post Inception) in this chat to generate a poster announcement with deep link in Updates Channel.\n` +
                 `• Or add titles directly in the Admin Panel. Every title you publish counts toward your team Work Share!\n\n` +
                 `🏆 <b>3. Work Share Rankings (% vs Points):</b>\n` +
                 `• Rankings show your percentage share of total team output (fulfillments + duty publications).\n` +
@@ -1518,12 +1518,12 @@ function setupBot(bot, adminBot) {
             }
         });
 
-        // Command: /post <Title> - Publish title announcement to @filmhouse_main
+        // Command: /post <Title> - Publish title announcement to Updates Channel
         adminBot.command('post', async (ctx) => {
             const raw = ctx.message && ctx.message.text ? ctx.message.text : "";
             const query = raw.replace(/^\/post(@\w+)?/i, '').trim();
             if (!query) {
-                return ctx.reply("📢 <b>Usage:</b> <code>/post &lt;Movie or Series Title&gt;</code>\n\nExample: <code>/post Inception</code> or <code>/post Young Sheldon</code>\nThis will publish the title announcement with high-res poster and deep link to @filmhouse_main.", {
+                return ctx.reply("📢 <b>Usage:</b> <code>/post &lt;Movie or Series Title&gt;</code>\n\nExample: <code>/post Inception</code> or <code>/post Young Sheldon</code>\nThis will publish the title announcement with high-res poster and deep link to the Updates Channel (Film House Updates 🔥).", {
                     parse_mode: "HTML",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
@@ -1649,14 +1649,14 @@ function setupBot(bot, adminBot) {
                         console.warn("Could not record publication stat in /post:", statErr.message);
                     }
 
-                    return ctx.reply(`✅ <b>Published to @filmhouse_main!</b>\n\n🎬 <b>Title:</b> ${escapeHtml(foundMovie.title)}\n🔗 <b>Message ID:</b> <code>${res.message_id}</code>\n📊 <i>Publication duty successfully credited to your Work Share!</i>`, {
+                    return ctx.reply(`✅ <b>Published to Updates Channel!</b>\n\n🎬 <b>Title:</b> ${escapeHtml(foundMovie.title)}\n🔗 <b>Message ID:</b> <code>${res.message_id}</code>\n📊 <i>Publication duty successfully credited to your Work Share!</i>`, {
                         parse_mode: "HTML",
                         reply_markup: {
                             inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                         }
                     });
                 } else {
-                    return ctx.reply(`⚠️ <b>Notice:</b> Could not post to @filmhouse_main.\n\nPlease make sure <b>@Filmhouseappbot</b> is added to your channel <b>@filmhouse_main</b> as an <b>Administrator</b> with <b>Post Messages</b> permission enabled!`, {
+                    return ctx.reply(`⚠️ <b>Notice:</b> Could not post to Updates Channel.\n\nPlease make sure <b>@Filmhouseappbot</b> is added to your channel as an <b>Administrator</b> with <b>Post Messages</b> permission enabled!`, {
                         parse_mode: "HTML",
                         reply_markup: {
                             inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
@@ -3785,7 +3785,7 @@ async function init() {
                                               `📅 <b>Boosted:</b> ${boostDateFormatted}\n` +
                                               `🪙 <b>Points Spent:</b> <code>1,000 Loyalty Points</code> ⚡\n` +
                                               `🔥 <b>Priority Level:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
-                                              `💡 <i>Action Required: Please expedite this request in the Admin Panel or upload to @filmhouse_main!</i>`;
+                                              `💡 <i>Action Required: Please expedite this request in the Admin Panel or upload to Updates Channel!</i>`;
 
                         try {
                             const allAdmins = await getAllAdminIds();
@@ -3871,7 +3871,7 @@ async function init() {
 
                                     const pubResult = await publishMovieToChannel(movieDataForChannel);
                                     if (pubResult && pubResult.message_id) {
-                                        console.log(`[CHANNEL PUBLISH] Successfully published announcement for "${title}" to @filmhouse_main (msg_id: ${pubResult.message_id})`);
+                                        console.log(`[CHANNEL PUBLISH] Successfully published announcement for "${title}" to Updates Channel (msg_id: ${pubResult.message_id})`);
                                         
                                         // Register in broadcasted catalog tracker to prevent duplicate repost when GitHub syncs!
                                         const bcIdKey = String(movieDataForChannel.csv_id || data.csv_id || "").toLowerCase().trim();

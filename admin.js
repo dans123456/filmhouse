@@ -2625,7 +2625,7 @@ function showMovieDetails(movie) {
                 <label style="font-size: 11px; font-weight: 700; color: #00c8ff; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;">
                     📢 Channel Announcement Edition:
                 </label>
-                <span style="font-size: 10px; color: var(--text-muted);">Highlighted in @filmhouse_main</span>
+                <span style="font-size: 10px; color: var(--text-muted);">Highlighted in Film House Updates 🔥</span>
             </div>
             <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                 <select id="details-channel-edition-select" style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; padding: 7px 10px; font-size: 12px;">
@@ -4612,11 +4612,11 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-// --- BROADCAST TO MAIN CHANNEL (@filmhouse_main) ---
+// --- BROADCAST TO UPDATES CHANNEL (5-Day Auto-Delete Timer) ---
 window.broadcastMovieToMainChannel = async function(movieInfo) {
     if (!movieInfo || !movieInfo.title) return;
     
-    const targetChannel = "-1002098683402"; // @filmhouse_main
+    const targetChannel = localStorage.getItem("filmhouse_updates_channel_id") || "-1004272961286"; // Film House Updates Channel
     const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAHl73JHfOXQrDGk-DR92XWoVkBMpMKXvYQ";
     
     const rawTitle = movieInfo.title || "Movie Update";
@@ -4778,7 +4778,7 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
         bannerUrl = bannerUrl.replace(/\/w(300|500|780)\//, "/w1280/");
     }
 
-    console.log(`[MAIN CHANNEL POST] Broadcasting "${cleanTitle}" announcement to @filmhouse_main...`);
+    console.log(`[UPDATES CHANNEL POST] Broadcasting "${cleanTitle}" announcement to Updates Channel...`);
 
     try {
         const sendPhotoUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
@@ -4794,14 +4794,14 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
         });
         const result = await res.json();
         if (result.ok) {
-            console.log("[MAIN CHANNEL POST] Photo announcement sent successfully:", result);
-            showToast(`📢 Announcement for "${cleanTitle}" posted to Main Channel!`, "success");
+            console.log("[UPDATES CHANNEL POST] Photo announcement sent successfully:", result);
+            showToast(`📢 Announcement for "${cleanTitle}" posted to Updates Channel!`, "success");
             if (typeof window.recordAdminActivity === 'function') {
                 window.recordAdminActivity("publication", cleanTitle);
             }
             return result;
         } else {
-            console.warn("[MAIN CHANNEL POST] Photo post failed, falling back to text:", result.description);
+            console.warn("[UPDATES CHANNEL POST] Photo post failed, falling back to text:", result.description);
             const sendMsgUrl = `https://api.telegram.org/bot${token}/sendMessage`;
             const msgRes = await fetch(sendMsgUrl, {
                 method: "POST",
@@ -4815,14 +4815,14 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
             });
             const msgResult = await msgRes.json();
             if (msgResult.ok) {
-                showToast(`📢 Announcement for "${cleanTitle}" posted to Main Channel!`, "success");
+                showToast(`📢 Announcement for "${cleanTitle}" posted to Updates Channel!`, "success");
                 return msgResult;
             } else {
-                console.warn("[MAIN CHANNEL POST] Text broadcast also failed:", msgResult.description);
+                console.warn("[UPDATES CHANNEL POST] Text broadcast also failed:", msgResult.description);
             }
         }
     } catch (e) {
-        console.warn("[MAIN CHANNEL POST] Error broadcasting to channel:", e);
+        console.warn("[UPDATES CHANNEL POST] Error broadcasting to channel:", e);
     }
 };
 
