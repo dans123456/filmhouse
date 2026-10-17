@@ -6984,8 +6984,34 @@ document.addEventListener("DOMContentLoaded", () => {
             language: originalLanguage,
             trailer: trailerId,
             rawLinksText: "",
+            linksList: isSeries ? [{ season: "Season 1", url: "" }] : [{ quality: "720p", url: "" }],
             links: []
         };
+    }
+
+    function saveCurrentBatchStagingInputs() {
+        if (!batchStagingContainer) return;
+        batchStagingContainer.querySelectorAll(".batch-season-url-input").forEach(input => {
+            const itemIdx = parseInt(input.dataset.itemIdx);
+            const seasonIdx = parseInt(input.dataset.seasonIdx);
+            if (batchStagedMovies[itemIdx]?.linksList?.[seasonIdx]) {
+                batchStagedMovies[itemIdx].linksList[seasonIdx].url = input.value.trim();
+            }
+        });
+        batchStagingContainer.querySelectorAll(".batch-movie-url-input").forEach(input => {
+            const itemIdx = parseInt(input.dataset.itemIdx);
+            const linkIdx = parseInt(input.dataset.linkIdx);
+            if (batchStagedMovies[itemIdx]?.linksList?.[linkIdx]) {
+                batchStagedMovies[itemIdx].linksList[linkIdx].url = input.value.trim();
+            }
+        });
+        batchStagingContainer.querySelectorAll(".batch-movie-quality-select").forEach(select => {
+            const itemIdx = parseInt(select.dataset.itemIdx);
+            const linkIdx = parseInt(select.dataset.linkIdx);
+            if (batchStagedMovies[itemIdx]?.linksList?.[linkIdx]) {
+                batchStagedMovies[itemIdx].linksList[linkIdx].quality = select.value;
+            }
+        });
     }
 
     function renderBatchStagingTable() {
@@ -7021,6 +7047,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectAllCheckbox = optionsBar.querySelector("#batch-select-all");
         if (selectAllCheckbox) {
             selectAllCheckbox.addEventListener("change", (e) => {
+                saveCurrentBatchStagingInputs();
                 const isChecked = e.target.checked;
                 batchStagedMovies.forEach(m => {
                     if (!m.error) m.checked = isChecked;
@@ -7044,12 +7071,82 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Ensure linksList is initialized
+            if (!Array.isArray(item.linksList) || item.linksList.length === 0) {
+                item.linksList = item.isSeries ? [{ season: "Season 1", url: "" }] : [{ quality: "720p", url: "" }];
+            }
+
             const card = document.createElement("div");
             card.style.cssText = `display: flex; gap: 12px; align-items: flex-start; padding: 10px; background: ${item.checked ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.01)'}; border: 1px solid ${item.checked ? 'rgba(255, 188, 0, 0.3)' : 'var(--border-color)'}; border-radius: 6px; transition: border-color 0.2s;`;
 
             const posterImg = item.poster || "MOVIE/img/FilmHouse3_nobg.png";
             const yearStr = item.releaseDate ? item.releaseDate.split("-")[0] : "";
             const catBadges = (item.categories || []).slice(0, 3).map(c => `<span style="font-size: 10px; background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 3px; color: var(--text-secondary);">${escapeHTML(c)}</span>`).join("");
+
+            let linksSectionHtml = "";
+            if (item.isSeries) {
+                const filledSeasons = item.linksList.filter(l => (l.url || '').trim().length > 0).length;
+                linksSectionHtml = `
+                    <div style="margin-top: 8px; background: rgba(0,0,0,0.22); border: 1px solid rgba(255, 188, 0, 0.25); border-radius: 6px; padding: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 11px; font-weight: 700; color: #ffbc00; text-transform: uppercase; letter-spacing: 0.5px;">📺 Seasons Links</span>
+                            <span style="font-size: 10px; color: ${filledSeasons > 0 ? '#4caf50' : 'var(--text-muted)'}; font-weight: 600;">
+                                ${filledSeasons} / ${item.linksList.length} Season(s) Linked
+                            </span>
+                        </div>
+                        
+                        <div class="batch-seasons-list" style="display: flex; flex-direction: column; gap: 6px;">
+                            ${item.linksList.map((link, sIdx) => `
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #ffbc00; background: rgba(255, 188, 0, 0.12); border: 1px solid rgba(255, 188, 0, 0.3); padding: 4px 6px; border-radius: 4px; width: 68px; text-align: center; flex-shrink: 0; box-sizing: border-box;">${escapeHTML(link.season || `Season ${sIdx + 1}`)}</span>
+                                    <input type="text" class="batch-season-url-input" data-item-idx="${idx}" data-season-idx="${sIdx}" value="${escapeHTML(link.url || '')}" placeholder="Telegram download URL for ${escapeHTML(link.season || `Season ${sIdx + 1}`)}..." style="flex: 1; padding: 6px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
+                                    ${item.linksList.length > 1 ? `
+                                        <button type="button" class="btn-remove-batch-season" data-item-idx="${idx}" data-season-idx="${sIdx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 2px 5px; font-size: 13px;" title="Remove this season">✕</button>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 8px; flex-wrap: wrap;">
+                            <div style="display: flex; gap: 6px;">
+                                <button type="button" class="btn btn-secondary btn-sm btn-add-batch-season" data-index="${idx}" style="font-size: 11px; padding: 3px 8px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.35);">+ Add Season ${item.linksList.length + 1}</button>
+                                <button type="button" class="btn btn-secondary btn-sm btn-toggle-batch-bulk" data-index="${idx}" style="font-size: 11px; padding: 3px 8px; border-radius: 4px; cursor: pointer; color: #00c8ff; border-color: rgba(0, 200, 255, 0.35);">📋 Bulk Paste All</button>
+                            </div>
+                        </div>
+
+                        <div class="batch-bulk-wrapper" data-index="${idx}" style="display: none; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px;">
+                            <textarea class="batch-bulk-textarea" data-index="${idx}" placeholder="Paste multiple Telegram links (one per line)...&#10;Line 1 -> Season 1&#10;Line 2 -> Season 2&#10;Line 3 -> Season 3..." style="width: 100%; min-height: 70px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 6px; color: #fff; font-size: 11px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                            <div style="display: flex; justify-content: flex-end; gap: 6px; margin-top: 5px;">
+                                <button type="button" class="btn btn-primary btn-sm btn-apply-batch-bulk" data-index="${idx}" style="font-size: 11px; padding: 3px 10px;">Apply Seasons ⚡</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                linksSectionHtml = `
+                    <div style="margin-top: 8px;">
+                        <div class="batch-movie-links-container" style="display: flex; flex-direction: column; gap: 6px;">
+                            ${item.linksList.map((link, mIdx) => `
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <input type="text" class="batch-movie-url-input" data-item-idx="${idx}" data-link-idx="${mIdx}" value="${escapeHTML(link.url || '')}" placeholder="Paste Telegram download URL..." style="flex: 1; padding: 6px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
+                                    <select class="batch-movie-quality-select" data-item-idx="${idx}" data-link-idx="${mIdx}" style="padding: 5px 6px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; width: 85px; cursor: pointer;">
+                                        <option value="720p" ${link.quality === '720p' ? 'selected' : ''}>720p</option>
+                                        <option value="1080p" ${link.quality === '1080p' ? 'selected' : ''}>1080p</option>
+                                        <option value="2160p (4K)" ${link.quality === '2160p (4K)' || link.quality === '4K UHD' ? 'selected' : ''}>4K UHD</option>
+                                        <option value="480p" ${link.quality === '480p' ? 'selected' : ''}>480p</option>
+                                        <option value="Cinema Cut / HDCam" ${link.quality === 'Cinema Cut / HDCam' || link.quality === 'Cinema Cut' ? 'selected' : ''}>Cinema Cut</option>
+                                    </select>
+                                    ${item.linksList.length > 1 ? `
+                                        <button type="button" class="btn-remove-batch-movie-link" data-item-idx="${idx}" data-link-idx="${mIdx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 2px 5px; font-size: 13px;" title="Remove this quality">✕</button>
+                                    ` : `
+                                        <button type="button" class="btn-add-batch-movie-quality" data-index="${idx}" style="background: rgba(0, 188, 212, 0.1); border: 1px solid rgba(0, 188, 212, 0.3); color: #00bcd4; border-radius: 4px; cursor: pointer; padding: 4px 6px; font-size: 10px; font-weight: 700; white-space: nowrap;" title="Add another quality like 1080p or 4K">+ Quality</button>
+                                    `}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
 
             card.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
@@ -7071,10 +7168,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">
                         ${catBadges}
                     </div>
-                    <!-- Inline Links Input -->
-                    <div style="margin-top: 8px;">
-                        <input type="text" class="batch-stage-link-input" data-index="${idx}" value="${escapeHTML(item.rawLinksText || '')}" placeholder="${item.isSeries ? 'Paste Telegram link(s)... (One per line for Season 1..N)' : 'Paste Telegram download URL...'}" style="width: 100%; padding: 6px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
-                    </div>
+                    ${linksSectionHtml}
                 </div>
             `;
 
@@ -7084,6 +7178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Event listeners for staged items
         batchStagingContainer.querySelectorAll(".batch-stage-checkbox").forEach(cb => {
             cb.addEventListener("change", (e) => {
+                saveCurrentBatchStagingInputs();
                 const idx = parseInt(e.target.dataset.index);
                 if (batchStagedMovies[idx]) {
                     batchStagedMovies[idx].checked = e.target.checked;
@@ -7100,17 +7195,127 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        batchStagingContainer.querySelectorAll(".batch-stage-link-input").forEach(input => {
+        batchStagingContainer.querySelectorAll(".batch-season-url-input").forEach(input => {
             input.addEventListener("input", (e) => {
-                const idx = parseInt(e.target.dataset.index);
+                const itemIdx = parseInt(e.target.dataset.itemIdx);
+                const seasonIdx = parseInt(e.target.dataset.seasonIdx);
+                if (batchStagedMovies[itemIdx]?.linksList?.[seasonIdx]) {
+                    batchStagedMovies[itemIdx].linksList[seasonIdx].url = e.target.value.trim();
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".btn-add-batch-season").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                saveCurrentBatchStagingInputs();
+                const idx = parseInt(e.currentTarget.dataset.index);
                 if (batchStagedMovies[idx]) {
-                    batchStagedMovies[idx].rawLinksText = e.target.value.trim();
+                    const nextSeasonNum = batchStagedMovies[idx].linksList.length + 1;
+                    batchStagedMovies[idx].linksList.push({
+                        season: `Season ${nextSeasonNum}`,
+                        url: ""
+                    });
+                    renderBatchStagingTable();
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".btn-remove-batch-season").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                saveCurrentBatchStagingInputs();
+                const itemIdx = parseInt(e.currentTarget.dataset.itemIdx);
+                const seasonIdx = parseInt(e.currentTarget.dataset.seasonIdx);
+                if (batchStagedMovies[itemIdx]?.linksList) {
+                    batchStagedMovies[itemIdx].linksList.splice(seasonIdx, 1);
+                    batchStagedMovies[itemIdx].linksList.forEach((l, i) => {
+                        l.season = `Season ${i + 1}`;
+                    });
+                    renderBatchStagingTable();
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".btn-toggle-batch-bulk").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const idx = parseInt(e.currentTarget.dataset.index);
+                const wrapper = batchStagingContainer.querySelector(`.batch-bulk-wrapper[data-index="${idx}"]`);
+                if (wrapper) {
+                    const isHidden = wrapper.style.display === "none";
+                    wrapper.style.display = isHidden ? "block" : "none";
+                    btn.textContent = isHidden ? "✕ Close Bulk" : "📋 Bulk Paste All";
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".btn-apply-batch-bulk").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                saveCurrentBatchStagingInputs();
+                const idx = parseInt(e.currentTarget.dataset.index);
+                const textarea = batchStagingContainer.querySelector(`.batch-bulk-textarea[data-index="${idx}"]`);
+                if (textarea && batchStagedMovies[idx]) {
+                    const parsed = parseBulkLinks(textarea.value, true);
+                    if (parsed.length > 0) {
+                        batchStagedMovies[idx].linksList = parsed;
+                        renderBatchStagingTable();
+                        showToast(`Parsed ${parsed.length} season(s) for "${batchStagedMovies[idx].title}"!`, "success");
+                    } else {
+                        alert("Please paste at least one valid link!");
+                    }
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".batch-movie-url-input").forEach(input => {
+            input.addEventListener("input", (e) => {
+                const itemIdx = parseInt(e.target.dataset.itemIdx);
+                const linkIdx = parseInt(e.target.dataset.linkIdx);
+                if (batchStagedMovies[itemIdx]?.linksList?.[linkIdx]) {
+                    batchStagedMovies[itemIdx].linksList[linkIdx].url = e.target.value.trim();
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".batch-movie-quality-select").forEach(select => {
+            select.addEventListener("change", (e) => {
+                const itemIdx = parseInt(e.target.dataset.itemIdx);
+                const linkIdx = parseInt(e.target.dataset.linkIdx);
+                if (batchStagedMovies[itemIdx]?.linksList?.[linkIdx]) {
+                    batchStagedMovies[itemIdx].linksList[linkIdx].quality = select.value;
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".btn-add-batch-movie-quality").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                saveCurrentBatchStagingInputs();
+                const idx = parseInt(e.currentTarget.dataset.index);
+                if (batchStagedMovies[idx]) {
+                    const existingQualities = batchStagedMovies[idx].linksList.map(l => l.quality);
+                    const defaultNext = existingQualities.includes("1080p") ? "2160p (4K)" : "1080p";
+                    batchStagedMovies[idx].linksList.push({
+                        quality: defaultNext,
+                        url: ""
+                    });
+                    renderBatchStagingTable();
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".btn-remove-batch-movie-link").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                saveCurrentBatchStagingInputs();
+                const itemIdx = parseInt(e.currentTarget.dataset.itemIdx);
+                const linkIdx = parseInt(e.currentTarget.dataset.linkIdx);
+                if (batchStagedMovies[itemIdx]?.linksList) {
+                    batchStagedMovies[itemIdx].linksList.splice(linkIdx, 1);
+                    renderBatchStagingTable();
                 }
             });
         });
 
         batchStagingContainer.querySelectorAll(".btn-remove-batch-item").forEach(btn => {
             btn.addEventListener("click", (e) => {
+                saveCurrentBatchStagingInputs();
                 const idx = parseInt(e.currentTarget.dataset.index);
                 batchStagedMovies.splice(idx, 1);
                 renderBatchStagingTable();
@@ -7175,11 +7380,24 @@ document.addEventListener("DOMContentLoaded", () => {
             const broadcastCheckbox = document.getElementById("batch-broadcast-toggle");
             const shouldBroadcast = broadcastCheckbox ? broadcastCheckbox.checked : true;
 
+            saveCurrentBatchStagingInputs();
             let addedCount = 0;
             itemsToCommit.forEach(item => {
-                // Parse links if raw text was provided in staging
+                // Parse links from linksList or fallback rawLinksText
                 let finalLinks = [];
-                if (item.rawLinksText) {
+                if (Array.isArray(item.linksList) && item.linksList.length > 0) {
+                    finalLinks = item.linksList
+                        .map((l, lIdx) => {
+                            const u = (l.url || '').trim();
+                            if (!u) return null;
+                            if (item.isSeries) {
+                                return { url: u, season: l.season || `Season ${lIdx + 1}` };
+                            } else {
+                                return { url: u, quality: l.quality || '720p' };
+                            }
+                        })
+                        .filter(Boolean);
+                } else if (item.rawLinksText) {
                     finalLinks = parseBulkLinks(item.rawLinksText, item.isSeries);
                 }
 
