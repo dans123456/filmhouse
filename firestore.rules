@@ -41,6 +41,12 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
     
+    // Admin Broadcast Queue: Read and create allowed for admin broadcast tracking; updates/deletions restricted to server worker
+    match /admin_broadcast_queue/{taskId} {
+      allow create, read: if true;
+      allow update, delete: if false;
+    }
+    
     // Default fallback: Deny all other collections
     match /{document=**} {
       allow read, write: if false;

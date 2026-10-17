@@ -483,36 +483,68 @@ function setupBot(bot, adminBot) {
         return next();
     });
 
-    // In-memory rate limiting map (cooldown) to prevent command spamming
-    const commandCooldowns = new Map();
-    bot.use(async (ctx, next) => {
-        if (!ctx.from || !ctx.message) return next();
-        const userId = String(ctx.from.id);
-        const now = Date.now();
-        const lastTime = commandCooldowns.get(userId) || 0;
-        
-        if (now - lastTime < 1000) { // 1 second cooldown per message/command
-            console.log(`Rate limiting user ${userId} to prevent spam.`);
-            return; // silently discard the update to prevent spamming
-        }
-        
-        commandCooldowns.set(userId, now);
-        if (ctx.from) {
-            localStore.upsertUser({
-                id: userId,
-                username: ctx.from.username || "",
-                fullName: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" ") || "Telegram User"
-            });
-        }
-        return next();
-    });
-
     // In-memory cache for banned users and admin lists to eliminate per-update Firestore latency
     const bannedUsersCache = new Set();
     const envAdmins = (process.env.ADMIN_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
     let cachedAdmins = Array.from(new Set(["1329840839", "1175336733", ...envAdmins]));
     let cachedMasters = Array.from(new Set(["1329840839", "1175336733", ...envAdmins]));
     let lastAdminFetchTime = 0;
+
+    // In-memory rate limiting map (sliding-window + cooldown penalty)
+    const userRateLimits = new Map();
+    const RATE_LIMIT_WINDOW_MS = 3000; // 3-second sliding window
+    const MAX_REQUESTS_PER_WINDOW = 5;  // Max 5 messages/commands per window
+    const COOLDOWN_DURATION_MS = 10000; // 10-second penalty cooldown
+
+    // Periodic cleanup of rate limits every 10 minutes
+    setInterval(() => {
+        const now = Date.now();
+        for (const [uid, record] of userRateLimits.entries()) {
+            if (now - record.windowStart > 60000 && now > record.cooldownUntil) {
+                userRateLimits.delete(uid);
+            }
+        }
+    }, 10 * 60 * 1000);
+
+    bot.use(async (ctx, next) => {
+        if (!ctx.from || !ctx.message) return next();
+        const userId = String(ctx.from.id);
+        const isMaster = cachedMasters.includes(userId);
+        
+        if (!isMaster) {
+            const now = Date.now();
+            let record = userRateLimits.get(userId);
+            if (!record) {
+                record = { count: 1, windowStart: now, cooldownUntil: 0 };
+                userRateLimits.set(userId, record);
+            } else {
+                if (now < record.cooldownUntil) {
+                    // In active cooldown - drop silently to prevent spam floods
+                    return;
+                }
+                if (now - record.windowStart < RATE_LIMIT_WINDOW_MS) {
+                    record.count++;
+                    if (record.count > MAX_REQUESTS_PER_WINDOW) {
+                        record.cooldownUntil = now + COOLDOWN_DURATION_MS;
+                        try {
+                            await ctx.reply("⏳ <b>Please slow down!</b>\nYou are sending commands too quickly. Please wait 10 seconds before trying again.", { parse_mode: 'HTML' });
+                        } catch(e) {}
+                        return;
+                    }
+                } else {
+                    record.count = 1;
+                    record.windowStart = now;
+                }
+            }
+        }
+
+        localStore.upsertUser({
+            id: userId,
+            username: ctx.from.username || "",
+            fullName: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" ") || "Telegram User"
+        });
+        return next();
+    });
 
     async function refreshAdminCache() {
         const now = Date.now();
@@ -1430,6 +1462,35 @@ function setupBot(bot, adminBot) {
             const adminId = ctx.from && ctx.from.id ? String(ctx.from.id) : '';
             await getPendingRequestsList();
             return renderOrEdit(ctx, getAdminMenuPayload(adminName, adminId));
+        });
+
+        // Command: /login - Generate 1-click magic desktop access link (Zero PIN / Zero password)
+        adminBot.command(['login', 'auth', 'web'], async (ctx) => {
+            const adminId = String(ctx.from && ctx.from.id ? ctx.from.id : '');
+            const isAuth = await isMasterAdmin(adminId);
+            if (!isAuth) {
+                return ctx.reply("❌ Unauthorized: Only registered Master Administrators can generate login tokens.");
+            }
+            
+            const expiry = Date.now() + (15 * 60 * 1000); // 15-minute token
+            const rawToken = `${adminId}:${expiry}`;
+            const tokenBase64 = Buffer.from(rawToken).toString('base64');
+            const loginUrl = `https://dans123456.github.io/filmhouse/admin.html?auth_token=${tokenBase64}&tg_id=${adminId}`;
+            
+            return ctx.reply(
+                `🔐 <b>One-Click Admin Login Link</b>\n\n` +
+                `Click below to open the Film House Admin Console on your computer:\n\n` +
+                `👉 <a href="${loginUrl}"><b>Open Admin Console on Desktop 🚀</b></a>\n\n` +
+                `⏱️ <i>This private magic link expires in 15 minutes and requires no PIN or password.</i>`,
+                {
+                    parse_mode: 'HTML',
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: "🖥️ Launch Admin Console", url: loginUrl }]
+                        ]
+                    }
+                }
+            );
         });
 
         // Command: /logs [category]
@@ -2434,6 +2495,33 @@ function setupBot(bot, adminBot) {
         return ctx.reply("🏓 Pong! I am online and running.", {
             reply_to_message_id: ctx.message.message_id
         });
+    });
+
+    // Command: /login - Generate 1-click magic desktop access link
+    bot.command(['login', 'adminlogin'], async (ctx) => {
+        const adminId = String(ctx.from?.id || "");
+        const isAuth = await isMasterAdmin(adminId);
+        if (!isAuth) return; // Silently ignore for regular non-admin users
+        
+        const expiry = Date.now() + (15 * 60 * 1000); // 15-minute token
+        const rawToken = `${adminId}:${expiry}`;
+        const tokenBase64 = Buffer.from(rawToken).toString('base64');
+        const loginUrl = `https://dans123456.github.io/filmhouse/admin.html?auth_token=${tokenBase64}&tg_id=${adminId}`;
+        
+        return ctx.reply(
+            `🔐 <b>One-Click Admin Login Link</b>\n\n` +
+            `Click below to open the Film House Admin Console on your computer:\n\n` +
+            `👉 <a href="${loginUrl}"><b>Open Admin Console on Desktop 🚀</b></a>\n\n` +
+            `⏱️ <i>This private magic link expires in 15 minutes and requires no PIN or password.</i>`,
+            {
+                parse_mode: 'HTML',
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: "🖥️ Launch Admin Console", url: loginUrl }]
+                    ]
+                }
+            }
+        );
     });
 
     // Command: /pending & /requests (Admin pending queue lookup on user bot)
@@ -3582,6 +3670,157 @@ async function init() {
                 }
             });
         }, (err) => console.error("Admin reminders listener error:", err));
+
+        // Real-time listener for secure admin broadcast & channel post queue
+        db.collection("admin_broadcast_queue").onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (change.type === "added") {
+                    const docId = change.doc.id;
+                    const data = change.doc.data();
+                    
+                    if (data.status && data.status !== "pending") return;
+
+                    // Skip historical tasks older than 60 seconds on startup
+                    if (data.timestamp) {
+                        const docMs = data.timestamp.toMillis ? data.timestamp.toMillis() : new Date(data.timestamp).getTime();
+                        if (Date.now() - docMs > 60000) return;
+                    }
+
+                    // Authenticate sender
+                    const senderId = String(data.adminId || "");
+                    const isAuthorized = await isMasterAdmin(senderId);
+                    if (!isAuthorized) {
+                        console.warn(`[SecurityQueue] Blocked unauthorized broadcast attempt from ID: ${senderId}`);
+                        await db.collection("admin_broadcast_queue").doc(docId).update({
+                            status: "rejected",
+                            reason: "Unauthorized administrator ID"
+                        }).catch(() => {});
+                        return;
+                    }
+
+                    console.log(`[SecurityQueue] Processing authorized task ${docId} of type '${data.type}' from admin ${senderId}`);
+
+                    if (data.type === "channel_post") {
+                        try {
+                            const movie = data.movie;
+                            const targetChannel = data.channelId || process.env.UPDATES_CHANNEL_ID || "-1004272961286";
+                            
+                            const rawTitle = movie.title || "Movie Update";
+                            const cleanTitle = String(rawTitle).replace(/\s*\([^)]+\)\s*$/g, "").replace(/[*_`~]/g, "").trim();
+                            const yearText = movie.release_date ? ` (${movie.release_date.substring(0, 4)})` : (movie.year ? ` (${movie.year})` : "");
+                            const isSeries = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
+                            const rawSeason = movie.seasonOrPart || (isSeries ? "Complete Series" : "Full Movie");
+
+                            let seasonOrQualityText = isSeries 
+                                ? (String(rawSeason).toLowerCase().includes("season") ? rawSeason : `Season ${rawSeason}`)
+                                : (String(rawSeason).toLowerCase().includes("quality") ? rawSeason : `${rawSeason} Quality`);
+                            if (movie.isSeriesComplete) {
+                                seasonOrQualityText = "Complete Series | All Seasons";
+                            }
+
+                            const genresList = Array.isArray(movie.genres) ? movie.genres.slice(0, 4).join(" • ") : "Action";
+                            const ratingStars = movie.rating ? `★ ${movie.rating}` : "★ 8.5";
+
+                            const caption = `🔥 <b>NEW RELEASE AVAILABLE!</b>\n\n` +
+                                            `🎬 <b>${escapeHtml(cleanTitle)}${escapeHtml(yearText)}</b>\n` +
+                                            `🏷️ <b>Format:</b> ${escapeHtml(seasonOrQualityText)}\n` +
+                                            `⭐ <b>Rating:</b> ${escapeHtml(ratingStars)} | 📁 ${escapeHtml(genresList)}\n\n` +
+                                            `📝 <i>${escapeHtml((movie.overview || "No synopsis available.").substring(0, 200))}...</i>\n\n` +
+                                            `🍿 <b>Stream or Download via Film House App:</b>`;
+
+                            const deepLink = movie.csv_id ? `https://t.me/Filmhouseappbot?start=dl_${movie.csv_id}` : `https://t.me/Filmhouseappbot`;
+                            const replyMarkup = {
+                                inline_keyboard: [
+                                    [
+                                        { text: "📥 Download / Watch in Bot", url: deepLink }
+                                    ]
+                                ]
+                            };
+
+                            const posterImg = movie.backdrop || movie.poster || "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png";
+
+                            let postRes;
+                            try {
+                                postRes = await callTelegramWithRetry('sendPhoto', targetChannel, posterImg, {
+                                    caption: caption,
+                                    parse_mode: 'HTML',
+                                    reply_markup: replyMarkup
+                                });
+                            } catch (photoErr) {
+                                console.warn(`[SecurityQueue] sendPhoto failed (${photoErr.message}), falling back to sendMessage...`);
+                                postRes = await callTelegramWithRetry('sendMessage', targetChannel, caption, {
+                                    parse_mode: 'HTML',
+                                    reply_markup: replyMarkup,
+                                    disable_web_page_preview: false
+                                });
+                            }
+
+                            console.log(`[SecurityQueue] Channel post delivered successfully for "${cleanTitle}" to ${targetChannel}`);
+                            await db.collection("admin_broadcast_queue").doc(docId).update({
+                                status: "completed",
+                                messageId: postRes?.message_id || null,
+                                processedAt: admin.firestore.FieldValue.serverTimestamp()
+                            }).catch(() => {});
+                        } catch (postErr) {
+                            console.error(`[SecurityQueue] Channel post failed for task ${docId}:`, postErr.message);
+                            await db.collection("admin_broadcast_queue").doc(docId).update({
+                                status: "failed",
+                                error: postErr.message
+                            }).catch(() => {});
+                        }
+                    } else if (data.type === "user_broadcast") {
+                        try {
+                            const messageText = data.message;
+                            let eligibleUsers = [];
+                            if (Array.isArray(data.targetUserIds) && data.targetUserIds.length > 0) {
+                                eligibleUsers = data.targetUserIds.map(id => ({ id: String(id) }));
+                            } else {
+                                const allUsers = localStore.getAllUsers();
+                                eligibleUsers = allUsers.filter(u => u && u.id && !u.banned && !u.blockedBot);
+                            }
+
+                            console.log(`[SecurityQueue] Starting server-side user broadcast to ${eligibleUsers.length} users...`);
+                            let sent = 0;
+                            let failed = 0;
+
+                            for (const u of eligibleUsers) {
+                                try {
+                                    await callTelegramWithRetry('sendMessage', u.id, messageText, {
+                                        parse_mode: 'HTML',
+                                        reply_markup: {
+                                            inline_keyboard: [
+                                                [{ text: data.buttonText || "🍿 Open Film House Mini App", url: data.buttonUrl || "https://t.me/Filmhouseappbot" }]
+                                            ]
+                                        }
+                                    });
+                                    sent++;
+                                } catch (e) {
+                                    failed++;
+                                    if (e.message && (e.message.includes("blocked") || e.message.includes("deactivated"))) {
+                                        localStore.setBlocked(u.id, true);
+                                    }
+                                }
+                                await new Promise(r => setTimeout(r, 40));
+                            }
+
+                            console.log(`[SecurityQueue] User broadcast finished. Delivered: ${sent}, Failed: ${failed}`);
+                            await db.collection("admin_broadcast_queue").doc(docId).update({
+                                status: "completed",
+                                deliveredCount: sent,
+                                failedCount: failed,
+                                processedAt: admin.firestore.FieldValue.serverTimestamp()
+                            }).catch(() => {});
+                        } catch (bErr) {
+                            console.error(`[SecurityQueue] User broadcast failed for task ${docId}:`, bErr.message);
+                            await db.collection("admin_broadcast_queue").doc(docId).update({
+                                status: "failed",
+                                error: bErr.message
+                            }).catch(() => {});
+                        }
+                    }
+                }
+            });
+        }, (err) => console.error("Admin broadcast queue listener error:", err));
 
         // Real-time listener for feedbacks additions (sends direct Telegram message to admins)
         db.collection("feedbacks").onSnapshot((snapshot) => {
