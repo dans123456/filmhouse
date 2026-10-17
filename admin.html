@@ -391,6 +391,11 @@
                 padding: 16px;
                 max-height: 95vh;
             }
+            #batch-import-modal .admin-modal-container {
+                width: 96%;
+                padding: 12px 10px;
+                max-height: 96vh;
+            }
             .form-row {
                 flex-direction: column;
                 gap: 0;
@@ -1210,7 +1215,7 @@
                     </div>
                 </div>
 
-                <div id="batch-staging-table-container" style="max-height: 440px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; background: rgba(0,0,0,0.2); padding: 8px; display: flex; flex-direction: column; gap: 10px;">
+                <div id="batch-staging-table-container" style="max-height: 480px; overflow-y: auto; overflow-x: hidden; border: 1px solid var(--border-color); border-radius: 6px; background: rgba(0,0,0,0.2); padding: 8px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; width: 100%;">
                     <!-- Staged items rendered dynamically -->
                 </div>
             </div>
@@ -1302,6 +1307,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=99"></script>
+    <script src="admin.js?v=100"></script>
 </body>
 </html>
