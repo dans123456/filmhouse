@@ -7375,6 +7375,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btnBatchCommitAll) {
         btnBatchCommitAll.addEventListener("click", () => {
+            saveCurrentBatchStagingInputs();
             const itemsToCommit = batchStagedMovies.filter(m => !m.error && m.checked);
             if (itemsToCommit.length === 0) {
                 alert("No titles selected to import! Please check at least one title.");
@@ -7383,8 +7384,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const broadcastCheckbox = document.getElementById("batch-broadcast-toggle");
             const shouldBroadcast = broadcastCheckbox ? broadcastCheckbox.checked : true;
-
-            saveCurrentBatchStagingInputs();
             let addedCount = 0;
             itemsToCommit.forEach(item => {
                 // Parse links from linksList or fallback rawLinksText
@@ -7448,6 +7447,15 @@ document.addEventListener("DOMContentLoaded", () => {
             batchStagedMovies = [];
             if (batchTitlesInput) batchTitlesInput.value = "";
             if (batchInputCounter) batchInputCounter.textContent = "0 titles entered";
+
+            const publishBtn = document.getElementById("btn-publish-catalog");
+            if (publishBtn) {
+                publishBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                publishBtn.style.boxShadow = "0 0 20px #ffbc00";
+                setTimeout(() => {
+                    publishBtn.style.boxShadow = "";
+                }, 3500);
+            }
 
             alert(`🎉 Successfully imported ${addedCount} title(s) to the catalog!\n\nClick "Publish Changes 🚀" in the catalog toolbar to commit them to GitHub and make them live.`);
         });
