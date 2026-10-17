@@ -2289,32 +2289,25 @@ if (testTelegramBtn) {
             return;
         }
 
-        const testMsg = `🤖 *Film House Bot Diagnostic*\n\nConnection successful! This bot is correctly configured and ready to broadcast and notify users. 🚀`;
+        const testMsg = `🤖 <b>Film House Bot Diagnostic</b>\n\nConnection successful! The secure server worker is fully operational and ready to broadcast. 🚀`;
 
         try {
-            const url = `https://api.telegram.org/bot${token}/sendMessage`;
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    chat_id: testChatId.trim(),
-                    text: testMsg,
-                    parse_mode: "Markdown"
-                })
-            });
-
-            const result = await response.json();
-            if (response.ok && result.ok) {
-                showToast("Success! Check your bot chat for the diagnostic test message. 💌", "success");
-            } else {
-                console.error("Telegram API Error response:", result);
-                showToast(`Failed: ${result.description || "Unknown error"}. Start chat with bot first!`, "error");
+            if (typeof firebase === 'undefined' || !db) {
+                throw new Error("Firestore is not connected.");
             }
+            const currentAdminId = sessionStorage.getItem("admin_auth_id") || "1175336733";
+            await db.collection("admin_broadcast_queue").add({
+                type: "user_broadcast",
+                adminId: String(currentAdminId),
+                message: testMsg,
+                targetUserIds: [testChatId.trim()],
+                status: "pending",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast("Diagnostic test message queued on secure server! Check your bot chat. 💌", "success");
         } catch (err) {
             console.error("Telegram connection error:", err);
-            showToast(`Network error testing Telegram Bot: ${err.message}`, "error");
+            showToast(`Error queuing diagnostic message: ${err.message}`, "error");
         } finally {
             testTelegramBtn.disabled = false;
             testTelegramBtn.textContent = "Test Bot";
@@ -6608,24 +6601,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert(`Successfully allocated +${amount} points from ${senderUser.fullName} to ${recipientUser.fullName}!`);
                 if (amountInput) amountInput.value = "";
                 
-                // Notify recipient via Telegram DM
-                db.collection("settings").doc("telegram").get().then(tgDoc => {
-                    if (tgDoc.exists) {
-                        const token = tgDoc.data().botToken;
-                        if (token) {
-                            const text = `🎁 *Points Reward Allocated!*\n\nAn administrator has allocated *+${amount} Points* to your Film House account balance! Thank you for using our app! 🍿`;
-                            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    chat_id: String(recipientId),
-                                    text: text,
-                                    parse_mode: "Markdown"
-                                })
-                            }).catch(err => console.warn("Failed to notify recipient of points allocation:", err));
-                        }
-                    }
-                });
+                // Notify recipient securely via admin_broadcast_queue
+                const currentAdminId = sessionStorage.getItem("admin_auth_id") || "1175336733";
+                const rewardMsg = `🎁 <b>Points Reward Allocated!</b>\n\nAn administrator has allocated <b>+${amount} Points</b> to your Film House account balance! Thank you for using our app! 🍿`;
+                db.collection("admin_broadcast_queue").add({
+                    type: "user_broadcast",
+                    adminId: String(currentAdminId),
+                    message: rewardMsg,
+                    targetUserIds: [String(recipientId)],
+                    status: "pending",
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(err => console.warn("Failed to queue points allocation notification:", err));
             }).catch(err => {
                 console.error("Points allocation batch error:", err);
                 alert("Database update failed! Check logs.");

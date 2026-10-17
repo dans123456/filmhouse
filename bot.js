@@ -3672,6 +3672,7 @@ async function init() {
         }, (err) => console.error("Admin reminders listener error:", err));
 
         // Real-time listener for secure admin broadcast & channel post queue
+        const processedBroadcastTasks = new Set();
         db.collection("admin_broadcast_queue").onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(async (change) => {
                 if (change.type === "added") {
@@ -3679,6 +3680,8 @@ async function init() {
                     const data = change.doc.data();
                     
                     if (data.status && data.status !== "pending") return;
+                    if (processedBroadcastTasks.has(docId)) return;
+                    processedBroadcastTasks.add(docId);
 
                     // Skip historical tasks older than 60 seconds on startup
                     if (data.timestamp) {
@@ -3699,10 +3702,11 @@ async function init() {
                     }
 
                     console.log(`[SecurityQueue] Processing authorized task ${docId} of type '${data.type}' from admin ${senderId}`);
+                    await db.collection("admin_broadcast_queue").doc(docId).update({ status: "processing" }).catch(() => {});
 
                     if (data.type === "channel_post") {
                         try {
-                            const movie = data.movie;
+                            const movie = data.movie || {};
                             const targetChannel = data.channelId || process.env.UPDATES_CHANNEL_ID || "-1004272961286";
                             
                             const rawTitle = movie.title || "Movie Update";
