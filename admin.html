@@ -1038,7 +1038,10 @@
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Categories (Select all that apply)</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label style="margin: 0; font-weight: 500;">Categories (Select all that apply)</label>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-add-auto-cats" style="font-size: 11px; padding: 2px 8px; border-radius: 4px; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3); cursor: pointer;">⚡ Auto-Detect</button>
+                    </div>
                     <div id="add-movie-categories-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; max-height: 110px; overflow-y: auto; box-sizing: border-box;">
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color: #fff;">
                             <input type="checkbox" class="add-cat-checkbox" value="Main" checked> Main (Home)
@@ -1111,7 +1114,7 @@
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; background: rgba(0, 136, 204, 0.08); border: 1px solid rgba(0, 136, 204, 0.25); padding: 10px 12px; border-radius: 6px;">
                     <input type="checkbox" id="add-movie-post-to-channel" checked style="width: 16px; height: 16px; accent-color: #0088cc; cursor: pointer;">
                     <label for="add-movie-post-to-channel" style="margin: 0; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; user-select: none;">
-                        📢 Auto-broadcast to Updates Channel upon Publish (5-Day Auto-Delete 🔥)
+                        📢 Auto-broadcast to Updates Channel upon Publish ✈️
                     </label>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Add to Local List</button>
@@ -1128,7 +1131,7 @@
                     <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><use href="#icon-close"></use></svg>
                 </button>
             </div>
-            <div id="details-modal-body" style="max-height: 480px; overflow-y: auto; color: #ffffff; padding-right: 4px;">
+            <div id="details-modal-body" style="color: #ffffff;">
                 <!-- Loaded Dynamically -->
             </div>
         </div>
@@ -1252,7 +1255,7 @@
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; background: rgba(0, 136, 204, 0.08); border: 1px solid rgba(0, 136, 204, 0.25); padding: 10px 12px; border-radius: 6px;">
                     <input type="checkbox" id="fulfill-post-to-channel" checked style="width: 16px; height: 16px; accent-color: #0088cc; cursor: pointer;">
                     <label for="fulfill-post-to-channel" style="margin: 0; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; user-select: none;">
-                        📢 Post release announcement to Updates Channel (5-Day Auto-Delete 🔥)
+                        📢 Post release announcement to Updates Channel ✈️
                     </label>
                 </div>
                 <div style="display: flex; gap: 10px;">
@@ -1285,6 +1288,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=96"></script>
+    <script src="admin.js?v=97"></script>
 </body>
 </html>

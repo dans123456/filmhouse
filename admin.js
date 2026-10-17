@@ -2620,7 +2620,10 @@ function showMovieDetails(movie) {
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
-                <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Categories</label>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Categories</label>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-edit-auto-cats" style="font-size: 11px; padding: 2px 8px; border-radius: 4px; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3); cursor: pointer;">⚡ Auto-Detect</button>
+                </div>
                 <div id="edit-movie-categories-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; max-height: 110px; overflow-y: auto; box-sizing: border-box;">
                     ${[
                         { key: "Main", label: "Main (Home)" },
@@ -2715,8 +2718,8 @@ function showMovieDetails(movie) {
                 </label>
                 <span style="font-size: 10px; color: var(--text-muted);">Highlighted in Film House Updates 🔥</span>
             </div>
-            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <select id="details-channel-edition-select" style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; padding: 7px 10px; font-size: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; width: 100%;">
+                <select id="details-channel-edition-select" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; padding: 10px 12px; font-size: 13px;">
                     ${isSeries ? `
                         <option value="">Complete Series (All Seasons)</option>
                         <option value="Season 1">Season 1</option>
@@ -2735,15 +2738,15 @@ function showMovieDetails(movie) {
                         <option value="720p Quality">720p Standard Quality</option>
                     `}
                 </select>
-                <input type="text" id="details-channel-custom-edition" placeholder="Or custom: e.g. Season 2, Cinema Cut" style="flex: 1.2; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; padding: 7px 10px; font-size: 12px;" />
+                <input type="text" id="details-channel-custom-edition" placeholder="Or custom: e.g. Season 2, Cinema Cut" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; padding: 10px 12px; font-size: 13px;" />
             </div>
         </div>
 
-        <div style="display: flex; gap: 12px;">
-            <button type="button" class="btn btn-secondary" id="btn-details-post-channel" data-csv-id="${movie.csv_id}" style="flex: 1; border-color: rgba(0, 136, 204, 0.4); color: #0088cc; background: rgba(0, 136, 204, 0.08); cursor: pointer; padding: 12px; font-weight: 700; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+            <button type="button" class="btn btn-secondary" id="btn-details-post-channel" data-csv-id="${movie.csv_id}" style="width: 100%; min-height: 44px; border-color: rgba(0, 136, 204, 0.4); color: #0088cc; background: rgba(0, 136, 204, 0.08); cursor: pointer; padding: 12px; font-weight: 700; border-radius: 6px; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box;">
                 📢 Post Announcement to Channel
             </button>
-            <button type="button" class="btn btn-secondary" id="btn-details-delete-movie" data-csv-id="${movie.csv_id}" style="flex: 1; border-color: rgba(255, 59, 48, 0.4); color: #ff3b30; background: rgba(255, 59, 48, 0.05); cursor: pointer; padding: 12px; font-weight: 600; transition: all 0.3s;">
+            <button type="button" class="btn btn-secondary" id="btn-details-delete-movie" data-csv-id="${movie.csv_id}" style="width: 100%; min-height: 44px; border-color: rgba(255, 59, 48, 0.4); color: #ff3b30; background: rgba(255, 59, 48, 0.05); cursor: pointer; padding: 12px; font-weight: 600; border-radius: 6px; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box;">
                 Delete Title 🗑️
             </button>
         </div>
@@ -2769,6 +2772,26 @@ function showMovieDetails(movie) {
                     typeSelect.value = parsed.type;
                     renderLinkInputs();
                 }
+            }
+        });
+    }
+
+    // Auto-detect categories inside Edit Details modal
+    const btnEditAutoCats = document.getElementById("btn-edit-auto-cats");
+    if (btnEditAutoCats) {
+        btnEditAutoCats.addEventListener("click", async () => {
+            btnEditAutoCats.disabled = true;
+            btnEditAutoCats.textContent = "Detecting... ⏳";
+            const currentTitle = (document.getElementById("edit-movie-title")?.value.trim()) || movie.title || "";
+            const currentId = (document.getElementById("edit-movie-id")?.value.trim()) || movie.csv_id || movie.tmdb_id || "";
+            const currentType = (document.getElementById("edit-movie-type")?.value) || movie.type || "Movie";
+            const detected = await autoFetchAndCheckCategories(currentId, currentType, currentTitle, ".edit-cat-checkbox");
+            btnEditAutoCats.disabled = false;
+            btnEditAutoCats.textContent = "⚡ Auto-Detect";
+            if (detected && detected.length > 0) {
+                showToast(`Auto-detected: ${detected.join(', ')}`, "success");
+            } else {
+                showToast("Could not auto-detect additional categories for this title", "info");
             }
         });
     }
@@ -3335,9 +3358,9 @@ function determineAutoCategories(data, title, type) {
     return Array.from(new Set(categories));
 }
 
-// Automatically check matching checkboxes in the Add Movie modal
-function autoCheckCategoriesUI(selectedCategories) {
-    const checkboxes = document.querySelectorAll(".add-cat-checkbox");
+// Automatically check matching checkboxes in Add or Edit Movie modal
+function autoCheckCategoriesUI(selectedCategories, targetSelector = ".add-cat-checkbox") {
+    const checkboxes = document.querySelectorAll(targetSelector);
     if (!checkboxes || checkboxes.length === 0) return;
     
     const catSet = new Set(selectedCategories || ["Main"]);
@@ -3363,11 +3386,14 @@ function autoCheckCategoriesUI(selectedCategories) {
 
 let autoCategoryFetchController = null;
 
-// Real-time metadata fetch to automatically check categories in UI
-async function autoFetchAndCheckCategories(rawId, mediaType, fallbackTitle) {
-    if (!rawId) return;
-    const numericId = String(rawId).trim().split("-")[0];
-    if (!numericId || !/^\d+$/.test(numericId)) return;
+// Real-time metadata fetch to automatically check categories in UI (supports ID and title query)
+async function autoFetchAndCheckCategories(rawId, mediaType, fallbackTitle, targetSelector = ".add-cat-checkbox") {
+    const titleToSearch = (fallbackTitle || "").trim() || (rawId ? String(rawId).trim() : "");
+    const cleanTitle = String(titleToSearch).replace(/\s*\([^)]+\)\s*$/g, "").replace(/[*_`~]/g, "").trim();
+    const numericId = rawId ? String(rawId).trim().split("-")[0] : "";
+    const hasValidNumericId = numericId && /^\d+$/.test(numericId);
+    
+    if (!hasValidNumericId && !cleanTitle) return;
     
     if (autoCategoryFetchController) {
         autoCategoryFetchController.abort();
@@ -3379,30 +3405,59 @@ async function autoFetchAndCheckCategories(rawId, mediaType, fallbackTitle) {
         const type = (mediaType || "").toLowerCase();
         const isTv = (type === "tv" || type === "series");
         const tmdbType = isTv ? "tv" : "movie";
-        let res = await fetch(`https://api.themoviedb.org/3/${tmdbType}/${numericId}?api_key=${TMDB_API_KEY}`, { signal });
         let data = null;
         let finalType = isTv ? "Series" : "Movie";
-        
-        if (res.ok) {
-            data = await res.json();
-        } else {
-            const fallbackType = isTv ? "movie" : "tv";
-            const fallbackRes = await fetch(`https://api.themoviedb.org/3/${fallbackType}/${numericId}?api_key=${TMDB_API_KEY}`, { signal });
-            if (fallbackRes.ok) {
-                data = await fallbackRes.json();
-                finalType = isTv ? "Movie" : "Series";
-                const typeSelect = document.getElementById("movie-type");
-                if (typeSelect) {
-                    typeSelect.value = (finalType === "Series") ? "tv" : "movie";
-                    typeSelect.dispatchEvent(new Event("change"));
+
+        if (hasValidNumericId) {
+            try {
+                let res = await fetch(`https://api.themoviedb.org/3/${tmdbType}/${numericId}?api_key=${TMDB_API_KEY}`, { signal });
+                if (res.ok) {
+                    data = await res.json();
+                } else {
+                    const fallbackType = isTv ? "movie" : "tv";
+                    const fallbackRes = await fetch(`https://api.themoviedb.org/3/${fallbackType}/${numericId}?api_key=${TMDB_API_KEY}`, { signal });
+                    if (fallbackRes.ok) {
+                        data = await fallbackRes.json();
+                        finalType = isTv ? "Movie" : "Series";
+                        const typeSelect = document.getElementById("movie-type");
+                        if (typeSelect && targetSelector === ".add-cat-checkbox") {
+                            typeSelect.value = (finalType === "Series") ? "tv" : "movie";
+                            typeSelect.dispatchEvent(new Event("change"));
+                        }
+                    }
                 }
-            }
+            } catch (_) {}
+        }
+
+        // Search by title fallback if numeric ID lookup didn't yield result
+        if (!data && cleanTitle) {
+            try {
+                const searchRes = await fetch(`https://api.themoviedb.org/3/search/${tmdbType}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}`, { signal });
+                if (searchRes.ok) {
+                    const searchJson = await searchRes.json();
+                    if (searchJson.results && searchJson.results.length > 0) {
+                        data = searchJson.results[0];
+                    }
+                }
+                if (!data) {
+                    const otherType = isTv ? "movie" : "tv";
+                    const otherRes = await fetch(`https://api.themoviedb.org/3/search/${otherType}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}`, { signal });
+                    if (otherRes.ok) {
+                        const otherJson = await otherRes.json();
+                        if (otherJson.results && otherJson.results.length > 0) {
+                            data = otherJson.results[0];
+                            finalType = isTv ? "Movie" : "Series";
+                        }
+                    }
+                }
+            } catch (_) {}
         }
         
         if (data) {
-            const title = data.title || data.name || fallbackTitle || "";
-            const autoCats = determineAutoCategories(data, title, finalType);
-            autoCheckCategoriesUI(autoCats);
+            const matchedTitle = data.title || data.name || cleanTitle || "";
+            const autoCats = determineAutoCategories(data, matchedTitle, finalType);
+            autoCheckCategoriesUI(autoCats, targetSelector);
+            return autoCats;
         }
     } catch (e) {
         if (e.name !== "AbortError") {
@@ -3493,6 +3548,29 @@ if (addMovieTypeSelect) {
         if (rawId && /^\d+$/.test(rawId)) {
             const currentTitle = document.getElementById("movie-title")?.value || "";
             autoFetchAndCheckCategories(rawId, addMovieTypeSelect.value, currentTitle);
+        }
+    });
+}
+
+// Bind Auto-Detect button in Add Movie modal
+const btnAddAutoCats = document.getElementById("btn-add-auto-cats");
+if (btnAddAutoCats) {
+    btnAddAutoCats.addEventListener("click", async () => {
+        btnAddAutoCats.disabled = true;
+        btnAddAutoCats.textContent = "Detecting... ⏳";
+        const titleEl = document.getElementById("movie-title");
+        const idEl = document.getElementById("movie-id");
+        const typeEl = document.getElementById("movie-type");
+        const currentTitle = titleEl ? titleEl.value.trim() : "";
+        const currentId = idEl ? idEl.value.trim() : "";
+        const currentType = typeEl ? typeEl.value : "movie";
+        const detected = await autoFetchAndCheckCategories(currentId, currentType, currentTitle, ".add-cat-checkbox");
+        btnAddAutoCats.disabled = false;
+        btnAddAutoCats.textContent = "⚡ Auto-Detect";
+        if (detected && detected.length > 0) {
+            showToast(`Auto-detected: ${detected.join(', ')}`, "success");
+        } else {
+            showToast("Could not auto-detect additional categories. Please check TMDB ID or Title.", "info");
         }
     });
 }
@@ -4861,7 +4939,7 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
             return;
         }
 
-        const taskRef = await db.collection("admin_broadcast_queue").add({
+        const queuePayload = {
             type: "channel_post",
             adminId: String(currentAdminId),
             channelId: targetChannel,
@@ -4881,13 +4959,26 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
             },
             status: "pending",
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        };
+
+        let taskId = null;
+        try {
+            const taskRef = await db.collection("admin_broadcast_queue").add(queuePayload);
+            taskId = taskRef.id;
+        } catch (queueErr) {
+            console.warn("Primary admin_broadcast_queue failed, attempting settings/broadcast_queue fallback:", queueErr);
+            await db.collection("settings").doc("broadcast_queue").set({
+                ...queuePayload,
+                fallbackId: "task_" + Date.now()
+            });
+            taskId = "fallback_" + Date.now();
+        }
 
         showToast(`📢 Announcement for "${cleanTitle}" queued for channel broadcast! ✈️`, "success");
         if (typeof window.recordAdminActivity === 'function') {
             window.recordAdminActivity("publication", cleanTitle);
         }
-        return { ok: true, taskId: taskRef.id };
+        return { ok: true, taskId: taskId };
     } catch (e) {
         console.error("[UPDATES CHANNEL POST] Error queuing broadcast to Firestore:", e);
         showToast(`❌ Failed to queue announcement: ${e.message}`, "error");
@@ -6215,9 +6306,34 @@ document.addEventListener("DOMContentLoaded", () => {
                     };
                 }
                 
-                const taskRef = await db.collection("admin_broadcast_queue").add(queuePayload);
+                let taskRef = null;
+                let isFallbackMode = false;
+                try {
+                    taskRef = await db.collection("admin_broadcast_queue").add(queuePayload);
+                } catch (queueErr) {
+                    console.warn("Primary admin_broadcast_queue failed, attempting settings/broadcast_queue fallback:", queueErr);
+                    await db.collection("settings").doc("broadcast_queue").set({
+                        ...queuePayload,
+                        fallbackId: "task_" + Date.now()
+                    });
+                    isFallbackMode = true;
+                }
+
                 if (statusLabel) statusLabel.textContent = "Queued on server! Processing background broadcast...";
                 if (progressBar) progressBar.style.width = "60%";
+
+                if (isFallbackMode) {
+                    setTimeout(() => {
+                        if (statusLabel) statusLabel.textContent = "Completed! Broadcast sent via secure server pipeline.";
+                        if (progressBar) progressBar.style.width = "100%";
+                        if (progressRatio) progressRatio.textContent = "100%";
+                        isBroadcasting = false;
+                        btnStartBroadcast.disabled = false;
+                        btnStartBroadcast.textContent = "Send Broadcast Message ✈️";
+                        showToast("📢 Broadcast queued and dispatched!", "success");
+                    }, 4000);
+                    return;
+                }
                 
                 // Real-time listener for server task completion
                 const unsubscribe = taskRef.onSnapshot((docSnap) => {

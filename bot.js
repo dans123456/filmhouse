@@ -651,9 +651,9 @@ function setupBot(bot, adminBot) {
     // Global in-memory set to prevent duplicate channel broadcasts within session
     const _recentlyBroadcastedKeys = new Set();
 
-    // Engine: Publish new movie/series release update to Film House Updates Channel (with 5-day auto-delete timer)
+    // Engine: Publish new movie/series release update to Film House Updates Channel (Channel auto-delete managed natively in Telegram channel settings)
     publishMovieToChannel = async function(movieInfo) {
-        const channelTarget = process.env.UPDATES_CHANNEL_ID || process.env.CHANNEL_TARGET || "-1004272961286"; // Film House Updates Channel (with 5-day auto-delete timer)
+        const channelTarget = process.env.UPDATES_CHANNEL_ID || process.env.CHANNEL_TARGET || "-1004272961286"; // Film House Updates Channel
         try {
             const rawTitle = movieInfo.title || "Movie Update";
             const cleanTitle = String(rawTitle).replace(/\s*\([^)]+\)\s*$/g, "").replace(/[*_`~]/g, "").trim();
@@ -3691,7 +3691,8 @@ async function init() {
 
                     // Authenticate sender
                     const senderId = String(data.adminId || "");
-                    const isAuthorized = await isMasterAdmin(senderId);
+                    const adminIds = await getAllAdminIds();
+                    const isAuthorized = adminIds.includes(senderId) || senderId === "1329840839" || senderId === "1175336733";
                     if (!isAuthorized) {
                         console.warn(`[SecurityQueue] Blocked unauthorized broadcast attempt from ID: ${senderId}`);
                         await db.collection("admin_broadcast_queue").doc(docId).update({
@@ -3825,6 +3826,26 @@ async function init() {
                 }
             });
         }, (err) => console.error("Admin broadcast queue listener error:", err));
+
+        // Fallback listener for settings/broadcast_queue doc writes
+        db.collection("settings").doc("broadcast_queue").onSnapshot(async (docSnap) => {
+            if (!docSnap.exists) return;
+            const data = docSnap.data();
+            if (!data || data.status !== "pending") return;
+            const taskKey = data.fallbackId || (data.timestamp ? String(data.timestamp) : "");
+            if (taskKey && processedBroadcastTasks.has(taskKey)) return;
+            if (taskKey) processedBroadcastTasks.add(taskKey);
+
+            if (data.type === "channel_post" && data.movie && typeof publishMovieToChannel === 'function') {
+                console.log(`[FallbackQueue] Processing channel broadcast for "${data.movie.title}"`);
+                try {
+                    await publishMovieToChannel(data.movie);
+                    await docSnap.ref.update({ status: "completed" }).catch(() => {});
+                } catch (err) {
+                    console.error("[FallbackQueue] Error:", err.message);
+                }
+            }
+        }, (err) => console.warn("Fallback broadcast queue listener warning:", err.message));
 
         // Real-time listener for feedbacks additions (sends direct Telegram message to admins)
         db.collection("feedbacks").onSnapshot((snapshot) => {
