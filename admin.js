@@ -4767,7 +4767,11 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
     if (!movieInfo || !movieInfo.title) return;
     
     const targetChannel = localStorage.getItem("filmhouse_updates_channel_id") || "-1004272961286"; // Film House Updates Channel
-    const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAHl73JHfOXQrDGk-DR92XWoVkBMpMKXvYQ";
+    const token = telegramBotToken || localStorage.getItem("filmhouse_telegram_bot_token") || "";
+    if (!token) {
+        console.warn("No Telegram Bot Token configured. Cannot post broadcast.");
+        return;
+    }
     
     const rawTitle = movieInfo.title || "Movie Update";
     const cleanTitle = String(rawTitle).replace(/\s*\([^)]+\)\s*$/g, "").replace(/[*_`~]/g, "").trim();
@@ -6225,7 +6229,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             
             if (!telegramBotToken) {
-                telegramBotToken = localStorage.getItem("filmhouse_telegram_bot_token") || "8777518927:AAHl73JHfOXQrDGk-DR92XWoVkBMpMKXvYQ";
+                telegramBotToken = localStorage.getItem("filmhouse_telegram_bot_token") || "";
             }
             if (!telegramBotToken) {
                 alert("Please configure and save your Telegram Bot Token in Settings first!");

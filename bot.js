@@ -3173,8 +3173,8 @@ async function init() {
     }
 
     if (!botToken) {
-        botToken = "8777518927:AAHl73JHfOXQrDGk-DR92XWoVkBMpMKXvYQ";
-        console.log("Using default Film House Telegram Bot Token.");
+        console.error("FATAL: No TELEGRAM_BOT_TOKEN found in .env or Firestore settings.");
+        process.exit(1);
     }
 
     // Load admin bot token strictly from environment variable or Firestore
