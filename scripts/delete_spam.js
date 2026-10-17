@@ -1,6 +1,27 @@
-require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
+
+// Native zero-dependency .env loader
+try {
+    const envPath = path.join(__dirname, "..", ".env");
+    if (fs.existsSync(envPath)) {
+        const envContent = fs.readFileSync(envPath, "utf8");
+        envContent.split(/\r?\n/).forEach(line => {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith("#")) return;
+            const eqIdx = trimmed.indexOf("=");
+            if (eqIdx > 0) {
+                const key = trimmed.substring(0, eqIdx).trim();
+                const val = trimmed.substring(eqIdx + 1).trim();
+                if (!process.env[key]) {
+                    process.env[key] = val;
+                }
+            }
+        });
+    }
+} catch (e) {
+    console.warn("Could not load .env:", e.message);
+}
 
 const token = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
@@ -21,7 +42,6 @@ async function postTelegram(method, body) {
 
 async function sweepChat(chatId) {
     console.log(`\n--- Sweeping chat ${chatId} ---`);
-    // 1. Send probe message to get latest message_id
     const probe = await postTelegram('sendMessage', {
         chat_id: chatId,
         text: '🛡️ Scanning for unauthorized spam messages...'
@@ -38,9 +58,9 @@ async function sweepChat(chatId) {
     // Delete probe message
     await postTelegram('deleteMessage', { chat_id: chatId, message_id: latestId });
 
-    // Sweep backwards 35 messages
+    // Sweep backwards 60 messages
     let deletedCount = 0;
-    for (let msgId = latestId - 1; msgId >= Math.max(1, latestId - 35); msgId--) {
+    for (let msgId = latestId - 1; msgId >= Math.max(1, latestId - 60); msgId--) {
         const delRes = await postTelegram('deleteMessage', {
             chat_id: chatId,
             message_id: msgId
@@ -58,7 +78,7 @@ async function run() {
     for (const adminId of adminIds) {
         await sweepChat(adminId);
     }
-    console.log("\nSweep complete!");
+    console.log("\nAdmin sweep complete!");
 }
 
 run();
