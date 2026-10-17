@@ -298,6 +298,27 @@ try {
     }
 }
 
+// Safe Timestamp & Date Helpers for App User Profiles
+function getSafeTimestamp(val) {
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    if (typeof val.toMillis === 'function') return val.toMillis();
+    if (typeof val.toDate === 'function') return val.toDate().getTime();
+    if (typeof val.seconds === 'number') return val.seconds * 1000;
+    const parsed = new Date(val).getTime();
+    return isNaN(parsed) ? 0 : parsed;
+}
+
+function formatJoinedDate(val) {
+    if (!val) return "Unknown";
+    if (typeof val.toDate === 'function') return val.toDate().toLocaleDateString();
+    if (typeof val.toMillis === 'function') return new Date(val.toMillis()).toLocaleDateString();
+    if (typeof val.seconds === 'number') return new Date(val.seconds * 1000).toLocaleDateString();
+    if (typeof val === 'number') return new Date(val).toLocaleDateString();
+    const parsed = new Date(val);
+    return isNaN(parsed.getTime()) ? "Unknown" : parsed.toLocaleDateString();
+}
+
 // Smart Caching for Users to save Firestore daily read quota
 const USERS_CACHE_KEY = "filmhouse_admin_users_cache";
 const USERS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
@@ -365,8 +386,8 @@ function initUsersSync(force = false) {
             allUsers.push(u);
         });
         allUsers.sort((a, b) => {
-            const timeA = a.lastSeen ? (a.lastSeen.toMillis ? a.lastSeen.toMillis() : new Date(a.lastSeen).getTime()) : 0;
-            const timeB = b.lastSeen ? (b.lastSeen.toMillis ? b.lastSeen.toMillis() : new Date(b.lastSeen).getTime()) : 0;
+            const timeA = getSafeTimestamp(a.lastSeen);
+            const timeB = getSafeTimestamp(b.lastSeen);
             return timeB - timeA;
         });
         saveUsersToCache(allUsers);
@@ -691,7 +712,7 @@ function renderUsersList() {
             return;
         }
 
-        const joinedDateStr = u.joinedDate ? new Date(u.joinedDate.seconds * 1000).toLocaleDateString() : "Unknown";
+        const joinedDateStr = formatJoinedDate(u.joinedDate);
         const bd = u.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
         
         // Compute real-time mining status
@@ -1017,16 +1038,19 @@ function renderRequestsList() {
         // "all" = no filter
     }
     
-    // Sorting logic based on sort selector dropdown
+    // Sorting logic based on sort selector dropdown (Default: Newest First with High Priority pinned at top)
     const sortSelect = document.getElementById("requests-sort-select");
-    const sortMode = sortSelect ? sortSelect.value : "count";
+    const sortMode = sortSelect ? sortSelect.value : "newest";
 
     filteredRequests.sort((a, b) => {
         if (sortMode === "newest") {
+            // High Priority always pinned at top, newest first within each tier
+            if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
             const timeA = a.latestTimestamp === Infinity ? 0 : a.latestTimestamp;
             const timeB = b.latestTimestamp === Infinity ? 0 : b.latestTimestamp;
             return timeB - timeA;
         } else if (sortMode === "oldest") {
+            if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
             const timeA = a.earliestTimestamp === Infinity ? 0 : a.earliestTimestamp;
             const timeB = b.earliestTimestamp === Infinity ? 0 : b.earliestTimestamp;
             if (timeA === 0 && timeB === 0) return 0;
@@ -1039,7 +1063,7 @@ function renderRequestsList() {
             const timeB = b.latestTimestamp === Infinity ? 0 : b.latestTimestamp;
             return timeB - timeA;
         } else {
-            // Default "count": Priority first, then by request count descending, then newest
+            // "count": Priority first, then by request count descending, then newest
             if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
             if (b.count !== a.count) return b.count - a.count;
             const timeA = a.latestTimestamp === Infinity ? 0 : a.latestTimestamp;
@@ -2476,7 +2500,8 @@ function showMovieDetails(movie) {
     const detailsBody = document.getElementById("details-modal-body");
     if (!detailsBody || !movieDetailsModal) return;
     
-    const badgeColor = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv' ? 'var(--primary-color)' : '#00bcd4';
+    const isSeries = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
+    const badgeColor = isSeries ? 'var(--primary-color)' : '#00bcd4';
     const posterUrl = getPosterUrl(movie.poster);
     const linksList = movie.links || [];
 
