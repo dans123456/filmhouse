@@ -7021,17 +7021,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const validItems = batchStagedMovies.filter(m => !m.error);
         const checkedCount = validItems.filter(m => m.checked).length;
         if (batchStagingSummary) {
-            batchStagingSummary.textContent = `Staged Titles: ${checkedCount} of ${validItems.length} selected`;
+            batchStagingSummary.textContent = `${checkedCount} of ${validItems.length} Selected`;
         }
 
         if (batchStagedMovies.length === 0) {
-            batchStagingContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px;">No titles staged. Go back to input list.</div>`;
+            batchStagingContainer.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;">No titles staged. Go back to input list.</div>`;
             return;
         }
 
         // Staging options header
         const optionsBar = document.createElement("div");
-        optionsBar.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; font-size: 11px; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; box-sizing: border-box; width: 100%;";
+        optionsBar.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; font-size: 11px; margin-bottom: 6px; gap: 8px; box-sizing: border-box; width: 100%; flex-shrink: 0;";
         optionsBar.innerHTML = `
             <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #fff; margin: 0; user-select: none;">
                 <input type="checkbox" id="batch-select-all" ${checkedCount === validItems.length && validItems.length > 0 ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: #ffbc00; cursor: pointer; margin: 0; flex-shrink: 0;">
@@ -7059,7 +7059,7 @@ document.addEventListener("DOMContentLoaded", () => {
         batchStagedMovies.forEach((item, idx) => {
             if (item.error) {
                 const errCard = document.createElement("div");
-                errCard.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.3); border-radius: 6px; font-size: 12px; color: #ff6b6b; box-sizing: border-box; width: 100%;";
+                errCard.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.3); border-radius: 6px; font-size: 12px; color: #ff6b6b; box-sizing: border-box; width: 100%; flex-shrink: 0;";
                 errCard.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span>⚠️</span>
@@ -7077,19 +7077,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const card = document.createElement("div");
-            card.style.cssText = `display: flex; gap: 10px; align-items: flex-start; padding: 10px; background: ${item.checked ? 'rgba(255, 188, 0, 0.03)' : 'rgba(255,255,255,0.01)'}; border: 1px solid ${item.checked ? 'rgba(255, 188, 0, 0.35)' : 'var(--border-color)'}; border-radius: 8px; transition: border-color 0.2s; box-sizing: border-box; width: 100%; max-width: 100%; overflow: hidden;`;
+            card.style.cssText = `display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; background: ${item.checked ? 'rgba(255, 188, 0, 0.03)' : 'rgba(255,255,255,0.015)'}; border: 1px solid ${item.checked ? 'rgba(255, 188, 0, 0.35)' : 'var(--border-color)'}; border-radius: 8px; transition: border-color 0.2s; box-sizing: border-box; width: 100%; max-width: 100%; overflow: hidden; flex-shrink: 0;`;
 
             const posterImg = item.poster || "MOVIE/img/FilmHouse3_nobg.png";
             const yearStr = item.releaseDate ? item.releaseDate.split("-")[0] : "";
-            const catBadges = (item.categories || []).slice(0, 3).map(c => `<span style="font-size: 10px; background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 3px; color: var(--text-secondary); white-space: nowrap;">${escapeHTML(c)}</span>`).join("");
+            const categoriesText = (item.categories && item.categories.length > 0) 
+                ? item.categories.join(' • ') 
+                : (item.genres ? item.genres.slice(0, 2).join(' • ') : '');
 
             let linksSectionHtml = "";
             if (item.isSeries) {
                 const filledSeasons = item.linksList.filter(l => (l.url || '').trim().length > 0).length;
                 linksSectionHtml = `
-                    <div style="margin-top: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 188, 0, 0.25); border-radius: 6px; padding: 8px; box-sizing: border-box; width: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 6px;">
-                            <span style="font-size: 11px; font-weight: 700; color: #ffbc00; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
+                    <div style="margin-top: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 188, 0, 0.25); border-radius: 6px; padding: 6px 8px; box-sizing: border-box; width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; gap: 6px;">
+                            <span style="font-size: 10px; font-weight: 700; color: #ffbc00; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
                                 <span>📺</span> <span>Seasons</span>
                             </span>
                             <span style="font-size: 10px; color: ${filledSeasons > 0 ? '#4caf50' : 'var(--text-muted)'}; font-weight: 600; white-space: nowrap;">
@@ -7097,30 +7099,30 @@ document.addEventListener("DOMContentLoaded", () => {
                             </span>
                         </div>
                         
-                        <div class="batch-seasons-list" style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+                        <div class="batch-seasons-list" style="display: flex; flex-direction: column; gap: 5px; width: 100%;">
                             ${item.linksList.map((link, sIdx) => `
-                                <div style="display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box;">
+                                <div style="display: flex; align-items: center; gap: 5px; width: 100%; box-sizing: border-box;">
                                     <span style="font-size: 10px; font-weight: 700; color: #ffbc00; background: rgba(255, 188, 0, 0.12); border: 1px solid rgba(255, 188, 0, 0.3); padding: 5px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; box-sizing: border-box;">${escapeHTML(link.season || `Season ${sIdx + 1}`)}</span>
-                                    <input type="text" class="batch-season-url-input" data-item-idx="${idx}" data-season-idx="${sIdx}" value="${escapeHTML(link.url || '')}" placeholder="Paste Season ${sIdx + 1} Telegram link..." style="flex: 1; min-width: 0; width: 100%; padding: 6px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
+                                    <input type="text" class="batch-season-url-input" data-item-idx="${idx}" data-season-idx="${sIdx}" value="${escapeHTML(link.url || '')}" placeholder="Telegram download URL..." style="flex: 1; min-width: 0; width: 100%; padding: 5px 7px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
                                     ${item.linksList.length > 1 ? `
-                                        <button type="button" class="btn-remove-batch-season" data-item-idx="${idx}" data-season-idx="${sIdx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 2px 5px; font-size: 13px; flex-shrink: 0;" title="Remove this season">✕</button>
+                                        <button type="button" class="btn-remove-batch-season" data-item-idx="${idx}" data-season-idx="${sIdx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 2px 4px; font-size: 13px; flex-shrink: 0;" title="Remove this season">✕</button>
                                     ` : ''}
                                 </div>
                             `).join('')}
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; width: 100%; box-sizing: border-box;">
-                            <button type="button" class="btn btn-secondary btn-sm btn-add-batch-season" data-index="${idx}" style="font-size: 11px; padding: 5px 6px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.35); text-align: center; justify-content: center; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; width: 100%; box-sizing: border-box;">
+                            <button type="button" class="btn btn-secondary btn-sm btn-add-batch-season" data-index="${idx}" style="font-size: 11px; padding: 4px 6px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.35); text-align: center; justify-content: center; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                 + Add Season ${item.linksList.length + 1}
                             </button>
-                            <button type="button" class="btn btn-secondary btn-sm btn-toggle-batch-bulk" data-index="${idx}" style="font-size: 11px; padding: 5px 6px; border-radius: 4px; cursor: pointer; color: #00c8ff; border-color: rgba(0, 200, 255, 0.35); text-align: center; justify-content: center; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <button type="button" class="btn btn-secondary btn-sm btn-toggle-batch-bulk" data-index="${idx}" style="font-size: 11px; padding: 4px 6px; border-radius: 4px; cursor: pointer; color: #00c8ff; border-color: rgba(0, 200, 255, 0.35); text-align: center; justify-content: center; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                 📋 Bulk Paste
                             </button>
                         </div>
 
-                        <div class="batch-bulk-wrapper" data-index="${idx}" style="display: none; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px; width: 100%; box-sizing: border-box;">
-                            <textarea class="batch-bulk-textarea" data-index="${idx}" placeholder="Paste multiple Telegram links (one per line)...&#10;Line 1 -> Season 1&#10;Line 2 -> Season 2&#10;Line 3 -> Season 3..." style="width: 100%; min-height: 70px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 6px; color: #fff; font-size: 11px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
-                            <div style="display: flex; justify-content: flex-end; gap: 6px; margin-top: 5px;">
+                        <div class="batch-bulk-wrapper" data-index="${idx}" style="display: none; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px; width: 100%; box-sizing: border-box;">
+                            <textarea class="batch-bulk-textarea" data-index="${idx}" placeholder="Paste multiple Telegram links (one per line)...&#10;Line 1 -> Season 1&#10;Line 2 -> Season 2&#10;Line 3 -> Season 3..." style="width: 100%; min-height: 65px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 6px; color: #fff; font-size: 11px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                            <div style="display: flex; justify-content: flex-end; gap: 6px; margin-top: 4px;">
                                 <button type="button" class="btn btn-primary btn-sm btn-apply-batch-bulk" data-index="${idx}" style="font-size: 11px; padding: 4px 10px;">Apply Seasons ⚡</button>
                             </div>
                         </div>
@@ -7128,53 +7130,48 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
             } else {
                 linksSectionHtml = `
-                    <div style="margin-top: 8px; width: 100%; box-sizing: border-box;">
-                        <div class="batch-movie-links-container" style="display: flex; flex-direction: column; gap: 6px; width: 100%; box-sizing: border-box;">
+                    <div style="margin-top: 6px; width: 100%; box-sizing: border-box;">
+                        <div class="batch-movie-links-container" style="display: flex; flex-direction: column; gap: 5px; width: 100%; box-sizing: border-box;">
                             ${item.linksList.map((link, mIdx) => `
-                                <div style="display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box;">
-                                    <select class="batch-movie-quality-select" data-item-idx="${idx}" data-link-idx="${mIdx}" style="width: 74px; padding: 6px 4px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; flex-shrink: 0; cursor: pointer; box-sizing: border-box;">
+                                <div style="display: flex; align-items: center; gap: 5px; width: 100%; box-sizing: border-box;">
+                                    <select class="batch-movie-quality-select" data-item-idx="${idx}" data-link-idx="${mIdx}" style="width: 72px; padding: 5px 2px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; flex-shrink: 0; cursor: pointer; box-sizing: border-box;">
                                         <option value="720p" ${link.quality === '720p' ? 'selected' : ''}>720p</option>
                                         <option value="1080p" ${link.quality === '1080p' ? 'selected' : ''}>1080p</option>
                                         <option value="2160p (4K)" ${link.quality === '2160p (4K)' || link.quality === '4K UHD' ? 'selected' : ''}>4K UHD</option>
                                         <option value="480p" ${link.quality === '480p' ? 'selected' : ''}>480p</option>
                                         <option value="Cinema Cut / HDCam" ${link.quality === 'Cinema Cut / HDCam' || link.quality === 'Cinema Cut' ? 'selected' : ''}>Cinema</option>
                                     </select>
-                                    <input type="text" class="batch-movie-url-input" data-item-idx="${idx}" data-link-idx="${mIdx}" value="${escapeHTML(link.url || '')}" placeholder="Paste Telegram download URL..." style="flex: 1; min-width: 0; width: 100%; padding: 6px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
+                                    <input type="text" class="batch-movie-url-input" data-item-idx="${idx}" data-link-idx="${mIdx}" value="${escapeHTML(link.url || '')}" placeholder="Paste Telegram download URL..." style="flex: 1; min-width: 0; width: 100%; padding: 5px 7px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
                                     ${item.linksList.length > 1 ? `
-                                        <button type="button" class="btn-remove-batch-movie-link" data-item-idx="${idx}" data-link-idx="${mIdx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 2px 5px; font-size: 13px; flex-shrink: 0;" title="Remove this quality">✕</button>
-                                    ` : ''}
+                                        <button type="button" class="btn-remove-batch-movie-link" data-item-idx="${idx}" data-link-idx="${mIdx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 2px 4px; font-size: 13px; flex-shrink: 0;" title="Remove this quality">✕</button>
+                                    ` : `
+                                        <button type="button" class="btn-add-batch-movie-quality" data-index="${idx}" style="background: rgba(0, 188, 212, 0.08); border: 1px solid rgba(0, 188, 212, 0.3); color: #00bcd4; border-radius: 4px; cursor: pointer; padding: 4px 6px; font-size: 10px; font-weight: 600; white-space: nowrap; flex-shrink: 0;" title="Add another quality like 1080p or 4K">+ Qual</button>
+                                    `}
                                 </div>
                             `).join('')}
-                        </div>
-                        <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
-                            <button type="button" class="btn-add-batch-movie-quality" data-index="${idx}" style="background: rgba(0, 188, 212, 0.08); border: 1px solid rgba(0, 188, 212, 0.3); color: #00bcd4; border-radius: 4px; cursor: pointer; padding: 3px 8px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" title="Add another quality like 1080p or 4K">
-                                + Add Quality (1080p / 4K)
-                            </button>
                         </div>
                     </div>
                 `;
             }
 
             card.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; width: 44px;">
-                    <input type="checkbox" class="batch-stage-checkbox" data-index="${idx}" ${item.checked ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: #ffbc00; cursor: pointer; margin: 0; flex-shrink: 0;">
-                    <img src="${posterImg}" alt="${escapeHTML(item.title)}" style="width: 44px; height: 62px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-top: 2px;">
+                    <input type="checkbox" class="batch-stage-checkbox" data-index="${idx}" ${item.checked ? 'checked' : ''} style="width: 17px; height: 17px; accent-color: #ffbc00; cursor: pointer; margin: 0; flex-shrink: 0;">
+                    <img src="${posterImg}" alt="${escapeHTML(item.title)}" style="width: 36px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
                 </div>
                 <div style="flex: 1; min-width: 0;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; width: 100%;">
                         <div style="min-width: 0; flex: 1;">
                             <span style="font-size: 13px; font-weight: 700; color: #fff; word-break: break-word;">${escapeHTML(item.title)}</span>
-                            <span style="font-size: 11px; color: var(--text-muted); margin-left: 4px; white-space: nowrap;">(${yearStr || 'N/A'})</span>
+                            <span style="font-size: 11px; color: var(--text-muted); margin-left: 3px; white-space: nowrap;">(${yearStr || 'N/A'})</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
-                            <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; background: ${item.type === 'Series' ? 'var(--primary-color)' : '#00bcd4'}; color: #000; white-space: nowrap;">${item.type}</span>
+                        <div style="display: flex; align-items: center; gap: 5px; flex-shrink: 0;">
+                            <span style="font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; background: ${item.type === 'Series' ? 'var(--primary-color)' : '#00bcd4'}; color: #000; white-space: nowrap;">${item.type}</span>
                             <span style="font-size: 11px; color: #ffbc00; font-weight: 700; white-space: nowrap;">★ ${item.rating || '0.0'}</span>
-                            <button type="button" class="btn-remove-batch-item" data-index="${idx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 2px 4px; font-size: 15px; line-height: 1;" title="Remove title">✕</button>
+                            <button type="button" class="btn-remove-batch-item" data-index="${idx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 1px 4px; font-size: 15px; line-height: 1;" title="Remove title">✕</button>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">
-                        ${catBadges}
-                    </div>
+                    ${categoriesText ? `<div style="font-size: 10px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(categoriesText)}</div>` : ''}
                     ${linksSectionHtml}
                 </div>
             `;
@@ -7371,7 +7368,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (batchStepInput && batchStepStaging) {
                 batchStepInput.style.display = "none";
-                batchStepStaging.style.display = "block";
+                batchStepStaging.style.display = "flex";
             }
         });
     }
