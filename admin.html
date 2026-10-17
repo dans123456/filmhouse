@@ -891,6 +891,20 @@
                 </div>
             </div>
 
+            <div style="margin-bottom: 15px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label for="broadcast-include-button" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 13px; font-weight: 600; color: #fff; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="broadcast-include-button" style="width: 16px; height: 16px; accent-color: #0088cc; cursor: pointer;">
+                        Attach "Open Film House" Button
+                    </label>
+                    <span style="font-size: 11px; color: var(--text-secondary);">Optional action button</span>
+                </div>
+                <div id="broadcast-button-options" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08);">
+                    <label for="broadcast-button-text" style="display: block; font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">Button Label (Optional)</label>
+                    <input type="text" id="broadcast-button-text" placeholder="🍿 Open Film House" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%; box-sizing: border-box;">
+                </div>
+            </div>
+
             <!-- Broadcast Progress Container (Hidden by default) -->
             <div id="broadcast-progress-container" style="display: none; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 15px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
@@ -1288,6 +1302,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=97"></script>
+    <script src="admin.js?v=98"></script>
 </body>
 </html>

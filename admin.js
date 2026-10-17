@@ -6188,6 +6188,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const broadcastCharCounter = document.getElementById("broadcast-char-counter");
     const btnStartBroadcast = document.getElementById("btn-start-broadcast");
     const btnCancelBroadcast = document.getElementById("btn-cancel-broadcast");
+    const includeBtnCheckbox = document.getElementById("broadcast-include-button");
+    const btnOptionsContainer = document.getElementById("broadcast-button-options");
+    
+    // Toggle optional custom button options
+    if (includeBtnCheckbox && btnOptionsContainer) {
+        includeBtnCheckbox.addEventListener("change", () => {
+            btnOptionsContainer.style.display = includeBtnCheckbox.checked ? "block" : "none";
+        });
+    }
     
     // UI elements update on user profile list sync to show target count
     const updateTargetCountLabel = () => {
@@ -6196,8 +6205,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!countLabel) return;
         
         if (target === "all") {
-            const count = (typeof allUsers !== 'undefined' && allUsers) ? allUsers.length : 0;
-            countLabel.textContent = `Target: ${count} Registered Users`;
+            const total = (typeof allUsers !== 'undefined' && Array.isArray(allUsers)) ? allUsers.length : 0;
+            const active = allUsers.filter(u => !u.blockedBot && !u.banned).length;
+            const displayActive = active > 0 ? active : (total > 0 ? total : 0);
+            countLabel.textContent = `Target: ~${displayActive} Active Subscribers (${total} Registered)`;
         } else if (target === "channel") {
             countLabel.textContent = `Target: @filmhousemain Channel`;
         } else {
@@ -6296,11 +6307,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     };
                 } else {
+                    const includeBtn = document.getElementById("broadcast-include-button")?.checked || false;
+                    const customBtnText = (document.getElementById("broadcast-button-text")?.value.trim()) || "🍿 Open Film House";
                     queuePayload = {
                         type: "user_broadcast",
                         adminId: String(currentAdminId),
                         message: message,
                         targetUserIds: parsedIds,
+                        includeButton: includeBtn,
+                        buttonText: customBtnText,
                         status: "pending",
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     };
@@ -6341,7 +6356,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const taskData = docSnap.data();
                     
                     if (taskData.status === "completed") {
-                        if (statusLabel) statusLabel.textContent = `Completed! Delivered: ${taskData.deliveredCount ?? 'Yes'}, Failed: ${taskData.failedCount ?? 0}`;
+                        if (statusLabel) statusLabel.textContent = `Completed! Delivered to ${taskData.deliveredCount ?? 'all'} active users (${taskData.failedCount ?? 0} blocked/failed)`;
                         if (progressBar) progressBar.style.width = "100%";
                         if (progressRatio) progressRatio.textContent = "100%";
                         if (successEl && taskData.deliveredCount !== undefined) successEl.textContent = taskData.deliveredCount;

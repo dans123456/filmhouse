@@ -3788,16 +3788,34 @@ async function init() {
                             let sent = 0;
                             let failed = 0;
 
+                            // Build optional button (only attached if admin checked "Attach Button")
+                            let replyMarkup = undefined;
+                            if (data.includeButton === true) {
+                                const btnText = data.buttonText || "🍿 Open Film House";
+                                const rawUrl = data.buttonUrl || "https://dans123456.github.io/filmhouse/";
+                                // If web URL, open mini app via web_app so clicking directly launches the app inside Telegram
+                                if (rawUrl.startsWith("https://") || rawUrl.startsWith("http://")) {
+                                    replyMarkup = {
+                                        inline_keyboard: [
+                                            [{ text: btnText, web_app: { url: rawUrl } }]
+                                        ]
+                                    };
+                                } else {
+                                    replyMarkup = {
+                                        inline_keyboard: [
+                                            [{ text: btnText, url: rawUrl }]
+                                        ]
+                                    };
+                                }
+                            }
+
                             for (const u of eligibleUsers) {
                                 try {
-                                    await callTelegramWithRetry('sendMessage', u.id, messageText, {
-                                        parse_mode: 'HTML',
-                                        reply_markup: {
-                                            inline_keyboard: [
-                                                [{ text: data.buttonText || "🍿 Open Film House Mini App", url: data.buttonUrl || "https://t.me/Filmhouseappbot" }]
-                                            ]
-                                        }
-                                    });
+                                    const sendOptions = { parse_mode: 'HTML' };
+                                    if (replyMarkup) {
+                                        sendOptions.reply_markup = replyMarkup;
+                                    }
+                                    await callTelegramWithRetry('sendMessage', u.id, messageText, sendOptions);
                                     sent++;
                                 } catch (e) {
                                     failed++;
