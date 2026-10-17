@@ -264,6 +264,48 @@ function normalizeQualityName(str) {
     return "720p";
 }
 
+function parseBulkLinks(rawText, isSeries) {
+    if (!rawText || typeof rawText !== "string") return [];
+    const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    const parsed = [];
+
+    function detectQuality(str, fallbackIdx) {
+        const lower = str.toLowerCase();
+        if (lower.includes("4k") || lower.includes("2160") || lower.includes("uhd")) return "2160p (4K)";
+        if (lower.includes("1080") || lower.includes("fhd")) return "1080p";
+        if (lower.includes("720") || lower.includes("hd")) return "720p";
+        if (lower.includes("480") || lower.includes("sd")) return "480p";
+        if (lower.includes("cinema") || lower.includes("cam") || lower.includes("hdcam")) return "Cinema Cut / HDCam";
+        const standardOrder = ["720p", "1080p", "2160p (4K)", "480p"];
+        return standardOrder[fallbackIdx % standardOrder.length] || "720p";
+    }
+
+    function detectSeason(str, fallbackIdx) {
+        const sMatch = str.match(/season\s*(\d+)/i) || str.match(/s(\d+)/i);
+        if (sMatch) {
+            return `Season ${parseInt(sMatch[1], 10)}`;
+        }
+        return `Season ${fallbackIdx + 1}`;
+    }
+
+    lines.forEach((line, idx) => {
+        const urlMatch = line.match(/(https?:\/\/[^\s]+|t\.me\/[^\s]+)/i);
+        let url = urlMatch ? urlMatch[0] : line;
+        if (url.startsWith("t.me")) {
+            url = "https://" + url;
+        }
+        if (isSeries) {
+            const season = detectSeason(line, idx);
+            parsed.push({ url, season });
+        } else {
+            const quality = detectQuality(line, idx);
+            parsed.push({ url, quality });
+        }
+    });
+
+    return parsed;
+}
+
 // Global Datasets for local search filter matching (saves Firestore quota reads)
 let allUsers = [];
 let adminIdsList = ["1329840839", "1175336733"];
@@ -2638,9 +2680,18 @@ function showMovieDetails(movie) {
                 <div id="links-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
                     <!-- Editable inputs dynamically rendered -->
                 </div>
-                <div style="display: flex; justify-content: space-between; gap: 10px;">
-                    <button class="btn btn-secondary btn-sm" id="btn-add-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">+ Add Link</button>
+                <div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-secondary btn-sm" id="btn-add-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">+ Add Link</button>
+                        <button class="btn btn-secondary btn-sm" id="btn-details-bulk-links-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
+                    </div>
                     <button class="btn btn-primary btn-sm" id="btn-save-links-changes" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Save Changes</button>
+                </div>
+                <div id="details-bulk-links-wrapper" style="display: none; margin-top: 10px;">
+                    <textarea id="details-bulk-links-input" placeholder="Paste multiple links (one per line)...&#10;Line 1 -> Season 1 (or 720p)&#10;Line 2 -> Season 2 (or 1080p)..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                    <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                        <button type="button" class="btn btn-primary btn-sm" id="btn-apply-details-bulk-links" style="font-size: 11px; padding: 4px 10px;">Apply Links</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2828,6 +2879,36 @@ function showMovieDetails(movie) {
             const nextSeason = `Season ${currentLinks.length + 1}`;
             currentLinks.push(isSeriesMovie ? { url: "", season: nextSeason } : { url: "", quality: "720p" });
             renderLinkInputs();
+        });
+    }
+
+    const detailsBulkToggle = document.getElementById("btn-details-bulk-links-toggle");
+    const detailsBulkWrapper = document.getElementById("details-bulk-links-wrapper");
+    const detailsBulkInput = document.getElementById("details-bulk-links-input");
+    const detailsBulkApply = document.getElementById("btn-apply-details-bulk-links");
+
+    if (detailsBulkToggle && detailsBulkWrapper) {
+        detailsBulkToggle.addEventListener("click", () => {
+            const isHidden = detailsBulkWrapper.style.display === "none";
+            detailsBulkWrapper.style.display = isHidden ? "block" : "none";
+            detailsBulkToggle.textContent = isHidden ? "✕ Close Bulk" : "📋 Bulk Paste";
+            if (isHidden && detailsBulkInput) detailsBulkInput.focus();
+        });
+    }
+
+    if (detailsBulkApply && detailsBulkInput) {
+        detailsBulkApply.addEventListener("click", () => {
+            const isSeriesType = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            const parsed = parseBulkLinks(detailsBulkInput.value, isSeriesType);
+            if (parsed.length === 0) {
+                alert("Please paste at least one valid link!");
+                return;
+            }
+            currentLinks = parsed;
+            renderLinkInputs();
+            detailsBulkInput.value = "";
+            if (detailsBulkWrapper) detailsBulkWrapper.style.display = "none";
+            if (detailsBulkToggle) detailsBulkToggle.textContent = "📋 Bulk Paste";
         });
     }
 
@@ -3435,6 +3516,13 @@ function resetAddMovieModalState() {
     document.querySelectorAll(".add-cat-checkbox").forEach(cb => {
         cb.checked = (cb.value === "Main");
     });
+
+    const addMovieBulkWrapper = document.getElementById("add-movie-bulk-links-wrapper");
+    const addMovieBulkInput = document.getElementById("add-movie-bulk-links-input");
+    const btnAddMovieBulkToggle = document.getElementById("btn-add-movie-bulk-links-toggle");
+    if (addMovieBulkWrapper) addMovieBulkWrapper.style.display = "none";
+    if (addMovieBulkInput) addMovieBulkInput.value = "";
+    if (btnAddMovieBulkToggle) btnAddMovieBulkToggle.textContent = "📋 Bulk Paste";
 }
 
 // Modal Toggle Logic
@@ -3736,6 +3824,37 @@ if (btnAddMovieLinkInput) {
     btnAddMovieLinkInput.addEventListener("click", () => {
         addMovieLinksState.push({ url: "", quality: "720p" });
         renderAddMovieLinks();
+    });
+}
+
+const btnAddMovieBulkToggle = document.getElementById("btn-add-movie-bulk-links-toggle");
+const addMovieBulkWrapper = document.getElementById("add-movie-bulk-links-wrapper");
+const addMovieBulkInput = document.getElementById("add-movie-bulk-links-input");
+const btnApplyAddBulkLinks = document.getElementById("btn-apply-add-bulk-links");
+
+if (btnAddMovieBulkToggle && addMovieBulkWrapper) {
+    btnAddMovieBulkToggle.addEventListener("click", () => {
+        const isHidden = addMovieBulkWrapper.style.display === "none";
+        addMovieBulkWrapper.style.display = isHidden ? "block" : "none";
+        btnAddMovieBulkToggle.textContent = isHidden ? "✕ Close Bulk" : "📋 Bulk Paste";
+        if (isHidden && addMovieBulkInput) addMovieBulkInput.focus();
+    });
+}
+
+if (btnApplyAddBulkLinks && addMovieBulkInput) {
+    btnApplyAddBulkLinks.addEventListener("click", () => {
+        const movieTypeSelect = document.getElementById("movie-type");
+        const isSeries = movieTypeSelect && (movieTypeSelect.value.toLowerCase() === 'tv' || movieTypeSelect.value.toLowerCase() === 'series');
+        const parsed = parseBulkLinks(addMovieBulkInput.value, isSeries);
+        if (parsed.length === 0) {
+            alert("Please paste at least one valid link!");
+            return;
+        }
+        addMovieLinksState = parsed;
+        renderAddMovieLinks();
+        addMovieBulkInput.value = "";
+        if (addMovieBulkWrapper) addMovieBulkWrapper.style.display = "none";
+        if (btnAddMovieBulkToggle) btnAddMovieBulkToggle.textContent = "📋 Bulk Paste";
     });
 }
 
@@ -4609,6 +4728,12 @@ window.closeFulfillRequestModal = function() {
     currentFulfillTitle = "";
     currentFulfillDocIds = [];
     currentFulfillReq = null;
+    const fulfillBulkWrapper = document.getElementById("fulfill-bulk-links-wrapper");
+    const fulfillBulkInput = document.getElementById("fulfill-bulk-links-input");
+    const btnFulfillBulkToggle = document.getElementById("btn-fulfill-bulk-links-toggle");
+    if (fulfillBulkWrapper) fulfillBulkWrapper.style.display = "none";
+    if (fulfillBulkInput) fulfillBulkInput.value = "";
+    if (btnFulfillBulkToggle) btnFulfillBulkToggle.textContent = "📋 Bulk Paste";
 };
 
 if (closeFulfillModalBtn) {
@@ -5466,6 +5591,44 @@ if (btnAddFulfillLinkInput) {
         const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === currentFulfillTitle.toLowerCase().trim());
         const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
         addFulfillLinkInputRow(nextIdx, "", "720p", isSeries, false);
+    });
+}
+
+const btnFulfillBulkToggle = document.getElementById("btn-fulfill-bulk-links-toggle");
+const fulfillBulkWrapper = document.getElementById("fulfill-bulk-links-wrapper");
+const fulfillBulkInput = document.getElementById("fulfill-bulk-links-input");
+const btnApplyFulfillBulkLinks = document.getElementById("btn-apply-fulfill-bulk-links");
+
+if (btnFulfillBulkToggle && fulfillBulkWrapper) {
+    btnFulfillBulkToggle.addEventListener("click", () => {
+        const isHidden = fulfillBulkWrapper.style.display === "none";
+        fulfillBulkWrapper.style.display = isHidden ? "block" : "none";
+        btnFulfillBulkToggle.textContent = isHidden ? "✕ Close Bulk" : "📋 Bulk Paste";
+        if (isHidden && fulfillBulkInput) fulfillBulkInput.focus();
+    });
+}
+
+if (btnApplyFulfillBulkLinks && fulfillBulkInput) {
+    btnApplyFulfillBulkLinks.addEventListener("click", () => {
+        const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
+        if (!wrapper) return;
+        const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === (typeof currentFulfillTitle !== 'undefined' ? currentFulfillTitle.toLowerCase().trim() : ""));
+        const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+
+        const parsed = parseBulkLinks(fulfillBulkInput.value, isSeries);
+        if (parsed.length === 0) {
+            alert("Please paste at least one valid link!");
+            return;
+        }
+
+        wrapper.replaceChildren();
+        parsed.forEach((item, idx) => {
+            addFulfillLinkInputRow(idx, item.url, item.quality || "720p", isSeries, idx === 0);
+        });
+
+        fulfillBulkInput.value = "";
+        if (fulfillBulkWrapper) fulfillBulkWrapper.style.display = "none";
+        if (btnFulfillBulkToggle) btnFulfillBulkToggle.textContent = "📋 Bulk Paste";
     });
 }
 
@@ -6683,6 +6846,445 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error("Failed to queue idle reminder:", err);
                 alert("Failed to queue reminders: " + err.message);
             });
+        });
+    }
+});
+
+// ==========================================
+// BATCH TMDB IMPORTER ENGINE
+// ==========================================
+let batchStagedMovies = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+    const batchModal = document.getElementById("batch-import-modal");
+    const btnOpenBatchModal = document.getElementById("btn-batch-tmdb-modal");
+    const btnCloseBatchModal = document.getElementById("btn-close-batch-modal");
+    const batchStepInput = document.getElementById("batch-step-input");
+    const batchStepStaging = document.getElementById("batch-step-staging");
+    const batchTitlesInput = document.getElementById("batch-titles-input");
+    const batchInputCounter = document.getElementById("batch-input-counter");
+    const btnFetchBatchTmdb = document.getElementById("btn-fetch-batch-tmdb");
+    const btnBatchBackToInput = document.getElementById("btn-batch-back-to-input");
+    const btnBatchCommitAll = document.getElementById("btn-batch-commit-all");
+    const batchStagingSummary = document.getElementById("batch-staging-summary");
+    const batchStagingContainer = document.getElementById("batch-staging-table-container");
+
+    if (btnOpenBatchModal && batchModal) {
+        btnOpenBatchModal.addEventListener("click", () => {
+            batchModal.classList.add("active");
+            if (batchStepInput && batchStepStaging) {
+                batchStepInput.style.display = "block";
+                batchStepStaging.style.display = "none";
+            }
+            if (batchTitlesInput) {
+                batchTitlesInput.focus();
+                updateInputCounter();
+            }
+        });
+    }
+
+    if (btnCloseBatchModal && batchModal) {
+        btnCloseBatchModal.addEventListener("click", () => {
+            batchModal.classList.remove("active");
+        });
+    }
+
+    if (batchModal) {
+        batchModal.addEventListener("click", (e) => {
+            if (e.target === batchModal) {
+                batchModal.classList.remove("active");
+            }
+        });
+    }
+
+    function updateInputCounter() {
+        if (!batchTitlesInput || !batchInputCounter) return;
+        const lines = batchTitlesInput.value.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+        batchInputCounter.textContent = `${lines.length} ${lines.length === 1 ? 'title' : 'titles'} entered`;
+    }
+
+    if (batchTitlesInput) {
+        batchTitlesInput.addEventListener("input", updateInputCounter);
+    }
+
+    if (btnBatchBackToInput && batchStepInput && batchStepStaging) {
+        btnBatchBackToInput.addEventListener("click", () => {
+            batchStepStaging.style.display = "none";
+            batchStepInput.style.display = "block";
+        });
+    }
+
+    async function fetchSingleTmdbBatchItem(rawQuery) {
+        const key = typeof TMDB_API_KEY !== "undefined" && TMDB_API_KEY ? TMDB_API_KEY : (localStorage.getItem("filmhouse_tmdb_key") || "d638f7775bfa1b8d456dfd028ccbef19");
+        let tmdbId = null;
+        let preferredType = null;
+        let cleanQuery = rawQuery.trim();
+
+        // 1. Check if input is a TMDB URL
+        const parsedUrl = extractTmdbIdAndType(cleanQuery);
+        if (parsedUrl) {
+            tmdbId = parsedUrl.id.split("-")[0];
+            preferredType = parsedUrl.type; // "movie" or "tv"
+        } else if (/^\d+$/.test(cleanQuery.split("-")[0])) {
+            // Pure numeric TMDB ID or "12345-slug"
+            tmdbId = cleanQuery.split("-")[0];
+        }
+
+        let data = null;
+        let mediaType = preferredType || "movie";
+
+        if (tmdbId) {
+            // Fetch by TMDB ID
+            let res = await fetch(`https://api.themoviedb.org/3/${mediaType}/${tmdbId}?api_key=${key}&append_to_response=videos`);
+            if (res.ok) {
+                data = await res.json();
+            } else {
+                // Fallback to the opposite type
+                const fallbackType = mediaType === "tv" ? "movie" : "tv";
+                let fallbackRes = await fetch(`https://api.themoviedb.org/3/${fallbackType}/${tmdbId}?api_key=${key}&append_to_response=videos`);
+                if (fallbackRes.ok) {
+                    data = await fallbackRes.json();
+                    mediaType = fallbackType;
+                } else {
+                    throw new Error(`TMDB ID ${tmdbId} not found on Movie or TV endpoints.`);
+                }
+            }
+        } else {
+            // Search by title (extract year if specified e.g. "Dune 2021" or "Avatar (2009)")
+            let yearParam = "";
+            let searchTitle = cleanQuery;
+            const yearMatch = cleanQuery.match(/\b(19\d\d|20\d\d)\b/);
+            if (yearMatch) {
+                yearParam = yearMatch[0];
+                searchTitle = cleanQuery.replace(/\b(19\d\d|20\d\d)\b/, "").replace(/[()\[\]]/g, "").trim();
+            }
+
+            const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${key}&query=${encodeURIComponent(searchTitle || cleanQuery)}`;
+            const searchRes = await fetch(searchUrl);
+            if (!searchRes.ok) {
+                throw new Error(`Search failed: HTTP ${searchRes.status}`);
+            }
+            const searchJson = await searchRes.json();
+            const validResults = (searchJson.results || []).filter(r => r.media_type === "movie" || r.media_type === "tv");
+            if (validResults.length === 0) {
+                throw new Error(`No movie or series results found on TMDB for "${cleanQuery}".`);
+            }
+
+            let bestMatch = validResults[0];
+            if (yearParam) {
+                const matchWithYear = validResults.find(r => {
+                    const date = r.release_date || r.first_air_date || "";
+                    return date.startsWith(yearParam);
+                });
+                if (matchWithYear) bestMatch = matchWithYear;
+            }
+
+            mediaType = bestMatch.media_type;
+            tmdbId = bestMatch.id;
+
+            const detailsRes = await fetch(`https://api.themoviedb.org/3/${mediaType}/${tmdbId}?api_key=${key}&append_to_response=videos`);
+            if (!detailsRes.ok) {
+                throw new Error(`Failed to fetch details for TMDB ID ${tmdbId}`);
+            }
+            data = await detailsRes.json();
+        }
+
+        const title = data.title || data.name || cleanQuery;
+        const isSeries = mediaType === "tv";
+        const finalType = isSeries ? "Series" : "Movie";
+
+        let trailerId = "";
+        if (data.videos && data.videos.results) {
+            const official = data.videos.results.find(v => v.type === "Trailer" && v.site === "YouTube");
+            if (official) {
+                trailerId = official.key;
+            } else if (data.videos.results.length > 0) {
+                trailerId = data.videos.results[0].key;
+            }
+        }
+
+        const categories = typeof determineAutoCategories === "function" 
+            ? determineAutoCategories(data, title, finalType) 
+            : ["Main"];
+
+        const genres = data.genres ? data.genres.map(g => g.name) : [];
+        const rating = Math.round((data.vote_average || 0) * 10) / 10;
+        const releaseDate = data.release_date || data.first_air_date || "";
+        const poster = data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : "";
+        const backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/w1280${data.backdrop_path}` : "";
+        const overview = data.overview || "No synopsis available.";
+        const originalLanguage = data.original_language || "en";
+
+        const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+        let baseId = `${data.id}-${slug}`;
+        let uniqueId = baseId;
+        let counter = 1;
+        while (allCatalogMovies.some(m => m.csv_id === uniqueId) || batchStagedMovies.some(m => !m.error && m.id === uniqueId)) {
+            uniqueId = `${baseId}-${counter++}`;
+        }
+
+        return {
+            error: false,
+            checked: true,
+            id: uniqueId,
+            numericId: data.id,
+            title: title,
+            type: finalType,
+            isSeries: isSeries,
+            categories: categories,
+            genres: genres,
+            overview: overview,
+            poster: poster,
+            backdrop: backdrop,
+            rating: rating,
+            releaseDate: releaseDate,
+            language: originalLanguage,
+            trailer: trailerId,
+            rawLinksText: "",
+            links: []
+        };
+    }
+
+    function renderBatchStagingTable() {
+        if (!batchStagingContainer) return;
+        batchStagingContainer.innerHTML = "";
+
+        const validItems = batchStagedMovies.filter(m => !m.error);
+        const checkedCount = validItems.filter(m => m.checked).length;
+        if (batchStagingSummary) {
+            batchStagingSummary.textContent = `Staged Titles: ${checkedCount} of ${validItems.length} selected`;
+        }
+
+        if (batchStagedMovies.length === 0) {
+            batchStagingContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px;">No titles staged. Go back to input list.</div>`;
+            return;
+        }
+
+        // Staging options header
+        const optionsBar = document.createElement("div");
+        optionsBar.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 4px; font-size: 12px; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;";
+        optionsBar.innerHTML = `
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #fff;">
+                <input type="checkbox" id="batch-select-all" ${checkedCount === validItems.length && validItems.length > 0 ? 'checked' : ''}>
+                <span>Select All (${validItems.length})</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #00c8ff;">
+                <input type="checkbox" id="batch-broadcast-toggle" checked>
+                <span>📢 Announce in Updates Channel on publish</span>
+            </label>
+        `;
+        batchStagingContainer.appendChild(optionsBar);
+
+        const selectAllCheckbox = optionsBar.querySelector("#batch-select-all");
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener("change", (e) => {
+                const isChecked = e.target.checked;
+                batchStagedMovies.forEach(m => {
+                    if (!m.error) m.checked = isChecked;
+                });
+                renderBatchStagingTable();
+            });
+        }
+
+        batchStagedMovies.forEach((item, idx) => {
+            if (item.error) {
+                const errCard = document.createElement("div");
+                errCard.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.3); border-radius: 6px; font-size: 12px; color: #ff6b6b;";
+                errCard.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span>⚠️</span>
+                        <span><strong>"${escapeHTML(item.query)}"</strong>: ${escapeHTML(item.message)}</span>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm btn-remove-batch-item" data-index="${idx}" style="color: #ff3b30; border: none; background: none; cursor: pointer; font-size: 14px; padding: 2px 6px;">✕</button>
+                `;
+                batchStagingContainer.appendChild(errCard);
+                return;
+            }
+
+            const card = document.createElement("div");
+            card.style.cssText = `display: flex; gap: 12px; align-items: flex-start; padding: 10px; background: ${item.checked ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.01)'}; border: 1px solid ${item.checked ? 'rgba(255, 188, 0, 0.3)' : 'var(--border-color)'}; border-radius: 6px; transition: border-color 0.2s;`;
+
+            const posterImg = item.poster || "MOVIE/img/FilmHouse3_nobg.png";
+            const yearStr = item.releaseDate ? item.releaseDate.split("-")[0] : "";
+            const catBadges = (item.categories || []).slice(0, 3).map(c => `<span style="font-size: 10px; background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 3px; color: var(--text-secondary);">${escapeHTML(c)}</span>`).join("");
+
+            card.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                    <input type="checkbox" class="batch-stage-checkbox" data-index="${idx}" ${item.checked ? 'checked' : ''} style="cursor: pointer; transform: scale(1.1);">
+                    <img src="${posterImg}" style="width: 44px; height: 62px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); flex-shrink: 0;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                        <div>
+                            <span style="font-size: 13px; font-weight: 700; color: #fff;">${escapeHTML(item.title)}</span>
+                            <span style="font-size: 11px; color: var(--text-muted); margin-left: 6px;">(${yearStr || 'N/A'})</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                            <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; background: ${item.type === 'Series' ? 'var(--primary-color)' : '#00bcd4'}; color: #000;">${item.type}</span>
+                            <span style="font-size: 11px; color: #ffbc00; font-weight: 700;">★ ${item.rating || '0.0'}</span>
+                            <button type="button" class="btn-remove-batch-item" data-index="${idx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 2px 6px; font-size: 14px;" title="Remove title">✕</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">
+                        ${catBadges}
+                    </div>
+                    <!-- Inline Links Input -->
+                    <div style="margin-top: 8px;">
+                        <input type="text" class="batch-stage-link-input" data-index="${idx}" value="${escapeHTML(item.rawLinksText || '')}" placeholder="${item.isSeries ? 'Paste Telegram link(s)... (One per line for Season 1..N)' : 'Paste Telegram download URL...'}" style="width: 100%; padding: 6px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
+                    </div>
+                </div>
+            `;
+
+            batchStagingContainer.appendChild(card);
+        });
+
+        // Event listeners for staged items
+        batchStagingContainer.querySelectorAll(".batch-stage-checkbox").forEach(cb => {
+            cb.addEventListener("change", (e) => {
+                const idx = parseInt(e.target.dataset.index);
+                if (batchStagedMovies[idx]) {
+                    batchStagedMovies[idx].checked = e.target.checked;
+                    const validItems = batchStagedMovies.filter(m => !m.error);
+                    const checkedCount = validItems.filter(m => m.checked).length;
+                    if (batchStagingSummary) {
+                        batchStagingSummary.textContent = `Staged Titles: ${checkedCount} of ${validItems.length} selected`;
+                    }
+                    const selectAllBox = batchStagingContainer.querySelector("#batch-select-all");
+                    if (selectAllBox) {
+                        selectAllBox.checked = (checkedCount === validItems.length && validItems.length > 0);
+                    }
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".batch-stage-link-input").forEach(input => {
+            input.addEventListener("input", (e) => {
+                const idx = parseInt(e.target.dataset.index);
+                if (batchStagedMovies[idx]) {
+                    batchStagedMovies[idx].rawLinksText = e.target.value.trim();
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".btn-remove-batch-item").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const idx = parseInt(e.currentTarget.dataset.index);
+                batchStagedMovies.splice(idx, 1);
+                renderBatchStagingTable();
+            });
+        });
+    }
+
+    if (btnFetchBatchTmdb) {
+        btnFetchBatchTmdb.addEventListener("click", async () => {
+            const rawLines = batchTitlesInput.value.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+            if (rawLines.length === 0) {
+                alert("Please enter at least one title, TMDB ID, or TMDB URL!");
+                return;
+            }
+
+            btnFetchBatchTmdb.disabled = true;
+            const originalText = btnFetchBatchTmdb.textContent;
+            btnFetchBatchTmdb.textContent = `Fetching 0 / ${rawLines.length}... ⏳`;
+
+            batchStagedMovies = [];
+            let completedCount = 0;
+
+            const results = await Promise.all(rawLines.map(async (rawQuery) => {
+                try {
+                    const item = await fetchSingleTmdbBatchItem(rawQuery);
+                    completedCount++;
+                    btnFetchBatchTmdb.textContent = `Fetching ${completedCount} / ${rawLines.length}... ⏳`;
+                    return item;
+                } catch (err) {
+                    console.warn(`Batch TMDB query error for "${rawQuery}":`, err);
+                    completedCount++;
+                    btnFetchBatchTmdb.textContent = `Fetching ${completedCount} / ${rawLines.length}... ⏳`;
+                    return {
+                        error: true,
+                        query: rawQuery,
+                        message: err.message || "Failed to find or fetch metadata"
+                    };
+                }
+            }));
+
+            btnFetchBatchTmdb.disabled = false;
+            btnFetchBatchTmdb.textContent = originalText;
+
+            batchStagedMovies = results;
+            renderBatchStagingTable();
+
+            if (batchStepInput && batchStepStaging) {
+                batchStepInput.style.display = "none";
+                batchStepStaging.style.display = "block";
+            }
+        });
+    }
+
+    if (btnBatchCommitAll) {
+        btnBatchCommitAll.addEventListener("click", () => {
+            const itemsToCommit = batchStagedMovies.filter(m => !m.error && m.checked);
+            if (itemsToCommit.length === 0) {
+                alert("No titles selected to import! Please check at least one title.");
+                return;
+            }
+
+            const broadcastCheckbox = document.getElementById("batch-broadcast-toggle");
+            const shouldBroadcast = broadcastCheckbox ? broadcastCheckbox.checked : true;
+
+            let addedCount = 0;
+            itemsToCommit.forEach(item => {
+                // Parse links if raw text was provided in staging
+                let finalLinks = [];
+                if (item.rawLinksText) {
+                    finalLinks = parseBulkLinks(item.rawLinksText, item.isSeries);
+                }
+
+                const newMovie = {
+                    csv_id: item.id,
+                    tmdb_id: item.numericId,
+                    imdb_id: "",
+                    title: item.title,
+                    type: item.type,
+                    categories: item.categories && item.categories.length > 0 ? item.categories : ["Main"],
+                    genres: item.genres || [],
+                    overview: item.overview || "No synopsis available.",
+                    poster: item.poster || "",
+                    backdrop: item.backdrop || "",
+                    rating: item.rating || 0,
+                    release_date: item.releaseDate || "",
+                    language: item.language || "en",
+                    cast: [],
+                    director: "",
+                    trailer: item.trailer || "",
+                    runtime: "",
+                    links: finalLinks,
+                    channelBroadcasted: !shouldBroadcast // If opted out, mark true
+                };
+
+                allCatalogMovies.unshift(newMovie);
+                newlyAddedIds.push(newMovie.csv_id);
+                addedCount++;
+
+                if (typeof window.recordAdminActivity === 'function') {
+                    window.recordAdminActivity("publication", item.title);
+                }
+            });
+
+            catalogChangesMade = true;
+            updatePublishButtonState();
+            renderCatalogList();
+
+            if (batchModal) {
+                batchModal.classList.remove("active");
+            }
+
+            // Reset staging state
+            batchStagedMovies = [];
+            if (batchTitlesInput) batchTitlesInput.value = "";
+            if (batchInputCounter) batchInputCounter.textContent = "0 titles entered";
+
+            alert(`🎉 Successfully imported ${addedCount} title(s) to the catalog!\n\nClick "Publish Changes 🚀" in the catalog toolbar to commit them to GitHub and make them live.`);
         });
     }
 });

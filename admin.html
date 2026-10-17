@@ -679,6 +679,9 @@
                 <button class="btn btn-secondary btn-sm btn-flex" id="btn-add-movie-modal">
                     <span>+ Add Movie</span>
                 </button>
+                <button class="btn btn-secondary btn-sm btn-flex" id="btn-batch-tmdb-modal" style="border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">
+                    <span>⚡ Batch TMDB</span>
+                </button>
                 <button class="btn btn-primary btn-sm btn-flex" id="btn-publish-catalog" style="display: none; box-shadow: 0 0 15px var(--primary-glow);">
                     <span>Publish Changes 🚀</span>
                 </button>
@@ -1091,7 +1094,16 @@
                         <div id="add-movie-links-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
                             <!-- Dynamic inputs loaded here -->
                         </div>
-                        <button type="button" class="btn btn-secondary btn-sm" id="btn-add-movie-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">+ Add Link</button>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-add-movie-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer;">+ Add Link</button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-add-movie-bulk-links-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
+                        </div>
+                        <div id="add-movie-bulk-links-wrapper" style="display: none; margin-top: 10px;">
+                            <textarea id="add-movie-bulk-links-input" placeholder="Paste multiple links (one per line)...&#10;Line 1 -> Season 1 (or 720p)&#10;Line 2 -> Season 2 (or 1080p)..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                                <button type="button" class="btn btn-primary btn-sm" id="btn-apply-add-bulk-links" style="font-size: 11px; padding: 4px 10px;">Apply Links</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; background: rgba(0, 136, 204, 0.08); border: 1px solid rgba(0, 136, 204, 0.25); padding: 10px 12px; border-radius: 6px;">
@@ -1144,6 +1156,48 @@
         </div>
     </div>
 
+    <!-- BATCH TMDB IMPORTER MODAL -->
+    <div class="admin-modal-overlay" id="batch-import-modal">
+        <div class="admin-modal-container" style="max-width: 880px; width: 95%;">
+            <div class="modal-header">
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #ffbc00;">⚡</span> Batch Import Titles from TMDB
+                </h3>
+                <button class="close-modal-btn" id="btn-close-batch-modal">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><use href="#icon-close"></use></svg>
+                </button>
+            </div>
+            
+            <!-- Step 1: Input list of titles/IDs -->
+            <div id="batch-step-input">
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 0; margin-bottom: 12px; line-height: 1.5;">
+                    Enter multiple movie or series titles, TMDB IDs (e.g. <code>27205</code>), or TMDB URLs — <strong>one per line</strong>. The system queries TMDB in parallel to fetch posters, backdrops, ratings, overviews, and genres automatically.
+                </p>
+                <textarea id="batch-titles-input" placeholder="Inception&#10;Avatar: The Way of Water&#10;Breaking Bad&#10;Stranger Things&#10;Oppenheimer" style="width: 100%; min-height: 140px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; color: #fff; font-size: 13px; font-family: inherit; resize: vertical; box-sizing: border-box;"></textarea>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+                    <span style="font-size: 11px; color: var(--text-muted);" id="batch-input-counter">0 titles entered</span>
+                    <button class="btn btn-primary" id="btn-fetch-batch-tmdb" style="padding: 10px 20px; font-weight: 700;">Fetch from TMDB ⚡</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Staging Table & Review -->
+            <div id="batch-step-staging" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                    <div style="font-size: 13px; color: #ffbc00; font-weight: 700;" id="batch-staging-summary">Staged Titles: 0</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-secondary btn-sm" id="btn-batch-back-to-input">« Back to List</button>
+                        <button class="btn btn-primary btn-sm" id="btn-batch-commit-all" style="font-weight: 700; background: linear-gradient(135deg, #ffbc00, #ff9800); color: #000;">Import All to Catalog 🚀</button>
+                    </div>
+                </div>
+
+                <div id="batch-staging-table-container" style="max-height: 440px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; background: rgba(0,0,0,0.2); padding: 8px; display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Staged items rendered dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CATEGORY MOVIES LIST MODAL -->
     <div class="admin-modal-overlay" id="category-movies-modal">
         <div class="admin-modal-container" style="max-width: 580px; width: 95%;">
@@ -1178,7 +1232,16 @@
                         <div id="fulfill-links-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
                             <!-- Dynamic inputs loaded here -->
                         </div>
-                        <button type="button" class="btn btn-secondary btn-sm" id="btn-add-fulfill-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">+ Add Another Season / Link</button>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-add-fulfill-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">+ Add Another Season / Link</button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-fulfill-bulk-links-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
+                        </div>
+                        <div id="fulfill-bulk-links-wrapper" style="display: none; margin-top: 10px;">
+                            <textarea id="fulfill-bulk-links-input" placeholder="Paste multiple links (one per line)...&#10;Line 1 -> Season 1&#10;Line 2 -> Season 2..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                                <button type="button" class="btn btn-primary btn-sm" id="btn-apply-fulfill-bulk-links" style="font-size: 11px; padding: 4px 10px;">Apply Links</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 14px;">
@@ -1220,6 +1283,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=93"></script>
+    <script src="admin.js?v=94"></script>
 </body>
 </html>
