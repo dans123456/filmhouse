@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "197427-savage-beauty",
+    "tmdb_id": 197427,
+    "imdb_id": "",
+    "title": "Savage Beauty",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "Seeking revenge for her tragic past, a mysterious woman embeds herself in a powerful family who possess a global beauty empire — and dark secrets.",
+    "poster": "https://image.tmdb.org/t/p/w500/nT9TdyMkIp9UpsmWbwIWdTUFS9Q.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rUPEyE6MIoVfjn0I26c16DP7BfX.jpg",
+    "rating": 7,
+    "release_date": "2022-05-12",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Ro9JbgbQHPM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADfBMAAjWioUYPEcK_QYjRBxYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADfhMAAjWioUaa0xvOmhxEjBYE",
+        "season": "Season 2"
+      }
+    ]
+  },
+  {
     "csv_id": "471014-wheelman",
     "tmdb_id": 471014,
     "imdb_id": "",
