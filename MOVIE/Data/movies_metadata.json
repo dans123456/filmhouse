@@ -38068,7 +38068,10 @@
     "trailer": "l6kp780S-os",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADuxkAAp4PiEYYTlhgqaBvKhYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADuxkAAp4PiEYYTlhgqaBvKhYE",
+        "season": "Season 1"
+      }
     ]
   },
   {
