@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "337848-crazy-rich-asians",
+    "tmdb_id": 337848,
+    "imdb_id": "",
+    "title": "Crazy Rich Asians",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "overview": "A one-hour drama series follow-up to the hit 2018 film.",
+    "poster": "img/FilmHouse3_nobg.png",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "OmHk6prfpFs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADDxMAAjWioUa35FXdYdkHuRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "60708-gotham",
     "tmdb_id": 60708,
     "imdb_id": "",
