@@ -1,5 +1,41 @@
 [
   {
+    "csv_id": "255752-haunted-hotel",
+    "tmdb_id": 255752,
+    "imdb_id": "",
+    "title": "Haunted Hotel",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation",
+      "Comedy"
+    ],
+    "overview": "After inheriting a hotel from her late brother, a single mom moves in with his good-natured ghost — and high-maintenance guests who will never check out.",
+    "poster": "https://image.tmdb.org/t/p/w500/4arTlVw8oceZDOhGv9GFrgGztUq.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lqsufP0yMhQ04SZx3ZlXTay4whw.jpg",
+    "rating": 8.1,
+    "release_date": "2025-09-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "UxEza8wLcS0",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADZgwAAjWiqUa_S8_DxAPR0BYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbAwAAjWiqUanIdYPwA1IARYE",
+        "season": "Season 2"
+      }
+    ]
+  },
+  {
     "csv_id": "197427-savage-beauty",
     "tmdb_id": 197427,
     "imdb_id": "",
