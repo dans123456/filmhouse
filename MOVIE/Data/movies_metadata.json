@@ -1,5 +1,61 @@
 [
   {
+    "csv_id": "478-captain-planet-and-the-planeteers",
+    "tmdb_id": 478,
+    "imdb_id": "",
+    "title": "Captain Planet and the Planeteers",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Classic Movies",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action & Adventure",
+      "Sci-Fi & Fantasy",
+      "Kids"
+    ],
+    "overview": "Eco-villains beware: Captain Planet is here to save the day! With the guidance of Gaia, five Planeteers - representing Earth, Fire, Water, Wind and Heart - come together to defend our planet from environmental destruction. With their powers combined, the team becomes the solution to pollution!",
+    "poster": "https://image.tmdb.org/t/p/w500/dYHburcl1LKnUQrmB7BOUpOiHx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fnBiI05I0eFqPWUHvC0NdYz3skM.jpg",
+    "rating": 6.9,
+    "release_date": "1990-09-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADfRMAAjWiqUbfU1oOvN6RbxYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADfhMAAjWiqUaTg_5Y79_wJhYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADfxMAAjWiqUanR-gJKtSq4xYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADgBMAAjWiqUa0xB4EWrmc4hYE",
+        "season": "Season 4"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADghMAAjWiqUY9cvLTqfKDuxYE",
+        "season": "Season 5"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADhBMAAjWiqUZmjXPSJ64lehYE",
+        "season": "Season 6"
+      }
+    ]
+  },
+  {
     "csv_id": "9541-jersey-girl",
     "tmdb_id": 9541,
     "imdb_id": "",
