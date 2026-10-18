@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "1659155-the-truthers",
+    "tmdb_id": 1659155,
+    "imdb_id": "",
+    "title": "The Truthers",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Thriller",
+      "Drama",
+      "Mystery"
+    ],
+    "overview": "After her mother's sudden death, Ruth returns to her hometown and reunites with her father, whose odd behavior makes her question what really happened.",
+    "poster": "https://image.tmdb.org/t/p/w500/ltuAheARdaUHbaS8lX1ZPrNOXe5.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2kQ71k6dq7DVNYuYY9ylNvRFKTv.jpg",
+    "rating": 5.7,
+    "release_date": "2026-07-24",
+    "language": "es",
+    "cast": [],
+    "director": "",
+    "trailer": "IvL0oT13djs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADdAwAAjWiqUYM6WvVOmv5rxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "255752-haunted-hotel",
     "tmdb_id": 255752,
     "imdb_id": "",
