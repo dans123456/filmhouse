@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "304452-the-lament-of-autumn",
+    "tmdb_id": 304452,
+    "imdb_id": "",
+    "title": "The Lament of Autumn",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "In the turbulent era of the Republic of China, student Ye Pingjun takes a job at a Western Hunan meeting house to fund her mother’s medical care. However, she's unexpectedly caught in the crossfire of an assassination attempt against the powerful Yu family’s fifth son, Yu Changxuan, and ends up accused of a crime she didn’t commit. Pingjun strikes a bold bargain: if Changxuan cannot identify the true culprit within ten days, he must clear her name. What begins as a high-stakes investigation quickly evolves into a calculated courtship as Changxuan maneuvers to win her heart while hiding a complex web of secrets. Will their blossoming romance survive the encroaching shadows of war, or will the secrets of their past pull them apart?",
+    "poster": "https://image.tmdb.org/t/p/w500/kH0dBgwoi2tb7YkOsPGTq18UVtc.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vD84yLJVVd7cC2lKF8sEukQG2A3.jpg",
+    "rating": 9,
+    "release_date": "2026-10-12",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "4Idq9bH6zl8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD5RMAAjWiqUbwhltL7oRElxYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "478-captain-planet-and-the-planeteers",
     "tmdb_id": 478,
     "imdb_id": "",
