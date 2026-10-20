@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "552532-charm-city-kings",
+    "tmdb_id": 552532,
+    "imdb_id": "",
+    "title": "Charm City Kings",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "Mouse desperately wants to join The Midnight Clique, the infamous Baltimore dirt bike riders who rule the summertime streets. When Midnight’s leader, Blax, takes 14-year-old Mouse under his wing, Mouse soon finds himself torn between the straight-and-narrow and a road filled with fast money and violence.",
+    "poster": "https://image.tmdb.org/t/p/w500/j732HPX0HSPcYvKURAIIS5Ppvk1.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/4FbTBvNO3VTFbFFghipK7Jqz7I6.jpg",
+    "rating": 7.8,
+    "release_date": "2020-01-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "8Cvrs-BCs6o",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADax4AAmldsEY9FEATchMm2hYE",
+        "quality": "720p"
+      },
+      {
+        "url": "",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1514026-buddy",
     "tmdb_id": 1514026,
     "imdb_id": "",
