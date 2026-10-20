@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "1514026-buddy",
+    "tmdb_id": 1514026,
+    "imdb_id": "",
+    "title": "Buddy",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror",
+      "Comedy",
+      "Fantasy"
+    ],
+    "overview": "A magical, singing orange unicorn holds his cast hostage in a surreal TV-show dimension, as he becomes more and more demented.",
+    "poster": "https://image.tmdb.org/t/p/w500/1BdZbNvl1SfrrX8J9X5tQzN6Ivu.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ytoLEl5yDaxB8AtZ52uKWjaQ9ql.jpg",
+    "rating": 7.1,
+    "release_date": "2026-08-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "udPBHzBnXKA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADGB4AAmldsEawRWDQjjl7shYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "304452-the-lament-of-autumn",
     "tmdb_id": 304452,
     "imdb_id": "",
