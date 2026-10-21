@@ -1,5 +1,256 @@
 [
   {
+    "csv_id": "1773630-she-did-it",
+    "tmdb_id": 1773630,
+    "imdb_id": "",
+    "title": "She Did It",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Thriller"
+    ],
+    "overview": "After a suicide attempt, a fragile young woman awakens to find her boyfriend claiming her dead body is in their bathtub.",
+    "poster": "https://image.tmdb.org/t/p/w500/ffXnYHw4Xip1SUfeDte7fKuqkkd.jpg",
+    "backdrop": "",
+    "rating": 1,
+    "release_date": "2026-10-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "3Z7mAkThz5Q",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADgg0AAt2AyEaRldAfRuNzfRYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": false
+  },
+  {
+    "csv_id": "1313826-nickels",
+    "tmdb_id": 1313826,
+    "imdb_id": "",
+    "title": "Nickels",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "A successful entrepreneur and family man is involved in a bike accident involving his neighbor's son, triggering memories of his older brother's tragic death 30 years earlier.",
+    "poster": "https://image.tmdb.org/t/p/w500/5Z2e8UCzVVsHjuqDIZvOdQhySht.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/p5Xy2kaWnSl969JJTdvrm7pNgy.jpg",
+    "rating": 4.3,
+    "release_date": "2026-10-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "HtGkvXA-qPc",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADfw0AAt2AyEbh7h_mUIYw5hYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": false
+  },
+  {
+    "csv_id": "1263904-sleep-no-more-1",
+    "tmdb_id": 1263904,
+    "imdb_id": "",
+    "title": "Sleep No More",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Asian Movies"
+    ],
+    "genres": [
+      "Horror",
+      "Fantasy"
+    ],
+    "overview": "As two sisters clash over whether their mother’s sudden death at a wig factory was suicide or demonic possession, their brother's supernatural body-regenerative gift attracts a wandering ghost searching for a human host.",
+    "poster": "https://image.tmdb.org/t/p/w500/l403J4tkqgAhEVdK8KgNnTlnzkj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/m7pUxa1AaXjuvpFJsb4hvB25Lv.jpg",
+    "rating": 7.2,
+    "release_date": "2026-06-04",
+    "language": "id",
+    "cast": [],
+    "director": "",
+    "trailer": "onMcP76Nam8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADcw0AAt2AyEaUIsh0eLN05hYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": false
+  },
+  {
+    "csv_id": "934644-mistletoe-massacre",
+    "tmdb_id": 934644,
+    "imdb_id": "",
+    "title": "Mistletoe Massacre",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Horror"
+    ],
+    "overview": "Marion Callevero has her guest list checked twice to host the company Christmas event, but gifts quickly turn to gore. This struggling staff has been invited to the party but no one will be returning home for the holidays.",
+    "poster": "https://image.tmdb.org/t/p/w500/sznm5JQCWR6DJ4H1JKf70ZavAnv.jpg",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2026-09-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADeQ0AAt2AyEbnSYAcGxox8RYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": false
+  },
+  {
+    "csv_id": "1285895-late-fame",
+    "tmdb_id": 1285895,
+    "imdb_id": "",
+    "title": "Late Fame",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "At the very end of the 1970s, post office worker Ed Saxberger wrote a book of poetry that nobody cared about. After an eager and flattering fan appears on his doorstep, Saxberger is beckoned into a coterie of young admirers who anoint him a rediscovered genius. The group of downtown bohemians is led by their \"tragic heroine,\" Gloria. Intoxicated by the attention, and Gloria's alluring presence, Saxberger gradually reckons with the authenticity of his newfound poetic circle.",
+    "poster": "https://image.tmdb.org/t/p/w500/bcyXE0p4XmZUlcxvTDbvdG9lgsN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vZtrJjhxMUhlnvdNd83nFJsWZsO.jpg",
+    "rating": 6.3,
+    "release_date": "2026-08-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "_qkhd73DE3E",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADaw0AAt2AyEZHkZunNqQq4xYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": false
+  },
+  {
+    "csv_id": "1781653-jamie-foxx-take-care-of-yourself",
+    "tmdb_id": 1781653,
+    "imdb_id": "",
+    "title": "Jamie Foxx: Take Care of Yourself",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy"
+    ],
+    "overview": "Jamie Foxx delivers honest self-care comedy in \"Take Care of Yourself.\" He joins the \"Hularious\" lineup with Hannah Berner, Ralph Barbosa, Bill Burr, Chris Distefano, Jim Gaffigan, Zarna Garg, Nikki Glaser, Ilana Glazer and more.",
+    "poster": "https://image.tmdb.org/t/p/w500/lVMY9gUcGpYozb4WVEJTNuUG2fN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/9dP8mdJrdvvYLDNw75ioarb2SlZ.jpg",
+    "rating": 5,
+    "release_date": "2026-10-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "Ff-0qqX0Sxw",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADZw0AAt2AyEYBJdCEYAgLlhYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": false
+  },
+  {
+    "csv_id": "1291595-insidious-out-of-the-further",
+    "tmdb_id": 1291595,
+    "imdb_id": "",
+    "title": "Insidious: Out of the Further",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror",
+      "Thriller"
+    ],
+    "overview": "Gemma, a young mother raising her daughter in the house she grew up in, discovers she can travel into The Further, where she possesses an ability to bring what lives there back to the real world.",
+    "poster": "https://image.tmdb.org/t/p/w500/4tTrW9dXCByS5wt2pXVWb58zNjz.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/p40lmrdI4blcAPZQMTPaiy5v5Ym.jpg",
+    "rating": 7.7,
+    "release_date": "2026-08-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "gXjurDkYnEM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADXg0AAt2AyEZhn4SI-UNIcxYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": false
+  },
+  {
+    "csv_id": "1610703-infirmary-1",
+    "tmdb_id": 1610703,
+    "imdb_id": "",
+    "title": "Infirmary",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror"
+    ],
+    "overview": "A guard vanished on his first night at an old psych hospital in 2023. His bodycam footage shows unexplainable incidents that continue to baffle investigators.",
+    "poster": "https://image.tmdb.org/t/p/w500/bHiAp8WWHgfUrJmRnoiw4URYGcq.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qkxk9URcK33HK54YSXFPQO8aqJH.jpg",
+    "rating": 5,
+    "release_date": "2026-10-02",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "gN1LMAwyvGY",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADWQ0AAt2AyEbngQfKEUnTlhYE",
+        "quality": "720p"
+      }
+    ],
+    "channelBroadcasted": false
+  },
+  {
     "csv_id": "1741456-final-orbit",
     "tmdb_id": 1741456,
     "imdb_id": "",
