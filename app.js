@@ -3612,10 +3612,44 @@ function openDetailModal(movie) {
     }
 
     // Download or Request Button
-    if (!movie.links || movie.links.length === 0) {
+    const recentFulfilledReq = currentUserRequests && currentUserRequests.find(r => 
+        r.title && titlesMatch(r.title, movie.title) &&
+        (r.status === "fulfilled" || r.status === "claimed" || r.claimed === true)
+    );
+
+    if ((!movie.links || movie.links.length === 0) && recentFulfilledReq && recentFulfilledReq.downloadLink) {
+        // Fallback: If catalog links haven't finished propagating from GitHub Pages, but user already has fulfilled request link
+        const directDlBtn = document.createElement("a");
+        directDlBtn.className = "btn btn-primary";
+        directDlBtn.href = recentFulfilledReq.downloadLink;
+        directDlBtn.target = "_blank";
+        directDlBtn.rel = "noopener noreferrer";
+        directDlBtn.style.textDecoration = "none";
+        directDlBtn.style.background = "linear-gradient(135deg, #00c853, #64dd17)";
+        directDlBtn.style.color = "#000";
+        directDlBtn.style.fontWeight = "700";
+        directDlBtn.appendChild(createSvgIcon("icon-download"));
+        const dlText = document.createElement("span");
+        dlText.textContent = "Download (Fulfilled) 🍿";
+        directDlBtn.appendChild(dlText);
+        actionsRow.appendChild(directDlBtn);
+
+        const fulfilledBanner = document.createElement("div");
+        fulfilledBanner.className = "requested-status-banner";
+        fulfilledBanner.style.cssText = "margin-top: 12px; padding: 10px 14px; background: rgba(0, 200, 83, 0.15); border: 1px solid rgba(0, 200, 83, 0.4); border-radius: var(--border-radius-sm); color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;";
+        fulfilledBanner.innerHTML = `
+            <span style="display: flex; align-items: center; gap: 6px;">
+                <span>✅</span>
+                <strong>Your Request Has Been Fulfilled!</strong>
+            </span>
+            <span style="font-size: 10px; opacity: 0.9; background: rgba(0,200,83,0.3); padding: 2px 8px; border-radius: 10px; font-weight: 700;">Ready 🍿</span>
+        `;
+        const detailInfoCol = modal.querySelector(".detail-info-column");
+        if (detailInfoCol) detailInfoCol.appendChild(fulfilledBanner);
+    } else if (!movie.links || movie.links.length === 0) {
         const existingReq = currentUserRequests && currentUserRequests.find(r => 
             r.title && titlesMatch(r.title, movie.title) &&
-            r.status !== "fulfilled"
+            r.status !== "fulfilled" && r.status !== "claimed"
         );
 
         const requestBtn = document.createElement("a");
@@ -3635,6 +3669,13 @@ function openDetailModal(movie) {
                 ? "linear-gradient(135deg, rgba(255, 188, 0, 0.25), rgba(255, 120, 0, 0.3))" 
                 : "rgba(255, 188, 0, 0.15)";
             requestBtn.style.borderColor = "var(--primary-color)";
+        } else if (recentFulfilledReq) {
+            requestBtn.appendChild(createSvgIcon("icon-check"));
+            const rText = document.createElement("span");
+            rText.textContent = "Fulfilled & Syncing ⚡";
+            requestBtn.appendChild(rText);
+            requestBtn.style.background = "rgba(0, 200, 83, 0.2)";
+            requestBtn.style.borderColor = "#00c853";
         } else {
             requestBtn.appendChild(createSvgIcon("icon-share"));
             const rText = document.createElement("span");
@@ -3644,6 +3685,10 @@ function openDetailModal(movie) {
 
         requestBtn.addEventListener("click", (e) => {
             e.preventDefault();
+            if (recentFulfilledReq) {
+                showToast("This movie has already been fulfilled and is currently syncing to the app! 🍿", "info");
+                return;
+            }
             showRequestSpecsDrawer(movie);
         });
         

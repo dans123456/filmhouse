@@ -6120,7 +6120,13 @@ if (fulfillForm && fulfillRequestModal) {
                 renderCatalogList();
                 updatePublishButtonState();
                 fulfillRequestModal.classList.remove("active");
-                showToast(`Successfully fulfilled requests for "${currentFulfillTitle}" in Firestore! Click 'Publish Changes' in the header to push live.`, "info");
+                showToast(`⚠️ Request fulfilled & channel notified, but NOT pushed to GitHub! Click the yellow 'Publish Changes' button in the top header NOW to push live to the app.`, "warning", 8000);
+                
+                const pBtn = document.getElementById("btn-publish-catalog");
+                if (pBtn) {
+                    pBtn.style.boxShadow = "0 0 15px #ffc107";
+                    setTimeout(() => { if (pBtn) pBtn.style.boxShadow = ""; }, 6000);
+                }
             }
         }).catch(err => {
             if (submitBtn) {
