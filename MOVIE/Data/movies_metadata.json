@@ -1,5 +1,102 @@
 [
   {
+    "csv_id": "12110-dracula-dead-and-loving-it",
+    "tmdb_id": 12110,
+    "imdb_id": "",
+    "title": "Dracula: Dead and Loving It",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Classic Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Horror"
+    ],
+    "overview": "When a lawyer shows up at the vampire's doorstep, he falls prey to his charms and joins him in his search for fresh blood. Enter Professor Van Helsing, who may be the only one able to vanquish the Count.",
+    "poster": "https://image.tmdb.org/t/p/w500/5QmMhHdKpJ2eQp5i8NqopzGbw9r.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/47HK3UNlIfLcS2C2pDIznSyUTsI.jpg",
+    "rating": 6.1,
+    "release_date": "1995-12-22",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ctsxTvTQUZI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD0xYAAt2AyEYLdoAeCGycRRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "493922-hereditary",
+    "tmdb_id": 493922,
+    "imdb_id": "",
+    "title": "Hereditary",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror",
+      "Mystery",
+      "Thriller"
+    ],
+    "overview": "Following the death of the Leigh family matriarch, Annie and her children uncover disturbing secrets about their heritage. Their daily lives are not only impacted, but they also become entangled in a chilling fate from which they cannot escape, driving them to the brink of madness.",
+    "poster": "https://image.tmdb.org/t/p/w500/4GFPuL14eXi66V96xBWY73Y9PfR.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/pS9Aub8MPyQbENblGD8mHeaqMuv.jpg",
+    "rating": 7.3,
+    "release_date": "2018-06-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "MJNR58zaStE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADzhYAAt2AyEbIWWrBUnMnQxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
+    "csv_id": "2210-earth-girls-are-easy",
+    "tmdb_id": 2210,
+    "imdb_id": "",
+    "title": "Earth Girls Are Easy",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Classic Movies",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Science Fiction",
+      "Romance"
+    ],
+    "overview": "In this musical comedy, Valerie is dealing with her philandering fiancé, Ted, when she finds that a trio of aliens have crashed their spaceship into her swimming pool. Once the furry beings are shaved at her girlfriend's salon, the women discover three handsome men underneath. After absorbing the native culture via television, the spacemen are ready to hit the dating scene in 1980s Los Angeles.",
+    "poster": "https://image.tmdb.org/t/p/w500/lwFR24fEGf8Q6mGMsGcQuQTLL9T.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6qQZ54iVgQWOFaVWss77yHy8YHu.jpg",
+    "rating": 5.6,
+    "release_date": "1988-09-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "UYelLENqNzA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADxBYAAt2AyEYW6iQZ_1G4hBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "898308-darby-and-the-dead",
     "tmdb_id": 898308,
     "imdb_id": "tt15748830",
