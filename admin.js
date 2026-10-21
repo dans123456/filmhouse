@@ -62,6 +62,11 @@ function getCollapsedTitle(title) {
     return clean.replace(/[^a-z0-9]/gi, "");
 }
 
+const STOP_WORDS = new Set([
+    'the', 'a', 'an', 'and', 'of', 'in', 'to', 'for', 'on', 'at', 'by', 'with', 'from',
+    'part', 'chapter', 'vol', 'volume', 'pt'
+]);
+
 // Robust fuzzy & punctuation-insensitive title matcher
 function titlesMatch(titleA, titleB) {
     if (!titleA || !titleB) return false;
@@ -77,15 +82,31 @@ function titlesMatch(titleA, titleB) {
     const colB = getCollapsedTitle(titleB);
     if (colA && colB && colA === colB) return true;
 
-    // 3. Token overlap comparison - require high similarity across both titles (>= 80% or 100% token coverage)
-    const toksA = normA.split(" ").filter(t => t.length > 0);
-    const toksB = normB.split(" ").filter(t => t.length > 0);
-    if (toksA.length > 0 && toksB.length > 0) {
-        const intersection = toksA.filter(t => toksB.includes(t));
-        const maxLen = Math.max(toksA.length, toksB.length);
-        const ratio = intersection.length / maxLen;
-        if (ratio >= 0.8 && intersection.length >= 2) return true;
-        if (intersection.length === maxLen && maxLen > 0) return true;
+    // 3. Keyword-level comparison with stop-word filtering
+    const toksA = normA.split(/\s+/).filter(Boolean);
+    const toksB = normB.split(/\s+/).filter(Boolean);
+
+    const kwA = toksA.filter(t => !STOP_WORDS.has(t));
+    const kwB = toksB.filter(t => !STOP_WORDS.has(t));
+
+    const effA = kwA.length > 0 ? kwA : toksA;
+    const effB = kwB.length > 0 ? kwB : toksB;
+
+    const setA = new Set(effA);
+    const setB = new Set(effB);
+
+    const intersection = [...setA].filter(t => setB.has(t));
+    const union = new Set([...setA, ...setB]);
+
+    // Identical distinct content words (e.g. "The King of Kings" and "King of Kings")
+    if (setA.size === setB.size && intersection.length === setA.size) {
+        return true;
+    }
+
+    // High Jaccard similarity (>= 85%) on content keywords with at least 2 shared keywords
+    const jaccard = intersection.length / union.size;
+    if (jaccard >= 0.85 && intersection.length >= 2) {
+        return true;
     }
 
     return false;
@@ -523,8 +544,10 @@ function hasCatalogMatch(r) {
         const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
         const isSeriesMedia = isReqSeries || (m.type || "").toLowerCase() === 'series' || (m.type || "").toLowerCase() === 'tv';
 
-        const isIdMatch = rId && mId && rId === mId;
-        const isTitleMatch = !isIdMatch && titlesMatch(m.title, r.title);
+        const hasValidRId = rId && !isNaN(rId);
+        const hasValidMId = mId && !isNaN(mId);
+        const isIdMatch = hasValidRId && hasValidMId && rId === mId;
+        const isTitleMatch = (!hasValidRId || !hasValidMId) && titlesMatch(m.title, r.title);
         if (!isIdMatch && !isTitleMatch) return false;
 
         // 1. If user requested a specific season for a series, verify the catalog actually has that season
@@ -1433,15 +1456,27 @@ function fulfillMovieTitleRequests(title, docIds, reqMeta = null) {
             
             titleEl.textContent = `Fulfill Request: "${title}${yearStr && !title.includes(yearStr) ? ` (${yearStr})` : ''}"`;
             
-            const cleanTitle = title.replace(/\s*\([^)]+\)\s*$/g, "").trim().toLowerCase();
+            const reqTmdb = reqMeta && reqMeta.tmdb_id ? String(reqMeta.tmdb_id).trim() : "";
             const existingMovie = allCatalogMovies.find(m => {
-                if (reqMeta && reqMeta.tmdb_id && (m.tmdb_id == reqMeta.tmdb_id || m.csv_id == reqMeta.tmdb_id)) return true;
-                if (titlesMatch(m.title, title)) {
-                    if (yearStr && m.year && String(m.year) === yearStr) return true;
-                    if (!yearStr) return true;
+                const mTmdb = m.tmdb_id ? String(m.tmdb_id).trim() : (m.csv_id && !isNaN(m.csv_id) ? String(m.csv_id).trim() : "");
+                if (reqTmdb && mTmdb) {
+                    return reqTmdb === mTmdb;
+                }
+                if (reqTmdb && !mTmdb) {
+                    if (titlesMatch(m.title, title)) {
+                        if (yearStr && m.year && String(m.year) === yearStr) return true;
+                        if (!yearStr) return true;
+                    }
+                    return false;
+                }
+                if (!reqTmdb && !mTmdb) {
+                    if (titlesMatch(m.title, title)) {
+                        if (yearStr && m.year && String(m.year) === yearStr) return true;
+                        if (!yearStr) return true;
+                    }
                 }
                 return false;
-            }) || allCatalogMovies.find(m => titlesMatch(m.title, title));
+            });
 
             const matchedReq = (reqMeta && reqMeta.title) ? reqMeta : (allRequests.find(r => targetDocIds.includes(r.docId)) || allRequests.find(r => r.title.toLowerCase().trim() === title.toLowerCase().trim()));
             currentFulfillReq = matchedReq;
@@ -5686,15 +5721,25 @@ if (fulfillForm && fulfillRequestModal) {
         const cleanMatchTitle = cleanTitle.toLowerCase();
         
         const existingMovie = allCatalogMovies.find(m => {
-            if (reqTmdbId && m.tmdb_id && String(reqTmdbId) === String(m.tmdb_id)) {
-                return true;
+            const mTmdb = m.tmdb_id ? String(m.tmdb_id).trim() : (m.csv_id && !isNaN(m.csv_id) ? String(m.csv_id).trim() : "");
+            if (reqTmdbId && mTmdb) {
+                return String(reqTmdbId).trim() === mTmdb;
             }
-            if (titlesMatch(m.title, currentFulfillTitle)) {
-                if (reqYear && m.year && String(m.year) === String(reqYear)) return true;
-                if (!reqYear) return true;
+            if (reqTmdbId && !mTmdb) {
+                if (titlesMatch(m.title, currentFulfillTitle)) {
+                    if (reqYear && m.year && String(m.year) === String(reqYear)) return true;
+                    if (!reqYear) return true;
+                }
+                return false;
+            }
+            if (!reqTmdbId && !mTmdb) {
+                if (titlesMatch(m.title, currentFulfillTitle)) {
+                    if (reqYear && m.year && String(m.year) === String(reqYear)) return true;
+                    if (!reqYear) return true;
+                }
             }
             return false;
-        }) || allCatalogMovies.find(m => titlesMatch(m.title, currentFulfillTitle));
+        });
 
         let movieToSync = null;
 
@@ -5866,7 +5911,8 @@ if (fulfillForm && fulfillRequestModal) {
             if (r.docId && !targetDocIds.includes(r.docId)) {
                 const rClean = (r.title || "").toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "").trim();
                 const sameTmdb = reqTmdbId && r.tmdb_id && String(reqTmdbId) === String(r.tmdb_id);
-                const sameTitle = rClean && (rClean === cleanT || titlesMatch(r.title, currentFulfillTitle));
+                const hasDiffTmdb = reqTmdbId && r.tmdb_id && String(reqTmdbId) !== String(r.tmdb_id);
+                const sameTitle = !hasDiffTmdb && rClean && (rClean === cleanT || titlesMatch(r.title, currentFulfillTitle));
                 if ((sameTmdb || sameTitle) && r.status !== "fulfilled" && r.status !== "claimed") {
                     if (isSeries && matchedReq && matchedReq.seasonOrPart && String(matchedReq.seasonOrPart).toLowerCase().includes("season")) {
                         if (!r.seasonOrPart || r.seasonOrPart.toLowerCase().trim() === matchedReq.seasonOrPart.toLowerCase().trim()) {

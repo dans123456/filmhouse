@@ -49,26 +49,49 @@ function getCollapsedTitle(title) {
     return clean.replace(/[^a-z0-9]/gi, "");
 }
 
+const STOP_WORDS = new Set([
+    'the', 'a', 'an', 'and', 'of', 'in', 'to', 'for', 'on', 'at', 'by', 'with', 'from',
+    'part', 'chapter', 'vol', 'volume', 'pt'
+]);
+
 function titlesMatch(titleA, titleB) {
     if (!titleA || !titleB) return false;
     const normA = normalizeTitleForComparison(titleA);
     const normB = normalizeTitleForComparison(titleB);
     if (!normA || !normB) return false;
     if (normA === normB) return true;
+
     const colA = getCollapsedTitle(titleA);
     const colB = getCollapsedTitle(titleB);
     if (colA && colB && colA === colB) return true;
 
-    // Token overlap comparison - require high similarity across both titles (>= 80% or 100% token coverage)
-    const toksA = normA.split(" ").filter(t => t.length > 0);
-    const toksB = normB.split(" ").filter(t => t.length > 0);
-    if (toksA.length > 0 && toksB.length > 0) {
-        const intersection = toksA.filter(t => toksB.includes(t));
-        const maxLen = Math.max(toksA.length, toksB.length);
-        const ratio = intersection.length / maxLen;
-        if (ratio >= 0.8 && intersection.length >= 2) return true;
-        if (intersection.length === maxLen && maxLen > 0) return true;
+    // Keyword-level comparison with stop-word filtering
+    const toksA = normA.split(/\s+/).filter(Boolean);
+    const toksB = normB.split(/\s+/).filter(Boolean);
+
+    const kwA = toksA.filter(t => !STOP_WORDS.has(t));
+    const kwB = toksB.filter(t => !STOP_WORDS.has(t));
+
+    const effA = kwA.length > 0 ? kwA : toksA;
+    const effB = kwB.length > 0 ? kwB : toksB;
+
+    const setA = new Set(effA);
+    const setB = new Set(effB);
+
+    const intersection = [...setA].filter(t => setB.has(t));
+    const union = new Set([...setA, ...setB]);
+
+    // Identical distinct content words (e.g. "The King of Kings" and "King of Kings")
+    if (setA.size === setB.size && intersection.length === setA.size) {
+        return true;
     }
+
+    // High Jaccard similarity (>= 85%) on content keywords with at least 2 shared keywords
+    const jaccard = intersection.length / union.size;
+    if (jaccard >= 0.85 && intersection.length >= 2) {
+        return true;
+    }
+
     return false;
 }
 
@@ -4122,11 +4145,22 @@ async function init() {
                                     const lookupTitle = rawClean;
 
                                     if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
-                                        const found = cachedMoviesMetadata.find(m => 
-                                            (lookupCsvId && String(m.csv_id || "").toLowerCase().trim() === lookupCsvId) ||
-                                            (lookupTmdbId && String(m.tmdb_id || "").trim() === lookupTmdbId) ||
-                                            (lookupTitle && (String(m.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim() === lookupTitle || titlesMatch(m.title, lookupTitle)))
-                                        );
+                                        const found = cachedMoviesMetadata.find(m => {
+                                            const mCsv = String(m.csv_id || "").toLowerCase().trim();
+                                            const mTmdb = String(m.tmdb_id || "").trim();
+                                            if (lookupTmdbId && mTmdb) {
+                                                return lookupTmdbId === mTmdb;
+                                            }
+                                            if (lookupCsvId && mCsv) {
+                                                return lookupCsvId === mCsv;
+                                            }
+                                            // Only consider title match if neither entry has a known conflicting TMDB ID
+                                            if (!lookupTmdbId && !mTmdb && lookupTitle) {
+                                                const mClean = String(m.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                                                return mClean === lookupTitle || titlesMatch(m.title, lookupTitle);
+                                            }
+                                            return false;
+                                        });
                                         if (found) {
                                             movieDataForChannel = {
                                                 ...found,

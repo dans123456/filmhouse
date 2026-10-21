@@ -15529,6 +15529,41 @@
     "director": "",
     "trailer": "HkGZ4ykhYPg",
     "runtime": "",
+    "links": []
+  },
+  {
+    "csv_id": "1008308-king-of-thieves",
+    "tmdb_id": 1008308,
+    "imdb_id": "tt19309370",
+    "title": "King of Thieves",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "African",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "African",
+      "Action",
+      "Drama",
+      "Fantasy"
+    ],
+    "overview": "King of thieves is an epic tale of Agesinkole, an all-powerful Bandit and his reign of terror in the prosperous Kingdom of Ajeromi. Concerned by his pillaging, the kingdom moves to destroy him, through the hunters, witches and priests, thus beginning this adventurous saga of revenge, bravery and glory.",
+    "poster": "https://image.tmdb.org/t/p/w500/yJBUtNK6ve4WUr2SNZ9nptaKuBK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jjUJ0e3Myn3vPP5VfpcGJ4ENGud.jpg",
+    "rating": 7.5,
+    "release_date": "2022-04-08",
+    "language": "yo",
+    "cast": [
+      "Femi Adebayo",
+      "Odunlade Adekola",
+      "Toyin Abraham",
+      "Azeez adebowale",
+      "Lateef Adedimeji"
+    ],
+    "director": "Tope Adebayo, Adebayo Tijani",
+    "trailer": "rCBQUzZmGXQ",
+    "runtime": "107m",
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADJg0AApHcSEQtA5HdCN5KWhYE",
