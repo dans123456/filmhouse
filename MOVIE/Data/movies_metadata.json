@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "232948-best-choice-ever",
+    "tmdb_id": 232948,
+    "imdb_id": "",
+    "title": "Best Choice Ever",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
+    ],
+    "genres": [
+      "Drama",
+      "Family"
+    ],
+    "overview": "Mai Chenghuan, a post-95 girl born into an ordinary family in Shanghai, agrees to marry her boyfriend, Xin Jialiang, under her mother’s urging. However, the economic gap between them creates an imbalance in their relationship, ultimately leading to its end. Mai Chenghuan then gains her grandmother's approval and is entrusted with the heavy responsibility of managing a hotel. Through cooperation, Mai Chenghuan and the professional hotel manager Yao Zhiming become working partners and go hand in hand. Mai Chenghuan transitions from being under her family's control to achieving self-fulfillment, forging her own path.",
+    "poster": "https://image.tmdb.org/t/p/w500/kHosEyMUhgrAKu3TsuBIepP5vCN.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/fcRgG6OsmAqbjAFLt55Bc41KEoO.jpg",
+    "rating": 7.3,
+    "release_date": "2024-04-09",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "PVwo7oztwdA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADkQ0AAsQ16EbsJGiO5vO0uxYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "9543-prince-of-persia-the-sands-of-time",
     "tmdb_id": 9543,
     "imdb_id": "",
