@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "327273-the-four-of-us",
+    "tmdb_id": 327273,
+    "imdb_id": "",
+    "title": "The Four of Us",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "African",
+      "Kids Shows and Movies (Nickelodeon and Disney)"
+    ],
+    "genres": [
+      "Soap",
+      "Drama",
+      "Family"
+    ],
+    "overview": "The Four of Us is a South African telenovela which is a family drama centred on the influential Dhlomo family in which old wounds, power struggles and long-held resentments threaten to tear the family apart. After their father's death, siblings Bobbi and Busani Dhlomo battle for wealth, power and control of their family legacy.",
+    "poster": "https://image.tmdb.org/t/p/w500/xW8iMCoNwj6EfwuSqWrWZzJTaCw.jpg",
+    "backdrop": "img/FilmHouse.png",
+    "rating": 9,
+    "release_date": "2026-06-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "lO1lMPzh4Zs",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD9RkAAsQ16EaqFge3bjmAgBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "2685-family-matters",
     "tmdb_id": 2685,
     "imdb_id": "",
