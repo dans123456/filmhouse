@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "237045-cherry-magic-thirty-years-of-virginity-can-make-you-a-wizard",
+    "tmdb_id": 237045,
+    "imdb_id": "",
+    "title": "Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Anime Series"
+    ],
+    "genres": [
+      "Animation",
+      "Comedy"
+    ],
+    "overview": "After a shy office worker unexpectedly gains the ability to read minds, he discovers that his handsome colleague can't stop thinking about him!",
+    "poster": "https://image.tmdb.org/t/p/w500/wKRE0Q30jkkHyuqdC8zCnpPARFm.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/8fmJoCKguRizkXBOMf0JwJUvqvH.jpg",
+    "rating": 7.6,
+    "release_date": "2024-01-11",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "BncsUEapcqA",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADmg8AAsQ16EYYtcxGcWGQDBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "423-the-pianist",
     "tmdb_id": 423,
     "imdb_id": "",
