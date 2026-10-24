@@ -54131,7 +54131,18 @@
     "csv_id": "125928-my-adventures-with-superman",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADIAQAAvTpGUd0FCBLBdd3YRYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADIAQAAvTpGUd0FCBLBdd3YRYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD4xkAAsQ16EYQ1TiVHMAk0BYE",
+        "season": "Season 3"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/eqCGgjQJRImIZp8dUOx1YUpx1dj.jpg",
     "rating": 8.2,
