@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "285807-nemesis",
+    "tmdb_id": 285807,
+    "imdb_id": "",
+    "title": "Nemesis",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Action & Adventure",
+      "Drama",
+      "Crime"
+    ],
+    "overview": "A relentless LAPD cop becomes obsessed with taking down the master thief behind a string of daring heists — and only one can come out on top.",
+    "poster": "https://image.tmdb.org/t/p/w500/NY7ZwSMw5PjoJdK2CObqiTj7Bm.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/pxnJeLSBdUikUOrWdNgrK1HQy2u.jpg",
+    "rating": 7.6,
+    "release_date": "2026-05-14",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "M9nc3simqAE",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADAxoAAsQ16Ebuj2q5L2a8DxYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "327273-the-four-of-us",
     "tmdb_id": 327273,
     "imdb_id": "",
