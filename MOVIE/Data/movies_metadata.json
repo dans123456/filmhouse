@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "311648-make-me-tingle",
+    "tmdb_id": 311648,
+    "imdb_id": "",
+    "title": "Make Me Tingle",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama",
+      "Comedy"
+    ],
+    "overview": "A marketer with traditional views on love and marriage tries to navigate a connection with an adult toy company CEO with different values.",
+    "poster": "https://image.tmdb.org/t/p/w500/e4MlbtE02So4D5DJy197DbiAxqs.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/voAufY8Jv3AVfG15sxY5H6XWFKr.jpg",
+    "rating": 8,
+    "release_date": "2026-10-15",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "lYowvljL9T8",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADVAwAAsQ16EYNT7P5GZWsIxYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1118224-maharaja",
     "tmdb_id": 1118224,
     "imdb_id": "",
