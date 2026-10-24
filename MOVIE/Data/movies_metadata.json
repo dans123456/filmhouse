@@ -51853,9 +51853,22 @@
     "csv_id": "96677-lupin",
     "type": "Series",
     "links": [
-      "https://t.me/FilmHouseFilebot?start=BQADAQADMQgAAka6CUQaznRRONLYuBYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADNAgAAka6CUQiTdkalYzqGxYE",
-      "https://t.me/FilmHouseFilebot?start=BQADAQADOAgAAka6CURztvLGSoJjoBYE"
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADMQgAAka6CUQaznRRONLYuBYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADNAgAAka6CUQiTdkalYzqGxYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADOAgAAka6CURztvLGSoJjoBYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADXhkAAsQ16EbjNYm6Hs5pexYE",
+        "season": "Season 4"
+      }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/h6Z2oogE4mJk2uffdtIlLhb0EHx.jpg",
     "rating": 7.7,
