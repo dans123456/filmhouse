@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "210704-the-worst-of-evil",
+    "tmdb_id": 210704,
+    "imdb_id": "",
+    "title": "The Worst of Evil",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Crime",
+      "Action & Adventure",
+      "Drama"
+    ],
+    "overview": "Set in the 1980s, a husband and wife, both detectives, infiltrate a massive criminal organization responsible for the illegal drug trade between Korea, China, and Japan.",
+    "poster": "https://image.tmdb.org/t/p/w500/uZJGMFgE1Q9xpncVAu1G3Vce4nP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rwvpB0kuOCBCEtCs344sjkeVnJp.jpg",
+    "rating": 8.4,
+    "release_date": "2023-09-27",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "L5qtpG1kqfI",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD7w0AAvVW8EbZRRgsh5Zz4hYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1163895-ruined",
     "tmdb_id": 1163895,
     "imdb_id": "",
