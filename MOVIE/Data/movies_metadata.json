@@ -1,5 +1,36 @@
 [
   {
+    "csv_id": "314939-a-love-other-than-yours",
+    "tmdb_id": 314939,
+    "imdb_id": "",
+    "title": "A Love Other Than Yours",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama",
+      "Comedy"
+    ],
+    "overview": "A realistic, emotionally resonant romance about a couple in their tenth year together whose comfortable relationship is tested by unexpected feelings.",
+    "poster": "https://image.tmdb.org/t/p/w500/iKgdhgBPi1cCRRqsUgaxUDRuFP6.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/moUjiEzpJVNZc7hyNRBbLPt0CPX.jpg",
+    "rating": 6.3,
+    "release_date": "2026-09-12",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "zp62ID0bbQM",
+    "runtime": "",
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD3AwAAvVW8EbZhrbu14w11xYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "762968-do-revenge",
     "tmdb_id": 762968,
     "imdb_id": "",
