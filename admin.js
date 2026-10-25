@@ -2775,6 +2775,22 @@ function showMovieDetails(movie) {
                 </select>
                 <input type="text" id="details-channel-custom-edition" placeholder="Or custom: e.g. Season 2, Cinema Cut" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; padding: 10px 12px; font-size: 13px;" />
             </div>
+
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 11px; font-weight: 700; color: #ffbc00; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                    📢 Announcement Style:
+                </label>
+                <div style="display: flex; gap: 10px; background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: var(--text-primary); font-weight: 600;">
+                        <input type="radio" name="details-channel-mode" value="updated" ${isSeries ? "checked" : ""} style="accent-color: #ffbc00;" />
+                        🔄 Updated Version <span style="font-size: 10px; color: var(--text-muted); font-weight: normal;">(🔥 NEW SEASON UPDATED!)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: var(--text-primary); font-weight: 600;">
+                        <input type="radio" name="details-channel-mode" value="released" ${!isSeries ? "checked" : ""} style="accent-color: #00c8ff;" />
+                        🆕 Released Version <span style="font-size: 10px; color: var(--text-muted); font-weight: normal;">(🔥 NEW SEASON RELEASED!)</span>
+                    </label>
+                </div>
+            </div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
@@ -3110,10 +3126,12 @@ function showMovieDetails(movie) {
                 const customEdition = document.getElementById("details-channel-custom-edition")?.value.trim();
                 const selectEdition = document.getElementById("details-channel-edition-select")?.value;
                 const chosenEdition = customEdition || selectEdition || (isSeries ? "Complete Series" : "");
+                const chosenMode = document.querySelector('input[name="details-channel-mode"]:checked')?.value || (isSeries ? "updated" : "released");
 
                 await window.broadcastMovieToMainChannel({
                     ...movie,
                     seasonOrPart: chosenEdition,
+                    broadcastMode: chosenMode,
                     forceBroadcast: true
                 });
             } catch (e) {
@@ -4995,6 +5013,8 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
                 type: movieInfo.type || "",
                 seasonOrPart: seasonOrQualityText,
                 isSeriesComplete: !!movieInfo.isSeriesComplete,
+                broadcastMode: movieInfo.broadcastMode || (movieInfo.isUpdate ? "updated" : (isSeries && String(seasonOrQualityText).toLowerCase().includes("season") ? "updated" : "released")),
+                isUpdate: (movieInfo.broadcastMode === "updated") || !!movieInfo.isUpdate,
                 genres: rawGenres,
                 rating: ratingVal,
                 overview: movieInfo.overview || "",

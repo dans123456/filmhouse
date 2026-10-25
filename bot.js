@@ -829,43 +829,64 @@ function setupBot(bot, adminBot) {
 
             const rawSpec = movieInfo.seasonOrPart || (movieInfo.updateType || "");
             const specLower = String(rawSpec).toLowerCase().trim();
+            const bMode = String(movieInfo.broadcastMode || (movieInfo.isUpdate ? "updated" : "")).toLowerCase();
+            const isExplicitRelease = bMode === "released" || bMode === "release" || bMode === "new";
+            const isExplicitUpdate = bMode === "updated" || bMode === "update";
 
             if (isSeries) {
                 if (specLower.includes("season") || specLower.match(/\bs\d+\b/i)) {
                     const sMatch = specLower.match(/season\s*(\d+)/i) || specLower.match(/\bs(\d+)\b/i);
                     const sNum = sMatch ? sMatch[1] : rawSpec;
-                    headerBadge = "🔥 <b>NEW SEASON RELEASED!</b> 🍿";
+                    if (isExplicitRelease) {
+                        headerBadge = "🔥 <b>NEW SEASON RELEASED!</b> 🍿";
+                    } else {
+                        // Default for seasons is NEW SEASON UPDATED!
+                        headerBadge = "🔥 <b>NEW SEASON UPDATED!</b> 🍿";
+                    }
                     updateCallout = `📌 <b>Update:</b> <b>Season ${escapeHtml(sNum)} Now Available!</b> ⚡\n`;
                 } else if (movieInfo.isSeriesComplete || specLower.includes("complete")) {
-                    headerBadge = "🎉 <b>COMPLETE SERIES BATCH!</b> 🎬";
+                    if (isExplicitUpdate) {
+                        headerBadge = "⚡ <b>SERIES UPDATED!</b> 🍿";
+                    } else {
+                        headerBadge = "🎉 <b>COMPLETE SERIES BATCH!</b> 🎬";
+                    }
                     updateCallout = `📌 <b>Update:</b> <b>All Seasons & Episodes Included!</b> ⚡\n`;
                 } else if (rawSpec) {
-                    headerBadge = "⚡ <b>SERIES UPDATE!</b> 🍿";
+                    if (isExplicitRelease) {
+                        headerBadge = "🔥 <b>NEW SERIES RELEASED!</b> 🍿";
+                    } else {
+                        headerBadge = "⚡ <b>SERIES UPDATED!</b> 🍿";
+                    }
                     updateCallout = `📌 <b>Update:</b> <b>${escapeHtml(rawSpec)} Added!</b> ⚡\n`;
                 } else {
-                    headerBadge = "🍿 <b>NEW SERIES ADDED!</b> 🎬";
-                    updateCallout = `📁 <b>Type:</b> Series • Multi-Season\n`;
+                    if (isExplicitUpdate) {
+                        headerBadge = "⚡ <b>SERIES UPDATED!</b> 🍿";
+                        updateCallout = `📌 <b>Update:</b> <b>New Seasons & Episodes Available!</b> ⚡\n`;
+                    } else {
+                        headerBadge = "🍿 <b>NEW SERIES ADDED!</b> 🎬";
+                        updateCallout = `📁 <b>Type:</b> Series • Multi-Season\n`;
+                    }
                 }
             } else {
                 // Movies
                 if (specLower.includes("cinema") || specLower.includes("cam") || specLower.includes("theatre")) {
-                    headerBadge = "📽️ <b>NEW CINEMA CUT RELEASE!</b> 🔥";
+                    headerBadge = isExplicitUpdate ? "📽️ <b>CINEMA CUT UPDATED!</b> 🔥" : "📽️ <b>NEW CINEMA CUT RELEASE!</b> 🔥";
                     updateCallout = `📌 <b>Update:</b> <b>Cinema Cut (Early Access) Now Available!</b> ⚡\n`;
                 } else if (specLower.includes("director")) {
-                    headerBadge = "🎬 <b>DIRECTOR'S CUT RELEASE!</b> 🔥";
+                    headerBadge = isExplicitUpdate ? "🎬 <b>DIRECTOR'S CUT UPDATED!</b> 🔥" : "🎬 <b>DIRECTOR'S CUT RELEASE!</b> 🔥";
                     updateCallout = `📌 <b>Update:</b> <b>Director's Cut Added!</b> ⚡\n`;
                 } else if (specLower.includes("extended") || specLower.includes("unrated")) {
-                    headerBadge = "⚡ <b>EXTENDED EDITION RELEASE!</b> 🔥";
+                    headerBadge = isExplicitUpdate ? "⚡ <b>EXTENDED EDITION UPDATED!</b> 🔥" : "⚡ <b>EXTENDED EDITION RELEASE!</b> 🔥";
                     updateCallout = `📌 <b>Update:</b> <b>Extended / Unrated Version Added!</b> ⚡\n`;
                 } else if (specLower.includes("quality") || specLower.includes("1080") || specLower.includes("4k") || specLower.includes("2160") || specLower.includes("720")) {
-                    headerBadge = "✨ <b>HIGH DEFINITION UPDATE!</b> 🍿";
+                    headerBadge = isExplicitRelease ? "✨ <b>HIGH DEFINITION RELEASE!</b> 🍿" : "✨ <b>HIGH DEFINITION UPDATE!</b> 🍿";
                     updateCallout = `📌 <b>Update:</b> <b>${escapeHtml(rawSpec)} Now Available!</b> ⚡\n`;
                 } else if (rawSpec) {
-                    headerBadge = "🎬 <b>NEW EDITION ADDED!</b> 🔥";
+                    headerBadge = isExplicitRelease ? "🎬 <b>NEW EDITION ADDED!</b> 🔥" : "✨ <b>MOVIE UPDATED!</b> 🍿";
                     updateCallout = `📌 <b>Update:</b> <b>${escapeHtml(rawSpec)} Now Available!</b> ⚡\n`;
                 } else {
-                    headerBadge = "🍿 <b>NEW MOVIE ADDED!</b> 🎬";
-                    updateCallout = `📁 <b>Type:</b> Full Movie • HD Quality\n`;
+                    headerBadge = isExplicitUpdate ? "✨ <b>MOVIE UPDATED!</b> 🍿" : "🍿 <b>NEW MOVIE ADDED!</b> 🎬";
+                    updateCallout = isExplicitUpdate ? `📌 <b>Update:</b> <b>HD Direct Stream & Download Live!</b> ⚡\n` : `📁 <b>Type:</b> Full Movie • HD Quality\n`;
                 }
             }
 
@@ -1602,18 +1623,139 @@ function setupBot(bot, adminBot) {
             }
         });
 
+        const pendingAdminPostActions = new Map();
+
+        async function processAdminChannelPost(ctx, foundMovie, mode, adminId, adminName, isCallback = false) {
+            try {
+                const res = await publishMovieToChannel({
+                    ...foundMovie,
+                    broadcastMode: mode,
+                    forceBroadcast: true
+                });
+
+                if (res && res.message_id) {
+                    try {
+                        if (adminId) {
+                            const adminKey = adminId.replace(/[^a-zA-Z0-9_]/g, "_");
+                            const statsRef = db.collection("settings").doc("admin_stats");
+                            const statsDoc = await statsRef.get();
+                            const currentStats = statsDoc.exists ? statsDoc.data() : {};
+                            
+                            const adm = currentStats[adminKey] || {
+                                id: adminId,
+                                name: adminName,
+                                fulfillments: 0,
+                                publications: 0,
+                                titles: []
+                            };
+                            
+                            adm.name = adminName;
+                            adm.titles = adm.titles || [];
+                            const cleanT = (foundMovie.title || "").trim();
+                            const exists = adm.titles.some(t => t.title && t.title.toLowerCase() === cleanT.toLowerCase());
+                            if (!exists) {
+                                adm.titles.unshift({
+                                    type: "publication",
+                                    title: cleanT,
+                                    date: new Date().toISOString()
+                                });
+                            }
+                            if (adm.titles.length > 30) adm.titles = adm.titles.slice(0, 30);
+                            
+                            adm.publications = (adm.publications || 0) + 1;
+                            const fCount = adm.titles.filter(t => t.type === "fulfillment" || !t.type).length;
+                            const pCount = adm.titles.filter(t => t.type === "publication").length;
+                            adm.fulfillments = Math.max(adm.fulfillments || 0, fCount);
+                            adm.publications = Math.max(adm.publications || 0, pCount);
+                            adm.lastActiveAt = Date.now();
+                            
+                            currentStats[adminKey] = adm;
+                            await statsRef.set(currentStats, { merge: true });
+                        }
+                    } catch (statErr) {
+                        console.warn("Could not record publication stat in /post:", statErr.message);
+                    }
+
+                    const modeLabel = mode === "updated" ? "UPDATED 🔄" : "RELEASED 🆕";
+                    const replyText = `✅ <b>Published as ${modeLabel} to Updates Channel!</b>\n\n🎬 <b>Title:</b> ${escapeHtml(foundMovie.title)}\n🔗 <b>Message ID:</b> <code>${res.message_id}</code>\n📊 <i>Publication duty successfully credited to your Work Share!</i>`;
+                    const replyMarkup = {
+                        inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+                    };
+
+                    if (isCallback) {
+                        return ctx.editMessageText(replyText, { parse_mode: "HTML", reply_markup: replyMarkup }).catch(() => ctx.reply(replyText, { parse_mode: "HTML", reply_markup: replyMarkup }));
+                    } else {
+                        return ctx.reply(replyText, { parse_mode: "HTML", reply_markup: replyMarkup });
+                    }
+                } else {
+                    const failText = `⚠️ <b>Notice:</b> Could not post to Updates Channel.\n\nPlease make sure <b>@Filmhouseappbot</b> is added to your channel as an <b>Administrator</b> with <b>Post Messages</b> permission enabled!`;
+                    if (isCallback) {
+                        return ctx.editMessageText(failText, { parse_mode: "HTML", reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] } }).catch(() => {});
+                    } else {
+                        return ctx.reply(failText, { parse_mode: "HTML", reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] } });
+                    }
+                }
+            } catch (err) {
+                const errText = `❌ <b>Failed to post:</b> ${escapeHtml(err.message)}`;
+                if (isCallback) {
+                    return ctx.editMessageText(errText, { parse_mode: "HTML" }).catch(() => {});
+                } else {
+                    return ctx.reply(errText, { parse_mode: "HTML" });
+                }
+            }
+        }
+
+        // Action handler for interactive post choice
+        adminBot.action(/^bpost:(upd|rel|cnc):(.+)$/, async (ctx) => {
+            const action = ctx.match[1];
+            const postId = ctx.match[2];
+            await ctx.answerCbQuery().catch(() => {});
+
+            if (action === "cnc") {
+                pendingAdminPostActions.delete(postId);
+                return ctx.editMessageText("❌ <b>Post announcement cancelled.</b>", {
+                    parse_mode: "HTML",
+                    reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
+                });
+            }
+
+            const item = pendingAdminPostActions.get(postId);
+            if (!item || !item.movie) {
+                return ctx.editMessageText("⚠️ <b>This post session has expired.</b> Please run <code>/post &lt;title&gt;</code> again.", {
+                    parse_mode: "HTML",
+                    reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
+                });
+            }
+
+            pendingAdminPostActions.delete(postId);
+            const mode = action === "upd" ? "updated" : "released";
+            return processAdminChannelPost(ctx, item.movie, mode, item.adminId, item.adminName, true);
+        });
+
         // Command: /post <Title> - Publish title announcement to Updates Channel
         adminBot.command('post', async (ctx) => {
             const raw = ctx.message && ctx.message.text ? ctx.message.text : "";
-            const query = raw.replace(/^\/post(@\w+)?/i, '').trim();
-            if (!query) {
-                return ctx.reply("📢 <b>Usage:</b> <code>/post &lt;Movie or Series Title&gt;</code>\n\nExample: <code>/post Inception</code> or <code>/post Young Sheldon</code>\nThis will publish the title announcement with high-res poster and deep link to the Updates Channel (Film House Updates 🔥).", {
+            const rawQuery = raw.replace(/^\/post(@\w+)?/i, '').trim();
+            if (!rawQuery) {
+                return ctx.reply("📢 <b>Usage:</b> <code>/post &lt;Movie or Series Title&gt;</code>\n\nOptions:\n• <code>/post Young Sheldon</code> (Prompts to choose Updated vs Released)\n• <code>/post update Family Matters</code> (Posts directly as Updated 🔄)\n• <code>/post release Dune 2</code> (Posts directly as Released 🆕)", {
                     parse_mode: "HTML",
                     reply_markup: {
                         inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
                     }
                 });
             }
+
+            let explicitMode = null;
+            let query = rawQuery;
+
+            if (/^(update|updated)\s+/i.test(rawQuery)) {
+                explicitMode = "updated";
+                query = rawQuery.replace(/^(update|updated)\s+/i, '').trim();
+            } else if (/^(release|released|new)\s+/i.test(rawQuery)) {
+                explicitMode = "released";
+                query = rawQuery.replace(/^(release|released|new)\s+/i, '').trim();
+            }
+
             await ctx.reply(`🔍 Searching for "${escapeHtml(query)}" to publish...`, { parse_mode: "HTML" });
             try {
                 let foundMovie = null;
@@ -1688,72 +1830,52 @@ function setupBot(bot, adminBot) {
                         poster: "https://dans123456.github.io/filmhouse/img/FilmHouse.png"
                     };
                 }
-                const res = await publishMovieToChannel(foundMovie);
-                if (res && res.message_id) {
-                    try {
-                        const adminId = ctx.from && ctx.from.id ? String(ctx.from.id) : "";
-                        let adminName = ctx.from ? (ctx.from.username ? `@${ctx.from.username}` : ctx.from.first_name || "Admin") : "Admin";
-                        if (adminId) {
-                            const adminKey = adminId.replace(/[^a-zA-Z0-9_]/g, "_");
-                            const statsRef = db.collection("settings").doc("admin_stats");
-                            const statsDoc = await statsRef.get();
-                            const currentStats = statsDoc.exists ? statsDoc.data() : {};
-                            
-                            const adm = currentStats[adminKey] || {
-                                id: adminId,
-                                name: adminName,
-                                fulfillments: 0,
-                                publications: 0,
-                                titles: []
-                            };
-                            
-                            adm.name = adminName;
-                            adm.titles = adm.titles || [];
-                            const cleanT = (foundMovie.title || query).trim();
-                            const exists = adm.titles.some(t => t.title && t.title.toLowerCase() === cleanT.toLowerCase());
-                            if (!exists) {
-                                adm.titles.unshift({
-                                    type: "publication",
-                                    title: cleanT,
-                                    date: new Date().toISOString()
-                                });
-                            }
-                            if (adm.titles.length > 30) adm.titles = adm.titles.slice(0, 30);
-                            
-                            adm.publications = (adm.publications || 0) + 1;
-                            const fCount = adm.titles.filter(t => t.type === "fulfillment" || !t.type).length;
-                            const pCount = adm.titles.filter(t => t.type === "publication").length;
-                            adm.fulfillments = Math.max(adm.fulfillments || 0, fCount);
-                            adm.publications = Math.max(adm.publications || 0, pCount);
-                            adm.lastActiveAt = Date.now();
-                            
-                            currentStats[adminKey] = adm;
-                            await statsRef.set(currentStats, { merge: true });
-                        }
-                    } catch (statErr) {
-                        console.warn("Could not record publication stat in /post:", statErr.message);
-                    }
 
-                    return ctx.reply(`✅ <b>Published to Updates Channel!</b>\n\n🎬 <b>Title:</b> ${escapeHtml(foundMovie.title)}\n🔗 <b>Message ID:</b> <code>${res.message_id}</code>\n📊 <i>Publication duty successfully credited to your Work Share!</i>`, {
-                        parse_mode: "HTML",
-                        reply_markup: {
-                            inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
-                        }
-                    });
-                } else {
-                    return ctx.reply(`⚠️ <b>Notice:</b> Could not post to Updates Channel.\n\nPlease make sure <b>@Filmhouseappbot</b> is added to your channel as an <b>Administrator</b> with <b>Post Messages</b> permission enabled!`, {
-                        parse_mode: "HTML",
-                        reply_markup: {
-                            inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
-                        }
-                    });
+                const adminId = ctx.from && ctx.from.id ? String(ctx.from.id) : "";
+                const adminName = ctx.from ? (ctx.from.username ? `@${ctx.from.username}` : ctx.from.first_name || "Admin") : "Admin";
+
+                if (explicitMode) {
+                    return processAdminChannelPost(ctx, foundMovie, explicitMode, adminId, adminName, false);
                 }
-            } catch (err) {
-                return ctx.reply(`❌ <b>Failed to post:</b> ${escapeHtml(err.message)}`, {
-                    parse_mode: "HTML",
-                    reply_markup: {
-                        inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]]
+
+                // If not explicitly set via command prefix, offer interactive choice buttons
+                const postId = "p_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 6);
+                pendingAdminPostActions.set(postId, {
+                    movie: foundMovie,
+                    adminId: adminId,
+                    adminName: adminName
+                });
+                setTimeout(() => pendingAdminPostActions.delete(postId), 10 * 60 * 1000);
+
+                const isTv = (foundMovie.type || "").toLowerCase() === 'series' || (foundMovie.type || "").toLowerCase() === 'tv';
+                const editionTag = foundMovie.seasonOrPart || (isTv ? "All Seasons" : "HD Quality");
+
+                return ctx.reply(
+                    `🎬 <b>Found:</b> <b>${escapeHtml(foundMovie.title || query)}</b>\n` +
+                    `🏷️ <b>Category:</b> ${isTv ? 'Series 📺' : 'Movie 🎬'} | 📌 <b>Format:</b> ${escapeHtml(editionTag)}\n\n` +
+                    `📢 <b>How would you like to post this announcement?</b>`,
+                    {
+                        parse_mode: "HTML",
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: isTv ? "🔄 Post as NEW SEASON UPDATED" : "🔄 Post as MOVIE UPDATED", callback_data: `bpost:upd:${postId}` }
+                                ],
+                                [
+                                    { text: isTv ? "🆕 Post as NEW SERIES RELEASED" : "🆕 Post as NEW MOVIE RELEASED", callback_data: `bpost:rel:${postId}` }
+                                ],
+                                [
+                                    { text: "❌ Cancel", callback_data: `bpost:cnc:${postId}` }
+                                ]
+                            ]
+                        }
                     }
+                );
+            } catch (err) {
+                console.error("Error in /post command:", err);
+                return ctx.reply(`❌ <b>Failed to search/post:</b> ${escapeHtml(err.message)}`, {
+                    parse_mode: "HTML",
+                    reply_markup: { inline_keyboard: [[{ text: "« Back to Menu", callback_data: "admin_menu" }]] }
                 });
             }
         });
@@ -3750,7 +3872,13 @@ async function init() {
                             const genresList = Array.isArray(movie.genres) ? movie.genres.slice(0, 4).join(" • ") : "Action";
                             const ratingStars = movie.rating ? `★ ${movie.rating}` : "★ 8.5";
 
-                            const caption = `🔥 <b>NEW RELEASE AVAILABLE!</b>\n\n` +
+                            const bMode = String(movie.broadcastMode || (movie.isUpdate ? "updated" : (isSeries && String(rawSeason).toLowerCase().includes("season") ? "updated" : "released"))).toLowerCase();
+                            const isExplicitRelease = bMode === "released" || bMode === "release" || bMode === "new";
+                            const headerBadge = isSeries
+                                ? (isExplicitRelease ? "🔥 <b>NEW SEASON RELEASED!</b> 🍿" : "🔥 <b>NEW SEASON UPDATED!</b> 🍿")
+                                : (isExplicitRelease ? "🔥 <b>NEW RELEASE AVAILABLE!</b> 🍿" : "✨ <b>MOVIE UPDATED!</b> 🍿");
+
+                            const caption = `${headerBadge}\n\n` +
                                             `🎬 <b>${escapeHtml(cleanTitle)}${escapeHtml(yearText)}</b>\n` +
                                             `🏷️ <b>Format:</b> ${escapeHtml(seasonOrQualityText)}\n` +
                                             `⭐ <b>Rating:</b> ${escapeHtml(ratingStars)} | 📁 ${escapeHtml(genresList)}\n\n` +
