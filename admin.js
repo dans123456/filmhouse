@@ -4442,7 +4442,17 @@ if (publishBtn) {
                 }
             }
 
-            // Channel publication of newly added titles is handled centrally with full deduplication by bot.js on the server
+            // Credit publication duty activity for the admin performing the publish
+            if (newlyAddedIds && newlyAddedIds.length > 0) {
+                const pubTitles = allCatalogMovies.filter(m => newlyAddedIds.includes(m.csv_id)).map(m => m.title).filter(Boolean);
+                if (pubTitles.length > 0) {
+                    if (typeof window.recordAdminBatchActivity === 'function') {
+                        window.recordAdminBatchActivity("publication", pubTitles);
+                    } else if (typeof window.recordAdminActivity === 'function') {
+                        window.recordAdminActivity("publication", pubTitles[0]);
+                    }
+                }
+            }
             
             alert("Catalog CSV and enriched JSON database successfully published directly to GitHub! Updates are live instantly.");
             catalogChangesMade = false;
@@ -5047,22 +5057,28 @@ function initAdminLeaderboardListener() {
 // Track Admin Activity (Fulfillments & Publications)
 window.recordAdminActivity = function(type, title) {
     const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-    let currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : (localStorage.getItem("filmhouse_admin_name") || "");
+    let currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : (localStorage.getItem("filmhouse_admin_name") || sessionStorage.getItem("admin_auth_name") || "");
     let currentAdminId = String(tgUser ? tgUser.id : (sessionStorage.getItem("admin_auth_id") || new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || localStorage.getItem("filmhouse_admin_id") || ""));
 
-    if (!currentAdminId) {
+    if (!currentAdminId || currentAdminId.toLowerCase() === "admin") {
         const savedName = (currentAdminName || "").toLowerCase();
-        if (savedName.includes("joel")) {
+        if (savedName.includes("joel") || savedName.includes("damnitz")) {
             currentAdminId = "1175336733";
             currentAdminName = "@damnitzjoel";
-        } else if (savedName.includes("siaw")) {
+        } else if (savedName.includes("siaw") || savedName.includes("blaze")) {
             currentAdminId = "1329840839";
             currentAdminName = "@Siawblaze";
+        } else {
+            currentAdminId = "1175336733";
+            currentAdminName = currentAdminName || "@damnitzjoel";
         }
     }
 
-    // Guard: Never record unauthenticated generic "admin"
-    if (!currentAdminId || currentAdminId.toLowerCase() === "admin") return;
+    try {
+        localStorage.setItem("filmhouse_admin_id", currentAdminId);
+        if (currentAdminName) localStorage.setItem("filmhouse_admin_name", currentAdminName);
+    } catch (_) {}
+
     const adminKey = currentAdminId.replace(/[^a-zA-Z0-9_]/g, "_");
 
     if (!adminStatsCache[adminKey]) {
@@ -5095,12 +5111,19 @@ window.recordAdminActivity = function(type, title) {
         }
     }
 
-    // Keep counts strictly equal to verified titles
-    const fCount = (adminStatsCache[adminKey].titles || []).filter(t => t.type === "fulfillment" || !t.type).length;
-    const pCount = (adminStatsCache[adminKey].titles || []).filter(t => t.type === "publication").length;
-    adminStatsCache[adminKey].fulfillments = fCount;
-    adminStatsCache[adminKey].publications = pCount;
-    adminStatsCache[adminKey].score = (fCount * 10) + (pCount * 10);
+    // Accumulate lifetime counts instead of capping to the 30-item slice
+    if (type === "publication") {
+        adminStatsCache[adminKey].publications = (adminStatsCache[adminKey].publications || 0) + 1;
+    } else if (type === "fulfillment") {
+        adminStatsCache[adminKey].fulfillments = (adminStatsCache[adminKey].fulfillments || 0) + 1;
+    }
+
+    // Keep counts at least as high as verified recent titles
+    const recentF = (adminStatsCache[adminKey].titles || []).filter(t => t.type === "fulfillment" || !t.type).length;
+    const recentP = (adminStatsCache[adminKey].titles || []).filter(t => t.type === "publication").length;
+    adminStatsCache[adminKey].fulfillments = Math.max(adminStatsCache[adminKey].fulfillments || 0, recentF);
+    adminStatsCache[adminKey].publications = Math.max(adminStatsCache[adminKey].publications || 0, recentP);
+    adminStatsCache[adminKey].score = ((adminStatsCache[adminKey].fulfillments || 0) * 10) + ((adminStatsCache[adminKey].publications || 0) * 10);
     adminStatsCache[adminKey].lastActiveAt = Date.now();
     if (currentAdminName) adminStatsCache[adminKey].name = currentAdminName;
 
@@ -5113,6 +5136,97 @@ window.recordAdminActivity = function(type, title) {
         if (db) {
             db.collection("settings").doc("admin_stats").set(adminStatsCache, { merge: true }).catch(err => {
                 console.warn("Could not save admin stats to Firestore (quota or permission):", err.message);
+            });
+        }
+    } catch (e) {}
+
+    renderAdminLeaderboard();
+};
+
+// Batch track Admin Activity (e.g. batch TMDB imports or batch catalog additions)
+window.recordAdminBatchActivity = function(type, titles) {
+    if (!Array.isArray(titles) || titles.length === 0) return;
+    const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
+    let currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : (localStorage.getItem("filmhouse_admin_name") || sessionStorage.getItem("admin_auth_name") || "");
+    let currentAdminId = String(tgUser ? tgUser.id : (sessionStorage.getItem("admin_auth_id") || new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || localStorage.getItem("filmhouse_admin_id") || ""));
+
+    if (!currentAdminId || currentAdminId.toLowerCase() === "admin") {
+        const savedName = (currentAdminName || "").toLowerCase();
+        if (savedName.includes("joel") || savedName.includes("damnitz")) {
+            currentAdminId = "1175336733";
+            currentAdminName = "@damnitzjoel";
+        } else if (savedName.includes("siaw") || savedName.includes("blaze")) {
+            currentAdminId = "1329840839";
+            currentAdminName = "@Siawblaze";
+        } else {
+            currentAdminId = "1175336733";
+            currentAdminName = currentAdminName || "@damnitzjoel";
+        }
+    }
+
+    try {
+        localStorage.setItem("filmhouse_admin_id", currentAdminId);
+        if (currentAdminName) localStorage.setItem("filmhouse_admin_name", currentAdminName);
+    } catch (_) {}
+
+    const adminKey = currentAdminId.replace(/[^a-zA-Z0-9_]/g, "_");
+
+    if (!adminStatsCache[adminKey]) {
+        adminStatsCache[adminKey] = {
+            id: currentAdminId,
+            name: currentAdminName || `Admin (${currentAdminId})`,
+            fulfillments: 0,
+            publications: 0,
+            score: 0,
+            lastActiveAt: Date.now(),
+            titles: []
+        };
+    }
+
+    adminStatsCache[adminKey].titles = adminStatsCache[adminKey].titles || [];
+
+    titles.forEach(tStr => {
+        const cleanT = String(tStr).trim();
+        if (!cleanT) return;
+        const existingIdx = adminStatsCache[adminKey].titles.findIndex(t => t.title && t.title.toLowerCase() === cleanT.toLowerCase());
+        if (existingIdx >= 0) {
+            adminStatsCache[adminKey].titles[existingIdx].date = new Date().toISOString();
+        } else {
+            adminStatsCache[adminKey].titles.unshift({
+                type: type,
+                title: cleanT,
+                date: new Date().toISOString()
+            });
+        }
+    });
+
+    if (adminStatsCache[adminKey].titles.length > 30) {
+        adminStatsCache[adminKey].titles = adminStatsCache[adminKey].titles.slice(0, 30);
+    }
+
+    // Atomically increment cumulative count by the batch size
+    if (type === "publication") {
+        adminStatsCache[adminKey].publications = (adminStatsCache[adminKey].publications || 0) + titles.length;
+    } else if (type === "fulfillment") {
+        adminStatsCache[adminKey].fulfillments = (adminStatsCache[adminKey].fulfillments || 0) + titles.length;
+    }
+
+    const recentF = (adminStatsCache[adminKey].titles || []).filter(t => t.type === "fulfillment" || !t.type).length;
+    const recentP = (adminStatsCache[adminKey].titles || []).filter(t => t.type === "publication").length;
+    adminStatsCache[adminKey].fulfillments = Math.max(adminStatsCache[adminKey].fulfillments || 0, recentF);
+    adminStatsCache[adminKey].publications = Math.max(adminStatsCache[adminKey].publications || 0, recentP);
+    adminStatsCache[adminKey].score = ((adminStatsCache[adminKey].fulfillments || 0) * 10) + ((adminStatsCache[adminKey].publications || 0) * 10);
+    adminStatsCache[adminKey].lastActiveAt = Date.now();
+    if (currentAdminName) adminStatsCache[adminKey].name = currentAdminName;
+
+    delete adminStatsCache.admin;
+    delete adminStatsCache.Admin;
+
+    try {
+        localStorage.setItem("filmhouse_admin_stats_cache", JSON.stringify(adminStatsCache));
+        if (db) {
+            db.collection("settings").doc("admin_stats").set(adminStatsCache, { merge: true }).catch(err => {
+                console.warn("Could not save batch admin stats to Firestore:", err.message);
             });
         }
     } catch (e) {}
@@ -5277,6 +5391,12 @@ function getComputedAdminRankings() {
             if (stat.name && (!adminMap[matchedKey].name || adminMap[matchedKey].name.startsWith("Admin ("))) {
                 adminMap[matchedKey].name = stat.name;
             }
+            if (stat.publications) {
+                adminMap[matchedKey].publications = Math.max(adminMap[matchedKey].publications || 0, stat.publications);
+            }
+            if (stat.fulfillments || stat.count) {
+                adminMap[matchedKey].fulfillments = Math.max(adminMap[matchedKey].fulfillments || 0, stat.fulfillments || stat.count || 0);
+            }
             if (Array.isArray(stat.titles) && stat.titles.length > 0) {
                 stat.titles.forEach(st => {
                     if (st && st.title && !adminMap[matchedKey].titles.some(t => t.title && t.title.toLowerCase() === st.title.toLowerCase())) {
@@ -5287,7 +5407,7 @@ function getComputedAdminRankings() {
         });
     }
 
-    // 4. Calculate total score and relative Work Share Percentage from verified titles list
+    // 4. Calculate total score and relative Work Share Percentage
     const now = Date.now();
     const oneDayMs = 24 * 60 * 60 * 1000;
     const adminList = Object.values(adminMap)
@@ -5301,8 +5421,8 @@ function getComputedAdminRankings() {
             const fulfillmentTitles = (adm.titles || []).filter(t => t.type === 'fulfillment' || !t.type);
             const publicationTitles = (adm.titles || []).filter(t => t.type === 'publication');
 
-            adm.fulfillments = fulfillmentTitles.length;
-            adm.publications = publicationTitles.length;
+            adm.fulfillments = Math.max(adm.fulfillments || 0, fulfillmentTitles.length);
+            adm.publications = Math.max(adm.publications || 0, publicationTitles.length);
             adm.workUnits = adm.fulfillments + adm.publications;
             adm.score = (adm.fulfillments * 10) + (adm.publications * 10);
             adm.isActive24h = adm.lastActiveAt ? (now - adm.lastActiveAt <= oneDayMs) : false;
@@ -6945,34 +7065,122 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         } else {
-            // Search by title (extract year if specified e.g. "Dune 2021" or "Avatar (2009)")
+            // Intelligent Sanitization for release titles, torrent strings, dots, season tags
+            let s = cleanQuery.replace(/[._\-+]/g, " ");
+
+            // Detect Series hints
+            const isSeriesHint = /\b(season\s*\d+|s\d{1,2}|series|episode\s*\d+|ep\s*\d+|complete\s*(?:series|season))\b/i.test(s);
+
+            // Extract Year if present (1900-2099)
             let yearParam = "";
-            let searchTitle = cleanQuery;
-            const yearMatch = cleanQuery.match(/\b(19\d\d|20\d\d)\b/);
+            const yearMatch = s.match(/\b(19\d\d|20\d\d)\b/);
             if (yearMatch) {
-                yearParam = yearMatch[0];
-                searchTitle = cleanQuery.replace(/\b(19\d\d|20\d\d)\b/, "").replace(/[()\[\]]/g, "").trim();
+                yearParam = yearMatch[1];
             }
 
-            const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${key}&query=${encodeURIComponent(searchTitle || cleanQuery)}`;
-            const searchRes = await fetch(searchUrl);
-            if (!searchRes.ok) {
-                throw new Error(`Search failed: HTTP ${searchRes.status}`);
+            // Strip common release quality and scene group noise tags
+            const releaseRegex = /\b(2160p|1080p|720p|480p|4k|uhd|fhd|hd|web-?dl|webrip|bluray|brrip|bdrip|dvdrip|hdrip|hdcam|camrip|cam|ts|tc|telecine|telesync|x264|x265|h264|h265|hevc|avc|xvid|divx|aac|dts|ddp?5\.1|ac3|subpack|repack|proper|unrated|extended|directors cut|remux|multi|dual audio|ita|eng|french|spanish|hindi)\b/gi;
+            s = s.replace(releaseRegex, " ");
+
+            // Strip season/episode tokens so base title can match TMDB
+            s = s.replace(/\b(season\s*\d{1,2}|s\d{1,2}(?:e\d{1,2})?|series|complete\s*(?:series|season)?|episode\s*\d{1,2}|ep\s*\d{1,2})\b/gi, " ");
+
+            // Strip brackets, parentheses, curly braces, and the extracted year from search query
+            if (yearParam) {
+                s = s.replace(new RegExp(`\\b${yearParam}\\b`, "g"), " ");
             }
-            const searchJson = await searchRes.json();
-            const validResults = (searchJson.results || []).filter(r => r.media_type === "movie" || r.media_type === "tv");
-            if (validResults.length === 0) {
+            s = s.replace(/[()\[\]{}<>|]/g, " ");
+            s = s.replace(/\s+/g, " ").trim();
+
+            const searchTitle = s || cleanQuery.replace(/[._\-]/g, " ").trim();
+
+            // Perform targeted search: if series hint, query search/tv and search/multi in parallel; otherwise search/multi
+            const searchPromises = [
+                fetch(`https://api.themoviedb.org/3/search/multi?api_key=${key}&query=${encodeURIComponent(searchTitle)}`).then(r => r.ok ? r.json() : { results: [] })
+            ];
+            if (isSeriesHint) {
+                searchPromises.push(
+                    fetch(`https://api.themoviedb.org/3/search/tv?api_key=${key}&query=${encodeURIComponent(searchTitle)}`).then(r => r.ok ? r.json() : { results: [] })
+                );
+            } else {
+                searchPromises.push(
+                    fetch(`https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${encodeURIComponent(searchTitle)}`).then(r => r.ok ? r.json() : { results: [] })
+                );
+            }
+
+            const searchResponses = await Promise.all(searchPromises);
+            let combinedResults = [];
+            const seenIds = new Set();
+
+            searchResponses.forEach((resp, rIdx) => {
+                (resp.results || []).forEach(item => {
+                    const mType = item.media_type || (rIdx === 1 ? (isSeriesHint ? "tv" : "movie") : null);
+                    if (mType !== "movie" && mType !== "tv") return;
+                    const uKey = `${mType}_${item.id}`;
+                    if (!seenIds.has(uKey)) {
+                        seenIds.add(uKey);
+                        combinedResults.push({ ...item, media_type: mType });
+                    }
+                });
+            });
+
+            if (combinedResults.length === 0) {
+                // Final fallback: try raw cleanQuery without year
+                const fallbackUrl = `https://api.themoviedb.org/3/search/multi?api_key=${key}&query=${encodeURIComponent(cleanQuery.replace(/[()\[\]]/g, "").trim())}`;
+                const fallbackRes = await fetch(fallbackUrl);
+                if (fallbackRes.ok) {
+                    const fallbackJson = await fallbackRes.json();
+                    combinedResults = (fallbackJson.results || []).filter(r => r.media_type === "movie" || r.media_type === "tv");
+                }
+            }
+
+            if (combinedResults.length === 0) {
                 throw new Error(`No movie or series results found on TMDB for "${cleanQuery}".`);
             }
 
-            let bestMatch = validResults[0];
-            if (yearParam) {
-                const matchWithYear = validResults.find(r => {
-                    const date = r.release_date || r.first_air_date || "";
-                    return date.startsWith(yearParam);
+            // Intelligent ranking / scoring of candidate results
+            const cleanSearchLower = searchTitle.toLowerCase().trim();
+            const searchWords = cleanSearchLower.split(/\s+/).filter(w => w.length > 1);
+
+            const scored = combinedResults.map(item => {
+                let score = 0;
+                const candTitle = (item.title || item.name || "").toLowerCase().trim();
+                const candDate = item.release_date || item.first_air_date || "";
+
+                // Exact title match bonus
+                if (candTitle === cleanSearchLower) {
+                    score += 150;
+                } else if (candTitle.startsWith(cleanSearchLower) || cleanSearchLower.startsWith(candTitle)) {
+                    score += 80;
+                }
+
+                // Word overlap match bonus
+                let matchedWords = 0;
+                searchWords.forEach(w => {
+                    if (candTitle.includes(w)) matchedWords++;
                 });
-                if (matchWithYear) bestMatch = matchWithYear;
-            }
+                score += matchedWords * 25;
+
+                // Year matching bonus
+                if (yearParam && candDate.startsWith(yearParam)) {
+                    score += 60;
+                }
+
+                // Series hint priority
+                if (isSeriesHint && item.media_type === "tv") {
+                    score += 50;
+                } else if (!isSeriesHint && item.media_type === "movie") {
+                    score += 20;
+                }
+
+                // Popularity bonus
+                score += Math.min(Math.log10((item.popularity || 1) + 1) * 10, 30);
+
+                return { item, score };
+            });
+
+            scored.sort((a, b) => b.score - a.score);
+            const bestMatch = scored[0].item;
 
             mediaType = bestMatch.media_type;
             tmdbId = bestMatch.id;
@@ -7437,6 +7645,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const broadcastCheckbox = document.getElementById("batch-broadcast-toggle");
             const shouldBroadcast = broadcastCheckbox ? broadcastCheckbox.checked : true;
             let addedCount = 0;
+            const importedTitles = [];
             itemsToCommit.forEach(item => {
                 // Parse links from linksList or fallback rawLinksText
                 let finalLinks = [];
@@ -7481,11 +7690,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(newMovie.csv_id);
                 addedCount++;
-
-                if (typeof window.recordAdminActivity === 'function') {
-                    window.recordAdminActivity("publication", item.title);
-                }
+                if (item.title) importedTitles.push(item.title);
             });
+
+            if (importedTitles.length > 0) {
+                if (typeof window.recordAdminBatchActivity === 'function') {
+                    window.recordAdminBatchActivity("publication", importedTitles);
+                } else if (typeof window.recordAdminActivity === 'function') {
+                    window.recordAdminActivity("publication", importedTitles[0]);
+                }
+            }
 
             catalogChangesMade = true;
             updatePublishButtonState();

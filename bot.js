@@ -1720,10 +1720,11 @@ function setupBot(bot, adminBot) {
                             }
                             if (adm.titles.length > 30) adm.titles = adm.titles.slice(0, 30);
                             
+                            adm.publications = (adm.publications || 0) + 1;
                             const fCount = adm.titles.filter(t => t.type === "fulfillment" || !t.type).length;
                             const pCount = adm.titles.filter(t => t.type === "publication").length;
-                            adm.fulfillments = fCount;
-                            adm.publications = pCount;
+                            adm.fulfillments = Math.max(adm.fulfillments || 0, fCount);
+                            adm.publications = Math.max(adm.publications || 0, pCount);
                             adm.lastActiveAt = Date.now();
                             
                             currentStats[adminKey] = adm;

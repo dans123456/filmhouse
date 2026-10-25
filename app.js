@@ -2715,18 +2715,42 @@ function renderFeaturedGrid(preservePagination = false) {
         noResults.className = "empty-state-grid";
         noResults.style.gridColumn = "1 / -1";
         noResults.style.textAlign = "center";
-        noResults.style.padding = "40px 0";
+        noResults.style.padding = "40px 16px";
 
-        const text = document.createElement("p");
         if (state.isLoadingTmdbCategory) {
+            const text = document.createElement("p");
             text.textContent = "Loading live titles from TMDB... ⏳🍿";
             text.style.color = "var(--primary-color)";
             text.style.fontWeight = "600";
+            noResults.appendChild(text);
+        } else if (state.searchQuery && state.searchQuery.trim().length > 0) {
+            const safeQuery = typeof escapeHtml === "function" ? escapeHtml(state.searchQuery) : state.searchQuery;
+            noResults.innerHTML = `
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border-color); border-radius: var(--border-radius-md); padding: 24px 18px; max-width: 440px; margin: 0 auto;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+                    <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin: 0 0 8px 0;">No Results for "${safeQuery}"</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 16px 0;">
+                        Title not found in our catalog or TMDB. Please check your spelling and verify the actual title on Google.
+                    </p>
+                    <button type="button" class="btn btn-primary" id="btn-empty-search-request" style="font-weight: 700; font-size: 13px; padding: 10px 18px; border-radius: var(--border-radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <span>Still can't find it? Proceed to Request 📩</span>
+                    </button>
+                </div>
+            `;
+            const reqBtn = noResults.querySelector("#btn-empty-search-request");
+            if (reqBtn) {
+                reqBtn.addEventListener("click", () => {
+                    if (typeof openManualRequestModal === "function") {
+                        openManualRequestModal(state.searchQuery);
+                    }
+                });
+            }
         } else {
+            const text = document.createElement("p");
             text.textContent = "No titles match your criteria currently.";
             text.style.color = "var(--text-secondary)";
+            noResults.appendChild(text);
         }
-        noResults.appendChild(text);
 
         grid.appendChild(noResults);
         return;
@@ -6302,6 +6326,161 @@ function bindEvents() {
             }, 800);
         });
     }
+
+    // Initialize Manual Request Modal
+    initManualRequestModal();
+}
+
+// Manual Movie / Series Request System
+function openManualRequestModal(prefillTitle) {
+    const searchOverlay = document.getElementById("premium-search-overlay");
+    if (searchOverlay) {
+        searchOverlay.classList.remove("active");
+        searchOverlay.style.display = "none";
+    }
+
+    const modal = document.getElementById("manual-request-modal");
+    if (!modal) return;
+    const titleInput = document.getElementById("manual-req-title");
+    const typeSelect = document.getElementById("manual-req-type");
+    const yearInput = document.getElementById("manual-req-year");
+
+    let cleanTitle = (prefillTitle || "").trim();
+    let detectedYear = "";
+    const yearMatch = cleanTitle.match(/\b(19\d\d|20\d\d)\b/);
+    if (yearMatch) {
+        detectedYear = yearMatch[1];
+        cleanTitle = cleanTitle.replace(/\b(19\d\d|20\d\d)\b/g, "").replace(/[()\[\]]/g, "").trim();
+    }
+
+    if (titleInput) {
+        titleInput.value = cleanTitle;
+    }
+    if (typeSelect) {
+        const isSeriesHint = /\b(season|series|episode|s\d+)\b/i.test(prefillTitle || "");
+        typeSelect.value = isSeriesHint ? "Series" : "Movie";
+    }
+    if (yearInput) {
+        yearInput.value = detectedYear;
+    }
+
+    modal.classList.add("active");
+    modal.style.display = "flex";
+}
+
+function closeManualRequestModal() {
+    const modal = document.getElementById("manual-request-modal");
+    if (!modal) return;
+    modal.classList.remove("active");
+    modal.style.display = "none";
+}
+
+function initManualRequestModal() {
+    const modal = document.getElementById("manual-request-modal");
+    const closeBtn = document.getElementById("btn-close-manual-req");
+    const form = document.getElementById("form-manual-request");
+
+    if (closeBtn) {
+        closeBtn.addEventListener("click", closeManualRequestModal);
+    }
+    if (modal) {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) closeManualRequestModal();
+        });
+    }
+
+    if (form) {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const titleInput = document.getElementById("manual-req-title");
+            const typeSelect = document.getElementById("manual-req-type");
+            const yearInput = document.getElementById("manual-req-year");
+            const submitBtn = document.getElementById("btn-submit-manual-req");
+
+            const rawTitle = (titleInput?.value || "").trim();
+            if (!rawTitle) {
+                showToast("Please enter a title to request.", "info");
+                return;
+            }
+
+            const selectedType = typeSelect?.value || "Movie";
+            const enteredYear = (yearInput?.value || "").trim();
+            const specs = selectedType === "Series" ? "All Seasons" : "Full Movie";
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Submitting... ⏳";
+            }
+
+            const requestTitle = enteredYear ? `${rawTitle} (${enteredYear})` : rawTitle;
+
+            const reqObj = {
+                title: requestTitle,
+                seasonOrPart: specs,
+                status: "pending",
+                _localTime: Date.now(),
+                requestedAt: new Date().toISOString(),
+                tmdb_id: null,
+                csv_id: "",
+                type: selectedType,
+                year: enteredYear,
+                requestedBy: state.user.username || state.user.fullName || state.user.firstName || `User ${state.user.id || 'Guest'}`,
+                requestedById: state.user.id || "",
+                fullName: state.user.fullName || state.user.firstName || "",
+                source: "manual_search_request"
+            };
+
+            if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
+                const exists = currentUserRequests.some(r => r.title && titlesMatch(r.title, requestTitle));
+                if (!exists) {
+                    currentUserRequests.unshift(reqObj);
+                }
+            }
+
+            try {
+                localStorage.setItem("filmhouse_my_requests", JSON.stringify(currentUserRequests));
+            } catch (_) {}
+
+            if (typeof renderUserRequests === "function") {
+                renderUserRequests(currentUserRequests);
+            }
+
+            if (typeof firebase !== "undefined" && db) {
+                db.collection("requests").add({
+                    title: requestTitle,
+                    seasonOrPart: specs,
+                    status: "pending",
+                    tmdb_id: null,
+                    csv_id: "",
+                    type: selectedType,
+                    year: enteredYear,
+                    requestedBy: state.user.username || state.user.fullName || state.user.firstName || `User ${state.user.id || 'Guest'}`,
+                    requestedById: state.user.id || "",
+                    fullName: state.user.fullName || state.user.firstName || "",
+                    requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    source: "manual_search_request"
+                }).then(() => {
+                    showToast("🎉 Request registered! Our team will find and add it soon.", "success");
+                }).catch(err => {
+                    console.error("Error saving manual request:", err);
+                    showToast("Request recorded locally! Will sync when connection restores.", "info");
+                }).finally(() => {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Submit Request 🚀";
+                    }
+                    closeManualRequestModal();
+                });
+            } else {
+                showToast("🎉 Request saved! Our team will find and add it soon.", "success");
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Submit Request 🚀";
+                }
+                closeManualRequestModal();
+            }
+        });
+    }
 }
 
 // Firebase Firestore Database Synchronization Helpers
@@ -8976,10 +9155,25 @@ function triggerOverlaySearch(query) {
                         // Show "no matches" warning only if both are empty
                         if (filtered.length === 0 && localContainer) {
                             localContainer.innerHTML = `
-                                <div style="padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 14px;">
-                                    🔍 No matches found in library or cloud.
+                                <div style="padding: 24px 16px; text-align: center; color: rgba(255,255,255,0.7); font-size: 13px;">
+                                    <div style="font-size: 28px; margin-bottom: 8px;">🔍</div>
+                                    <strong style="color: #fff; display: block; margin-bottom: 6px;">No matches found in library or cloud</strong>
+                                    <p style="font-size: 11px; color: var(--text-secondary); margin: 0 0 14px 0; line-height: 1.4;">
+                                        Please check your spelling and verify the actual title on Google.
+                                    </p>
+                                    <button type="button" class="btn btn-primary btn-sm" id="btn-overlay-manual-request" style="font-weight: 700; font-size: 12px; padding: 8px 16px; border-radius: var(--border-radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                        <span>Still can't find it? Proceed to Request 📩</span>
+                                    </button>
                                 </div>
                             `;
+                            const overlayReqBtn = localContainer.querySelector("#btn-overlay-manual-request");
+                            if (overlayReqBtn) {
+                                overlayReqBtn.addEventListener("click", () => {
+                                    if (typeof openManualRequestModal === "function") {
+                                        openManualRequestModal(query);
+                                    }
+                                });
+                            }
                         }
                     } else {
                         globalContainer.innerHTML = `
@@ -9011,10 +9205,25 @@ function triggerOverlaySearch(query) {
                 }
                 if (filtered.length === 0 && localContainer) {
                     localContainer.innerHTML = `
-                        <div style="padding: 40px 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 14px;">
-                            🔍 No matches found in library.
+                        <div style="padding: 24px 16px; text-align: center; color: rgba(255,255,255,0.7); font-size: 13px;">
+                            <div style="font-size: 28px; margin-bottom: 8px;">🔍</div>
+                            <strong style="color: #fff; display: block; margin-bottom: 6px;">No matches found in library</strong>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 0 0 14px 0; line-height: 1.4;">
+                                Please check your spelling and verify the actual title on Google.
+                            </p>
+                            <button type="button" class="btn btn-primary btn-sm" id="btn-overlay-manual-request-err" style="font-weight: 700; font-size: 12px; padding: 8px 16px; border-radius: var(--border-radius-sm); cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                <span>Still can't find it? Proceed to Request 📩</span>
+                            </button>
                         </div>
                     `;
+                    const overlayReqBtnErr = localContainer.querySelector("#btn-overlay-manual-request-err");
+                    if (overlayReqBtnErr) {
+                        overlayReqBtnErr.addEventListener("click", () => {
+                            if (typeof openManualRequestModal === "function") {
+                                openManualRequestModal(query);
+                            }
+                        });
+                    }
                 }
             }
         }, 400);
