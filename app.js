@@ -4278,12 +4278,21 @@ function openCinemaModal(movie, customStreamUrl) {
         qualityChip.textContent = movie.type === "Series" ? "Series HD" : "1080p HD";
         chipsEl.appendChild(qualityChip);
 
-        if (movie.language) {
-            const langChip = document.createElement("span");
-            langChip.className = "cinema-chip";
-            langChip.textContent = String(movie.language).toUpperCase();
-            chipsEl.appendChild(langChip);
-        }
+        const subChip = document.createElement("span");
+        subChip.className = "cinema-chip cinema-chip-sub";
+        subChip.textContent = "SUB";
+        subChip.title = "Subtitles Available";
+        chipsEl.appendChild(subChip);
+
+        const langChip = document.createElement("span");
+        langChip.className = "cinema-chip cinema-chip-lang";
+        langChip.textContent = String(movie.language || "EN").toUpperCase();
+        chipsEl.appendChild(langChip);
+
+        const specChip = document.createElement("span");
+        specChip.className = "cinema-chip cinema-chip-spec";
+        specChip.textContent = "H.264 / AAC";
+        chipsEl.appendChild(specChip);
 
         let genres = [];
         if (Array.isArray(movie.genres)) {
@@ -4566,6 +4575,56 @@ function openDownloadModal(movie) {
             grid.appendChild(fallbackMsg);
         }
     } else {
+        // Build Filter Tabs for Download Modal if there are multiple options
+        const existingTabs = modal.querySelector(".download-quality-filter-tabs");
+        if (existingTabs) existingTabs.remove();
+
+        if (!isTVShow && movie.links.length > 1) {
+            const counts = { all: 0, "720p": 0, "1080p": 0, "480p": 0, "4k": 0, "cam": 0 };
+            movie.links.forEach((l, i) => {
+                const isObj = typeof l === 'object' && l !== null;
+                const q = (isObj && l.quality ? l.quality : (qualityLabels[i] || "")).toLowerCase();
+                counts.all++;
+                if (q.includes("cinema cut") || q.includes("hdcam") || q.includes("cam")) counts["cam"]++;
+                else if (q.includes("1080")) counts["1080p"]++;
+                else if (q.includes("720")) counts["720p"]++;
+                else if (q.includes("480")) counts["480p"]++;
+                else if (q.includes("4k") || q.includes("2160")) counts["4k"]++;
+            });
+
+            const tabsToCreate = [{ key: "all", label: "All", count: counts.all }];
+            if (counts["720p"] > 0) tabsToCreate.push({ key: "720p", label: "720p", count: counts["720p"] });
+            if (counts["1080p"] > 0) tabsToCreate.push({ key: "1080p", label: "1080p", count: counts["1080p"] });
+            if (counts["480p"] > 0) tabsToCreate.push({ key: "480p", label: "480p", count: counts["480p"] });
+            if (counts["4k"] > 0) tabsToCreate.push({ key: "4k", label: "4K UHD", count: counts["4k"] });
+            if (counts["cam"] > 0) tabsToCreate.push({ key: "cam", label: "Cinema Cut", count: counts["cam"] });
+
+            if (tabsToCreate.length > 2) {
+                const filterTabs = document.createElement("div");
+                filterTabs.className = "download-quality-filter-tabs";
+                tabsToCreate.forEach((tab, tIdx) => {
+                    const tabBtn = document.createElement("button");
+                    tabBtn.type = "button";
+                    tabBtn.className = `quality-filter-tab ${tIdx === 0 ? "active" : ""}`;
+                    tabBtn.innerHTML = `<span>${tab.label}</span><span class="tab-count">${tab.count}</span>`;
+                    tabBtn.addEventListener("click", () => {
+                        filterTabs.querySelectorAll(".quality-filter-tab").forEach(t => t.classList.remove("active"));
+                        tabBtn.classList.add("active");
+                        grid.querySelectorAll(".download-link-item").forEach(item => {
+                            const itemQ = item.dataset.qualityCategory || "all";
+                            if (tab.key === "all" || itemQ === tab.key) {
+                                item.style.display = "flex";
+                            } else {
+                                item.style.display = "none";
+                            }
+                        });
+                    });
+                    filterTabs.appendChild(tabBtn);
+                });
+                grid.parentNode.insertBefore(filterTabs, grid);
+            }
+        }
+
         movie.links.forEach((link, idx) => {
             const linkUrl = typeof link === 'object' && link !== null ? link.url : link;
             if (isTVShow && (!linkUrl || !String(linkUrl).trim())) {
@@ -4580,18 +4639,18 @@ function openDownloadModal(movie) {
                 r.status === "fulfilled"
             );
 
-            if (matchingRequest) {
-                anchor.addEventListener("click", () => {
+            const triggerDownloadAction = () => {
+                if (matchingRequest) {
                     showToast("Fulfillment download unlocked! Connecting directly...", "success");
                     logAppEvent("download", movie.csv_id || movie.id, movie.title);
                     window.open(linkUrl, "_blank");
-                });
-            } else {
-                anchor.addEventListener("click", () => {
+                } else {
                     logAppEvent("download", movie.csv_id || movie.id, movie.title);
                     showConnectionDrawer(linkUrl, ADSGRAM_DOWNLOAD_BLOCK_ID);
-                });
-            }
+                }
+            };
+
+            anchor.addEventListener("click", triggerDownloadAction);
 
             if (isTVShow) {
                 // --- TV SERIES: Season layout ---
@@ -4626,6 +4685,26 @@ function openDownloadModal(movie) {
                 }
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
+
+                // Series Specs Row
+                const specsRow = document.createElement("div");
+                specsRow.className = "link-specs-row";
+                const hdPill = document.createElement("span");
+                hdPill.className = "link-spec-badge badge-res-720p";
+                hdPill.textContent = "720p HD";
+                specsRow.appendChild(hdPill);
+
+                const subPill = document.createElement("span");
+                subPill.className = "link-spec-badge badge-sub";
+                subPill.textContent = "SUB";
+                specsRow.appendChild(subPill);
+
+                const langPill = document.createElement("span");
+                langPill.className = "link-spec-badge badge-lang";
+                langPill.textContent = (movie.language || "EN").toUpperCase();
+                specsRow.appendChild(langPill);
+
+                labelWrap.appendChild(specsRow);
                 anchor.appendChild(labelWrap);
             } else {
                 // --- MOVIE: Quality layout ---
@@ -4634,14 +4713,44 @@ function openDownloadModal(movie) {
                 const isCinemaCutLink = qLabel.toLowerCase().includes("cinema cut") || qLabel.toLowerCase().includes("hdcam") || qLabel.toLowerCase().includes("cam");
                 
                 let qIcon = "📥";
-                if (isCinemaCutLink) qIcon = "📽️";
-                else if (qLabel.includes("720p")) qIcon = "🎬";
-                else if (qLabel.includes("1080p")) qIcon = "🎥";
-                else if (qLabel.includes("4K") || qLabel.includes("2160p")) qIcon = "✨";
-                else if (qLabel.includes("480p")) qIcon = "📱";
-                else {
+                let qCat = "all";
+                let resBadgeClass = "badge-res-720p";
+                let resBadgeText = "720p";
+                let estimatedSize = "~850 MB";
+
+                if (isCinemaCutLink) {
+                    qIcon = "📽️";
+                    qCat = "cam";
+                    resBadgeClass = "badge-res-cam";
+                    resBadgeText = "CAM";
+                    estimatedSize = "~650 MB";
+                } else if (qLabel.includes("1080p")) {
+                    qIcon = "🎥";
+                    qCat = "1080p";
+                    resBadgeClass = "badge-res-1080p";
+                    resBadgeText = "1080p Full HD";
+                    estimatedSize = "~1.85 GB";
+                } else if (qLabel.includes("4K") || qLabel.includes("2160p")) {
+                    qIcon = "✨";
+                    qCat = "4k";
+                    resBadgeClass = "badge-res-4k";
+                    resBadgeText = "4K UHD";
+                    estimatedSize = "~4.5 GB";
+                } else if (qLabel.includes("480p")) {
+                    qIcon = "📱";
+                    qCat = "480p";
+                    resBadgeClass = "badge-res-720p";
+                    resBadgeText = "480p SD";
+                    estimatedSize = "~420 MB";
+                } else {
                     qIcon = qualityIcons[idx] || "📥";
                 }
+
+                if (isObj && link.size) {
+                    estimatedSize = link.size;
+                }
+
+                anchor.dataset.qualityCategory = qCat;
 
                 const badge = document.createElement("span");
                 badge.className = `download-link-badge quality-badge ${isCinemaCutLink ? 'cinemacut-badge' : ''}`;
@@ -4687,15 +4796,69 @@ function openDownloadModal(movie) {
                 }
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
+
+                // Specs Row
+                const specsRow = document.createElement("div");
+                specsRow.className = "link-specs-row";
+
+                const resPill = document.createElement("span");
+                resPill.className = `link-spec-badge ${resBadgeClass}`;
+                resPill.textContent = resBadgeText;
+                specsRow.appendChild(resPill);
+
+                const subPill = document.createElement("span");
+                subPill.className = "link-spec-badge badge-sub";
+                subPill.textContent = "SUB";
+                specsRow.appendChild(subPill);
+
+                const langPill = document.createElement("span");
+                langPill.className = "link-spec-badge badge-lang";
+                langPill.textContent = (movie.language || "EN").toUpperCase();
+                specsRow.appendChild(langPill);
+
+                const codecPill = document.createElement("span");
+                codecPill.className = "link-spec-badge badge-codec";
+                codecPill.textContent = "MKV";
+                specsRow.appendChild(codecPill);
+
+                const sizePill = document.createElement("span");
+                sizePill.className = "link-spec-badge badge-size";
+                sizePill.textContent = estimatedSize;
+                specsRow.appendChild(sizePill);
+
+                labelWrap.appendChild(specsRow);
                 anchor.appendChild(labelWrap);
+            }
+
+            // Action buttons group (Stream + Download)
+            const actionsGroup = document.createElement("div");
+            actionsGroup.className = "download-link-actions-group";
+
+            const currentTelegramUserId = String(state.user?.id || window.Telegram?.WebApp?.initDataUnsafe?.user?.id || localStorage.getItem("filmhouse_user_id") || "");
+            const isStreamingTester = typeof STREAMING_ADMIN_IDS !== "undefined" && STREAMING_ADMIN_IDS.includes(currentTelegramUserId);
+            const isObj = typeof link === 'object' && link !== null;
+            const streamTarget = (isObj && link.stream_url) ? link.stream_url : (movie.stream_url || "");
+
+            if (isStreamingTester && streamTarget) {
+                const streamBtn = document.createElement("button");
+                streamBtn.type = "button";
+                streamBtn.className = "download-link-stream-btn";
+                streamBtn.innerHTML = `<span>▶️</span><span>Stream</span>`;
+                streamBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    closeModal(modal);
+                    openCinemaModal(movie, streamTarget);
+                });
+                actionsGroup.appendChild(streamBtn);
             }
 
             const actionLabel = document.createElement("span");
             actionLabel.className = "download-link-action-label";
             actionLabel.innerHTML = `<span>DOWNLOAD</span> 📥`;
             actionLabel.appendChild(createSvgIcon("icon-download"));
-            anchor.appendChild(actionLabel);
+            actionsGroup.appendChild(actionLabel);
 
+            anchor.appendChild(actionsGroup);
             grid.appendChild(anchor);
         });
 
