@@ -4217,7 +4217,7 @@ function openCinemaModal(movie, customStreamUrl) {
     iframe.src = playerSrc;
     iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
     iframe.setAttribute("allowfullscreen", "true");
-    iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-presentation");
+    // No sandbox restriction to ensure Monetag ad delivery and native video fullscreen
 
     container.appendChild(iframe);
 
@@ -4347,20 +4347,60 @@ function openCinemaModal(movie, customStreamUrl) {
     if (fsBtn && !fsBtn._bound) {
         fsBtn._bound = true;
         fsBtn.addEventListener("click", () => {
+            // 1. Send command to iframe to trigger native HTML5 video fullscreen
+            const frame = document.querySelector("#cinema-iframe-container iframe");
+            if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage({ action: "enterFullscreen" }, "*");
+            }
+
+            // 2. Request native Telegram Mini App fullscreen if supported
+            if (window.Telegram?.WebApp?.requestFullscreen) {
+                try { window.Telegram.WebApp.requestFullscreen(); } catch (e) {}
+            }
+
+            // 3. Fallback browser fullscreen on container
             const theater = document.querySelector(".cinema-theater-container");
-            if (!theater) return;
-            const isFs = theater.classList.toggle("is-fullscreen");
-            if (isFs) {
-                if (theater.requestFullscreen) {
-                    theater.requestFullscreen().catch(() => {});
-                } else if (theater.webkitRequestFullscreen) {
-                    theater.webkitRequestFullscreen();
+            if (theater) {
+                if (!document.fullscreenElement) {
+                    if (theater.requestFullscreen) {
+                        theater.requestFullscreen().catch(() => {});
+                    } else if (theater.webkitRequestFullscreen) {
+                        theater.webkitRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen().catch(() => {});
+                    }
                 }
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen().catch(() => {});
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
+            }
+        });
+    }
+
+    // Auto-hide controls in landscape mode
+    let cinemaControlsTimer = null;
+    const theaterContainer = document.querySelector(".cinema-theater-container");
+    const refreshCinemaControls = () => {
+        if (!theaterContainer) return;
+        theaterContainer.classList.remove("controls-hidden");
+        clearTimeout(cinemaControlsTimer);
+        cinemaControlsTimer = setTimeout(() => {
+            if (window.innerWidth > window.innerHeight) {
+                theaterContainer.classList.add("controls-hidden");
+            }
+        }, 3500);
+    };
+
+    if (theaterContainer && !theaterContainer._controlsBound) {
+        theaterContainer._controlsBound = true;
+        theaterContainer.addEventListener("touchstart", refreshCinemaControls, { passive: true });
+        theaterContainer.addEventListener("mousemove", refreshCinemaControls, { passive: true });
+        theaterContainer.addEventListener("click", (e) => {
+            if (e.target.closest(".cinema-top-bar")) return;
+            if (window.innerWidth > window.innerHeight) {
+                if (theaterContainer.classList.contains("controls-hidden")) {
+                    refreshCinemaControls();
+                } else {
+                    theaterContainer.classList.add("controls-hidden");
                 }
             }
         });
