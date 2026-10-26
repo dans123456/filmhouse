@@ -1178,9 +1178,9 @@
                         <span style="font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.12); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Monetag Ad Active</span>
                     </div>
                     <div style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
-                        <input type="text" id="movie-stream-url" placeholder="Paste stream token (e.g. 6adee561a4b67b48703250e2) or stream bot link..." style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace;">
+                        <input type="text" id="movie-stream-url" placeholder="Paste File Stream Bot link or token (unique per movie)..." style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace;">
                         <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
-                            💡 Accepts raw 24-char hex tokens, TGStream watch links, or Blogspot player links. Activates the in-app <b>Watch Online</b> button.
+                            💡 Accepts File Stream Bot links or tokens (unique per movie). Activates the in-app <b>Watch Online</b> button.
                         </div>
                     </div>
                 </div>
@@ -1331,9 +1331,9 @@
                         <span style="font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.12); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Monetag Stream</span>
                     </div>
                     <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
-                        <input type="text" id="fulfill-stream-url" placeholder="Paste stream token (e.g. 6adee561a4b67b48703250e2) or stream bot link..." style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace;">
+                        <input type="text" id="fulfill-stream-url" placeholder="Paste File Stream Bot link or token (unique per movie)..." style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace;">
                         <div style="font-size: 10px; color: var(--text-muted); margin-top: 5px; line-height: 1.4;">
-                            💡 Attaches streaming to this title so users can watch online in the app player.
+                            💡 Attaches streaming to this title so users can watch online in the app player. Leave blank if only providing Telegram download.
                         </div>
                     </div>
                 </div>
@@ -1373,6 +1373,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=108"></script>
+    <script src="admin.js?v=109"></script>
 </body>
 </html>

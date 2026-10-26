@@ -3737,12 +3737,26 @@ function openDetailModal(movie) {
         const currentTelegramUserId = String(state.user?.id || window.Telegram?.WebApp?.initDataUnsafe?.user?.id || localStorage.getItem("filmhouse_user_id") || "");
         const isStreamingTester = typeof STREAMING_ADMIN_IDS !== "undefined" && STREAMING_ADMIN_IDS.includes(currentTelegramUserId);
 
+        let hasStreamLink = !!(movie.stream_url);
+        if (!hasStreamLink && movie.links && Array.isArray(movie.links)) {
+            hasStreamLink = movie.links.some(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
+        }
+
         if (isStreamingTester) {
             const watchOnlineBtn = document.createElement("button");
             watchOnlineBtn.className = "btn btn-primary btn-stream-hero";
             watchOnlineBtn.innerHTML = `<svg style="width:16px;height:16px;fill:currentColor;"><use href="#icon-play"></use></svg><span>Watch Online</span><span class="beta-pill">BETA</span>`;
             
+            if (!hasStreamLink) {
+                watchOnlineBtn.style.opacity = "0.75";
+                watchOnlineBtn.title = "No streaming link added yet (Admin)";
+            }
+
             watchOnlineBtn.addEventListener("click", () => {
+                if (!hasStreamLink) {
+                    showToast(`⚠️ No streaming link added for "${movie.title}" yet. Add it via Admin Panel!`, "warning");
+                    return;
+                }
                 addWatchHistory(movie.csv_id || movie.id);
                 openCinemaModal(movie);
             });
@@ -4198,7 +4212,7 @@ function openCinemaModal(movie, customStreamUrl) {
     const title = movie.title || "Film House Cinema";
     if (titleEl) titleEl.textContent = title;
 
-    // Resolve stream parameter: custom URL -> link.stream_url -> Home of the Brave fallback
+    // Resolve stream parameter: custom URL -> link.stream_url
     let streamTarget = customStreamUrl || movie.stream_url || "";
     if (!streamTarget && movie.links && Array.isArray(movie.links)) {
         const streamLink = movie.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
@@ -4206,9 +4220,10 @@ function openCinemaModal(movie, customStreamUrl) {
             streamTarget = streamLink.stream_url || streamLink.url;
         }
     }
-    // Test video fallback token for admin verification
+
     if (!streamTarget) {
-        streamTarget = "6adee561a4b67b48703250e2";
+        showToast(`⚠️ No streaming link found for "${title}". Please add one via Admin Panel!`, "warning");
+        return;
     }
 
     const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(streamTarget)}&title=${encodeURIComponent(title)}`;
@@ -4347,31 +4362,15 @@ function openCinemaModal(movie, customStreamUrl) {
     if (fsBtn && !fsBtn._bound) {
         fsBtn._bound = true;
         fsBtn.addEventListener("click", () => {
-            // 1. Send command to iframe to trigger native HTML5 video fullscreen
+            const theater = document.querySelector(".cinema-theater-container");
+            if (theater) {
+                theater.classList.toggle("is-fullscreen");
+            }
+
+            // Signal iframe to trigger native video fullscreen
             const frame = document.querySelector("#cinema-iframe-container iframe");
             if (frame && frame.contentWindow) {
                 frame.contentWindow.postMessage({ action: "enterFullscreen" }, "*");
-            }
-
-            // 2. Request native Telegram Mini App fullscreen if supported
-            if (window.Telegram?.WebApp?.requestFullscreen) {
-                try { window.Telegram.WebApp.requestFullscreen(); } catch (e) {}
-            }
-
-            // 3. Fallback browser fullscreen on container
-            const theater = document.querySelector(".cinema-theater-container");
-            if (theater) {
-                if (!document.fullscreenElement) {
-                    if (theater.requestFullscreen) {
-                        theater.requestFullscreen().catch(() => {});
-                    } else if (theater.webkitRequestFullscreen) {
-                        theater.webkitRequestFullscreen();
-                    }
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen().catch(() => {});
-                    }
-                }
             }
         });
     }

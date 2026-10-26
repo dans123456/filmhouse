@@ -1518,6 +1518,10 @@ function fulfillMovieTitleRequests(title, docIds, reqMeta = null) {
                 }
             }
             renderFulfillLinksInputs(existingMovie, isSeries, reqSpec);
+            const fulfillStreamInput = document.getElementById("fulfill-stream-url");
+            if (fulfillStreamInput) {
+                fulfillStreamInput.value = (existingMovie && existingMovie.stream_url) ? existingMovie.stream_url : (existingMovie && existingMovie.links && existingMovie.links[0] && existingMovie.links[0].stream_url ? existingMovie.links[0].stream_url : "");
+            }
             modal.classList.add("active");
         };
 
@@ -2686,7 +2690,7 @@ function showMovieDetails(movie) {
                 <label style="font-size: 11px; color: #ffbc00; text-transform: uppercase; font-weight: bold; display: flex; align-items: center; gap: 6px;">
                     <span>▶️ Online Streaming Link or Token (Monetag Player)</span>
                 </label>
-                <input type="text" id="edit-movie-stream-url" value="${escapeHTML(movie.stream_url || (movie.links && movie.links[0] && movie.links[0].stream_url ? movie.links[0].stream_url : ''))}" placeholder="Paste stream token (e.g. 6adee561a4b67b48703250e2) or stream bot link..." style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%; font-family: monospace;">
+                <input type="text" id="edit-movie-stream-url" value="${escapeHTML(movie.stream_url || (movie.links && movie.links[0] && movie.links[0].stream_url ? movie.links[0].stream_url : ''))}" placeholder="Paste File Stream Bot link or token (unique per movie)..." style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%; font-family: monospace;">
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -4961,6 +4965,8 @@ window.closeFulfillRequestModal = function() {
     if (fulfillBulkWrapper) fulfillBulkWrapper.style.display = "none";
     if (fulfillBulkInput) fulfillBulkInput.value = "";
     if (btnFulfillBulkToggle) btnFulfillBulkToggle.textContent = "📋 Bulk Paste";
+    const fulfillStreamInput = document.getElementById("fulfill-stream-url");
+    if (fulfillStreamInput) fulfillStreamInput.value = "";
 };
 
 if (closeFulfillModalBtn) {
@@ -5917,6 +5923,9 @@ if (fulfillForm && fulfillRequestModal) {
             return;
         }
 
+        const fulfillStreamVal = document.getElementById("fulfill-stream-url")?.value.trim() || "";
+        const cleanStreamVal = cleanStreamInput(fulfillStreamVal);
+
         const downloadLink = primaryNotificationLink;
         
         // Disable form buttons during async operations
@@ -5969,6 +5978,13 @@ if (fulfillForm && fulfillRequestModal) {
                 }
                 existingMovie.links[targetIdx] = formattedLink;
             });
+
+            if (cleanStreamVal) {
+                existingMovie.stream_url = cleanStreamVal;
+                if (existingMovie.links && existingMovie.links.length > 0) {
+                    existingMovie.links[0].stream_url = cleanStreamVal;
+                }
+            }
 
             catalogChangesMade = true;
             if (!newlyUpdatedIds.includes(existingMovie.csv_id)) {
@@ -6081,8 +6097,12 @@ if (fulfillForm && fulfillRequestModal) {
                     director: "",
                     trailer: trailerId,
                     runtime: "",
+                    stream_url: cleanStreamVal,
                     links: formattedLinksArray
                 };
+                if (cleanStreamVal && formattedLinksArray.length > 0) {
+                    formattedLinksArray[0].stream_url = cleanStreamVal;
+                }
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(csvId);
                 catalogChangesMade = true;
@@ -6109,8 +6129,12 @@ if (fulfillForm && fulfillRequestModal) {
                     director: "",
                     trailer: "",
                     runtime: "",
+                    stream_url: cleanStreamVal,
                     links: formattedLinksArray
                 };
+                if (cleanStreamVal && formattedLinksArray.length > 0) {
+                    formattedLinksArray[0].stream_url = cleanStreamVal;
+                }
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(csvId);
                 catalogChangesMade = true;
