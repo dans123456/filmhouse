@@ -3733,6 +3733,23 @@ function openDetailModal(movie) {
             infoColumn.appendChild(reqBanner);
         }
     } else {
+        // Admin Streaming Beta Tester Whitelist Button
+        const currentTelegramUserId = String(state.user?.id || window.Telegram?.WebApp?.initDataUnsafe?.user?.id || localStorage.getItem("filmhouse_user_id") || "");
+        const isStreamingTester = typeof STREAMING_ADMIN_IDS !== "undefined" && STREAMING_ADMIN_IDS.includes(currentTelegramUserId);
+
+        if (isStreamingTester) {
+            const watchOnlineBtn = document.createElement("button");
+            watchOnlineBtn.className = "btn btn-primary btn-stream-online";
+            watchOnlineBtn.style.cssText = "background: linear-gradient(135deg, #ffd700, #ff9900); color: #0b0d14; font-weight: 800; border: none; box-shadow: 0 4px 15px rgba(255, 188, 0, 0.35); display: inline-flex; align-items: center; gap: 6px; cursor: pointer;";
+            watchOnlineBtn.innerHTML = `<span>▶️</span><span>Watch Online</span><span style="font-size: 9px; background: rgba(0,0,0,0.25); color: #000; padding: 2px 5px; border-radius: 6px; font-weight: 800; margin-left: 2px;">BETA</span>`;
+            
+            watchOnlineBtn.addEventListener("click", () => {
+                addWatchHistory(movie.csv_id || movie.id);
+                openCinemaModal(movie);
+            });
+            actionsRow.appendChild(watchOnlineBtn);
+        }
+
         const downloadBtn = document.createElement("button");
         downloadBtn.className = "btn btn-secondary";
         downloadBtn.appendChild(createSvgIcon("icon-download"));
@@ -4148,6 +4165,52 @@ function openTrailerModal(videoKey) {
     
     container.appendChild(iframe);
     modal.classList.add("active");
+}
+
+// Admin Whitelist for Streaming Beta Testing
+const STREAMING_ADMIN_IDS = ["1175336733", "1329840839"];
+
+// Open In-App Cinema Streaming Player Modal
+function openCinemaModal(movie, customStreamUrl) {
+    const modal = document.getElementById("cinema-modal");
+    const container = document.getElementById("cinema-iframe-container");
+    const titleEl = document.getElementById("cinema-modal-title");
+    const qualityEl = document.getElementById("cinema-quality-label");
+    if (!modal || !container || !movie) return;
+
+    container.replaceChildren();
+
+    const title = movie.title || "Film House Cinema";
+    if (titleEl) titleEl.textContent = title;
+
+    // Resolve stream parameter: custom URL -> link.stream_url -> Home of the Brave fallback
+    let streamTarget = customStreamUrl || movie.stream_url || "";
+    if (!streamTarget && movie.links && Array.isArray(movie.links)) {
+        const streamLink = movie.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
+        if (streamLink) {
+            streamTarget = streamLink.stream_url || streamLink.url;
+        }
+    }
+    // Test video fallback token for admin verification
+    if (!streamTarget) {
+        streamTarget = "6adee561a4b67b48703250e2";
+    }
+
+    if (qualityEl) {
+        qualityEl.textContent = movie.type === "Series" ? "Series HD" : "1080p HD";
+    }
+
+    const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(streamTarget)}&title=${encodeURIComponent(title)}`;
+
+    const iframe = document.createElement("iframe");
+    iframe.src = playerSrc;
+    iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
+    iframe.setAttribute("allowfullscreen", "true");
+    iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-presentation");
+
+    container.appendChild(iframe);
+    modal.classList.add("active");
+    if (typeof triggerHaptic === "function") triggerHaptic("notification");
 }
 
 // Helper to fetch total season count for a TV Series from TMDB
@@ -5351,9 +5414,12 @@ function bindEvents() {
         if (modal && btn) {
             btn.addEventListener("click", () => {
                 modal.classList.remove("active");
-                // Stop iframe video streaming on trailer close
+                // Stop iframe video streaming on trailer or cinema close
                 if (modalId === "trailer-modal") {
                     const frameBox = document.getElementById("trailer-iframe-container");
+                    if (frameBox) frameBox.replaceChildren();
+                } else if (modalId === "cinema-modal") {
+                    const frameBox = document.getElementById("cinema-iframe-container");
                     if (frameBox) frameBox.replaceChildren();
                 }
             });
@@ -5364,6 +5430,9 @@ function bindEvents() {
                     if (modalId === "trailer-modal") {
                         const frameBox = document.getElementById("trailer-iframe-container");
                         if (frameBox) frameBox.replaceChildren();
+                    } else if (modalId === "cinema-modal") {
+                        const frameBox = document.getElementById("cinema-iframe-container");
+                        if (frameBox) frameBox.replaceChildren();
                     }
                 }
             });
@@ -5372,6 +5441,7 @@ function bindEvents() {
     
     setupModalClose("detail-modal", "btn-close-detail");
     setupModalClose("trailer-modal", "btn-close-trailer");
+    setupModalClose("cinema-modal", "btn-close-cinema");
     setupModalClose("download-modal", "btn-close-download");
 
 

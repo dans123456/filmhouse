@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=64">
+    <link rel="stylesheet" href="index.css?v=65">
 </head>
 <body>
 
@@ -716,6 +716,28 @@
         </div>
     </div>
 
+    <!-- IN-APP CINEMA PLAYER MODAL -->
+    <div class="modal-overlay" id="cinema-modal">
+        <div class="modal-container cinema-modal-container">
+            <div class="cinema-modal-header">
+                <div class="cinema-header-info">
+                    <span class="cinema-stream-badge"><span class="dot-live"></span> STREAMING</span>
+                    <h3 id="cinema-modal-title" class="cinema-modal-title">Film House Cinema</h3>
+                </div>
+                <button class="modal-close-btn" id="btn-close-cinema" aria-label="Close cinema player">
+                    <svg><use href="#icon-close"></use></svg>
+                </button>
+            </div>
+            <div class="cinema-iframe-wrapper" id="cinema-iframe-container">
+                <!-- Embedded Cinema Stream -->
+            </div>
+            <div class="cinema-modal-footer">
+                <span class="cinema-footer-brand">🍿 Powered by Film House Streaming Engine</span>
+                <span class="cinema-footer-quality" id="cinema-quality-label">1080p HD</span>
+            </div>
+        </div>
+    </div>
+
     <!-- PROFILE DRAWER (SLIDE IN SIDEBAR) -->
     <div class="profile-drawer-overlay" id="profile-drawer">
         <div class="profile-drawer-container">
@@ -1271,6 +1293,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=93"></script>
+    <script src="app.js?v=94"></script>
 </body>
 </html>

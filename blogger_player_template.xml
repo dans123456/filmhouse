@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html b:css='false' b:defaultwidgetversion='2' b:layoutsVersion='3' b:responsive='true' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+<head>
+  <meta charset='utf-8'/>
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' name='viewport'/>
+  <meta content='d5a6c39f06bb1c4f60a134f72a9315db' name='monetag'/>
+  <title>Film House Cinema Player</title>
+  <link href='https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap' rel='stylesheet'/>
+  
+  <!-- Monetag Ad Tag Zone: 12125242 -->
+  <script>(function(s){s.dataset.zone='12125242',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+
+  <b:skin><![CDATA[
+    /* Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: radial-gradient(circle at 50% 10%, #151926 0%, #080a0f 100%);
+      color: #e6edf3;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 16px 12px 40px;
+      overflow-x: hidden;
+    }
+
+    /* Top Brand Header */
+    .brand-header {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(18, 22, 34, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 188, 0, 0.15);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .brand-logo img {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 188, 0, 0.4);
+    }
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #00c8ff;
+      background: rgba(0, 200, 255, 0.1);
+      border: 1px solid rgba(0, 200, 255, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Theater Player Wrapper */
+    .player-card {
+      width: 100%;
+      max-width: 960px;
+      background: rgba(15, 18, 28, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 188, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Video Viewport */
+    .video-viewport {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+      background: #000;
+      overflow: hidden;
+    }
+    .video-viewport video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    /* Loading Overlay */
+    .player-loader {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 12, 18, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      z-index: 10;
+      transition: opacity 0.4s ease;
+    }
+    .spinner {
+      width: 46px;
+      height: 46px;
+      border: 3px solid rgba(255, 188, 0, 0.15);
+      border-top-color: #ffd700;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loader-text {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* Video Meta & Controls Below */
+    .player-meta {
+      padding: 16px 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .meta-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .movie-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      flex: 1;
+      min-width: 200px;
+    }
+    .meta-tags {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tag-quality {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffd700;
+      background: rgba(255, 215, 0, 0.12);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      padding: 4px 9px;
+      border-radius: 6px;
+    }
+    .tag-server {
+      font-size: 11px;
+      font-weight: 600;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 4px 9px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .dot-live {
+      width: 6px;
+      height: 6px;
+      background: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    /* Action Buttons Row */
+    .action-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.25s ease;
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #ffd700 0%, #ff9900 100%);
+      color: #0b0d14;
+      box-shadow: 0 4px 16px rgba(255, 188, 0, 0.3);
+    }
+    .btn-gold:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 188, 0, 0.45);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* Notice Footer */
+    .player-footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.5;
+      max-width: 600px;
+    }
+    .player-footer a {
+      color: #ffd700;
+      text-decoration: none;
+    }
+
+    /* Error Message Box */
+    .error-card {
+      display: none;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 16px;
+      border-radius: 8px;
+      color: #fca5a5;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    /* Embedded In-App Mode (when inside Film House Telegram Mini App) */
+    html.in-iframe body {
+      padding: 0 !important;
+      margin: 0 !important;
+      background: #000 !important;
+      min-height: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    html.in-iframe .brand-header,
+    html.in-iframe .player-footer {
+      display: none !important;
+    }
+    html.in-iframe .player-card {
+      max-width: 100% !important;
+      width: 100% !important;
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      background: #000 !important;
+    }
+    html.in-iframe .video-viewport {
+      width: 100% !important;
+      padding-top: 56.25% !important;
+      background: #000 !important;
+    }
+    html.in-iframe .player-meta {
+      padding: 8px 12px 12px !important;
+      background: #090b10 !important;
+    }
+    html.in-iframe .movie-title {
+      font-size: 15px !important;
+    }
+    html.in-iframe .action-row {
+      display: none !important; /* Download already available natively in Film House */
+    }
+  ]]></b:skin>
+</head>
+<body>
+  <!-- Brand Header -->
+  <header class='brand-header'>
+    <a class='brand-logo' href='https://t.me/Filmhouseappbot'>
+      <img alt='Film House' src='https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png'/>
+      <span class='brand-title'>FILM HOUSE CINEMA</span>
+    </a>
+    <span class='brand-badge'>HD STREAMING</span>
+  </header>
+
+  <!-- Cinema Card -->
+  <main class='player-card'>
+    <!-- Video Player Viewport -->
+    <div class='video-viewport' id='viewport'>
+      <div class='player-loader' id='loader'>
+        <div class='spinner'></div>
+        <div class='loader-text'>Connecting to Film House Stream Engine...</div>
+      </div>
+      <video controls='controls' id='mainVideo' playsinline='playsinline' preload='auto'>
+        Your browser does not support HTML5 video streaming.
+      </video>
+    </div>
+
+    <!-- Video Meta Info -->
+    <div class='player-meta'>
+      <div class='meta-header'>
+        <h1 class='movie-title' id='movieTitle'>Film House Cinema Stream</h1>
+        <div class='meta-tags'>
+          <span class='tag-quality' id='qualityTag'>1080p HD</span>
+          <span class='tag-server'><span class='dot-live'></span> FAST CDN</span>
+        </div>
+      </div>
+
+      <div class='error-card' id='errorCard'>
+        ⚠️ <b>Stream link missing or expired.</b> Please launch this title directly from the Film House Telegram Bot.
+      </div>
+
+      <!-- Action Buttons Row -->
+      <div class='action-row'>
+        <a class='btn btn-gold' href='#' id='btnDownload' target='_blank'>
+          ⬇️ Direct Download File
+        </a>
+        <a class='btn btn-secondary' href='https://t.me/Filmhouseappbot' target='_blank'>
+          🍿 Open Film House Bot
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class='player-footer'>
+    Powered by <b>Film House Global Streaming Infrastructure</b>.<br/>
+    If video buffers, pause for 5 seconds to build buffer or use the direct download button above.
+  </footer>
+
+  <!-- Script: Universal Smart Stream Resolver -->
+  <script type='text/javascript'>
+  //<![CDATA[
+    document.addEventListener("DOMContentLoaded", function() {
+      try {
+        if (window.self !== window.top) {
+          document.documentElement.classList.add('in-iframe');
+          // Anti-leech: Check embed origin
+          const ref = (document.referrer || "").toLowerCase();
+          const allowedEmbeds = ["dans123456.github.io", "web.telegram.org", "t.me", "telegram.org", "localhost", "127.0.0.1"];
+          const isAllowed = allowedEmbeds.some(o => ref.includes(o)) || !ref;
+          if (!isAllowed) {
+            document.body.innerHTML = "<div style='color:#ef4444;text-align:center;padding:50px 20px;font-family:sans-serif;'><h2>⛔ Access Denied</h2><p style='color:#94a3b8;'>Unauthorized embedding detected. Watch exclusively inside <b>@Filmhouseappbot</b>.</p></div>";
+            throw new Error("Unauthorized embed origin.");
+          }
+        }
+      } catch (e) {
+        document.documentElement.classList.add('in-iframe');
+      }
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const watchParam = urlParams.get('watch') || urlParams.get('stream') || urlParams.get('id') || urlParams.get('dl') || '';
+      const titleParam = urlParams.get('title') || urlParams.get('name') || '';
+      const qualityParam = urlParams.get('quality') || '1080p HD';
+
+      const videoEl = document.getElementById('mainVideo');
+      const loaderEl = document.getElementById('loader');
+      const titleEl = document.getElementById('movieTitle');
+      const qualityEl = document.getElementById('qualityTag');
+      const downloadBtn = document.getElementById('btnDownload');
+      const errorCard = document.getElementById('errorCard');
+
+      if (titleParam) {
+        titleEl.textContent = decodeURIComponent(titleParam);
+        document.title = decodeURIComponent(titleParam) + " - Film House Cinema";
+      }
+      if (qualityParam) {
+        qualityEl.textContent = qualityParam;
+      }
+
+      let finalStreamUrl = "";
+
+      if (watchParam) {
+        let clean = decodeURIComponent(watchParam).trim();
+        
+        // Case 1: If clean is full URL (e.g. herokuapp / koyeb / publicbotshub / raw)
+        if (clean.startsWith('http://') || clean.startsWith('https://')) {
+          if (clean.includes('watch=')) {
+            // Extract token from inside a watch URL
+            const match = clean.match(/watch=([a-zA-Z0-9_\-]+)/);
+            if (match && match[1]) {
+              clean = match[1];
+              finalStreamUrl = "https://fs1vivid-stone-33239114-4ca6324ed1d7.herokuapp.com/dl/" + clean;
+            } else {
+              finalStreamUrl = clean;
+            }
+          } else if (clean.includes('/watch/')) {
+            // Replace /watch/ with /dl/ for direct video stream
+            finalStreamUrl = clean.replace('/watch/', '/dl/');
+          } else {
+            finalStreamUrl = clean;
+          }
+        } 
+        // Case 2: Just a raw hex/token ID (e.g. 6adee561a4b67b48703250e2)
+        else {
+          finalStreamUrl = "https://fs1vivid-stone-33239114-4ca6324ed1d7.herokuapp.com/dl/" + encodeURIComponent(clean);
+        }
+      }
+
+      if (finalStreamUrl) {
+        videoEl.src = finalStreamUrl;
+        downloadBtn.href = finalStreamUrl;
+
+        // Hide loader when video can play
+        videoEl.addEventListener('canplay', function() {
+          if (loaderEl) loaderEl.style.opacity = '0';
+          setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 400);
+        });
+
+        videoEl.addEventListener('error', function(e) {
+          console.warn("Video load issue:", e);
+          if (loaderEl) loaderEl.style.display = 'none';
+          if (errorCard) {
+            errorCard.style.display = 'block';
+            errorCard.innerHTML = "⚠️ <b>Stream server is warming up.</b> Tap <b>Direct Download File</b> or reload in 10 seconds.";
+          }
+        });
+      } else {
+        if (loaderEl) loaderEl.style.display = 'none';
+        if (errorCard) errorCard.style.display = 'block';
+      }
+    });
+  //]]>
+  </script>
+
+  <!-- Required hidden Blogger section -->
+  <div style='display:none;'>
+    <b:section id='content' showaddelement='no'/>
+  </div>
+</body>
+</html>

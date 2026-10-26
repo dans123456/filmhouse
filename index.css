@@ -1664,6 +1664,178 @@ img {
 }
 
 /* ==========================================================================
+   IN-APP CINEMA PLAYER MODAL (MOBILE HARDENED & RESPONSIVE)
+   ========================================================================== */
+#cinema-modal {
+    z-index: 2500; /* Strictly above detail modal (1200) and bottom navigation (1000) */
+}
+
+.cinema-modal-container {
+    width: 96%;
+    max-width: 880px;
+    background: #0b0d14;
+    border: 1px solid rgba(255, 188, 0, 0.35);
+    border-radius: 16px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9), 0 0 45px rgba(255, 188, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    max-height: 90vh;
+}
+
+.cinema-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(18, 22, 34, 0.98);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 10px;
+}
+
+.cinema-modal-header .modal-close-btn {
+    position: static;
+    top: auto;
+    right: auto;
+    margin-left: auto;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.cinema-modal-header .modal-close-btn:hover {
+    background: rgba(255, 59, 48, 0.25);
+    border-color: rgba(255, 59, 48, 0.5);
+}
+
+.cinema-header-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.cinema-stream-badge {
+    font-size: 10px;
+    font-weight: 800;
+    color: #ffd700;
+    background: rgba(255, 215, 0, 0.12);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    padding: 3px 8px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.cinema-stream-badge .dot-live {
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 6px #10b981;
+    animation: livePulse 1.5s infinite;
+}
+
+@keyframes livePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.cinema-modal-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.cinema-iframe-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background: #000;
+    overflow: hidden;
+}
+
+.cinema-iframe-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #000;
+}
+
+.cinema-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: rgba(14, 17, 26, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.cinema-footer-brand {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.cinema-footer-quality {
+    font-weight: 700;
+    color: #ffd700;
+    background: rgba(255, 215, 0, 0.12);
+    border: 1px solid rgba(255, 215, 0, 0.25);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+}
+
+/* Mobile Responsive Optimization for Telegram Mobile App */
+@media (max-width: 640px) {
+    .cinema-modal-container {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 16px 16px 0 0;
+        margin-top: auto;
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
+        max-height: 94vh;
+    }
+    .cinema-modal-header {
+        padding: 8px 12px;
+    }
+    .cinema-modal-title {
+        font-size: 12px;
+    }
+    .cinema-modal-footer {
+        padding: 6px 12px;
+    }
+}
+
+/* ==========================================================================
    PROFILE DRAWER (SLIDE-OUT DRAWERS)
    ========================================================================== */
 .profile-drawer-overlay {

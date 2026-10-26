@@ -14353,11 +14353,13 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADDRIAAuOS4ERVDC-pcYwNMhYE",
-        "quality": "720p"
+        "quality": "720p",
+        "stream_url": "6adee561a4b67b48703250e2"
       },
       {
         "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADAg8AAvVW8EZN7ask2gItlxYE",
-        "quality": "1080p"
+        "quality": "1080p",
+        "stream_url": "6adee561a4b67b48703250e2"
       }
     ]
   },
