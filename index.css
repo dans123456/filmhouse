@@ -1891,9 +1891,9 @@ img {
 /* Action Buttons Grid in Cinema View */
 .cinema-actions-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 4px 0;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 6px 0;
 }
 
 .cinema-action-btn {

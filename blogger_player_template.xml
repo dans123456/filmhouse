@@ -8,8 +8,12 @@
   <title>Film House Cinema Player</title>
   <link href='https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap' rel='stylesheet'/>
   
-  <!-- Monetag Ad Tag Zone: 12125242 -->
-  <script>(function(s){s.dataset.zone='12125242',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+  <!-- Monetag SmartLink Integration (Zone: 12129096) -->
+  <script type='text/javascript'>
+    //<![CDATA[
+    var MONETAG_SMARTLINK = 'https://uplcm.com/4/12129096';
+    //]]>
+  </script>
 
   <b:skin><![CDATA[
     /* Reset & Base */
@@ -466,7 +470,7 @@
       const downloadBtn = document.getElementById('btnDownload');
       const errorCard = document.getElementById('errorCard');
 
-      // Click-to-Play Overlay (Triggers Monetag Ad and starts HTML5 video)
+      // Click-to-Play Overlay (Starts HTML5 video & triggers SmartLink for web visitors)
       if (playOverlay) {
         playOverlay.addEventListener('click', function() {
           playOverlay.style.opacity = '0';
@@ -474,6 +478,21 @@
           if (videoEl) {
             videoEl.play().catch(err => console.log("Play error handled:", err));
           }
+          // If on web (outside Telegram iframe), open Monetag SmartLink in new tab
+          try {
+            if (!window.self || window.self === window.top) {
+              window.open(MONETAG_SMARTLINK, '_blank');
+            }
+          } catch (e) {}
+        });
+      }
+
+      // Monetag SmartLink on Direct Download button
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', function(e) {
+          try {
+            window.open(MONETAG_SMARTLINK, '_blank');
+          } catch (err) {}
         });
       }
 
