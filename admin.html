@@ -1170,6 +1170,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label for="movie-stream-url" style="margin: 0; font-weight: 600; color: #ffbc00; display: flex; align-items: center; gap: 6px;">
+                            <span>▶️ Online Streaming Link or Token (Optional)</span>
+                        </label>
+                        <span style="font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.12); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Monetag Ad Active</span>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
+                        <input type="text" id="movie-stream-url" placeholder="Paste stream token (e.g. 6adee561a4b67b48703250e2) or stream bot link..." style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace;">
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+                            💡 Accepts raw 24-char hex tokens, TGStream watch links, or Blogspot player links. Activates the in-app <b>Watch Online</b> button.
+                        </div>
+                    </div>
+                </div>
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; background: rgba(0, 136, 204, 0.08); border: 1px solid rgba(0, 136, 204, 0.25); padding: 10px 12px; border-radius: 6px;">
                     <input type="checkbox" id="add-movie-post-to-channel" checked style="width: 16px; height: 16px; accent-color: #0088cc; cursor: pointer;">
                     <label for="add-movie-post-to-channel" style="margin: 0; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; user-select: none;">
@@ -1235,9 +1249,9 @@
             <!-- Step 1: Input list of titles/IDs -->
             <div id="batch-step-input">
                 <p style="font-size: 12px; color: var(--text-secondary); margin-top: 0; margin-bottom: 12px; line-height: 1.5;">
-                    Enter multiple movie or series titles, TMDB IDs (e.g. <code>27205</code>), or TMDB URLs — <strong>one per line</strong>. The system queries TMDB in parallel to fetch posters, backdrops, ratings, overviews, and genres automatically.
+                    Enter multiple movie or series titles, TMDB IDs (e.g. <code>27205</code>), or TMDB URLs — <strong>one per line</strong>. You can optionally attach a stream link or token using a pipe: <code>Title | stream_token</code>.
                 </p>
-                <textarea id="batch-titles-input" placeholder="Inception&#10;Avatar: The Way of Water&#10;Breaking Bad&#10;Stranger Things&#10;Oppenheimer" style="width: 100%; min-height: 140px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; color: #fff; font-size: 13px; font-family: inherit; resize: vertical; box-sizing: border-box;"></textarea>
+                <textarea id="batch-titles-input" placeholder="Inception&#10;Home of the Brave | 6adee561a4b67b48703250e2&#10;Avatar: The Way of Water&#10;Breaking Bad&#10;Stranger Things" style="width: 100%; min-height: 140px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; color: #fff; font-size: 13px; font-family: inherit; resize: vertical; box-sizing: border-box;"></textarea>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
                     <span style="font-size: 11px; color: var(--text-muted);" id="batch-input-counter">0 titles entered</span>
@@ -1309,6 +1323,20 @@
                 <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 14px;">
                     💡 Season 1 link will be sent directly to Telegram users. All published seasons will be saved into their exact slots in the Film House App!
                 </div>
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label for="fulfill-stream-url" style="margin: 0; font-size: 11px; font-weight: 700; color: #ffbc00; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+                            <span>▶️ Online Streaming Link or Token (Optional)</span>
+                        </label>
+                        <span style="font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.12); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Monetag Stream</span>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
+                        <input type="text" id="fulfill-stream-url" placeholder="Paste stream token (e.g. 6adee561a4b67b48703250e2) or stream bot link..." style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace;">
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 5px; line-height: 1.4;">
+                            💡 Attaches streaming to this title so users can watch online in the app player.
+                        </div>
+                    </div>
+                </div>
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; background: rgba(0, 136, 204, 0.08); border: 1px solid rgba(0, 136, 204, 0.25); padding: 10px 12px; border-radius: 6px;">
                     <input type="checkbox" id="fulfill-post-to-channel" checked style="width: 16px; height: 16px; accent-color: #0088cc; cursor: pointer;">
                     <label for="fulfill-post-to-channel" style="margin: 0; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; user-select: none;">
@@ -1345,6 +1373,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=106"></script>
+    <script src="admin.js?v=108"></script>
 </body>
 </html>

@@ -246,6 +246,34 @@ function extractYoutubeId(urlOrId) {
     return cleanStr;
 }
 
+// Clean and extract stream token or URL from TGStream, Blogspot, or raw tokens
+function cleanStreamInput(input) {
+    if (!input) return "";
+    let s = String(input).trim();
+    if (!s) return "";
+    // If it's a URL, extract query parameters or path segments
+    if (s.includes("://") || s.includes("blogspot.com") || s.includes("watch") || s.includes("dl")) {
+        try {
+            // Check query parameters: ?watch=... or ?id=... or ?stream=... or ?dl=...
+            const qMatch = s.match(/[?&](?:watch|stream|id|dl)=([^&#]+)/i);
+            if (qMatch && qMatch[1]) {
+                return decodeURIComponent(qMatch[1]).trim();
+            }
+            // Check path segments: /watch/TOKEN or /dl/TOKEN or /stream/TOKEN
+            const pathMatch = s.match(/(?:\/watch\/|\/dl\/|\/stream\/|\/v\/)([a-zA-Z0-9_\-]+)/i);
+            if (pathMatch && pathMatch[1]) {
+                return pathMatch[1].trim();
+            }
+        } catch (e) {}
+    }
+    // Check for 24-character hex ID (standard in TGStream / MongoDB)
+    const hexMatch = s.match(/\b([a-f0-9]{24})\b/i);
+    if (hexMatch) {
+        return hexMatch[1];
+    }
+    return s;
+}
+
 function extractTmdbIdAndType(inputVal) {
     if (!inputVal || typeof inputVal !== "string") return null;
     if (!inputVal.toLowerCase().includes("themoviedb.org")) return null;
@@ -2655,6 +2683,12 @@ function showMovieDetails(movie) {
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                <label style="font-size: 11px; color: #ffbc00; text-transform: uppercase; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                    <span>▶️ Online Streaming Link or Token (Monetag Player)</span>
+                </label>
+                <input type="text" id="edit-movie-stream-url" value="${escapeHTML(movie.stream_url || (movie.links && movie.links[0] && movie.links[0].stream_url ? movie.links[0].stream_url : ''))}" placeholder="Paste stream token (e.g. 6adee561a4b67b48703250e2) or stream bot link..." style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%; font-family: monospace;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <label style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold;">Categories</label>
                     <button type="button" class="btn btn-secondary btn-sm" id="btn-edit-auto-cats" style="font-size: 11px; padding: 2px 8px; border-radius: 4px; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3); cursor: pointer;">⚡ Auto-Detect</button>
@@ -2705,7 +2739,7 @@ function showMovieDetails(movie) {
         </div>
         ` : ''}
 
-        <div style="margin-bottom: 24px;">
+        <div style="margin-bottom: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <h5 style="margin: 0; color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Telegram Download Links</h5>
                 <button class="btn btn-secondary btn-sm" id="btn-edit-links-toggle" style="font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Edit Details</button>
@@ -2744,6 +2778,32 @@ function showMovieDetails(movie) {
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Online Streaming Status & Direct Test -->
+        <div style="margin-bottom: 24px; background: rgba(255, 188, 0, 0.03); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 6px; padding: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h5 style="margin: 0; color: #ffbc00; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+                    <span>▶️ Online Streaming (Monetag Player)</span>
+                </h5>
+                ${(movie.stream_url || (movie.links && movie.links[0] && movie.links[0].stream_url)) ? `
+                    <span style="font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.15); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 10px; font-weight: 700;">Active</span>
+                ` : `
+                    <span style="font-size: 10px; color: var(--text-muted); background: rgba(255, 255, 255, 0.05); padding: 2px 8px; border-radius: 10px;">Not Attached</span>
+                `}
+            </div>
+            ${(movie.stream_url || (movie.links && movie.links[0] && movie.links[0].stream_url)) ? `
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <div style="font-size: 12px; color: var(--text-secondary); font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%;">
+                        Token: <strong style="color: #fff;">${escapeHTML(movie.stream_url || movie.links[0].stream_url)}</strong>
+                    </div>
+                    <a href="https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(movie.stream_url || movie.links[0].stream_url)}&title=${encodeURIComponent(movie.title)}" target="_blank" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 10px; border-color: rgba(255, 188, 0, 0.35); color: #ffbc00; text-decoration: none; white-space: nowrap;">Test Player ▶️</a>
+                </div>
+            ` : `
+                <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                    Click <strong>Edit Details</strong> above to add a stream link/token so users can stream this movie inside the app.
+                </div>
+            `}
         </div>
 
         <div style="border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 14px;">
@@ -3030,6 +3090,8 @@ function showMovieDetails(movie) {
             const newTrailerVal = document.getElementById("edit-movie-trailer")?.value.trim() || "";
             const newTrailerId = extractYoutubeId(newTrailerVal);
             const newReleaseDate = document.getElementById("edit-movie-release-date")?.value.trim() || "";
+            const newStreamVal = document.getElementById("edit-movie-stream-url")?.value.trim() || "";
+            const cleanStreamVal = cleanStreamInput(newStreamVal);
             
             // Get selected categories
             const newCategories = Array.from(document.querySelectorAll(".edit-cat-checkbox:checked")).map(cb => cb.value);
@@ -3047,6 +3109,10 @@ function showMovieDetails(movie) {
                 allCatalogMovies[movieIndex].csv_id = newId;
                 allCatalogMovies[movieIndex].type = newType === 'Series' ? 'Series' : 'Movie';
                 allCatalogMovies[movieIndex].links = finalLinks;
+                allCatalogMovies[movieIndex].stream_url = cleanStreamVal;
+                if (cleanStreamVal && allCatalogMovies[movieIndex].links && allCatalogMovies[movieIndex].links.length > 0) {
+                    allCatalogMovies[movieIndex].links[0].stream_url = cleanStreamVal;
+                }
                 allCatalogMovies[movieIndex].poster = newPoster || "img/FilmHouse3_nobg.png";
                 allCatalogMovies[movieIndex].backdrop = newBackdrop || "img/FilmHouse.png";
                 allCatalogMovies[movieIndex].overview = newOverview || "No synopsis available.";
@@ -3649,12 +3715,14 @@ function resetAddMovieModalState() {
     const customOverview = document.getElementById("movie-overview");
     const customTrailer = document.getElementById("movie-trailer");
     const customReleaseDate = document.getElementById("movie-release-date");
+    const customStreamUrl = document.getElementById("movie-stream-url");
 
     if (customPoster) customPoster.value = "";
     if (customBackdrop) customBackdrop.value = "";
     if (customOverview) customOverview.value = "";
     if (customTrailer) customTrailer.value = "";
     if (customReleaseDate) customReleaseDate.value = "";
+    if (customStreamUrl) customStreamUrl.value = "";
 
     document.querySelectorAll(".add-cat-checkbox").forEach(cb => {
         cb.checked = (cb.value === "Main");
@@ -4016,6 +4084,8 @@ if (addMovieForm) {
         const customTrailerVal = document.getElementById("movie-trailer")?.value.trim() || "";
         const customTrailerId = extractYoutubeId(customTrailerVal);
         const customReleaseDate = document.getElementById("movie-release-date")?.value.trim() || "";
+        const customStreamVal = document.getElementById("movie-stream-url")?.value.trim() || "";
+        const cleanStreamVal = cleanStreamInput(customStreamVal);
         
         // Get selected categories
         const checkedCategories = Array.from(document.querySelectorAll(".add-cat-checkbox:checked")).map(cb => cb.value);
@@ -4168,8 +4238,12 @@ if (addMovieForm) {
             director: "",
             trailer: trailerId,
             runtime: "",
+            stream_url: cleanStreamVal,
             links: linksList
         };
+        if (cleanStreamVal && linksList.length > 0) {
+            linksList[0].stream_url = cleanStreamVal;
+        }
         
         allCatalogMovies.unshift(newMovie);
         newlyAddedIds.push(id); // Show new addition badge!
@@ -7054,6 +7128,14 @@ document.addEventListener("DOMContentLoaded", () => {
         let tmdbId = null;
         let preferredType = null;
         let cleanQuery = rawQuery.trim();
+        let streamTokenHint = "";
+
+        // Extract optional stream link or token attached via pipe (e.g. "Title | stream_url")
+        if (cleanQuery.includes("|")) {
+            const parts = cleanQuery.split("|");
+            cleanQuery = parts[0].trim();
+            streamTokenHint = cleanStreamInput(parts.slice(1).join("|").trim());
+        }
 
         // 1. Check if input is a TMDB URL
         const parsedUrl = extractTmdbIdAndType(cleanQuery);
@@ -7264,6 +7346,7 @@ document.addEventListener("DOMContentLoaded", () => {
             language: originalLanguage,
             trailer: trailerId,
             rawLinksText: "",
+            stream_url: streamTokenHint || "",
             linksList: isSeries ? [{ season: "Season 1", url: "" }] : [{ quality: "720p", url: "" }],
             links: []
         };
@@ -7290,6 +7373,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const linkIdx = parseInt(select.dataset.linkIdx);
             if (batchStagedMovies[itemIdx]?.linksList?.[linkIdx]) {
                 batchStagedMovies[itemIdx].linksList[linkIdx].quality = select.value;
+            }
+        });
+        batchStagingContainer.querySelectorAll(".batch-stream-url-input").forEach(input => {
+            const itemIdx = parseInt(input.dataset.itemIdx);
+            if (batchStagedMovies[itemIdx]) {
+                batchStagedMovies[itemIdx].stream_url = input.value.trim();
             }
         });
     }
@@ -7453,6 +7542,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     ${categoriesText ? `<div style="font-size: 10px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(categoriesText)}</div>` : ''}
                     ${linksSectionHtml}
+                    <!-- Stream Link / Token in Batch Staging Card -->
+                    <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box;">
+                        <span style="font-size: 10px; color: #ffbc00; font-weight: 700; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; gap: 3px;">
+                            <span>▶️ Stream:</span>
+                        </span>
+                        <input type="text" class="batch-stream-url-input" data-item-idx="${idx}" value="${escapeHTML(item.stream_url || '')}" placeholder="Paste File Stream Bot link or token (optional)..." style="flex: 1; min-width: 0; width: 100%; padding: 4px 7px; background: rgba(255, 188, 0, 0.04); border: 1px solid rgba(255, 188, 0, 0.25); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
+                        ${item.stream_url ? `
+                            <a href="https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(cleanStreamInput(item.stream_url))}&title=${encodeURIComponent(item.title)}" target="_blank" style="font-size: 10px; color: #ffbc00; text-decoration: none; padding: 2px 7px; border: 1px solid rgba(255, 188, 0, 0.35); border-radius: 3px; flex-shrink: 0; white-space: nowrap; background: rgba(255, 188, 0, 0.1);" title="Test Stream Player">Test ▶️</a>
+                        ` : ''}
+                    </div>
                 </div>
             `;
 
@@ -7605,6 +7704,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 renderBatchStagingTable();
             });
         });
+
+        batchStagingContainer.querySelectorAll(".batch-stream-url-input").forEach(input => {
+            input.addEventListener("input", (e) => {
+                const itemIdx = parseInt(e.target.dataset.itemIdx);
+                if (batchStagedMovies[itemIdx]) {
+                    batchStagedMovies[itemIdx].stream_url = e.target.value.trim();
+                }
+            });
+        });
     }
 
     if (btnFetchBatchTmdb) {
@@ -7685,6 +7793,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     finalLinks = parseBulkLinks(item.rawLinksText, item.isSeries);
                 }
 
+                const cleanStreamVal = cleanStreamInput(item.stream_url || "");
                 const newMovie = {
                     csv_id: item.id,
                     tmdb_id: item.numericId,
@@ -7703,9 +7812,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     director: "",
                     trailer: item.trailer || "",
                     runtime: "",
+                    stream_url: cleanStreamVal,
                     links: finalLinks,
                     channelBroadcasted: !shouldBroadcast // If opted out, mark true
                 };
+                if (cleanStreamVal && finalLinks.length > 0) {
+                    finalLinks[0].stream_url = cleanStreamVal;
+                }
 
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(newMovie.csv_id);
