@@ -1666,7 +1666,10 @@ img {
 /* ==========================================================================
    IN-APP CINEMA THEATER VIEW (TOP STICKY PLAYER + SCROLLABLE DETAILS)
    ========================================================================== */
-#cinema-modal,
+#cinema-modal {
+    display: none !important;
+}
+
 #cinema-modal.active {
     display: flex !important;
     position: fixed !important;
@@ -2132,7 +2135,6 @@ img {
 
 /* Responsive Cinema Theater: Landscape Immersive Mode & Fullscreen Mode */
 @media (orientation: landscape) {
-    #cinema-modal,
     #cinema-modal.active {
         padding: 0 !important;
         background: #000 !important;
