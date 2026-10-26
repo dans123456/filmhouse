@@ -3758,17 +3758,6 @@ function openDetailModal(movie) {
                     return;
                 }
                 addWatchHistory(movie.csv_id || movie.id);
-
-                // Monetag Smart Link (Direct Link: 12129096)
-                const smartLinkUrl = "https://uplcm.com/4/12129096";
-                try {
-                    if (window.Telegram?.WebApp?.openLink) {
-                        window.Telegram.WebApp.openLink(smartLinkUrl);
-                    }
-                } catch (err) {
-                    console.warn("SmartLink trigger error:", err);
-                }
-
                 openCinemaModal(movie);
             });
             actionsRow.appendChild(watchOnlineBtn);
@@ -4251,7 +4240,62 @@ function openCinemaModal(movie, customStreamUrl) {
     if (detailsContainer) {
         detailsContainer.replaceChildren();
 
-        // 1. Movie Header with Title & Metadata Chips
+        // 1. Streaming Server Switcher Bar (Server 1 vs Server 2 VIP High-Speed)
+        const serverBar = document.createElement("div");
+        serverBar.className = "cinema-servers-bar";
+        serverBar.innerHTML = `
+            <div class="cinema-servers-header">
+                <div class="cinema-servers-header-left">
+                    <svg><use href="#icon-server"></use></svg>
+                    <span>Streaming Server</span>
+                </div>
+                <div class="cinema-servers-hint">
+                    <span>● Multi-CDN Active</span>
+                </div>
+            </div>
+            <div class="cinema-servers-list">
+                <button type="button" class="cinema-server-pill active" id="cinema-server-1">
+                    <span class="server-status-dot"></span>
+                    <span>Server 1 (Default HD)</span>
+                </button>
+                <button type="button" class="cinema-server-pill premium" id="cinema-server-2">
+                    <svg><use href="#icon-zap"></use></svg>
+                    <span>Server 2 (VIP High-Speed ⚡)</span>
+                </button>
+            </div>
+        `;
+        detailsContainer.appendChild(serverBar);
+
+        const s1Btn = serverBar.querySelector("#cinema-server-1");
+        const s2Btn = serverBar.querySelector("#cinema-server-2");
+
+        if (s1Btn && s2Btn) {
+            s1Btn.addEventListener("click", () => {
+                s1Btn.classList.add("active");
+                s2Btn.classList.remove("active");
+                showToast("Switched to Server 1 (Default HD)", "info");
+            });
+
+            s2Btn.addEventListener("click", () => {
+                s2Btn.classList.add("active");
+                s1Btn.classList.remove("active");
+                showToast("⚡ Connecting to High-Speed VIP Server...", "success");
+
+                // Trigger Monetag VIP SmartLink
+                const smartLinkUrl = "https://uplcm.com/4/12129096";
+                try {
+                    if (window.Telegram?.WebApp?.openLink) {
+                        window.Telegram.WebApp.openLink(smartLinkUrl);
+                    } else {
+                        window.open(smartLinkUrl, "_blank");
+                    }
+                } catch (e) {
+                    console.warn("VIP SmartLink trigger:", e);
+                }
+            });
+        }
+
+        // 2. Movie Header with Title & Metadata Chips
         const headerEl = document.createElement("div");
         headerEl.className = "cinema-details-header";
 
@@ -4321,7 +4365,7 @@ function openCinemaModal(movie, customStreamUrl) {
         headerEl.appendChild(chipsEl);
         detailsContainer.appendChild(headerEl);
 
-        // 2. Action Buttons Grid (Download, Watchlist, Share)
+        // 3. Action Buttons Grid (Download, Watchlist, Share)
         const actionsGrid = document.createElement("div");
         actionsGrid.className = "cinema-actions-grid";
 
@@ -4354,21 +4398,6 @@ function openCinemaModal(movie, customStreamUrl) {
             shareMovie(movie);
         });
         actionsGrid.appendChild(shareBtn);
-
-        // Fast Mirror Action (Direct Monetag SmartLink)
-        const mirrorBtn = document.createElement("button");
-        mirrorBtn.className = "cinema-action-btn";
-        mirrorBtn.innerHTML = `<svg style="color:var(--accent,#ffcc00)"><use href="#icon-zap"></use></svg><span>Fast Mirror</span>`;
-        mirrorBtn.title = "Switch to fast mirror stream";
-        mirrorBtn.addEventListener("click", () => {
-            const smartLinkUrl = "https://uplcm.com/4/12129096";
-            if (window.Telegram?.WebApp?.openLink) {
-                window.Telegram.WebApp.openLink(smartLinkUrl);
-            } else {
-                window.open(smartLinkUrl, "_blank");
-            }
-        });
-        actionsGrid.appendChild(mirrorBtn);
 
         detailsContainer.appendChild(actionsGrid);
 
