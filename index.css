@@ -1664,82 +1664,94 @@ img {
 }
 
 /* ==========================================================================
-   IN-APP CINEMA PLAYER MODAL (MOBILE HARDENED & RESPONSIVE)
+   IN-APP CINEMA THEATER VIEW (TOP STICKY PLAYER + SCROLLABLE DETAILS)
    ========================================================================== */
 #cinema-modal {
-    z-index: 2500; /* Strictly above detail modal (1200) and bottom navigation (1000) */
+    z-index: 2500; /* Above all other layers */
+    padding: 0;
+    background: #000000;
+    align-items: stretch;
+    justify-content: flex-start;
 }
 
-.cinema-modal-container {
-    width: 96%;
-    max-width: 880px;
-    background: #0b0d14;
-    border: 1px solid rgba(255, 188, 0, 0.35);
-    border-radius: 16px;
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9), 0 0 45px rgba(255, 188, 0, 0.12);
+.cinema-theater-container {
+    width: 100%;
+    max-width: 920px;
+    height: 100%;
+    max-height: 100vh;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    padding: 0;
+    background: #080a10;
     position: relative;
-    max-height: 90vh;
+    overflow: hidden;
 }
 
-.cinema-modal-header {
+/* Top App Bar */
+.cinema-top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 14px;
-    background: rgba(18, 22, 34, 0.98);
+    padding: 8px 14px;
+    background: #0c0f17;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     gap: 10px;
-}
-
-.cinema-modal-header .modal-close-btn {
-    position: static;
-    top: auto;
-    right: auto;
-    margin-left: auto;
     flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    z-index: 30;
+}
+
+.cinema-back-btn {
     background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.2s ease;
 }
 
-.cinema-modal-header .modal-close-btn:hover {
-    background: rgba(255, 59, 48, 0.25);
+.cinema-back-btn:hover, .cinema-back-btn:active {
+    background: rgba(255, 59, 48, 0.2);
     border-color: rgba(255, 59, 48, 0.5);
+    color: #ff3b30;
 }
 
-.cinema-header-info {
+.cinema-top-center {
     display: flex;
     align-items: center;
     gap: 8px;
     flex: 1;
     overflow: hidden;
     min-width: 0;
+    justify-content: center;
+}
+
+.cinema-top-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .cinema-stream-badge {
     font-size: 10px;
     font-weight: 800;
-    color: #ffd700;
-    background: rgba(255, 215, 0, 0.12);
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    padding: 3px 8px;
+    color: var(--primary-color);
+    background: rgba(255, 188, 0, 0.12);
+    border: 1px solid var(--border-color-glow);
+    padding: 2px 7px;
     border-radius: 12px;
     letter-spacing: 0.5px;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     flex-shrink: 0;
 }
 
@@ -1753,26 +1765,41 @@ img {
     animation: livePulse 1.5s infinite;
 }
 
-@keyframes livePulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.85); }
+.cinema-fs-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
 }
 
-.cinema-modal-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: 0;
+.cinema-fs-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Sticky Video Viewport (Fixed at Top of Screen) */
+.cinema-sticky-player {
+    width: 100%;
+    background: #000000;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    flex-shrink: 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }
 
 .cinema-iframe-wrapper {
     position: relative;
     width: 100%;
     padding-top: 56.25%; /* 16:9 Aspect Ratio */
-    background: #000;
+    background: #000000;
     overflow: hidden;
 }
 
@@ -1783,56 +1810,230 @@ img {
     width: 100%;
     height: 100%;
     border: none;
-    background: #000;
+    background: #000000;
 }
 
-.cinema-modal-footer {
+/* Scrollable Movie Details (Beneath the Video) */
+.cinema-details-scroll-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 18px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: radial-gradient(circle at 50% 0%, #101420 0%, #07080c 100%);
+}
+
+.cinema-details-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cinema-details-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.25;
+}
+
+.cinema-details-chips {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px 14px;
-    background: rgba(14, 17, 26, 0.95);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    font-size: 11px;
-    color: var(--text-muted);
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text-secondary);
 }
 
-.cinema-footer-brand {
-    color: #94a3b8;
+.cinema-chip {
+    padding: 3px 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-weight: 600;
     font-size: 11px;
 }
 
-.cinema-footer-quality {
-    font-weight: 700;
+.cinema-chip-rating {
     color: #ffd700;
-    background: rgba(255, 215, 0, 0.12);
-    border: 1px solid rgba(255, 215, 0, 0.25);
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-size: 10px;
+    border-color: rgba(255, 215, 0, 0.3);
+    background: rgba(255, 215, 0, 0.1);
 }
 
-/* Mobile Responsive Optimization for Telegram Mobile App */
-@media (max-width: 640px) {
-    .cinema-modal-container {
+.cinema-chip-quality {
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+/* Action Buttons Grid in Cinema View */
+.cinema-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 4px 0;
+}
+
+.cinema-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.cinema-action-btn:hover, .cinema-action-btn:active {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.cinema-action-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Synopsis Card */
+.cinema-synopsis-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cinema-synopsis-heading {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cinema-synopsis-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.cinema-back-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.cinema-fs-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+/* Landscape / Fullscreen Immersive Cinema Mode */
+@media (orientation: landscape) and (max-height: 650px) {
+    .cinema-top-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        max-width: 100%;
-        border-radius: 16px 16px 0 0;
-        margin-top: auto;
-        border-bottom: none;
-        border-left: none;
-        border-right: none;
-        max-height: 94vh;
+        background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 50;
     }
-    .cinema-modal-header {
-        padding: 8px 12px;
+    .cinema-theater-container:hover .cinema-top-bar,
+    .cinema-theater-container.show-controls .cinema-top-bar {
+        opacity: 1;
     }
-    .cinema-modal-title {
-        font-size: 12px;
+    .cinema-sticky-player {
+        height: 100%;
+        width: 100%;
     }
-    .cinema-modal-footer {
-        padding: 6px 12px;
+    .cinema-iframe-wrapper {
+        padding-top: 0;
+        height: 100%;
     }
+    .cinema-details-scroll-body {
+        display: none;
+    }
+}
+
+.cinema-theater-container.is-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    z-index: 3000;
+}
+.cinema-theater-container.is-fullscreen .cinema-sticky-player {
+    height: 100%;
+    width: 100%;
+}
+.cinema-theater-container.is-fullscreen .cinema-iframe-wrapper {
+    padding-top: 0;
+    height: 100%;
+}
+.cinema-theater-container.is-fullscreen .cinema-details-scroll-body {
+    display: none;
+}
+
+/* Detail Modal Hero Stream Button (Themed to Active Color Palette) */
+.detail-actions-row .btn.btn-stream-hero {
+    flex: 1 1 calc(50% - 6px);
+    background: var(--primary-gradient) !important;
+    color: #ffffff !important;
+    font-weight: 800;
+    box-shadow: 0 4px 18px var(--primary-glow, rgba(230, 57, 70, 0.4));
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    order: -2;
+    cursor: pointer;
+}
+
+.detail-actions-row .btn.btn-stream-hero .beta-pill {
+    font-size: 9px;
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 800;
+    margin-left: 2px;
+    letter-spacing: 0.5px;
+}
+
+.detail-actions-row .btn.btn-download-hero {
+    flex: 1 1 calc(50% - 6px);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-weight: 700;
+    order: -1;
+}
+
+.detail-actions-row .btn.btn-download-hero:hover,
+.detail-actions-row .btn.btn-download-hero:active {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.25);
 }
 
 /* ==========================================================================

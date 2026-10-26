@@ -3739,9 +3739,8 @@ function openDetailModal(movie) {
 
         if (isStreamingTester) {
             const watchOnlineBtn = document.createElement("button");
-            watchOnlineBtn.className = "btn btn-primary btn-stream-online";
-            watchOnlineBtn.style.cssText = "background: linear-gradient(135deg, #ffd700, #ff9900); color: #0b0d14; font-weight: 800; border: none; box-shadow: 0 4px 15px rgba(255, 188, 0, 0.35); display: inline-flex; align-items: center; gap: 6px; cursor: pointer;";
-            watchOnlineBtn.innerHTML = `<span>▶️</span><span>Watch Online</span><span style="font-size: 9px; background: rgba(0,0,0,0.25); color: #000; padding: 2px 5px; border-radius: 6px; font-weight: 800; margin-left: 2px;">BETA</span>`;
+            watchOnlineBtn.className = "btn btn-primary btn-stream-hero";
+            watchOnlineBtn.innerHTML = `<svg style="width:16px;height:16px;fill:currentColor;"><use href="#icon-play"></use></svg><span>Watch Online</span><span class="beta-pill">BETA</span>`;
             
             watchOnlineBtn.addEventListener("click", () => {
                 addWatchHistory(movie.csv_id || movie.id);
@@ -3751,7 +3750,7 @@ function openDetailModal(movie) {
         }
 
         const downloadBtn = document.createElement("button");
-        downloadBtn.className = "btn btn-secondary";
+        downloadBtn.className = "btn btn-secondary btn-download-hero";
         downloadBtn.appendChild(createSvgIcon("icon-download"));
         
         const dText = document.createElement("span");
@@ -4170,12 +4169,28 @@ function openTrailerModal(videoKey) {
 // Admin Whitelist for Streaming Beta Testing
 const STREAMING_ADMIN_IDS = ["1175336733", "1329840839"];
 
+// Close In-App Cinema Modal & Reset State
+function closeCinemaModal() {
+    const modal = document.getElementById("cinema-modal");
+    const container = document.getElementById("cinema-iframe-container");
+    const theater = document.querySelector(".cinema-theater-container");
+    if (modal) modal.classList.remove("active");
+    if (theater) theater.classList.remove("is-fullscreen");
+    if (container) container.replaceChildren();
+    if (window.Telegram?.WebApp?.BackButton) {
+        window.Telegram.WebApp.BackButton.hide();
+    }
+    if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+    }
+}
+
 // Open In-App Cinema Streaming Player Modal
 function openCinemaModal(movie, customStreamUrl) {
     const modal = document.getElementById("cinema-modal");
     const container = document.getElementById("cinema-iframe-container");
     const titleEl = document.getElementById("cinema-modal-title");
-    const qualityEl = document.getElementById("cinema-quality-label");
+    const detailsContainer = document.getElementById("cinema-details-container");
     if (!modal || !container || !movie) return;
 
     container.replaceChildren();
@@ -4196,10 +4211,6 @@ function openCinemaModal(movie, customStreamUrl) {
         streamTarget = "6adee561a4b67b48703250e2";
     }
 
-    if (qualityEl) {
-        qualityEl.textContent = movie.type === "Series" ? "Series HD" : "1080p HD";
-    }
-
     const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(streamTarget)}&title=${encodeURIComponent(title)}`;
 
     const iframe = document.createElement("iframe");
@@ -4209,6 +4220,162 @@ function openCinemaModal(movie, customStreamUrl) {
     iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-presentation");
 
     container.appendChild(iframe);
+
+    // Populate Rich Movie Details Directly Beneath Video Viewport
+    if (detailsContainer) {
+        detailsContainer.replaceChildren();
+
+        // 1. Movie Header with Title & Metadata Chips
+        const headerEl = document.createElement("div");
+        headerEl.className = "cinema-details-header";
+
+        const movieTitle = document.createElement("h2");
+        movieTitle.className = "cinema-details-title";
+        movieTitle.textContent = title;
+        headerEl.appendChild(movieTitle);
+
+        const chipsEl = document.createElement("div");
+        chipsEl.className = "cinema-details-chips";
+
+        const ratingVal = movie.rating || movie.imdb_rating || movie.vote_average;
+        if (ratingVal) {
+            const ratingChip = document.createElement("span");
+            ratingChip.className = "cinema-chip cinema-chip-rating";
+            ratingChip.textContent = `★ IMDb ${typeof ratingVal === 'number' ? ratingVal.toFixed(1) : ratingVal}`;
+            chipsEl.appendChild(ratingChip);
+        }
+
+        const typeChip = document.createElement("span");
+        typeChip.className = "cinema-chip";
+        typeChip.textContent = movie.type === "Series" ? "Series" : "Movie";
+        chipsEl.appendChild(typeChip);
+
+        const yearVal = movie.year || (movie.release_date ? movie.release_date.split("-")[0] : "");
+        if (yearVal) {
+            const yearChip = document.createElement("span");
+            yearChip.className = "cinema-chip";
+            yearChip.textContent = yearVal;
+            chipsEl.appendChild(yearChip);
+        }
+
+        const qualityChip = document.createElement("span");
+        qualityChip.className = "cinema-chip cinema-chip-quality";
+        qualityChip.textContent = movie.type === "Series" ? "Series HD" : "1080p HD";
+        chipsEl.appendChild(qualityChip);
+
+        if (movie.language) {
+            const langChip = document.createElement("span");
+            langChip.className = "cinema-chip";
+            langChip.textContent = String(movie.language).toUpperCase();
+            chipsEl.appendChild(langChip);
+        }
+
+        let genres = [];
+        if (Array.isArray(movie.genres)) {
+            genres = movie.genres;
+        } else if (typeof movie.genre === "string") {
+            genres = movie.genre.split(/[,/]/).map(g => g.trim()).filter(Boolean);
+        }
+        genres.forEach(g => {
+            const gChip = document.createElement("span");
+            gChip.className = "cinema-chip";
+            gChip.textContent = g;
+            chipsEl.appendChild(gChip);
+        });
+
+        headerEl.appendChild(chipsEl);
+        detailsContainer.appendChild(headerEl);
+
+        // 2. Action Buttons Grid (Download, Watchlist, Share)
+        const actionsGrid = document.createElement("div");
+        actionsGrid.className = "cinema-actions-grid";
+
+        // Download Action
+        const dlBtn = document.createElement("button");
+        dlBtn.className = "cinema-action-btn";
+        dlBtn.innerHTML = `<svg><use href="#icon-download"></use></svg><span>Download</span>`;
+        dlBtn.addEventListener("click", () => {
+            openDownloadModal(movie);
+        });
+        actionsGrid.appendChild(dlBtn);
+
+        // Watchlist Action
+        const inWl = state.watchlist && state.watchlist.includes(movie.csv_id || movie.id);
+        const wlBtn = document.createElement("button");
+        wlBtn.className = "cinema-action-btn";
+        wlBtn.innerHTML = `<svg><use href="${inWl ? '#icon-check' : '#icon-bookmark'}"></use></svg><span>${inWl ? 'Saved' : 'Watchlist'}</span>`;
+        wlBtn.addEventListener("click", () => {
+            toggleWatchlist(movie);
+            const nowWl = state.watchlist && state.watchlist.includes(movie.csv_id || movie.id);
+            wlBtn.innerHTML = `<svg><use href="${nowWl ? '#icon-check' : '#icon-bookmark'}"></use></svg><span>${nowWl ? 'Saved' : 'Watchlist'}</span>`;
+        });
+        actionsGrid.appendChild(wlBtn);
+
+        // Share Action
+        const shareBtn = document.createElement("button");
+        shareBtn.className = "cinema-action-btn";
+        shareBtn.innerHTML = `<svg><use href="#icon-share"></use></svg><span>Share</span>`;
+        shareBtn.addEventListener("click", () => {
+            shareMovie(movie);
+        });
+        actionsGrid.appendChild(shareBtn);
+
+        detailsContainer.appendChild(actionsGrid);
+
+        // 3. Synopsis Card
+        const synopsis = movie.synopsis || movie.overview || movie.description;
+        if (synopsis) {
+            const synCard = document.createElement("div");
+            synCard.className = "cinema-synopsis-card";
+
+            const synHead = document.createElement("div");
+            synHead.className = "cinema-synopsis-heading";
+            synHead.textContent = "Synopsis";
+            synCard.appendChild(synHead);
+
+            const synBody = document.createElement("div");
+            synBody.className = "cinema-synopsis-text";
+            synBody.textContent = synopsis;
+            synCard.appendChild(synBody);
+
+            detailsContainer.appendChild(synCard);
+        }
+    }
+
+    // Fullscreen Toggle Button Binding
+    const fsBtn = document.getElementById("btn-cinema-fullscreen");
+    if (fsBtn && !fsBtn._bound) {
+        fsBtn._bound = true;
+        fsBtn.addEventListener("click", () => {
+            const theater = document.querySelector(".cinema-theater-container");
+            if (!theater) return;
+            const isFs = theater.classList.toggle("is-fullscreen");
+            if (isFs) {
+                if (theater.requestFullscreen) {
+                    theater.requestFullscreen().catch(() => {});
+                } else if (theater.webkitRequestFullscreen) {
+                    theater.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        });
+    }
+
+    // Telegram Native BackButton support
+    if (window.Telegram?.WebApp?.BackButton) {
+        window.Telegram.WebApp.BackButton.show();
+        const onTgBack = () => {
+            closeCinemaModal();
+            window.Telegram.WebApp.BackButton.offClick(onTgBack);
+        };
+        window.Telegram.WebApp.BackButton.onClick(onTgBack);
+    }
+
     modal.classList.add("active");
     if (typeof triggerHaptic === "function") triggerHaptic("notification");
 }
@@ -5419,8 +5586,7 @@ function bindEvents() {
                     const frameBox = document.getElementById("trailer-iframe-container");
                     if (frameBox) frameBox.replaceChildren();
                 } else if (modalId === "cinema-modal") {
-                    const frameBox = document.getElementById("cinema-iframe-container");
-                    if (frameBox) frameBox.replaceChildren();
+                    closeCinemaModal();
                 }
             });
             // Click outside close
@@ -5431,8 +5597,7 @@ function bindEvents() {
                         const frameBox = document.getElementById("trailer-iframe-container");
                         if (frameBox) frameBox.replaceChildren();
                     } else if (modalId === "cinema-modal") {
-                        const frameBox = document.getElementById("cinema-iframe-container");
-                        if (frameBox) frameBox.replaceChildren();
+                        closeCinemaModal();
                     }
                 }
             });
