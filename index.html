@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=74">
+    <link rel="stylesheet" href="index.css?v=75">
 </head>
 <body>
 
@@ -704,6 +704,147 @@
                 </div>
             </div>
         </section>
+
+        <!-- DEDICATED FULL-SCREEN MEDIA DETAILS PAGE (PHONOFILM CINEMATIC LAYOUT) -->
+        <section id="screen-media-detail" class="app-screen">
+            <!-- Floating Glassmorphic Top Navigation -->
+            <div class="media-detail-top-nav">
+                <button type="button" class="media-nav-circle-btn" id="btn-media-back" aria-label="Go Back">
+                    <svg><use href="#icon-arrow-left"></use></svg>
+                </button>
+                <div class="media-top-nav-right">
+                    <button type="button" class="media-nav-circle-btn" id="btn-media-home" aria-label="Home">
+                        <svg><use href="#icon-play"></use></svg>
+                    </button>
+                    <button type="button" class="media-nav-circle-btn" id="btn-media-search" aria-label="Search">
+                        <svg><use href="#icon-search"></use></svg>
+                    </button>
+                    <button type="button" class="media-nav-circle-btn media-nav-me-btn" id="btn-media-profile" aria-label="User Profile">
+                        <svg><use href="#icon-profile"></use></svg>
+                        <span>Me</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Media Hero Viewport (Backdrop Banner / Sticky Video Stream Player) -->
+            <div class="media-hero-viewport" id="media-hero-viewport">
+                <!-- Preview Backdrop Banner -->
+                <div class="media-backdrop-wrapper" id="media-backdrop-container">
+                    <img src="" alt="Movie Backdrop" class="media-backdrop-img" id="media-backdrop-img">
+                    <div class="media-backdrop-overlay-top"></div>
+                    <div class="media-backdrop-overlay-bottom"></div>
+                    <button type="button" class="media-hero-play-fab" id="btn-hero-play-preview" aria-label="Start Watching">
+                        <svg><use href="#icon-play"></use></svg>
+                    </button>
+                </div>
+                <!-- Embedded Stream & Trailer Viewport -->
+                <div class="media-stream-iframe-container" id="media-stream-iframe-container" style="display: none;">
+                    <!-- Embedded live video player inserted here on stream -->
+                </div>
+            </div>
+
+            <!-- Main Media Info & Actions Container -->
+            <div class="media-detail-content" id="media-detail-content">
+                <!-- Movie Title -->
+                <h1 class="media-detail-title" id="media-detail-title">Loading...</h1>
+
+                <!-- Expandable Synopsis -->
+                <div class="media-synopsis-wrapper" id="media-synopsis-wrapper">
+                    <p class="media-synopsis-text" id="media-detail-synopsis"></p>
+                    <button type="button" class="media-synopsis-expand-btn" id="btn-expand-synopsis" style="display: none;">Read more</button>
+                </div>
+
+                <!-- Clean Meta Tag Chips Row (Movie • ★ 7.5 • 2024 • 1h 58m • Genres) -->
+                <div class="media-meta-chips-row" id="media-meta-chips-row">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Primary Action Buttons Row (👑 Stream | 📥 Download | ▶ Trailer) -->
+                <div class="media-primary-actions-row">
+                    <button type="button" class="btn-media-action btn-media-stream" id="btn-media-stream-main">
+                        <span class="action-icon">👑</span>
+                        <span>Stream</span>
+                    </button>
+                    <button type="button" class="btn-media-action btn-media-download" id="btn-media-download-main">
+                        <svg><use href="#icon-download"></use></svg>
+                        <span>Download</span>
+                    </button>
+                    <button type="button" class="btn-media-action btn-media-trailer" id="btn-media-trailer-main">
+                        <svg class="yt-play-icon" viewBox="0 0 24 24"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.11-2.12C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.39.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.11 2.12C4.5 20.5 12 20.5 12 20.5s7.5 0 9.39-.58A3 3 0 0 0 23.5 17.8 31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8Z"></path><path fill="#fff" d="M9.6 15.6V8.4l6.25 3.6-6.25 3.6Z"></path></svg>
+                        <span>Trailer</span>
+                    </button>
+                </div>
+
+                <!-- Subtitles Row Placeholder -->
+                <div class="media-subtitles-bar" id="media-subtitles-bar">
+                    <div class="subtitles-bar-left">
+                        <svg><use href="#icon-server"></use></svg>
+                        <span>Subtitles</span>
+                        <span class="subtitles-hint">in your language</span>
+                    </div>
+                    <div class="subtitles-bar-right">
+                        <span class="subtitles-flags" title="Subtitles Available">🇬🇧 🇫🇷 🇪🇸 🇸🇦</span>
+                        <svg class="chevron-icon"><use href="#icon-chevron-right"></use></svg>
+                    </div>
+                </div>
+
+                <!-- 5-Column Interactive Quick Actions Grid (Watchlist, Watched, Request, Like, Share) -->
+                <div class="media-quick-actions-grid">
+                    <button type="button" class="media-quick-btn" id="btn-media-watchlist">
+                        <svg><use href="#icon-bookmark"></use></svg>
+                        <span>Watchlist</span>
+                    </button>
+                    <button type="button" class="media-quick-btn" id="btn-media-watched">
+                        <svg><use href="#icon-check"></use></svg>
+                        <span>Watched</span>
+                    </button>
+                    <button type="button" class="media-quick-btn" id="btn-media-request">
+                        <svg><use href="#icon-feedback"></use></svg>
+                        <span>Request</span>
+                    </button>
+                    <button type="button" class="media-quick-btn" id="btn-media-like">
+                        <svg><use href="#icon-star"></use></svg>
+                        <span>Like</span>
+                    </button>
+                    <button type="button" class="media-quick-btn" id="btn-media-share">
+                        <svg><use href="#icon-share"></use></svg>
+                        <span>Share</span>
+                    </button>
+                </div>
+
+                <!-- In-Page Download Quality Section (Expands smoothly on Download click, NO MODAL) -->
+                <div class="media-download-accordion" id="media-download-accordion" style="display: none;">
+                    <div class="download-accordion-header">
+                        <h4>Available Downloads</h4>
+                        <span class="download-accordion-subtitle">Select quality to start download</span>
+                    </div>
+                    <div class="media-download-links-list" id="media-download-links-list">
+                        <!-- Clean quality pills rendered here (720p HD, 1080p FHD) -->
+                    </div>
+                </div>
+
+                <!-- TV Series Season & Episode Section (For Series) -->
+                <div class="media-series-container" id="media-series-container" style="display: none;">
+                    <!-- Rendered with season tabs & episode cards -->
+                </div>
+
+                <!-- Cast & Crew Carousel -->
+                <div class="media-cast-section" id="media-cast-section" style="display: none;">
+                    <h3 class="media-section-heading">Top Cast &amp; Crew</h3>
+                    <div class="media-cast-scroll" id="media-cast-scroll">
+                        <!-- Dynamic actor/director cards -->
+                    </div>
+                </div>
+
+                <!-- Related Movies Carousel -->
+                <div class="media-related-section" id="media-related-section" style="display: none;">
+                    <h3 class="media-section-heading">More Like This</h3>
+                    <div class="media-related-scroll" id="media-related-scroll">
+                        <!-- Dynamic movie cards -->
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- MOVIE DETAIL OVERLAY MODAL -->
@@ -1317,6 +1458,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=103"></script>
+    <script src="app.js?v=104"></script>
 </body>
 </html>

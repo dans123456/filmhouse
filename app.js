@@ -3365,8 +3365,903 @@ function initializeFilterDropdowns() {
     });
 }
 
-// Movie Detail modal build
+// ==========================================================================
+// DEDICATED FULL-SCREEN MEDIA DETAILS CONTROLLER (PHONOFILM CINEMATIC LAYOUT)
+// ==========================================================================
+let currentMediaDetailMovie = null;
+
+function initMediaDetailPage() {
+    const btnBack = document.getElementById("btn-media-back");
+    const btnHome = document.getElementById("btn-media-home");
+    const btnSearch = document.getElementById("btn-media-search");
+    const btnProfile = document.getElementById("btn-media-profile");
+    const btnExpand = document.getElementById("btn-expand-synopsis");
+
+    if (btnBack) {
+        btnBack.onclick = () => closeMediaDetailPage();
+    }
+
+    if (btnHome) {
+        btnHome.onclick = () => {
+            closeMediaDetailPage();
+            navigateToScreen("home");
+        };
+    }
+
+    if (btnSearch) {
+        btnSearch.onclick = () => {
+            closeMediaDetailPage();
+            navigateToScreen("home");
+            const searchInput = document.getElementById("search-input");
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        };
+    }
+
+    if (btnProfile) {
+        btnProfile.onclick = () => {
+            closeMediaDetailPage();
+            navigateToScreen("profile");
+        };
+    }
+
+    if (btnExpand) {
+        btnExpand.onclick = () => {
+            const synopsisEl = document.getElementById("media-detail-synopsis");
+            if (synopsisEl) {
+                const isExpanded = synopsisEl.classList.toggle("expanded");
+                btnExpand.textContent = isExpanded ? "Show less" : "Read more";
+            }
+        };
+    }
+}
+
+function closeMediaDetailPage() {
+    const iframeContainer = document.getElementById("media-stream-iframe-container");
+    if (iframeContainer) {
+        iframeContainer.replaceChildren();
+        iframeContainer.style.display = "none";
+    }
+    const backdropContainer = document.getElementById("media-backdrop-container");
+    if (backdropContainer) {
+        backdropContainer.style.display = "block";
+    }
+
+    const downloadAccordion = document.getElementById("media-download-accordion");
+    if (downloadAccordion) downloadAccordion.style.display = "none";
+
+    document.body.classList.remove("media-detail-active");
+
+    if (window.Telegram?.WebApp?.BackButton) {
+        window.Telegram.WebApp.BackButton.hide();
+    }
+
+    const prev = (state.previousScreen && state.previousScreen !== "media-detail") ? state.previousScreen : "home";
+    navigateToScreen(prev);
+}
+
+function openMediaDetailPage(movie) {
+    if (!movie) return;
+    currentMediaDetailMovie = movie;
+
+    const currentActiveScreen = Array.from(document.querySelectorAll(".app-screen")).find(s => s.classList.contains("active") && s.id !== "screen-media-detail");
+    if (currentActiveScreen) {
+        state.previousScreen = currentActiveScreen.id.replace("screen-", "");
+    } else if (state.currentScreen && state.currentScreen !== "media-detail") {
+        state.previousScreen = state.currentScreen;
+    } else {
+        state.previousScreen = "home";
+    }
+
+    // Normalize movie fields
+    movie.poster = movie.poster || "MOVIE/img/FilmHouse3_nobg.png";
+    movie.backdrop = movie.backdrop || movie.poster || "MOVIE/img/FilmHouse.png";
+    movie.overview = movie.overview || "No synopsis available.";
+    movie.language = movie.language || "en";
+    movie.categories = movie.categories || ["Main"];
+    movie.genres = movie.genres || [];
+    movie.cast = movie.cast || [];
+    movie.rating = movie.rating || 0;
+    movie.release_date = movie.release_date || "";
+
+    const isTVShow = (movie.type || "").toLowerCase() === "series" || 
+                     (movie.type || "").toLowerCase() === "tv" || 
+                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+    movie.type = isTVShow ? "Series" : "Movie";
+
+    navigateToScreen("media-detail");
+    document.body.classList.add("media-detail-active");
+
+    if (window.Telegram?.WebApp?.BackButton) {
+        window.Telegram.WebApp.BackButton.show();
+        const onTgBack = () => {
+            closeMediaDetailPage();
+            window.Telegram.WebApp.BackButton.offClick(onTgBack);
+        };
+        window.Telegram.WebApp.BackButton.onClick(onTgBack);
+    }
+
+    // 1. Hero Backdrop
+    const backdropImg = document.getElementById("media-backdrop-img");
+    if (backdropImg) {
+        backdropImg.src = movie.backdrop;
+        backdropImg.alt = movie.title;
+    }
+
+    const iframeContainer = document.getElementById("media-stream-iframe-container");
+    const backdropContainer = document.getElementById("media-backdrop-container");
+    if (iframeContainer) {
+        iframeContainer.replaceChildren();
+        iframeContainer.style.display = "none";
+    }
+    if (backdropContainer) {
+        backdropContainer.style.display = "block";
+    }
+
+    // 2. Title
+    const titleEl = document.getElementById("media-detail-title");
+    if (titleEl) {
+        titleEl.textContent = movie.title;
+    }
+
+    // 3. Synopsis
+    const synopsisEl = document.getElementById("media-detail-synopsis");
+    const expandBtn = document.getElementById("btn-expand-synopsis");
+    if (synopsisEl) {
+        synopsisEl.textContent = movie.overview;
+        synopsisEl.classList.remove("expanded");
+        if (expandBtn) {
+            if (movie.overview && movie.overview.length > 140) {
+                expandBtn.style.display = "inline-block";
+                expandBtn.textContent = "Read more";
+            } else {
+                expandBtn.style.display = "none";
+            }
+        }
+    }
+
+    // 4. Meta Chips Row
+    const chipsRow = document.getElementById("media-meta-chips-row");
+    if (chipsRow) {
+        chipsRow.replaceChildren();
+
+        const typeChip = document.createElement("span");
+        typeChip.className = "media-chip-type";
+        typeChip.textContent = isTVShow ? "Series" : "Movie";
+        chipsRow.appendChild(typeChip);
+
+        const ratingVal = movie.rating || movie.imdb_rating || movie.vote_average;
+        if (ratingVal && parseFloat(ratingVal) > 0) {
+            const sep = document.createElement("span");
+            sep.className = "media-dot-sep";
+            sep.textContent = "•";
+            chipsRow.appendChild(sep);
+
+            const ratingChip = document.createElement("span");
+            ratingChip.className = "media-chip-rating";
+            ratingChip.textContent = `★ ${typeof ratingVal === 'number' ? ratingVal.toFixed(1) : ratingVal}`;
+            chipsRow.appendChild(ratingChip);
+        }
+
+        const yearVal = movie.year || (movie.release_date ? movie.release_date.substring(0, 4) : "");
+        if (yearVal) {
+            const sep = document.createElement("span");
+            sep.className = "media-dot-sep";
+            sep.textContent = "•";
+            chipsRow.appendChild(sep);
+
+            const yearChip = document.createElement("span");
+            yearChip.className = "media-chip-text";
+            yearChip.textContent = yearVal;
+            chipsRow.appendChild(yearChip);
+        }
+
+        if (movie.runtime) {
+            const sep = document.createElement("span");
+            sep.className = "media-dot-sep";
+            sep.textContent = "•";
+            chipsRow.appendChild(sep);
+
+            const runtimeChip = document.createElement("span");
+            runtimeChip.className = "media-chip-text";
+            runtimeChip.textContent = movie.runtime;
+            chipsRow.appendChild(runtimeChip);
+        }
+
+        const sepRes = document.createElement("span");
+        sepRes.className = "media-dot-sep";
+        sepRes.textContent = "•";
+        chipsRow.appendChild(sepRes);
+
+        const resChip = document.createElement("span");
+        resChip.className = "media-chip-type";
+        resChip.style.background = "rgba(255, 188, 0, 0.15)";
+        resChip.style.borderColor = "rgba(255, 188, 0, 0.35)";
+        resChip.style.color = "var(--primary-color, #ffbc00)";
+        resChip.textContent = isTVShow ? "HD Series" : "1080p FHD";
+        chipsRow.appendChild(resChip);
+
+        let genres = [];
+        if (Array.isArray(movie.genres) && movie.genres.length > 0) {
+            genres = movie.genres.slice(0, 2);
+        } else if (typeof movie.genre === "string") {
+            genres = movie.genre.split(/[,/]/).map(g => g.trim()).filter(Boolean).slice(0, 2);
+        }
+        genres.forEach(g => {
+            const sep = document.createElement("span");
+            sep.className = "media-dot-sep";
+            sep.textContent = "•";
+            chipsRow.appendChild(sep);
+
+            const gChip = document.createElement("span");
+            gChip.className = "media-chip-text";
+            gChip.textContent = g;
+            chipsRow.appendChild(gChip);
+        });
+    }
+
+    function playMediaStream(customUrl, optTitle) {
+        let streamTarget = customUrl || movie.stream_url || "";
+        if (!streamTarget && movie.links && Array.isArray(movie.links)) {
+            const streamLink = movie.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
+            if (streamLink) {
+                streamTarget = streamLink.stream_url || streamLink.url;
+            }
+        }
+
+        if (!streamTarget && isTVShow) {
+            const seriesContainer = document.getElementById("media-series-container");
+            if (seriesContainer) {
+                seriesContainer.style.display = "block";
+                seriesContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+                showToast("📺 Please tap an episode below to stream", "info");
+                return;
+            }
+        }
+
+        if (!streamTarget) {
+            showToast(`⚠️ Streaming link for "${movie.title}" will be available shortly!`, "warning");
+            return;
+        }
+
+        if (iframeContainer && backdropContainer) {
+            iframeContainer.replaceChildren();
+            const playerTitle = optTitle || movie.title;
+            const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(streamTarget)}&title=${encodeURIComponent(playerTitle)}`;
+            const iframe = document.createElement("iframe");
+            iframe.src = playerSrc;
+            iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
+            iframe.setAttribute("allowfullscreen", "true");
+            iframeContainer.appendChild(iframe);
+
+            backdropContainer.style.display = "none";
+            iframeContainer.style.display = "block";
+
+            const heroViewport = document.getElementById("media-hero-viewport");
+            if (heroViewport) {
+                heroViewport.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+
+            addWatchHistory(movie.csv_id || movie.id);
+            triggerMonetagSmartLink();
+            if (typeof triggerHaptic === "function") triggerHaptic("selection");
+        }
+    }
+
+    // 5. Wire Hero Stream Button & Preview Play FAB
+    const streamBtn = document.getElementById("btn-media-stream-main");
+    if (streamBtn) {
+        streamBtn.onclick = () => playMediaStream();
+    }
+    const previewFab = document.getElementById("btn-hero-play-preview");
+    if (previewFab) {
+        previewFab.onclick = () => playMediaStream();
+    }
+
+    // 6. Wire Hero Download Button (In-Page Accordion, NO MODAL)
+    const downloadBtn = document.getElementById("btn-media-download-main");
+    const downloadAccordion = document.getElementById("media-download-accordion");
+    const downloadList = document.getElementById("media-download-links-list");
+
+    if (downloadBtn && downloadAccordion && downloadList) {
+        downloadAccordion.style.display = "none";
+        downloadBtn.onclick = () => {
+            const isOpen = downloadAccordion.style.display === "flex" || downloadAccordion.style.display === "block";
+            if (isOpen) {
+                downloadAccordion.style.display = "none";
+            } else {
+                renderMediaDownloadRows(movie, downloadList);
+                downloadAccordion.style.display = "flex";
+                downloadAccordion.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                if (typeof triggerHaptic === "function") triggerHaptic("light");
+            }
+        };
+    }
+
+    // 7. Wire Hero Trailer Button
+    const trailerBtn = document.getElementById("btn-media-trailer-main");
+    if (trailerBtn) {
+        if (movie.trailer || movie.imdb_id) {
+            trailerBtn.style.display = "flex";
+            trailerBtn.onclick = () => {
+                if (movie.trailer) {
+                    if (iframeContainer && backdropContainer) {
+                        iframeContainer.replaceChildren();
+                        let embedUrl = movie.trailer;
+                        const ytMatch = movie.trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                        if (ytMatch) {
+                            embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`;
+                        } else if (!movie.trailer.includes("http")) {
+                            embedUrl = `https://www.youtube.com/embed/${movie.trailer}?autoplay=1`;
+                        }
+                        const iframe = document.createElement("iframe");
+                        iframe.src = embedUrl;
+                        iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
+                        iframe.setAttribute("allowfullscreen", "true");
+                        iframeContainer.appendChild(iframe);
+                        backdropContainer.style.display = "none";
+                        iframeContainer.style.display = "block";
+                        const heroViewport = document.getElementById("media-hero-viewport");
+                        if (heroViewport) heroViewport.scrollIntoView({ behavior: "smooth", block: "start" });
+                    } else if (typeof openTrailerModal === "function") {
+                        openTrailerModal(movie.trailer);
+                    }
+                } else if (movie.imdb_id) {
+                    window.open(`https://www.imdb.com/title/${movie.imdb_id}/videogallery`, '_blank');
+                }
+            };
+        } else {
+            trailerBtn.style.display = "none";
+        }
+    }
+
+    // 8. Wire Subtitles Row Placeholder
+    const subtitlesBar = document.getElementById("media-subtitles-bar");
+    if (subtitlesBar) {
+        subtitlesBar.onclick = () => {
+            showToast("💬 Subtitles: 🇬🇧 English, 🇫🇷 French, 🇪🇸 Spanish & 🇸🇦 Arabic available in player settings!", "info");
+            if (typeof triggerHaptic === "function") triggerHaptic("selection");
+        };
+    }
+
+    // 9. Wire 5-Column Quick Actions
+    updateMediaQuickActions(movie);
+
+    // 10. TV Series Seasons & Episodes
+    const seriesContainer = document.getElementById("media-series-container");
+    if (seriesContainer) {
+        if (isTVShow) {
+            seriesContainer.style.display = "block";
+            renderMediaSeriesSection(movie, seriesContainer, playMediaStream);
+        } else {
+            seriesContainer.style.display = "none";
+            seriesContainer.replaceChildren();
+        }
+    }
+
+    // 11. Top Cast & Crew
+    renderMediaCast(movie);
+
+    // 12. More Like This
+    renderMediaRelated(movie);
+
+    // 13. Dynamic TMDB Self-Healing
+    fetchTmdbDetailsForMedia(movie);
+
+    logAppEvent("view", movie.csv_id || movie.id, movie.title);
+    window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+function renderMediaDownloadRows(movie, container) {
+    if (!container) return;
+    container.replaceChildren();
+
+    const links = movie.links && Array.isArray(movie.links) ? movie.links.filter(l => {
+        const u = typeof l === "object" && l !== null ? l.url : l;
+        return u && String(u).trim().length > 0;
+    }) : [];
+
+    const isTVShow = (movie.type || "").toLowerCase() === "series";
+
+    if (links.length === 0) {
+        const emptyBox = document.createElement("div");
+        emptyBox.style.cssText = "text-align: center; padding: 18px 12px; color: var(--text-secondary); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px;";
+        emptyBox.innerHTML = `
+            <span>Direct download links are currently being prepared.</span>
+            <button type="button" class="btn btn-primary" id="btn-request-unavail-dl" style="padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 4px;">
+                Request Download ⚡
+            </button>
+        `;
+        const reqBtn = emptyBox.querySelector("#btn-request-unavail-dl");
+        if (reqBtn) {
+            reqBtn.onclick = () => {
+                if (typeof showRequestSpecsDrawer === "function") {
+                    showRequestSpecsDrawer(movie);
+                } else if (typeof openManualRequestModal === "function") {
+                    openManualRequestModal(movie.title);
+                }
+            };
+        }
+        container.appendChild(emptyBox);
+        return;
+    }
+
+    const matchingRequest = currentUserRequests && currentUserRequests.find(r => 
+        r.title && titlesMatch(r.title, movie.title) &&
+        r.status === "fulfilled"
+    );
+
+    links.forEach((link, idx) => {
+        const isObj = typeof link === "object" && link !== null;
+        const linkUrl = isObj ? link.url : link;
+        let qualityLabel = isObj && link.quality ? link.quality : (isTVShow ? (link.season || `Season ${idx + 1}`) : (idx === 0 ? "720p HD" : "1080p Full HD"));
+        
+        let estimatedSize = "~850 MB";
+        if (isObj && link.size) {
+            estimatedSize = link.size;
+        } else if (qualityLabel.includes("1080")) {
+            estimatedSize = "~1.85 GB";
+        } else if (qualityLabel.includes("4K") || qualityLabel.includes("2160")) {
+            estimatedSize = "~4.5 GB";
+        } else if (qualityLabel.includes("480")) {
+            estimatedSize = "~420 MB";
+        } else if (isTVShow) {
+            estimatedSize = "~3.2 GB";
+        }
+
+        const isCinemaCut = qualityLabel.toLowerCase().includes("cinema") || qualityLabel.toLowerCase().includes("cam");
+
+        const row = document.createElement("div");
+        row.className = "media-download-row";
+
+        const leftCol = document.createElement("div");
+        leftCol.className = "media-download-row-left";
+
+        const titleSpan = document.createElement("span");
+        titleSpan.className = "media-download-quality-title";
+        titleSpan.textContent = qualityLabel;
+        if (isCinemaCut) {
+            titleSpan.innerHTML = `⚠️ ${qualityLabel} <span style="font-size: 9px; background: #ff9800; color: #000; padding: 2px 5px; border-radius: 4px; margin-left: 4px; font-weight: 800;">CAM</span>`;
+        }
+
+        const sizeBadge = document.createElement("span");
+        sizeBadge.className = "media-download-size-badge";
+        sizeBadge.textContent = estimatedSize;
+
+        leftCol.appendChild(titleSpan);
+        leftCol.appendChild(sizeBadge);
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "media-download-row-btn";
+        btn.innerHTML = `<svg><use href="#icon-download"></use></svg><span>Download</span>`;
+
+        const onDownloadClick = () => {
+            logAppEvent("download", movie.csv_id || movie.id, movie.title);
+            if (matchingRequest) {
+                showToast("Fulfillment download unlocked! Connecting...", "success");
+                window.open(linkUrl, "_blank");
+            } else {
+                showConnectionDrawer(linkUrl, ADSGRAM_DOWNLOAD_BLOCK_ID);
+            }
+        };
+
+        row.onclick = onDownloadClick;
+        row.appendChild(leftCol);
+        row.appendChild(btn);
+        container.appendChild(row);
+    });
+}
+
+function updateMediaQuickActions(movie) {
+    // 1. Watchlist
+    const btnWatchlist = document.getElementById("btn-media-watchlist");
+    if (btnWatchlist) {
+        const inWatchlist = state.watchlist.includes(movie.csv_id);
+        btnWatchlist.classList.toggle("active", inWatchlist);
+        const label = btnWatchlist.querySelector("span");
+        const iconUse = btnWatchlist.querySelector("use");
+        if (label) label.textContent = inWatchlist ? "Saved" : "Watchlist";
+        if (iconUse) iconUse.setAttribute("href", inWatchlist ? "#icon-bookmark-fill" : "#icon-bookmark");
+
+        btnWatchlist.onclick = () => {
+            toggleWatchlist(movie);
+            const active = state.watchlist.includes(movie.csv_id);
+            btnWatchlist.classList.toggle("active", active);
+            if (label) label.textContent = active ? "Saved" : "Watchlist";
+            if (iconUse) iconUse.setAttribute("href", active ? "#icon-bookmark-fill" : "#icon-bookmark");
+            if (typeof triggerHaptic === "function") triggerHaptic("selection");
+        };
+    }
+
+    // 2. Watched
+    const btnWatched = document.getElementById("btn-media-watched");
+    if (btnWatched) {
+        const inHistory = state.history.includes(movie.csv_id);
+        btnWatched.classList.toggle("active", inHistory);
+        const label = btnWatched.querySelector("span");
+        if (label) label.textContent = inHistory ? "Watched" : "Watched";
+
+        btnWatched.onclick = () => {
+            const active = state.history.includes(movie.csv_id);
+            if (active) {
+                state.history = state.history.filter(id => id !== movie.csv_id);
+                localStorage.setItem("filmhouse_history", JSON.stringify(state.history));
+                awardPoints(-5, "watched");
+                btnWatched.classList.remove("active");
+                showToast("Removed from watched list", "info");
+            } else {
+                addWatchHistory(movie);
+                awardPoints(5, "watched");
+                btnWatched.classList.add("active");
+                showToast("Marked as watched! 🍿", "success");
+            }
+            if (typeof triggerHaptic === "function") triggerHaptic("selection");
+        };
+    }
+
+    // 3. Request
+    const btnRequest = document.getElementById("btn-media-request");
+    if (btnRequest) {
+        btnRequest.onclick = () => {
+            if (typeof showRequestSpecsDrawer === "function") {
+                showRequestSpecsDrawer(movie);
+            } else if (typeof openManualRequestModal === "function") {
+                openManualRequestModal(movie.title);
+            }
+        };
+    }
+
+    // 4. Like
+    const btnLike = document.getElementById("btn-media-like");
+    if (btnLike) {
+        const likedIds = JSON.parse(localStorage.getItem("filmhouse_liked_movies") || "[]");
+        const isLiked = likedIds.includes(movie.csv_id);
+        btnLike.classList.toggle("active", isLiked);
+
+        btnLike.onclick = () => {
+            let currentLikes = JSON.parse(localStorage.getItem("filmhouse_liked_movies") || "[]");
+            const nowLiked = !currentLikes.includes(movie.csv_id);
+            if (nowLiked) {
+                currentLikes.push(movie.csv_id);
+                btnLike.classList.add("active");
+                showToast("Added to your favorites! 💖", "success");
+            } else {
+                currentLikes = currentLikes.filter(id => id !== movie.csv_id);
+                btnLike.classList.remove("active");
+                showToast("Removed from favorites", "info");
+            }
+            localStorage.setItem("filmhouse_liked_movies", JSON.stringify(currentLikes));
+            if (typeof triggerHaptic === "function") triggerHaptic("light");
+        };
+    }
+
+    // 5. Share
+    const btnShare = document.getElementById("btn-media-share");
+    if (btnShare) {
+        btnShare.onclick = () => {
+            if (typeof shareMovie === "function") {
+                shareMovie(movie);
+            } else {
+                const shareText = `Check out "${movie.title}" on FilmHouse! 🎬`;
+                if (navigator.share) {
+                    navigator.share({ title: movie.title, text: shareText, url: window.location.href }).catch(() => {});
+                } else {
+                    navigator.clipboard?.writeText(window.location.href);
+                    showToast("Link copied to clipboard! 📋", "success");
+                }
+            }
+        };
+    }
+}
+
+function renderMediaSeriesSection(movie, container, streamCallback) {
+    if (!container) return;
+    container.replaceChildren();
+
+    let detectedSeasons = [];
+    if (movie.links && Array.isArray(movie.links) && movie.links.length > 0) {
+        movie.links.forEach((l, idx) => {
+            const isObj = typeof l === "object" && l !== null;
+            const rawSeason = isObj && l.season ? String(l.season).trim() : `Season ${idx + 1}`;
+            const sMatch = rawSeason.match(/\d+/);
+            const sNum = sMatch ? parseInt(sMatch[0], 10) : idx + 1;
+            const sStream = isObj ? (l.stream_url || l.url || "") : String(l);
+
+            const existing = detectedSeasons.find(s => s.seasonNumber === sNum);
+            if (!existing) {
+                detectedSeasons.push({
+                    seasonNumber: sNum,
+                    name: rawSeason.startsWith("Season") ? rawSeason : `Season ${sNum}`,
+                    streamUrl: sStream,
+                    links: [l]
+                });
+            } else {
+                existing.links.push(l);
+                if (!existing.streamUrl && sStream) existing.streamUrl = sStream;
+            }
+        });
+    }
+
+    if (detectedSeasons.length === 0) {
+        detectedSeasons.push({
+            seasonNumber: 1,
+            name: "Season 1",
+            streamUrl: movie.stream_url || "",
+            links: []
+        });
+    }
+
+    detectedSeasons.sort((a, b) => a.seasonNumber - b.seasonNumber);
+    let currentSeason = detectedSeasons[0];
+
+    const header = document.createElement("div");
+    header.className = "cinema-series-header";
+    header.innerHTML = `
+        <div class="cinema-series-header-title">
+            <svg><use href="#icon-tv"></use></svg>
+            <span>Seasons &amp; Episodes</span>
+        </div>
+        <span class="cinema-series-count-badge" id="media-ep-count-badge">Loading...</span>
+    `;
+    container.appendChild(header);
+
+    const tabsRow = document.createElement("div");
+    tabsRow.className = "cinema-seasons-tabs";
+
+    const episodesGrid = document.createElement("div");
+    episodesGrid.className = "cinema-episodes-grid";
+
+    async function loadSeasonEpisodes(seasonObj) {
+        episodesGrid.replaceChildren();
+        const badgeEl = container.querySelector("#media-ep-count-badge");
+        if (badgeEl) badgeEl.textContent = "Loading...";
+
+        let episodes = [];
+        const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
+        const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
+
+        if (tmdbId) {
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${seasonObj.seasonNumber}?api_key=${apiKey}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && Array.isArray(data.episodes) && data.episodes.length > 0) {
+                        episodes = data.episodes;
+                    }
+                }
+            } catch (err) {
+                console.warn("TMDB episodes fetch error:", err);
+            }
+        }
+
+        if (episodes.length === 0) {
+            for (let i = 1; i <= 10; i++) {
+                episodes.push({
+                    episode_number: i,
+                    name: `Episode ${i}`,
+                    overview: ""
+                });
+            }
+        }
+
+        if (badgeEl) badgeEl.textContent = `${episodes.length} Episodes`;
+
+        episodes.forEach(ep => {
+            const epNum = ep.episode_number;
+            const epCard = document.createElement("div");
+            epCard.className = "cinema-episode-card";
+
+            const cardLeft = document.createElement("div");
+            cardLeft.className = "cinema-episode-card-left";
+
+            const epTag = document.createElement("span");
+            epTag.className = "cinema-ep-tag";
+            epTag.textContent = `EP ${epNum}`;
+
+            const epTitleEl = document.createElement("span");
+            epTitleEl.className = "cinema-ep-title";
+            epTitleEl.textContent = ep.name || `Episode ${epNum}`;
+
+            cardLeft.appendChild(epTag);
+            cardLeft.appendChild(epTitleEl);
+            epCard.appendChild(cardLeft);
+
+            const playIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            playIcon.setAttribute("class", "cinema-ep-play-icon");
+            playIcon.innerHTML = `<use href="#icon-play"></use>`;
+            epCard.appendChild(playIcon);
+
+            epCard.addEventListener("click", () => {
+                episodesGrid.querySelectorAll(".cinema-episode-card").forEach(c => c.classList.remove("active"));
+                epCard.classList.add("active");
+
+                const epTarget = ep.stream_url || seasonObj.streamUrl || movie.stream_url || "";
+                const epDisplayTitle = `${movie.title} • S${seasonObj.seasonNumber}:E${epNum}`;
+                streamCallback(epTarget, epDisplayTitle);
+                showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
+            });
+
+            episodesGrid.appendChild(epCard);
+        });
+    }
+
+    detectedSeasons.forEach(sObj => {
+        const tabBtn = document.createElement("button");
+        tabBtn.type = "button";
+        tabBtn.className = `cinema-season-tab ${sObj.seasonNumber === currentSeason.seasonNumber ? "active" : ""}`;
+        tabBtn.textContent = sObj.name;
+        tabBtn.addEventListener("click", () => {
+            tabsRow.querySelectorAll(".cinema-season-tab").forEach(t => t.classList.remove("active"));
+            tabBtn.classList.add("active");
+            currentSeason = sObj;
+            loadSeasonEpisodes(sObj);
+        });
+        tabsRow.appendChild(tabBtn);
+    });
+
+    container.appendChild(tabsRow);
+    container.appendChild(episodesGrid);
+    loadSeasonEpisodes(currentSeason);
+}
+
+function renderMediaCast(movie) {
+    const castSection = document.getElementById("media-cast-section");
+    const castScroll = document.getElementById("media-cast-scroll");
+    if (!castSection || !castScroll) return;
+
+    const castList = (movie.cast && Array.isArray(movie.cast) && movie.cast.length > 0) ? movie.cast : [];
+    if (castList.length === 0 && !movie.director) {
+        castSection.style.display = "none";
+        return;
+    }
+
+    castScroll.replaceChildren();
+    castSection.style.display = "block";
+
+    if (movie.director) {
+        const dCard = document.createElement("div");
+        dCard.className = "media-cast-card";
+        dCard.innerHTML = `
+            <div class="media-cast-avatar" style="display:flex;align-items:center;justify-content:center;font-size:24px;">🎬</div>
+            <span class="media-cast-name">${movie.director}</span>
+            <span class="media-cast-role">${movie.type === "Series" ? "Creator" : "Director"}</span>
+        `;
+        castScroll.appendChild(dCard);
+    }
+
+    castList.slice(0, 10).forEach(actor => {
+        const isObj = typeof actor === "object" && actor !== null;
+        const name = isObj ? actor.name : actor;
+        const role = isObj && actor.character ? actor.character : "Actor";
+        const avatarUrl = isObj && actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : "";
+
+        const aCard = document.createElement("div");
+        aCard.className = "media-cast-card";
+
+        const imgEl = document.createElement(avatarUrl ? "img" : "div");
+        imgEl.className = "media-cast-avatar";
+        if (avatarUrl) {
+            imgEl.src = avatarUrl;
+            imgEl.alt = name;
+        } else {
+            imgEl.style.cssText = "display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,255,255,0.06);";
+            imgEl.textContent = "🎭";
+        }
+
+        const nameEl = document.createElement("span");
+        nameEl.className = "media-cast-name";
+        nameEl.textContent = name;
+
+        const roleEl = document.createElement("span");
+        roleEl.className = "media-cast-role";
+        roleEl.textContent = role;
+
+        aCard.appendChild(imgEl);
+        aCard.appendChild(nameEl);
+        aCard.appendChild(roleEl);
+        castScroll.appendChild(aCard);
+    });
+}
+
+function renderMediaRelated(movie) {
+    const relatedSection = document.getElementById("media-related-section");
+    const relatedScroll = document.getElementById("media-related-scroll");
+    if (!relatedSection || !relatedScroll) return;
+
+    const relatedList = state.movies.filter(m => 
+        m.csv_id !== movie.csv_id && 
+        m.categories && 
+        movie.categories && 
+        m.categories.some(c => movie.categories.includes(c))
+    ).slice(0, 10);
+
+    if (relatedList.length === 0) {
+        relatedSection.style.display = "none";
+        return;
+    }
+
+    relatedScroll.replaceChildren();
+    relatedSection.style.display = "block";
+
+    relatedList.forEach(rel => {
+        const card = document.createElement("div");
+        card.className = "media-related-card";
+
+        const img = document.createElement("img");
+        img.src = rel.poster || "MOVIE/img/FilmHouse3_nobg.png";
+        img.alt = rel.title;
+        img.loading = "lazy";
+
+        const title = document.createElement("p");
+        title.className = "media-related-title";
+        title.textContent = rel.title;
+
+        card.appendChild(img);
+        card.appendChild(title);
+
+        card.addEventListener("click", () => {
+            openMediaDetailPage(rel);
+        });
+
+        relatedScroll.appendChild(card);
+    });
+}
+
+function fetchTmdbDetailsForMedia(movie) {
+    const numericId = movie.tmdb_id || (movie.csv_id && movie.csv_id.split("-")[0]);
+    if (!numericId || !/^\d+$/.test(numericId)) return;
+
+    const needsHeal = !movie.overview || movie.overview === "No synopsis available." || 
+                      !movie.release_date || !movie.poster || movie.poster.includes("FilmHouse3_nobg.png") ||
+                      !movie.backdrop || movie.backdrop.includes("FilmHouse.png") ||
+                      !movie.cast || movie.cast.length === 0;
+
+    if (!needsHeal) return;
+
+    const mediaType = (movie.type || "").toLowerCase() === "series" ? "tv" : "movie";
+    const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
+
+    fetch(`https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${apiKey}&append_to_response=credits,videos`)
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+            if (!data) return;
+
+            movie.overview = data.overview || movie.overview;
+            movie.release_date = data.release_date || data.first_air_date || movie.release_date;
+            movie.rating = data.vote_average ? Math.round(data.vote_average * 10) / 10 : movie.rating;
+            if (data.runtime) movie.runtime = `${Math.floor(data.runtime / 60)}h ${data.runtime % 60}m`;
+
+            if (data.poster_path && (!movie.poster || movie.poster.includes("FilmHouse3_nobg.png"))) {
+                movie.poster = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
+            }
+            if (data.backdrop_path && (!movie.backdrop || movie.backdrop.includes("FilmHouse.png"))) {
+                movie.backdrop = `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`;
+            }
+
+            if (data.credits && Array.isArray(data.credits.cast) && data.credits.cast.length > 0) {
+                movie.cast = data.credits.cast.slice(0, 10);
+            }
+
+            if (currentMediaDetailMovie && (currentMediaDetailMovie.csv_id === movie.csv_id || currentMediaDetailMovie.title === movie.title)) {
+                const backdropImg = document.getElementById("media-backdrop-img");
+                if (backdropImg && movie.backdrop) backdropImg.src = movie.backdrop;
+
+                const synopsisEl = document.getElementById("media-detail-synopsis");
+                if (synopsisEl && movie.overview) synopsisEl.textContent = movie.overview;
+
+                renderMediaCast(movie);
+            }
+        })
+        .catch(e => console.warn("TMDB healing background error:", e));
+}
+
+// Movie Detail modal build (Directs to Full-Screen Media Page)
 function openDetailModal(movie) {
+    openMediaDetailPage(movie);
+    return;
     const modal = document.getElementById("detail-modal");
     const body = document.getElementById("detail-modal-body");
     if (!modal || !body) return;
@@ -4936,26 +5831,6 @@ function openDownloadModal(movie) {
                 }
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
-
-                // Series Specs Row
-                const specsRow = document.createElement("div");
-                specsRow.className = "link-specs-row";
-                const hdPill = document.createElement("span");
-                hdPill.className = "link-spec-badge badge-res-720p";
-                hdPill.textContent = "720p HD";
-                specsRow.appendChild(hdPill);
-
-                const subPill = document.createElement("span");
-                subPill.className = "link-spec-badge badge-sub";
-                subPill.textContent = "SUB";
-                specsRow.appendChild(subPill);
-
-                const langPill = document.createElement("span");
-                langPill.className = "link-spec-badge badge-lang";
-                langPill.textContent = (movie.language || "EN").toUpperCase();
-                specsRow.appendChild(langPill);
-
-                labelWrap.appendChild(specsRow);
                 anchor.appendChild(labelWrap);
             } else {
                 // --- MOVIE: Quality layout ---
@@ -5041,43 +5916,12 @@ function openDownloadModal(movie) {
                 else if (qLabel.includes("480p")) qualityText = "Mobile Quality (480p)";
                 
                 if (matchingRequest) {
-                    sublabel.textContent = isCinemaCutLink ? `⚠️ Cinema Cut Recording • Free Fulfillment (No Ads)` : `${qualityText} • Free Fulfillment (No Ads)`;
+                    sublabel.textContent = isCinemaCutLink ? `⚠️ Cinema Cut • Free Fulfillment` : `${qualityText} • ${estimatedSize} • Free Fulfillment`;
                 } else {
-                    sublabel.textContent = isCinemaCutLink ? `⚠️ Cinema Cut Recording • Watch Ad to Get Link` : `${qualityText} • Watch Ad to Get Link`;
+                    sublabel.textContent = isCinemaCutLink ? `⚠️ Cinema Cut • Watch Ad` : `${qualityText} • ${estimatedSize}`;
                 }
                 labelWrap.appendChild(label);
                 labelWrap.appendChild(sublabel);
-
-                // Specs Row
-                const specsRow = document.createElement("div");
-                specsRow.className = "link-specs-row";
-
-                const resPill = document.createElement("span");
-                resPill.className = `link-spec-badge ${resBadgeClass}`;
-                resPill.textContent = resBadgeText;
-                specsRow.appendChild(resPill);
-
-                const subPill = document.createElement("span");
-                subPill.className = "link-spec-badge badge-sub";
-                subPill.textContent = "SUB";
-                specsRow.appendChild(subPill);
-
-                const langPill = document.createElement("span");
-                langPill.className = "link-spec-badge badge-lang";
-                langPill.textContent = (movie.language || "EN").toUpperCase();
-                specsRow.appendChild(langPill);
-
-                const codecPill = document.createElement("span");
-                codecPill.className = "link-spec-badge badge-codec";
-                codecPill.textContent = "MKV";
-                specsRow.appendChild(codecPill);
-
-                const sizePill = document.createElement("span");
-                sizePill.className = "link-spec-badge badge-size";
-                sizePill.textContent = estimatedSize;
-                specsRow.appendChild(sizePill);
-
-                labelWrap.appendChild(specsRow);
                 anchor.appendChild(labelWrap);
             }
 
@@ -8309,6 +9153,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 1. Initial login credentials grab
     handleTelegramAuth();
     updateUserGreeting();
+    initMediaDetailPage();
 
     // Parse Telegram startapp parameter (e.g. startapp=mining or boost_docId or movie_id)
     let initialScreen = "home";
