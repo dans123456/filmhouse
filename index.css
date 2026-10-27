@@ -781,6 +781,11 @@ img {
 }
 #screen-home #editors-choice-section-wrapper {
     order: 3;
+    margin-top: 0 !important;
+    margin-bottom: 8px !important;
+}
+#screen-home #editors-choice-section-wrapper .section-title {
+    margin-bottom: 8px !important;
 }
 #screen-home .genre-chips-container-outer {
     order: 4;
@@ -994,14 +999,14 @@ img {
 .categories-container-outer {
     position: relative;
     width: 100%;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
 }
 
 .categories-bar {
     display: flex;
     overflow-x: auto;
     gap: 12px;
-    padding: 10px 4px 16px;
+    padding: 6px 4px 8px;
     scroll-snap-type: x mandatory;
     scrollbar-width: none; /* Firefox */
     scroll-behavior: smooth;
@@ -1120,7 +1125,7 @@ img {
    MOVIES GRID & CARDS
    ========================================================================== */
 .movie-listing-section {
-    margin-top: 10px;
+    margin-top: 4px;
 }
 
 .movies-grid {
@@ -4105,11 +4110,19 @@ img {
 }
 
 /* Genre Chips Filter styling */
+.genre-chips-container-outer {
+    margin-bottom: 8px !important;
+}
+
+.genre-chips-container-outer .section-title {
+    margin-bottom: 4px;
+}
+
 .genre-chips-container {
     display: flex;
     overflow-x: auto;
     gap: 12px;
-    padding: 10px 4px 16px;
+    padding: 4px 4px 8px;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     scroll-behavior: smooth;
