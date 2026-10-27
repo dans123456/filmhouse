@@ -2267,6 +2267,164 @@ img {
     display: none !important;
 }
 
+/* Series Season & Episode Selector in Cinema Theater View (Option 3 Hybrid) */
+.cinema-series-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 4px;
+}
+
+.cinema-series-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cinema-series-header-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #ffffff;
+}
+
+.cinema-series-header-title svg {
+    width: 14px;
+    height: 14px;
+    fill: var(--accent, #ffcc00);
+}
+
+.cinema-series-count-badge {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+}
+
+.cinema-seasons-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+}
+.cinema-seasons-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.cinema-season-tab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.cinema-season-tab:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.cinema-season-tab.active {
+    background: var(--primary-gradient, linear-gradient(135deg, #e11d48, #be123c));
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), var(--primary-glow, 0 0 10px rgba(225, 29, 72, 0.4));
+}
+
+.cinema-episodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.cinema-episode-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: #e2e8f0;
+    cursor: pointer;
+    font-size: 11.5px;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.cinema-episode-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.cinema-episode-card.active {
+    background: rgba(225, 29, 72, 0.18);
+    border-color: rgba(225, 29, 72, 0.6);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(225, 29, 72, 0.25);
+}
+
+.cinema-episode-card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.cinema-ep-tag {
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--accent, #ffcc00);
+}
+
+.cinema-episode-card.active .cinema-ep-tag {
+    color: #ffffff;
+}
+
+.cinema-ep-title {
+    font-size: 11px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cinema-episode-card.active .cinema-ep-title {
+    color: #f1f5f9;
+}
+
+.cinema-ep-play-icon {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    opacity: 0.6;
+    flex-shrink: 0;
+}
+
+.cinema-episode-card.active .cinema-ep-play-icon {
+    opacity: 1;
+    fill: #ffffff;
+}
+
 /* Detail Modal Hero Stream Button (Themed to Active Color Palette) */
 .detail-actions-row .btn.btn-stream-hero {
     flex: 1 1 calc(50% - 6px);

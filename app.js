@@ -3758,6 +3758,7 @@ function openDetailModal(movie) {
                     return;
                 }
                 addWatchHistory(movie.csv_id || movie.id);
+                triggerMonetagSmartLink();
                 openCinemaModal(movie);
             });
             actionsRow.appendChild(watchOnlineBtn);
@@ -4199,6 +4200,20 @@ function closeCinemaModal() {
     }
 }
 
+// Trigger Monetag SmartLink (Zone 12129096)
+function triggerMonetagSmartLink() {
+    const smartLinkUrl = "https://uplcm.com/4/12129096";
+    try {
+        if (window.Telegram?.WebApp?.openLink) {
+            window.Telegram.WebApp.openLink(smartLinkUrl);
+        } else {
+            window.open(smartLinkUrl, "_blank");
+        }
+    } catch (err) {
+        console.warn("SmartLink trigger error:", err);
+    }
+}
+
 // Open In-App Cinema Streaming Player Modal
 function openCinemaModal(movie, customStreamUrl) {
     const modal = document.getElementById("cinema-modal");
@@ -4207,12 +4222,26 @@ function openCinemaModal(movie, customStreamUrl) {
     const detailsContainer = document.getElementById("cinema-details-container");
     if (!modal || !container || !movie) return;
 
-    container.replaceChildren();
+    const baseTitle = movie.title || "Film House Cinema";
+    const isTVShow = (movie.type || "").toLowerCase() === "series" || 
+                     (movie.type || "").toLowerCase() === "tv" || 
+                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
 
-    const title = movie.title || "Film House Cinema";
-    if (titleEl) titleEl.textContent = title;
+    // Helper to switch or reload the cinema stream iframe
+    function setCinemaStream(targetUrl, currentTitle) {
+        if (!container) return;
+        container.replaceChildren();
+        if (!targetUrl) return;
+        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(targetUrl)}&title=${encodeURIComponent(currentTitle || baseTitle)}`;
+        const iframe = document.createElement("iframe");
+        iframe.src = playerSrc;
+        iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
+        iframe.setAttribute("allowfullscreen", "true");
+        container.appendChild(iframe);
+        if (titleEl) titleEl.textContent = currentTitle || baseTitle;
+    }
 
-    // Resolve stream parameter: custom URL -> link.stream_url
+    // Resolve initial stream parameter: custom URL -> link.stream_url -> movie.stream_url
     let streamTarget = customStreamUrl || movie.stream_url || "";
     if (!streamTarget && movie.links && Array.isArray(movie.links)) {
         const streamLink = movie.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
@@ -4221,20 +4250,22 @@ function openCinemaModal(movie, customStreamUrl) {
         }
     }
 
-    if (!streamTarget) {
-        showToast(`⚠️ No streaming link found for "${title}". Please add one via Admin Panel!`, "warning");
+    if (!streamTarget && !isTVShow) {
+        showToast(`⚠️ No streaming link found for "${baseTitle}". Please add one via Admin Panel!`, "warning");
         return;
     }
 
-    const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(streamTarget)}&title=${encodeURIComponent(title)}`;
-
-    const iframe = document.createElement("iframe");
-    iframe.src = playerSrc;
-    iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
-    iframe.setAttribute("allowfullscreen", "true");
-    // No sandbox restriction to ensure Monetag ad delivery and native video fullscreen
-
-    container.appendChild(iframe);
+    // Set initial player stream
+    if (streamTarget) {
+        setCinemaStream(streamTarget, baseTitle);
+    } else {
+        container.replaceChildren();
+        const placeholder = document.createElement("div");
+        placeholder.style.cssText = "display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#94a3b8;gap:8px;font-size:13px;padding:20px;text-align:center;";
+        placeholder.innerHTML = `<span>📺 Select an episode below to start streaming</span>`;
+        container.appendChild(placeholder);
+        if (titleEl) titleEl.textContent = baseTitle;
+    }
 
     // Populate Rich Movie Details Directly Beneath Video Viewport
     if (detailsContainer) {
@@ -4280,18 +4311,7 @@ function openCinemaModal(movie, customStreamUrl) {
                 s2Btn.classList.add("active");
                 s1Btn.classList.remove("active");
                 showToast("⚡ Connecting to High-Speed VIP Server...", "success");
-
-                // Trigger Monetag VIP SmartLink
-                const smartLinkUrl = "https://uplcm.com/4/12129096";
-                try {
-                    if (window.Telegram?.WebApp?.openLink) {
-                        window.Telegram.WebApp.openLink(smartLinkUrl);
-                    } else {
-                        window.open(smartLinkUrl, "_blank");
-                    }
-                } catch (e) {
-                    console.warn("VIP SmartLink trigger:", e);
-                }
+                triggerMonetagSmartLink();
             });
         }
 
@@ -4301,7 +4321,7 @@ function openCinemaModal(movie, customStreamUrl) {
 
         const movieTitle = document.createElement("h2");
         movieTitle.className = "cinema-details-title";
-        movieTitle.textContent = title;
+        movieTitle.textContent = baseTitle;
         headerEl.appendChild(movieTitle);
 
         const chipsEl = document.createElement("div");
@@ -4317,7 +4337,7 @@ function openCinemaModal(movie, customStreamUrl) {
 
         const typeChip = document.createElement("span");
         typeChip.className = "cinema-chip";
-        typeChip.textContent = movie.type === "Series" ? "Series" : "Movie";
+        typeChip.textContent = isTVShow ? "Series" : "Movie";
         chipsEl.appendChild(typeChip);
 
         const yearVal = movie.year || (movie.release_date ? movie.release_date.split("-")[0] : "");
@@ -4330,7 +4350,7 @@ function openCinemaModal(movie, customStreamUrl) {
 
         const qualityChip = document.createElement("span");
         qualityChip.className = "cinema-chip cinema-chip-quality";
-        qualityChip.textContent = movie.type === "Series" ? "Series HD" : "1080p HD";
+        qualityChip.textContent = isTVShow ? "Series HD" : "1080p HD";
         chipsEl.appendChild(qualityChip);
 
         const subChip = document.createElement("span");
@@ -4365,7 +4385,183 @@ function openCinemaModal(movie, customStreamUrl) {
         headerEl.appendChild(chipsEl);
         detailsContainer.appendChild(headerEl);
 
-        // 3. Action Buttons Grid (Download, Watchlist, Share)
+        // 3. Series Seasons & Episodes Selector (Option 3 Hybrid)
+        if (isTVShow) {
+            const seriesSection = document.createElement("div");
+            seriesSection.className = "cinema-series-section";
+
+            // Extract seasons from movie.links
+            let detectedSeasons = [];
+            if (movie.links && Array.isArray(movie.links) && movie.links.length > 0) {
+                movie.links.forEach((l, idx) => {
+                    const isObj = typeof l === "object" && l !== null;
+                    const rawSeason = isObj && l.season ? String(l.season).trim() : `Season ${idx + 1}`;
+                    const sMatch = rawSeason.match(/\d+/);
+                    const sNum = sMatch ? parseInt(sMatch[0], 10) : idx + 1;
+                    const sStream = isObj ? (l.stream_url || l.url || "") : String(l);
+
+                    const existing = detectedSeasons.find(s => s.seasonNumber === sNum);
+                    if (!existing) {
+                        detectedSeasons.push({
+                            seasonNumber: sNum,
+                            name: rawSeason.startsWith("Season") ? rawSeason : `Season ${sNum}`,
+                            streamUrl: sStream,
+                            links: [l]
+                        });
+                    } else {
+                        existing.links.push(l);
+                        if (!existing.streamUrl && sStream) existing.streamUrl = sStream;
+                    }
+                });
+            }
+
+            // Fallback if no seasons detected in links
+            if (detectedSeasons.length === 0) {
+                detectedSeasons.push({
+                    seasonNumber: 1,
+                    name: "Season 1",
+                    streamUrl: streamTarget,
+                    links: []
+                });
+            }
+
+            detectedSeasons.sort((a, b) => a.seasonNumber - b.seasonNumber);
+
+            let currentSeason = detectedSeasons[0];
+            if (customStreamUrl) {
+                const matchCustom = detectedSeasons.find(s => s.streamUrl === customStreamUrl);
+                if (matchCustom) currentSeason = matchCustom;
+            }
+            let currentEpisodeNum = 1;
+
+            // Header: Title + Episode Count Badge
+            const seriesHeader = document.createElement("div");
+            seriesHeader.className = "cinema-series-header";
+            seriesHeader.innerHTML = `
+                <div class="cinema-series-header-title">
+                    <svg><use href="#icon-tv"></use></svg>
+                    <span>Seasons &amp; Episodes</span>
+                </div>
+                <span class="cinema-series-count-badge" id="cinema-ep-count-badge">Loading...</span>
+            `;
+            seriesSection.appendChild(seriesHeader);
+
+            // Seasons Tabs Row
+            const seasonsTabs = document.createElement("div");
+            seasonsTabs.className = "cinema-seasons-tabs";
+
+            // Episodes Grid Container
+            const episodesGrid = document.createElement("div");
+            episodesGrid.className = "cinema-episodes-grid";
+
+            // Async function to fetch and render episodes for the selected season
+            async function renderSeasonEpisodes(seasonObj) {
+                episodesGrid.replaceChildren();
+                const badgeEl = seriesSection.querySelector("#cinema-ep-count-badge");
+                if (badgeEl) badgeEl.textContent = "Loading...";
+
+                let episodes = [];
+                const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
+                const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
+
+                if (tmdbId) {
+                    try {
+                        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${seasonObj.seasonNumber}?api_key=${apiKey}`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data && Array.isArray(data.episodes) && data.episodes.length > 0) {
+                                episodes = data.episodes;
+                            }
+                        }
+                    } catch (err) {
+                        console.warn("TMDB episodes fetch error:", err);
+                    }
+                }
+
+                // Fallback episode generation if TMDB returned empty
+                if (episodes.length === 0) {
+                    const epCount = (seasonObj.links && seasonObj.links[0] && seasonObj.links[0].episode_count) || 12;
+                    for (let i = 1; i <= epCount; i++) {
+                        episodes.push({
+                            episode_number: i,
+                            name: `Episode ${i}`
+                        });
+                    }
+                }
+
+                if (badgeEl) {
+                    badgeEl.textContent = `${episodes.length} Episodes`;
+                }
+
+                episodes.forEach(ep => {
+                    const epNum = ep.episode_number || 1;
+                    const isEpActive = (currentSeason.seasonNumber === seasonObj.seasonNumber && currentEpisodeNum === epNum);
+                    const epCard = document.createElement("div");
+                    epCard.className = `cinema-episode-card ${isEpActive ? "active" : ""}`;
+
+                    const cardLeft = document.createElement("div");
+                    cardLeft.className = "cinema-episode-card-left";
+
+                    const epTag = document.createElement("span");
+                    epTag.className = "cinema-ep-tag";
+                    epTag.textContent = `EP ${epNum}`;
+
+                    const epTitleEl = document.createElement("span");
+                    epTitleEl.className = "cinema-ep-title";
+                    epTitleEl.textContent = ep.name || `Episode ${epNum}`;
+                    epTitleEl.title = ep.name || `Episode ${epNum}`;
+
+                    cardLeft.appendChild(epTag);
+                    cardLeft.appendChild(epTitleEl);
+                    epCard.appendChild(cardLeft);
+
+                    const playIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    playIcon.setAttribute("class", "cinema-ep-play-icon");
+                    playIcon.innerHTML = `<use href="#icon-play"></use>`;
+                    epCard.appendChild(playIcon);
+
+                    epCard.addEventListener("click", () => {
+                        episodesGrid.querySelectorAll(".cinema-episode-card").forEach(c => c.classList.remove("active"));
+                        epCard.classList.add("active");
+                        currentEpisodeNum = epNum;
+
+                        const epTarget = ep.stream_url || seasonObj.streamUrl || movie.stream_url || streamTarget;
+                        const epDisplayTitle = `${baseTitle} • S${seasonObj.seasonNumber}:E${epNum}`;
+                        setCinemaStream(epTarget, epDisplayTitle);
+                        showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
+                        if (typeof triggerHaptic === "function") triggerHaptic("selection");
+                    });
+
+                    episodesGrid.appendChild(epCard);
+                });
+            }
+
+            // Populate Seasons Tabs
+            detectedSeasons.forEach(sObj => {
+                const tabBtn = document.createElement("button");
+                tabBtn.type = "button";
+                tabBtn.className = `cinema-season-tab ${sObj.seasonNumber === currentSeason.seasonNumber ? "active" : ""}`;
+                tabBtn.textContent = sObj.name;
+                tabBtn.addEventListener("click", () => {
+                    seasonsTabs.querySelectorAll(".cinema-season-tab").forEach(t => t.classList.remove("active"));
+                    tabBtn.classList.add("active");
+                    currentSeason = sObj;
+                    currentEpisodeNum = 1;
+                    renderSeasonEpisodes(sObj);
+                });
+                seasonsTabs.appendChild(tabBtn);
+            });
+
+            seriesSection.appendChild(seasonsTabs);
+            seriesSection.appendChild(episodesGrid);
+
+            // Initial episodes load
+            renderSeasonEpisodes(currentSeason);
+
+            detailsContainer.appendChild(seriesSection);
+        }
+
+        // 4. Action Buttons Grid (Download, Watchlist, Share)
         const actionsGrid = document.createElement("div");
         actionsGrid.className = "cinema-actions-grid";
 
@@ -4902,6 +5098,7 @@ function openDownloadModal(movie) {
                 streamBtn.addEventListener("click", (e) => {
                     e.stopPropagation();
                     closeModal(modal);
+                    triggerMonetagSmartLink();
                     openCinemaModal(movie, streamTarget);
                 });
                 actionsGroup.appendChild(streamBtn);
