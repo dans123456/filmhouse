@@ -4920,71 +4920,53 @@ body.media-detail-active .app-content-container {
 #screen-media-detail {
     position: relative;
     min-height: 100vh;
-    background: #0e0e0d;
-    color: #ffffff;
+    background-color: var(--bg-dark-pure, #07080c);
+    color: var(--text-primary, #ffffff);
     padding: 0 0 60px 0;
     overflow-x: hidden;
     max-width: 680px;
     margin: 0 auto;
 }
 
-/* Floating Glassmorphic Top Nav */
+/* Floating Glassmorphic Top Nav (Back Button Only) */
 .media-detail-top-nav {
     position: absolute;
-    top: 12px;
-    left: 0;
-    right: 0;
+    top: 14px;
+    left: 14px;
     z-index: 50;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
     pointer-events: none;
 }
 
 .media-nav-circle-btn {
     pointer-events: auto;
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(14, 14, 13, 0.6);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+    background: var(--bg-dark-card, rgba(22, 24, 35, 0.75));
+    backdrop-filter: var(--glass-blur, blur(16px));
+    -webkit-backdrop-filter: var(--glass-blur, blur(16px));
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
 .media-nav-circle-btn:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.35);
-    transform: scale(1.05);
+    background: var(--bg-dark-elevated, #161823);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.06);
 }
 
 .media-nav-circle-btn svg {
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
     fill: currentColor;
-}
-
-.media-top-nav-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    pointer-events: auto;
-}
-
-.media-nav-me-btn {
-    width: auto;
-    border-radius: 20px;
-    padding: 0 14px;
-    gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
 }
 
 /* Hero Viewport (Backdrop Banner & Live Video Player) */
@@ -5018,7 +5000,7 @@ body.media-detail-active .app-content-container {
     left: 0;
     right: 0;
     height: 90px;
-    background: linear-gradient(180deg, rgba(14, 14, 13, 0.9) 0%, rgba(14, 14, 13, 0.3) 50%, transparent 100%);
+    background: linear-gradient(180deg, rgba(7, 8, 12, 0.85) 0%, rgba(7, 8, 12, 0.2) 60%, transparent 100%);
     pointer-events: none;
 }
 
@@ -5028,7 +5010,7 @@ body.media-detail-active .app-content-container {
     left: 0;
     right: 0;
     height: 140px;
-    background: linear-gradient(0deg, #0e0e0d 0%, rgba(14, 14, 13, 0.75) 40%, transparent 100%);
+    background: linear-gradient(0deg, var(--bg-dark-pure, #07080c) 0%, rgba(7, 8, 12, 0.8) 45%, transparent 100%);
     pointer-events: none;
 }
 
@@ -5215,8 +5197,8 @@ body.media-detail-active .app-content-container {
 }
 
 .btn-media-trailer {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: var(--bg-dark-card, rgba(22, 24, 35, 0.7));
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
     color: #ffffff;
     backdrop-filter: blur(12px);
     flex: 0 0 auto;
@@ -5226,63 +5208,6 @@ body.media-detail-active .app-content-container {
 .btn-media-trailer .yt-play-icon {
     width: 18px;
     height: 18px;
-}
-
-/* Subtitles Bar (Ready for OpenSubtitles / stream tracks) */
-.media-subtitles-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.media-subtitles-bar:hover {
-    background: rgba(255, 255, 255, 0.09);
-    border-color: rgba(255, 255, 255, 0.22);
-}
-
-.subtitles-bar-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #ffffff;
-}
-
-.subtitles-bar-left svg {
-    width: 16px;
-    height: 16px;
-    fill: var(--primary-color, #ffbc00);
-}
-
-.subtitles-hint {
-    font-size: 11.5px;
-    color: rgba(255, 255, 255, 0.55);
-    font-weight: 400;
-}
-
-.subtitles-bar-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.subtitles-flags {
-    font-size: 13px;
-    letter-spacing: 2px;
-}
-
-.subtitles-bar-right .chevron-icon {
-    width: 14px;
-    height: 14px;
-    fill: rgba(255, 255, 255, 0.4);
 }
 
 /* 5-Column Quick Actions Grid */
@@ -5299,17 +5224,18 @@ body.media-detail-active .app-content-container {
     justify-content: center;
     gap: 4px;
     padding: 10px 4px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(8px);
+    border-radius: var(--border-radius-md, 14px);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    background: var(--bg-dark-card, rgba(22, 24, 35, 0.7));
+    backdrop-filter: var(--glass-blur, blur(16px));
+    -webkit-backdrop-filter: var(--glass-blur, blur(16px));
     color: rgba(255, 255, 255, 0.85);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .media-quick-btn:hover, .media-quick-btn.active {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-dark-elevated, #161823);
     border-color: rgba(255, 255, 255, 0.25);
     color: #ffffff;
 }
@@ -5329,11 +5255,86 @@ body.media-detail-active .app-content-container {
     font-weight: 600;
 }
 
+/* Subtitles Picker Popup Sheet */
+.media-subtitles-picker-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.media-subtitles-picker-card {
+    width: 100%;
+    max-width: 500px;
+    background: var(--bg-dark-elevated, #161823);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.media-subtitles-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.media-subtitles-picker-header h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.subtitles-picker-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.subtitles-lang-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.subtitles-lang-item:hover, .subtitles-lang-item.active {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary-color, #ffbc00);
+}
+
 /* In-Page Download Accordion */
 .media-download-accordion {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
+    background: var(--bg-dark-card, rgba(22, 24, 35, 0.7));
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    backdrop-filter: var(--glass-blur, blur(16px));
+    border-radius: var(--border-radius-md, 14px);
     padding: 14px;
     display: flex;
     flex-direction: column;
@@ -5370,8 +5371,8 @@ body.media-detail-active .app-content-container {
     align-items: center;
     justify-content: space-between;
     padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--bg-dark-elevated, #161823);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
     border-radius: 12px;
     transition: all 0.2s ease;
     cursor: pointer;
@@ -5380,6 +5381,12 @@ body.media-detail-active .app-content-container {
 .media-download-row:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.18);
+}
+
+.media-download-row.missing-quality {
+    border-style: dashed;
+    background: rgba(255, 255, 255, 0.02);
+    opacity: 0.9;
 }
 
 .media-download-row-left {
@@ -5420,6 +5427,145 @@ body.media-detail-active .app-content-container {
     width: 12px;
     height: 12px;
     fill: currentColor;
+}
+
+.media-download-row-btn.btn-req-quality {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: var(--primary-color, #ffbc00);
+    box-shadow: none;
+}
+
+.media-download-row-btn.btn-req-quality:hover {
+    background: rgba(255, 188, 0, 0.15);
+    border-color: var(--primary-color, #ffbc00);
+}
+
+/* TV Series Episode Guide (Collapsible Dropdown) */
+.episode-guide-toggle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: var(--border-radius-md, 14px);
+    background: var(--bg-dark-card, rgba(22, 24, 35, 0.7));
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    backdrop-filter: var(--glass-blur, blur(16px));
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.episode-guide-toggle-header:hover {
+    background: var(--bg-dark-elevated, #161823);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.episode-guide-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.episode-guide-header-left svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--primary-color, #ffbc00);
+}
+
+.episode-guide-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.episode-guide-chevron {
+    width: 14px;
+    height: 14px;
+    fill: var(--text-secondary);
+    transition: transform 0.25s ease;
+}
+
+.episode-guide-chevron.expanded {
+    transform: rotate(90deg);
+}
+
+.episode-guide-collapsible-body {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeIn 0.25s ease-out;
+}
+
+.episode-rich-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--bg-dark-card, rgba(22, 24, 35, 0.7));
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.episode-rich-card:hover {
+    background: var(--bg-dark-elevated, #161823);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.episode-rich-card.active {
+    border-color: var(--primary-color, #ffbc00);
+    background: rgba(255, 188, 0, 0.08);
+    box-shadow: 0 0 16px var(--primary-glow, rgba(255, 188, 0, 0.2));
+}
+
+.episode-rich-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.episode-rich-tag-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.episode-rich-ep-num {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--primary-color, #ffbc00);
+    background: rgba(255, 188, 0, 0.12);
+    padding: 2px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+.episode-rich-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.episode-rich-synopsis {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
 }
 
 /* Cast and Crew Section */

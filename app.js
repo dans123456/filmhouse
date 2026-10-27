@@ -3372,39 +3372,12 @@ let currentMediaDetailMovie = null;
 
 function initMediaDetailPage() {
     const btnBack = document.getElementById("btn-media-back");
-    const btnHome = document.getElementById("btn-media-home");
-    const btnSearch = document.getElementById("btn-media-search");
-    const btnProfile = document.getElementById("btn-media-profile");
     const btnExpand = document.getElementById("btn-expand-synopsis");
+    const closeSubsPicker = document.getElementById("btn-close-subtitles-picker");
+    const subsPickerModal = document.getElementById("media-subtitles-picker-modal");
 
     if (btnBack) {
         btnBack.onclick = () => closeMediaDetailPage();
-    }
-
-    if (btnHome) {
-        btnHome.onclick = () => {
-            closeMediaDetailPage();
-            navigateToScreen("home");
-        };
-    }
-
-    if (btnSearch) {
-        btnSearch.onclick = () => {
-            closeMediaDetailPage();
-            navigateToScreen("home");
-            const searchInput = document.getElementById("search-input");
-            if (searchInput) {
-                searchInput.focus();
-                searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
-            }
-        };
-    }
-
-    if (btnProfile) {
-        btnProfile.onclick = () => {
-            closeMediaDetailPage();
-            navigateToScreen("profile");
-        };
     }
 
     if (btnExpand) {
@@ -3414,6 +3387,28 @@ function initMediaDetailPage() {
                 const isExpanded = synopsisEl.classList.toggle("expanded");
                 btnExpand.textContent = isExpanded ? "Show less" : "Read more";
             }
+        };
+    }
+
+    if (closeSubsPicker && subsPickerModal) {
+        closeSubsPicker.onclick = () => {
+            subsPickerModal.style.display = "none";
+        };
+        subsPickerModal.onclick = (e) => {
+            if (e.target === subsPickerModal) subsPickerModal.style.display = "none";
+        };
+    }
+
+    // Episode guide dropdown toggle
+    const epGuideToggle = document.getElementById("btn-toggle-episode-guide");
+    const epGuideBody = document.getElementById("episode-guide-body");
+    const epGuideChevron = document.getElementById("episode-guide-chevron");
+    if (epGuideToggle && epGuideBody && epGuideChevron) {
+        epGuideToggle.onclick = () => {
+            const isShown = epGuideBody.style.display === "flex" || epGuideBody.style.display === "block";
+            epGuideBody.style.display = isShown ? "none" : "flex";
+            epGuideChevron.classList.toggle("expanded", !isShown);
+            if (!isShown && typeof triggerHaptic === "function") triggerHaptic("light");
         };
     }
 }
@@ -3431,6 +3426,9 @@ function closeMediaDetailPage() {
 
     const downloadAccordion = document.getElementById("media-download-accordion");
     if (downloadAccordion) downloadAccordion.style.display = "none";
+
+    const subsPickerModal = document.getElementById("media-subtitles-picker-modal");
+    if (subsPickerModal) subsPickerModal.style.display = "none";
 
     document.body.classList.remove("media-detail-active");
 
@@ -3483,7 +3481,7 @@ function openMediaDetailPage(movie) {
         window.Telegram.WebApp.BackButton.onClick(onTgBack);
     }
 
-    // 1. Hero Backdrop
+    // 1. Hero Viewport: Auto-play trailer if available, with backdrop image as alternative
     const backdropImg = document.getElementById("media-backdrop-img");
     if (backdropImg) {
         backdropImg.src = movie.backdrop;
@@ -3492,12 +3490,37 @@ function openMediaDetailPage(movie) {
 
     const iframeContainer = document.getElementById("media-stream-iframe-container");
     const backdropContainer = document.getElementById("media-backdrop-container");
-    if (iframeContainer) {
-        iframeContainer.replaceChildren();
-        iframeContainer.style.display = "none";
+    
+    // Auto-play trailer if trailer link/key exists
+    let trailerEmbedUrl = "";
+    if (movie.trailer) {
+        const ytMatch = movie.trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+        if (ytMatch) {
+            trailerEmbedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&mute=1&playsinline=1&rel=0`;
+        } else if (!movie.trailer.includes("http")) {
+            trailerEmbedUrl = `https://www.youtube.com/embed/${movie.trailer}?autoplay=1&mute=1&playsinline=1&rel=0`;
+        } else {
+            trailerEmbedUrl = movie.trailer;
+        }
     }
-    if (backdropContainer) {
-        backdropContainer.style.display = "block";
+
+    if (trailerEmbedUrl && iframeContainer && backdropContainer) {
+        iframeContainer.replaceChildren();
+        const iframe = document.createElement("iframe");
+        iframe.src = trailerEmbedUrl;
+        iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
+        iframe.setAttribute("allowfullscreen", "true");
+        iframeContainer.appendChild(iframe);
+        backdropContainer.style.display = "none";
+        iframeContainer.style.display = "block";
+    } else {
+        if (iframeContainer) {
+            iframeContainer.replaceChildren();
+            iframeContainer.style.display = "none";
+        }
+        if (backdropContainer) {
+            backdropContainer.style.display = "block";
+        }
     }
 
     // 2. Title
@@ -3602,6 +3625,7 @@ function openMediaDetailPage(movie) {
         });
     }
 
+    // 5. Live Streaming Controller (Honest Availability)
     function playMediaStream(customUrl, optTitle) {
         let streamTarget = customUrl || movie.stream_url || "";
         if (!streamTarget && movie.links && Array.isArray(movie.links)) {
@@ -3611,18 +3635,14 @@ function openMediaDetailPage(movie) {
             }
         }
 
-        if (!streamTarget && isTVShow) {
-            const seriesContainer = document.getElementById("media-series-container");
-            if (seriesContainer) {
-                seriesContainer.style.display = "block";
-                seriesContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-                showToast("📺 Please tap an episode below to stream", "info");
-                return;
-            }
-        }
-
+        // If streaming is not available: honest prompt for stream request
         if (!streamTarget) {
-            showToast(`⚠️ Streaming link for "${movie.title}" will be available shortly!`, "warning");
+            showToast(`⚡ Streaming not yet available for "${movie.title}". Opening request...`, "info");
+            if (typeof showRequestSpecsDrawer === "function") {
+                showRequestSpecsDrawer(movie);
+            } else if (typeof openManualRequestModal === "function") {
+                openManualRequestModal(movie.title);
+            }
             return;
         }
 
@@ -3650,7 +3670,7 @@ function openMediaDetailPage(movie) {
         }
     }
 
-    // 5. Wire Hero Stream Button & Preview Play FAB
+    // Wire Hero Stream Button & Preview Play FAB
     const streamBtn = document.getElementById("btn-media-stream-main");
     if (streamBtn) {
         streamBtn.onclick = () => playMediaStream();
@@ -3660,7 +3680,7 @@ function openMediaDetailPage(movie) {
         previewFab.onclick = () => playMediaStream();
     }
 
-    // 6. Wire Hero Download Button (In-Page Accordion, NO MODAL)
+    // 6. Wire Hero Download Button (All Qualities with Missing Request)
     const downloadBtn = document.getElementById("btn-media-download-main");
     const downloadAccordion = document.getElementById("media-download-accordion");
     const downloadList = document.getElementById("media-download-links-list");
@@ -3680,7 +3700,7 @@ function openMediaDetailPage(movie) {
         };
     }
 
-    // 7. Wire Hero Trailer Button
+    // 7. Wire Hero Trailer Button (Manual Trigger)
     const trailerBtn = document.getElementById("btn-media-trailer-main");
     if (trailerBtn) {
         if (movie.trailer || movie.imdb_id) {
@@ -3692,9 +3712,9 @@ function openMediaDetailPage(movie) {
                         let embedUrl = movie.trailer;
                         const ytMatch = movie.trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
                         if (ytMatch) {
-                            embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`;
+                            embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&mute=0&playsinline=1&rel=0`;
                         } else if (!movie.trailer.includes("http")) {
-                            embedUrl = `https://www.youtube.com/embed/${movie.trailer}?autoplay=1`;
+                            embedUrl = `https://www.youtube.com/embed/${movie.trailer}?autoplay=1&mute=0&playsinline=1&rel=0`;
                         }
                         const iframe = document.createElement("iframe");
                         iframe.src = embedUrl;
@@ -3717,19 +3737,10 @@ function openMediaDetailPage(movie) {
         }
     }
 
-    // 8. Wire Subtitles Row Placeholder
-    const subtitlesBar = document.getElementById("media-subtitles-bar");
-    if (subtitlesBar) {
-        subtitlesBar.onclick = () => {
-            showToast("💬 Subtitles: 🇬🇧 English, 🇫🇷 French, 🇪🇸 Spanish & 🇸🇦 Arabic available in player settings!", "info");
-            if (typeof triggerHaptic === "function") triggerHaptic("selection");
-        };
-    }
-
-    // 9. Wire 5-Column Quick Actions
+    // 8. Wire 5-Column Quick Actions (Watchlist, Watched, Subtitles, Like, Share)
     updateMediaQuickActions(movie);
 
-    // 10. TV Series Seasons & Episodes
+    // 9. TV Series Episode Guide (Collapsible Dropdown)
     const seriesContainer = document.getElementById("media-series-container");
     if (seriesContainer) {
         if (isTVShow) {
@@ -3741,77 +3752,142 @@ function openMediaDetailPage(movie) {
         }
     }
 
-    // 11. Top Cast & Crew
+    // 10. Top Cast & Crew
     renderMediaCast(movie);
 
-    // 12. More Like This
+    // 11. More Like This
     renderMediaRelated(movie);
 
-    // 13. Dynamic TMDB Self-Healing
+    // 12. Dynamic TMDB Self-Healing (fetches missing trailer/synopsis in background)
     fetchTmdbDetailsForMedia(movie);
 
     logAppEvent("view", movie.csv_id || movie.id, movie.title);
     window.scrollTo({ top: 0, behavior: "instant" });
 }
 
+// Render Download Rows with ALL standard qualities (720p, 1080p, 4K)
+// Uploaded qualities have Download button; unavailable qualities have Request button like before
 function renderMediaDownloadRows(movie, container) {
     if (!container) return;
     container.replaceChildren();
 
-    const links = movie.links && Array.isArray(movie.links) ? movie.links.filter(l => {
+    const isTVShow = (movie.type || "").toLowerCase() === "series";
+    const uploadedLinks = (movie.links && Array.isArray(movie.links)) ? movie.links.filter(l => {
         const u = typeof l === "object" && l !== null ? l.url : l;
         return u && String(u).trim().length > 0;
     }) : [];
-
-    const isTVShow = (movie.type || "").toLowerCase() === "series";
-
-    if (links.length === 0) {
-        const emptyBox = document.createElement("div");
-        emptyBox.style.cssText = "text-align: center; padding: 18px 12px; color: var(--text-secondary); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px;";
-        emptyBox.innerHTML = `
-            <span>Direct download links are currently being prepared.</span>
-            <button type="button" class="btn btn-primary" id="btn-request-unavail-dl" style="padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 4px;">
-                Request Download ⚡
-            </button>
-        `;
-        const reqBtn = emptyBox.querySelector("#btn-request-unavail-dl");
-        if (reqBtn) {
-            reqBtn.onclick = () => {
-                if (typeof showRequestSpecsDrawer === "function") {
-                    showRequestSpecsDrawer(movie);
-                } else if (typeof openManualRequestModal === "function") {
-                    openManualRequestModal(movie.title);
-                }
-            };
-        }
-        container.appendChild(emptyBox);
-        return;
-    }
 
     const matchingRequest = currentUserRequests && currentUserRequests.find(r => 
         r.title && titlesMatch(r.title, movie.title) &&
         r.status === "fulfilled"
     );
 
-    links.forEach((link, idx) => {
-        const isObj = typeof link === "object" && link !== null;
-        const linkUrl = isObj ? link.url : link;
-        let qualityLabel = isObj && link.quality ? link.quality : (isTVShow ? (link.season || `Season ${idx + 1}`) : (idx === 0 ? "720p HD" : "1080p Full HD"));
-        
-        let estimatedSize = "~850 MB";
-        if (isObj && link.size) {
-            estimatedSize = link.size;
-        } else if (qualityLabel.includes("1080")) {
-            estimatedSize = "~1.85 GB";
-        } else if (qualityLabel.includes("4K") || qualityLabel.includes("2160")) {
-            estimatedSize = "~4.5 GB";
-        } else if (qualityLabel.includes("480")) {
-            estimatedSize = "~420 MB";
-        } else if (isTVShow) {
-            estimatedSize = "~3.2 GB";
+    if (isTVShow) {
+        // --- TV SHOW: Season downloads ---
+        if (uploadedLinks.length === 0) {
+            const emptyBox = document.createElement("div");
+            emptyBox.style.cssText = "text-align: center; padding: 18px 12px; color: var(--text-secondary); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px;";
+            emptyBox.innerHTML = `
+                <span>Seasons are currently being synced. Tap below to request!</span>
+                <button type="button" class="btn btn-primary" id="btn-request-unavail-series" style="padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 4px;">
+                    Request Series ⚡
+                </button>
+            `;
+            const reqBtn = emptyBox.querySelector("#btn-request-unavail-series");
+            if (reqBtn) {
+                reqBtn.onclick = () => {
+                    if (typeof showRequestSpecsDrawer === "function") {
+                        showRequestSpecsDrawer(movie);
+                    } else if (typeof openManualRequestModal === "function") {
+                        openManualRequestModal(movie.title);
+                    }
+                };
+            }
+            container.appendChild(emptyBox);
+            return;
         }
 
-        const isCinemaCut = qualityLabel.toLowerCase().includes("cinema") || qualityLabel.toLowerCase().includes("cam");
+        uploadedLinks.forEach((link, idx) => {
+            const isObj = typeof link === "object" && link !== null;
+            const linkUrl = isObj ? link.url : link;
+            const seasonLabel = isObj && link.season ? link.season : `Season ${idx + 1}`;
+            const estimatedSize = (isObj && link.size) ? link.size : "~3.2 GB";
+
+            const row = document.createElement("div");
+            row.className = "media-download-row";
+
+            const leftCol = document.createElement("div");
+            leftCol.className = "media-download-row-left";
+
+            const titleSpan = document.createElement("span");
+            titleSpan.className = "media-download-quality-title";
+            titleSpan.textContent = seasonLabel;
+
+            const sizeBadge = document.createElement("span");
+            sizeBadge.className = "media-download-size-badge";
+            sizeBadge.textContent = estimatedSize;
+
+            leftCol.appendChild(titleSpan);
+            leftCol.appendChild(sizeBadge);
+
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "media-download-row-btn";
+            btn.innerHTML = `<svg><use href="#icon-download"></use></svg><span>Download</span>`;
+
+            row.onclick = () => {
+                logAppEvent("download", movie.csv_id || movie.id, movie.title);
+                if (matchingRequest) {
+                    showToast("Fulfillment download unlocked! Connecting...", "success");
+                    window.open(linkUrl, "_blank");
+                } else {
+                    showConnectionDrawer(linkUrl, ADSGRAM_DOWNLOAD_BLOCK_ID);
+                }
+            };
+
+            row.appendChild(leftCol);
+            row.appendChild(btn);
+            container.appendChild(row);
+        });
+        return;
+    }
+
+    // --- MOVIE: Full Quality Suite (720p HD, 1080p FHD, 4K UHD) ---
+    // Release year for 4K capability
+    let movieReleaseYear = 0;
+    if (movie.release_date && String(movie.release_date).length >= 4) {
+        movieReleaseYear = parseInt(String(movie.release_date).substring(0, 4), 10);
+    } else if (movie.year) {
+        movieReleaseYear = parseInt(String(movie.year).replace(/\D/g, '').slice(0, 4), 10);
+    }
+    const allows4K = movieReleaseYear >= 2017;
+
+    // Define standard quality tiers
+    const standardQualities = [
+        { code: "720p", label: "720p HD", size: "~850 MB" },
+        { code: "1080p", label: "1080p Full HD", size: "~1.85 GB" }
+    ];
+    if (allows4K) {
+        standardQualities.push({ code: "4k", label: "4K Ultra HD", size: "~4.5 GB" });
+    }
+
+    // Render uploaded qualities first (including Cinema Cut if any)
+    const renderedCodes = new Set();
+
+    uploadedLinks.forEach((link, idx) => {
+        const isObj = typeof link === "object" && link !== null;
+        const linkUrl = isObj ? link.url : link;
+        const rawQuality = isObj && link.quality ? link.quality : (idx === 0 ? "720p HD" : "1080p Full HD");
+        const lowerQ = rawQuality.toLowerCase();
+
+        let qCode = "720p";
+        if (lowerQ.includes("1080")) qCode = "1080p";
+        else if (lowerQ.includes("4k") || lowerQ.includes("2160")) qCode = "4k";
+        else if (lowerQ.includes("480")) qCode = "480p";
+        renderedCodes.add(qCode);
+
+        const isCinemaCut = lowerQ.includes("cinema") || lowerQ.includes("cam");
+        const estimatedSize = (isObj && link.size) ? link.size : (qCode === "1080p" ? "~1.85 GB" : (qCode === "4k" ? "~4.5 GB" : "~850 MB"));
 
         const row = document.createElement("div");
         row.className = "media-download-row";
@@ -3821,9 +3897,10 @@ function renderMediaDownloadRows(movie, container) {
 
         const titleSpan = document.createElement("span");
         titleSpan.className = "media-download-quality-title";
-        titleSpan.textContent = qualityLabel;
         if (isCinemaCut) {
-            titleSpan.innerHTML = `⚠️ ${qualityLabel} <span style="font-size: 9px; background: #ff9800; color: #000; padding: 2px 5px; border-radius: 4px; margin-left: 4px; font-weight: 800;">CAM</span>`;
+            titleSpan.innerHTML = `⚠️ ${rawQuality} <span style="font-size: 9px; background: #ff9800; color: #000; padding: 2px 5px; border-radius: 4px; margin-left: 4px; font-weight: 800;">CAM</span>`;
+        } else {
+            titleSpan.textContent = rawQuality;
         }
 
         const sizeBadge = document.createElement("span");
@@ -3838,7 +3915,7 @@ function renderMediaDownloadRows(movie, container) {
         btn.className = "media-download-row-btn";
         btn.innerHTML = `<svg><use href="#icon-download"></use></svg><span>Download</span>`;
 
-        const onDownloadClick = () => {
+        row.onclick = () => {
             logAppEvent("download", movie.csv_id || movie.id, movie.title);
             if (matchingRequest) {
                 showToast("Fulfillment download unlocked! Connecting...", "success");
@@ -3848,9 +3925,47 @@ function renderMediaDownloadRows(movie, container) {
             }
         };
 
-        row.onclick = onDownloadClick;
         row.appendChild(leftCol);
         row.appendChild(btn);
+        container.appendChild(row);
+    });
+
+    // Render missing qualities with "Request" button (like FilmHouse classic)
+    standardQualities.forEach(qItem => {
+        if (renderedCodes.has(qItem.code)) return; // Already uploaded
+
+        const row = document.createElement("div");
+        row.className = "media-download-row missing-quality";
+
+        const leftCol = document.createElement("div");
+        leftCol.className = "media-download-row-left";
+
+        const titleSpan = document.createElement("span");
+        titleSpan.className = "media-download-quality-title";
+        titleSpan.innerHTML = `${qItem.label} <span style="font-size: 10px; font-weight: normal; color: var(--text-secondary); opacity: 0.8;">• Not uploaded</span>`;
+
+        const sizeBadge = document.createElement("span");
+        sizeBadge.className = "media-download-size-badge";
+        sizeBadge.textContent = qItem.size;
+
+        leftCol.appendChild(titleSpan);
+        leftCol.appendChild(sizeBadge);
+
+        const reqBtn = document.createElement("button");
+        reqBtn.type = "button";
+        reqBtn.className = "media-download-row-btn btn-req-quality";
+        reqBtn.innerHTML = `<span>Request ⚡</span>`;
+
+        row.onclick = () => {
+            if (typeof showRequestSpecsDrawer === "function") {
+                showRequestSpecsDrawer(movie);
+            } else if (typeof openManualRequestModal === "function") {
+                openManualRequestModal(`${movie.title} (${qItem.label})`);
+            }
+        };
+
+        row.appendChild(leftCol);
+        row.appendChild(reqBtn);
         container.appendChild(row);
     });
 }
@@ -3902,15 +4017,11 @@ function updateMediaQuickActions(movie) {
         };
     }
 
-    // 3. Request
-    const btnRequest = document.getElementById("btn-media-request");
-    if (btnRequest) {
-        btnRequest.onclick = () => {
-            if (typeof showRequestSpecsDrawer === "function") {
-                showRequestSpecsDrawer(movie);
-            } else if (typeof openManualRequestModal === "function") {
-                openManualRequestModal(movie.title);
-            }
+    // 3. Subtitles (Replaces old Request button)
+    const btnSubtitles = document.getElementById("btn-media-subtitles");
+    if (btnSubtitles) {
+        btnSubtitles.onclick = () => {
+            openSubtitlesPicker(movie);
         };
     }
 
@@ -3938,28 +4049,91 @@ function updateMediaQuickActions(movie) {
         };
     }
 
-    // 5. Share
+    // 5. Share (Directly leads anyone who opens it to this exact movie page)
     const btnShare = document.getElementById("btn-media-share");
     if (btnShare) {
         btnShare.onclick = () => {
-            if (typeof shareMovie === "function") {
-                shareMovie(movie);
+            const targetId = movie.csv_id || movie.tmdb_id || movie.id;
+            const directUrl = window.Telegram?.WebApp?.initData
+                ? `https://t.me/FilmHouseGh_bot?startapp=movie_${targetId}`
+                : `${window.location.origin}${window.location.pathname}?movie=${encodeURIComponent(movie.csv_id || movie.title)}`;
+
+            const shareData = {
+                title: movie.title,
+                text: `Watch "${movie.title}" on FilmHouse! 🎬`,
+                url: directUrl
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+            } else if (navigator.clipboard?.writeText) {
+                navigator.clipboard.writeText(directUrl);
+                showToast(`Link copied! Opening this link leads straight to ${movie.title} 🍿`, "success");
             } else {
-                const shareText = `Check out "${movie.title}" on FilmHouse! 🎬`;
-                if (navigator.share) {
-                    navigator.share({ title: movie.title, text: shareText, url: window.location.href }).catch(() => {});
-                } else {
-                    navigator.clipboard?.writeText(window.location.href);
-                    showToast("Link copied to clipboard! 📋", "success");
-                }
+                showToast("Direct movie link copied!", "success");
             }
+            if (typeof triggerHaptic === "function") triggerHaptic("selection");
         };
     }
 }
 
+// Subtitles selection sheet
+function openSubtitlesPicker(movie) {
+    const modal = document.getElementById("media-subtitles-picker-modal");
+    const content = document.getElementById("media-subtitles-picker-content");
+    if (!modal || !content) return;
+
+    content.replaceChildren();
+
+    // Default multi-language subtitle tracks supported by our streaming engine
+    const availableLangs = [
+        { code: "en", flag: "🇬🇧", name: "English Subtitles" },
+        { code: "fr", flag: "🇫🇷", name: "French Subtitles (Français)" },
+        { code: "es", flag: "🇪🇸", name: "Spanish Subtitles (Español)" },
+        { code: "ar", flag: "🇸🇦", name: "Arabic Subtitles (العربية)" }
+    ];
+
+    if (availableLangs.length === 0) {
+        content.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-secondary);font-size:13px;">No subtitles available for this title.</div>`;
+    } else {
+        const hint = document.createElement("p");
+        hint.style.cssText = "font-size:12px;color:var(--text-secondary);margin:0 0 6px 0;";
+        hint.textContent = "Select a language to activate captions in the player:";
+        content.appendChild(hint);
+
+        availableLangs.forEach(lang => {
+            const item = document.createElement("div");
+            item.className = "subtitles-lang-item";
+            item.innerHTML = `
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:18px;">${lang.flag}</span>
+                    <span style="font-size:13px;font-weight:600;color:#fff;">${lang.name}</span>
+                </div>
+                <span style="font-size:11px;color:var(--primary-color,#ffbc00);font-weight:700;">Ready</span>
+            `;
+
+            item.onclick = () => {
+                showToast(`Selected ${lang.flag} ${lang.name}! Captions will load inside the player.`, "success");
+                modal.style.display = "none";
+                if (typeof triggerHaptic === "function") triggerHaptic("selection");
+            };
+
+            content.appendChild(item);
+        });
+    }
+
+    modal.style.display = "flex";
+    if (typeof triggerHaptic === "function") triggerHaptic("light");
+}
+
+// TV Series Episode Guide (Collapsible dropdown with rich titles & synopsis)
 function renderMediaSeriesSection(movie, container, streamCallback) {
     if (!container) return;
-    container.replaceChildren();
+    const body = container.querySelector("#episode-guide-body");
+    const countBadge = container.querySelector("#media-ep-count-badge");
+    if (!body) return;
+
+    body.replaceChildren();
 
     let detectedSeasons = [];
     if (movie.links && Array.isArray(movie.links) && movie.links.length > 0) {
@@ -3997,27 +4171,16 @@ function renderMediaSeriesSection(movie, container, streamCallback) {
     detectedSeasons.sort((a, b) => a.seasonNumber - b.seasonNumber);
     let currentSeason = detectedSeasons[0];
 
-    const header = document.createElement("div");
-    header.className = "cinema-series-header";
-    header.innerHTML = `
-        <div class="cinema-series-header-title">
-            <svg><use href="#icon-tv"></use></svg>
-            <span>Seasons &amp; Episodes</span>
-        </div>
-        <span class="cinema-series-count-badge" id="media-ep-count-badge">Loading...</span>
-    `;
-    container.appendChild(header);
-
     const tabsRow = document.createElement("div");
     tabsRow.className = "cinema-seasons-tabs";
 
-    const episodesGrid = document.createElement("div");
-    episodesGrid.className = "cinema-episodes-grid";
+    const episodesList = document.createElement("div");
+    episodesList.className = "episode-guide-list";
+    episodesList.style.cssText = "display:flex;flex-direction:column;gap:8px;";
 
     async function loadSeasonEpisodes(seasonObj) {
-        episodesGrid.replaceChildren();
-        const badgeEl = container.querySelector("#media-ep-count-badge");
-        if (badgeEl) badgeEl.textContent = "Loading...";
+        episodesList.replaceChildren();
+        if (countBadge) countBadge.textContent = "Loading...";
 
         let episodes = [];
         const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
@@ -4038,44 +4201,57 @@ function renderMediaSeriesSection(movie, container, streamCallback) {
         }
 
         if (episodes.length === 0) {
-            for (let i = 1; i <= 10; i++) {
+            for (let i = 1; i <= 8; i++) {
                 episodes.push({
                     episode_number: i,
                     name: `Episode ${i}`,
-                    overview: ""
+                    overview: "Episode details will sync automatically."
                 });
             }
         }
 
-        if (badgeEl) badgeEl.textContent = `${episodes.length} Episodes`;
+        if (countBadge) countBadge.textContent = `${episodes.length} Episodes`;
 
         episodes.forEach(ep => {
             const epNum = ep.episode_number;
             const epCard = document.createElement("div");
-            epCard.className = "cinema-episode-card";
+            epCard.className = "episode-rich-card";
 
-            const cardLeft = document.createElement("div");
-            cardLeft.className = "cinema-episode-card-left";
+            const topRow = document.createElement("div");
+            topRow.className = "episode-rich-card-top";
 
-            const epTag = document.createElement("span");
-            epTag.className = "cinema-ep-tag";
-            epTag.textContent = `EP ${epNum}`;
+            const tagTitle = document.createElement("div");
+            tagTitle.className = "episode-rich-tag-title";
 
-            const epTitleEl = document.createElement("span");
-            epTitleEl.className = "cinema-ep-title";
-            epTitleEl.textContent = ep.name || `Episode ${epNum}`;
+            const epNumTag = document.createElement("span");
+            epNumTag.className = "episode-rich-ep-num";
+            epNumTag.textContent = `EP ${epNum}`;
 
-            cardLeft.appendChild(epTag);
-            cardLeft.appendChild(epTitleEl);
-            epCard.appendChild(cardLeft);
+            const epTitle = document.createElement("span");
+            epTitle.className = "episode-rich-title";
+            epTitle.textContent = ep.name || `Episode ${epNum}`;
+
+            tagTitle.appendChild(epNumTag);
+            tagTitle.appendChild(epTitle);
+            topRow.appendChild(tagTitle);
 
             const playIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             playIcon.setAttribute("class", "cinema-ep-play-icon");
+            playIcon.style.cssText = "width:14px;height:14px;fill:currentColor;opacity:0.7;";
             playIcon.innerHTML = `<use href="#icon-play"></use>`;
-            epCard.appendChild(playIcon);
+            topRow.appendChild(playIcon);
+
+            epCard.appendChild(topRow);
+
+            if (ep.overview) {
+                const syn = document.createElement("p");
+                syn.className = "episode-rich-synopsis";
+                syn.textContent = ep.overview;
+                epCard.appendChild(syn);
+            }
 
             epCard.addEventListener("click", () => {
-                episodesGrid.querySelectorAll(".cinema-episode-card").forEach(c => c.classList.remove("active"));
+                episodesList.querySelectorAll(".episode-rich-card").forEach(c => c.classList.remove("active"));
                 epCard.classList.add("active");
 
                 const epTarget = ep.stream_url || seasonObj.streamUrl || movie.stream_url || "";
@@ -4084,7 +4260,7 @@ function renderMediaSeriesSection(movie, container, streamCallback) {
                 showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
             });
 
-            episodesGrid.appendChild(epCard);
+            episodesList.appendChild(epCard);
         });
     }
 
@@ -4102,8 +4278,8 @@ function renderMediaSeriesSection(movie, container, streamCallback) {
         tabsRow.appendChild(tabBtn);
     });
 
-    container.appendChild(tabsRow);
-    container.appendChild(episodesGrid);
+    body.appendChild(tabsRow);
+    body.appendChild(episodesList);
     loadSeasonEpisodes(currentSeason);
 }
 
@@ -4217,7 +4393,7 @@ function fetchTmdbDetailsForMedia(movie) {
     const needsHeal = !movie.overview || movie.overview === "No synopsis available." || 
                       !movie.release_date || !movie.poster || movie.poster.includes("FilmHouse3_nobg.png") ||
                       !movie.backdrop || movie.backdrop.includes("FilmHouse.png") ||
-                      !movie.cast || movie.cast.length === 0;
+                      !movie.cast || movie.cast.length === 0 || !movie.trailer;
 
     if (!needsHeal) return;
 
@@ -4245,6 +4421,14 @@ function fetchTmdbDetailsForMedia(movie) {
                 movie.cast = data.credits.cast.slice(0, 10);
             }
 
+            // Extract trailer if available from TMDB videos
+            if (!movie.trailer && data.videos && Array.isArray(data.videos.results)) {
+                const ytTrailer = data.videos.results.find(v => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser"));
+                if (ytTrailer && ytTrailer.key) {
+                    movie.trailer = ytTrailer.key;
+                }
+            }
+
             if (currentMediaDetailMovie && (currentMediaDetailMovie.csv_id === movie.csv_id || currentMediaDetailMovie.title === movie.title)) {
                 const backdropImg = document.getElementById("media-backdrop-img");
                 if (backdropImg && movie.backdrop) backdropImg.src = movie.backdrop;
@@ -4253,6 +4437,21 @@ function fetchTmdbDetailsForMedia(movie) {
                 if (synopsisEl && movie.overview) synopsisEl.textContent = movie.overview;
 
                 renderMediaCast(movie);
+
+                // If no trailer was playing and we just found one, embed and autoplay it
+                const iframeContainer = document.getElementById("media-stream-iframe-container");
+                const backdropContainer = document.getElementById("media-backdrop-container");
+                if (movie.trailer && iframeContainer && backdropContainer && iframeContainer.style.display === "none") {
+                    const ytMatch = movie.trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                    const embedKey = ytMatch ? ytMatch[1] : movie.trailer;
+                    const iframe = document.createElement("iframe");
+                    iframe.src = `https://www.youtube.com/embed/${embedKey}?autoplay=1&mute=1&playsinline=1&rel=0`;
+                    iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
+                    iframe.setAttribute("allowfullscreen", "true");
+                    iframeContainer.replaceChildren(iframe);
+                    backdropContainer.style.display = "none";
+                    iframeContainer.style.display = "block";
+                }
             }
         })
         .catch(e => console.warn("TMDB healing background error:", e));
