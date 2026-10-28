@@ -401,6 +401,13 @@
         <div class='stream-play-sub'>Fast CDN • 1080p HD Streaming</div>
       </div>
 
+      <!-- Resume Playback Toast -->
+      <div id='resumeToast' style='display:none;position:absolute;bottom:70px;left:50%;transform:translateX(-50%);background:rgba(18,20,29,0.95);backdrop-filter:blur(12px);padding:10px 18px;border-radius:10px;border:1px solid rgba(255,188,0,0.5);box-shadow:0 8px 25px rgba(0,0,0,0.8);z-index:15;align-items:center;gap:10px;font-size:13px;color:#fff;'>
+        <span>⏱️ Resume from <b id='resumeTimeText' style='color:#ffbc00;'>00:00</b>?</span>
+        <button id='btnResume' style='background:#ffbc00;color:#000;font-weight:700;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;'>▶ Resume</button>
+        <button id='btnDismissResume' style='background:none;border:none;color:#94a3b8;cursor:pointer;font-size:16px;'>✖</button>
+      </div>
+
       <video controls='controls' id='mainVideo' playsinline='playsinline' preload='auto'>
         Your browser does not support HTML5 video streaming.
       </video>
@@ -422,6 +429,10 @@
 
       <!-- Action Buttons Row -->
       <div class='action-row'>
+        <label for='bloggerSubInput' class='btn btn-secondary' style='cursor:pointer;' title='Load Subtitles'>
+          💬 Subtitles (.srt/.vtt)
+          <input type='file' id='bloggerSubInput' accept='.srt,.vtt' style='display:none;'/>
+        </label>
         <a class='btn btn-gold' href='#' id='btnDownload' target='_blank'>
           ⬇️ Direct Download File
         </a>
@@ -529,7 +540,7 @@
             const match = clean.match(/watch=([a-zA-Z0-9_\-]+)/);
             if (match && match[1]) {
               clean = match[1];
-              finalStreamUrl = "https://fs1vivid-stone-33239114-4ca6324ed1d7.herokuapp.com/dl/" + clean;
+              finalStreamUrl = "https://comments-load-stuffed-tower.trycloudflare.com/dl/" + clean;
             } else {
               finalStreamUrl = clean;
             }
@@ -542,8 +553,74 @@
         } 
         // Case 2: Just a raw hex/token ID (e.g. 6adee561a4b67b48703250e2)
         else {
-          finalStreamUrl = "https://fs1vivid-stone-33239114-4ca6324ed1d7.herokuapp.com/dl/" + encodeURIComponent(clean);
+          finalStreamUrl = "https://comments-load-stuffed-tower.trycloudflare.com/dl/" + encodeURIComponent(clean);
         }
+      }
+
+      // 1. Resume Playback Progress Logic
+      const resumeKey = 'filmhouse_resume_' + (watchParam ? btoa(watchParam).slice(0, 20) : 'default');
+      const resumeToast = document.getElementById('resumeToast');
+      const resumeTimeText = document.getElementById('resumeTimeText');
+      const btnResume = document.getElementById('btnResume');
+      const btnDismissResume = document.getElementById('btnDismissResume');
+
+      function formatTime(secs) {
+        const m = Math.floor(secs / 60);
+        const s = Math.floor(secs % 60);
+        return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      }
+
+      videoEl.addEventListener('loadedmetadata', function() {
+        const saved = parseFloat(localStorage.getItem(resumeKey) || '0');
+        if (saved > 15 && videoEl.duration && (videoEl.duration - saved) > 30) {
+          if (resumeTimeText) resumeTimeText.textContent = formatTime(saved);
+          if (resumeToast) resumeToast.style.display = 'flex';
+          if (btnResume) {
+            btnResume.onclick = function() {
+              videoEl.currentTime = saved;
+              videoEl.play();
+              if (resumeToast) resumeToast.style.display = 'none';
+            };
+          }
+          if (btnDismissResume) {
+            btnDismissResume.onclick = function() {
+              if (resumeToast) resumeToast.style.display = 'none';
+            };
+          }
+          setTimeout(function() { if (resumeToast) resumeToast.style.display = 'none'; }, 8000);
+        }
+      });
+
+      videoEl.addEventListener('timeupdate', function() {
+        if (videoEl.currentTime > 5 && videoEl.duration && (videoEl.duration - videoEl.currentTime) > 15) {
+          localStorage.setItem(resumeKey, videoEl.currentTime);
+        }
+      });
+
+      // 2. Custom Subtitles (.srt/.vtt) Loader
+      const subInput = document.getElementById('bloggerSubInput');
+      if (subInput) {
+        subInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            let content = evt.target.result;
+            if (file.name.endsWith('.srt')) {
+              content = "WEBVTT\n\n" + content.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, "$1.$2");
+            }
+            const blob = new Blob([content], { type: 'text/vtt' });
+            const track = document.createElement('track');
+            track.kind = 'subtitles';
+            track.label = file.name.replace(/\.[^/.]+$/, "");
+            track.srclang = 'en';
+            track.src = URL.createObjectURL(blob);
+            track.default = true;
+            videoEl.appendChild(track);
+            alert("✅ Subtitles loaded: " + file.name);
+          };
+          reader.readAsText(file);
+        });
       }
 
       if (finalStreamUrl) {

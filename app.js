@@ -3396,6 +3396,57 @@ function initializeFilterDropdowns() {
 // ==========================================================================
 let currentMediaDetailMovie = null;
 
+// Centralized App Back & Escape Handler (supports Telegram Native BackButton & In-App Back)
+function handleAppBack() {
+    // 1. Cinema modal active?
+    const cinemaModal = document.getElementById("cinema-modal");
+    if (cinemaModal && cinemaModal.classList.contains("active")) {
+        closeCinemaModal();
+        return;
+    }
+    // 2. Share modal active?
+    const shareModal = document.getElementById("share-app-modal");
+    if (shareModal && shareModal.classList.contains("active")) {
+        shareModal.classList.remove("active");
+        return;
+    }
+    // 3. Subtitles picker open?
+    const subsPickerModal = document.getElementById("media-subtitles-picker-modal");
+    if (subsPickerModal && subsPickerModal.style.display !== "none") {
+        subsPickerModal.style.display = "none";
+        return;
+    }
+    // 4. Download accordion open?
+    const downloadAccordion = document.getElementById("media-download-accordion");
+    if (downloadAccordion && downloadAccordion.style.display !== "none") {
+        downloadAccordion.style.display = "none";
+        return;
+    }
+    // 5. Stream request modal open?
+    const streamModal = document.getElementById("stream-request-modal");
+    if (streamModal && (streamModal.classList.contains("active") || streamModal.style.display === "flex")) {
+        streamModal.classList.remove("active");
+        streamModal.style.display = "none";
+        return;
+    }
+    // 6. Media detail screen active?
+    const mediaDetailScreen = document.getElementById("screen-media-detail");
+    if (mediaDetailScreen && mediaDetailScreen.classList.contains("active")) {
+        closeMediaDetailPage();
+        return;
+    }
+    // 7. Any other non-home screen? Return to home
+    const homeScreen = document.getElementById("screen-home");
+    if (homeScreen && !homeScreen.classList.contains("active")) {
+        navigateToScreen("home");
+        return;
+    }
+    // Fallback: If already at home with nothing open, hide Telegram BackButton
+    if (window.Telegram?.WebApp?.BackButton) {
+        window.Telegram.WebApp.BackButton.hide();
+    }
+}
+
 function initMediaDetailPage() {
     const btnBack = document.getElementById("btn-media-back");
     const btnExpand = document.getElementById("btn-expand-synopsis");
@@ -3709,20 +3760,15 @@ function openMediaDetailPage(movie) {
     document.body.classList.add("media-detail-active");
 
     const btnMediaBack = document.getElementById("btn-media-back");
+    if (btnMediaBack) {
+        btnMediaBack.style.display = "flex";
+        btnMediaBack.onclick = (e) => {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            handleAppBack();
+        };
+    }
     if (window.Telegram?.WebApp?.BackButton) {
         window.Telegram.WebApp.BackButton.show();
-        const onTgBack = () => {
-            closeMediaDetailPage();
-            window.Telegram.WebApp.BackButton.offClick(onTgBack);
-        };
-        window.Telegram.WebApp.BackButton.onClick(onTgBack);
-        // Hide in-app back icon since Telegram native top bar handles it
-        if (btnMediaBack) btnMediaBack.style.display = "none";
-    } else {
-        if (btnMediaBack) {
-            btnMediaBack.style.display = "flex";
-            btnMediaBack.onclick = () => closeMediaDetailPage();
-        }
     }
 
     // 1. Immediately terminate previous trailer and clean previous video from DOM
@@ -3885,7 +3931,7 @@ function openMediaDetailPage(movie) {
         });
     }
 
-    // 5. Live Streaming Controller (Honest Availability & Request Confirmation)
+    // 5. Live Streaming Controller (Option 2: Dedicated In-App Cinema Theater Modal)
     function playMediaStream(customUrl, optTitle) {
         let streamTarget = customUrl || movie.stream_url || "";
         if (!streamTarget && movie.links && Array.isArray(movie.links)) {
@@ -3895,71 +3941,50 @@ function openMediaDetailPage(movie) {
             }
         }
 
-        // If streaming is not available: open confirmation modal with active class for smooth glassmorphism
-        if (!streamTarget) {
-            const streamModal = document.getElementById("stream-request-modal");
-            const streamDesc = document.getElementById("stream-request-modal-desc");
-            const btnConfirm = document.getElementById("btn-confirm-stream-request");
-
-            if (streamModal) {
-                if (streamDesc) {
-                    streamDesc.textContent = `"${movie.title}" is currently only available for download. Would you like to request an online streaming link?`;
-                }
-                streamModal.style.display = "flex";
-                requestAnimationFrame(() => {
-                    streamModal.classList.add("active");
-                });
-
-                if (btnConfirm) {
-                    btnConfirm.onclick = async () => {
-                        streamModal.classList.remove("active");
-                        setTimeout(() => { streamModal.style.display = "none"; }, 250);
-                        // 1. Trigger Monetag SmartLink (Highest-paying monetization with 100% global fill rate)
-                        triggerMonetagSmartLink();
-                        // 2. Submit dedicated stream request to Firestore
-                        await submitDedicatedStreamRequest(movie);
-                    };
-                }
-            } else {
-                if (typeof showRequestSpecsDrawer === "function") {
-                    showRequestSpecsDrawer(movie);
-                }
-            }
-            return;
-        }
-
-        if (iframeContainer && backdropContainer) {
-            iframeContainer.replaceChildren();
-
-            const heroViewport = document.getElementById("media-hero-viewport");
-            const detailScreen = document.getElementById("screen-media-detail");
-            if (heroViewport) heroViewport.classList.add("has-active-video");
-            if (detailScreen) detailScreen.classList.add("video-playing");
-
-            if (window.Telegram?.WebApp?.unlockOrientation) {
-                try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
-            }
-
-            const playerTitle = optTitle || movie.title;
-            const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(streamTarget)}&title=${encodeURIComponent(playerTitle)}`;
-            const iframe = document.createElement("iframe");
-            iframe.src = playerSrc;
-            iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen");
-            iframe.setAttribute("allowfullscreen", "true");
-            iframe.setAttribute("webkitallowfullscreen", "true");
-            iframe.setAttribute("mozallowfullscreen", "true");
-            iframeContainer.appendChild(iframe);
-
-            backdropContainer.classList.add("hidden-for-playback");
-            iframeContainer.style.display = "block";
-
-            if (heroViewport) {
-                heroViewport.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
-
+        // TV Series: Always open Option 2 Dedicated Cinema Theater modal
+        if (isTVShow) {
+            openCinemaModal(movie, streamTarget, optTitle);
             addWatchHistory(movie.csv_id || movie.id);
             triggerMonetagSmartLink();
             if (typeof triggerHaptic === "function") triggerHaptic("selection");
+            return;
+        }
+
+        // Movies with available stream: Open Option 2 Dedicated Cinema Theater modal
+        if (streamTarget) {
+            openCinemaModal(movie, streamTarget, optTitle);
+            addWatchHistory(movie.csv_id || movie.id);
+            triggerMonetagSmartLink();
+            if (typeof triggerHaptic === "function") triggerHaptic("selection");
+            return;
+        }
+
+        // Movies without stream: Open honest Stream Request Confirmation modal
+        const streamModal = document.getElementById("stream-request-modal");
+        const streamDesc = document.getElementById("stream-request-modal-desc");
+        const btnConfirm = document.getElementById("btn-confirm-stream-request");
+
+        if (streamModal) {
+            if (streamDesc) {
+                streamDesc.textContent = `"${movie.title}" is currently only available for download. Would you like to request an online streaming link?`;
+            }
+            streamModal.style.display = "flex";
+            requestAnimationFrame(() => {
+                streamModal.classList.add("active");
+            });
+
+            if (btnConfirm) {
+                btnConfirm.onclick = async () => {
+                    streamModal.classList.remove("active");
+                    setTimeout(() => { streamModal.style.display = "none"; }, 250);
+                    triggerMonetagSmartLink();
+                    await submitDedicatedStreamRequest(movie);
+                };
+            }
+        } else {
+            if (typeof showRequestSpecsDrawer === "function") {
+                showRequestSpecsDrawer(movie);
+            }
         }
     }
 
@@ -4369,57 +4394,70 @@ function updateMediaQuickActions(movie) {
         };
     }
 
-    // 5. Universal Native OS Share Sheet (WhatsApp, TikTok, Quick Share, Google Save, etc.)
+    // 5. Universal Telegram & Social Sharing (Safe in Telegram WebView)
     const btnShare = document.getElementById("btn-media-share");
     if (btnShare) {
-        btnShare.onclick = () => {
+        btnShare.onclick = (e) => {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
             const targetId = movie.csv_id || movie.tmdb_id || movie.id;
-            const directUrl = `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${targetId}`;
+            const directUrl = targetId ? `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${targetId}` : "https://t.me/Filmhouseappbot/filmhouseapp";
             const ratingVal = movie.rating || movie.imdb_rating || movie.vote_average || "7.5";
             const yearVal = movie.year || (movie.release_date ? movie.release_date.split("-")[0] : "");
             const typeLabel = (movie.type || "").toLowerCase().includes("series") ? "Series" : "Movie";
 
             const shareTitle = `${movie.title} ${yearVal ? `(${yearVal})` : ""}`;
             const shareText = `🎬 Watch "${movie.title}" on Film House App!\n⭐ Rating: ${ratingVal}/10 • ${typeLabel}\n🔥 Stream in HD or Download now:\n${directUrl}`;
+            const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(directUrl)}&text=${encodeURIComponent(shareText)}`;
 
             if (typeof triggerHaptic === "function") triggerHaptic("selection");
 
-            // Copy to clipboard immediately as standard fallback
+            // Copy to clipboard immediately so user has link ready
             if (navigator.clipboard?.writeText) {
                 navigator.clipboard.writeText(shareText).catch(() => {});
             }
 
-            const openSystemShareSheet = () => {
-                const isAndroid = /android/i.test(navigator.userAgent || "");
-                if (isAndroid) {
-                    // Android SEND Intent opens the exact Android OS Share Sheet (WhatsApp, TikTok, Quick Share, etc.)
-                    const intentUrl = `intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(shareText)};S.android.intent.extra.SUBJECT=${encodeURIComponent(shareTitle)};end`;
-                    try {
-                        window.location.href = intentUrl;
-                        return;
-                    } catch (e) {
-                        console.warn("Android intent invoke failed", e);
-                    }
-                }
-                showToast("Movie link & details copied! Share anywhere 🍿", "success");
-            };
+            // Award points for sharing
+            if (typeof awardPoints === "function") {
+                awardPoints(3, "share", true);
+            }
 
-            // Modern Web Share API: triggers the user's phone native OS bottom sheet (WhatsApp, Telegram, chats, apps)
-            if (navigator.share) {
+            // Priority 1: Native Telegram in-app sharing (safe, instant, zero ERR_UNKNOWN_URL_SCHEME)
+            const tg = window.Telegram?.WebApp;
+            if (tg && typeof tg.openTelegramLink === "function") {
+                try {
+                    tg.openTelegramLink(telegramShareUrl);
+                    showToast("Choose a chat to share with! Link also copied 🍿", "success");
+                    return;
+                } catch (e) {
+                    console.warn("tg.openTelegramLink failed, using fallbacks", e);
+                }
+            }
+
+            // Priority 2: Standard Web Share API (only if supported and not inside Telegram webview)
+            if (navigator.share && !window.Telegram?.WebApp?.initData) {
                 navigator.share({
                     title: shareTitle,
                     text: shareText,
                     url: directUrl
                 }).then(() => {
-                    awardPoints(3, "share", true);
+                    showToast("Shared successfully! 🍿", "success");
                 }).catch(err => {
                     if (err.name !== "AbortError") {
-                        openSystemShareSheet();
+                        showToast("Movie link & details copied! Share anywhere 🍿", "success");
                     }
                 });
-            } else {
-                openSystemShareSheet();
+                return;
             }
+
+            // Priority 3: Fallback web link
+            try {
+                if (tg && typeof tg.openLink === "function") {
+                    tg.openLink(telegramShareUrl);
+                } else {
+                    window.open(telegramShareUrl, "_blank");
+                }
+            } catch (e) {}
+            showToast("Movie link & details copied! Share anywhere 🍿", "success");
         };
     }
 }
@@ -5774,7 +5812,7 @@ function triggerMonetagSmartLink() {
 }
 
 // Open In-App Cinema Streaming Player Modal
-function openCinemaModal(movie, customStreamUrl) {
+function openCinemaModal(movie, customStreamUrl, customTitle) {
     const modal = document.getElementById("cinema-modal");
     const container = document.getElementById("cinema-iframe-container");
     const titleEl = document.getElementById("cinema-modal-title");
@@ -5782,6 +5820,7 @@ function openCinemaModal(movie, customStreamUrl) {
     if (!modal || !container || !movie) return;
 
     const baseTitle = movie.title || "Film House Cinema";
+    const initialTitle = customTitle || baseTitle;
     const isTVShow = (movie.type || "").toLowerCase() === "series" || 
                      (movie.type || "").toLowerCase() === "tv" || 
                      (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
@@ -5791,13 +5830,13 @@ function openCinemaModal(movie, customStreamUrl) {
         if (!container) return;
         container.replaceChildren();
         if (!targetUrl) return;
-        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(targetUrl)}&title=${encodeURIComponent(currentTitle || baseTitle)}`;
+        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(targetUrl)}&title=${encodeURIComponent(currentTitle || initialTitle)}`;
         const iframe = document.createElement("iframe");
         iframe.src = playerSrc;
         iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
         iframe.setAttribute("allowfullscreen", "true");
         container.appendChild(iframe);
-        if (titleEl) titleEl.textContent = currentTitle || baseTitle;
+        if (titleEl) titleEl.textContent = currentTitle || initialTitle;
     }
 
     // Resolve initial stream parameter: custom URL -> link.stream_url -> movie.stream_url
@@ -5816,14 +5855,14 @@ function openCinemaModal(movie, customStreamUrl) {
 
     // Set initial player stream
     if (streamTarget) {
-        setCinemaStream(streamTarget, baseTitle);
+        setCinemaStream(streamTarget, initialTitle);
     } else {
         container.replaceChildren();
         const placeholder = document.createElement("div");
         placeholder.style.cssText = "display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#94a3b8;gap:8px;font-size:13px;padding:20px;text-align:center;";
         placeholder.innerHTML = `<span>📺 Select an episode below to start streaming</span>`;
         container.appendChild(placeholder);
-        if (titleEl) titleEl.textContent = baseTitle;
+        if (titleEl) titleEl.textContent = initialTitle;
     }
 
     // Populate Rich Movie Details Directly Beneath Video Viewport
@@ -6048,6 +6087,28 @@ function openCinemaModal(movie, customStreamUrl) {
                     }
                 }
 
+                // Merge explicit episode stream links if uploaded in movie.links
+                if (seasonObj.links && Array.isArray(seasonObj.links) && seasonObj.links.length > 0) {
+                    const hasExplicitEps = seasonObj.links.some(l => l && (l.episode || l.ep || l.episode_number || (l.name && /ep/i.test(l.name))));
+                    if (hasExplicitEps) {
+                        seasonObj.links.forEach((l, idx) => {
+                            const epNum = l.episode || l.ep || l.episode_number || (idx + 1);
+                            const existing = episodes.find(e => (e.episode_number == epNum));
+                            if (existing) {
+                                existing.stream_url = l.stream_url || l.url || "";
+                                if (l.name) existing.name = l.name;
+                            } else {
+                                episodes.push({
+                                    episode_number: parseInt(epNum, 10) || (idx + 1),
+                                    name: l.name || `Episode ${epNum}`,
+                                    stream_url: l.stream_url || l.url || ""
+                                });
+                            }
+                        });
+                        episodes.sort((a, b) => (a.episode_number || 0) - (b.episode_number || 0));
+                    }
+                }
+
                 if (badgeEl) {
                     badgeEl.textContent = `${episodes.length} Episodes`;
                 }
@@ -6227,11 +6288,6 @@ function openCinemaModal(movie, customStreamUrl) {
     // Telegram Native BackButton support
     if (window.Telegram?.WebApp?.BackButton) {
         window.Telegram.WebApp.BackButton.show();
-        const onTgBack = () => {
-            closeCinemaModal();
-            window.Telegram.WebApp.BackButton.offClick(onTgBack);
-        };
-        window.Telegram.WebApp.BackButton.onClick(onTgBack);
     }
 
     modal.classList.add("active");
@@ -6845,36 +6901,53 @@ function openDownloadModal(movie) {
 
 // Share Media integration
 function shareMovie(movie) {
-    const shareText = `Check out "${movie.title}" on Film House! Rating: ${movie.rating}/10. Play now: https://t.me/Filmhouseappbot/filmhouseapp`;
-    const shareUrl = "https://t.me/Filmhouseappbot/filmhouseapp";
-    const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+    if (!movie) return;
+    const targetId = movie.csv_id || movie.tmdb_id || movie.id;
+    const directUrl = targetId ? `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${targetId}` : "https://t.me/Filmhouseappbot/filmhouseapp";
+    const ratingVal = movie.rating || movie.imdb_rating || movie.vote_average || "7.5";
+    const yearVal = movie.year || (movie.release_date ? movie.release_date.split("-")[0] : "");
+    const shareTitle = `${movie.title} ${yearVal ? `(${yearVal})` : ""}`;
+    const shareText = `🎬 Watch "${movie.title}" on Film House App!\n⭐ Rating: ${ratingVal}/10\n🔥 Stream or Download now:\n${directUrl}`;
+    const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(directUrl)}&text=${encodeURIComponent(shareText)}`;
     
     // Award points (+2)
-    awardPoints(2, "share");
+    if (typeof awardPoints === "function") awardPoints(2, "share");
+    if (typeof triggerHaptic === "function") triggerHaptic("selection");
     
+    if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(shareText).catch(() => {});
+    }
+
     const tg = window.Telegram?.WebApp;
-    if (tg && tg.openTelegramLink) {
+    if (tg && typeof tg.openTelegramLink === "function") {
         try {
             tg.openTelegramLink(telegramShareUrl);
+            showToast("Choose a chat to share with! Link copied 🍿", "success");
             return;
         } catch (e) {
             console.error("tg.openTelegramLink failed, using fallback:", e);
         }
     }
     
-    // Fallback if not inside Telegram or failed
-    if (navigator.share) {
+    if (navigator.share && !window.Telegram?.WebApp?.initData) {
         navigator.share({
-            title: 'Film House',
+            title: shareTitle,
             text: shareText,
-            url: shareUrl
+            url: directUrl
         }).then(() => {
-            showToast("Shared successfully!");
+            showToast("Shared successfully! 🍿", "success");
         }).catch(err => {
-            window.open(telegramShareUrl, '_blank');
+            if (err.name !== "AbortError") {
+                showToast("Movie link copied to clipboard! 🍿", "success");
+            }
         });
     } else {
-        window.open(telegramShareUrl, '_blank');
+        if (tg && typeof tg.openLink === "function") {
+            try { tg.openLink(telegramShareUrl); } catch (e) { window.open(telegramShareUrl, "_blank"); }
+        } else {
+            window.open(telegramShareUrl, "_blank");
+        }
+        showToast("Movie link copied to clipboard! 🍿", "success");
     }
 }
 
@@ -9818,6 +9891,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     handleTelegramAuth();
     updateUserGreeting();
     initMediaDetailPage();
+
+    // Register single global Telegram Native BackButton listener
+    if (window.Telegram?.WebApp?.BackButton) {
+        try {
+            window.Telegram.WebApp.BackButton.onClick(handleAppBack);
+        } catch (e) {
+            console.warn("BackButton.onClick register error:", e);
+        }
+    }
 
     // Parse Telegram startapp parameter (e.g. startapp=mining or boost_docId or movie_id)
     let initialScreen = "home";
