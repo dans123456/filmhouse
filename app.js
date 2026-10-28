@@ -3293,7 +3293,7 @@ function renderCarouselBanner() {
             trailerBtn.textContent = "Watch Trailer";
             trailerBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
-                openTrailerModal(movie.trailer);
+                openMediaDetailPage(movie);
             });
             actions.appendChild(trailerBtn);
         }
@@ -3464,6 +3464,11 @@ function closeMediaDetailPage() {
         try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
     }
 
+    if (typeof currentHeroTrailerCleanup === "function") {
+        currentHeroTrailerCleanup();
+        currentHeroTrailerCleanup = null;
+    }
+
     const heroViewport = document.getElementById("media-hero-viewport");
     if (heroViewport) heroViewport.classList.remove("has-active-video");
 
@@ -3504,6 +3509,169 @@ function closeMediaDetailPage() {
 
     const prev = (state.previousScreen && state.previousScreen !== "media-detail") ? state.previousScreen : "home";
     navigateToScreen(prev);
+}
+
+let currentHeroTrailerCleanup = null;
+
+function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
+    if (!trailerKeyOrUrl) return;
+    if (typeof currentHeroTrailerCleanup === "function") {
+        currentHeroTrailerCleanup();
+        currentHeroTrailerCleanup = null;
+    }
+
+    const iframeContainer = document.getElementById("media-stream-iframe-container");
+    const backdropContainer = document.getElementById("media-backdrop-container");
+    const heroViewport = document.getElementById("media-hero-viewport");
+    const detailScreen = document.getElementById("screen-media-detail");
+    const previewFab = document.getElementById("btn-hero-play-preview");
+    if (!iframeContainer || !backdropContainer) return;
+
+    let ytKey = trailerKeyOrUrl;
+    const ytMatch = String(trailerKeyOrUrl).match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    if (ytMatch) {
+        ytKey = ytMatch[1];
+    } else if (trailerKeyOrUrl.includes("http")) {
+        ytKey = trailerKeyOrUrl;
+    }
+
+    const embedUrl = ytKey.startsWith("http") 
+        ? ytKey 
+        : `https://www.youtube.com/embed/${ytKey}?autoplay=1&mute=0&playsinline=0&fs=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+
+    iframeContainer.replaceChildren();
+    iframeContainer.style.display = "block";
+    if (heroViewport) heroViewport.classList.add("has-active-video");
+    if (detailScreen) detailScreen.classList.add("video-playing");
+
+    if (window.Telegram?.WebApp?.unlockOrientation) {
+        try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
+    }
+
+    const iframe = document.createElement("iframe");
+    iframe.src = embedUrl;
+    iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen");
+    iframe.setAttribute("allowfullscreen", "true");
+    iframe.setAttribute("webkitallowfullscreen", "true");
+    iframe.setAttribute("mozallowfullscreen", "true");
+    iframe.style.cssText = "width: 100%; height: 100%; border: none; display: block;";
+    iframeContainer.appendChild(iframe);
+
+    const postCmd = (func, args = []) => {
+        try {
+            iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), "*");
+        } catch (e) {}
+    };
+
+    const stopAndRestoreBackdrop = () => {
+        if (backdropContainer) {
+            backdropContainer.classList.remove("hidden-for-playback");
+            backdropContainer.style.display = "block";
+        }
+        if (iframeContainer) {
+            iframeContainer.style.display = "none";
+            iframeContainer.replaceChildren();
+        }
+        if (heroViewport) heroViewport.classList.remove("has-active-video");
+        if (detailScreen) detailScreen.classList.remove("video-playing");
+    };
+
+    let crossfadeTimeout = setTimeout(() => {
+        if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
+    }, 1800);
+
+    let progressPollInterval = null;
+
+    iframe.onload = () => {
+        clearTimeout(crossfadeTimeout);
+        try {
+            iframe.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: 1 }), "*");
+        } catch (e) {}
+        postCmd("addEventListener", ["onStateChange"]);
+        postCmd("setVolume", [25]);
+        postCmd("unMute");
+
+        setTimeout(() => {
+            try {
+                iframe.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: 1 }), "*");
+            } catch (e) {}
+            postCmd("setVolume", [25]);
+            postCmd("unMute");
+            if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
+        }, 600);
+
+        // Active duration/playback monitor to guarantee YouTube end-cards are NEVER shown
+        progressPollInterval = setInterval(() => {
+            postCmd("getCurrentTime");
+            postCmd("getDuration");
+        }, 1000);
+    };
+
+    let currentDuration = 0;
+    const onYtMessage = (event) => {
+        try {
+            let data = event.data;
+            if (typeof data === "string") {
+                try { data = JSON.parse(data); } catch (e) { return; }
+            }
+            if (!data) return;
+
+            // 1. YouTube onStateChange event
+            let playerState = null;
+            if (data.event === "onStateChange" && typeof data.info !== "undefined") {
+                playerState = data.info;
+            } else if (data.info && typeof data.info.playerState !== "undefined") {
+                playerState = data.info.playerState;
+            }
+
+            // 2. Track current time & duration for end detection
+            if (data.info && typeof data.info.duration === "number" && data.info.duration > 0) {
+                currentDuration = data.info.duration;
+            }
+            if (data.info && typeof data.info.currentTime === "number" && currentDuration > 0) {
+                if (data.info.currentTime >= currentDuration - 0.75) {
+                    playerState = 0; // Trigger video ended ahead of YouTube's end-card render!
+                }
+            }
+
+            if (playerState !== null) {
+                if (playerState === 1) {
+                    // Playing
+                    if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
+                } else if (playerState === 0) {
+                    // Video ENDED - IMMEDIATELY remove iframe and restore clean movie backdrop!
+                    // This guarantees YouTube's recommended video tiles NEVER appear.
+                    stopAndRestoreBackdrop();
+                    if (progressPollInterval) clearInterval(progressPollInterval);
+                    window.removeEventListener("message", onYtMessage);
+                } else if (playerState === 2) {
+                    // Paused - show clean movie artwork
+                    if (backdropContainer) backdropContainer.classList.remove("hidden-for-playback");
+                }
+            }
+        } catch (err) {}
+    };
+
+    window.addEventListener("message", onYtMessage);
+
+    currentHeroTrailerCleanup = () => {
+        clearTimeout(crossfadeTimeout);
+        if (progressPollInterval) clearInterval(progressPollInterval);
+        window.removeEventListener("message", onYtMessage);
+    };
+
+    if (previewFab) {
+        previewFab.onclick = () => {
+            if (iframeContainer && iframeContainer.style.display === "none") {
+                embedAndPlayHeroTrailer(trailerKeyOrUrl);
+                return;
+            }
+            if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
+            postCmd("playVideo");
+            postCmd("setVolume", [25]);
+            postCmd("unMute");
+        };
+    }
 }
 
 function openMediaDetailPage(movie) {
@@ -3571,127 +3739,17 @@ function openMediaDetailPage(movie) {
         backdropContainer.classList.remove("hidden-for-playback");
     }
 
-    // Auto-play trailer if trailer link/key exists
-    let trailerEmbedUrl = "";
-    if (movie.trailer) {
-        const ytMatch = movie.trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-        if (ytMatch) {
-            trailerEmbedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
-        } else if (!movie.trailer.includes("http")) {
-            trailerEmbedUrl = `https://www.youtube.com/embed/${movie.trailer}`;
-        } else {
-            trailerEmbedUrl = movie.trailer;
-        }
-    }
-
-    let activeTrailerIframe = null;
     const heroViewport = document.getElementById("media-hero-viewport");
     const detailScreen = document.getElementById("screen-media-detail");
     const cinemaFsBtn = document.getElementById("btn-hero-cinema-fullscreen");
     if (cinemaFsBtn) cinemaFsBtn.style.display = "none";
 
-    if (trailerEmbedUrl && iframeContainer && backdropContainer) {
-        iframeContainer.replaceChildren();
-        iframeContainer.style.display = "block";
-
-        if (heroViewport) heroViewport.classList.add("has-active-video");
-        if (detailScreen) detailScreen.classList.add("video-playing");
-
-        // Unlock orientation for native phone landscape rotation in Telegram 8.0+
-        if (window.Telegram?.WebApp?.unlockOrientation) {
-            try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
-        }
-
-        const hasQuery = trailerEmbedUrl.includes("?");
-        // Sound default ON at low volume (mute=0, setVolume(25)), rel=0, fs=1 for native fullscreen
-        const fullTrailerSrc = `${trailerEmbedUrl}${hasQuery ? "&" : "?"}autoplay=1&mute=0&playsinline=0&fs=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
-
-        const iframe = document.createElement("iframe");
-        iframe.src = fullTrailerSrc;
-        iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen");
-        iframe.setAttribute("allowfullscreen", "true");
-        iframe.setAttribute("webkitallowfullscreen", "true");
-        iframe.setAttribute("mozallowfullscreen", "true");
-        iframe.style.cssText = "width: 100%; height: 100%; border: none; display: block;";
-        iframeContainer.appendChild(iframe);
-        activeTrailerIframe = iframe;
-
-        const sendTrailerCmd = (func, args = []) => {
-            try {
-                iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), "*");
-            } catch (e) {}
-        };
-
-        // Auto-crossfade backdrop to video after YouTube initializes
-        let trailerLoadedTimeout = setTimeout(() => {
-            if (backdropContainer && activeTrailerIframe) {
-                backdropContainer.classList.add("hidden-for-playback");
-            }
-        }, 1800);
-
-        iframe.onload = () => {
-            clearTimeout(trailerLoadedTimeout);
-            // Default sound on at low volume (25%) as requested
-            sendTrailerCmd("setVolume", [25]);
-            sendTrailerCmd("unMute");
-            setTimeout(() => {
-                sendTrailerCmd("setVolume", [25]);
-                sendTrailerCmd("unMute");
-                if (backdropContainer && activeTrailerIframe) {
-                    backdropContainer.classList.add("hidden-for-playback");
-                }
-            }, 600);
-        };
-
-        // Listen for YouTube player state changes via postMessage
-        const onYtMessage = (event) => {
-            try {
-                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                if (data && data.event === "infoDelivery" && data.info) {
-                    // playerState: 1 = playing, 2 = paused, 0 = ended
-                    if (data.info.playerState === 1) {
-                        if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
-                    } else if (data.info.playerState === 0) {
-                        // Trailer ended: instantly restore clean movie backdrop & hide iframe so YouTube recommendations never show
-                        if (backdropContainer) {
-                            backdropContainer.classList.remove("hidden-for-playback");
-                            backdropContainer.style.display = "block";
-                        }
-                        if (iframeContainer) {
-                            iframeContainer.style.display = "none";
-                            iframeContainer.replaceChildren();
-                        }
-                        if (heroViewport) heroViewport.classList.remove("has-active-video");
-                        if (detailScreen) detailScreen.classList.remove("video-playing");
-                    } else if (data.info.playerState === 2) {
-                        // Trailer paused: restore clean movie artwork
-                        if (backdropContainer) {
-                            backdropContainer.classList.remove("hidden-for-playback");
-                        }
-                    }
-                }
-            } catch (err) {}
-        };
-        window.addEventListener("message", onYtMessage);
-
-        if (previewFab) {
-            previewFab.onclick = () => {
-                if (iframeContainer && iframeContainer.style.display === "none") {
-                    iframeContainer.style.display = "block";
-                    iframeContainer.replaceChildren(iframe);
-                    if (heroViewport) heroViewport.classList.add("has-active-video");
-                    if (detailScreen) detailScreen.classList.add("video-playing");
-                }
-                backdropContainer.classList.add("hidden-for-playback");
-                sendTrailerCmd("playVideo");
-                sendTrailerCmd("setVolume", [25]);
-                sendTrailerCmd("unMute");
-            };
-        }
+    // Play trailer if present, otherwise set clean backdrop
+    if (movie.trailer) {
+        embedAndPlayHeroTrailer(movie.trailer);
     } else {
         if (heroViewport) heroViewport.classList.remove("has-active-video");
         if (detailScreen) detailScreen.classList.remove("video-playing");
-        if (cinemaFsBtn) cinemaFsBtn.style.display = "none";
 
         if (iframeContainer) {
             iframeContainer.replaceChildren();
@@ -3919,27 +3977,9 @@ function openMediaDetailPage(movie) {
             trailerBtn.style.display = "flex";
             trailerBtn.onclick = () => {
                 if (movie.trailer) {
-                    if (iframeContainer && backdropContainer) {
-                        iframeContainer.replaceChildren();
-                        let embedUrl = movie.trailer;
-                        const ytMatch = movie.trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                        if (ytMatch) {
-                            embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&mute=0&playsinline=1&rel=0`;
-                        } else if (!movie.trailer.includes("http")) {
-                            embedUrl = `https://www.youtube.com/embed/${movie.trailer}?autoplay=1&mute=0&playsinline=1&rel=0`;
-                        }
-                        const iframe = document.createElement("iframe");
-                        iframe.src = embedUrl;
-                        iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
-                        iframe.setAttribute("allowfullscreen", "true");
-                        iframeContainer.appendChild(iframe);
-                        backdropContainer.style.display = "none";
-                        iframeContainer.style.display = "block";
-                        const heroViewport = document.getElementById("media-hero-viewport");
-                        if (heroViewport) heroViewport.scrollIntoView({ behavior: "smooth", block: "start" });
-                    } else if (typeof openTrailerModal === "function") {
-                        openTrailerModal(movie.trailer);
-                    }
+                    embedAndPlayHeroTrailer(movie.trailer);
+                    const heroViewport = document.getElementById("media-hero-viewport");
+                    if (heroViewport) heroViewport.scrollIntoView({ behavior: "smooth", block: "start" });
                 } else if (movie.imdb_id) {
                     window.open(`https://www.imdb.com/title/${movie.imdb_id}/videogallery`, '_blank');
                 }
@@ -4848,25 +4888,14 @@ function fetchTmdbDetailsForMedia(movie) {
 
                 renderMediaCast(movie);
 
-                // If no trailer was playing and we just found one, embed and autoplay it
+                // If on media detail screen, update trailer button and load trailer with end-card elimination
+                const trailerBtn = document.getElementById("btn-media-trailer-main");
+                if (trailerBtn && movie.trailer) {
+                    trailerBtn.style.display = "flex";
+                }
                 const iframeContainer = document.getElementById("media-stream-iframe-container");
-                const backdropContainer = document.getElementById("media-backdrop-container");
-                if (movie.trailer && iframeContainer && backdropContainer && iframeContainer.style.display === "none") {
-                    const ytMatch = movie.trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                    const embedKey = ytMatch ? ytMatch[1] : movie.trailer;
-                    const iframe = document.createElement("iframe");
-                    iframe.src = `https://www.youtube.com/embed/${embedKey}?autoplay=1&mute=0&playsinline=0&fs=1&rel=0&enablejsapi=1`;
-                    iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen");
-                    iframe.setAttribute("allowfullscreen", "true");
-                    iframe.onload = () => {
-                        try {
-                            iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "setVolume", args: [25] }), "*");
-                            iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "unMute", args: "" }), "*");
-                        } catch (e) {}
-                    };
-                    iframeContainer.replaceChildren(iframe);
-                    backdropContainer.style.display = "none";
-                    iframeContainer.style.display = "block";
+                if (movie.trailer && iframeContainer && iframeContainer.style.display === "none") {
+                    embedAndPlayHeroTrailer(movie.trailer);
                 }
             }
         })
