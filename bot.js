@@ -193,6 +193,7 @@ let getAllAdminIds = async () => ["1329840839", "1175336733"];
 const PENDING_FILE = path.join(__dirname, "data", "pending_requests.json");
 let cachedPendingRequests = [];
 const _channelPostingLocks = new Set();
+const adminRequestMsgMap = new Map(); // message_id -> request info for instant reply-to-fulfill
 
 // Categorized in-memory ring buffers for live tracing
 const categorizedLogs = {
@@ -1036,6 +1037,272 @@ function setupBot(bot, adminBot) {
         }
     };
 
+    // Engine: Admin Reply-to-Fulfill Handler
+    // Enables any admin to fulfill movie/stream requests by simply replying to the alert message with a URL or video file
+    async function handleAdminReplyToFulfill(ctx) {
+        try {
+            if (!ctx.message || !ctx.message.reply_to_message) return false;
+
+            const replyMsg = ctx.message.reply_to_message;
+            const replyText = replyMsg.text || replyMsg.caption || "";
+
+            // 1. Identify request doc ID from #REQ_ tag or in-memory map
+            let docId = null;
+            const reqMatch = replyText.match(/#REQ_([a-zA-Z0-9_-]+)/i);
+            if (reqMatch) {
+                docId = reqMatch[1];
+            } else if (adminRequestMsgMap.has(String(replyMsg.message_id))) {
+                docId = adminRequestMsgMap.get(String(replyMsg.message_id)).docId;
+            }
+
+            // Not a reply to a request notification
+            if (!docId) return false;
+
+            // 2. Authorization check
+            const senderId = String(ctx.from ? ctx.from.id : "");
+            const authorized = await isAdmin(senderId);
+            if (!authorized) {
+                await ctx.reply("⛔ <b>Unauthorized:</b> Only Film House Administrators can fulfill requests.", { parse_mode: "HTML" });
+                return true;
+            }
+
+            // 3. Extract fulfillment URL or uploaded/forwarded file
+            const rawContent = (ctx.message.text || ctx.message.caption || "").trim();
+            const urlMatch = rawContent.match(/(https?:\/\/[^\s]+|t\.me\/[^\s]+)/i);
+            let fulfillmentLink = "";
+
+            if (urlMatch) {
+                fulfillmentLink = urlMatch[1].trim();
+                if (!fulfillmentLink.startsWith("http://") && !fulfillmentLink.startsWith("https://")) {
+                    fulfillmentLink = "https://" + fulfillmentLink;
+                }
+            } else if (ctx.message.document || ctx.message.video) {
+                const fileObj = ctx.message.document || ctx.message.video;
+                fulfillmentLink = `https://t.me/Filmhouseappbot?start=${fileObj.file_id}`;
+            }
+
+            if (!fulfillmentLink) {
+                await ctx.reply(
+                    `⚠️ <b>No Valid Link or File Detected!</b>\n\n` +
+                    `To fulfill this request via reply, please include a valid download/stream URL (e.g. <code>https://...</code>) or attach/forward a video file.`,
+                    { parse_mode: "HTML" }
+                );
+                return true;
+            }
+
+            // 4. Load request from Firestore
+            const reqRef = db.collection("requests").doc(docId);
+            const reqSnap = await reqRef.get();
+            if (!reqSnap.exists) {
+                await ctx.reply(`⚠️ Request <code>#REQ_${escapeHtml(docId)}</code> was not found in Firestore.`, { parse_mode: "HTML" });
+                return true;
+            }
+
+            const reqData = reqSnap.data() || {};
+            const isStreamReq = (reqData.type === "stream" || reqData.requestType === "stream" || reqData.target === "stream_url");
+            const reqTitle = (reqData.title || "Movie").trim();
+            const cleanReqTitle = reqTitle.toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+            const reqCsvId = String(reqData.csv_id || "").toLowerCase().trim();
+            const reqTmdbId = String(reqData.tmdb_id || "").trim();
+
+            // Detect quality tag if present in admin message
+            let qualityTag = "1080p";
+            const qMatch = rawContent.match(/\b(480p|720p|1080p|2160p|4k|HD|CAM)\b/i);
+            if (qMatch) qualityTag = qMatch[1].toUpperCase();
+
+            // Detect season tag if present
+            let seasonTag = reqData.seasonOrPart || "";
+            const sMatch = rawContent.match(/(?:Season\s*\d+|S\d+)/i);
+            if (sMatch && !seasonTag) seasonTag = sMatch[0];
+
+            // 5. Update Movie in-memory cache and disk (movies_metadata.json)
+            let foundMovie = null;
+            if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                foundMovie = cachedMoviesMetadata.find(m => {
+                    const mCsv = String(m.csv_id || "").toLowerCase().trim();
+                    const mTmdb = String(m.tmdb_id || "").trim();
+                    if (reqTmdbId && mTmdb && reqTmdbId === mTmdb) return true;
+                    if (reqCsvId && mCsv && reqCsvId === mCsv) return true;
+                    if (!reqTmdbId && cleanReqTitle) {
+                        const mClean = String(m.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                        return mClean === cleanReqTitle || (typeof titlesMatch === 'function' && titlesMatch(m.title, cleanReqTitle));
+                    }
+                    return false;
+                });
+            }
+
+            if (foundMovie) {
+                if (isStreamReq) {
+                    foundMovie.stream_url = fulfillmentLink;
+                } else {
+                    foundMovie.links = foundMovie.links || [];
+                    const linkObj = { url: fulfillmentLink, quality: qualityTag };
+                    if (seasonTag) linkObj.season = seasonTag;
+
+                    const existingIdx = foundMovie.links.findIndex(l => {
+                        if (typeof l === 'string') return l === fulfillmentLink;
+                        if (seasonTag && l.season) return l.season.toLowerCase() === seasonTag.toLowerCase();
+                        return l.quality === qualityTag;
+                    });
+                    if (existingIdx >= 0) {
+                        foundMovie.links[existingIdx] = linkObj;
+                    } else {
+                        foundMovie.links.push(linkObj);
+                    }
+                    foundMovie.downloadLink = fulfillmentLink;
+                }
+            } else {
+                // Synthesize new movie entry
+                const slug = cleanReqTitle.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'movie';
+                const genCsvId = reqCsvId || `${reqTmdbId || Date.now()}-${slug}`;
+                foundMovie = {
+                    csv_id: genCsvId,
+                    tmdb_id: reqTmdbId ? (parseInt(reqTmdbId) || reqTmdbId) : null,
+                    title: reqTitle,
+                    year: reqData.year || "",
+                    type: reqData.type || "Movie",
+                    categories: ["Main", (reqData.type || "").toLowerCase() === "series" ? "Hollywood/British Series" : "Hollywood/British Movies"],
+                    genres: reqData.genres || ["Drama"],
+                    overview: reqData.overview || "",
+                    poster: reqData.poster || "MOVIE/img/FilmHouse3_nobg.png",
+                    backdrop: reqData.backdrop || "img/FilmHouse.png",
+                    rating: reqData.rating || 0,
+                    stream_url: isStreamReq ? fulfillmentLink : "",
+                    links: isStreamReq ? [] : [{ url: fulfillmentLink, quality: qualityTag, ...(seasonTag ? { season: seasonTag } : {}) }],
+                    downloadLink: fulfillmentLink
+                };
+                if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                    cachedMoviesMetadata.push(foundMovie);
+                }
+            }
+
+            // Persist updated movie to local disk
+            if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                try {
+                    fs.writeFileSync(localMetaPathGlobal, JSON.stringify(cachedMoviesMetadata, null, 2), "utf8");
+                    console.log(`[ReplyFulfill] Persisted updated movie "${foundMovie.title}" to ${localMetaPathGlobal}`);
+                } catch (diskErr) {
+                    console.warn("[ReplyFulfill] Disk write error:", diskErr.message);
+                }
+            }
+
+            // Persist updated movie to Firestore movies collection so web app reflects it immediately
+            const movieDocKey = foundMovie.csv_id || reqCsvId;
+            if (movieDocKey) {
+                await db.collection("movies").doc(movieDocKey).set(foundMovie, { merge: true }).catch(fsErr => {
+                    console.warn("[ReplyFulfill] Firestore movies set error:", fsErr.message);
+                });
+            }
+
+            // 6. Update the Request document in Firestore
+            const adminUsername = ctx.from.username ? `@${ctx.from.username}` : (ctx.from.first_name || "Admin");
+            const adminId = String(ctx.from.id);
+
+            await reqRef.update({
+                status: "fulfilled",
+                downloadLink: fulfillmentLink,
+                ...(isStreamReq ? { streamUrl: fulfillmentLink, stream_url: fulfillmentLink } : {}),
+                fulfilledBy: adminUsername,
+                fulfilledById: adminId,
+                publishToChannel: true,
+                channelPosted: false,
+                fulfilledAt: admin.firestore.FieldValue.serverTimestamp(),
+                adminClaimId: admin.firestore.FieldValue.delete(),
+                adminClaimName: admin.firestore.FieldValue.delete(),
+                adminClaimTime: admin.firestore.FieldValue.delete()
+            });
+
+            // 7. Auto-fulfill any sibling pending requests for the exact same title
+            try {
+                const siblingSnap = await db.collection("requests")
+                    .where("status", "in", ["pending", "priority", "claimed"])
+                    .get();
+
+                const siblingDocIds = [];
+                siblingSnap.forEach(sDoc => {
+                    if (sDoc.id === docId) return;
+                    const sData = sDoc.data();
+                    const sClean = (sData.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
+                    if ((reqCsvId && sData.csv_id === reqCsvId) || (sClean && sClean === cleanReqTitle)) {
+                        siblingDocIds.push(sDoc.id);
+                    }
+                });
+
+                if (siblingDocIds.length > 0) {
+                    console.log(`[ReplyFulfill] Auto-fulfilling ${siblingDocIds.length} sibling request(s) for "${cleanReqTitle}"`);
+                    const batch = db.batch();
+                    siblingDocIds.forEach(sId => {
+                        batch.update(db.collection("requests").doc(sId), {
+                            status: "fulfilled",
+                            downloadLink: fulfillmentLink,
+                            ...(isStreamReq ? { streamUrl: fulfillmentLink, stream_url: fulfillmentLink } : {}),
+                            fulfilledBy: adminUsername,
+                            fulfilledById: adminId,
+                            publishToChannel: false,
+                            channelPosted: true,
+                            fulfilledAt: admin.firestore.FieldValue.serverTimestamp()
+                        });
+                    });
+                    await batch.commit();
+                }
+            } catch (sibErr) {
+                console.warn("[ReplyFulfill] Sibling batch error:", sibErr.message);
+            }
+
+            // 8. Record Admin Stats & Leaderboard
+            try {
+                const adminKey = adminId.replace(/[^a-zA-Z0-9_]/g, "_");
+                const statsRef = db.collection("settings").doc("admin_stats");
+                const statsDoc = await statsRef.get();
+                const currentStats = statsDoc.exists ? statsDoc.data() : {};
+                const adm = currentStats[adminKey] || {
+                    id: adminId,
+                    name: adminUsername,
+                    fulfillments: 0,
+                    publications: 0,
+                    titles: []
+                };
+                adm.name = adminUsername;
+                adm.titles = adm.titles || [];
+                adm.titles.unshift({
+                    type: "fulfillment",
+                    title: reqTitle,
+                    date: new Date().toISOString()
+                });
+                if (adm.titles.length > 30) adm.titles = adm.titles.slice(0, 30);
+                adm.fulfillments = (adm.fulfillments || 0) + 1;
+                adm.lastActiveAt = Date.now();
+                currentStats[adminKey] = adm;
+                await statsRef.set(currentStats, { merge: true });
+            } catch (statErr) {
+                console.warn("[ReplyFulfill] Admin stats record error:", statErr.message);
+            }
+
+            // 9. Send direct confirmation reply to admin
+            const targetTypeLabel = isStreamReq ? "🟣 Online Stream Link" : `📥 Download (${qualityTag}${seasonTag ? ` - ${seasonTag}` : ""})`;
+            const requesterLabel = reqData.requestedBy || (reqData.userId ? `User (ID: <code>${reqData.userId}</code>)` : "Guest");
+
+            await ctx.reply(
+                `✅ <b>Request Successfully Fulfilled!</b> 🍿\n\n` +
+                `🎬 <b>Title:</b> <b>${escapeHtml(reqTitle)}</b>${reqData.year ? ` (${escapeHtml(reqData.year)})` : ""}\n` +
+                `🎯 <b>Type:</b> ${targetTypeLabel}\n` +
+                `🔗 <b>Link:</b> <code>${escapeHtml(fulfillmentLink)}</code>\n` +
+                `👤 <b>Requester:</b> ${requesterLabel}\n` +
+                `👑 <b>Fulfilled By:</b> ${escapeHtml(adminUsername)}\n\n` +
+                `✨ <i>The movie catalog has been updated, the requester has been notified via DM, and the release announcement is queued for the channel!</i>`,
+                { parse_mode: "HTML" }
+            );
+
+            return true;
+        } catch (err) {
+            console.error("[ReplyFulfill Error]:", err);
+            try {
+                await ctx.reply(`❌ <b>Fulfillment Failed:</b> ${escapeHtml(err.message)}`, { parse_mode: "HTML" });
+            } catch (e) {}
+            return true;
+        }
+    }
+
     // ==========================================
     // DEDICATED ADMIN BOT SUITE (@Fiimhouse_adminBot)
     // ==========================================
@@ -1080,6 +1347,15 @@ function setupBot(bot, adminBot) {
             const authorized = await isAdmin(userId);
             if (!authorized) {
                 return ctx.reply("⛔ *Unauthorized Access*\n\nThis bot is strictly reserved for Film House Administrators.", { parse_mode: "Markdown" });
+            }
+            return next();
+        });
+
+        // Admin Reply-to-Fulfill handler for dedicated admin bot
+        adminBot.use(async (ctx, next) => {
+            if (ctx.message && ctx.message.reply_to_message) {
+                const handled = await handleAdminReplyToFulfill(ctx);
+                if (handled) return;
             }
             return next();
         });
@@ -3013,6 +3289,15 @@ function setupBot(bot, adminBot) {
         }
     });
 
+    // Admin Reply-to-Fulfill Handler for main bot
+    bot.use(async (ctx, next) => {
+        if (ctx.message && ctx.message.reply_to_message) {
+            const handled = await handleAdminReplyToFulfill(ctx);
+            if (handled) return;
+        }
+        return next();
+    });
+
     // Default reply for regular text messages (Automation)
     bot.on('text', async (ctx) => {
         // Forward group messages to admins or notify them
@@ -4166,22 +4451,26 @@ async function init() {
                                     `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
                                     `🎯 <b>Target:</b> 🟣 <b>Online Stream Player Link</b>\n` +
                                     `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
-                                    `📅 <b>Requested:</b> ${reqDateFormatted}\n\n` +
-                                    `💡 <i>Action Required: Fulfill with online stream URL in Admin Panel!</i>`;
+                                    `📅 <b>Requested:</b> ${reqDateFormatted}\n` +
+                                    `🆔 <b>Req ID:</b> <code>#REQ_${docId}</code>\n\n` +
+                                    `💬 <i>Tip: Reply directly to this message with a stream URL to fulfill instantly!</i>`;
                     } else if (isDirectPriority) {
                         adminText = `🚀🔥 <b>NEW MOVIE REQUEST (HIGH PRIORITY)!</b> 🔥🚀\n\n` +
                                     `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
                                     `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
                                     `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
                                     `📅 <b>Requested:</b> ${reqDateFormatted}\n` +
-                                    `🔥 <b>Priority:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
-                                    `💡 <i>Action Required: Please expedite this request in the Admin Panel or channel!</i>`;
+                                    `🔥 <b>Priority:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n` +
+                                    `🆔 <b>Req ID:</b> <code>#REQ_${docId}</code>\n\n` +
+                                    `💬 <i>Tip: Reply directly to this message with a download/stream link to fulfill instantly!</i>`;
                     } else {
                         adminText = `🍿 <b>New Movie Request!</b>\n\n` +
                                     `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
                                     `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
                                     `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
-                                    `📅 <b>Requested:</b> ${reqDateFormatted}`;
+                                    `📅 <b>Requested:</b> ${reqDateFormatted}\n` +
+                                    `🆔 <b>Req ID:</b> <code>#REQ_${docId}</code>\n\n` +
+                                    `💬 <i>Tip: Reply directly to this message with a download/stream link to fulfill instantly!</i>`;
                     }
 
                     try {
@@ -4192,7 +4481,7 @@ async function init() {
                                 const fulfillBtn = String(adminId).startsWith("-")
                                     ? { text: "👑 Open Film House Admin to Fulfill 🚀", url: adminUrl }
                                     : { text: "👑 Open Film House Admin to Fulfill 🚀", web_app: { url: adminUrl } };
-                                await callAdminTelegramWithRetry('sendMessage', adminId, adminText, {
+                                const sentMsg = await callAdminTelegramWithRetry('sendMessage', adminId, adminText, {
                                     parse_mode: "HTML",
                                     reply_markup: {
                                         inline_keyboard: [
@@ -4200,6 +4489,24 @@ async function init() {
                                         ]
                                     }
                                 });
+                                if (sentMsg && sentMsg.message_id) {
+                                    if (adminRequestMsgMap.size > 2000) {
+                                        const firstKey = adminRequestMsgMap.keys().next().value;
+                                        adminRequestMsgMap.delete(firstKey);
+                                    }
+                                    adminRequestMsgMap.set(String(sentMsg.message_id), {
+                                        docId,
+                                        title,
+                                        year,
+                                        type,
+                                        seasonOrPart: data.seasonOrPart,
+                                        csv_id: data.csv_id,
+                                        tmdb_id: data.tmdb_id,
+                                        userId,
+                                        username,
+                                        isStreamReq
+                                    });
+                                }
                             } catch (e) {
                                 console.warn(`Failed to notify admin ${adminId} of request:`, e.message);
                             }
@@ -4247,8 +4554,9 @@ async function init() {
                                               `⚡ <b>Boosted By:</b> ${cleanBooster}\n` +
                                               `📅 <b>Boosted:</b> ${boostDateFormatted}\n` +
                                               `🪙 <b>Points Spent:</b> <code>1,000 Loyalty Points</code> ⚡\n` +
-                                              `🔥 <b>Priority Level:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
-                                              `💡 <i>Action Required: Please expedite this request in the Admin Panel or upload to Updates Channel!</i>`;
+                                              `🔥 <b>Priority Level:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n` +
+                                              `🆔 <b>Req ID:</b> <code>#REQ_${docId}</code>\n\n` +
+                                              `💬 <i>Tip: Reply directly to this message with a download/stream link to fulfill instantly!</i>`;
 
                         try {
                             const allAdmins = await getAllAdminIds();
@@ -4260,7 +4568,7 @@ async function init() {
                                     const boostFulfillBtn = String(adminId).startsWith("-")
                                         ? { text: "⚡🔥 Open Admin to Fulfill Priority 🚀", url: adminUrl }
                                         : { text: "⚡🔥 Open Admin to Fulfill Priority 🚀", web_app: { url: adminUrl } };
-                                    await callAdminTelegramWithRetry('sendMessage', adminId, adminBoostText, {
+                                    const sentBoostMsg = await callAdminTelegramWithRetry('sendMessage', adminId, adminBoostText, {
                                         parse_mode: "HTML",
                                         reply_markup: {
                                             inline_keyboard: [
@@ -4268,6 +4576,24 @@ async function init() {
                                             ]
                                         }
                                     });
+                                    if (sentBoostMsg && sentBoostMsg.message_id) {
+                                        if (adminRequestMsgMap.size > 2000) {
+                                            const firstKey = adminRequestMsgMap.keys().next().value;
+                                            adminRequestMsgMap.delete(firstKey);
+                                        }
+                                        adminRequestMsgMap.set(String(sentBoostMsg.message_id), {
+                                            docId,
+                                            title,
+                                            year,
+                                            type,
+                                            seasonOrPart: data.seasonOrPart,
+                                            csv_id: data.csv_id,
+                                            tmdb_id: data.tmdb_id,
+                                            userId,
+                                            username,
+                                            isStreamReq: false
+                                        });
+                                    }
                                     console.log(`[BOOST ALERT] HTML DM successfully sent to admin ${adminId}`);
                                 } catch (e) {
                                     console.warn(`Failed to notify admin ${adminId} of boost:`, e.message);
