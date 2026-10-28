@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=78">
+    <link rel="stylesheet" href="index.css?v=79">
 </head>
 <body>
 
@@ -712,11 +712,15 @@
 
         <!-- DEDICATED FULL-SCREEN MEDIA DETAILS PAGE (PHONOFILM CINEMATIC LAYOUT) -->
         <section id="screen-media-detail" class="app-screen">
-            <!-- Floating Glassmorphic Top Navigation (Clean Left Back Button Only) -->
-            <div class="media-detail-top-nav">
-                <button type="button" class="media-nav-circle-btn" id="btn-media-back" aria-label="Go Back">
+            <!-- Sleek Glassmorphic Media Detail Header (Centered Brand Wordmark) -->
+            <div class="media-detail-top-nav" id="media-detail-top-nav">
+                <button type="button" class="media-nav-back-icon-btn" id="btn-media-back" aria-label="Go Back" style="display: none;">
                     <svg><use href="#icon-arrow-left"></use></svg>
                 </button>
+                <div class="media-detail-brand-title">
+                    <span class="brand-text-film">FILM</span><span class="brand-text-house">HOUSE</span>
+                </div>
+                <div class="media-detail-header-spacer"></div>
             </div>
 
             <!-- Media Hero Viewport (Backdrop Banner / Sticky Video Stream Player) -->
@@ -734,6 +738,11 @@
                 <div class="media-stream-iframe-container" id="media-stream-iframe-container" style="display: none;">
                     <!-- Auto-playing trailer or live stream iframe inserted here -->
                 </div>
+                <!-- Cinema Fullscreen / Landscape Overlay Trigger -->
+                <button type="button" class="btn-hero-cinema-fullscreen" id="btn-hero-cinema-fullscreen" aria-label="Watch Fullscreen Landscape" style="display: none;">
+                    <svg><use href="#icon-maximize"></use></svg>
+                    <span>Full Screen</span>
+                </button>
             </div>
 
             <!-- Main Media Info & Actions Container -->
@@ -1482,6 +1491,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=107"></script>
+    <script src="app.js?v=108"></script>
 </body>
 </html>

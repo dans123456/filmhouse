@@ -3406,11 +3406,13 @@ function initMediaDetailPage() {
     const streamModal = document.getElementById("stream-request-modal");
     const btnCancelStreamReq = document.getElementById("btn-cancel-stream-request");
     if (streamModal && btnCancelStreamReq) {
-        btnCancelStreamReq.onclick = () => {
-            streamModal.style.display = "none";
+        const hideStreamModal = () => {
+            streamModal.classList.remove("active");
+            setTimeout(() => { streamModal.style.display = "none"; }, 250);
         };
+        btnCancelStreamReq.onclick = hideStreamModal;
         streamModal.onclick = (e) => {
-            if (e.target === streamModal) streamModal.style.display = "none";
+            if (e.target === streamModal) hideStreamModal();
         };
     }
 
@@ -3429,6 +3431,25 @@ function initMediaDetailPage() {
 }
 
 function closeMediaDetailPage() {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+        try {
+            if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        } catch (e) {}
+    }
+    if (window.Telegram?.WebApp?.unlockOrientation) {
+        try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
+    }
+
+    const heroViewport = document.getElementById("media-hero-viewport");
+    if (heroViewport) heroViewport.classList.remove("has-active-video");
+
+    const detailScreen = document.getElementById("screen-media-detail");
+    if (detailScreen) detailScreen.classList.remove("video-playing");
+
+    const cinemaFsBtn = document.getElementById("btn-hero-cinema-fullscreen");
+    if (cinemaFsBtn) cinemaFsBtn.style.display = "none";
+
     const iframeContainer = document.getElementById("media-stream-iframe-container");
     if (iframeContainer) {
         iframeContainer.replaceChildren();
@@ -3447,7 +3468,10 @@ function closeMediaDetailPage() {
     if (subsPickerModal) subsPickerModal.style.display = "none";
 
     const streamModal = document.getElementById("stream-request-modal");
-    if (streamModal) streamModal.style.display = "none";
+    if (streamModal) {
+        streamModal.classList.remove("active");
+        streamModal.style.display = "none";
+    }
 
     document.body.classList.remove("media-detail-active");
 
@@ -3491,6 +3515,7 @@ function openMediaDetailPage(movie) {
     navigateToScreen("media-detail");
     document.body.classList.add("media-detail-active");
 
+    const btnMediaBack = document.getElementById("btn-media-back");
     if (window.Telegram?.WebApp?.BackButton) {
         window.Telegram.WebApp.BackButton.show();
         const onTgBack = () => {
@@ -3498,6 +3523,13 @@ function openMediaDetailPage(movie) {
             window.Telegram.WebApp.BackButton.offClick(onTgBack);
         };
         window.Telegram.WebApp.BackButton.onClick(onTgBack);
+        // Hide in-app back icon since Telegram native top bar handles it
+        if (btnMediaBack) btnMediaBack.style.display = "none";
+    } else {
+        if (btnMediaBack) {
+            btnMediaBack.style.display = "flex";
+            btnMediaBack.onclick = () => closeMediaDetailPage();
+        }
     }
 
     // 1. Hero Viewport: Always show backdrop first with centered Play FAB (zero black screen)
@@ -3530,18 +3562,32 @@ function openMediaDetailPage(movie) {
     }
 
     let activeTrailerIframe = null;
+    const heroViewport = document.getElementById("media-hero-viewport");
+    const detailScreen = document.getElementById("screen-media-detail");
+    const cinemaFsBtn = document.getElementById("btn-hero-cinema-fullscreen");
 
     if (trailerEmbedUrl && iframeContainer && backdropContainer) {
         iframeContainer.replaceChildren();
         iframeContainer.style.display = "block";
 
+        if (heroViewport) heroViewport.classList.add("has-active-video");
+        if (detailScreen) detailScreen.classList.add("video-playing");
+        if (cinemaFsBtn) cinemaFsBtn.style.display = "flex";
+
+        // Unlock orientation for native phone landscape rotation in Telegram 8.0+
+        if (window.Telegram?.WebApp?.unlockOrientation) {
+            try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
+        }
+
         const hasQuery = trailerEmbedUrl.includes("?");
-        const fullTrailerSrc = `${trailerEmbedUrl}${hasQuery ? "&" : "?"}autoplay=1&mute=1&playsinline=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+        const fullTrailerSrc = `${trailerEmbedUrl}${hasQuery ? "&" : "?"}autoplay=1&mute=1&playsinline=0&fs=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
 
         const iframe = document.createElement("iframe");
         iframe.src = fullTrailerSrc;
-        iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
+        iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen");
         iframe.setAttribute("allowfullscreen", "true");
+        iframe.setAttribute("webkitallowfullscreen", "true");
+        iframe.setAttribute("mozallowfullscreen", "true");
         iframe.style.cssText = "width: 100%; height: 100%; border: none; display: block;";
         iframeContainer.appendChild(iframe);
         activeTrailerIframe = iframe;
@@ -3559,7 +3605,7 @@ function openMediaDetailPage(movie) {
                 if (backdropContainer && activeTrailerIframe) {
                     backdropContainer.classList.add("hidden-for-playback");
                 }
-            }, 1200);
+            }, 1000);
         };
 
         // Listen for YouTube player state changes via postMessage
@@ -3582,11 +3628,15 @@ function openMediaDetailPage(movie) {
             previewFab.onclick = () => {
                 backdropContainer.classList.add("hidden-for-playback");
                 try {
-                    iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "playVideo", args: "" }), "*");
+                    activeTrailerIframe?.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "playVideo", args: "" }), "*");
                 } catch (e) {}
             };
         }
     } else {
+        if (heroViewport) heroViewport.classList.remove("has-active-video");
+        if (detailScreen) detailScreen.classList.remove("video-playing");
+        if (cinemaFsBtn) cinemaFsBtn.style.display = "none";
+
         if (iframeContainer) {
             iframeContainer.replaceChildren();
             iframeContainer.style.display = "none";
@@ -3598,6 +3648,31 @@ function openMediaDetailPage(movie) {
         if (previewFab) {
             previewFab.onclick = () => playMediaStream();
         }
+    }
+
+    // Cinema Fullscreen Toggle handler
+    if (cinemaFsBtn) {
+        cinemaFsBtn.onclick = () => {
+            const targetVp = document.getElementById("media-hero-viewport");
+            if (!targetVp) return;
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                if (window.Telegram?.WebApp?.unlockOrientation) {
+                    try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
+                }
+            } else {
+                if (targetVp.requestFullscreen) {
+                    targetVp.requestFullscreen().catch(() => {});
+                } else if (targetVp.webkitRequestFullscreen) {
+                    targetVp.webkitRequestFullscreen();
+                }
+                if (window.Telegram?.WebApp?.lockOrientation) {
+                    try { window.Telegram.WebApp.lockOrientation("landscape"); } catch (e) {}
+                }
+            }
+            if (typeof triggerHaptic === "function") triggerHaptic("medium");
+        };
     }
 
     // 2. Title
@@ -3712,7 +3787,7 @@ function openMediaDetailPage(movie) {
             }
         }
 
-        // If streaming is not available: open confirmation modal first (no automatic spam)
+        // If streaming is not available: open confirmation modal with active class for smooth glassmorphism
         if (!streamTarget) {
             const streamModal = document.getElementById("stream-request-modal");
             const streamDesc = document.getElementById("stream-request-modal-desc");
@@ -3723,10 +3798,14 @@ function openMediaDetailPage(movie) {
                     streamDesc.textContent = `"${movie.title}" is currently only available for download. Would you like to request an online streaming link?`;
                 }
                 streamModal.style.display = "flex";
+                requestAnimationFrame(() => {
+                    streamModal.classList.add("active");
+                });
 
                 if (btnConfirm) {
                     btnConfirm.onclick = async () => {
-                        streamModal.style.display = "none";
+                        streamModal.classList.remove("active");
+                        setTimeout(() => { streamModal.style.display = "none"; }, 250);
                         // 1. Trigger Monetag SmartLink (Highest-paying monetization with 100% global fill rate)
                         triggerMonetagSmartLink();
                         // 2. Submit dedicated stream request to Firestore
@@ -3743,18 +3822,32 @@ function openMediaDetailPage(movie) {
 
         if (iframeContainer && backdropContainer) {
             iframeContainer.replaceChildren();
+
+            const heroViewport = document.getElementById("media-hero-viewport");
+            const detailScreen = document.getElementById("screen-media-detail");
+            const cinemaFsBtn = document.getElementById("btn-hero-cinema-fullscreen");
+
+            if (heroViewport) heroViewport.classList.add("has-active-video");
+            if (detailScreen) detailScreen.classList.add("video-playing");
+            if (cinemaFsBtn) cinemaFsBtn.style.display = "flex";
+
+            if (window.Telegram?.WebApp?.unlockOrientation) {
+                try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
+            }
+
             const playerTitle = optTitle || movie.title;
             const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(streamTarget)}&title=${encodeURIComponent(playerTitle)}`;
             const iframe = document.createElement("iframe");
             iframe.src = playerSrc;
-            iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
+            iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen");
             iframe.setAttribute("allowfullscreen", "true");
+            iframe.setAttribute("webkitallowfullscreen", "true");
+            iframe.setAttribute("mozallowfullscreen", "true");
             iframeContainer.appendChild(iframe);
 
             backdropContainer.classList.add("hidden-for-playback");
             iframeContainer.style.display = "block";
 
-            const heroViewport = document.getElementById("media-hero-viewport");
             if (heroViewport) {
                 heroViewport.scrollIntoView({ behavior: "smooth", block: "start" });
             }
