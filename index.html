@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=77">
+    <link rel="stylesheet" href="index.css?v=78">
 </head>
 <body>
 
@@ -98,6 +98,12 @@
             </symbol>
             <symbol id="icon-tv" viewBox="0 0 24 24">
                 <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z" fill="currentColor"/>
+            </symbol>
+            <symbol id="icon-heart" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2"/>
+            </symbol>
+            <symbol id="icon-heart-fill" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
             </symbol>
         </defs>
     </svg>
@@ -776,9 +782,10 @@
                         <svg><use href="#icon-server"></use></svg>
                         <span>Subtitles</span>
                     </button>
-                    <button type="button" class="media-quick-btn" id="btn-media-like">
-                        <svg><use href="#icon-star"></use></svg>
-                        <span>Like</span>
+                    <button type="button" class="media-quick-btn media-heart-like-btn" id="btn-media-like" aria-label="Like Movie">
+                        <svg><use href="#icon-heart"></use></svg>
+                        <span class="media-like-text" id="media-like-text">Like</span>
+                        <span class="media-like-count" id="media-like-count">0</span>
                     </button>
                     <button type="button" class="media-quick-btn" id="btn-media-share">
                         <svg><use href="#icon-share"></use></svg>
@@ -1475,6 +1482,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=106"></script>
+    <script src="app.js?v=107"></script>
 </body>
 </html>

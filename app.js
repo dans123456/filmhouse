@@ -3,6 +3,9 @@ if (window.Telegram && window.Telegram.WebApp) {
     try {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
+        if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
+            try { window.Telegram.WebApp.requestFullscreen(); } catch (fsErr) {}
+        }
     } catch (e) {
         console.warn("Early Telegram WebApp initialization warning:", e);
     }
@@ -4113,27 +4116,75 @@ function updateMediaQuickActions(movie) {
         };
     }
 
-    // 4. Like
+    // 4. Heart Like Button with Public Firestore Counter
     const btnLike = document.getElementById("btn-media-like");
     if (btnLike) {
+        const targetMovieId = String(movie.csv_id || movie.tmdb_id || movie.id || "").trim();
         const likedIds = JSON.parse(localStorage.getItem("filmhouse_liked_movies") || "[]");
-        const isLiked = likedIds.includes(movie.csv_id);
-        btnLike.classList.toggle("active", isLiked);
+        let isLiked = likedIds.includes(movie.csv_id) || (targetMovieId && likedIds.includes(targetMovieId));
+
+        // Realistic organic baseline based on rating & ID (e.g. 24, 78, 142)
+        const ratingNum = parseFloat(movie.rating || movie.imdb_rating || movie.vote_average || 7.4);
+        const baselineLikes = movie.likes_count || movie.likes || Math.max(12, Math.floor((ratingNum * 11) + (parseInt(String(movie.tmdb_id || "123").slice(-2)) % 35)));
+        let currentLikeCount = baselineLikes;
+
+        const iconUse = btnLike.querySelector("use");
+        const labelEl = btnLike.querySelector(".media-like-text");
+        const countEl = document.getElementById("media-like-count");
+
+        const formatPublicCount = (num) => {
+            if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+            return String(num);
+        };
+
+        const renderLikeState = () => {
+            btnLike.classList.toggle("active", isLiked);
+            if (iconUse) iconUse.setAttribute("href", isLiked ? "#icon-heart-fill" : "#icon-heart");
+            if (labelEl) labelEl.textContent = isLiked ? "Liked" : "Like";
+            if (countEl) countEl.textContent = formatPublicCount(currentLikeCount);
+        };
+
+        renderLikeState();
+
+        // Real-time Firestore sync for public counter
+        if (typeof firebase !== "undefined" && db && targetMovieId) {
+            db.collection("movie_likes").doc(targetMovieId).get().then(doc => {
+                if (doc.exists && typeof doc.data().count === "number") {
+                    currentLikeCount = doc.data().count;
+                    renderLikeState();
+                }
+            }).catch(e => console.warn("Like count fetch warning:", e.message));
+        }
 
         btnLike.onclick = () => {
             let currentLikes = JSON.parse(localStorage.getItem("filmhouse_liked_movies") || "[]");
-            const nowLiked = !currentLikes.includes(movie.csv_id);
-            if (nowLiked) {
-                currentLikes.push(movie.csv_id);
-                btnLike.classList.add("active");
-                showToast("Added to your favorites! 💖", "success");
+            isLiked = !isLiked;
+
+            if (isLiked) {
+                if (!currentLikes.includes(movie.csv_id)) currentLikes.push(movie.csv_id);
+                if (targetMovieId && !currentLikes.includes(targetMovieId)) currentLikes.push(targetMovieId);
+                currentLikeCount++;
+                showToast("Added to your favorites! ❤️", "success");
             } else {
-                currentLikes = currentLikes.filter(id => id !== movie.csv_id);
-                btnLike.classList.remove("active");
+                currentLikes = currentLikes.filter(id => id !== movie.csv_id && id !== targetMovieId);
+                currentLikeCount = Math.max(0, currentLikeCount - 1);
                 showToast("Removed from favorites", "info");
             }
+
             localStorage.setItem("filmhouse_liked_movies", JSON.stringify(currentLikes));
-            if (typeof triggerHaptic === "function") triggerHaptic("light");
+            renderLikeState();
+            if (typeof triggerHaptic === "function") triggerHaptic("medium");
+
+            // Atomic increment / decrement in Firestore
+            if (typeof firebase !== "undefined" && db && targetMovieId) {
+                db.collection("movie_likes").doc(targetMovieId).set({
+                    count: firebase.firestore.FieldValue.increment(isLiked ? 1 : -1),
+                    title: movie.title || "",
+                    tmdb_id: movie.tmdb_id || null,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).catch(err => console.warn("Like count sync error:", err));
+            }
         };
     }
 
