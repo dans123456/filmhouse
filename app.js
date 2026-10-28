@@ -589,10 +589,31 @@ function createSvgIcon(iconId, className = "icon") {
     return svg;
 }
 
-// Toast Notifications Helper
+// Toast Notifications Helper with Deduplication
+const _recentToastCache = new Map();
 function showToast(message, type = "success", action = null) {
     const container = document.getElementById("toast-container");
-    if (!container) return;
+    if (!container || !message) return;
+
+    // Deduplicate identical toasts within 2000ms
+    const now = Date.now();
+    const cacheKey = String(message).trim();
+    if (_recentToastCache.has(cacheKey) && (now - _recentToastCache.get(cacheKey)) < 2000) {
+        return;
+    }
+    _recentToastCache.set(cacheKey, now);
+    if (_recentToastCache.size > 40) {
+        for (const [k, v] of _recentToastCache.entries()) {
+            if (now - v > 4000) _recentToastCache.delete(k);
+        }
+    }
+
+    // Limit active visible toasts to 2 so they never pile up
+    while (container.children.length >= 2) {
+        const oldest = container.firstElementChild;
+        if (oldest) oldest.remove();
+        else break;
+    }
 
     const toast = document.createElement("div");
     toast.className = `toast toast-${type}`;
@@ -1361,7 +1382,7 @@ function calculateUserRank() {
     return userIndex !== -1 ? userIndex + 1 : list.length;
 }
 
-function awardPoints(points, reason) {
+function awardPoints(points, reason, silent = false) {
     state.user.points = (state.user.points || 0) + points;
     
     if (!state.user.pointsBreakdown) {
@@ -1408,19 +1429,21 @@ function awardPoints(points, reason) {
         renderLeaderboard();
     }
     
-    // Notify the user via toast
-    let reasonText = "";
-    if (reason === "download") reasonText = "downloading a movie";
-    else if (reason === "task") reasonText = "completing the task";
-    else if (reason === "visit") reasonText = "your daily visit";
-    else if (reason === "share") reasonText = "sharing a movie";
-    else if (reason === "mining") reasonText = "mining rewards";
-    else if (reason === "watched") reasonText = points > 0 ? "marking a movie as watched" : "removing a movie from watched list";
-    
-    if (points > 0) {
-        showToast(`Earned +${points} Loyalty Points for ${reasonText}! 🏆`, "success");
-    } else if (points < 0) {
-        showToast(`Removed ${Math.abs(points)} Loyalty Points for ${reasonText}.`, "info");
+    // Notify the user via toast (if not silent)
+    if (!silent) {
+        let reasonText = "";
+        if (reason === "download") reasonText = "downloading a movie";
+        else if (reason === "task") reasonText = "completing the task";
+        else if (reason === "visit") reasonText = "your daily visit";
+        else if (reason === "share") reasonText = "sharing a movie";
+        else if (reason === "mining") reasonText = "mining rewards";
+        else if (reason === "watched") reasonText = points > 0 ? "marking a movie as watched" : "removing a movie from watched list";
+        
+        if (points > 0) {
+            showToast(`Earned +${points} Loyalty Points for ${reasonText}! 🏆`, "success");
+        } else if (points < 0) {
+            showToast(`Removed ${Math.abs(points)} Loyalty Points for ${reasonText}.`, "info");
+        }
     }
 }
 
@@ -3565,6 +3588,7 @@ function openMediaDetailPage(movie) {
     const heroViewport = document.getElementById("media-hero-viewport");
     const detailScreen = document.getElementById("screen-media-detail");
     const cinemaFsBtn = document.getElementById("btn-hero-cinema-fullscreen");
+    if (cinemaFsBtn) cinemaFsBtn.style.display = "none";
 
     if (trailerEmbedUrl && iframeContainer && backdropContainer) {
         iframeContainer.replaceChildren();
@@ -3572,7 +3596,6 @@ function openMediaDetailPage(movie) {
 
         if (heroViewport) heroViewport.classList.add("has-active-video");
         if (detailScreen) detailScreen.classList.add("video-playing");
-        if (cinemaFsBtn) cinemaFsBtn.style.display = "flex";
 
         // Unlock orientation for native phone landscape rotation in Telegram 8.0+
         if (window.Telegram?.WebApp?.unlockOrientation) {
@@ -3580,7 +3603,8 @@ function openMediaDetailPage(movie) {
         }
 
         const hasQuery = trailerEmbedUrl.includes("?");
-        const fullTrailerSrc = `${trailerEmbedUrl}${hasQuery ? "&" : "?"}autoplay=1&mute=1&playsinline=0&fs=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+        // Sound default ON at low volume (mute=0, setVolume(25)), rel=0, fs=1 for native fullscreen
+        const fullTrailerSrc = `${trailerEmbedUrl}${hasQuery ? "&" : "?"}autoplay=1&mute=0&playsinline=0&fs=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
 
         const iframe = document.createElement("iframe");
         iframe.src = fullTrailerSrc;
@@ -3592,6 +3616,12 @@ function openMediaDetailPage(movie) {
         iframeContainer.appendChild(iframe);
         activeTrailerIframe = iframe;
 
+        const sendTrailerCmd = (func, args = []) => {
+            try {
+                iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), "*");
+            } catch (e) {}
+        };
+
         // Auto-crossfade backdrop to video after YouTube initializes
         let trailerLoadedTimeout = setTimeout(() => {
             if (backdropContainer && activeTrailerIframe) {
@@ -3601,11 +3631,16 @@ function openMediaDetailPage(movie) {
 
         iframe.onload = () => {
             clearTimeout(trailerLoadedTimeout);
+            // Default sound on at low volume (25%) as requested
+            sendTrailerCmd("setVolume", [25]);
+            sendTrailerCmd("unMute");
             setTimeout(() => {
+                sendTrailerCmd("setVolume", [25]);
+                sendTrailerCmd("unMute");
                 if (backdropContainer && activeTrailerIframe) {
                     backdropContainer.classList.add("hidden-for-playback");
                 }
-            }, 1000);
+            }, 600);
         };
 
         // Listen for YouTube player state changes via postMessage
@@ -3615,9 +3650,24 @@ function openMediaDetailPage(movie) {
                 if (data && data.event === "infoDelivery" && data.info) {
                     // playerState: 1 = playing, 2 = paused, 0 = ended
                     if (data.info.playerState === 1) {
-                        backdropContainer.classList.add("hidden-for-playback");
-                    } else if (data.info.playerState === 2 || data.info.playerState === 0) {
-                        backdropContainer.classList.remove("hidden-for-playback");
+                        if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
+                    } else if (data.info.playerState === 0) {
+                        // Trailer ended: instantly restore clean movie backdrop & hide iframe so YouTube recommendations never show
+                        if (backdropContainer) {
+                            backdropContainer.classList.remove("hidden-for-playback");
+                            backdropContainer.style.display = "block";
+                        }
+                        if (iframeContainer) {
+                            iframeContainer.style.display = "none";
+                            iframeContainer.replaceChildren();
+                        }
+                        if (heroViewport) heroViewport.classList.remove("has-active-video");
+                        if (detailScreen) detailScreen.classList.remove("video-playing");
+                    } else if (data.info.playerState === 2) {
+                        // Trailer paused: restore clean movie artwork
+                        if (backdropContainer) {
+                            backdropContainer.classList.remove("hidden-for-playback");
+                        }
                     }
                 }
             } catch (err) {}
@@ -3626,10 +3676,16 @@ function openMediaDetailPage(movie) {
 
         if (previewFab) {
             previewFab.onclick = () => {
+                if (iframeContainer && iframeContainer.style.display === "none") {
+                    iframeContainer.style.display = "block";
+                    iframeContainer.replaceChildren(iframe);
+                    if (heroViewport) heroViewport.classList.add("has-active-video");
+                    if (detailScreen) detailScreen.classList.add("video-playing");
+                }
                 backdropContainer.classList.add("hidden-for-playback");
-                try {
-                    activeTrailerIframe?.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "playVideo", args: "" }), "*");
-                } catch (e) {}
+                sendTrailerCmd("playVideo");
+                sendTrailerCmd("setVolume", [25]);
+                sendTrailerCmd("unMute");
             };
         }
     } else {
@@ -3648,31 +3704,6 @@ function openMediaDetailPage(movie) {
         if (previewFab) {
             previewFab.onclick = () => playMediaStream();
         }
-    }
-
-    // Cinema Fullscreen Toggle handler
-    if (cinemaFsBtn) {
-        cinemaFsBtn.onclick = () => {
-            const targetVp = document.getElementById("media-hero-viewport");
-            if (!targetVp) return;
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
-                if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                if (window.Telegram?.WebApp?.unlockOrientation) {
-                    try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
-                }
-            } else {
-                if (targetVp.requestFullscreen) {
-                    targetVp.requestFullscreen().catch(() => {});
-                } else if (targetVp.webkitRequestFullscreen) {
-                    targetVp.webkitRequestFullscreen();
-                }
-                if (window.Telegram?.WebApp?.lockOrientation) {
-                    try { window.Telegram.WebApp.lockOrientation("landscape"); } catch (e) {}
-                }
-            }
-            if (typeof triggerHaptic === "function") triggerHaptic("medium");
-        };
     }
 
     // 2. Title
@@ -3825,11 +3856,8 @@ function openMediaDetailPage(movie) {
 
             const heroViewport = document.getElementById("media-hero-viewport");
             const detailScreen = document.getElementById("screen-media-detail");
-            const cinemaFsBtn = document.getElementById("btn-hero-cinema-fullscreen");
-
             if (heroViewport) heroViewport.classList.add("has-active-video");
             if (detailScreen) detailScreen.classList.add("video-playing");
-            if (cinemaFsBtn) cinemaFsBtn.style.display = "flex";
 
             if (window.Telegram?.WebApp?.unlockOrientation) {
                 try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
@@ -4188,12 +4216,12 @@ function updateMediaQuickActions(movie) {
             if (active) {
                 state.history = state.history.filter(id => id !== movie.csv_id);
                 localStorage.setItem("filmhouse_history", JSON.stringify(state.history));
-                awardPoints(-5, "watched");
+                awardPoints(-5, "watched", true);
                 btnWatched.classList.remove("active");
                 showToast("Removed from watched list", "info");
             } else {
                 addWatchHistory(movie);
-                awardPoints(5, "watched");
+                awardPoints(5, "watched", true);
                 btnWatched.classList.add("active");
                 showToast("Marked as watched! 🍿", "success");
             }
@@ -4281,7 +4309,7 @@ function updateMediaQuickActions(movie) {
         };
     }
 
-    // 5. Share (TikTok / Spotify style native OS sheet with contacts & direct deep link)
+    // 5. Universal Native OS Share Sheet (WhatsApp, TikTok, Quick Share, Google Save, etc.)
     const btnShare = document.getElementById("btn-media-share");
     if (btnShare) {
         btnShare.onclick = () => {
@@ -4294,16 +4322,26 @@ function updateMediaQuickActions(movie) {
             const shareTitle = `${movie.title} ${yearVal ? `(${yearVal})` : ""}`;
             const shareText = `🎬 Watch "${movie.title}" on Film House App!\n⭐ Rating: ${ratingVal}/10 • ${typeLabel}\n🔥 Stream in HD or Download now:\n${directUrl}`;
 
-            const fallbackShare = () => {
-                if (window.Telegram?.WebApp?.openTelegramLink) {
-                    window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(directUrl)}&text=${encodeURIComponent(shareText)}`);
+            if (typeof triggerHaptic === "function") triggerHaptic("selection");
+
+            // Copy to clipboard immediately as standard fallback
+            if (navigator.clipboard?.writeText) {
+                navigator.clipboard.writeText(shareText).catch(() => {});
+            }
+
+            const openSystemShareSheet = () => {
+                const isAndroid = /android/i.test(navigator.userAgent || "");
+                if (isAndroid) {
+                    // Android SEND Intent opens the exact Android OS Share Sheet (WhatsApp, TikTok, Quick Share, etc.)
+                    const intentUrl = `intent:#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(shareText)};S.android.intent.extra.SUBJECT=${encodeURIComponent(shareTitle)};end`;
+                    try {
+                        window.location.href = intentUrl;
+                        return;
+                    } catch (e) {
+                        console.warn("Android intent invoke failed", e);
+                    }
                 }
-                if (navigator.clipboard?.writeText) {
-                    navigator.clipboard.writeText(shareText);
-                    showToast(`Link & details copied! Share anywhere 🍿`, "success");
-                } else {
-                    showToast(`Direct movie link copied!`, "success");
-                }
+                showToast("Movie link & details copied! Share anywhere 🍿", "success");
             };
 
             // Modern Web Share API: triggers the user's phone native OS bottom sheet (WhatsApp, Telegram, chats, apps)
@@ -4312,15 +4350,16 @@ function updateMediaQuickActions(movie) {
                     title: shareTitle,
                     text: shareText,
                     url: directUrl
+                }).then(() => {
+                    awardPoints(3, "share", true);
                 }).catch(err => {
                     if (err.name !== "AbortError") {
-                        fallbackShare();
+                        openSystemShareSheet();
                     }
                 });
             } else {
-                fallbackShare();
+                openSystemShareSheet();
             }
-            if (typeof triggerHaptic === "function") triggerHaptic("selection");
         };
     }
 }
@@ -4816,9 +4855,15 @@ function fetchTmdbDetailsForMedia(movie) {
                     const ytMatch = movie.trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
                     const embedKey = ytMatch ? ytMatch[1] : movie.trailer;
                     const iframe = document.createElement("iframe");
-                    iframe.src = `https://www.youtube.com/embed/${embedKey}?autoplay=1&mute=1&playsinline=1&rel=0`;
-                    iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
+                    iframe.src = `https://www.youtube.com/embed/${embedKey}?autoplay=1&mute=0&playsinline=0&fs=1&rel=0&enablejsapi=1`;
+                    iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen");
                     iframe.setAttribute("allowfullscreen", "true");
+                    iframe.onload = () => {
+                        try {
+                            iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "setVolume", args: [25] }), "*");
+                            iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "unMute", args: "" }), "*");
+                        } catch (e) {}
+                    };
                     iframeContainer.replaceChildren(iframe);
                     backdropContainer.style.display = "none";
                     iframeContainer.style.display = "block";
