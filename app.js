@@ -3399,6 +3399,18 @@ function initMediaDetailPage() {
         };
     }
 
+    // Stream request confirmation modal close handlers
+    const streamModal = document.getElementById("stream-request-modal");
+    const btnCancelStreamReq = document.getElementById("btn-cancel-stream-request");
+    if (streamModal && btnCancelStreamReq) {
+        btnCancelStreamReq.onclick = () => {
+            streamModal.style.display = "none";
+        };
+        streamModal.onclick = (e) => {
+            if (e.target === streamModal) streamModal.style.display = "none";
+        };
+    }
+
     // Episode guide dropdown toggle
     const epGuideToggle = document.getElementById("btn-toggle-episode-guide");
     const epGuideBody = document.getElementById("episode-guide-body");
@@ -3422,6 +3434,7 @@ function closeMediaDetailPage() {
     const backdropContainer = document.getElementById("media-backdrop-container");
     if (backdropContainer) {
         backdropContainer.style.display = "block";
+        backdropContainer.classList.remove("hidden-for-playback");
     }
 
     const downloadAccordion = document.getElementById("media-download-accordion");
@@ -3429,6 +3442,9 @@ function closeMediaDetailPage() {
 
     const subsPickerModal = document.getElementById("media-subtitles-picker-modal");
     if (subsPickerModal) subsPickerModal.style.display = "none";
+
+    const streamModal = document.getElementById("stream-request-modal");
+    if (streamModal) streamModal.style.display = "none";
 
     document.body.classList.remove("media-detail-active");
 
@@ -3481,7 +3497,7 @@ function openMediaDetailPage(movie) {
         window.Telegram.WebApp.BackButton.onClick(onTgBack);
     }
 
-    // 1. Hero Viewport: Auto-play trailer if available, with backdrop image as alternative
+    // 1. Hero Viewport: Always show backdrop first with centered Play FAB (zero black screen)
     const backdropImg = document.getElementById("media-backdrop-img");
     if (backdropImg) {
         backdropImg.src = movie.backdrop;
@@ -3490,29 +3506,83 @@ function openMediaDetailPage(movie) {
 
     const iframeContainer = document.getElementById("media-stream-iframe-container");
     const backdropContainer = document.getElementById("media-backdrop-container");
+    const previewFab = document.getElementById("btn-hero-play-preview");
     
+    if (backdropContainer) {
+        backdropContainer.style.display = "block";
+        backdropContainer.classList.remove("hidden-for-playback");
+    }
+
     // Auto-play trailer if trailer link/key exists
     let trailerEmbedUrl = "";
     if (movie.trailer) {
         const ytMatch = movie.trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
         if (ytMatch) {
-            trailerEmbedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&mute=1&playsinline=1&rel=0`;
+            trailerEmbedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
         } else if (!movie.trailer.includes("http")) {
-            trailerEmbedUrl = `https://www.youtube.com/embed/${movie.trailer}?autoplay=1&mute=1&playsinline=1&rel=0`;
+            trailerEmbedUrl = `https://www.youtube.com/embed/${movie.trailer}`;
         } else {
             trailerEmbedUrl = movie.trailer;
         }
     }
 
+    let activeTrailerIframe = null;
+
     if (trailerEmbedUrl && iframeContainer && backdropContainer) {
         iframeContainer.replaceChildren();
+        iframeContainer.style.display = "block";
+
+        const hasQuery = trailerEmbedUrl.includes("?");
+        const fullTrailerSrc = `${trailerEmbedUrl}${hasQuery ? "&" : "?"}autoplay=1&mute=1&playsinline=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+
         const iframe = document.createElement("iframe");
-        iframe.src = trailerEmbedUrl;
+        iframe.src = fullTrailerSrc;
         iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
         iframe.setAttribute("allowfullscreen", "true");
+        iframe.style.cssText = "width: 100%; height: 100%; border: none; display: block;";
         iframeContainer.appendChild(iframe);
-        backdropContainer.style.display = "none";
-        iframeContainer.style.display = "block";
+        activeTrailerIframe = iframe;
+
+        // Auto-crossfade backdrop to video after YouTube initializes
+        let trailerLoadedTimeout = setTimeout(() => {
+            if (backdropContainer && activeTrailerIframe) {
+                backdropContainer.classList.add("hidden-for-playback");
+            }
+        }, 1800);
+
+        iframe.onload = () => {
+            clearTimeout(trailerLoadedTimeout);
+            setTimeout(() => {
+                if (backdropContainer && activeTrailerIframe) {
+                    backdropContainer.classList.add("hidden-for-playback");
+                }
+            }, 1200);
+        };
+
+        // Listen for YouTube player state changes via postMessage
+        const onYtMessage = (event) => {
+            try {
+                const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                if (data && data.event === "infoDelivery" && data.info) {
+                    // playerState: 1 = playing, 2 = paused, 0 = ended
+                    if (data.info.playerState === 1) {
+                        backdropContainer.classList.add("hidden-for-playback");
+                    } else if (data.info.playerState === 2 || data.info.playerState === 0) {
+                        backdropContainer.classList.remove("hidden-for-playback");
+                    }
+                }
+            } catch (err) {}
+        };
+        window.addEventListener("message", onYtMessage);
+
+        if (previewFab) {
+            previewFab.onclick = () => {
+                backdropContainer.classList.add("hidden-for-playback");
+                try {
+                    iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "playVideo", args: "" }), "*");
+                } catch (e) {}
+            };
+        }
     } else {
         if (iframeContainer) {
             iframeContainer.replaceChildren();
@@ -3520,6 +3590,10 @@ function openMediaDetailPage(movie) {
         }
         if (backdropContainer) {
             backdropContainer.style.display = "block";
+            backdropContainer.classList.remove("hidden-for-playback");
+        }
+        if (previewFab) {
+            previewFab.onclick = () => playMediaStream();
         }
     }
 
@@ -3625,7 +3699,7 @@ function openMediaDetailPage(movie) {
         });
     }
 
-    // 5. Live Streaming Controller (Honest Availability)
+    // 5. Live Streaming Controller (Honest Availability & Request Confirmation)
     function playMediaStream(customUrl, optTitle) {
         let streamTarget = customUrl || movie.stream_url || "";
         if (!streamTarget && movie.links && Array.isArray(movie.links)) {
@@ -3635,13 +3709,31 @@ function openMediaDetailPage(movie) {
             }
         }
 
-        // If streaming is not available: honest prompt for stream request
+        // If streaming is not available: open confirmation modal first (no automatic spam)
         if (!streamTarget) {
-            showToast(`⚡ Streaming not yet available for "${movie.title}". Opening request...`, "info");
-            if (typeof showRequestSpecsDrawer === "function") {
-                showRequestSpecsDrawer(movie);
-            } else if (typeof openManualRequestModal === "function") {
-                openManualRequestModal(movie.title);
+            const streamModal = document.getElementById("stream-request-modal");
+            const streamDesc = document.getElementById("stream-request-modal-desc");
+            const btnConfirm = document.getElementById("btn-confirm-stream-request");
+
+            if (streamModal) {
+                if (streamDesc) {
+                    streamDesc.textContent = `"${movie.title}" is currently only available for download. Would you like to request an online streaming link?`;
+                }
+                streamModal.style.display = "flex";
+
+                if (btnConfirm) {
+                    btnConfirm.onclick = async () => {
+                        streamModal.style.display = "none";
+                        // 1. Trigger Monetag SmartLink (Highest-paying monetization with 100% global fill rate)
+                        triggerMonetagSmartLink();
+                        // 2. Submit dedicated stream request to Firestore
+                        await submitDedicatedStreamRequest(movie);
+                    };
+                }
+            } else {
+                if (typeof showRequestSpecsDrawer === "function") {
+                    showRequestSpecsDrawer(movie);
+                }
             }
             return;
         }
@@ -3656,7 +3748,7 @@ function openMediaDetailPage(movie) {
             iframe.setAttribute("allowfullscreen", "true");
             iframeContainer.appendChild(iframe);
 
-            backdropContainer.style.display = "none";
+            backdropContainer.classList.add("hidden-for-playback");
             iframeContainer.style.display = "block";
 
             const heroViewport = document.getElementById("media-hero-viewport");
@@ -3670,14 +3762,10 @@ function openMediaDetailPage(movie) {
         }
     }
 
-    // Wire Hero Stream Button & Preview Play FAB
+    // Wire Hero Stream Button
     const streamBtn = document.getElementById("btn-media-stream-main");
     if (streamBtn) {
         streamBtn.onclick = () => playMediaStream();
-    }
-    const previewFab = document.getElementById("btn-hero-play-preview");
-    if (previewFab) {
-        previewFab.onclick = () => playMediaStream();
     }
 
     // 6. Wire Hero Download Button (All Qualities with Missing Request)
@@ -4049,31 +4137,170 @@ function updateMediaQuickActions(movie) {
         };
     }
 
-    // 5. Share (Directly leads anyone who opens it to this exact movie page)
+    // 5. Share (TikTok / Spotify style native OS sheet with contacts & direct deep link)
     const btnShare = document.getElementById("btn-media-share");
     if (btnShare) {
         btnShare.onclick = () => {
             const targetId = movie.csv_id || movie.tmdb_id || movie.id;
-            const directUrl = window.Telegram?.WebApp?.initData
-                ? `https://t.me/FilmHouseGh_bot?startapp=movie_${targetId}`
-                : `${window.location.origin}${window.location.pathname}?movie=${encodeURIComponent(movie.csv_id || movie.title)}`;
+            const directUrl = `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${targetId}`;
+            const ratingVal = movie.rating || movie.imdb_rating || movie.vote_average || "7.5";
+            const yearVal = movie.year || (movie.release_date ? movie.release_date.split("-")[0] : "");
+            const typeLabel = (movie.type || "").toLowerCase().includes("series") ? "Series" : "Movie";
 
-            const shareData = {
-                title: movie.title,
-                text: `Watch "${movie.title}" on FilmHouse! 🎬`,
-                url: directUrl
+            const shareTitle = `${movie.title} ${yearVal ? `(${yearVal})` : ""}`;
+            const shareText = `🎬 Watch "${movie.title}" on Film House App!\n⭐ Rating: ${ratingVal}/10 • ${typeLabel}\n🔥 Stream in HD or Download now:\n${directUrl}`;
+
+            const fallbackShare = () => {
+                if (window.Telegram?.WebApp?.openTelegramLink) {
+                    window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(directUrl)}&text=${encodeURIComponent(shareText)}`);
+                }
+                if (navigator.clipboard?.writeText) {
+                    navigator.clipboard.writeText(shareText);
+                    showToast(`Link & details copied! Share anywhere 🍿`, "success");
+                } else {
+                    showToast(`Direct movie link copied!`, "success");
+                }
             };
 
+            // Modern Web Share API: triggers the user's phone native OS bottom sheet (WhatsApp, Telegram, chats, apps)
             if (navigator.share) {
-                navigator.share(shareData).catch(() => {});
-            } else if (navigator.clipboard?.writeText) {
-                navigator.clipboard.writeText(directUrl);
-                showToast(`Link copied! Opening this link leads straight to ${movie.title} 🍿`, "success");
+                navigator.share({
+                    title: shareTitle,
+                    text: shareText,
+                    url: directUrl
+                }).catch(err => {
+                    if (err.name !== "AbortError") {
+                        fallbackShare();
+                    }
+                });
             } else {
-                showToast("Direct movie link copied!", "success");
+                fallbackShare();
             }
             if (typeof triggerHaptic === "function") triggerHaptic("selection");
         };
+    }
+}
+
+// Submit dedicated streaming request to Firestore with admin distinction
+async function submitDedicatedStreamRequest(movie) {
+    if (!movie) return;
+    try {
+        if (typeof firebase !== "undefined" && db) {
+            const reqPayload = {
+                title: movie.title,
+                cleanTitle: typeof normalizeTitleForComparison === "function" ? normalizeTitleForComparison(movie.title) : movie.title.toLowerCase(),
+                category: movie.type || "Movie",
+                year: movie.year || (movie.release_date ? movie.release_date.split("-")[0] : ""),
+                type: "stream",
+                requestType: "stream",
+                target: "stream_url",
+                quality: "Stream (Online Player)",
+                tmdb_id: movie.tmdb_id || null,
+                csv_id: movie.csv_id || null,
+                poster: movie.poster || "",
+                backdrop: movie.backdrop || "",
+                status: "pending",
+                requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                requestedBy: state.user?.username || state.user?.fullName || "Anonymous",
+                requestedById: state.user?.id ? String(state.user.id) : "unknown",
+                platform: state.isTelegram ? "telegram" : "web"
+            };
+
+            await db.collection("requests").add(reqPayload);
+            showToast(`🚀 Stream request submitted for "${movie.title}"! We'll notify you once uploaded.`, "success");
+            if (typeof triggerHaptic === "function") triggerHaptic("success");
+        } else {
+            showToast(`Stream request recorded for "${movie.title}"!`, "success");
+        }
+    } catch (err) {
+        console.warn("Stream request submit error:", err);
+        showToast(`Stream request recorded for "${movie.title}"!`, "success");
+    }
+}
+
+// Resolve and open deep link movie directly in full-screen cinematic media page
+async function resolveAndOpenDeepLinkMovie(targetId) {
+    if (!targetId) return;
+    const cleanTarget = String(targetId).toLowerCase().trim();
+
+    // 1. In-memory fast match from state.allMovies
+    if (state.allMovies && state.allMovies.length > 0) {
+        const found = state.allMovies.find(m => {
+            const csvMatch = m.csv_id && String(m.csv_id).toLowerCase() === cleanTarget;
+            const tmdbMatch = m.tmdb_id && String(m.tmdb_id).toLowerCase() === cleanTarget;
+            const titleMatch = m.title && m.title.toLowerCase().trim() === cleanTarget;
+            const slugMatch = m.csv_id && m.csv_id.toLowerCase().includes(cleanTarget);
+            return csvMatch || tmdbMatch || titleMatch || slugMatch;
+        });
+        if (found) {
+            openMediaDetailPage(found);
+            return;
+        }
+    }
+
+    // 2. Query Firestore if not found in initial memory cache
+    if (typeof firebase !== "undefined" && db) {
+        try {
+            // By Doc ID
+            const docSnap = await db.collection("movies").doc(targetId).get();
+            if (docSnap.exists) {
+                const mData = { id: docSnap.id, csv_id: docSnap.id, ...docSnap.data() };
+                openMediaDetailPage(mData);
+                return;
+            }
+
+            // By csv_id field
+            const csvSnap = await db.collection("movies").where("csv_id", "==", targetId).limit(1).get();
+            if (!csvSnap.empty) {
+                const mData = { id: csvSnap.docs[0].id, ...csvSnap.docs[0].data() };
+                openMediaDetailPage(mData);
+                return;
+            }
+
+            // By numeric tmdb_id
+            const numericId = parseInt(cleanTarget.split("-")[0]);
+            if (!isNaN(numericId) && numericId > 0) {
+                const tmdbSnap = await db.collection("movies").where("tmdb_id", "==", numericId).limit(1).get();
+                if (!tmdbSnap.empty) {
+                    const mData = { id: tmdbSnap.docs[0].id, ...tmdbSnap.docs[0].data() };
+                    openMediaDetailPage(mData);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn("Firestore deep link lookup warning:", e.message);
+        }
+    }
+
+    // 3. Fallback TMDB API fetch
+    const numericId = parseInt(cleanTarget.split("-")[0]);
+    if (!isNaN(numericId) && numericId > 0) {
+        try {
+            const apiKey = "d638f7775bfa1b8d456dfd028ccbef19";
+            const res = await fetch(`https://api.themoviedb.org/3/movie/${numericId}?api_key=${apiKey}&append_to_response=videos,credits`);
+            if (res.ok) {
+                const d = await res.json();
+                const movieObj = {
+                    csv_id: targetId,
+                    tmdb_id: d.id,
+                    title: d.title || d.name,
+                    overview: d.overview || "No synopsis available.",
+                    poster: d.poster_path ? `https://image.tmdb.org/t/p/w500${d.poster_path}` : "MOVIE/img/FilmHouse3_nobg.png",
+                    backdrop: d.backdrop_path ? `https://image.tmdb.org/t/p/w1280${d.backdrop_path}` : "",
+                    rating: d.vote_average ? d.vote_average.toFixed(1) : "7.5",
+                    year: d.release_date ? d.release_date.split("-")[0] : "",
+                    release_date: d.release_date || "",
+                    trailer: (d.videos && d.videos.results && d.videos.results.length > 0) ? d.videos.results[0].key : "",
+                    genres: d.genres ? d.genres.map(g => g.name) : [],
+                    cast: (d.credits && d.credits.cast) ? d.credits.cast.slice(0, 8).map(c => ({ name: c.name, character: c.character, profile_path: c.profile_path })) : [],
+                    type: "Movie"
+                };
+                openMediaDetailPage(movieObj);
+                return;
+            }
+        } catch (err) {
+            console.warn("TMDB deep link fallback error:", err);
+        }
     }
 }
 
@@ -9367,8 +9594,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 initialScreen = "mining";
             } else if (param.startsWith("boost_")) {
                 boostRequestDocId = rawParam.substring(6);
-            } else if (param.startsWith("movie_") || param.startsWith("open_") || param.startsWith("watch_")) {
-                targetDeepLinkMovieId = rawParam.replace(/^(movie_|open_|watch_)/i, "").trim();
+            } else if (param.startsWith("movie_") || param.startsWith("open_") || param.startsWith("watch_") || param.startsWith("dl_")) {
+                targetDeepLinkMovieId = rawParam.replace(/^(movie_|open_|watch_|dl_)/i, "").trim();
             }
         }
     }
@@ -9378,8 +9605,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!targetDeepLinkMovieId) {
         if (queryMovie) {
             targetDeepLinkMovieId = queryMovie.trim();
-        } else if (queryStartApp && (queryStartApp.startsWith("movie_") || queryStartApp.startsWith("open_") || queryStartApp.startsWith("watch_"))) {
-            targetDeepLinkMovieId = queryStartApp.replace(/^(movie_|open_|watch_)/i, "").trim();
+        } else if (queryStartApp && (queryStartApp.startsWith("movie_") || queryStartApp.startsWith("open_") || queryStartApp.startsWith("watch_") || queryStartApp.startsWith("dl_"))) {
+            targetDeepLinkMovieId = queryStartApp.replace(/^(movie_|open_|watch_|dl_)/i, "").trim();
         }
     }
     
@@ -9651,18 +9878,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (targetDeepLinkMovieId) {
         setTimeout(() => {
-            const cleanTarget = targetDeepLinkMovieId.toLowerCase().trim();
-            const movie = state.allMovies.find(m => {
-                const csvMatch = m.csv_id && String(m.csv_id).toLowerCase() === cleanTarget;
-                const tmdbMatch = m.tmdb_id && String(m.tmdb_id).toLowerCase() === cleanTarget;
-                const titleMatch = m.title && m.title.toLowerCase().trim() === cleanTarget;
-                const slugMatch = m.csv_id && m.csv_id.toLowerCase().includes(cleanTarget);
-                return csvMatch || tmdbMatch || titleMatch || slugMatch;
-            });
-            if (movie) {
-                openDetailModal(movie);
-            }
-        }, 1500);
+            resolveAndOpenDeepLinkMovie(targetDeepLinkMovieId);
+        }, 1200);
     }
 
     // 11. Clear loader splash page with a cinematic 1.5s delay presentation

@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=76">
+    <link rel="stylesheet" href="index.css?v=77">
 </head>
 <body>
 
@@ -397,7 +397,6 @@
                     How to Mine Points? 📖
                 </button>
             </div>
-            </div>
         </section>
 
         <!-- PROFILE SCREEN -->
@@ -706,7 +705,8 @@
         </section>
 
         <!-- DEDICATED FULL-SCREEN MEDIA DETAILS PAGE (PHONOFILM CINEMATIC LAYOUT) -->
-                 <!-- Floating Glassmorphic Top Navigation (Clean Left Back Button Only) -->
+        <section id="screen-media-detail" class="app-screen">
+            <!-- Floating Glassmorphic Top Navigation (Clean Left Back Button Only) -->
             <div class="media-detail-top-nav">
                 <button type="button" class="media-nav-circle-btn" id="btn-media-back" aria-label="Go Back">
                     <svg><use href="#icon-arrow-left"></use></svg>
@@ -854,6 +854,24 @@
             </button>
             <div class="modal-scroll-body" id="detail-modal-body">
                 <!-- Dynamically Populated detail contents -->
+            </div>
+        </div>
+    </div>
+
+    <!-- STREAM REQUEST CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="stream-request-modal" style="display: none;">
+        <div class="modal-container stream-request-container" style="max-width: 380px; width: 90%; padding: 26px 20px; text-align: center; border-radius: var(--border-radius-md); background: var(--bg-dark-card); border: 1px solid var(--border-color); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); box-shadow: 0 16px 40px rgba(0,0,0,0.6); margin: auto;">
+            <div style="font-size: 40px; margin-bottom: 12px; filter: drop-shadow(0 4px 10px rgba(255, 188, 0, 0.3));">🎬</div>
+            <h3 style="font-size: 18px; font-weight: 800; color: #fff; margin: 0 0 8px 0; font-family: var(--font-heading);">Streaming Not Available Yet</h3>
+            <p id="stream-request-modal-desc" style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 22px 0;">This movie is currently only available for download. Would you like to request an online streaming link?</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button type="button" class="btn btn-primary" id="btn-confirm-stream-request" style="font-weight: 800; padding: 13px 20px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px var(--primary-glow); border: none;">
+                    <span>Request Stream 🚀</span>
+                </button>
+                <button type="button" class="btn btn-secondary" id="btn-cancel-stream-request" style="font-weight: 600; padding: 11px 20px; font-size: 13px; border-radius: 12px; color: var(--text-secondary); background: transparent; border: 1px solid rgba(255,255,255,0.1);">
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
@@ -1457,6 +1475,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=105"></script>
+    <script src="app.js?v=106"></script>
 </body>
 </html>

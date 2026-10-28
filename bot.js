@@ -925,6 +925,17 @@ function setupBot(bot, adminBot) {
 
             console.log(`[CHANNEL PUBLISH] Publishing "${cleanTitle}" announcement to channel...`);
 
+            const channelReplyMarkup = {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "🎬 Watch / Download in App 🍿",
+                            url: `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${movieId}`
+                        }
+                    ]
+                ]
+            };
+
             const sendToTarget = async (botInstance, target) => {
                 if (!botInstance) throw new Error("Bot instance unavailable");
                 try {
@@ -933,7 +944,8 @@ function setupBot(bot, adminBot) {
                         try {
                             return await botInstance.telegram.sendPhoto(target, bannerUrl, {
                                 caption: caption,
-                                parse_mode: "HTML"
+                                parse_mode: "HTML",
+                                reply_markup: channelReplyMarkup
                             });
                         } catch (urlSendErr) {
                             console.warn(`[CHANNEL PUBLISH] Direct URL send failed (${urlSendErr.message}), falling back to buffer download...`);
@@ -960,14 +972,16 @@ function setupBot(bot, adminBot) {
 
                     return await botInstance.telegram.sendPhoto(target, photoPayload, {
                         caption: caption,
-                        parse_mode: "HTML"
+                        parse_mode: "HTML",
+                        reply_markup: channelReplyMarkup
                     });
                 } catch (photoErr) {
                     if (photoErr.message && (photoErr.message.includes("photo") || photoErr.message.includes("IMAGE") || photoErr.message.includes("wrong file") || photoErr.message.includes("HTTP") || photoErr.message.includes("failed to get http"))) {
                         console.warn(`[CHANNEL PUBLISH] Photo send failed (${photoErr.message}), falling back to sendMessage...`);
                         return await botInstance.telegram.sendMessage(target, caption, {
                             parse_mode: "HTML",
-                            disable_web_page_preview: true
+                            disable_web_page_preview: true,
+                            reply_markup: channelReplyMarkup
                         });
                     }
                     throw photoErr;
@@ -4105,9 +4119,11 @@ async function init() {
                     const cleanSeason = data.seasonOrPart ? `\n📌 <b>Season/Part:</b> ${escapeHtml(String(data.seasonOrPart).replace(/[*_`~]/g, '').trim())}` : '';
                     const cleanUser = escapeHtml(String(username || (userId ? `User ${userId}` : "Guest User")).replace(/[*_`~]/g, '').trim());
 
+                    const isStreamReq = (data.type === "stream" || data.requestType === "stream" || data.target === "stream_url");
+
                     // 1. Send confirmation to requesting user if userId is available
                     if (userId) {
-                        const canBoost = !data.boosted;
+                        const canBoost = !data.boosted && !isStreamReq;
                         const replyMarkup = canBoost ? {
                             inline_keyboard: [
                                 [
@@ -4119,10 +4135,12 @@ async function init() {
                             ]
                         } : undefined;
 
-                        const userReqText = `🍿 <b>Request Received!</b>\n\nYour request for <b>${cleanTitle}</b>${cleanYear} (${cleanType}) has been logged in our queue.\n\n` +
-                            (canBoost 
-                                ? `💡 <b>Boost Available!</b> You can boost this request to <b>High Priority</b> for 1,000 points to get it faster! 🚀`
-                                : `We will notify you here as soon as it is fulfilled! 🚀`);
+                        const userReqText = isStreamReq
+                            ? `🍿 <b>Stream Request Received!</b>\n\nYour request for an online streaming link of <b>${cleanTitle}</b>${cleanYear} has been logged in our queue.\n\nWe will notify you here as soon as the stream player is active! 🚀`
+                            : `🍿 <b>Request Received!</b>\n\nYour request for <b>${cleanTitle}</b>${cleanYear} (${cleanType}) has been logged in our queue.\n\n` +
+                                (canBoost 
+                                    ? `💡 <b>Boost Available!</b> You can boost this request to <b>High Priority</b> for 1,000 points to get it faster! 🚀`
+                                    : `We will notify you here as soon as it is fulfilled! 🚀`);
 
                         try {
                             await callTelegramWithRetry('sendMessage', userId, userReqText, {
@@ -4141,19 +4159,30 @@ async function init() {
                     const reqDate = parseRequestDate(data.requestedAt || data.createdAt || data.timestamp) || new Date();
                     const reqDateFormatted = formatRequestDateTime(reqDate, true);
                     const isDirectPriority = (data.status === "priority" || data.boosted === true);
-                    const adminText = isDirectPriority
-                        ? `🚀🔥 <b>NEW MOVIE REQUEST (HIGH PRIORITY)!</b> 🔥🚀\n\n` +
-                          `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
-                          `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
-                          `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
-                          `📅 <b>Requested:</b> ${reqDateFormatted}\n` +
-                          `🔥 <b>Priority:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
-                          `💡 <i>Action Required: Please expedite this request in the Admin Panel or channel!</i>`
-                        : `🍿 <b>New Movie Request!</b>\n\n` +
-                          `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
-                          `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
-                          `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
-                          `📅 <b>Requested:</b> ${reqDateFormatted}`;
+                    
+                    let adminText = "";
+                    if (isStreamReq) {
+                        adminText = `🎬🟣 <b>NEW STREAM LINK REQUEST!</b> 🟣🎬\n\n` +
+                                    `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
+                                    `🎯 <b>Target:</b> 🟣 <b>Online Stream Player Link</b>\n` +
+                                    `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
+                                    `📅 <b>Requested:</b> ${reqDateFormatted}\n\n` +
+                                    `💡 <i>Action Required: Fulfill with online stream URL in Admin Panel!</i>`;
+                    } else if (isDirectPriority) {
+                        adminText = `🚀🔥 <b>NEW MOVIE REQUEST (HIGH PRIORITY)!</b> 🔥🚀\n\n` +
+                                    `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
+                                    `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
+                                    `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
+                                    `📅 <b>Requested:</b> ${reqDateFormatted}\n` +
+                                    `🔥 <b>Priority:</b> ⚡⚡ <b>HIGH PRIORITY</b> ⚡⚡\n\n` +
+                                    `💡 <i>Action Required: Please expedite this request in the Admin Panel or channel!</i>`;
+                    } else {
+                        adminText = `🍿 <b>New Movie Request!</b>\n\n` +
+                                    `🎬 <b>Title:</b> <b>${cleanTitle}</b>${cleanYear}\n` +
+                                    `📁 <b>Type:</b> ${cleanType}${cleanSeason}\n` +
+                                    `👤 <b>Requested By:</b> ${cleanUser}${userId ? ` (ID: <code>${userId}</code>)` : ''}\n` +
+                                    `📅 <b>Requested:</b> ${reqDateFormatted}`;
+                    }
 
                     try {
                         const allAdmins = await getAllAdminIds();

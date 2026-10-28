@@ -1021,6 +1021,7 @@ function renderRequestsList() {
                 seasonOrPart: r.seasonOrPart || "",
                 count: 0, 
                 isPriority: false, 
+                isStreamRequest: (r.type === "stream" || r.requestType === "stream" || r.target === "stream_url"),
                 isFulfilled: true,
                 fulfilledBy: r.fulfilledBy || null,
                 fulfilledById: r.fulfilledById || null,
@@ -1079,6 +1080,9 @@ function renderRequestsList() {
         
         if (r.status === "priority" || r.boosted === true || r.isPriority === true) {
             counts[key].isPriority = true;
+        }
+        if (r.type === "stream" || r.requestType === "stream" || r.target === "stream_url") {
+            counts[key].isStreamRequest = true;
         }
         
         // Track active claim lock
@@ -1205,6 +1209,10 @@ function renderRequestsList() {
             if (hasCatalogMatch(req)) {
                 catalogBadgeMarkup = `<span style="font-size: 10px; background: rgba(0, 200, 255, 0.15); border: 1px solid rgba(0, 200, 255, 0.3); color: #00c8ff; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;" title="This title exists in the catalog with active links">✨ In Catalog</span>`;
             }
+        }
+
+        if (req.isStreamRequest) {
+            badgeMarkup += `<span style="font-size: 10px; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 8px;">🟣 Stream Request</span>`;
         }
 
         if (req.adminClaimId && !req.isFulfilled) {
