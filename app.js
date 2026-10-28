@@ -3700,7 +3700,9 @@ function openMediaDetailPage(movie) {
 
     const isTVShow = (movie.type || "").toLowerCase() === "series" || 
                      (movie.type || "").toLowerCase() === "tv" || 
-                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+                     (movie.type || "").toLowerCase() === "show" ||
+                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series"))) ||
+                     (movie.links && Array.isArray(movie.links) && movie.links.some(l => l && (l.season || l.episode)));
     movie.type = isTVShow ? "Series" : "Movie";
 
     navigateToScreen("media-detail");
@@ -3723,14 +3725,31 @@ function openMediaDetailPage(movie) {
         }
     }
 
-    // 1. Hero Viewport: Always show backdrop first with centered Play FAB (zero black screen)
-    const backdropImg = document.getElementById("media-backdrop-img");
-    if (backdropImg) {
-        backdropImg.src = movie.backdrop;
-        backdropImg.alt = movie.title;
+    // 1. Immediately terminate previous trailer and clean previous video from DOM
+    if (typeof currentHeroTrailerCleanup === "function") {
+        currentHeroTrailerCleanup();
+        currentHeroTrailerCleanup = null;
+    }
+    const iframeContainer = document.getElementById("media-stream-iframe-container");
+    if (iframeContainer) {
+        iframeContainer.replaceChildren();
+        iframeContainer.style.display = "none";
     }
 
-    const iframeContainer = document.getElementById("media-stream-iframe-container");
+    // 2. Hero Viewport: Instantly hide old movie's backdrop, then smoothly fade in the new one
+    const backdropImg = document.getElementById("media-backdrop-img");
+    if (backdropImg) {
+        backdropImg.style.opacity = "0"; // Instantly hide previous movie's backdrop
+        backdropImg.src = movie.backdrop || movie.poster || "";
+        backdropImg.alt = movie.title;
+        backdropImg.onload = () => {
+            backdropImg.style.opacity = "1";
+        };
+        if (backdropImg.complete && backdropImg.naturalWidth > 0) {
+            backdropImg.style.opacity = "1";
+        }
+    }
+
     const backdropContainer = document.getElementById("media-backdrop-container");
     const previewFab = document.getElementById("btn-hero-play-preview");
     
@@ -4000,7 +4019,8 @@ function openMediaDetailPage(movie) {
             renderMediaSeriesSection(movie, seriesContainer, playMediaStream);
         } else {
             seriesContainer.style.display = "none";
-            seriesContainer.replaceChildren();
+            const body = seriesContainer.querySelector("#episode-guide-body");
+            if (body) body.replaceChildren();
         }
     }
 
@@ -10216,16 +10236,34 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
 
         // Use Telegram's native link opener for t.me links (avoids popup blocking inside webapp view)
         const tg = window.Telegram?.WebApp;
-        const isMobile = tg && (tg.platform === "android" || tg.platform === "ios");
         
-        if (tg && tg.openTelegramLink && targetLink.includes("t.me") && isMobile) {
-            try {
-                tg.openTelegramLink(targetLink);
-                return;
-            } catch (e) {
-                console.warn("tg.openTelegramLink failed:", e);
+        if (targetLink.includes("t.me")) {
+            if (tg && tg.openTelegramLink) {
+                try {
+                    tg.openTelegramLink(targetLink);
+                    // Close the mini app so Telegram switches directly to the bot chat with the START button!
+                    setTimeout(() => {
+                        try { tg.close(); } catch (e) {}
+                    }, 500);
+                    return;
+                } catch (e) {
+                    console.warn("tg.openTelegramLink failed:", e);
+                }
+            }
+            
+            // Extract bot name and start parameter for tg:// protocol deep link
+            const match = targetLink.match(/t\.me\/([^\/?#]+)(?:\?start=(.*))?/);
+            if (match) {
+                const botName = match[1];
+                const startParam = match[2] || "";
+                const tgProtocolUrl = `tg://resolve?domain=${botName}${startParam ? `&start=${startParam}` : ''}`;
+                try {
+                    window.location.href = tgProtocolUrl;
+                    return;
+                } catch (e) {}
             }
         }
+        
         // Fallback for non-Telegram links or if openTelegramLink fails/is skipped inside Telegram WebApp
         if (tg && tg.openLink) {
             try {

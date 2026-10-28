@@ -5081,6 +5081,8 @@ body.media-detail-active .app-content-container {
     object-fit: cover;
     object-position: center 25%;
     display: block;
+    background-color: #07080c;
+    transition: opacity 0.22s ease-in-out;
 }
 
 /* Sheer top overlay so movie backdrop artwork is 100% visible and vivid right to the top */
