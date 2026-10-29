@@ -1,14 +1,21 @@
 
+function isDesktopEnvironment() {
+    const ua = (navigator.userAgent || "").toLowerCase();
+    const isMobileUA = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+    const tgPlatform = (window.Telegram?.WebApp?.platform || "").toLowerCase();
+    const isMobileTG = tgPlatform === "android" || tgPlatform === "ios";
+    if (isMobileUA || isMobileTG) return false;
+    return true;
+}
+
 function initDesktopExpandToggle() {
     const toggleBtn = document.getElementById("btn-desktop-expand-toggle");
     const toggleIcon = document.getElementById("desktop-expand-icon");
     if (!toggleBtn || !toggleIcon) return;
 
-    const tgPlatform = (window.Telegram?.WebApp?.platform || "").toLowerCase();
-    const isDesktopPlatform = tgPlatform === "tdesktop" || tgPlatform === "macos" || tgPlatform === "web" || tgPlatform === "weba" || tgPlatform === "webk" || (!tgPlatform && window.innerWidth >= 768);
-
-    if (!isDesktopPlatform) {
+    if (!isDesktopEnvironment()) {
         toggleBtn.style.display = "none";
+        document.body.classList.add("is-mobile-device");
         return;
     }
 

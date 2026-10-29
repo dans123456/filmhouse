@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=87">
+    <link rel="stylesheet" href="index.css?v=88">
 </head>
 <body>
 
@@ -90,7 +90,10 @@
             <symbol id="icon-maximize" viewBox="0 0 24 24">
                 <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" fill="currentColor"/>
             </symbol>
-            <symbol id="icon-zap" viewBox="0 0 24 24">
+                        <symbol id="icon-minimize" viewBox="0 0 24 24">
+                <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-14v3h3v2h-5V5h2z" fill="currentColor"/>
+            </symbol>
+<symbol id="icon-zap" viewBox="0 0 24 24">
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
             </symbol>
             <symbol id="icon-server" viewBox="0 0 24 24">
@@ -165,6 +168,9 @@
             </div>
 
             <div style="display: flex; align-items: center; gap: 12px;">
+                <button id="btn-desktop-expand-toggle" class="desktop-only-btn" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; width: 32px; height: 32px; padding: 0; cursor: pointer; color: #ffbc00; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s;" title="Toggle Fullscreen / Compact Window">
+                    <svg id="desktop-expand-icon" style="width: 17px; height: 17px; fill: currentColor;"><use href="#icon-maximize"></use></svg>
+                </button>
                 <button id="btn-header-rewards" class="header-coin-btn" style="background: none; border: none; padding: 4px; cursor: pointer; color: #ffbc00; display: flex; align-items: center; transition: transform 0.2s; position: relative;" title="View Reward Center">
                     <svg style="width: 22px; height: 22px; fill: currentColor;"><use href="#icon-coin"></use></svg>
                     <span id="rewards-notification-dot" style="position: absolute; top: 2px; right: 2px; width: 6px; height: 6px; background-color: #ff3b30; border-radius: 50%; display: none;"></span>
@@ -1534,6 +1540,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=121"></script>
+    <script src="app.js?v=122"></script>
 </body>
 </html>
