@@ -52,6 +52,16 @@ service cloud.firestore {
       allow read, write: if true;
     }
     
+    // Subscriptions: Ongoing series episode notification subscriptions
+    match /subscriptions/{subId} {
+      allow read, write: if true;
+    }
+
+    // System: Dynamic platform configurations (e.g. streaming_config)
+    match /system/{docId} {
+      allow read, write: if true;
+    }
+    
     // Default fallback: Deny all other collections
     match /{document=**} {
       allow read, write: if false;
