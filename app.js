@@ -7139,11 +7139,23 @@ function copyToClipboard(text) {
 
 // Initialize Adsgram controller dynamically for a specific block ID
 
-// Universal Rewarded Ad Engine (Adsgram + Fallback)
+// Universal Rewarded Ad Engine (Smart Waterfall: Adsgram Primary -> Monetag Fallback)
 function showRewardedAd(onSuccess, onError) {
     const isTelegramEnv = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== "";
     
-    // Check if Adsgram is available
+    let fallbackTriggered = false;
+    const triggerMonetagFallback = () => {
+        if (fallbackTriggered) return;
+        fallbackTriggered = true;
+        console.log("[SmartWaterfall] Adsgram unavailable in region. Falling back to Monetag SmartLink...");
+        triggerMonetagSmartLink();
+        showToast("Connecting via backup sponsor network... ✓", "info");
+        setTimeout(() => {
+            if (typeof onSuccess === "function") onSuccess();
+        }, 1200);
+    };
+
+    // Primary: In-App Adsgram SDK (keeps user inside Telegram)
     if (isTelegramEnv && window.Adsgram) {
         const blockId = (typeof ADSGRAM_TASK_BLOCK_ID !== "undefined" ? ADSGRAM_TASK_BLOCK_ID : "") || 
                         (typeof ADSGRAM_DOWNLOAD_BLOCK_ID !== "undefined" ? ADSGRAM_DOWNLOAD_BLOCK_ID : "") || "36631";
@@ -7158,21 +7170,18 @@ function showRewardedAd(onSuccess, onError) {
         const controller = state.adsgramControllers[blockId];
         if (controller) {
             controller.show().then(() => {
+                console.log("[SmartWaterfall] Adsgram rewarded ad completed successfully!");
                 if (typeof onSuccess === "function") onSuccess();
             }).catch((err) => {
-                console.warn("[RewardedAd] Adsgram ad dismissed or unavailable:", err);
-                // Fallback gracefully so user isn't punished if ad network is empty
-                if (typeof onSuccess === "function") onSuccess();
+                console.warn("[SmartWaterfall] Adsgram ad unavailable or skipped. Activating Monetag fallback:", err);
+                triggerMonetagFallback();
             });
             return;
         }
     }
 
-    // Web / Local development fallback
-    showToast("Connecting to sponsor network...", "info");
-    setTimeout(() => {
-        if (typeof onSuccess === "function") onSuccess();
-    }, 1500);
+    // Secondary / Web fallback: Monetag SmartLink
+    triggerMonetagFallback();
 }
 
 // Cinema Stream Pre-Roll Session Guard (4-Hour Binge Lock)
