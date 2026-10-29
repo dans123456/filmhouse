@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=89">
+    <link rel="stylesheet" href="index.css?v=90">
 </head>
 <body>
 
@@ -775,6 +775,25 @@
                     <button type="button" class="btn-media-action btn-media-trailer" id="btn-media-trailer-main">
                         <svg class="yt-play-icon" viewBox="0 0 24 24"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.11-2.12C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.39.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.11 2.12C4.5 20.5 12 20.5 12 20.5s7.5 0 9.39-.58A3 3 0 0 0 23.5 17.8 31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8Z"></path><path fill="#fff" d="M9.6 15.6V8.4l6.25 3.6-6.25 3.6Z"></path></svg>
                         <span>Trailer</span>
+                    </button>
+                </div>
+
+                <!-- TV Series Release Tracker & Telegram Push Notification Hub -->
+                <div class="series-tracker-banner" id="media-series-tracker-banner" style="display: none;">
+                    <div class="series-tracker-info">
+                        <div class="series-tracker-badge-wrapper">
+                            <span class="series-status-pill" id="media-series-status-pill">
+                                <span class="series-pulse-dot" id="media-series-pulse-dot"></span>
+                                <span id="media-series-status-text">Ongoing Series</span>
+                            </span>
+                        </div>
+                        <div class="series-tracker-meta" id="media-series-tracker-meta">
+                            <span class="series-progress-text" id="media-series-progress-text">Tracking latest air dates</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-series-notify" id="btn-series-subscribe" aria-label="Toggle Episode Notifications">
+                        <span class="notify-icon" id="series-notify-icon">🔔</span>
+                        <span class="notify-label" id="series-notify-label">Notify Me</span>
                     </button>
                 </div>
 
@@ -1547,6 +1566,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=125"></script>
+    <script src="seriesSchema.js?v=2"></script>
+    <script src="app.js?v=126"></script>
 </body>
 </html>

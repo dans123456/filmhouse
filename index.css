@@ -5505,6 +5505,223 @@ body.media-detail-active .app-content-container {
     height: 18px;
 }
 
+/* ==========================================================================
+   SERIES TRACKER & SUBSCRIBER NOTIFICATION HUB (PHONOFILM CINEMATIC)
+   ========================================================================== */
+.series-tracker-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    margin: 8px 0 10px 0;
+    background: linear-gradient(135deg, rgba(255, 188, 0, 0.08) 0%, rgba(22, 24, 35, 0.88) 50%, rgba(13, 14, 20, 0.96) 100%);
+    border: 1px solid rgba(255, 188, 0, 0.25);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.series-tracker-banner::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 188, 0, 0.5) 40%, rgba(255, 188, 0, 0.8) 50%, rgba(255, 188, 0, 0.5) 60%, transparent 100%);
+    pointer-events: none;
+}
+
+.series-tracker-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+.series-tracker-badge-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.series-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    line-height: 1.3;
+    white-space: nowrap;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+/* Status variants */
+.series-status-pill.variant-today {
+    background: rgba(255, 69, 58, 0.18);
+    border: 1px solid rgba(255, 69, 58, 0.5);
+    color: #ff6b6b;
+    box-shadow: 0 0 12px rgba(255, 69, 58, 0.25);
+}
+
+.series-status-pill.variant-tomorrow {
+    background: rgba(255, 188, 0, 0.18);
+    border: 1px solid rgba(255, 188, 0, 0.55);
+    color: #ffbc00;
+    box-shadow: 0 0 12px rgba(255, 188, 0, 0.25);
+}
+
+.series-status-pill.variant-upcoming {
+    background: rgba(10, 132, 255, 0.18);
+    border: 1px solid rgba(10, 132, 255, 0.45);
+    color: #64d2ff;
+}
+
+.series-status-pill.variant-break {
+    background: rgba(175, 82, 222, 0.18);
+    border: 1px solid rgba(175, 82, 222, 0.45);
+    color: #da8fff;
+}
+
+.series-status-pill.variant-completed {
+    background: rgba(48, 209, 88, 0.18);
+    border: 1px solid rgba(48, 209, 88, 0.45);
+    color: #30d158;
+}
+
+.series-status-pill.variant-default {
+    background: rgba(255, 188, 0, 0.12);
+    border: 1px solid rgba(255, 188, 0, 0.3);
+    color: #ffbc00;
+}
+
+.series-pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+    display: inline-block;
+    box-shadow: 0 0 6px currentColor;
+    animation: seriesDotPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes seriesDotPulse {
+    0%, 100% {
+        transform: scale(0.9);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.35);
+        opacity: 1;
+    }
+}
+
+.series-tracker-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+}
+
+.series-progress-text {
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Subscribe Toggle Button */
+.btn-series-notify {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Unsubscribed state: Elegant frosted outline */
+.btn-series-notify:not(.is-subscribed) {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 188, 0, 0.45);
+    color: #ffbc00;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-series-notify:not(.is-subscribed):hover {
+    background: rgba(255, 188, 0, 0.14);
+    border-color: #ffbc00;
+    box-shadow: 0 0 16px rgba(255, 188, 0, 0.25);
+    transform: translateY(-1px);
+}
+
+.btn-series-notify:not(.is-subscribed):active {
+    transform: scale(0.96);
+}
+
+/* Subscribed state: Glowing Gold Gradient */
+.btn-series-notify.is-subscribed {
+    background: linear-gradient(135deg, #ffbc00 0%, #ff9800 100%);
+    border: 1px solid #ffd700;
+    color: #0b0c10;
+    box-shadow: 0 4px 18px rgba(255, 188, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+    animation: subPulse 0.4s ease-out;
+}
+
+.btn-series-notify.is-subscribed:hover {
+    box-shadow: 0 6px 22px rgba(255, 188, 0, 0.6);
+    transform: translateY(-1px);
+}
+
+.btn-series-notify.is-subscribed:active {
+    transform: scale(0.96);
+}
+
+@keyframes subPulse {
+    0% {
+        transform: scale(0.92);
+    }
+    50% {
+        transform: scale(1.06);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.btn-series-notify .notify-icon {
+    font-size: 14px;
+    line-height: 1;
+    display: inline-block;
+    transition: transform 0.25s ease;
+}
+
+.btn-series-notify:hover .notify-icon {
+    transform: scale(1.15) rotate(-8deg);
+}
+
 /* 5-Column Quick Actions Grid */
 .media-quick-actions-grid {
     display: grid;

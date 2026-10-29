@@ -3867,6 +3867,209 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
     }
 }
 
+// ==========================================================================
+// ONGOING SERIES TRACKER & TELEGRAM PUSH NOTIFICATION CONTROLLER
+// ==========================================================================
+function getLocalSeriesSubscriptions() {
+    try {
+        const raw = localStorage.getItem("filmhouse_series_subs");
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function setLocalSeriesSubscription(tmdbId, isSubscribed) {
+    try {
+        const numId = Number(tmdbId);
+        if (!numId) return;
+        const subs = getLocalSeriesSubscriptions();
+        const idx = subs.indexOf(numId);
+        if (isSubscribed && idx === -1) {
+            subs.push(numId);
+        } else if (!isSubscribed && idx !== -1) {
+            subs.splice(idx, 1);
+        }
+        localStorage.setItem("filmhouse_series_subs", JSON.stringify(subs));
+    } catch (e) {}
+}
+
+function updateMediaSeriesTracker(movie, isTVShow) {
+    const banner = document.getElementById("media-series-tracker-banner");
+    if (!banner) return;
+
+    if (!isTVShow || !movie) {
+        banner.style.display = "none";
+        return;
+    }
+
+    banner.style.display = "flex";
+
+    const statusPill = document.getElementById("media-series-status-pill");
+    const statusText = document.getElementById("media-series-status-text");
+    const progressText = document.getElementById("media-series-progress-text");
+    const subscribeBtn = document.getElementById("btn-series-subscribe");
+    const notifyIcon = document.getElementById("series-notify-icon");
+    const notifyLabel = document.getElementById("series-notify-label");
+
+    // Extract numerical TMDB ID
+    let tmdbId = movie.tmdb_id;
+    if (!tmdbId && movie.id && !isNaN(parseInt(movie.id, 10))) {
+        tmdbId = parseInt(movie.id, 10);
+    }
+    if (!tmdbId && movie.csv_id) {
+        const parsed = parseInt(String(movie.csv_id).split("-")[0], 10);
+        if (!isNaN(parsed)) tmdbId = parsed;
+    }
+
+    // 1. Compute dynamic countdown badge via seriesSchema.js helper
+    const badge = typeof getSeriesCountdownBadge === "function" 
+        ? getSeriesCountdownBadge(movie) 
+        : null;
+
+    if (statusPill && statusText) {
+        // Reset variant classes
+        statusPill.className = "series-status-pill";
+        if (badge) {
+            statusPill.classList.add("variant-" + badge.variant);
+            statusText.textContent = badge.label;
+        } else if (movie.status) {
+            statusPill.classList.add("variant-default");
+            statusText.textContent = movie.status;
+        } else {
+            statusPill.classList.add("variant-default");
+            statusText.textContent = "Ongoing Series";
+        }
+    }
+
+    // 2. Render episode progress subtitle
+    if (progressText) {
+        const sNum = movie.current_season || 1;
+        const lastEp = movie.last_uploaded_episode || 0;
+        const totalEp = movie.total_episodes || 0;
+
+        if (movie.status === "Completed") {
+            progressText.textContent = "Season Complete • All episodes ready to stream";
+        } else if (lastEp > 0 && totalEp > 0) {
+            progressText.textContent = `Season ${sNum} • Ep ${lastEp} of ${totalEp} uploaded`;
+        } else if (lastEp > 0) {
+            progressText.textContent = `Season ${sNum} • Episode ${lastEp} uploaded`;
+        } else if (totalEp > 0) {
+            progressText.textContent = `Season ${sNum} • ${totalEp} Episodes planned`;
+        } else {
+            progressText.textContent = "Auto-tracks new episodes & air dates";
+        }
+    }
+
+    // 3. User subscription status & Firestore listener
+    const userId = (state.user && state.user.id) ? String(state.user.id).trim() : null;
+
+    function renderSubscribeState(isSub) {
+        if (!subscribeBtn) return;
+        if (isSub) {
+            subscribeBtn.classList.add("is-subscribed");
+            if (notifyIcon) notifyIcon.textContent = "🔕";
+            if (notifyLabel) notifyLabel.textContent = "Subscribed";
+            subscribeBtn.setAttribute("aria-label", "Unsubscribe from Episode Alerts");
+        } else {
+            subscribeBtn.classList.remove("is-subscribed");
+            if (notifyIcon) notifyIcon.textContent = "🔔";
+            if (notifyLabel) notifyLabel.textContent = "Notify Me";
+            subscribeBtn.setAttribute("aria-label", "Notify Me for New Episodes");
+        }
+    }
+
+    // Instant zero-latency render from local storage cache
+    const localSubs = getLocalSeriesSubscriptions();
+    const isInitiallySubbed = tmdbId ? localSubs.includes(Number(tmdbId)) : false;
+    renderSubscribeState(isInitiallySubbed);
+
+    // Asynchronous Firestore background check (sync multi-device state)
+    if (userId && tmdbId && typeof db !== "undefined" && db) {
+        const docId = typeof buildSubscriptionDocId === "function" 
+            ? buildSubscriptionDocId(userId, tmdbId) 
+            : `${userId}_${tmdbId}`;
+
+        db.collection("subscriptions").doc(docId).get()
+            .then(docSnap => {
+                if (docSnap && docSnap.exists) {
+                    renderSubscribeState(true);
+                    setLocalSeriesSubscription(tmdbId, true);
+                } else {
+                    renderSubscribeState(false);
+                    setLocalSeriesSubscription(tmdbId, false);
+                }
+            })
+            .catch(err => {
+                // Non-fatal warning (offline / quota)
+                console.warn("Series subscription Firestore check:", err.message);
+            });
+    }
+
+    // 4. Click Handler with Optimistic UI & Haptics
+    if (subscribeBtn) {
+        subscribeBtn.onclick = async (e) => {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+
+            if (!tmdbId) {
+                if (typeof showToast === "function") showToast("Series ID missing for notification tracker", "error");
+                return;
+            }
+
+            const isCurrentSub = subscribeBtn.classList.contains("is-subscribed");
+            const targetSub = !isCurrentSub;
+
+            // Telegram haptic feedback
+            if (typeof triggerHaptic === "function") {
+                triggerHaptic(targetSub ? "medium" : "light");
+            }
+
+            // Optimistic instant UI flip
+            renderSubscribeState(targetSub);
+            setLocalSeriesSubscription(tmdbId, targetSub);
+
+            if (targetSub) {
+                if (typeof showToast === "function") {
+                    showToast("🔔 Subscribed! You'll be alerted on Telegram when new episodes drop 🍿", "success");
+                }
+            } else {
+                if (typeof showToast === "function") {
+                    showToast("🔕 Unsubscribed from episode alerts", "info");
+                }
+            }
+
+            // Remote Firestore persistence
+            if (typeof db !== "undefined" && db && userId) {
+                const docId = typeof buildSubscriptionDocId === "function" 
+                    ? buildSubscriptionDocId(userId, tmdbId) 
+                    : `${userId}_${tmdbId}`;
+                const docRef = db.collection("subscriptions").doc(docId);
+
+                try {
+                    if (targetSub) {
+                        await docRef.set({
+                            user_telegram_id: String(userId),
+                            tmdb_id: Number(tmdbId),
+                            series_title: movie.title || "Series",
+                            subscribed_at: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        await docRef.delete();
+                    }
+                } catch (err) {
+                    console.error("Failed to persist subscription in Firestore:", err);
+                    // Rollback optimistic UI on failure
+                    renderSubscribeState(isCurrentSub);
+                    setLocalSeriesSubscription(tmdbId, isCurrentSub);
+                    if (typeof showToast === "function") {
+                        showToast("Unable to sync subscription. Please try again.", "error");
+                    }
+                }
+            }
+        };
+    }
+}
+
 function openMediaDetailPage(movie) {
     if (!movie) return;
     currentMediaDetailMovie = movie;
@@ -4219,6 +4422,9 @@ function openMediaDetailPage(movie) {
             trailerBtn.style.display = "none";
         }
     }
+
+    // 7.5 TV Series Tracker & Notification Hub (Airing Status, Countdown, Subscribe)
+    updateMediaSeriesTracker(movie, isTVShow);
 
     // 8. Wire 5-Column Quick Actions (Watchlist, Watched, Subtitles, Like, Share)
     updateMediaQuickActions(movie);
@@ -5111,14 +5317,16 @@ function fetchTmdbDetailsForMedia(movie) {
     const numericId = movie.tmdb_id || (movie.csv_id && movie.csv_id.split("-")[0]);
     if (!numericId || !/^\d+$/.test(numericId)) return;
 
+    const isTVShow = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
     const needsHeal = !movie.overview || movie.overview === "No synopsis available." || 
                       !movie.release_date || !movie.poster || movie.poster.includes("FilmHouse3_nobg.png") ||
                       !movie.backdrop || movie.backdrop.includes("FilmHouse.png") ||
-                      !movie.cast || movie.cast.length === 0 || !movie.trailer;
+                      !movie.cast || movie.cast.length === 0 || !movie.trailer ||
+                      (isTVShow && !movie.next_air_date && movie.status !== "Completed");
 
     if (!needsHeal) return;
 
-    const mediaType = (movie.type || "").toLowerCase() === "series" ? "tv" : "movie";
+    const mediaType = isTVShow ? "tv" : "movie";
     const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
 
     fetch(`https://api.themoviedb.org/3/${mediaType}/${numericId}?api_key=${apiKey}&append_to_response=credits,videos`)
@@ -5130,6 +5338,28 @@ function fetchTmdbDetailsForMedia(movie) {
             movie.release_date = data.release_date || data.first_air_date || movie.release_date;
             movie.rating = data.vote_average ? Math.round(data.vote_average * 10) / 10 : movie.rating;
             if (data.runtime) movie.runtime = `${Math.floor(data.runtime / 60)}h ${data.runtime % 60}m`;
+
+            // Auto-heal TV Series tracking attributes
+            if (isTVShow) {
+                if (data.next_episode_to_air && data.next_episode_to_air.air_date) {
+                    movie.next_air_date = data.next_episode_to_air.air_date;
+                    if (!movie.current_season && data.next_episode_to_air.season_number) {
+                        movie.current_season = data.next_episode_to_air.season_number;
+                    }
+                }
+                if (data.number_of_episodes && !movie.total_episodes) {
+                    movie.total_episodes = data.number_of_episodes;
+                }
+                if (!movie.status) {
+                    if (data.status === "Ended" || data.status === "Canceled") {
+                        movie.status = "Completed";
+                    } else if (data.next_episode_to_air) {
+                        movie.status = "Ongoing";
+                    } else {
+                        movie.status = "On Break";
+                    }
+                }
+            }
 
             if (data.poster_path && (!movie.poster || movie.poster.includes("FilmHouse3_nobg.png"))) {
                 movie.poster = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
@@ -5167,6 +5397,10 @@ function fetchTmdbDetailsForMedia(movie) {
                 const iframeContainer = document.getElementById("media-stream-iframe-container");
                 if (movie.trailer && iframeContainer && iframeContainer.style.display === "none") {
                     embedAndPlayHeroTrailer(movie.trailer);
+                }
+
+                if (isTVShow) {
+                    updateMediaSeriesTracker(movie, true);
                 }
             }
         })
