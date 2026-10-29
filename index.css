@@ -1264,6 +1264,45 @@ img {
     }
 }
 
+
+/* Dynamic Stream Available Badge on Movie Cards */
+.movie-card-stream-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(11, 13, 20, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 188, 0, 0.45);
+    color: #ffbc00;
+    font-size: 8px;
+    font-weight: 800;
+    padding: 2.5px 6.5px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    letter-spacing: 0.5px;
+    z-index: 2;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.movie-card-stream-badge .stream-dot {
+    width: 5px;
+    height: 5px;
+    background: #ffbc00;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #ffbc00;
+    animation: livePulse 1.5s infinite;
+}
+
+.movie-card:hover .movie-card-stream-badge {
+    border-color: #ffbc00;
+    box-shadow: 0 0 10px rgba(255, 188, 0, 0.4);
+    transform: scale(1.05);
+}
+
 .movie-card-info {
     padding: 10px;
     display: flex;
@@ -2273,6 +2312,52 @@ img {
 }
 
 /* Series Season & Episode Selector in Cinema Theater View (Option 3 Hybrid) */
+
+/* Next Episode Quick Jump Pill */
+.cinema-next-ep-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(255, 188, 0, 0.2) 0%, rgba(255, 152, 0, 0.1) 100%);
+    border: 1px solid rgba(255, 188, 0, 0.4);
+    color: #ffbc00;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.cinema-next-ep-btn:hover {
+    background: linear-gradient(135deg, rgba(255, 188, 0, 0.3) 0%, rgba(255, 152, 0, 0.18) 100%);
+    border-color: #ffbc00;
+    box-shadow: 0 0 14px rgba(255, 188, 0, 0.4);
+    transform: translateY(-1px);
+}
+
+.cinema-next-ep-btn:active {
+    transform: scale(0.96);
+}
+
+/* Quality Pill in Cinema Top Bar */
+.cinema-quality-pill {
+    font-size: 9px;
+    font-weight: 800;
+    color: #00bcd4;
+    background: rgba(0, 188, 212, 0.12);
+    border: 1px solid rgba(0, 188, 212, 0.35);
+    padding: 2px 6px;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
 .cinema-series-section {
     display: flex;
     flex-direction: column;
@@ -2382,10 +2467,10 @@ img {
 }
 
 .cinema-episode-card.active {
-    background: rgba(225, 29, 72, 0.18);
-    border-color: rgba(225, 29, 72, 0.6);
+    background: linear-gradient(135deg, rgba(255, 188, 0, 0.18) 0%, rgba(255, 152, 0, 0.08) 100%);
+    border-color: #ffbc00;
     color: #ffffff;
-    box-shadow: 0 0 12px rgba(225, 29, 72, 0.25);
+    box-shadow: 0 0 16px rgba(255, 188, 0, 0.35);
 }
 
 .cinema-episode-card-left {
@@ -5895,3 +5980,84 @@ body.media-detail-active .app-content-container {
     text-overflow: ellipsis;
 }
 
+
+
+/* Admin Mobile Floating Quick Action Bar */
+@media (max-width: 600px) {
+    body {
+        padding-bottom: 78px !important;
+    }
+}
+
+.admin-mobile-quick-bar {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .admin-mobile-quick-bar {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(11, 13, 20, 0.94);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 8px 12px;
+        box-sizing: border-box;
+        z-index: 999;
+        justify-content: space-around;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .admin-quick-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 6px 4px;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        user-select: none;
+        position: relative;
+    }
+
+    .admin-quick-btn:active {
+        transform: scale(0.95);
+        background: rgba(255, 188, 0, 0.15);
+        border-color: rgba(255, 188, 0, 0.4);
+    }
+
+    .admin-quick-btn-publish {
+        background: linear-gradient(135deg, #ffbc00 0%, #ff9800 100%) !important;
+        color: #000 !important;
+        border: none !important;
+        box-shadow: 0 0 12px rgba(255, 188, 0, 0.4);
+        animation: pulse-glow 2s infinite;
+    }
+
+    .quick-bar-badge {
+        position: absolute;
+        top: -4px;
+        right: 4px;
+        background: #ff453a;
+        color: #fff;
+        font-size: 8px;
+        font-weight: 800;
+        padding: 1px 4px;
+        border-radius: 10px;
+        line-height: 1;
+    }
+}

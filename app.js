@@ -2154,6 +2154,23 @@ function renderNotificationsList() {
 }
 
 // Requested Badge Generator Helper
+
+function hasMovieStream(movie) {
+    if (!movie) return false;
+    if (movie.stream_url && String(movie.stream_url).trim().length > 0) return true;
+    if (Array.isArray(movie.stream_links) && movie.stream_links.some(s => s && (s.stream_url || s.url))) return true;
+    if (Array.isArray(movie.links) && movie.links.some(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))))) return true;
+    return false;
+}
+
+function getStreamBadgeElement(movie) {
+    if (!hasMovieStream(movie)) return null;
+    const badge = document.createElement("div");
+    badge.className = "movie-card-stream-badge";
+    badge.innerHTML = `<span class="stream-dot"></span><span>STREAM</span>`;
+    return badge;
+}
+
 function getRequestedBadgeElement(movie) {
     if (!movie || typeof currentUserRequests === 'undefined' || !currentUserRequests || currentUserRequests.length === 0) return null;
     if (movie.links && movie.links.length > 0) return null;
@@ -2207,6 +2224,8 @@ function renderHistoryGrid() {
 
         const reqBadge = getRequestedBadgeElement(movie);
         if (reqBadge) imgWrapper.appendChild(reqBadge);
+        const streamBadge = getStreamBadgeElement(movie);
+        if (streamBadge) imgWrapper.appendChild(streamBadge);
 
         const cinemaCutBadge = getCinemaCutBadgeElement(movie);
         const asianOriginBadge = getAsianOriginBadgeElement(movie);
@@ -4772,6 +4791,26 @@ function renderMediaSeriesSection(movie, container, streamCallback) {
                 const epDisplayTitle = `${movie.title} • S${seasonObj.seasonNumber}:E${epNum}`;
                 streamCallback(epTarget, epDisplayTitle);
                 showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
+                    // Update Next Episode Quick Jump button
+                    let nextEpBtn = seriesHeader.querySelector(".cinema-next-ep-btn");
+                    const nextEpObj = episodes.find(e => (e.episode_number || 1) === (epNum + 1));
+                    if (nextEpObj) {
+                        if (!nextEpBtn) {
+                            nextEpBtn = document.createElement("button");
+                            nextEpBtn.type = "button";
+                            nextEpBtn.className = "cinema-next-ep-btn";
+                            seriesHeader.appendChild(nextEpBtn);
+                        }
+                        nextEpBtn.innerHTML = `<span>Next Ep ${epNum + 1}</span><span>▶️</span>`;
+                        nextEpBtn.onclick = () => {
+                            const nextCard = episodesGrid.children[epNum];
+                            if (nextCard) nextCard.click();
+                        };
+                        nextEpBtn.style.display = "inline-flex";
+                    } else if (nextEpBtn) {
+                        nextEpBtn.style.display = "none";
+                    }
+
             });
 
             episodesList.appendChild(epCard);
@@ -5858,6 +5897,8 @@ const STREAMING_ADMIN_IDS = ["1175336733", "1329840839"];
 // Close In-App Cinema Modal & Reset State
 function closeCinemaModal() {
     stopStreamingPresence();
+    const qPill = document.querySelector(".cinema-top-center .cinema-quality-pill");
+    if (qPill) qPill.remove();
     const modal = document.getElementById("cinema-modal");
     const container = document.getElementById("cinema-iframe-container");
     const theater = document.querySelector(".cinema-theater-container");
@@ -5913,6 +5954,19 @@ function openCinemaModal(movie, customStreamUrl, customTitle) {
         container.appendChild(iframe);
         if (titleEl) titleEl.textContent = currentTitle || initialTitle;
         startStreamingPresence(movie, currentTitle || initialTitle);
+        // Update or add Quality Pill
+        let qPill = document.querySelector(".cinema-top-center .cinema-quality-pill");
+        if (!qPill) {
+            qPill = document.createElement("span");
+            qPill.className = "cinema-quality-pill";
+            const topCenter = document.querySelector(".cinema-top-center");
+            if (topCenter) topCenter.appendChild(qPill);
+        }
+        if (qPill) {
+            const is4K = movie.links && movie.links.some(l => (l.quality || '').includes('4K') || (l.quality || '').includes('2160'));
+            qPill.textContent = is4K ? '4K UHD' : '1080p FHD';
+        }
+
     }
 
     // Resolve initial stream parameter: custom URL -> link.stream_url -> movie.stream_url

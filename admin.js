@@ -3826,6 +3826,7 @@ function updatePublishButtonState() {
     if (publishBtn) {
         if (catalogChangesMade) {
             publishBtn.style.display = "inline-flex";
+        const quickPub = document.getElementById("quick-bar-publish-btn"); if (quickPub) quickPub.style.display = "flex";
             // Save draft locally
             localStorage.setItem("filmhouse_unpublished_catalog", JSON.stringify({
                 allCatalogMovies,
@@ -3835,6 +3836,7 @@ function updatePublishButtonState() {
             }));
         } else {
             publishBtn.style.display = "none";
+        const quickPub = document.getElementById("quick-bar-publish-btn"); if (quickPub) quickPub.style.display = "none";
             localStorage.removeItem("filmhouse_unpublished_catalog");
         }
     }
@@ -6470,6 +6472,8 @@ function renderActiveStreamersUI() {
             : `${activeCount} active viewers right now`;
     }
 
+    const quickLiveEl = document.getElementById("quick-bar-live-count");
+    if (quickLiveEl) { quickLiveEl.textContent = activeCount; quickLiveEl.style.display = activeCount > 0 ? "inline-block" : "none"; }
     const modalCountEl = document.getElementById("modal-live-streamers-count");
     if (modalCountEl) modalCountEl.textContent = activeCount;
 

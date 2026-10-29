@@ -15,7 +15,7 @@
     <!-- Telegram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=6">
+    <link rel="stylesheet" href="index.css?v=7">
     <style>
         body {
             background-color: #040508;
@@ -1454,6 +1454,34 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
+    
+    <!-- MOBILE QUICK ACTION BAR FOR ADMINS -->
+    <div class="admin-mobile-quick-bar" id="admin-mobile-quick-bar">
+        <button type="button" class="admin-quick-btn" onclick="document.getElementById('btn-add-movie-modal').click()">
+            <span style="font-size: 15px;">➕</span>
+            <span>+ Movie</span>
+        </button>
+        <button type="button" class="admin-quick-btn" onclick="document.getElementById('btn-batch-tmdb-modal').click()">
+            <span style="font-size: 15px;">⚡</span>
+            <span>Batch TMDB</span>
+        </button>
+        <button type="button" class="admin-quick-btn" onclick="openLiveStreamersModal()">
+            <span style="font-size: 15px; position: relative; display: inline-block;">
+                <span>🔴</span>
+                <span id="quick-bar-live-count" class="quick-bar-badge" style="display: none;">0</span>
+            </span>
+            <span>Live Stream</span>
+        </button>
+        <button type="button" class="admin-quick-btn" onclick="openAdminRankingsModal('active')">
+            <span style="font-size: 15px;">🏆</span>
+            <span>Rankings</span>
+        </button>
+        <button type="button" class="admin-quick-btn admin-quick-btn-publish" id="quick-bar-publish-btn" onclick="document.getElementById('btn-publish-catalog').click()" style="display: none;">
+            <span style="font-size: 15px;">🚀</span>
+            <span>Publish</span>
+        </button>
+    </div>
+
     <script src="admin.js?v=113"></script>
 </body>
 </html>
