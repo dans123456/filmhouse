@@ -1749,12 +1749,21 @@ img {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 14px;
+    padding-top: calc(var(--tg-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 8px);
+    padding-bottom: 8px;
+    padding-left: 14px;
+    padding-right: 14px;
     background: #0c0f17;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     gap: 10px;
     flex-shrink: 0;
     z-index: 30;
+}
+
+/* In-App Back Button - Hidden in Telegram Mini App to prevent duplicate back buttons */
+body.telegram-app-ready .cinema-back-btn,
+.is-telegram-env .cinema-back-btn {
+    display: none !important;
 }
 
 .cinema-back-btn {
@@ -1770,12 +1779,51 @@ img {
     font-size: 12px;
     font-weight: 700;
     transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .cinema-back-btn:hover, .cinema-back-btn:active {
     background: rgba(255, 59, 48, 0.2);
     border-color: rgba(255, 59, 48, 0.5);
     color: #ff3b30;
+}
+
+/* Film House Brand Group in Cinema Header */
+.cinema-brand-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.cinema-brand-logo {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    border-radius: 6px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.cinema-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.cinema-brand-title {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    color: #ffbc00;
+    text-transform: uppercase;
+}
+
+.cinema-brand-subtitle {
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #94a3b8;
+    text-transform: uppercase;
 }
 
 .cinema-top-center {
@@ -2206,7 +2254,7 @@ img {
         width: 100% !important;
         background: linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.4) 65%, transparent 100%) !important;
         border-bottom: none !important;
-        padding: 12px 18px !important;
+        padding: calc(var(--tg-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 10px) 18px 12px !important;
         z-index: 100 !important;
         opacity: 1;
         transition: opacity 0.35s ease;

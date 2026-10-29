@@ -132,6 +132,41 @@ if (process.env.FIREBASE_CONFIG) {
 
 const db = admin.firestore();
 
+// Auto-synchronize live Cloudflare tunnel URL to Firestore system/streaming_config
+let lastSyncedTunnelUrl = null;
+function syncStreamingServerConfig() {
+    try {
+        const candidates = [
+            "/home/ubuntu/filmhouse-stream-bot/tunnel.log",
+            path.join(__dirname, "..", "filmhouse-stream-bot", "tunnel.log"),
+            path.join(__dirname, "tunnel.log")
+        ];
+        for (const p of candidates) {
+            if (fs.existsSync(p)) {
+                const content = fs.readFileSync(p, "utf8");
+                const matches = content.match(/https:\/\/[a-zA-Z0-9-]+\.trycloudflare\.com/g);
+                if (matches && matches.length > 0) {
+                    const latestUrl = matches[matches.length - 1];
+                    if (latestUrl !== lastSyncedTunnelUrl) {
+                        lastSyncedTunnelUrl = latestUrl;
+                        db.collection("system").doc("streaming_config").set({
+                            server_url: latestUrl,
+                            updated_at: new Date().toISOString()
+                        }, { merge: true }).then(() => {
+                            console.log(`[StreamConfig] Synced active Cloudflare tunnel to Firestore: ${latestUrl}`);
+                        }).catch(err => console.warn("[StreamConfig] Firestore sync notice:", err.message));
+                    }
+                    return latestUrl;
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("[StreamConfig] Tunnel sync notice:", e.message);
+    }
+}
+syncStreamingServerConfig();
+setInterval(syncStreamingServerConfig, 30000);
+
 
 // Helper: Safe remote server updater with syntax integrity checks and PM2 reload
 function performServerGitUpdate(onProgress) {

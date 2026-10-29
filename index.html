@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=88">
+    <link rel="stylesheet" href="index.css?v=89">
 </head>
 <body>
 
@@ -908,12 +908,19 @@
     <!-- IN-APP CINEMA PLAYER THEATER MODAL -->
     <div class="modal-overlay" id="cinema-modal">
         <div class="cinema-theater-container">
-            <!-- Fixed Top Bar -->
+            <!-- Fixed Top Bar (Sits below Telegram Safe Area) -->
             <div class="cinema-top-bar">
                 <button class="cinema-back-btn" id="btn-close-cinema" aria-label="Close cinema player">
                     <svg><use href="#icon-arrow-left"></use></svg>
                     <span>Back</span>
                 </button>
+                <div class="cinema-brand-group">
+                    <img src="./MOVIE/m.png" alt="Film House Logo" class="cinema-brand-logo">
+                    <div class="cinema-brand-text">
+                        <span class="cinema-brand-title">FILM HOUSE</span>
+                        <span class="cinema-brand-subtitle">CINEMA</span>
+                    </div>
+                </div>
                 <div class="cinema-top-center">
                     <span class="cinema-stream-badge"><span class="dot-live"></span> STREAMING</span>
                     <span class="cinema-top-title" id="cinema-modal-title">Film House Cinema</span>
@@ -1540,6 +1547,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=124"></script>
+    <script src="app.js?v=125"></script>
 </body>
 </html>

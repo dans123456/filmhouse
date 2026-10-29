@@ -6072,6 +6072,45 @@ window.addEventListener("pagehide", stopStreamingPresence);
 
 const STREAMING_ADMIN_IDS = ["1175336733", "1329840839"];
 
+// Active Streaming Server state & Real-time Firestore synchronizer
+let activeStreamingServerUrl = "https://contributed-travel-buyer-drop.trycloudflare.com";
+
+if (typeof db !== "undefined" && db) {
+    try {
+        db.collection("system").doc("streaming_config").onSnapshot(doc => {
+            if (doc.exists && doc.data()?.server_url) {
+                const sUrl = doc.data().server_url.replace(/\/+$/, "");
+                if (sUrl) {
+                    activeStreamingServerUrl = sUrl;
+                    console.log("[StreamEngine] Active Streaming Server synced:", activeStreamingServerUrl);
+                }
+            }
+        }, err => console.warn("[StreamEngine] streaming_config sync notice:", err.message));
+    } catch (e) {}
+}
+
+// Convert any stream target (raw token, expired tunnel link, /watch/ link) into a robust direct stream URL
+function resolveDirectStreamUrl(targetUrl) {
+    if (!targetUrl) return "";
+    let clean = String(targetUrl).trim();
+    if (clean.startsWith("http://") || clean.startsWith("https://")) {
+        // Normalize /watch/ to /dl/
+        if (clean.includes("/watch/")) {
+            clean = clean.replace("/watch/", "/dl/");
+        }
+        // If it points to an old trycloudflare tunnel or herokuapp with a token, upgrade domain to activeStreamingServerUrl
+        if (clean.includes(".trycloudflare.com/dl/") || clean.includes("herokuapp.com/dl/")) {
+            const tokenMatch = clean.match(/\/dl\/([a-zA-Z0-9_\-]+)/);
+            if (tokenMatch && tokenMatch[1]) {
+                return `${activeStreamingServerUrl}/dl/${tokenMatch[1]}`;
+            }
+        }
+        return clean;
+    }
+    // If it's a raw token ID (e.g. MzE6YjE3NTE5M2ZhNzI5OWYwNg)
+    return `${activeStreamingServerUrl}/dl/${encodeURIComponent(clean)}`;
+}
+
 // Close In-App Cinema Modal & Reset State
 function closeCinemaModal() {
     stopStreamingPresence();
@@ -6083,8 +6122,14 @@ function closeCinemaModal() {
     if (modal) modal.classList.remove("active");
     if (theater) theater.classList.remove("is-fullscreen");
     if (container) container.replaceChildren();
+    
+    // Telegram BackButton management: unbind and restore previous drawer back button if open
     if (window.Telegram?.WebApp?.BackButton) {
-        window.Telegram.WebApp.BackButton.hide();
+        try { window.Telegram.WebApp.BackButton.offClick(closeCinemaModal); } catch (e) {}
+        const detailsDrawer = document.getElementById("movie-modal");
+        if (!detailsDrawer || !detailsDrawer.classList.contains("active")) {
+            window.Telegram.WebApp.BackButton.hide();
+        }
     }
     if (document.fullscreenElement && document.exitFullscreen) {
         document.exitFullscreen().catch(() => {});
@@ -6127,6 +6172,13 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     const detailsContainer = document.getElementById("cinema-details-container");
     if (!modal || !container || !movie) return;
 
+    // In-app Back Button Binding (for non-Telegram desktop/browser fallbacks)
+    const closeBtn = document.getElementById("btn-close-cinema");
+    if (closeBtn && !closeBtn._bound) {
+        closeBtn._bound = true;
+        closeBtn.addEventListener("click", closeCinemaModal);
+    }
+
     const baseTitle = movie.title || "Film House Cinema";
     const initialTitle = customTitle || baseTitle;
     const isTVShow = (movie.type || "").toLowerCase() === "series" || 
@@ -6138,13 +6190,15 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (!container) return;
         container.replaceChildren();
         if (!targetUrl) return;
-        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(targetUrl)}&title=${encodeURIComponent(currentTitle || initialTitle)}`;
+        const directUrl = resolveDirectStreamUrl(targetUrl);
+        const currentMediaTitle = currentTitle || initialTitle;
+        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&server=${encodeURIComponent(activeStreamingServerUrl)}`;
         const iframe = document.createElement("iframe");
         iframe.src = playerSrc;
         iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
         iframe.setAttribute("allowfullscreen", "true");
         container.appendChild(iframe);
-        if (titleEl) titleEl.textContent = currentTitle || initialTitle;
+        if (titleEl) titleEl.textContent = currentMediaTitle;
         startStreamingPresence(movie, currentTitle || initialTitle);
         // Update or add Quality Pill
         let qPill = document.querySelector(".cinema-top-center .cinema-quality-pill");
@@ -6617,9 +6671,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         });
     }
 
-    // Telegram Native BackButton support
+    // Telegram Native BackButton support: Show and bind to close cinema modal
     if (window.Telegram?.WebApp?.BackButton) {
-        window.Telegram.WebApp.BackButton.show();
+        try {
+            window.Telegram.WebApp.BackButton.show();
+            window.Telegram.WebApp.BackButton.onClick(closeCinemaModal);
+        } catch (e) {}
     }
 
     modal.classList.add("active");

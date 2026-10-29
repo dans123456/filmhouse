@@ -397,8 +397,8 @@
         <div class='stream-play-circle'>
           <svg viewBox='0 0 24 24'><polygon points='6 3 20 12 6 21 6 3'/></svg>
         </div>
-        <div class='stream-play-title'>▶ Tap to Stream Movie</div>
-        <div class='stream-play-sub'>Fast CDN • 1080p HD Streaming</div>
+        <div class='stream-play-title' id='streamPlayTitle'>▶ Tap to Watch Movie</div>
+        <div class='stream-play-sub' id='streamPlaySub'>Full 1080p HD • Online Cinema</div>
       </div>
 
       <!-- Resume Playback Toast -->
@@ -520,9 +520,29 @@
         }
       });
 
+      const typeParam = (urlParams.get('type') || '').toLowerCase();
+      const serverParam = urlParams.get('server') || '';
+      const defaultStreamServer = (serverParam || "https://contributed-travel-buyer-drop.trycloudflare.com").replace(/\/+$/, "");
+      const isSeries = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
+
+      const playTitleEl = document.getElementById('streamPlayTitle');
+      const playSubEl = document.getElementById('streamPlaySub');
+      const cleanTitle = titleParam ? decodeURIComponent(titleParam).trim() : '';
+
+      if (playTitleEl) {
+        if (isSeries) {
+          playTitleEl.textContent = cleanTitle ? `▶ Tap to Start Watching "${cleanTitle}"` : '▶ Tap to Start Watching Series';
+        } else {
+          playTitleEl.textContent = cleanTitle ? `▶ Tap to Watch "${cleanTitle}"` : '▶ Tap to Watch Movie';
+        }
+      }
+      if (playSubEl) {
+        playSubEl.textContent = 'Full 1080p HD • Online Cinema';
+      }
+
       if (titleParam) {
-        titleEl.textContent = decodeURIComponent(titleParam);
-        document.title = decodeURIComponent(titleParam) + " - Film House Cinema";
+        titleEl.textContent = cleanTitle;
+        document.title = cleanTitle + " - Film House Cinema";
       }
       if (qualityParam) {
         qualityEl.textContent = qualityParam;
@@ -533,14 +553,14 @@
       if (watchParam) {
         let clean = decodeURIComponent(watchParam).trim();
         
-        // Case 1: If clean is full URL (e.g. herokuapp / koyeb / publicbotshub / raw)
+        // Case 1: If clean is full URL (e.g. cloudflare / herokuapp / koyeb / raw)
         if (clean.startsWith('http://') || clean.startsWith('https://')) {
           if (clean.includes('watch=')) {
             // Extract token from inside a watch URL
             const match = clean.match(/watch=([a-zA-Z0-9_\-]+)/);
             if (match && match[1]) {
               clean = match[1];
-              finalStreamUrl = "https://comments-load-stuffed-tower.trycloudflare.com/dl/" + clean;
+              finalStreamUrl = defaultStreamServer + "/dl/" + clean;
             } else {
               finalStreamUrl = clean;
             }
@@ -551,9 +571,9 @@
             finalStreamUrl = clean;
           }
         } 
-        // Case 2: Just a raw hex/token ID (e.g. 6adee561a4b67b48703250e2)
+        // Case 2: Just a raw hex/token ID (e.g. MzE6YjE3NTE5M2ZhNzI5OWYwNg)
         else {
-          finalStreamUrl = "https://comments-load-stuffed-tower.trycloudflare.com/dl/" + encodeURIComponent(clean);
+          finalStreamUrl = defaultStreamServer + "/dl/" + encodeURIComponent(clean);
         }
       }
 
