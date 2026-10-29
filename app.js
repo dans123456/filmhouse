@@ -5,8 +5,21 @@ function ensureTelegramFullscreen() {
             document.body.classList.add("telegram-app-ready");
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
-            if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
-                window.Telegram.WebApp.requestFullscreen();
+            
+            const tgPlatform = (window.Telegram.WebApp.platform || "").toLowerCase();
+            const isDesktopPlatform = tgPlatform === "tdesktop" || tgPlatform === "macos" || tgPlatform === "web" || tgPlatform === "weba" || tgPlatform === "webk";
+            
+            if (isDesktopPlatform) {
+                document.body.classList.add("telegram-desktop-mode");
+                // On PC Desktop, do NOT lock into fullscreen so the window remains freely draggable, movable, and resizable
+                if (typeof window.Telegram.WebApp.exitFullscreen === "function") {
+                    try { window.Telegram.WebApp.exitFullscreen(); } catch (e) {}
+                }
+            } else {
+                // On Mobile (Android/iOS), request fullscreen for optimal immersive view
+                if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
+                    try { window.Telegram.WebApp.requestFullscreen(); } catch (e) {}
+                }
             }
         } catch (e) {}
     }
@@ -20,8 +33,17 @@ if (window.Telegram && window.Telegram.WebApp) {
     try {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
-        if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
-            try { window.Telegram.WebApp.requestFullscreen(); } catch (fsErr) {}
+        const tgPlatform = (window.Telegram.WebApp.platform || "").toLowerCase();
+        const isDesktopPlatform = tgPlatform === "tdesktop" || tgPlatform === "macos" || tgPlatform === "web" || tgPlatform === "weba" || tgPlatform === "webk";
+        if (isDesktopPlatform) {
+            document.body.classList.add("telegram-desktop-mode");
+            if (typeof window.Telegram.WebApp.exitFullscreen === "function") {
+                try { window.Telegram.WebApp.exitFullscreen(); } catch (fsErr) {}
+            }
+        } else {
+            if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
+                try { window.Telegram.WebApp.requestFullscreen(); } catch (fsErr) {}
+            }
         }
     } catch (e) {
         console.warn("Early Telegram WebApp initialization warning:", e);
