@@ -6236,3 +6236,22 @@ body.telegram-desktop-mode .bottom-nav {
     transform: translateX(-50%) !important;
     border-radius: 16px 16px 0 0;
 }
+
+
+/* Desktop Wide Layout Mode (Toggled via Desktop Toggle Button) */
+body.desktop-wide-layout .header-container,
+body.desktop-wide-layout .app-content-container,
+body.desktop-wide-layout .app-screen {
+    max-width: 1300px !important;
+}
+body.desktop-wide-layout .movies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) !important;
+    gap: 16px !important;
+}
+body.desktop-wide-layout .hero-carousel-container {
+    max-height: 480px !important;
+}
+body.desktop-wide-layout .profile-card-container,
+body.desktop-wide-layout .mining-card-container {
+    max-width: 600px !important;
+}

@@ -1,4 +1,59 @@
 
+function initDesktopExpandToggle() {
+    const toggleBtn = document.getElementById("btn-desktop-expand-toggle");
+    const toggleIcon = document.getElementById("desktop-expand-icon");
+    if (!toggleBtn || !toggleIcon) return;
+
+    const tgPlatform = (window.Telegram?.WebApp?.platform || "").toLowerCase();
+    const isDesktopPlatform = tgPlatform === "tdesktop" || tgPlatform === "macos" || tgPlatform === "web" || tgPlatform === "weba" || tgPlatform === "webk" || (!tgPlatform && window.innerWidth >= 768);
+
+    if (!isDesktopPlatform) {
+        toggleBtn.style.display = "none";
+        return;
+    }
+
+    toggleBtn.style.display = "inline-flex";
+
+    let isWide = localStorage.getItem("filmhouse_desktop_wide_mode") === "true";
+
+    const applyState = (wide, notify = false) => {
+        if (wide) {
+            document.body.classList.add("desktop-wide-layout");
+            toggleIcon.innerHTML = '<use href="#icon-minimize"></use>';
+            toggleBtn.title = "Restore Compact Window";
+            toggleBtn.style.color = "#ffbc00";
+            toggleBtn.style.borderColor = "rgba(255, 188, 0, 0.4)";
+            if (typeof window.Telegram?.WebApp?.requestFullscreen === "function") {
+                try { window.Telegram.WebApp.requestFullscreen(); } catch (e) {}
+            }
+            if (notify && typeof showToast === "function") {
+                showToast("Expanded to Fullscreen Layout 🖥️", "info");
+            }
+        } else {
+            document.body.classList.remove("desktop-wide-layout");
+            toggleIcon.innerHTML = '<use href="#icon-maximize"></use>';
+            toggleBtn.title = "Expand to Fullscreen";
+            toggleBtn.style.color = "var(--text-secondary)";
+            toggleBtn.style.borderColor = "rgba(255, 255, 255, 0.15)";
+            if (typeof window.Telegram?.WebApp?.exitFullscreen === "function") {
+                try { window.Telegram.WebApp.exitFullscreen(); } catch (e) {}
+            }
+            if (notify && typeof showToast === "function") {
+                showToast("Restored Compact Window 🪟", "info");
+            }
+        }
+        localStorage.setItem("filmhouse_desktop_wide_mode", wide ? "true" : "false");
+    };
+
+    applyState(isWide, false);
+
+    toggleBtn.onclick = () => {
+        isWide = !isWide;
+        applyState(isWide, true);
+        if (typeof triggerHaptic === "function") triggerHaptic("selection");
+    };
+}
+
 function ensureTelegramFullscreen() {
     if (window.Telegram && window.Telegram.WebApp) {
         try {
@@ -11,9 +66,15 @@ function ensureTelegramFullscreen() {
             
             if (isDesktopPlatform) {
                 document.body.classList.add("telegram-desktop-mode");
-                // On PC Desktop, do NOT lock into fullscreen so the window remains freely draggable, movable, and resizable
-                if (typeof window.Telegram.WebApp.exitFullscreen === "function") {
-                    try { window.Telegram.WebApp.exitFullscreen(); } catch (e) {}
+                const savedWide = localStorage.getItem("filmhouse_desktop_wide_mode") === "true";
+                if (savedWide) {
+                    if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
+                        try { window.Telegram.WebApp.requestFullscreen(); } catch (e) {}
+                    }
+                } else {
+                    if (typeof window.Telegram.WebApp.exitFullscreen === "function") {
+                        try { window.Telegram.WebApp.exitFullscreen(); } catch (e) {}
+                    }
                 }
             } else {
                 // On Mobile (Android/iOS), request fullscreen for optimal immersive view
@@ -27,6 +88,8 @@ function ensureTelegramFullscreen() {
 ensureTelegramFullscreen();
 setTimeout(ensureTelegramFullscreen, 200);
 setTimeout(ensureTelegramFullscreen, 800);
+setTimeout(initDesktopExpandToggle, 150);
+setTimeout(initDesktopExpandToggle, 600);
 
 // Early Telegram WebApp initialization to prevent loading splash hang
 if (window.Telegram && window.Telegram.WebApp) {
@@ -37,8 +100,15 @@ if (window.Telegram && window.Telegram.WebApp) {
         const isDesktopPlatform = tgPlatform === "tdesktop" || tgPlatform === "macos" || tgPlatform === "web" || tgPlatform === "weba" || tgPlatform === "webk";
         if (isDesktopPlatform) {
             document.body.classList.add("telegram-desktop-mode");
-            if (typeof window.Telegram.WebApp.exitFullscreen === "function") {
-                try { window.Telegram.WebApp.exitFullscreen(); } catch (fsErr) {}
+            const savedWide = localStorage.getItem("filmhouse_desktop_wide_mode") === "true";
+            if (savedWide) {
+                if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
+                    try { window.Telegram.WebApp.requestFullscreen(); } catch (fsErr) {}
+                }
+            } else {
+                if (typeof window.Telegram.WebApp.exitFullscreen === "function") {
+                    try { window.Telegram.WebApp.exitFullscreen(); } catch (fsErr) {}
+                }
             }
         } else {
             if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
