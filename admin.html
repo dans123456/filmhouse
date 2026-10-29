@@ -1261,9 +1261,9 @@
             <!-- Step 1: Input list of titles/IDs -->
             <div id="batch-step-input">
                 <p style="font-size: 12px; color: var(--text-secondary); margin-top: 0; margin-bottom: 12px; line-height: 1.5;">
-                    Enter multiple movie or series titles, TMDB IDs (e.g. <code>27205</code>), or TMDB URLs — <strong>one per line</strong>. You can optionally attach a stream link or token using a pipe: <code>Title | stream_token</code>.
+                    Enter multiple movie or series titles, TMDB IDs (e.g. <code>27205</code>), or TMDB URLs — <strong>one per line</strong>. You can optionally attach streaming links or tokens using a pipe: <code>Movie | stream_token</code> or <code>Series | Ep 1 | token</code> or multiple episode tokens separated by commas: <code>Series | token1, token2, token3</code>.
                 </p>
-                <textarea id="batch-titles-input" placeholder="Inception&#10;Home of the Brave | 6adee561a4b67b48703250e2&#10;Avatar: The Way of Water&#10;Breaking Bad&#10;Stranger Things" style="width: 100%; min-height: 140px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; color: #fff; font-size: 13px; font-family: inherit; resize: vertical; box-sizing: border-box;"></textarea>
+                <textarea id="batch-titles-input" placeholder="Inception&#10;Home of the Brave | 6adee561a4b67b48703250e2&#10;Avatar: The Way of Water&#10;Breaking Bad | token_ep1, token_ep2&#10;Stranger Things | Ep 1 | token_stranger_ep1" style="width: 100%; min-height: 140px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; color: #fff; font-size: 13px; font-family: inherit; resize: vertical; box-sizing: border-box;"></textarea>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
                     <span style="font-size: 11px; color: var(--text-muted);" id="batch-input-counter">0 titles entered</span>
@@ -1397,6 +1397,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=111"></script>
+    <script src="admin.js?v=112"></script>
 </body>
 </html>

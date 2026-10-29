@@ -8052,12 +8052,14 @@ document.addEventListener("DOMContentLoaded", () => {
         let preferredType = null;
         let cleanQuery = rawQuery.trim();
         let streamTokenHint = "";
+        let rawStreamHint = "";
 
         // Extract optional stream link or token attached via pipe (e.g. "Title | stream_url")
         if (cleanQuery.includes("|")) {
             const parts = cleanQuery.split("|");
             cleanQuery = parts[0].trim();
-            streamTokenHint = cleanStreamInput(parts.slice(1).join("|").trim());
+            rawStreamHint = parts.slice(1).join("|").trim();
+            streamTokenHint = cleanStreamInput(rawStreamHint);
         }
 
         // 1. Check if input is a TMDB URL
@@ -8269,7 +8271,30 @@ document.addEventListener("DOMContentLoaded", () => {
             language: originalLanguage,
             trailer: trailerId,
             rawLinksText: "",
-            stream_url: streamTokenHint || "",
+            stream_url: (function() {
+                if (!rawStreamHint) return "";
+                if (rawStreamHint.includes(",") || rawStreamHint.includes(";") || rawStreamHint.includes("\n")) {
+                    const parsed = parseBulkStreams(rawStreamHint.replace(/[,;]+/g, "\n"), isSeries);
+                    return parsed.length > 0 ? parsed[0].stream_url : (streamTokenHint || "");
+                }
+                return streamTokenHint || "";
+            })(),
+            stream_links: (function() {
+                if (!rawStreamHint) return [];
+                if (rawStreamHint.includes(",") || rawStreamHint.includes(";") || rawStreamHint.includes("\n")) {
+                    return parseBulkStreams(rawStreamHint.replace(/[,;]+/g, "\n"), isSeries);
+                }
+                if (isSeries && (rawStreamHint.toLowerCase().includes("ep") || rawStreamHint.includes("|"))) {
+                    return parseBulkStreams(rawStreamHint, true);
+                }
+                const cleaned = cleanStreamInput(rawStreamHint);
+                if (cleaned) {
+                    return isSeries 
+                        ? [{ episode: 1, season: 1, stream_url: cleaned, url: cleaned }] 
+                        : [{ quality: "720p", stream_url: cleaned, url: cleaned }];
+                }
+                return [];
+            })(),
             linksList: isSeries ? [{ season: "Season 1", url: "" }] : [{ quality: "720p", url: "" }],
             links: []
         };
@@ -8301,7 +8326,26 @@ document.addEventListener("DOMContentLoaded", () => {
         batchStagingContainer.querySelectorAll(".batch-stream-url-input").forEach(input => {
             const itemIdx = parseInt(input.dataset.itemIdx);
             if (batchStagedMovies[itemIdx]) {
-                batchStagedMovies[itemIdx].stream_url = input.value.trim();
+                const cleaned = cleanStreamInput(input.value.trim());
+                batchStagedMovies[itemIdx].stream_url = cleaned;
+                if (!Array.isArray(batchStagedMovies[itemIdx].stream_links) || batchStagedMovies[itemIdx].stream_links.length === 0) {
+                    batchStagedMovies[itemIdx].stream_links = cleaned ? [{ quality: "720p", stream_url: cleaned, url: cleaned }] : [];
+                } else if (batchStagedMovies[itemIdx].stream_links[0]) {
+                    batchStagedMovies[itemIdx].stream_links[0].stream_url = cleaned;
+                    batchStagedMovies[itemIdx].stream_links[0].url = cleaned;
+                }
+            }
+        });
+        batchStagingContainer.querySelectorAll(".batch-series-stream-input").forEach(input => {
+            const itemIdx = parseInt(input.dataset.itemIdx);
+            const streamIdx = parseInt(input.dataset.streamIdx);
+            if (batchStagedMovies[itemIdx]?.stream_links?.[streamIdx]) {
+                const cleaned = cleanStreamInput(input.value.trim());
+                batchStagedMovies[itemIdx].stream_links[streamIdx].stream_url = cleaned;
+                batchStagedMovies[itemIdx].stream_links[streamIdx].url = cleaned;
+            }
+            if (batchStagedMovies[itemIdx]?.stream_links?.length > 0) {
+                batchStagedMovies[itemIdx].stream_url = batchStagedMovies[itemIdx].stream_links[0].stream_url || "";
             }
         });
     }
@@ -8321,20 +8365,48 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Staging options header
+        // Staging options header with Global Stream Mapper
         const optionsBar = document.createElement("div");
-        optionsBar.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; font-size: 11px; margin-bottom: 6px; gap: 8px; box-sizing: border-box; width: 100%; flex-shrink: 0;";
+        optionsBar.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; font-size: 11px; margin-bottom: 6px; gap: 8px; box-sizing: border-box; width: 100%; flex-shrink: 0; flex-wrap: wrap;";
         optionsBar.innerHTML = `
-            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #fff; margin: 0; user-select: none;">
-                <input type="checkbox" id="batch-select-all" ${checkedCount === validItems.length && validItems.length > 0 ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: #ffbc00; cursor: pointer; margin: 0; flex-shrink: 0;">
-                <span style="font-weight: 600;">Select All (${validItems.length})</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #00c8ff; margin: 0; user-select: none;">
-                <input type="checkbox" id="batch-broadcast-toggle" checked style="width: 16px; height: 16px; accent-color: #00c8ff; cursor: pointer; margin: 0; flex-shrink: 0;">
-                <span style="font-weight: 600;">📢 Announce in Channel</span>
-            </label>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #fff; margin: 0; user-select: none;">
+                    <input type="checkbox" id="batch-select-all" ${checkedCount === validItems.length && validItems.length > 0 ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: #ffbc00; cursor: pointer; margin: 0; flex-shrink: 0;">
+                    <span style="font-weight: 600;">Select All (${validItems.length})</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #00c8ff; margin: 0; user-select: none;">
+                    <input type="checkbox" id="batch-broadcast-toggle" checked style="width: 16px; height: 16px; accent-color: #00c8ff; cursor: pointer; margin: 0; flex-shrink: 0;">
+                    <span style="font-weight: 600;">📢 Announce in Channel</span>
+                </label>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-global-stream-mapper" style="font-size: 11px; padding: 3px 8px; border-radius: 4px; color: #ffbc00; border-color: rgba(255, 188, 0, 0.4); cursor: pointer; display: flex; align-items: center; gap: 4px; background: rgba(255, 188, 0, 0.08);">
+                    <span>⚡ Bulk Stream Mapper</span>
+                </button>
+            </div>
         `;
         batchStagingContainer.appendChild(optionsBar);
+
+        const globalMapperDrawer = document.createElement("div");
+        globalMapperDrawer.id = "batch-global-stream-mapper-drawer";
+        globalMapperDrawer.style.cssText = "display: none; background: rgba(0,0,0,0.4); border: 1px solid rgba(255, 188, 0, 0.3); border-radius: 6px; padding: 10px; margin-bottom: 8px; width: 100%; box-sizing: border-box; flex-shrink: 0;";
+        globalMapperDrawer.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 11px; font-weight: 700; color: #ffbc00;">⚡ Global Stream Mapper (Map tokens across all staged titles at once)</span>
+                <button type="button" id="btn-close-global-stream-mapper" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px;">✕</button>
+            </div>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.4;">
+                Paste tokens in any format:<br>
+                • <code>Title | stream_token</code> (Matches staged movie/series by title)<br>
+                • <code>Title | Ep 1 | token</code> (Matches series episodes by title)<br>
+                • Or 1 token per line to map sequentially across all staged titles.
+            </div>
+            <textarea id="batch-global-stream-mapper-input" placeholder="Inception | 6adee561a4b67b48703250e2&#10;Breaking Bad | Ep 1 | token1&#10;Breaking Bad | Ep 2 | token2&#10;Stranger Things | token3" style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 11px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                <button type="button" class="btn btn-primary btn-sm" id="btn-apply-global-stream-mapper" style="font-size: 11px; padding: 4px 12px; font-weight: 700;">Apply to Staged Titles ⚡</button>
+            </div>
+        `;
+        batchStagingContainer.appendChild(globalMapperDrawer);
 
         const selectAllCheckbox = optionsBar.querySelector("#batch-select-all");
         if (selectAllCheckbox) {
@@ -8446,6 +8518,64 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
             }
 
+            let streamSectionHtml = "";
+            if (item.isSeries) {
+                if (!Array.isArray(item.stream_links) || item.stream_links.length === 0) {
+                    item.stream_links = item.stream_url ? [{ episode: 1, stream_url: item.stream_url }] : [{ episode: 1, stream_url: "" }];
+                }
+                streamSectionHtml = `
+                    <div style="margin-top: 6px; width: 100%; box-sizing: border-box; background: rgba(255, 188, 0, 0.03); border: 1px dashed rgba(255, 188, 0, 0.25); border-radius: 6px; padding: 6px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span style="font-size: 10px; color: #ffbc00; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                                <span>▶️ Episode Streams:</span>
+                                <span style="font-size: 9px; opacity: 0.8;">(${item.stream_links.length} ep${item.stream_links.length === 1 ? '' : 's'})</span>
+                            </span>
+                            <div style="display: flex; gap: 4px;">
+                                <button type="button" class="btn btn-secondary btn-sm btn-add-batch-series-stream" data-index="${idx}" style="font-size: 10px; padding: 2px 6px; border-radius: 3px; color: #ffbc00; border-color: rgba(255,188,0,0.35); cursor: pointer;">+ Ep Stream</button>
+                                <button type="button" class="btn btn-secondary btn-sm btn-toggle-batch-series-stream-bulk" data-index="${idx}" style="font-size: 10px; padding: 2px 6px; border-radius: 3px; color: #00c8ff; border-color: rgba(0,200,255,0.35); cursor: pointer;">📋 Bulk</button>
+                            </div>
+                        </div>
+                        <div class="batch-series-streams-container" style="display: flex; flex-direction: column; gap: 4px;">
+                            ${item.stream_links.map((st, sIdx) => {
+                                const epNum = st.episode || (sIdx + 1);
+                                const tokenVal = cleanStreamInput(st.stream_url || st.url || '');
+                                return `
+                                    <div style="display: flex; align-items: center; gap: 5px; width: 100%;">
+                                        <span style="font-size: 10px; color: #ffbc00; font-weight: 700; width: 34px; flex-shrink: 0;">Ep ${epNum}:</span>
+                                        <input type="text" class="batch-series-stream-input" data-item-idx="${idx}" data-stream-idx="${sIdx}" value="${escapeHTML(st.stream_url || st.url || '')}" placeholder="Ep ${epNum} token or stream link..." style="flex: 1; min-width: 0; padding: 3px 6px; background: var(--input-bg); border: 1px solid rgba(255,188,0,0.2); border-radius: 4px; color: #fff; font-size: 11px; font-family: monospace;">
+                                        ${tokenVal ? `
+                                            <a href="https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(tokenVal)}&title=${encodeURIComponent(item.title + ' - Episode ' + epNum)}" target="_blank" style="font-size: 10px; color: #ffbc00; text-decoration: none; padding: 2px 5px; border: 1px solid rgba(255,188,0,0.35); border-radius: 3px; flex-shrink: 0; background: rgba(255,188,0,0.1);" title="Test Stream Player">Test ▶️</a>
+                                        ` : ''}
+                                        ${item.stream_links.length > 1 ? `
+                                            <button type="button" class="btn-remove-batch-series-stream" data-item-idx="${idx}" data-stream-idx="${sIdx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 1px 4px; font-size: 12px; flex-shrink: 0;" title="Remove this episode stream">✕</button>
+                                        ` : ''}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <div class="batch-series-stream-bulk-wrapper" data-index="${idx}" style="display: none; margin-top: 6px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px;">
+                            <textarea class="batch-series-stream-bulk-textarea" data-index="${idx}" placeholder="Paste multiple stream tokens/links for ${escapeHTML(item.title)} (one per line)...&#10;Line 1 -> Ep 1&#10;Line 2 -> Ep 2..." style="width: 100%; min-height: 55px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 4px; padding: 5px; color: #fff; font-size: 11px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                            <div style="display: flex; justify-content: flex-end; gap: 6px; margin-top: 4px;">
+                                <button type="button" class="btn btn-primary btn-sm btn-apply-batch-series-stream-bulk" data-index="${idx}" style="font-size: 10px; padding: 3px 8px;">Apply Stream Episodes ⚡</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const tokenVal = cleanStreamInput(item.stream_url || '');
+                streamSectionHtml = `
+                    <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box;">
+                        <span style="font-size: 10px; color: #ffbc00; font-weight: 700; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; gap: 3px;">
+                            <span>▶️ Stream:</span>
+                        </span>
+                        <input type="text" class="batch-stream-url-input" data-item-idx="${idx}" value="${escapeHTML(item.stream_url || '')}" placeholder="Paste File Stream Bot link or token (optional)..." style="flex: 1; min-width: 0; width: 100%; padding: 4px 7px; background: rgba(255, 188, 0, 0.04); border: 1px solid rgba(255, 188, 0, 0.25); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
+                        ${tokenVal ? `
+                            <a href="https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(tokenVal)}&title=${encodeURIComponent(item.title)}" target="_blank" style="font-size: 10px; color: #ffbc00; text-decoration: none; padding: 2px 7px; border: 1px solid rgba(255, 188, 0, 0.35); border-radius: 3px; flex-shrink: 0; white-space: nowrap; background: rgba(255, 188, 0, 0.1);" title="Test Stream Player">Test ▶️</a>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
             card.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-top: 2px;">
                     <input type="checkbox" class="batch-stage-checkbox" data-index="${idx}" ${item.checked ? 'checked' : ''} style="width: 17px; height: 17px; accent-color: #ffbc00; cursor: pointer; margin: 0; flex-shrink: 0;">
@@ -8465,21 +8595,127 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     ${categoriesText ? `<div style="font-size: 10px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(categoriesText)}</div>` : ''}
                     ${linksSectionHtml}
-                    <!-- Stream Link / Token in Batch Staging Card -->
-                    <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box;">
-                        <span style="font-size: 10px; color: #ffbc00; font-weight: 700; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; gap: 3px;">
-                            <span>▶️ Stream:</span>
-                        </span>
-                        <input type="text" class="batch-stream-url-input" data-item-idx="${idx}" value="${escapeHTML(item.stream_url || '')}" placeholder="Paste File Stream Bot link or token (optional)..." style="flex: 1; min-width: 0; width: 100%; padding: 4px 7px; background: rgba(255, 188, 0, 0.04); border: 1px solid rgba(255, 188, 0, 0.25); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
-                        ${item.stream_url ? `
-                            <a href="https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(cleanStreamInput(item.stream_url))}&title=${encodeURIComponent(item.title)}" target="_blank" style="font-size: 10px; color: #ffbc00; text-decoration: none; padding: 2px 7px; border: 1px solid rgba(255, 188, 0, 0.35); border-radius: 3px; flex-shrink: 0; white-space: nowrap; background: rgba(255, 188, 0, 0.1);" title="Test Stream Player">Test ▶️</a>
-                        ` : ''}
-                    </div>
+                    ${streamSectionHtml}
                 </div>
             `;
 
             batchStagingContainer.appendChild(card);
         });
+
+        // Global Stream Mapper Event Listeners
+        const btnToggleGlobal = batchStagingContainer.querySelector("#btn-toggle-global-stream-mapper");
+        const btnCloseGlobal = batchStagingContainer.querySelector("#btn-close-global-stream-mapper");
+        const globalDrawer = batchStagingContainer.querySelector("#batch-global-stream-mapper-drawer");
+        const btnApplyGlobal = batchStagingContainer.querySelector("#btn-apply-global-stream-mapper");
+        const inputGlobal = batchStagingContainer.querySelector("#batch-global-stream-mapper-input");
+
+        if (btnToggleGlobal && globalDrawer) {
+            btnToggleGlobal.addEventListener("click", () => {
+                const isHidden = globalDrawer.style.display === "none";
+                globalDrawer.style.display = isHidden ? "block" : "none";
+                if (isHidden && inputGlobal) inputGlobal.focus();
+            });
+        }
+        if (btnCloseGlobal && globalDrawer) {
+            btnCloseGlobal.addEventListener("click", () => {
+                globalDrawer.style.display = "none";
+            });
+        }
+        if (btnApplyGlobal && inputGlobal) {
+            btnApplyGlobal.addEventListener("click", () => {
+                saveCurrentBatchStagingInputs();
+                const rawText = inputGlobal.value.trim();
+                if (!rawText) {
+                    alert("Please paste some stream tokens or links first!");
+                    return;
+                }
+                const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+                if (lines.length === 0) return;
+
+                let mappedCount = 0;
+                const hasPipes = lines.some(l => l.includes("|"));
+
+                if (hasPipes) {
+                    lines.forEach(line => {
+                        const parts = line.split("|").map(p => p.trim());
+                        if (parts.length >= 2) {
+                            const queryTitle = parts[0].toLowerCase();
+                            const matchedItem = batchStagedMovies.find(m => 
+                                !m.error && m.title && (m.title.toLowerCase() === queryTitle || m.title.toLowerCase().includes(queryTitle))
+                            );
+                            if (matchedItem) {
+                                if (matchedItem.isSeries) {
+                                    if (!Array.isArray(matchedItem.stream_links)) matchedItem.stream_links = [];
+                                    if (parts.length >= 3) {
+                                        // Format: Title | Ep 2 | token
+                                        const epMatch = parts[1].match(/(?:ep|episode)?\s*(\d+)/i);
+                                        const epNum = epMatch ? parseInt(epMatch[1]) : (matchedItem.stream_links.length + 1);
+                                        const token = cleanStreamInput(parts[2]);
+                                        const existingEp = matchedItem.stream_links.find(s => s.episode === epNum);
+                                        if (existingEp) {
+                                            existingEp.stream_url = token;
+                                            existingEp.url = token;
+                                        } else {
+                                            matchedItem.stream_links.push({ episode: epNum, stream_url: token, url: token });
+                                        }
+                                        matchedItem.stream_links.sort((a,b) => (a.episode || 0) - (b.episode || 0));
+                                        if (matchedItem.stream_links[0]) matchedItem.stream_url = matchedItem.stream_links[0].stream_url;
+                                        mappedCount++;
+                                    } else {
+                                        // Format: Title | token1, token2, token3 OR Title | token
+                                        const tokens = parts[1].split(",").map(t => cleanStreamInput(t.trim())).filter(Boolean);
+                                        if (tokens.length > 1) {
+                                            matchedItem.stream_links = tokens.map((tk, tIdx) => ({ episode: tIdx + 1, stream_url: tk, url: tk }));
+                                            matchedItem.stream_url = tokens[0] || "";
+                                            mappedCount += tokens.length;
+                                        } else if (tokens.length === 1) {
+                                            if (matchedItem.stream_links.length === 0) {
+                                                matchedItem.stream_links = [{ episode: 1, stream_url: tokens[0], url: tokens[0] }];
+                                            } else {
+                                                matchedItem.stream_links[0].stream_url = tokens[0];
+                                                matchedItem.stream_links[0].url = tokens[0];
+                                            }
+                                            matchedItem.stream_url = tokens[0];
+                                            mappedCount++;
+                                        }
+                                    }
+                                } else {
+                                    // Movie
+                                    const token = cleanStreamInput(parts[1]);
+                                    matchedItem.stream_url = token;
+                                    matchedItem.stream_links = [{ quality: "720p", stream_url: token, url: token }];
+                                    mappedCount++;
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // Sequential mapping across valid staged items
+                    const validItems = batchStagedMovies.filter(m => !m.error);
+                    lines.forEach((tokenLine, lIdx) => {
+                        const targetItem = validItems[lIdx];
+                        if (targetItem) {
+                            const cleanedToken = cleanStreamInput(tokenLine);
+                            targetItem.stream_url = cleanedToken;
+                            if (targetItem.isSeries) {
+                                if (!Array.isArray(targetItem.stream_links) || targetItem.stream_links.length === 0) {
+                                    targetItem.stream_links = [{ episode: 1, stream_url: cleanedToken, url: cleanedToken }];
+                                } else {
+                                    targetItem.stream_links[0].stream_url = cleanedToken;
+                                    targetItem.stream_links[0].url = cleanedToken;
+                                }
+                            } else {
+                                targetItem.stream_links = [{ quality: "720p", stream_url: cleanedToken, url: cleanedToken }];
+                            }
+                            mappedCount++;
+                        }
+                    });
+                }
+
+                renderBatchStagingTable();
+                showToast(`Successfully mapped ${mappedCount} stream link(s) across staged titles!`, "success");
+            });
+        }
 
         // Event listeners for staged items
         batchStagingContainer.querySelectorAll(".batch-stage-checkbox").forEach(cb => {
@@ -8636,6 +8872,81 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         });
+
+        // Series Episode Stream Event Listeners
+        batchStagingContainer.querySelectorAll(".btn-add-batch-series-stream").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                saveCurrentBatchStagingInputs();
+                const idx = parseInt(e.currentTarget.dataset.index);
+                if (batchStagedMovies[idx]) {
+                    if (!Array.isArray(batchStagedMovies[idx].stream_links)) batchStagedMovies[idx].stream_links = [];
+                    const nextEp = batchStagedMovies[idx].stream_links.length + 1;
+                    batchStagedMovies[idx].stream_links.push({
+                        episode: nextEp,
+                        stream_url: ""
+                    });
+                    renderBatchStagingTable();
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".btn-remove-batch-series-stream").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                saveCurrentBatchStagingInputs();
+                const itemIdx = parseInt(e.currentTarget.dataset.itemIdx);
+                const streamIdx = parseInt(e.currentTarget.dataset.streamIdx);
+                if (batchStagedMovies[itemIdx]?.stream_links) {
+                    batchStagedMovies[itemIdx].stream_links.splice(streamIdx, 1);
+                    batchStagedMovies[itemIdx].stream_links.forEach((st, i) => {
+                        st.episode = i + 1;
+                    });
+                    if (batchStagedMovies[itemIdx].stream_links.length > 0) {
+                        batchStagedMovies[itemIdx].stream_url = batchStagedMovies[itemIdx].stream_links[0].stream_url || "";
+                    } else {
+                        batchStagedMovies[itemIdx].stream_url = "";
+                    }
+                    renderBatchStagingTable();
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".btn-toggle-batch-series-stream-bulk").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const idx = parseInt(e.currentTarget.dataset.index);
+                const wrapper = batchStagingContainer.querySelector(`.batch-series-stream-bulk-wrapper[data-index="${idx}"]`);
+                if (wrapper) {
+                    const isHidden = wrapper.style.display === "none";
+                    wrapper.style.display = isHidden ? "block" : "none";
+                    btn.textContent = isHidden ? "✕ Close" : "📋 Bulk";
+                }
+            });
+        });
+
+        batchStagingContainer.querySelectorAll(".btn-apply-batch-series-stream-bulk").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                saveCurrentBatchStagingInputs();
+                const idx = parseInt(e.currentTarget.dataset.index);
+                const textarea = batchStagingContainer.querySelector(`.batch-series-stream-bulk-textarea[data-index="${idx}"]`);
+                if (textarea && batchStagedMovies[idx]) {
+                    const lines = textarea.value.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+                    if (lines.length > 0) {
+                        batchStagedMovies[idx].stream_links = lines.map((line, lIdx) => {
+                            const cleaned = cleanStreamInput(line);
+                            return {
+                                episode: lIdx + 1,
+                                stream_url: cleaned,
+                                url: cleaned
+                            };
+                        });
+                        batchStagedMovies[idx].stream_url = batchStagedMovies[idx].stream_links[0].stream_url || "";
+                        renderBatchStagingTable();
+                        showToast(`Parsed ${lines.length} episode stream(s) for "${batchStagedMovies[idx].title}"!`, "success");
+                    } else {
+                        alert("Please paste at least one stream token or link!");
+                    }
+                }
+            });
+        });
     }
 
     if (btnFetchBatchTmdb) {
@@ -8716,7 +9027,41 @@ document.addEventListener("DOMContentLoaded", () => {
                     finalLinks = parseBulkLinks(item.rawLinksText, item.isSeries);
                 }
 
-                const cleanStreamVal = cleanStreamInput(item.stream_url || "");
+                let finalStreams = [];
+                if (Array.isArray(item.stream_links) && item.stream_links.length > 0) {
+                    finalStreams = item.stream_links
+                        .map((st, sIdx) => {
+                            const raw = (st.stream_url || st.url || "").trim();
+                            const cleaned = cleanStreamInput(raw);
+                            if (!cleaned) return null;
+                            if (item.isSeries) {
+                                return {
+                                    episode: st.episode || (sIdx + 1),
+                                    stream_url: cleaned,
+                                    url: cleaned
+                                };
+                            } else {
+                                return {
+                                    quality: st.quality || '720p',
+                                    stream_url: cleaned,
+                                    url: cleaned
+                                };
+                            }
+                        })
+                        .filter(Boolean);
+                } else if (item.stream_url) {
+                    const cleaned = cleanStreamInput(item.stream_url);
+                    if (cleaned) {
+                        finalStreams = [{
+                            quality: item.isSeries ? undefined : '720p',
+                            episode: item.isSeries ? 1 : undefined,
+                            stream_url: cleaned,
+                            url: cleaned
+                        }];
+                    }
+                }
+
+                const cleanStreamVal = finalStreams.length > 0 ? (finalStreams[0].stream_url || finalStreams[0].url || "") : cleanStreamInput(item.stream_url || "");
                 const newMovie = {
                     csv_id: item.id,
                     tmdb_id: item.numericId,
@@ -8736,6 +9081,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     trailer: item.trailer || "",
                     runtime: "",
                     stream_url: cleanStreamVal,
+                    stream_links: finalStreams,
                     links: finalLinks,
                     channelBroadcasted: !shouldBroadcast // If opted out, mark true
                 };
