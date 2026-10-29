@@ -563,9 +563,10 @@
                 </p>
             </div>
 
-            <!-- Tab 2: Telegram Bot -->
+            <!-- Tab 2: Telegram Bot & Ubuntu Server Manager -->
             <div class="settings-tab-content" id="settings-telegram" style="display: none;">
-                <div class="form-row" style="margin-bottom: 12px;">
+                <!-- 1. Telegram Bot Token Configuration -->
+                <div class="form-row" style="margin-bottom: 14px;">
                     <div class="form-group" style="flex: 2;">
                         <label for="telegram-bot-token">Telegram Bot Token</label>
                         <input type="password" id="telegram-bot-token" placeholder="e.g. 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
@@ -575,95 +576,34 @@
                         <button class="btn btn-secondary" id="btn-test-telegram-conn" style="height: 42px; margin-top: auto; flex: 1; border-color: rgba(0, 136, 204, 0.3); color: #0088cc;">Test Bot</button>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group" style="flex: 2;">
-                        <label for="telegram-webhook-url">Bot Webhook URL / Domain (for webhook mode)</label>
-                        <input type="text" id="telegram-webhook-url" placeholder="e.g. https://your-app.onrender.com">
-                    </div>
-                    <div class="form-group" style="flex: 1; justify-content: flex-end; display: flex; gap: 8px; flex-direction: row;">
-                        <button class="btn btn-secondary" id="btn-save-telegram-webhook" style="height: 42px; margin-top: auto; flex: 1; border-color: rgba(0, 136, 204, 0.3); color: #0088cc;">Save Webhook</button>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group" style="flex: 2;">
-                        <label for="telegram-ping-urls">File Bots / Keep-alive Ping URLs (comma separated)</label>
-                        <input type="text" id="telegram-ping-urls" placeholder="e.g. https://filebot1.onrender.com/health, https://filebot2.onrender.com/health">
-                    </div>
-                    <div class="form-group" style="flex: 1; justify-content: flex-end; display: flex; gap: 8px; flex-direction: row;">
-                        <button class="btn btn-secondary" id="btn-save-telegram-pings" style="height: 42px; margin-top: auto; flex: 1; border-color: rgba(0, 136, 204, 0.3); color: #0088cc;">Save URLs</button>
-                    </div>
-                </div>
-                <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px; margin-bottom: 12px;">
-                    * The bot token and webhook URL will be securely synchronized to your Firestore database so the dashboard and backend can use them.
-                </p>
-                <div id="bot-status-container" style="padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+
+                <!-- 2. Bot Health Status Card -->
+                <div id="bot-status-container" style="padding: 14px 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
                     <div style="display: flex; flex-direction: column; gap: 4px;">
                         <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Telegram Bot Health Status</span>
-                        <span id="bot-status-details" style="font-size: 10px; color: var(--text-muted);">Last status: Unknown</span>
+                        <span id="bot-status-details" style="font-size: 11px; color: var(--text-muted);">Last status: Unknown</span>
                     </div>
+                    <span id="bot-status-badge" style="font-size: 11px; padding: 5px 14px; border-radius: 12px; font-weight: 800; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--border-color);">UNKNOWN</span>
+                </div>
 
-                <!-- Ubuntu Server Remote Updater Card -->
-                <div id="server-bot-management-card" style="margin-top: 14px; padding: 14px; background: rgba(0, 136, 204, 0.05); border: 1px solid rgba(0, 136, 204, 0.2); border-radius: var(--border-radius-sm);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                        <div>
-                            <div style="font-size: 12px; font-weight: 700; color: #00a2ed; display: flex; align-items: center; gap: 6px;">
+                <!-- 3. Ubuntu Server Remote Updater Card (Clean, Prominent Glassmorphic UI) -->
+                <div id="server-bot-management-card" style="padding: 16px; background: linear-gradient(135deg, rgba(0, 136, 204, 0.08) 0%, rgba(0, 180, 216, 0.04) 100%); border: 1px solid rgba(0, 162, 237, 0.3); border-radius: var(--border-radius-sm); box-shadow: 0 4px 20px rgba(0, 136, 204, 0.08);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <div style="font-size: 13px; font-weight: 800; color: #00a2ed; display: flex; align-items: center; gap: 8px;">
                                 <span>🔄 Ubuntu Server Remote Updater</span>
-                                <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: rgba(0, 162, 237, 0.2); color: #00a2ed;">Zero-Downtime</span>
+                                <span style="font-size: 9px; padding: 2px 7px; border-radius: 4px; background: rgba(0, 162, 237, 0.2); color: #00a2ed; font-weight: 800;">Zero-Downtime</span>
                             </div>
-                            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 3px;">
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
                                 Pulls latest code from GitHub into your live bot &amp; reloads PM2 automatically without SSH terminal access.
                             </div>
                         </div>
-                        <button class="btn" id="btn-server-bot-update" style="background: linear-gradient(135deg, #0088cc 0%, #00b4d8 100%); color: #fff; border: none; font-weight: 700; padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 11px;">
+                        <button class="btn" id="btn-server-bot-update" style="background: linear-gradient(135deg, #0088cc 0%, #00b4d8 100%); color: #fff; border: none; font-weight: 700; padding: 10px 18px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 12px; box-shadow: 0 4px 15px rgba(0, 136, 204, 0.35);">
                             <span>⚡ Pull Latest Code from GitHub</span>
                         </button>
                     </div>
-                    <div id="server-bot-update-status" style="margin-top: 10px; font-size: 11px; display: none; padding: 8px 12px; border-radius: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);">
+                    <div id="server-bot-update-status" style="margin-top: 12px; font-size: 11px; display: none; padding: 10px 14px; border-radius: 8px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);">
                         <span id="server-bot-update-text" style="color: var(--text-secondary);">Idle</span>
-                    </div>
-                </div>
-
-                    <span id="bot-status-badge" style="font-size: 11px; padding: 4px 12px; border-radius: 12px; font-weight: 700; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--border-color);">UNKNOWN</span>
-                </div>
-                
-                <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 16px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 12px;">Telegram Bot Welcome Message (/start)</span>
-                    <div class="form-row" style="margin-bottom: 12px;">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="telegram-welcome-image">Welcome Image URL (Banner)</label>
-                            <input type="text" id="telegram-welcome-image" placeholder="e.g. https://example.com/banner.jpg">
-                        </div>
-                    </div>
-                    <div class="form-row" style="margin-bottom: 12px;">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="telegram-welcome-text">Welcome Message Text (HTML allowed)</label>
-                            <textarea id="telegram-welcome-text" rows="5" placeholder="Welcome to Film House! Use {name} for Full Name, {username} for @username handle." style="width: 100%; min-height: 120px; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-primary); font-family: monospace; font-size: 12px; resize: vertical; box-sizing: border-box;"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-row" style="margin-bottom: 12px; gap: 12px;">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="telegram-welcome-app-text">Mini App Button Text</label>
-                            <input type="text" id="telegram-welcome-app-text" placeholder="e.g. Launch Film House 🚀">
-                        </div>
-                        <div class="form-group" style="flex: 2;">
-                            <label for="telegram-welcome-app-url">Mini App Button URL (Link)</label>
-                            <input type="text" id="telegram-welcome-app-url" placeholder="e.g. https://t.me/Filmhouseappbot/filmhouseapp">
-                        </div>
-                    </div>
-                    <div class="form-row" style="margin-bottom: 12px; gap: 12px;">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="telegram-welcome-channel-text">Channel Button Text</label>
-                            <input type="text" id="telegram-welcome-channel-text" placeholder="e.g. Join Channel 📢">
-                        </div>
-                        <div class="form-group" style="flex: 2;">
-                            <label for="telegram-welcome-channel-url">Channel Button URL (Link)</label>
-                            <input type="text" id="telegram-welcome-channel-url" placeholder="e.g. https://t.me/filmhouse_main">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group" style="flex: 1;">
-                            <button class="btn btn-primary" id="btn-save-welcome-message" style="background: var(--primary-gradient); color: #000; border: none; font-weight: 700; height: 42px;">Save Welcome Message</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1504,6 +1444,6 @@
         </button>
     </div>
 
-    <script src="admin.js?v=115"></script>
+    <script src="admin.js?v=116"></script>
 </body>
 </html>
