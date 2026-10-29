@@ -1,3 +1,20 @@
+
+function ensureTelegramFullscreen() {
+    if (window.Telegram && window.Telegram.WebApp) {
+        try {
+            document.body.classList.add("telegram-app-ready");
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+            if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
+                window.Telegram.WebApp.requestFullscreen();
+            }
+        } catch (e) {}
+    }
+}
+ensureTelegramFullscreen();
+setTimeout(ensureTelegramFullscreen, 200);
+setTimeout(ensureTelegramFullscreen, 800);
+
 // Early Telegram WebApp initialization to prevent loading splash hang
 if (window.Telegram && window.Telegram.WebApp) {
     try {
@@ -2302,6 +2319,13 @@ function clearWatchHistory() {
 
 // View Routing Manager
 function navigateToScreen(targetScreenId) {
+    // If navigating away from media-detail, ensure proper cleanup of video and body state
+    if (targetScreenId !== "media-detail") {
+        if (typeof closeMediaDetailPage === "function" && document.body.classList.contains("media-detail-active")) {
+            closeMediaDetailPage();
+        }
+        document.body.classList.remove("media-detail-active");
+    }
     // Unsubscribe from leaderboard if navigating away
     if (targetScreenId !== "leaderboard" && typeof leaderboardUnsubscribe === "function") {
         try {
@@ -3780,7 +3804,8 @@ function openMediaDetailPage(movie) {
 
     const btnMediaBack = document.getElementById("btn-media-back");
     if (btnMediaBack) {
-        btnMediaBack.style.display = "flex";
+        const hasTgBackButton = !!(window.Telegram?.WebApp?.BackButton);
+        btnMediaBack.style.display = hasTgBackButton ? "none" : "flex";
         btnMediaBack.onclick = (e) => {
             if (e) { e.preventDefault(); e.stopPropagation(); }
             handleAppBack();
