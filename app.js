@@ -4075,12 +4075,47 @@ function openMediaDetailPage(movie) {
     }
 
     // 5. Live Streaming Controller (Option 2: Dedicated In-App Cinema Theater Modal)
-    function playMediaStream(customUrl, optTitle) {
+    async function playMediaStream(customUrl, optTitle) {
         let streamTarget = customUrl || movie.stream_url || "";
+        if (!streamTarget && movie.stream_links && Array.isArray(movie.stream_links)) {
+            const sl = movie.stream_links.find(s => s && (s.stream_url || s.url));
+            if (sl) streamTarget = sl.stream_url || sl.url;
+        }
         if (!streamTarget && movie.links && Array.isArray(movie.links)) {
             const streamLink = movie.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
             if (streamLink) {
                 streamTarget = streamLink.stream_url || streamLink.url;
+            }
+        }
+
+        // Real-time Firestore fallback: If stream link was just added in Admin without re-publishing, pick it up live
+        if (!streamTarget && typeof db !== "undefined" && db && (movie.csv_id || movie.id)) {
+            try {
+                const docKey = movie.csv_id || movie.id;
+                const snap = await db.collection("movies").doc(docKey).get();
+                if (snap.exists) {
+                    const data = snap.data();
+                    if (data.stream_url) {
+                        movie.stream_url = data.stream_url;
+                        streamTarget = data.stream_url;
+                    }
+                    if (data.stream_links && Array.isArray(data.stream_links)) {
+                        movie.stream_links = data.stream_links;
+                        if (!streamTarget) {
+                            const sl = data.stream_links.find(s => s && (s.stream_url || s.url));
+                            if (sl) streamTarget = sl.stream_url || sl.url;
+                        }
+                    }
+                    if (data.links && Array.isArray(data.links)) {
+                        movie.links = data.links;
+                        if (!streamTarget) {
+                            const sl = data.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
+                            if (sl) streamTarget = sl.stream_url || sl.url;
+                        }
+                    }
+                }
+            } catch (fsErr) {
+                console.warn("Firestore live stream lookup notice:", fsErr.message);
             }
         }
 
@@ -6112,6 +6147,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
     // Resolve initial stream parameter: custom URL -> link.stream_url -> movie.stream_url
     let streamTarget = customStreamUrl || movie.stream_url || "";
+    if (!streamTarget && movie.stream_links && Array.isArray(movie.stream_links)) {
+        const sl = movie.stream_links.find(s => s && (s.stream_url || s.url));
+        if (sl) streamTarget = sl.stream_url || sl.url;
+    }
     if (!streamTarget && movie.links && Array.isArray(movie.links)) {
         const streamLink = movie.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
         if (streamLink) {
