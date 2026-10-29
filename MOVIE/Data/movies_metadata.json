@@ -646,9 +646,18 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADzwwAAsQ16EYKGz5-vFbORBYE",
-        "quality": "720p"
+        "quality": "720p",
+        "stream_url": "MzE6YjE3NTE5M2ZhNzI5OWYwNg"
       }
-    ]
+    ],
+    "stream_links": [
+      {
+        "quality": "720p",
+        "stream_url": "MzE6YjE3NTE5M2ZhNzI5OWYwNg",
+        "url": "MzE6YjE3NTE5M2ZhNzI5OWYwNg"
+      }
+    ],
+    "stream_url": "MzE6YjE3NTE5M2ZhNzI5OWYwNg"
   },
   {
     "csv_id": "311648-make-me-tingle",
