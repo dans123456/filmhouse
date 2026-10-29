@@ -5964,6 +5964,13 @@ function triggerMonetagSmartLink() {
 
 // Open In-App Cinema Streaming Player Modal
 function openCinemaModal(movie, customStreamUrl, customTitle) {
+    // Phase 3: Smart Pre-Roll Guard with 4-Hour Binge-Watching Session Memory
+    checkAndTriggerStreamAd(movie, () => {
+        openCinemaModalCore(movie, customStreamUrl, customTitle);
+    });
+}
+
+function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     const modal = document.getElementById("cinema-modal");
     const container = document.getElementById("cinema-iframe-container");
     const titleEl = document.getElementById("cinema-modal-title");
@@ -7131,6 +7138,132 @@ function copyToClipboard(text) {
 }
 
 // Initialize Adsgram controller dynamically for a specific block ID
+
+// Universal Rewarded Ad Engine (Adsgram + Fallback)
+function showRewardedAd(onSuccess, onError) {
+    const isTelegramEnv = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== "";
+    
+    // Check if Adsgram is available
+    if (isTelegramEnv && window.Adsgram) {
+        const blockId = (typeof ADSGRAM_TASK_BLOCK_ID !== "undefined" ? ADSGRAM_TASK_BLOCK_ID : "") || 
+                        (typeof ADSGRAM_DOWNLOAD_BLOCK_ID !== "undefined" ? ADSGRAM_DOWNLOAD_BLOCK_ID : "") || "36631";
+        if (!state.adsgramControllers) state.adsgramControllers = {};
+        if (!state.adsgramControllers[blockId]) {
+            try {
+                state.adsgramControllers[blockId] = window.Adsgram.init({ blockId });
+            } catch (e) {
+                console.warn("[RewardedAd] Adsgram init error:", e);
+            }
+        }
+        const controller = state.adsgramControllers[blockId];
+        if (controller) {
+            controller.show().then(() => {
+                if (typeof onSuccess === "function") onSuccess();
+            }).catch((err) => {
+                console.warn("[RewardedAd] Adsgram ad dismissed or unavailable:", err);
+                // Fallback gracefully so user isn't punished if ad network is empty
+                if (typeof onSuccess === "function") onSuccess();
+            });
+            return;
+        }
+    }
+
+    // Web / Local development fallback
+    showToast("Connecting to sponsor network...", "info");
+    setTimeout(() => {
+        if (typeof onSuccess === "function") onSuccess();
+    }, 1500);
+}
+
+// Cinema Stream Pre-Roll Session Guard (4-Hour Binge Lock)
+function checkAndTriggerStreamAd(movie, onReady) {
+    const now = Date.now();
+    const adFreeUntil = parseInt(localStorage.getItem("ad_free_until") || "0");
+    const fastStreamUntil = parseInt(localStorage.getItem("cinema_fast_stream_until") || "0");
+    const sessionUnlockedUntil = parseInt(localStorage.getItem("cinema_stream_unlocked_until") || "0");
+
+    // 1. If active VIP Ad-Free, Fast-Stream Pass, or active 4h Binge Session:
+    if (adFreeUntil > now || fastStreamUntil > now || sessionUnlockedUntil > now) {
+        if (typeof onReady === "function") onReady();
+        return;
+    }
+
+    // 2. Otherwise, prompt Cinema Pre-roll Sponsor Modal
+    showCinemaPreRollModal(movie, () => {
+        const unlockDuration = 4 * 60 * 60 * 1000; // 4 Hours
+        localStorage.setItem("cinema_stream_unlocked_until", String(Date.now() + unlockDuration));
+        
+        if (state.user && state.user.dailyStats) {
+            state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
+            saveDailyStats();
+        }
+        
+        showToast("🍿 Cinema Session Unlocked! Enjoy 4 hours of ad-free streaming.", "success");
+        if (typeof onReady === "function") onReady();
+    });
+}
+
+function showCinemaPreRollModal(movie, onUnlocked) {
+    const modal = document.getElementById("cinema-preroll-modal");
+    const titleEl = document.getElementById("preroll-movie-title");
+    const watchAdBtn = document.getElementById("btn-preroll-watch-ad");
+    const redeemBtn = document.getElementById("btn-preroll-redeem-pass");
+    const closeBtn = document.getElementById("btn-close-preroll");
+    if (!modal) {
+        if (typeof onUnlocked === "function") onUnlocked();
+        return;
+    }
+
+    if (titleEl) {
+        titleEl.textContent = (movie && movie.title) ? movie.title : "Film House Cinema";
+    }
+
+    const closeModal = () => {
+        modal.classList.remove("active");
+        setTimeout(() => { modal.style.display = "none"; }, 250);
+    };
+
+    if (closeBtn) {
+        closeBtn.onclick = closeModal;
+    }
+
+    if (redeemBtn) {
+        redeemBtn.onclick = () => {
+            if (state.user.points < 500) {
+                showToast("Not enough points! You have " + state.user.points + " pts. Need 500 pts.", "error");
+                return;
+            }
+            deductPoints(500);
+            localStorage.setItem("cinema_fast_stream_until", Date.now() + 4 * 60 * 60 * 1000);
+            closeModal();
+            if (typeof onUnlocked === "function") onUnlocked();
+        };
+    }
+
+    if (watchAdBtn) {
+        watchAdBtn.onclick = () => {
+            watchAdBtn.disabled = true;
+            watchAdBtn.innerHTML = "<span>⏳ Loading Sponsor Clip...</span>";
+            showRewardedAd(() => {
+                watchAdBtn.disabled = false;
+                watchAdBtn.innerHTML = "<span>▶️ Watch Clip (Unlock 4h Binge)</span>";
+                closeModal();
+                if (typeof onUnlocked === "function") onUnlocked();
+            }, () => {
+                watchAdBtn.disabled = false;
+                watchAdBtn.innerHTML = "<span>▶️ Watch Clip (Unlock 4h Binge)</span>";
+                closeModal();
+                if (typeof onUnlocked === "function") onUnlocked();
+            });
+        };
+    }
+
+    modal.style.display = "flex";
+    requestAnimationFrame(() => {
+        modal.classList.add("active");
+    });
+}
+
 function initializeAdsgram(blockId) {
     if (!window.Adsgram) {
         console.warn("Adsgram SDK not loaded yet.");
