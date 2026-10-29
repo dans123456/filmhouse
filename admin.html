@@ -601,6 +601,28 @@
                         <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Telegram Bot Health Status</span>
                         <span id="bot-status-details" style="font-size: 10px; color: var(--text-muted);">Last status: Unknown</span>
                     </div>
+
+                <!-- Ubuntu Server Remote Updater Card -->
+                <div id="server-bot-management-card" style="margin-top: 14px; padding: 14px; background: rgba(0, 136, 204, 0.05); border: 1px solid rgba(0, 136, 204, 0.2); border-radius: var(--border-radius-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <div style="font-size: 12px; font-weight: 700; color: #00a2ed; display: flex; align-items: center; gap: 6px;">
+                                <span>🔄 Ubuntu Server Remote Updater</span>
+                                <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: rgba(0, 162, 237, 0.2); color: #00a2ed;">Zero-Downtime</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 3px;">
+                                Pulls latest code from GitHub into your live bot &amp; reloads PM2 automatically without SSH terminal access.
+                            </div>
+                        </div>
+                        <button class="btn" id="btn-server-bot-update" style="background: linear-gradient(135deg, #0088cc 0%, #00b4d8 100%); color: #fff; border: none; font-weight: 700; padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 11px;">
+                            <span>⚡ Pull Latest Code from GitHub</span>
+                        </button>
+                    </div>
+                    <div id="server-bot-update-status" style="margin-top: 10px; font-size: 11px; display: none; padding: 8px 12px; border-radius: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);">
+                        <span id="server-bot-update-text" style="color: var(--text-secondary);">Idle</span>
+                    </div>
+                </div>
+
                     <span id="bot-status-badge" style="font-size: 11px; padding: 4px 12px; border-radius: 12px; font-weight: 700; background: rgba(255,255,255,0.05); color: var(--text-secondary); border: 1px solid var(--border-color);">UNKNOWN</span>
                 </div>
                 
@@ -1482,6 +1504,6 @@
         </button>
     </div>
 
-    <script src="admin.js?v=113"></script>
+    <script src="admin.js?v=115"></script>
 </body>
 </html>

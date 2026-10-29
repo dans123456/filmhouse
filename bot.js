@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { exec } = require("child_process");
 
 // Native .env parser (guarantees instant loading of .env without external dependencies)
 try {
@@ -130,6 +131,73 @@ if (process.env.FIREBASE_CONFIG) {
 }
 
 const db = admin.firestore();
+
+
+// Helper: Safe remote server updater with syntax integrity checks and PM2 reload
+function performServerGitUpdate(onProgress) {
+    return new Promise((resolve) => {
+        const projectDir = path.resolve(__dirname);
+        if (typeof onProgress === "function") onProgress("Pulling latest code from GitHub main branch...");
+        
+        exec("git pull origin main", { cwd: projectDir }, (pullErr, pullOut, pullErrOut) => {
+            if (pullErr) {
+                console.error("[ServerUpdater] git pull failed:", pullErr);
+                return resolve({
+                    success: false,
+                    error: `Git pull failed: ${pullErr.message}\n${pullErrOut || ""}`,
+                    output: pullErrOut || pullErr.message
+                });
+            }
+
+            const gitOutput = (pullOut || pullErrOut || "").trim();
+            const isAlreadyUpdated = gitOutput.includes("Already up to date") || gitOutput.includes("Already up-to-date");
+
+            if (typeof onProgress === "function") onProgress("Verifying JavaScript syntax integrity...");
+
+            exec("node -c bot.js", { cwd: projectDir }, (syntaxErr, synOut, synErrOut) => {
+                if (syntaxErr) {
+                    console.error("[ServerUpdater] Syntax check failed:", syntaxErr);
+                    return resolve({
+                        success: false,
+                        error: `Syntax validation failed on bot.js. PM2 reload aborted to keep server online: ${synErrOut || syntaxErr.message}`,
+                        output: synErrOut || syntaxErr.message
+                    });
+                }
+
+                if (isAlreadyUpdated) {
+                    console.log("[ServerUpdater] Repository is already up to date.");
+                    return resolve({
+                        success: true,
+                        alreadyUpToDate: true,
+                        output: gitOutput,
+                        message: "Repository is already up to date (0 syntax errors)."
+                    });
+                }
+
+                if (typeof onProgress === "function") onProgress("Update pulled! Reloading PM2 process (Zero Downtime)...");
+                console.log("[ServerUpdater] Changes detected and syntax verified. Reloading PM2 process...");
+
+                // Schedule PM2 reload slightly after resolving to allow response to be sent first
+                setTimeout(() => {
+                    exec("pm2 reload filmhouse-bot || pm2 reload bot || pm2 reload all", { cwd: projectDir }, (pm2Err, pm2Out) => {
+                        if (pm2Err) {
+                            console.warn("[ServerUpdater] PM2 reload notice:", pm2Err.message);
+                        } else {
+                            console.log("[ServerUpdater] PM2 reload completed:", pm2Out);
+                        }
+                    });
+                }, 1500);
+
+                return resolve({
+                    success: true,
+                    alreadyUpToDate: false,
+                    output: gitOutput,
+                    message: "Successfully pulled latest code and triggered PM2 zero-downtime reload!"
+                });
+            });
+        });
+    });
+}
 
 // HTML escaping helper for clean Telegram formatting
 function escapeHtml(str) {
@@ -2960,6 +3028,54 @@ function setupBot(bot, adminBot) {
         );
     });
 
+    // Command: /update & /upgrade - Remote 1-Click Server Bot & Catalog Safe Updater
+    bot.command(['update', 'upgrade', 'pull'], async (ctx) => {
+        const adminId = String(ctx.from?.id || "");
+        const isAuth = await isMasterAdmin(adminId);
+        if (!isAuth) return; // Silently ignore for regular non-admin users
+
+        const statusMsg = await ctx.reply("🔄 <b>Checking for GitHub updates...</b>\nConnecting to repository on Ubuntu server...", { parse_mode: 'HTML' });
+
+        const result = await performServerGitUpdate((stepText) => {
+            ctx.telegram.editMessageText(
+                ctx.chat.id,
+                statusMsg.message_id,
+                null,
+                `🔄 <b>Updating Ubuntu Server...</b>\n\n<i>${escapeHtml(stepText)}</i>`,
+                { parse_mode: 'HTML' }
+            ).catch(() => {});
+        });
+
+        if (!result.success) {
+            return ctx.telegram.editMessageText(
+                ctx.chat.id,
+                statusMsg.message_id,
+                null,
+                `❌ <b>Server Update Failed!</b>\n\n<code>${escapeHtml(result.error || result.output)}</code>`,
+                { parse_mode: 'HTML' }
+            ).catch(() => {});
+        }
+
+        if (result.alreadyUpToDate) {
+            return ctx.telegram.editMessageText(
+                ctx.chat.id,
+                statusMsg.message_id,
+                null,
+                `✅ <b>Server is Already Up to Date!</b>\n\n<code>${escapeHtml(result.output)}</code>\n\n🚀 Running latest build with 0 syntax errors.`,
+                { parse_mode: 'HTML' }
+            ).catch(() => {});
+        }
+
+        return ctx.telegram.editMessageText(
+            ctx.chat.id,
+            statusMsg.message_id,
+            null,
+            `🎉 <b>Update Successfully Applied!</b>\n\n<code>${escapeHtml(result.output)}</code>\n\n⚡ PM2 zero-downtime reload initiated.`,
+            { parse_mode: 'HTML' }
+        ).catch(() => {});
+    });
+
+
     // Command: /pending & /requests (Admin pending queue lookup on user bot)
     bot.command(['pending', 'requests'], async (ctx) => {
         const userId = String(ctx.from?.id);
@@ -5013,6 +5129,53 @@ async function init() {
         setInterval(checkNewEpisodeReleasesForAdmins, 30 * 60 * 1000);
 
         // Graceful shutdown hooks
+        
+        // Setup Firestore listener for remote tasks (e.g. 1-click update from Admin Console)
+        let isTaskProcessing = false;
+        db.collection("settings").doc("server_tasks").onSnapshot(async (docSnap) => {
+            if (!docSnap.exists) return;
+            const task = docSnap.data();
+            if (task.action === "git_update" && task.status === "pending") {
+                if (isTaskProcessing) return;
+                isTaskProcessing = true;
+                console.log(`[ServerTasks] Received remote git_update request from admin: ${task.requestedBy || "unknown"}`);
+                
+                await db.collection("settings").doc("server_tasks").set({
+                    status: "in_progress",
+                    progressText: "Pulling latest code from GitHub...",
+                    startedAt: admin.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                const updateResult = await performServerGitUpdate(async (step) => {
+                    try {
+                        await db.collection("settings").doc("server_tasks").set({
+                            progressText: step
+                        }, { merge: true });
+                    } catch (e) {}
+                });
+
+                if (updateResult.success) {
+                    await db.collection("settings").doc("server_tasks").set({
+                        status: "completed",
+                        alreadyUpToDate: !!updateResult.alreadyUpToDate,
+                        output: updateResult.output || "",
+                        message: updateResult.message || "Completed successfully",
+                        completedAt: admin.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                } else {
+                    await db.collection("settings").doc("server_tasks").set({
+                        status: "failed",
+                        error: updateResult.error || "Unknown error during update",
+                        output: updateResult.output || "",
+                        failedAt: admin.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                }
+                isTaskProcessing = false;
+            }
+        }, (err) => {
+            console.warn("[ServerTasks] Snapshot listener notice:", err.message);
+        });
+
         const handleShutdown = async (signal) => {
             console.log(`Received ${signal}. Shutting down gracefully...`);
             clearInterval(statusInterval);

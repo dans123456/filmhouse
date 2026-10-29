@@ -185,6 +185,31 @@ Whenever you SSH into your server, use these PM2 commands:
 - Stop the bot:
   pm2 stop filmhouse-bot
 
+--------------------------------------------------------------------------------
+8.1 HOW TO SAFELY UPDATE YOUR BOT (3 EASY WAYS - NO MANUAL CODING)
+--------------------------------------------------------------------------------
+Whenever new features, bug fixes, or movie updates are pushed to GitHub, 
+you DO NOT need to copy files or edit code manually on the server. 
+Choose any of these 3 seamless methods:
+
+METHOD 1: TELEGRAM DM COMMAND (FASTEST - FROM YOUR PHONE)
+- Open private chat with your Telegram Bot.
+- Type and send: /update (or /upgrade)
+- The bot will pull latest code from GitHub, verify JavaScript syntax 
+  integrity, and reload PM2 automatically with zero downtime!
+- Only Master Admins (1329840839, 1175336733) have permission to run this.
+
+METHOD 2: 1-CLICK FROM ADMIN CONSOLE (FROM ANY BROWSER)
+- Open Film House Admin Console (admin.html).
+- Go to Settings (⚙️) -> Telegram Bot tab.
+- Click the button: "⚡ Pull Latest Code from GitHub".
+- Watch the live progress indicator. It pulls, validates, and reloads!
+
+METHOD 3: 1-CLICK SHELL SCRIPT (IF ALREADY IN SSH TERMINAL)
+- In your Ubuntu terminal, run:
+  ./update.sh
+- This script automatically runs git pull, node -c bot.js, and pm2 reload.
+
 ================================================================================
 9. CHANNEL AUTOMATION (UPLOADING MOVIES/SERIES TO @filmhouse_main)
 ================================================================================

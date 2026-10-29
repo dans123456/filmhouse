@@ -2385,6 +2385,48 @@ if (saveTelegramPingsBtn) {
 }
 
 // Save Welcome Message configuration to Firestore
+
+// Ubuntu Server 1-Click Remote Updater Button Handler
+const serverBotUpdateBtn = document.getElementById("btn-server-bot-update");
+if (serverBotUpdateBtn) {
+    serverBotUpdateBtn.addEventListener("click", async () => {
+        if (!db) {
+            showToast("Firestore database connection required to trigger server update.", "warning");
+            return;
+        }
+        
+        const confirmUpdate = confirm("Are you sure you want to pull the latest code from GitHub into your Ubuntu server bot?\n\nThis will safely verify JavaScript syntax and reload PM2 with zero downtime.");
+        if (!confirmUpdate) return;
+
+        serverBotUpdateBtn.disabled = true;
+        serverBotUpdateBtn.innerHTML = '<span>⏳ Requesting Update...</span>';
+
+        const statusContainer = document.getElementById("server-bot-update-status");
+        const statusText = document.getElementById("server-bot-update-text");
+        if (statusContainer && statusText) {
+            statusContainer.style.display = "block";
+            statusText.textContent = "🚀 Sent update request to Ubuntu server. Waiting for bot response...";
+            statusText.style.color = "#00a2ed";
+        }
+
+        try {
+            const adminId = window.currentAdminTelegramId || localStorage.getItem("filmhouse_admin_tg_id") || "admin";
+            await db.collection("settings").doc("server_tasks").set({
+                action: "git_update",
+                status: "pending",
+                requestedBy: String(adminId),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast("Server update request dispatched to Ubuntu bot! 🔄", "info");
+        } catch (err) {
+            console.error("Failed to request server update:", err);
+            showToast("Failed to send update request: " + err.message, "error");
+            serverBotUpdateBtn.disabled = false;
+            serverBotUpdateBtn.innerHTML = '<span>⚡ Pull Latest Code from GitHub</span>';
+        }
+    });
+}
+
 const saveWelcomeMessageBtn = document.getElementById("btn-save-welcome-message");
 if (saveWelcomeMessageBtn) {
     saveWelcomeMessageBtn.addEventListener("click", async () => {
