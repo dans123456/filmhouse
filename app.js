@@ -5886,6 +5886,16 @@ function startStreamingPresence(movie, title) {
         console.warn("Could not register stream presence:", err);
     });
 
+    // Auto-track daily streaming mission
+    if (state.user) {
+        if (!state.user.dailyStats) checkAndResetDailyMissions();
+        if (state.user.dailyStats) {
+            state.user.dailyStats.streamsCount = (state.user.dailyStats.streamsCount || 0) + 1;
+            saveDailyStats();
+            if (typeof renderDailyMissions === "function") renderDailyMissions();
+        }
+    }
+
     db.collection("settings").doc("stream_metrics").set({
         totalStreamPlays: firebase.firestore.FieldValue.increment(1),
         lastStreamedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -9848,6 +9858,15 @@ function renderDailyMissions() {
     
     const missions = [
         {
+            id: "stream",
+            title: "Cinema Binge Watcher 🍿",
+            desc: "Stream 1 movie or series episode.",
+            target: 1,
+            current: Math.min(1, stats.streamsCount || 0),
+            claimed: stats.streamClaimed,
+            reward: 25
+        },
+        {
             id: "share",
             title: "Social Promoter 🔗",
             desc: "Share 1 movie link with friends on Telegram.",
@@ -9926,6 +9945,9 @@ function claimMissionReward(missionId) {
     if (missionId === "login" && !stats.checkInClaimed) {
         stats.checkInClaimed = true;
         pointsToAward = 5;
+    } else if (missionId === "stream" && !stats.streamClaimed && (stats.streamsCount || 0) >= 1) {
+        stats.streamClaimed = true;
+        pointsToAward = 25;
     } else if (missionId === "share" && !stats.shareClaimed && (stats.sharesCount || 0) >= 1) {
         stats.shareClaimed = true;
         pointsToAward = 10;
@@ -10216,11 +10238,55 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     
     // Reward redemption actions
+    // Reward Center Sponsor Ad Bonus Listener
+    const btnWatchAdPoints = document.getElementById("btn-watch-ad-for-points");
+    if (btnWatchAdPoints) {
+        btnWatchAdPoints.addEventListener("click", () => {
+            const stats = state.user.dailyStats || {};
+            const adCount = stats.adWatchesCount || 0;
+            if (adCount >= 10) {
+                showToast("Daily ad bonus limit reached (10/10)! Check back tomorrow.", "info");
+                return;
+            }
+
+            btnWatchAdPoints.disabled = true;
+            btnWatchAdPoints.innerHTML = "<span>⏳ Loading Sponsor Clip...</span>";
+
+            // Trigger monetag / adsgram rewarded ad
+            showRewardedAd(() => {
+                btnWatchAdPoints.disabled = false;
+                btnWatchAdPoints.innerHTML = "<span>📺 Watch Sponsor Ad (+25 pts)</span>";
+                
+                if (state.user && state.user.dailyStats) {
+                    state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
+                    saveDailyStats();
+                }
+                awardPoints(25, "ad");
+                triggerHaptic("success");
+                showToast("🎉 Sponsor Ad Completed! +25 Loyalty Points added to balance.", "success");
+                if (typeof renderDailyMissions === "function") renderDailyMissions();
+            }, () => {
+                btnWatchAdPoints.disabled = false;
+                btnWatchAdPoints.innerHTML = "<span>📺 Watch Sponsor Ad (+25 pts)</span>";
+                showToast("Ad could not be loaded at this moment. Please try again in a few seconds.", "warning");
+            });
+        });
+    }
+
     const redeemButtons = document.querySelectorAll("#rewards-drawer .redeem-btn");
     redeemButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             const rewardId = btn.getAttribute("data-reward-id");
-            if (rewardId === "ad-free") {
+            if (rewardId === "stream-pass") {
+                if (state.user.points < 500) {
+                    showToast("Not enough points! You need 500 points for 4h Fast-Stream Pass.", "error");
+                    return;
+                }
+                deductPoints(500);
+                localStorage.setItem("cinema_fast_stream_until", Date.now() + 4 * 60 * 60 * 1000);
+                localStorage.setItem("ad_free_until", Date.now() + 4 * 60 * 60 * 1000);
+                showToast("⚡ 4-Hour Cinema Fast-Stream Pass activated! Enjoy ad-free streaming & instant buffering.", "success");
+            } else if (rewardId === "ad-free") {
                 if (state.user.points < 1500) {
                     showToast("Not enough points! You need 1,500 points for Ad-Free pass.", "error");
                     return;
