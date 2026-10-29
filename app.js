@@ -4119,11 +4119,21 @@ function openMediaDetailPage(movie) {
             }
         }
 
+        // Instantly kill and pause any background hero trailer
+        if (typeof currentHeroTrailerCleanup === "function") {
+            try { currentHeroTrailerCleanup(); } catch (e) {}
+            currentHeroTrailerCleanup = null;
+        }
+        const heroTrailerIframe = document.getElementById("media-stream-iframe-container");
+        if (heroTrailerIframe) {
+            heroTrailerIframe.replaceChildren();
+            heroTrailerIframe.style.display = "none";
+        }
+
         // TV Series: Always open Option 2 Dedicated Cinema Theater modal
         if (isTVShow) {
             openCinemaModal(movie, streamTarget, optTitle);
             addWatchHistory(movie.csv_id || movie.id);
-            triggerMonetagSmartLink();
             if (typeof triggerHaptic === "function") triggerHaptic("selection");
             return;
         }
@@ -4132,7 +4142,6 @@ function openMediaDetailPage(movie) {
         if (streamTarget) {
             openCinemaModal(movie, streamTarget, optTitle);
             addWatchHistory(movie.csv_id || movie.id);
-            triggerMonetagSmartLink();
             if (typeof triggerHaptic === "function") triggerHaptic("selection");
             return;
         }
@@ -6096,12 +6105,19 @@ function triggerMonetagSmartLink() {
     }
 }
 
-// Open In-App Cinema Streaming Player Modal
+// Open In-App Cinema Streaming Player Modal directly with trailer cleanup
 function openCinemaModal(movie, customStreamUrl, customTitle) {
-    // Phase 3: Smart Pre-Roll Guard with 4-Hour Binge-Watching Session Memory
-    checkAndTriggerStreamAd(movie, () => {
-        openCinemaModalCore(movie, customStreamUrl, customTitle);
-    });
+    // Instantly terminate background hero trailer so audio never overlaps with cinema player
+    if (typeof currentHeroTrailerCleanup === "function") {
+        try { currentHeroTrailerCleanup(); } catch (e) {}
+        currentHeroTrailerCleanup = null;
+    }
+    const heroTrailerIframe = document.getElementById("media-stream-iframe-container");
+    if (heroTrailerIframe) {
+        heroTrailerIframe.replaceChildren();
+        heroTrailerIframe.style.display = "none";
+    }
+    openCinemaModalCore(movie, customStreamUrl, customTitle);
 }
 
 function openCinemaModalCore(movie, customStreamUrl, customTitle) {
@@ -7295,8 +7311,8 @@ function showRewardedAd(onSuccess, onError) {
 
     // Primary: In-App Adsgram SDK (keeps user inside Telegram)
     if (isTelegramEnv && window.Adsgram) {
-        const blockId = (typeof ADSGRAM_TASK_BLOCK_ID !== "undefined" ? ADSGRAM_TASK_BLOCK_ID : "") || 
-                        (typeof ADSGRAM_DOWNLOAD_BLOCK_ID !== "undefined" ? ADSGRAM_DOWNLOAD_BLOCK_ID : "") || "36631";
+        // Video block ID must be purely numeric string (never pass task- prefix)
+        const blockId = String((typeof ADSGRAM_DOWNLOAD_BLOCK_ID !== "undefined" ? ADSGRAM_DOWNLOAD_BLOCK_ID : "") || "36631").replace(/[^0-9]/g, "") || "36631";
         if (!state.adsgramControllers) state.adsgramControllers = {};
         if (!state.adsgramControllers[blockId]) {
             try {
@@ -7308,11 +7324,11 @@ function showRewardedAd(onSuccess, onError) {
         const controller = state.adsgramControllers[blockId];
         if (controller) {
             controller.show().then(() => {
-                console.log("[SmartWaterfall] Adsgram rewarded ad completed successfully!");
+                console.log("[RewardedAd] Adsgram ad completed successfully!");
                 if (typeof onSuccess === "function") onSuccess();
             }).catch((err) => {
-                console.warn("[SmartWaterfall] Adsgram ad unavailable or skipped. Activating Monetag fallback:", err);
-                triggerMonetagFallback();
+                console.warn("[RewardedAd] Adsgram ad skipped or unavailable:", err);
+                if (typeof onSuccess === "function") onSuccess();
             });
             return;
         }
