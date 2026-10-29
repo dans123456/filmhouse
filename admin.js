@@ -2386,8 +2386,86 @@ if (saveTelegramPingsBtn) {
 
 // Save Welcome Message configuration to Firestore
 
-// Ubuntu Server 1-Click Remote Updater Button Handler
+// Ubuntu Server 1-Click Remote Updater Button Handler & Real-Time Sync
 const serverBotUpdateBtn = document.getElementById("btn-server-bot-update");
+const serverBotStatusContainer = document.getElementById("server-bot-update-status");
+const serverBotStatusText = document.getElementById("server-bot-update-text");
+const serverBotDismissBtn = document.getElementById("btn-server-bot-update-reset");
+let serverUpdateWatchdogTimer = null;
+
+const formatSafeHtml = (str) => {
+    if (!str) return "";
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
+
+if (serverBotDismissBtn && serverBotStatusContainer) {
+    serverBotDismissBtn.addEventListener("click", () => {
+        serverBotStatusContainer.style.display = "none";
+        if (serverUpdateWatchdogTimer) clearTimeout(serverUpdateWatchdogTimer);
+        if (serverBotUpdateBtn) {
+            serverBotUpdateBtn.disabled = false;
+            serverBotUpdateBtn.innerHTML = '<span>⚡ Pull Latest Code from GitHub</span>';
+        }
+    });
+}
+
+// Attach real-time snapshot listener on Firestore settings/server_tasks
+if (typeof db !== "undefined" && db) {
+    try {
+        db.collection("settings").doc("server_tasks").onSnapshot((docSnap) => {
+            if (!docSnap.exists) return;
+            const task = docSnap.data();
+            if (!task || !task.status) return;
+
+            if (task.status === "in_progress") {
+                if (serverBotStatusContainer) serverBotStatusContainer.style.display = "block";
+                if (serverBotStatusText) {
+                    serverBotStatusText.innerHTML = `🔄 <b>In Progress:</b> ${formatSafeHtml(task.progressText || "Ubuntu server is pulling code from GitHub...")}`;
+                    serverBotStatusText.style.color = "#00a2ed";
+                }
+                if (serverBotUpdateBtn) {
+                    serverBotUpdateBtn.disabled = true;
+                    serverBotUpdateBtn.innerHTML = '<span>⏳ Updating Server...</span>';
+                }
+            } else if (task.status === "completed") {
+                if (serverUpdateWatchdogTimer) clearTimeout(serverUpdateWatchdogTimer);
+                if (serverBotUpdateBtn) {
+                    serverBotUpdateBtn.disabled = false;
+                    serverBotUpdateBtn.innerHTML = '<span>⚡ Pull Latest Code from GitHub</span>';
+                }
+                if (serverBotStatusContainer) serverBotStatusContainer.style.display = "block";
+                if (serverBotStatusText) {
+                    const isUpToDate = !!task.alreadyUpToDate;
+                    const header = isUpToDate ? "✅ <b>Repository Already Up to Date</b>" : "🎉 <b>Server Updated Successfully!</b>";
+                    const subtitle = isUpToDate 
+                        ? "Ubuntu server is running the latest build with 0 syntax errors." 
+                        : "Latest code pulled and PM2 zero-downtime reload initiated.";
+                    const outputSnippet = task.output 
+                        ? `<pre style="font-family: monospace; font-size: 10px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 4px; margin: 6px 0 0 0; overflow-x: auto; max-height: 80px; white-space: pre-wrap; color: #a0aec0;">${formatSafeHtml(task.output.trim().slice(0, 300))}</pre>` 
+                        : "";
+                    serverBotStatusText.innerHTML = `${header}<br><span style="font-size: 10px; color: var(--text-secondary);">${subtitle}</span>${outputSnippet}`;
+                    serverBotStatusText.style.color = "#28a745";
+                }
+            } else if (task.status === "failed") {
+                if (serverUpdateWatchdogTimer) clearTimeout(serverUpdateWatchdogTimer);
+                if (serverBotUpdateBtn) {
+                    serverBotUpdateBtn.disabled = false;
+                    serverBotUpdateBtn.innerHTML = '<span>⚡ Pull Latest Code from GitHub</span>';
+                }
+                if (serverBotStatusContainer) serverBotStatusContainer.style.display = "block";
+                if (serverBotStatusText) {
+                    serverBotStatusText.innerHTML = `❌ <b>Update Failed:</b> ${formatSafeHtml(task.error || task.output || "Unknown server error")}`;
+                    serverBotStatusText.style.color = "#dc3545";
+                }
+            }
+        }, (err) => {
+            console.warn("[AdminUpdater] Snapshot listener warning:", err);
+        });
+    } catch (e) {
+        console.warn("[AdminUpdater] Could not bind server_tasks listener:", e);
+    }
+}
+
 if (serverBotUpdateBtn) {
     serverBotUpdateBtn.addEventListener("click", async () => {
         if (!db) {
@@ -2401,13 +2479,30 @@ if (serverBotUpdateBtn) {
         serverBotUpdateBtn.disabled = true;
         serverBotUpdateBtn.innerHTML = '<span>⏳ Requesting Update...</span>';
 
-        const statusContainer = document.getElementById("server-bot-update-status");
-        const statusText = document.getElementById("server-bot-update-text");
-        if (statusContainer && statusText) {
-            statusContainer.style.display = "block";
-            statusText.textContent = "🚀 Sent update request to Ubuntu server. Waiting for bot response...";
-            statusText.style.color = "#00a2ed";
+        if (serverBotStatusContainer && serverBotStatusText) {
+            serverBotStatusContainer.style.display = "block";
+            serverBotStatusText.innerHTML = "🚀 <b>Update request dispatched to Ubuntu server.</b> Waiting for bot response...";
+            serverBotStatusText.style.color = "#00a2ed";
         }
+
+        if (serverUpdateWatchdogTimer) clearTimeout(serverUpdateWatchdogTimer);
+
+        // 25-Second Watchdog Timer: prevents button from ever getting stuck permanently
+        serverUpdateWatchdogTimer = setTimeout(() => {
+            if (serverBotUpdateBtn && serverBotUpdateBtn.disabled) {
+                serverBotUpdateBtn.disabled = false;
+                serverBotUpdateBtn.innerHTML = '<span>⚡ Pull Latest Code from GitHub</span>';
+                if (serverBotStatusText) {
+                    serverBotStatusText.innerHTML = "⚠️ <b>Ubuntu bot did not respond within 25 seconds.</b><br>" +
+                        "<span style='font-size: 10.5px; color: var(--text-secondary); line-height: 1.4; display: block; margin-top: 4px;'>" +
+                        "• The bot process on Ubuntu may be offline, OR<br>" +
+                        "• The server is still running an earlier bot build from before remote updates were enabled.<br>" +
+                        "👉 <b>Solution:</b> Run <code>bash update.sh</code> once in your Ubuntu terminal or type <code>/update</code> in Telegram DM to your bot. Once updated, 1-click remote updates will be instantaneous!" +
+                        "</span>";
+                    serverBotStatusText.style.color = "#ffbc00";
+                }
+            }
+        }, 25000);
 
         try {
             const adminId = window.currentAdminTelegramId || localStorage.getItem("filmhouse_admin_tg_id") || "admin";
@@ -2419,10 +2514,15 @@ if (serverBotUpdateBtn) {
             });
             showToast("Server update request dispatched to Ubuntu bot! 🔄", "info");
         } catch (err) {
+            if (serverUpdateWatchdogTimer) clearTimeout(serverUpdateWatchdogTimer);
             console.error("Failed to request server update:", err);
             showToast("Failed to send update request: " + err.message, "error");
             serverBotUpdateBtn.disabled = false;
             serverBotUpdateBtn.innerHTML = '<span>⚡ Pull Latest Code from GitHub</span>';
+            if (serverBotStatusText) {
+                serverBotStatusText.textContent = "❌ Failed to dispatch update: " + err.message;
+                serverBotStatusText.style.color = "#dc3545";
+            }
         }
     });
 }

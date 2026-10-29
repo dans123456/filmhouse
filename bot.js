@@ -139,7 +139,7 @@ function performServerGitUpdate(onProgress) {
         const projectDir = path.resolve(__dirname);
         if (typeof onProgress === "function") onProgress("Pulling latest code from GitHub main branch...");
         
-        exec("git pull origin main", { cwd: projectDir }, (pullErr, pullOut, pullErrOut) => {
+        exec("git pull origin main", { cwd: projectDir, timeout: 25000 }, (pullErr, pullOut, pullErrOut) => {
             if (pullErr) {
                 console.error("[ServerUpdater] git pull failed:", pullErr);
                 return resolve({
@@ -154,7 +154,7 @@ function performServerGitUpdate(onProgress) {
 
             if (typeof onProgress === "function") onProgress("Verifying JavaScript syntax integrity...");
 
-            exec("node -c bot.js", { cwd: projectDir }, (syntaxErr, synOut, synErrOut) => {
+            exec("node -c bot.js", { cwd: projectDir, timeout: 10000 }, (syntaxErr, synOut, synErrOut) => {
                 if (syntaxErr) {
                     console.error("[ServerUpdater] Syntax check failed:", syntaxErr);
                     return resolve({
@@ -179,7 +179,7 @@ function performServerGitUpdate(onProgress) {
 
                 // Schedule PM2 reload slightly after resolving to allow response to be sent first
                 setTimeout(() => {
-                    exec("pm2 reload filmhouse-bot || pm2 reload bot || pm2 reload all", { cwd: projectDir }, (pm2Err, pm2Out) => {
+                    exec("pm2 reload filmhouse-bot || pm2 reload bot || pm2 reload all", { cwd: projectDir, timeout: 15000 }, (pm2Err, pm2Out) => {
                         if (pm2Err) {
                             console.warn("[ServerUpdater] PM2 reload notice:", pm2Err.message);
                         } else {
@@ -5137,6 +5137,14 @@ async function init() {
             const task = docSnap.data();
             if (task.action === "git_update" && task.status === "pending") {
                 if (isTaskProcessing) return;
+                
+                const taskTime = task.timestamp ? (task.timestamp.toMillis ? task.timestamp.toMillis() : new Date(task.timestamp).getTime()) : 0;
+                if (taskTime && (Date.now() - taskTime > 3 * 60 * 1000)) {
+                    console.log("[ServerTasks] Ignoring stale update request from:", task.requestedBy);
+                    await db.collection("settings").doc("server_tasks").set({ status: "expired" }, { merge: true });
+                    return;
+                }
+
                 isTaskProcessing = true;
                 console.log(`[ServerTasks] Received remote git_update request from admin: ${task.requestedBy || "unknown"}`);
                 

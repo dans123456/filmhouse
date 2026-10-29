@@ -602,8 +602,11 @@
                             <span>⚡ Pull Latest Code from GitHub</span>
                         </button>
                     </div>
-                    <div id="server-bot-update-status" style="margin-top: 12px; font-size: 11px; display: none; padding: 10px 14px; border-radius: 8px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);">
-                        <span id="server-bot-update-text" style="color: var(--text-secondary);">Idle</span>
+                    <div id="server-bot-update-status" style="margin-top: 12px; font-size: 11px; display: none; padding: 12px 14px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                            <div id="server-bot-update-text" style="color: var(--text-secondary); line-height: 1.5; flex: 1;">Idle</div>
+                            <button id="btn-server-bot-update-reset" type="button" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text-secondary); font-size: 10px; padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap;">Dismiss ✕</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1444,6 +1447,6 @@
         </button>
     </div>
 
-    <script src="admin.js?v=116"></script>
+    <script src="admin.js?v=117"></script>
 </body>
 </html>
