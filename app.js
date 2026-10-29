@@ -4762,7 +4762,13 @@ function renderMediaSeriesSection(movie, container, streamCallback) {
                 episodesList.querySelectorAll(".episode-rich-card").forEach(c => c.classList.remove("active"));
                 epCard.classList.add("active");
 
-                const epTarget = ep.stream_url || seasonObj.streamUrl || movie.stream_url || "";
+                let epTarget = ep.stream_url || seasonObj.streamUrl || movie.stream_url || "";
+                if (movie.stream_links && Array.isArray(movie.stream_links)) {
+                    const foundStream = movie.stream_links.find(s => (s.episode == epNum || s.episode_number == epNum) && (s.season == seasonObj.seasonNumber || !s.season));
+                    if (foundStream) {
+                        epTarget = foundStream.stream_url || foundStream.url || epTarget;
+                    }
+                }
                 const epDisplayTitle = `${movie.title} • S${seasonObj.seasonNumber}:E${epNum}`;
                 streamCallback(epTarget, epDisplayTitle);
                 showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
@@ -6145,7 +6151,13 @@ function openCinemaModal(movie, customStreamUrl, customTitle) {
                         epCard.classList.add("active");
                         currentEpisodeNum = epNum;
 
-                        const epTarget = ep.stream_url || seasonObj.streamUrl || movie.stream_url || streamTarget;
+                        let epTarget = ep.stream_url || seasonObj.streamUrl || movie.stream_url || streamTarget;
+                        if (movie.stream_links && Array.isArray(movie.stream_links)) {
+                            const foundStream = movie.stream_links.find(s => (s.episode == epNum || s.episode_number == epNum) && (s.season == seasonObj.seasonNumber || !s.season));
+                            if (foundStream) {
+                                epTarget = foundStream.stream_url || foundStream.url || epTarget;
+                            }
+                        }
                         const epDisplayTitle = `${baseTitle} • S${seasonObj.seasonNumber}:E${epNum}`;
                         setCinemaStream(epTarget, epDisplayTitle);
                         showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");

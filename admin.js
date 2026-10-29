@@ -355,6 +355,61 @@ function parseBulkLinks(rawText, isSeries) {
     return parsed;
 }
 
+function parseBulkStreams(rawText, isSeries) {
+    if (!rawText || typeof rawText !== "string") return [];
+    const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    const parsed = [];
+
+    function detectQuality(str, fallbackIdx) {
+        const lower = str.toLowerCase();
+        if (lower.includes("4k") || lower.includes("2160") || lower.includes("uhd")) return "2160p (4K)";
+        if (lower.includes("1080") || lower.includes("fhd")) return "1080p";
+        if (lower.includes("720") || lower.includes("hd")) return "720p";
+        if (lower.includes("480") || lower.includes("sd")) return "480p";
+        if (lower.includes("cinema") || lower.includes("cam") || lower.includes("hdcam")) return "Cinema Cut / HDCam";
+        const standardOrder = ["720p", "1080p", "2160p (4K)", "480p"];
+        return standardOrder[fallbackIdx % standardOrder.length] || "720p";
+    }
+
+    function detectEpisode(str, fallbackIdx) {
+        const epMatch = str.match(/(?:ep(?:isode)?|e)\s*(\d+)/i) || str.match(/\b(\d+)\b/);
+        if (epMatch) {
+            return parseInt(epMatch[1], 10);
+        }
+        return fallbackIdx + 1;
+    }
+
+    lines.forEach((line, idx) => {
+        let tokenOrUrl = line;
+        let specifiedQuality = "";
+        let specifiedEpisode = 0;
+
+        if (line.includes("|")) {
+            const parts = line.split("|");
+            const prefix = parts[0].trim();
+            tokenOrUrl = parts.slice(1).join("|").trim();
+            if (isSeries) {
+                specifiedEpisode = detectEpisode(prefix, idx);
+            } else {
+                specifiedQuality = detectQuality(prefix, idx);
+            }
+        }
+
+        const cleaned = cleanStreamInput(tokenOrUrl);
+        if (!cleaned) return;
+
+        if (isSeries) {
+            const epNum = specifiedEpisode || (idx + 1);
+            parsed.push({ url: cleaned, episode: epNum });
+        } else {
+            const quality = specifiedQuality || detectQuality(line, idx);
+            parsed.push({ url: cleaned, quality });
+        }
+    });
+
+    return parsed;
+}
+
 // Global Datasets for local search filter matching (saves Firestore quota reads)
 let allUsers = [];
 let adminIdsList = ["1329840839", "1175336733"];
@@ -1526,10 +1581,7 @@ function fulfillMovieTitleRequests(title, docIds, reqMeta = null) {
                 }
             }
             renderFulfillLinksInputs(existingMovie, isSeries, reqSpec);
-            const fulfillStreamInput = document.getElementById("fulfill-stream-url");
-            if (fulfillStreamInput) {
-                fulfillStreamInput.value = (existingMovie && existingMovie.stream_url) ? existingMovie.stream_url : (existingMovie && existingMovie.links && existingMovie.links[0] && existingMovie.links[0].stream_url ? existingMovie.links[0].stream_url : "");
-            }
+            renderFulfillStreamLinksInputs(existingMovie, isSeries, reqSpec);
             modal.classList.add("active");
         };
 
@@ -3671,10 +3723,95 @@ function renderAddMovieLinks() {
     });
 }
 
+let addMovieStreamLinksState = [{ url: "", quality: "720p", episode: 1 }];
+
+function renderAddMovieStreamLinks() {
+    const wrapper = document.getElementById("add-movie-streams-inputs-wrapper");
+    if (!wrapper) return;
+    
+    const movieTypeSelect = document.getElementById("movie-type");
+    const isSeries = movieTypeSelect && (movieTypeSelect.value.toLowerCase() === 'tv' || movieTypeSelect.value.toLowerCase() === 'series');
+    
+    // Update Add button label
+    const addBtn = document.getElementById("btn-add-movie-stream-link-input");
+    if (addBtn) {
+        addBtn.textContent = isSeries ? "+ Add Episode Stream" : "+ Add Stream Link";
+    }
+
+    wrapper.innerHTML = addMovieStreamLinksState.map((linkObj, idx) => {
+        const urlVal = typeof linkObj === 'object' && linkObj !== null ? (linkObj.url || linkObj.stream_url || "") : String(linkObj || "");
+        const qualityVal = typeof linkObj === 'object' && linkObj !== null && linkObj.quality ? linkObj.quality : (idx === 0 ? "720p" : (idx === 1 ? "1080p" : "2160p (4K)"));
+        const epNum = typeof linkObj === 'object' && linkObj !== null && linkObj.episode ? linkObj.episode : (idx + 1);
+        const escaped = escapeHTML(urlVal || "");
+        const cleanToken = cleanStreamInput(urlVal);
+        
+        return `
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 11px; color: ${isSeries ? '#00e676' : '#ffbc00'}; font-weight: 700; width: ${isSeries ? '100px' : '65px'}; flex-shrink: 0;">${isSeries ? `Episode ${epNum}:` : `Stream ${idx + 1}:`}</span>
+                <input type="text" class="add-movie-stream-url-input" data-index="${idx}" value="${escaped}" placeholder="${isSeries ? `Paste token / URL for Episode ${epNum}...` : `Paste stream token or URL...`}" style="flex: 1; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; font-family: monospace;">
+                
+                ${!isSeries ? `
+                <select class="add-movie-stream-quality-select" data-index="${idx}" style="padding: 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; width: 95px; cursor: pointer;">
+                    <option value="480p" ${qualityVal === '480p' ? 'selected' : ''}>480p</option>
+                    <option value="720p" ${qualityVal === '720p' ? 'selected' : ''}>720p</option>
+                    <option value="1080p" ${qualityVal === '1080p' ? 'selected' : ''}>1080p</option>
+                    <option value="2160p (4K)" ${qualityVal === '2160p (4K)' || qualityVal === '4K UHD' ? 'selected' : ''}>2160p (4K)</option>
+                    <option value="Cinema Cut / HDCam" ${qualityVal === 'Cinema Cut / HDCam' || qualityVal === 'Cinema Cut' || qualityVal === 'HDCam' ? 'selected' : ''}>Cinema Cut / HDCam</option>
+                </select>
+                ` : ''}
+
+                ${cleanToken ? `
+                <a href="https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(cleanToken)}" target="_blank" class="btn btn-secondary btn-sm" style="font-size: 10px; padding: 5px 8px; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00; text-decoration: none; flex-shrink: 0;" title="Test Stream Player">Test ▶️</a>
+                ` : ''}
+
+                <button type="button" class="btn-remove-add-movie-stream" data-index="${idx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 6px; display: ${addMovieStreamLinksState.length > 1 ? 'block' : 'none'};">
+                    <svg style="width: 14px; height: 14px; fill: currentColor;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+            </div>
+        `;
+    }).join('');
+    
+    // Bind url input updates
+    wrapper.querySelectorAll(".add-movie-stream-url-input").forEach(input => {
+        input.addEventListener("input", (e) => {
+            const idx = parseInt(e.target.dataset.index);
+            const isSeriesNow = movieTypeSelect && (movieTypeSelect.value.toLowerCase() === 'tv' || movieTypeSelect.value.toLowerCase() === 'series');
+            if (typeof addMovieStreamLinksState[idx] !== 'object' || addMovieStreamLinksState[idx] === null) {
+                addMovieStreamLinksState[idx] = isSeriesNow ? { url: e.target.value.trim(), episode: idx + 1 } : { url: e.target.value.trim(), quality: "720p" };
+            } else {
+                addMovieStreamLinksState[idx].url = e.target.value.trim();
+                if (isSeriesNow && !addMovieStreamLinksState[idx].episode) addMovieStreamLinksState[idx].episode = idx + 1;
+            }
+        });
+    });
+
+    // Bind quality select updates
+    wrapper.querySelectorAll(".add-movie-stream-quality-select").forEach(select => {
+        select.addEventListener("change", (e) => {
+            const idx = parseInt(e.target.dataset.index);
+            if (typeof addMovieStreamLinksState[idx] !== 'object' || addMovieStreamLinksState[idx] === null) {
+                addMovieStreamLinksState[idx] = { url: "", quality: e.target.value };
+            } else {
+                addMovieStreamLinksState[idx].quality = e.target.value;
+            }
+        });
+    });
+    
+    // Bind remove button clicks
+    wrapper.querySelectorAll(".btn-remove-add-movie-stream").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const idx = parseInt(e.currentTarget.dataset.index);
+            addMovieStreamLinksState.splice(idx, 1);
+            renderAddMovieStreamLinks();
+        });
+    });
+}
+
 const addMovieTypeSelect = document.getElementById("movie-type");
 if (addMovieTypeSelect) {
     addMovieTypeSelect.addEventListener("change", () => {
         renderAddMovieLinks();
+        renderAddMovieStreamLinks();
         const rawId = document.getElementById("movie-id")?.value.trim().split("-")[0];
         if (rawId && /^\d+$/.test(rawId)) {
             const currentTitle = document.getElementById("movie-title")?.value || "";
@@ -3711,6 +3848,9 @@ function resetAddMovieModalState() {
     addMovieLinksState = [{ url: "", quality: "720p" }];
     renderAddMovieLinks();
 
+    addMovieStreamLinksState = [{ url: "", quality: "720p", episode: 1 }];
+    renderAddMovieStreamLinks();
+
     const customSection = document.getElementById("add-movie-custom-fields");
     const toggleBtn = document.getElementById("btn-toggle-custom-fields");
     const toggleContainer = toggleBtn ? toggleBtn.parentElement : null;
@@ -3727,14 +3867,12 @@ function resetAddMovieModalState() {
     const customOverview = document.getElementById("movie-overview");
     const customTrailer = document.getElementById("movie-trailer");
     const customReleaseDate = document.getElementById("movie-release-date");
-    const customStreamUrl = document.getElementById("movie-stream-url");
 
     if (customPoster) customPoster.value = "";
     if (customBackdrop) customBackdrop.value = "";
     if (customOverview) customOverview.value = "";
     if (customTrailer) customTrailer.value = "";
     if (customReleaseDate) customReleaseDate.value = "";
-    if (customStreamUrl) customStreamUrl.value = "";
 
     document.querySelectorAll(".add-cat-checkbox").forEach(cb => {
         cb.checked = (cb.value === "Main");
@@ -3746,6 +3884,13 @@ function resetAddMovieModalState() {
     if (addMovieBulkWrapper) addMovieBulkWrapper.style.display = "none";
     if (addMovieBulkInput) addMovieBulkInput.value = "";
     if (btnAddMovieBulkToggle) btnAddMovieBulkToggle.textContent = "📋 Bulk Paste";
+
+    const addMovieBulkStreamsWrapper = document.getElementById("add-movie-bulk-streams-wrapper");
+    const addMovieBulkStreamsInput = document.getElementById("add-movie-bulk-streams-input");
+    const btnAddMovieBulkStreamsToggle = document.getElementById("btn-add-movie-bulk-streams-toggle");
+    if (addMovieBulkStreamsWrapper) addMovieBulkStreamsWrapper.style.display = "none";
+    if (addMovieBulkStreamsInput) addMovieBulkStreamsInput.value = "";
+    if (btnAddMovieBulkStreamsToggle) btnAddMovieBulkStreamsToggle.textContent = "📋 Bulk Paste";
 }
 
 // Modal Toggle Logic
@@ -4081,6 +4226,54 @@ if (btnApplyAddBulkLinks && addMovieBulkInput) {
     });
 }
 
+// Add Movie Streaming Link Handlers
+const btnAddMovieStreamLinkInput = document.getElementById("btn-add-movie-stream-link-input");
+if (btnAddMovieStreamLinkInput) {
+    btnAddMovieStreamLinkInput.addEventListener("click", () => {
+        const movieTypeSelect = document.getElementById("movie-type");
+        const isSeries = movieTypeSelect && (movieTypeSelect.value.toLowerCase() === 'tv' || movieTypeSelect.value.toLowerCase() === 'series');
+        const nextIdx = addMovieStreamLinksState.length;
+        if (isSeries) {
+            addMovieStreamLinksState.push({ url: "", episode: nextIdx + 1 });
+        } else {
+            const standardQualities = ["720p", "1080p", "2160p (4K)", "480p"];
+            addMovieStreamLinksState.push({ url: "", quality: standardQualities[nextIdx % standardQualities.length] || "720p" });
+        }
+        renderAddMovieStreamLinks();
+    });
+}
+
+const btnAddMovieBulkStreamsToggle = document.getElementById("btn-add-movie-bulk-streams-toggle");
+const addMovieBulkStreamsWrapper = document.getElementById("add-movie-bulk-streams-wrapper");
+const addMovieBulkStreamsInput = document.getElementById("add-movie-bulk-streams-input");
+const btnApplyAddBulkStreams = document.getElementById("btn-apply-add-bulk-streams");
+
+if (btnAddMovieBulkStreamsToggle && addMovieBulkStreamsWrapper) {
+    btnAddMovieBulkStreamsToggle.addEventListener("click", () => {
+        const isHidden = addMovieBulkStreamsWrapper.style.display === "none";
+        addMovieBulkStreamsWrapper.style.display = isHidden ? "block" : "none";
+        btnAddMovieBulkStreamsToggle.textContent = isHidden ? "✕ Close Bulk" : "📋 Bulk Paste";
+        if (isHidden && addMovieBulkStreamsInput) addMovieBulkStreamsInput.focus();
+    });
+}
+
+if (btnApplyAddBulkStreams && addMovieBulkStreamsInput) {
+    btnApplyAddBulkStreams.addEventListener("click", () => {
+        const movieTypeSelect = document.getElementById("movie-type");
+        const isSeries = movieTypeSelect && (movieTypeSelect.value.toLowerCase() === 'tv' || movieTypeSelect.value.toLowerCase() === 'series');
+        const parsed = parseBulkStreams(addMovieBulkStreamsInput.value, isSeries);
+        if (parsed.length === 0) {
+            alert("Please paste at least one valid stream token or URL!");
+            return;
+        }
+        addMovieStreamLinksState = parsed;
+        renderAddMovieStreamLinks();
+        addMovieBulkStreamsInput.value = "";
+        if (addMovieBulkStreamsWrapper) addMovieBulkStreamsWrapper.style.display = "none";
+        if (btnAddMovieBulkStreamsToggle) btnAddMovieBulkStreamsToggle.textContent = "📋 Bulk Paste";
+    });
+}
+
 // Add Movie Form Submit
 const addMovieForm = document.getElementById("add-movie-form");
 if (addMovieForm) {
@@ -4096,13 +4289,27 @@ if (addMovieForm) {
         const customTrailerVal = document.getElementById("movie-trailer")?.value.trim() || "";
         const customTrailerId = extractYoutubeId(customTrailerVal);
         const customReleaseDate = document.getElementById("movie-release-date")?.value.trim() || "";
-        const customStreamVal = document.getElementById("movie-stream-url")?.value.trim() || "";
-        const cleanStreamVal = cleanStreamInput(customStreamVal);
+        
+        const isInitialSeries = (type.toLowerCase() === 'tv' || type.toLowerCase() === 'series');
+        const validStreams = addMovieStreamLinksState
+            .map((s, idx) => {
+                const u = cleanStreamInput(typeof s === 'object' && s !== null ? (s.url || s.stream_url) : s);
+                if (!u) return null;
+                if (isInitialSeries) {
+                    const epNum = (typeof s === 'object' && s !== null && s.episode) ? s.episode : (idx + 1);
+                    return { episode: epNum, season: 1, stream_url: u, url: u };
+                } else {
+                    const q = (typeof s === 'object' && s !== null && s.quality) ? s.quality : (idx === 0 ? "720p" : "1080p");
+                    return { quality: q, stream_url: u, url: u };
+                }
+            })
+            .filter(Boolean);
+
+        const cleanStreamVal = validStreams.length > 0 ? (validStreams[0].stream_url || validStreams[0].url) : "";
         
         // Get selected categories
         const checkedCategories = Array.from(document.querySelectorAll(".add-cat-checkbox:checked")).map(cb => cb.value);
         
-        const isInitialSeries = (type.toLowerCase() === 'tv' || type.toLowerCase() === 'series');
         const linksList = addMovieLinksState.filter(l => {
             const urlVal = typeof l === 'object' && l !== null ? l.url : l;
             return urlVal && urlVal.trim() !== "";
@@ -4251,10 +4458,17 @@ if (addMovieForm) {
             trailer: trailerId,
             runtime: "",
             stream_url: cleanStreamVal,
+            stream_links: validStreams,
             links: linksList
         };
         if (cleanStreamVal && linksList.length > 0) {
             linksList[0].stream_url = cleanStreamVal;
+            if (!isInitialSeries) {
+                linksList.forEach(l => {
+                    const match = validStreams.find(vs => normalizeQualityName(vs.quality) === normalizeQualityName(l.quality));
+                    if (match) l.stream_url = match.stream_url;
+                });
+            }
         }
         
         allCatalogMovies.unshift(newMovie);
@@ -5904,6 +6118,188 @@ if (btnApplyFulfillBulkLinks && fulfillBulkInput) {
     });
 }
 
+// Fulfill Request Streaming Link Handlers
+let fulfillStreamLinksState = [];
+
+function renderFulfillStreamLinksInputs(existingMovie, isSeries = true, reqSpec = "") {
+    const wrapper = document.getElementById("fulfill-streams-inputs-wrapper");
+    if (!wrapper) return;
+    wrapper.replaceChildren();
+
+    const addBtn = document.getElementById("btn-add-fulfill-stream-input");
+    if (addBtn) {
+        addBtn.textContent = isSeries ? "+ Add Episode Stream" : "+ Add Stream / Quality";
+    }
+
+    let existingStreams = [];
+    if (existingMovie) {
+        if (existingMovie.stream_links && Array.isArray(existingMovie.stream_links) && existingMovie.stream_links.length > 0) {
+            existingStreams = [...existingMovie.stream_links];
+        } else if (existingMovie.links && Array.isArray(existingMovie.links)) {
+            existingMovie.links.forEach((l, idx) => {
+                if (l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/"))))) {
+                    const u = l.stream_url || l.url;
+                    if (isSeries) {
+                        existingStreams.push({ url: u, episode: l.episode || (idx + 1) });
+                    } else {
+                        existingStreams.push({ url: u, quality: l.quality || "720p" });
+                    }
+                }
+            });
+        }
+        if (existingStreams.length === 0 && existingMovie.stream_url) {
+            existingStreams.push(isSeries ? { url: existingMovie.stream_url, episode: 1 } : { url: existingMovie.stream_url, quality: "720p" });
+        }
+    }
+
+    if (existingStreams.length > 0) {
+        existingStreams.forEach((item, idx) => {
+            const u = item.url || item.stream_url || "";
+            const q = item.quality || "720p";
+            const ep = item.episode || (idx + 1);
+            addFulfillStreamLinkInputRow(idx, u, q, isSeries, idx === 0, ep);
+        });
+    } else {
+        addFulfillStreamLinkInputRow(0, "", "720p", isSeries, true, 1);
+    }
+}
+
+function addFulfillStreamLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", isSeries = true, isRequested = false, defaultEp = 1) {
+    const wrapper = document.getElementById("fulfill-streams-inputs-wrapper");
+    if (!wrapper) return;
+
+    const row = document.createElement("div");
+    row.className = "fulfill-stream-row";
+    row.dataset.index = idx;
+    row.style.cssText = `display: flex; flex-wrap: wrap; gap: 6px; align-items: center; background: ${isRequested ? 'rgba(76, 217, 100, 0.08)' : 'rgba(255,255,255,0.02)'}; padding: 8px 10px; border-radius: 6px; border: 1px solid ${isRequested ? 'rgba(76, 217, 100, 0.35)' : 'rgba(255,255,255,0.05)'}; margin-bottom: 8px; width: 100%; box-sizing: border-box;`;
+
+    const labelBadge = document.createElement("span");
+    labelBadge.style.cssText = "font-size: 11px; color: #4cd964; font-weight: 800; flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;";
+    
+    const epNum = defaultEp || (idx + 1);
+    const normQuality = normalizeQualityName(defaultQuality);
+
+    if (isSeries) {
+        labelBadge.innerHTML = `<span>Episode ${epNum}:</span>${isRequested ? '<span style="font-size:9px; background:#4cd964; color:#000; padding:1px 4px; border-radius:3px;">⚡ STREAM</span>' : ''}`;
+    } else {
+        labelBadge.innerHTML = `<span>Stream ${idx + 1}:</span>${isRequested ? '<span style="font-size:9px; background:#4cd964; color:#000; padding:1px 4px; border-radius:3px;">⚡ PRIMARY</span>' : ''}`;
+    }
+
+    const cleanInitial = cleanStreamInput(defaultUrl);
+
+    const urlInput = document.createElement("input");
+    urlInput.type = "text";
+    urlInput.className = "fulfill-stream-url-input";
+    urlInput.value = cleanInitial;
+    urlInput.placeholder = isSeries ? `Paste token / URL for Episode ${epNum}...` : `Paste stream token / URL for ${normQuality}...`;
+    urlInput.style.cssText = "flex: 1; min-width: 140px; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace; outline: none; box-sizing: border-box;";
+
+    row.appendChild(labelBadge);
+    row.appendChild(urlInput);
+
+    if (!isSeries) {
+        const qualitySelect = document.createElement("select");
+        qualitySelect.className = "fulfill-stream-quality-select";
+        qualitySelect.style.cssText = "padding: 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; width: 115px; cursor: pointer; outline: none; flex-shrink: 0;";
+        
+        const qualities = ["720p", "1080p", "2160p (4K)", "480p", "Cinema Cut / HDCam"];
+        qualities.forEach(q => {
+            const opt = document.createElement("option");
+            opt.value = q;
+            opt.textContent = q;
+            if (q === normQuality) opt.selected = true;
+            qualitySelect.appendChild(opt);
+        });
+        row.appendChild(qualitySelect);
+    } else {
+        const epInput = document.createElement("input");
+        epInput.type = "hidden";
+        epInput.className = "fulfill-stream-episode-val";
+        epInput.value = epNum;
+        row.appendChild(epInput);
+    }
+
+    const testBtn = document.createElement("a");
+    testBtn.className = "fulfill-stream-test-btn";
+    testBtn.textContent = "Test ▶️";
+    testBtn.target = "_blank";
+    testBtn.style.cssText = `font-size: 10px; padding: 4px 8px; border: 1px solid rgba(255, 188, 0, 0.4); border-radius: 4px; color: #ffbc00; text-decoration: none; display: ${cleanInitial ? 'inline-flex' : 'none'}; align-items: center; white-space: nowrap; flex-shrink: 0;`;
+    if (cleanInitial) {
+        testBtn.href = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(cleanInitial)}&title=${encodeURIComponent(typeof currentFulfillTitle !== 'undefined' ? currentFulfillTitle : 'Movie')}`;
+    }
+
+    urlInput.addEventListener("input", (e) => {
+        const cleaned = cleanStreamInput(e.target.value.trim());
+        if (cleaned) {
+            testBtn.href = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(cleaned)}&title=${encodeURIComponent(typeof currentFulfillTitle !== 'undefined' ? currentFulfillTitle : 'Movie')}`;
+            testBtn.style.display = "inline-flex";
+        } else {
+            testBtn.style.display = "none";
+        }
+    });
+
+    row.appendChild(testBtn);
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "✕";
+    removeBtn.title = "Remove Stream";
+    removeBtn.style.cssText = "background: rgba(255, 59, 48, 0.2); color: #ff3b30; border: none; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;";
+    removeBtn.onclick = () => row.remove();
+    row.appendChild(removeBtn);
+
+    wrapper.appendChild(row);
+}
+
+const btnAddFulfillStreamInput = document.getElementById("btn-add-fulfill-stream-input");
+if (btnAddFulfillStreamInput) {
+    btnAddFulfillStreamInput.addEventListener("click", () => {
+        const wrapper = document.getElementById("fulfill-streams-inputs-wrapper");
+        const nextIdx = wrapper ? wrapper.querySelectorAll(".fulfill-stream-row").length : 0;
+        const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === currentFulfillTitle.toLowerCase().trim());
+        const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+        addFulfillStreamLinkInputRow(nextIdx, "", "720p", isSeries, false, nextIdx + 1);
+    });
+}
+
+const btnFulfillBulkStreamsToggle = document.getElementById("btn-fulfill-bulk-streams-toggle");
+const fulfillBulkStreamsWrapper = document.getElementById("fulfill-bulk-streams-wrapper");
+const fulfillBulkStreamsInput = document.getElementById("fulfill-bulk-streams-input");
+const btnApplyFulfillBulkStreams = document.getElementById("btn-apply-fulfill-bulk-streams");
+
+if (btnFulfillBulkStreamsToggle && fulfillBulkStreamsWrapper) {
+    btnFulfillBulkStreamsToggle.addEventListener("click", () => {
+        const isHidden = fulfillBulkStreamsWrapper.style.display === "none";
+        fulfillBulkStreamsWrapper.style.display = isHidden ? "block" : "none";
+        btnFulfillBulkStreamsToggle.textContent = isHidden ? "✕ Close Bulk" : "📋 Bulk Paste";
+        if (isHidden && fulfillBulkStreamsInput) fulfillBulkStreamsInput.focus();
+    });
+}
+
+if (btnApplyFulfillBulkStreams && fulfillBulkStreamsInput) {
+    btnApplyFulfillBulkStreams.addEventListener("click", () => {
+        const wrapper = document.getElementById("fulfill-streams-inputs-wrapper");
+        if (!wrapper) return;
+        const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === (typeof currentFulfillTitle !== 'undefined' ? currentFulfillTitle.toLowerCase().trim() : ""));
+        const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+
+        const parsed = parseBulkStreams(fulfillBulkStreamsInput.value, isSeries);
+        if (parsed.length === 0) {
+            alert("Please paste at least one valid stream token or URL!");
+            return;
+        }
+
+        wrapper.replaceChildren();
+        parsed.forEach((item, idx) => {
+            addFulfillStreamLinkInputRow(idx, item.url, item.quality || "720p", isSeries, idx === 0, item.episode || (idx + 1));
+        });
+
+        fulfillBulkStreamsInput.value = "";
+        if (fulfillBulkStreamsWrapper) fulfillBulkStreamsWrapper.style.display = "none";
+        if (btnFulfillBulkStreamsToggle) btnFulfillBulkStreamsToggle.textContent = "📋 Bulk Paste";
+    });
+}
+
 if (fulfillForm && fulfillRequestModal) {
     fulfillForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -5931,8 +6327,29 @@ if (fulfillForm && fulfillRequestModal) {
             return;
         }
 
-        const fulfillStreamVal = document.getElementById("fulfill-stream-url")?.value.trim() || "";
-        const cleanStreamVal = cleanStreamInput(fulfillStreamVal);
+        // Extract structured stream links
+        const streamRows = Array.from(document.querySelectorAll("#fulfill-streams-inputs-wrapper .fulfill-stream-row"));
+        const validFulfillStreams = [];
+
+        streamRows.forEach((row, idx) => {
+            const urlInput = row.querySelector(".fulfill-stream-url-input");
+            const qualitySelect = row.querySelector(".fulfill-stream-quality-select");
+            const epInput = row.querySelector(".fulfill-stream-episode-val");
+            const rawUrl = urlInput ? urlInput.value.trim() : "";
+            const cleanToken = cleanStreamInput(rawUrl);
+            if (cleanToken) {
+                const isSeriesNow = (currentFulfillReq && currentFulfillReq.type) ? ((currentFulfillReq.type || "").toLowerCase() === 'series' || (currentFulfillReq.type || "").toLowerCase() === 'tv') : true;
+                if (isSeriesNow) {
+                    const epNum = epInput ? parseInt(epInput.value, 10) : (idx + 1);
+                    validFulfillStreams.push({ episode: epNum, season: 1, stream_url: cleanToken, url: cleanToken });
+                } else {
+                    const quality = qualitySelect ? qualitySelect.value : (idx === 0 ? "720p" : "1080p");
+                    validFulfillStreams.push({ quality, stream_url: cleanToken, url: cleanToken });
+                }
+            }
+        });
+
+        const cleanStreamVal = validFulfillStreams.length > 0 ? (validFulfillStreams[0].stream_url || validFulfillStreams[0].url) : "";
 
         const downloadLink = primaryNotificationLink;
         
@@ -5989,8 +6406,15 @@ if (fulfillForm && fulfillRequestModal) {
 
             if (cleanStreamVal) {
                 existingMovie.stream_url = cleanStreamVal;
+                existingMovie.stream_links = validFulfillStreams;
                 if (existingMovie.links && existingMovie.links.length > 0) {
                     existingMovie.links[0].stream_url = cleanStreamVal;
+                    if (!isSeries) {
+                        existingMovie.links.forEach(l => {
+                            const match = validFulfillStreams.find(vs => normalizeQualityName(vs.quality) === normalizeQualityName(l.quality));
+                            if (match) l.stream_url = match.stream_url;
+                        });
+                    }
                 }
             }
 
@@ -6106,10 +6530,17 @@ if (fulfillForm && fulfillRequestModal) {
                     trailer: trailerId,
                     runtime: "",
                     stream_url: cleanStreamVal,
+                    stream_links: validFulfillStreams,
                     links: formattedLinksArray
                 };
                 if (cleanStreamVal && formattedLinksArray.length > 0) {
                     formattedLinksArray[0].stream_url = cleanStreamVal;
+                    if (!isSeries) {
+                        formattedLinksArray.forEach(l => {
+                            const match = validFulfillStreams.find(vs => normalizeQualityName(vs.quality) === normalizeQualityName(l.quality));
+                            if (match) l.stream_url = match.stream_url;
+                        });
+                    }
                 }
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(csvId);
@@ -6138,10 +6569,17 @@ if (fulfillForm && fulfillRequestModal) {
                     trailer: "",
                     runtime: "",
                     stream_url: cleanStreamVal,
+                    stream_links: validFulfillStreams,
                     links: formattedLinksArray
                 };
                 if (cleanStreamVal && formattedLinksArray.length > 0) {
                     formattedLinksArray[0].stream_url = cleanStreamVal;
+                    if (!isSeries) {
+                        formattedLinksArray.forEach(l => {
+                            const match = validFulfillStreams.find(vs => normalizeQualityName(vs.quality) === normalizeQualityName(l.quality));
+                            if (match) l.stream_url = match.stream_url;
+                        });
+                    }
                 }
                 allCatalogMovies.unshift(newMovie);
                 newlyAddedIds.push(csvId);

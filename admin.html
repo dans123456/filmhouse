@@ -1172,15 +1172,27 @@
                 </div>
                 <div class="form-group" style="margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <label for="movie-stream-url" style="margin: 0; font-weight: 600; color: #ffbc00; display: flex; align-items: center; gap: 6px;">
-                            <span>▶️ Online Streaming Link or Token (Optional)</span>
+                        <label style="margin: 0; font-weight: 600; color: #ffbc00; display: flex; align-items: center; gap: 6px;">
+                            <span>▶️ Online Streaming Links (Qualities / Episodes)</span>
                         </label>
-                        <span style="font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.12); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Monetag Ad Active</span>
+                        <span style="font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.12); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Monetag Stream</span>
                     </div>
-                    <div style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
-                        <input type="text" id="movie-stream-url" placeholder="Paste File Stream Bot link or token (unique per movie)..." style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace;">
-                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
-                            💡 Accepts File Stream Bot links or tokens (unique per movie). Activates the in-app <b>Watch Online</b> button.
+                    <div id="add-movie-streams-container" style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
+                        <div id="add-movie-streams-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
+                            <!-- Dynamic stream inputs loaded here -->
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-add-movie-stream-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">+ Add Stream Link</button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-add-movie-bulk-streams-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
+                        </div>
+                        <div id="add-movie-bulk-streams-wrapper" style="display: none; margin-top: 10px;">
+                            <textarea id="add-movie-bulk-streams-input" placeholder="Paste multiple stream tokens or FileStream URLs (one per line)...&#10;For Series: Line 1 -> Ep 1, Line 2 -> Ep 2...&#10;For Movies: Line 1 -> 720p, Line 2 -> 1080p..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                                <button type="button" class="btn btn-primary btn-sm" id="btn-apply-add-bulk-streams" style="font-size: 11px; padding: 4px 10px;">Apply Streams</button>
+                            </div>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.4;">
+                            💡 Accepts File Stream Bot links or tokens. For Series: enter episode-by-episode stream tokens. For Movies: enter 720p, 1080p, etc. Activates in-app <b>Watch Online</b> button.
                         </div>
                     </div>
                 </div>
@@ -1325,15 +1337,27 @@
                 </div>
                 <div class="form-group" style="margin-bottom: 14px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <label for="fulfill-stream-url" style="margin: 0; font-size: 11px; font-weight: 700; color: #ffbc00; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
-                            <span>▶️ Online Streaming Link or Token (Optional)</span>
+                        <label style="margin: 0; font-size: 11px; font-weight: 700; color: #ffbc00; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+                            <span>▶️ Online Streaming Links (Qualities / Episodes)</span>
                         </label>
                         <span style="font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.12); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Monetag Stream</span>
                     </div>
-                    <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
-                        <input type="text" id="fulfill-stream-url" placeholder="Paste File Stream Bot link or token (unique per movie)..." style="width: 100%; box-sizing: border-box; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace;">
-                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 5px; line-height: 1.4;">
-                            💡 Attaches streaming to this title so users can watch online in the app player. Leave blank if only providing Telegram download.
+                    <div id="fulfill-streams-container" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
+                        <div id="fulfill-streams-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
+                            <!-- Dynamic stream inputs loaded here -->
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-add-fulfill-stream-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">+ Add Stream / Episode</button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-fulfill-bulk-streams-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
+                        </div>
+                        <div id="fulfill-bulk-streams-wrapper" style="display: none; margin-top: 10px;">
+                            <textarea id="fulfill-bulk-streams-input" placeholder="Paste multiple stream tokens or FileStream URLs (one per line)...&#10;For Series: Line 1 -> Ep 1, Line 2 -> Ep 2...&#10;For Movies: Line 1 -> 720p, Line 2 -> 1080p..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                                <button type="button" class="btn btn-primary btn-sm" id="btn-apply-fulfill-bulk-streams" style="font-size: 11px; padding: 4px 10px;">Apply Streams</button>
+                            </div>
+                        </div>
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+                            💡 Attaches streaming to this title so users can watch online. For Series: enter episode-by-episode stream tokens. Leave blank if only providing Telegram download.
                         </div>
                     </div>
                 </div>
@@ -1373,6 +1397,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=109"></script>
+    <script src="admin.js?v=110"></script>
 </body>
 </html>
