@@ -410,6 +410,56 @@ function parseBulkStreams(rawText, isSeries) {
     return parsed;
 }
 
+function extractMovieStreams(targetMovie) {
+    if (!targetMovie) return [];
+    
+    if (Array.isArray(targetMovie.stream_links) && targetMovie.stream_links.length > 0) {
+        return targetMovie.stream_links.map((s, idx) => {
+            const token = cleanStreamInput(typeof s === 'object' && s !== null ? (s.stream_url || s.url || '') : s);
+            return {
+                episode: (typeof s === 'object' && s !== null && s.episode) ? parseInt(s.episode, 10) : (idx + 1),
+                season: (typeof s === 'object' && s !== null && s.season) ? parseInt(s.season, 10) : 1,
+                quality: (typeof s === 'object' && s !== null && s.quality) ? s.quality : '720p',
+                stream_url: token,
+                url: token
+            };
+        }).filter(s => !!s.stream_url);
+    }
+    
+    // Check links array for stream_urls
+    const extracted = [];
+    if (Array.isArray(targetMovie.links)) {
+        targetMovie.links.forEach((l, idx) => {
+            if (typeof l === 'object' && l !== null && l.stream_url) {
+                const token = cleanStreamInput(l.stream_url);
+                if (token) {
+                    extracted.push({
+                        episode: l.episode || (idx + 1),
+                        season: l.season || 1,
+                        quality: l.quality || '720p',
+                        stream_url: token,
+                        url: token
+                    });
+                }
+            }
+        });
+    }
+    if (extracted.length > 0) return extracted;
+    
+    // Fallback to targetMovie.stream_url
+    const single = cleanStreamInput(targetMovie.stream_url || '');
+    if (single) {
+        return [{
+            episode: 1,
+            season: 1,
+            quality: '720p',
+            stream_url: single,
+            url: single
+        }];
+    }
+    return [];
+}
+
 // Global Datasets for local search filter matching (saves Firestore quota reads)
 let allUsers = [];
 let adminIdsList = ["1329840839", "1175336733"];
@@ -2677,6 +2727,40 @@ if (closeDetailsModalBtn && movieDetailsModal) {
     });
 }
 
+function renderDetailsStreamsReadOnlyHTML(streams, movie, isSeries) {
+    if (!streams || streams.length === 0) {
+        return `
+            <div style="font-size: 12px; color: var(--text-muted); padding: 12px; text-align: center; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                No online streaming links attached yet.<br>Click <strong style="color: #ffbc00;">⚡ Quick Add / Update Streams</strong> or <strong style="color: #fff;">Edit Details</strong> above to attach stream tokens.
+            </div>
+        `;
+    }
+
+    return streams.map((s, idx) => {
+        const epNum = s.episode || (idx + 1);
+        const label = isSeries ? `Episode ${epNum}` : (s.quality || `Link ${idx + 1}`);
+        const tokenVal = s.stream_url || s.url || '';
+        const playUrl = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(tokenVal)}&title=${encodeURIComponent(movie.title)}${isSeries ? `&ep=${epNum}` : ''}`;
+        
+        return `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+                    <span style="font-size: 11px; font-weight: 700; color: #ffbc00; background: rgba(255,188,0,0.1); border: 1px solid rgba(255,188,0,0.25); border-radius: 4px; padding: 2px 7px; white-space: nowrap;">
+                        ${escapeHTML(label)}
+                    </span>
+                    <span style="font-size: 11px; color: var(--text-secondary); font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHTML(tokenVal)}">
+                        ${escapeHTML(tokenVal)}
+                    </span>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+                    <button type="button" class="btn-copy-stream-token" data-token="${escapeHTML(tokenVal)}" style="font-size: 10px; padding: 2px 7px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff; border-radius: 4px; cursor: pointer;" title="Copy Token">📋 Copy</button>
+                    <a href="${playUrl}" target="_blank" style="font-size: 10px; color: #ffbc00; text-decoration: none; padding: 2px 8px; border: 1px solid rgba(255, 188, 0, 0.35); border-radius: 4px; font-weight: 600; background: rgba(255, 188, 0, 0.08); white-space: nowrap;" title="Test Stream in Monetag Player">Test ▶️</a>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 function showMovieDetails(movie) {
     const detailsBody = document.getElementById("details-modal-body");
     if (!detailsBody || !movieDetailsModal) return;
@@ -2685,6 +2769,7 @@ function showMovieDetails(movie) {
     const badgeColor = isSeries ? 'var(--primary-color)' : '#00bcd4';
     const posterUrl = getPosterUrl(movie.poster);
     const linksList = movie.links || [];
+    let currentStreams = extractMovieStreams(movie);
 
     const hasCinemaCut = linksList.some(l => {
         const q = (typeof l === 'object' && l !== null ? (l.quality || "") : "").toLowerCase();
@@ -2746,11 +2831,33 @@ function showMovieDetails(movie) {
                     <input type="text" id="edit-movie-release-date" value="${escapeHTML(movie.release_date || '')}" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
                 </div>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
-                <label style="font-size: 11px; color: #ffbc00; text-transform: uppercase; font-weight: bold; display: flex; align-items: center; gap: 6px;">
-                    <span>▶️ Online Streaming Link or Token (Monetag Player)</span>
-                </label>
-                <input type="text" id="edit-movie-stream-url" value="${escapeHTML(movie.stream_url || (movie.links && movie.links[0] && movie.links[0].stream_url ? movie.links[0].stream_url : ''))}" placeholder="Paste File Stream Bot link or token (unique per movie)..." style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%; font-family: monospace;">
+            <!-- Dynamic Streaming & Episode Links Manager in Edit View -->
+            <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; background: rgba(255, 188, 0, 0.03); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 6px; padding: 12px; box-sizing: border-box;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                    <label style="font-size: 11px; color: #ffbc00; text-transform: uppercase; font-weight: bold; display: flex; align-items: center; gap: 6px; margin: 0;">
+                        <span>▶️ Online Streaming & Episode Manager</span>
+                    </label>
+                    <div style="display: flex; gap: 6px;">
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-details-auto-slots" style="font-size: 10px; padding: 3px 8px; color: #00c8ff; border-color: rgba(0, 200, 255, 0.3); cursor: pointer;" title="Automatically generate episode slots">⚡ Auto-Slots</button>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-details-bulk-streams-toggle" style="font-size: 10px; padding: 3px 8px; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3); cursor: pointer;">📋 Bulk Paste</button>
+                    </div>
+                </div>
+                
+                <div id="details-streams-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;">
+                    <!-- Editable stream rows dynamically rendered -->
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; flex-wrap: wrap; gap: 6px;">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-add-details-stream-input" style="font-size: 11px; padding: 4px 10px; border-radius: 4px; cursor: pointer;">+ Add Stream Row</button>
+                    <span style="font-size: 10px; color: var(--text-muted);" id="details-streams-counter">0 streams attached</span>
+                </div>
+
+                <div id="details-bulk-streams-wrapper" style="display: none; margin-top: 8px; border-top: 1px dashed rgba(255, 188, 0, 0.2); padding-top: 8px;">
+                    <textarea id="details-bulk-streams-input" placeholder="Paste stream links or tokens (one per line)...&#10;Line 1 -> Episode 1 (or 720p)&#10;Line 2 -> Episode 2 (or 1080p)...&#10;Or: Ep 1 | token...&#10;Or File Stream Bot link..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                    <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                        <button type="button" class="btn btn-primary btn-sm" id="btn-apply-details-bulk-streams" style="font-size: 11px; padding: 4px 10px; cursor: pointer;">Apply Streams</button>
+                    </div>
+                </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -2844,30 +2951,42 @@ function showMovieDetails(movie) {
             </div>
         </div>
 
-        <!-- Online Streaming Status & Direct Test -->
-        <div style="margin-bottom: 24px; background: rgba(255, 188, 0, 0.03); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 6px; padding: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <!-- Online Streaming Hub & Episode Manager (Read-Only + Quick Drawer) -->
+        <div id="details-streaming-hub-container" style="margin-bottom: 24px; background: rgba(255, 188, 0, 0.03); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 6px; padding: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
                 <h5 style="margin: 0; color: #ffbc00; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
                     <span>▶️ Online Streaming (Monetag Player)</span>
                 </h5>
-                ${(movie.stream_url || (movie.links && movie.links[0] && movie.links[0].stream_url)) ? `
-                    <span style="font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.15); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 10px; font-weight: 700;">Active</span>
-                ` : `
-                    <span style="font-size: 10px; color: var(--text-muted); background: rgba(255, 255, 255, 0.05); padding: 2px 8px; border-radius: 10px;">Not Attached</span>
-                `}
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span id="details-streaming-status-badge" style="font-size: 10px; ${currentStreams.length > 0 ? 'color: #4cd964; background: rgba(76, 217, 100, 0.15); border: 1px solid rgba(76, 217, 100, 0.3); font-weight: 700;' : 'color: var(--text-muted); background: rgba(255, 255, 255, 0.05);'} padding: 2px 8px; border-radius: 10px;">
+                        ${currentStreams.length > 0 ? (isSeries ? `🟢 ${currentStreams.length} Episode Stream(s) Ready` : `🟢 Stream Active (${currentStreams.length} Qualities)`) : '⚪ No Streams Attached'}
+                    </span>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-quick-streams-toggle" style="font-size: 11px; padding: 2px 8px; border-radius: 4px; color: #ffbc00; border-color: rgba(255, 188, 0, 0.35); cursor: pointer;">
+                        ⚡ Quick Add / Update Streams
+                    </button>
+                </div>
             </div>
-            ${(movie.stream_url || (movie.links && movie.links[0] && movie.links[0].stream_url)) ? `
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <div style="font-size: 12px; color: var(--text-secondary); font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%;">
-                        Token: <strong style="color: #fff;">${escapeHTML(movie.stream_url || movie.links[0].stream_url)}</strong>
+
+            <!-- List of streams in Read-Only View -->
+            <div id="details-streams-view-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 190px; overflow-y: auto; margin-top: 8px;">
+                ${renderDetailsStreamsReadOnlyHTML(currentStreams, movie, isSeries)}
+            </div>
+
+            <!-- Quick Inline Add / Paste Drawer -->
+            <div id="details-quick-streams-drawer" style="display: none; margin-top: 10px; border-top: 1px dashed rgba(255, 188, 0, 0.25); padding-top: 10px;">
+                <div style="font-size: 11px; color: #00c8ff; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                    <span>⚡ Quick Batch Paste Streams (File Stream Bot tokens or links):</span>
+                    <span style="font-size: 10px; color: var(--text-muted); font-weight: normal;">Format: 1 token per line or 'Ep 1 | token'</span>
+                </div>
+                <textarea id="details-quick-streams-input" placeholder="${isSeries ? 'Paste episode streams here (one per line)...&#10;Line 1 -> Episode 1&#10;Line 2 -> Episode 2&#10;Or: Ep 1 | token...' : 'Paste stream token or URL (or 720p | token)...'}" style="width: 100%; min-height: 85px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 8px;">
+                    <span style="font-size: 10px; color: var(--text-muted);">Saves immediately to this title in your catalog</span>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-quick-streams-cancel" style="font-size: 11px; padding: 4px 10px; cursor: pointer;">Cancel</button>
+                        <button type="button" class="btn btn-primary btn-sm" id="btn-save-quick-streams" style="font-size: 11px; padding: 4px 14px; cursor: pointer; font-weight: 700;">💾 Save Streams</button>
                     </div>
-                    <a href="https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(movie.stream_url || movie.links[0].stream_url)}&title=${encodeURIComponent(movie.title)}" target="_blank" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 10px; border-color: rgba(255, 188, 0, 0.35); color: #ffbc00; text-decoration: none; white-space: nowrap;">Test Player ▶️</a>
                 </div>
-            ` : `
-                <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
-                    Click <strong>Edit Details</strong> above to add a stream link/token so users can stream this movie inside the app.
-                </div>
-            `}
+            </div>
         </div>
 
         <div style="border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 14px;">
@@ -2934,6 +3053,9 @@ function showMovieDetails(movie) {
     const inputsWrapper = document.getElementById("links-inputs-wrapper");
     
     let currentLinks = [...linksList];
+    let currentEditStreams = currentStreams.length > 0 
+        ? JSON.parse(JSON.stringify(currentStreams)) 
+        : [isSeries ? { episode: 1, season: 1, stream_url: "" } : { quality: "720p", stream_url: "" }];
 
     // Auto-extract TMDB ID and Type on pasting in Edit modal
     const editMovieIdInput = document.getElementById("edit-movie-id");
@@ -3061,6 +3183,315 @@ function showMovieDetails(movie) {
         });
     }
 
+    // Bind Copy Stream Token buttons in read-only view
+    function bindCopyTokenButtons() {
+        document.querySelectorAll(".btn-copy-stream-token").forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const token = btn.getAttribute("data-token");
+                if (token && navigator.clipboard) {
+                    navigator.clipboard.writeText(token);
+                    const orig = btn.textContent;
+                    btn.textContent = "✓ Copied!";
+                    setTimeout(() => { btn.textContent = orig; }, 1500);
+                }
+            };
+        });
+    }
+    bindCopyTokenButtons();
+
+    // Quick Streams Drawer in Read-Only View (Instant Save without Edit mode)
+    const quickStreamsToggle = document.getElementById("btn-quick-streams-toggle");
+    const quickStreamsDrawer = document.getElementById("details-quick-streams-drawer");
+    const quickStreamsInput = document.getElementById("details-quick-streams-input");
+    const quickStreamsCancel = document.getElementById("btn-quick-streams-cancel");
+    const quickStreamsSave = document.getElementById("btn-save-quick-streams");
+
+    if (quickStreamsToggle && quickStreamsDrawer) {
+        quickStreamsToggle.addEventListener("click", () => {
+            const isHidden = quickStreamsDrawer.style.display === "none";
+            quickStreamsDrawer.style.display = isHidden ? "block" : "none";
+            quickStreamsToggle.textContent = isHidden ? "✕ Close Quick Drawer" : "⚡ Quick Add / Update Streams";
+            if (isHidden && quickStreamsInput) quickStreamsInput.focus();
+        });
+    }
+
+    if (quickStreamsCancel && quickStreamsDrawer) {
+        quickStreamsCancel.addEventListener("click", () => {
+            quickStreamsDrawer.style.display = "none";
+            if (quickStreamsToggle) quickStreamsToggle.textContent = "⚡ Quick Add / Update Streams";
+        });
+    }
+
+    if (quickStreamsSave && quickStreamsInput) {
+        quickStreamsSave.addEventListener("click", () => {
+            const isCurrentSeries = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
+            const parsed = parseBulkStreams(quickStreamsInput.value, isCurrentSeries);
+            if (parsed.length === 0) {
+                alert("Please paste at least one valid stream token or URL!");
+                return;
+            }
+
+            const movieIndex = allCatalogMovies.findIndex(m => m.csv_id === movie.csv_id);
+            if (movieIndex === -1) {
+                alert("Error: Title not found in catalog.");
+                return;
+            }
+
+            const formattedStreams = parsed.map((s, idx) => {
+                const u = cleanStreamInput(s.url || s.stream_url);
+                if (isCurrentSeries) {
+                    return { episode: s.episode || (idx + 1), season: 1, stream_url: u, url: u };
+                }
+                return { quality: s.quality || '720p', stream_url: u, url: u };
+            });
+
+            allCatalogMovies[movieIndex].stream_links = formattedStreams;
+            allCatalogMovies[movieIndex].stream_url = formattedStreams[0].stream_url;
+            if (allCatalogMovies[movieIndex].links && allCatalogMovies[movieIndex].links.length > 0) {
+                allCatalogMovies[movieIndex].links[0].stream_url = formattedStreams[0].stream_url;
+            }
+
+            const currentId = allCatalogMovies[movieIndex].csv_id;
+            if (!newlyUpdatedIds.includes(currentId) && !newlyAddedIds.includes(currentId)) {
+                newlyUpdatedIds.push(currentId);
+            }
+
+            currentStreams = [...formattedStreams];
+            currentEditStreams = JSON.parse(JSON.stringify(formattedStreams));
+
+            catalogChangesMade = true;
+            renderCatalogList();
+            updatePublishButtonState();
+
+            // Refresh read-only list & badge
+            const viewList = document.getElementById("details-streams-view-list");
+            if (viewList) {
+                viewList.innerHTML = renderDetailsStreamsReadOnlyHTML(currentStreams, allCatalogMovies[movieIndex], isCurrentSeries);
+            }
+            const statusBadge = document.getElementById("details-streaming-status-badge");
+            if (statusBadge) {
+                statusBadge.textContent = isCurrentSeries ? `🟢 ${currentStreams.length} Episode Stream(s) Ready` : `🟢 Stream Active (${currentStreams.length} Qualities)`;
+                statusBadge.style.cssText = "font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.15); border: 1px solid rgba(76, 217, 100, 0.3); font-weight: 700; padding: 2px 8px; border-radius: 10px;";
+            }
+
+            bindCopyTokenButtons();
+            quickStreamsDrawer.style.display = "none";
+            if (quickStreamsToggle) quickStreamsToggle.textContent = "⚡ Quick Add / Update Streams";
+            quickStreamsInput.value = "";
+
+            if (typeof showToast === 'function') {
+                showToast(`🎉 Attached ${formattedStreams.length} stream links to "${allCatalogMovies[movieIndex].title}"!`, "success");
+            } else {
+                alert(`🎉 Attached ${formattedStreams.length} stream links to "${allCatalogMovies[movieIndex].title}"! Click 'Publish Changes 🚀' to save to GitHub.`);
+            }
+        });
+    }
+
+    // Dynamic Stream inputs editor in Edit View
+    function renderDetailsStreamInputs() {
+        const wrapper = document.getElementById("details-streams-inputs-wrapper");
+        const counter = document.getElementById("details-streams-counter");
+        if (!wrapper) return;
+        wrapper.innerHTML = "";
+
+        const isCurrentSeries = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+
+        if (counter) {
+            const validCount = currentEditStreams.filter(s => (s.stream_url || s.url || '').trim().length > 0).length;
+            counter.textContent = `${validCount} stream${validCount === 1 ? '' : 's'} attached`;
+        }
+
+        currentEditStreams.forEach((item, idx) => {
+            const row = document.createElement("div");
+            row.style.display = "flex";
+            row.style.gap = "8px";
+            row.style.alignItems = "center";
+            row.style.background = "rgba(0,0,0,0.2)";
+            row.style.padding = "6px 8px";
+            row.style.borderRadius = "4px";
+            row.style.border = "1px solid rgba(255,255,255,0.05)";
+
+            if (isCurrentSeries) {
+                const epLabel = document.createElement("span");
+                epLabel.style.cssText = "font-size: 11px; color: #ffbc00; font-weight: 700; width: 55px; flex-shrink: 0;";
+                epLabel.textContent = `Ep ${item.episode || (idx + 1)}:`;
+                row.appendChild(epLabel);
+            } else {
+                const select = document.createElement("select");
+                select.style.padding = "5px 6px";
+                select.style.background = "var(--input-bg)";
+                select.style.border = "1px solid var(--border-color)";
+                select.style.color = "#fff";
+                select.style.borderRadius = "4px";
+                select.style.fontSize = "11px";
+                select.style.width = "95px";
+                select.style.cursor = "pointer";
+
+                const qualities = ["480p", "720p", "1080p", "2160p (4K)", "Cinema Cut / HDCam"];
+                qualities.forEach(q => {
+                    const opt = document.createElement("option");
+                    opt.value = q;
+                    opt.textContent = q;
+                    if (q === item.quality) opt.selected = true;
+                    select.appendChild(opt);
+                });
+                select.addEventListener("change", (e) => {
+                    currentEditStreams[idx].quality = e.target.value;
+                });
+                row.appendChild(select);
+            }
+
+            const input = document.createElement("input");
+            input.type = "text";
+            input.style.flex = "1";
+            input.style.padding = "6px 8px";
+            input.style.background = "var(--input-bg)";
+            input.style.border = "1px solid var(--border-color)";
+            input.style.color = "#fff";
+            input.style.borderRadius = "4px";
+            input.style.fontSize = "12px";
+            input.style.fontFamily = "monospace";
+            input.value = item.stream_url || item.url || "";
+            input.placeholder = isCurrentSeries ? `Paste token or FileStream link for Ep ${item.episode || (idx + 1)}...` : `Paste token or FileStream link (${item.quality || '720p'})...`;
+            
+            const currentTokenVal = cleanStreamInput(input.value.trim());
+
+            // Test link
+            const testLink = document.createElement("a");
+            testLink.textContent = "▶️";
+            testLink.title = "Test Stream Player";
+            testLink.target = "_blank";
+            testLink.style.cssText = "font-size: 11px; text-decoration: none; padding: 4px 8px; border: 1px solid rgba(255, 188, 0, 0.35); border-radius: 4px; color: #ffbc00; background: rgba(255, 188, 0, 0.08); cursor: pointer; flex-shrink: 0;";
+            testLink.href = currentTokenVal ? `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(currentTokenVal)}&title=${encodeURIComponent(movie.title)}${isCurrentSeries ? `&ep=${item.episode || (idx + 1)}` : ''}` : '#';
+            if (!currentTokenVal) testLink.style.opacity = "0.4";
+
+            input.addEventListener("input", (e) => {
+                const cleaned = cleanStreamInput(e.target.value.trim());
+                currentEditStreams[idx].stream_url = cleaned;
+                currentEditStreams[idx].url = cleaned;
+                if (cleaned) {
+                    testLink.href = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(cleaned)}&title=${encodeURIComponent(movie.title)}${isCurrentSeries ? `&ep=${item.episode || (idx + 1)}` : ''}`;
+                    testLink.style.opacity = "1";
+                } else {
+                    testLink.href = '#';
+                    testLink.style.opacity = "0.4";
+                }
+                if (counter) {
+                    const validCount = currentEditStreams.filter(s => (s.stream_url || s.url || '').trim().length > 0).length;
+                    counter.textContent = `${validCount} stream${validCount === 1 ? '' : 's'} attached`;
+                }
+            });
+            row.appendChild(input);
+            row.appendChild(testLink);
+
+            // Remove button
+            const removeBtn = document.createElement("button");
+            removeBtn.type = "button";
+            removeBtn.textContent = "✖";
+            removeBtn.style.cssText = "padding: 4px 8px; font-size: 11px; color: #ff3b30; border: 1px solid rgba(255, 59, 48, 0.25); background: rgba(255, 59, 48, 0.05); border-radius: 4px; cursor: pointer; flex-shrink: 0;";
+            removeBtn.addEventListener("click", () => {
+                currentEditStreams.splice(idx, 1);
+                if (currentEditStreams.length === 0) {
+                    currentEditStreams.push(isCurrentSeries ? { episode: 1, season: 1, stream_url: "" } : { quality: "720p", stream_url: "" });
+                }
+                renderDetailsStreamInputs();
+            });
+            row.appendChild(removeBtn);
+
+            wrapper.appendChild(row);
+        });
+    }
+
+    // Add Stream row button in Edit mode
+    const btnAddDetailsStream = document.getElementById("btn-add-details-stream-input");
+    if (btnAddDetailsStream) {
+        btnAddDetailsStream.addEventListener("click", () => {
+            const isCurrentSeries = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            const nextEp = currentEditStreams.length + 1;
+            currentEditStreams.push(isCurrentSeries ? { episode: nextEp, season: 1, stream_url: "" } : { quality: "720p", stream_url: "" });
+            renderDetailsStreamInputs();
+        });
+    }
+
+    // Bulk paste streams toggle and apply in Edit mode
+    const detailsBulkStreamsToggle = document.getElementById("btn-details-bulk-streams-toggle");
+    const detailsBulkStreamsWrapper = document.getElementById("details-bulk-streams-wrapper");
+    const detailsBulkStreamsInput = document.getElementById("details-bulk-streams-input");
+    const detailsBulkStreamsApply = document.getElementById("btn-apply-details-bulk-streams");
+
+    if (detailsBulkStreamsToggle && detailsBulkStreamsWrapper) {
+        detailsBulkStreamsToggle.addEventListener("click", () => {
+            const isHidden = detailsBulkStreamsWrapper.style.display === "none";
+            detailsBulkStreamsWrapper.style.display = isHidden ? "block" : "none";
+            detailsBulkStreamsToggle.textContent = isHidden ? "✕ Close Bulk" : "📋 Bulk Paste";
+            if (isHidden && detailsBulkStreamsInput) detailsBulkStreamsInput.focus();
+        });
+    }
+
+    if (detailsBulkStreamsApply && detailsBulkStreamsInput) {
+        detailsBulkStreamsApply.addEventListener("click", () => {
+            const isCurrentSeries = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            const parsed = parseBulkStreams(detailsBulkStreamsInput.value, isCurrentSeries);
+            if (parsed.length === 0) {
+                alert("Please paste at least one valid stream token or URL!");
+                return;
+            }
+            currentEditStreams = parsed.map((s, idx) => {
+                const u = cleanStreamInput(s.url || s.stream_url);
+                if (isCurrentSeries) {
+                    return { episode: s.episode || (idx + 1), season: 1, stream_url: u, url: u };
+                }
+                return { quality: s.quality || '720p', stream_url: u, url: u };
+            });
+            renderDetailsStreamInputs();
+            detailsBulkStreamsInput.value = "";
+            if (detailsBulkStreamsWrapper) detailsBulkStreamsWrapper.style.display = "none";
+            if (detailsBulkStreamsToggle) detailsBulkStreamsToggle.textContent = "📋 Bulk Paste";
+        });
+    }
+
+    // Auto-slots button in Edit mode
+    const btnDetailsAutoSlots = document.getElementById("btn-details-auto-slots");
+    if (btnDetailsAutoSlots) {
+        btnDetailsAutoSlots.addEventListener("click", () => {
+            const isCurrentSeries = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            if (isCurrentSeries) {
+                const suggestedCount = Math.max(currentLinks.length, currentEditStreams.length, 10);
+                const countPrompt = prompt("How many episode slots would you like to generate?", suggestedCount);
+                if (!countPrompt) return;
+                const totalEps = parseInt(countPrompt, 10);
+                if (isNaN(totalEps) || totalEps <= 0) {
+                    alert("Please enter a valid positive number.");
+                    return;
+                }
+                const newSlots = [];
+                for (let ep = 1; ep <= totalEps; ep++) {
+                    const existing = currentEditStreams.find(s => s.episode === ep);
+                    newSlots.push({
+                        episode: ep,
+                        season: 1,
+                        stream_url: existing ? existing.stream_url : "",
+                        url: existing ? existing.stream_url : ""
+                    });
+                }
+                currentEditStreams = newSlots;
+                renderDetailsStreamInputs();
+            } else {
+                const defaultQualities = ["480p", "720p", "1080p", "2160p (4K)", "Cinema Cut / HDCam"];
+                currentEditStreams = defaultQualities.map(q => {
+                    const existing = currentEditStreams.find(s => s.quality === q);
+                    return {
+                        quality: q,
+                        stream_url: existing ? existing.stream_url : "",
+                        url: existing ? existing.stream_url : ""
+                    };
+                });
+                renderDetailsStreamInputs();
+            }
+        });
+    }
+
     if (editToggle && viewContainer && editContainer) {
         editToggle.addEventListener("click", () => {
             const editInfoContainer = document.getElementById("details-title-info-edit");
@@ -3072,6 +3503,7 @@ function showMovieDetails(movie) {
                 if (viewInfoContainer) viewInfoContainer.style.display = "none";
                 editToggle.textContent = "Cancel";
                 renderLinkInputs();
+                renderDetailsStreamInputs();
             } else {
                 editContainer.style.display = "none";
                 viewContainer.style.display = "block";
@@ -3126,6 +3558,7 @@ function showMovieDetails(movie) {
     if (editTypeSelect) {
         editTypeSelect.addEventListener("change", () => {
             renderLinkInputs();
+            renderDetailsStreamInputs();
         });
     }
 
@@ -3144,6 +3577,19 @@ function showMovieDetails(movie) {
                 const qualityVal = typeof l === 'object' && l !== null && l.quality ? l.quality : "720p";
                 return { url: urlVal, quality: qualityVal };
             });
+
+            // Parse valid streams from currentEditStreams
+            const finalStreams = currentEditStreams.filter(s => {
+                const u = (s.stream_url || s.url || '').trim();
+                return u.length > 0;
+            }).map((s, idx) => {
+                const u = cleanStreamInput(s.stream_url || s.url);
+                if (isSeriesType) {
+                    return { episode: s.episode || (idx + 1), season: 1, stream_url: u, url: u };
+                }
+                return { quality: s.quality || '720p', stream_url: u, url: u };
+            });
+            const cleanStreamVal = finalStreams.length > 0 ? finalStreams[0].stream_url : "";
             
             const newTitle = document.getElementById("edit-movie-title")?.value.trim();
             const newId = document.getElementById("edit-movie-id")?.value.trim();
@@ -3154,8 +3600,6 @@ function showMovieDetails(movie) {
             const newTrailerVal = document.getElementById("edit-movie-trailer")?.value.trim() || "";
             const newTrailerId = extractYoutubeId(newTrailerVal);
             const newReleaseDate = document.getElementById("edit-movie-release-date")?.value.trim() || "";
-            const newStreamVal = document.getElementById("edit-movie-stream-url")?.value.trim() || "";
-            const cleanStreamVal = cleanStreamInput(newStreamVal);
             
             // Get selected categories
             const newCategories = Array.from(document.querySelectorAll(".edit-cat-checkbox:checked")).map(cb => cb.value);
@@ -3173,6 +3617,7 @@ function showMovieDetails(movie) {
                 allCatalogMovies[movieIndex].csv_id = newId;
                 allCatalogMovies[movieIndex].type = newType === 'Series' ? 'Series' : 'Movie';
                 allCatalogMovies[movieIndex].links = finalLinks;
+                allCatalogMovies[movieIndex].stream_links = finalStreams;
                 allCatalogMovies[movieIndex].stream_url = cleanStreamVal;
                 if (cleanStreamVal && allCatalogMovies[movieIndex].links && allCatalogMovies[movieIndex].links.length > 0) {
                     allCatalogMovies[movieIndex].links[0].stream_url = cleanStreamVal;
@@ -3324,6 +3769,13 @@ function renderCatalogList() {
         });
         const cinemaCutBadge = hasCinemaCut ? `<span style="font-size: 9px; background: linear-gradient(135deg, rgba(255, 152, 0, 0.2), rgba(255, 87, 34, 0.2)); border: 1px solid rgba(255, 152, 0, 0.4); color: #ff9800; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 800;">📽️ Cinema Cut</span>` : "";
 
+        const streamsCount = (Array.isArray(m.stream_links) && m.stream_links.length > 0) 
+            ? m.stream_links.length 
+            : (m.stream_url || (m.links && m.links[0] && m.links[0].stream_url) ? 1 : 0);
+        const streamBadge = streamsCount > 0 
+            ? `<span class="breakdown-tag" style="color: #4cd964; border-color: rgba(76, 217, 100, 0.3); background: rgba(76, 217, 100, 0.1);">▶️ Stream: ${streamsCount}</span>` 
+            : `<span class="breakdown-tag" style="color: var(--text-muted); opacity: 0.65;">▶️ No Stream</span>`;
+
         row.innerHTML = `
             <div class="user-info" style="pointer-events: none;">
                 <img src="${escapeHTML(posterUrl)}" alt="Poster" class="user-avatar" style="border-radius: 4px; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
@@ -3332,6 +3784,7 @@ function renderCatalogList() {
                     <p>ID: ${escapeHTML(m.csv_id)} | Type: <span style="text-transform: uppercase; font-weight: 600; color: ${badgeColor};">${escapeHTML(m.type)}</span></p>
                     <div class="breakdown-group">
                         <span class="breakdown-tag">🔗 Links: ${m.links ? m.links.length : 0}</span>
+                        ${streamBadge}
                         ${m.rating ? `<span class="breakdown-tag">⭐ ${escapeHTML(m.rating)}</span>` : ''}
                         ${m.release_date ? `<span class="breakdown-tag">📅 ${escapeHTML(m.release_date)}</span>` : ''}
                     </div>
