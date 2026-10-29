@@ -5037,12 +5037,12 @@ body.media-detail-active .app-content-container {
     transition: all 0.3s ease;
 }
 
-/* When a trailer or stream is active, push player down so it clears the top header cleanly */
+/* When a trailer or stream is active, stretch player up smoothly right under the floating brand pill */
 .media-hero-viewport.has-active-video {
-    padding-top: calc(48px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px) + env(safe-area-inset-top, 0px));
+    padding-top: calc(var(--tg-safe-area-inset-top, env(safe-area-inset-top, 0px)) + 38px);
     aspect-ratio: auto;
     height: auto;
-    min-height: 260px;
+    min-height: auto;
     background: #000000;
 }
 
