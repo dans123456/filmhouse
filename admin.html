@@ -695,6 +695,50 @@
         </div>
     </div>
 
+    <!-- ONGOING SERIES TRACKER & EPISODE UPLOADER PANEL -->
+    <div class="glass-panel" id="ongoing-series-panel" style="border: 1px solid rgba(255, 188, 0, 0.2); margin-bottom: 24px; background: linear-gradient(135deg, rgba(255, 188, 0, 0.03) 0%, rgba(22, 24, 35, 0.5) 100%);">
+        <div class="section-header collapsible-header" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="togglePanel('ongoing-series-content', 'ongoing-series-chevron')">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h4 class="section-title" style="color: #ffbc00; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>📺</span>
+                    <span>Ongoing Series Tracker</span>
+                </h4>
+                <span id="ongoing-series-counter" style="font-size: 10px; font-weight: 800; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00; padding: 2px 8px; border-radius: 12px; letter-spacing: 0.5px;">0 TRACKED</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button type="button" id="btn-refresh-series-tracker" onclick="event.stopPropagation(); refreshOngoingSeries();" title="Refresh Tracker" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">🔄 Sync</button>
+                <span id="ongoing-series-chevron" style="color: var(--text-secondary); transition: transform 0.2s;">▼</span>
+            </div>
+        </div>
+
+        <div id="ongoing-series-content" style="margin-top: 14px; display: block;">
+            <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 14px 0; line-height: 1.5;">
+                Track airing seasons, monitor weekly episode drops via TMDB, and upload new episodes with automated Telegram push notifications to subscribed users.
+            </p>
+
+            <!-- Filter tabs -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap;">
+                <div id="series-filter-tabs" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button class="series-filter-tab active" data-filter="all" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: var(--primary-gradient); color: #000; cursor: pointer; transition: all 0.2s;">All Active</button>
+                    <button class="series-filter-tab" data-filter="awaiting" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid rgba(255, 59, 48, 0.3); background: rgba(255, 59, 48, 0.08); color: #ff453a; cursor: pointer; transition: all 0.2s;">🚨 Awaiting Upload</button>
+                    <button class="series-filter-tab" data-filter="ongoing" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">🟢 Ongoing</button>
+                    <button class="series-filter-tab" data-filter="break" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">⏸️ On Break</button>
+                    <button class="series-filter-tab" data-filter="completed" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">✅ Completed</button>
+                </div>
+            </div>
+
+            <!-- Search box -->
+            <div class="search-container" style="margin-bottom: 14px;">
+                <input type="text" id="series-search-input" placeholder="Search ongoing series by title or TMDB ID...">
+            </div>
+
+            <!-- Series items container -->
+            <div class="table-container" id="ongoing-series-list" style="max-height: 420px;">
+                <div style="padding: 32px; text-align: center; color: var(--text-secondary);">Scanning catalog for ongoing series...</div>
+            </div>
+        </div>
+    </div>
+
     <!-- CATALOG MANAGER SECTION -->
     <div class="glass-panel" id="catalog-panel">
         <div class="section-header">
@@ -1412,6 +1456,94 @@
         </div>
     </div>
 
+    <!-- UPLOAD EPISODE & NOTIFY MODAL -->
+    <div class="admin-modal-overlay" id="upload-episode-modal">
+        <div class="admin-modal-container" style="max-width: 540px; width: 95%;">
+            <div class="modal-header">
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #ffbc00;">⚡</span>
+                    <span>Upload Series Episode</span>
+                </h3>
+                <button type="button" class="close-modal-btn" onclick="closeUploadEpisodeModal()" title="Close" aria-label="Close" style="cursor: pointer; z-index: 10;">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;pointer-events:none;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+                </button>
+            </div>
+
+            <!-- Series Preview Banner -->
+            <div id="upload-ep-series-banner" style="display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                <img id="upload-ep-poster" src="MOVIE/img/FilmHouse3_nobg.png" alt="Poster" style="width: 48px; height: 68px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="flex: 1; min-width: 0;">
+                    <h4 id="upload-ep-title" style="margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Series Title</h4>
+                    <div id="upload-ep-meta" style="font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span id="upload-ep-current-season">Season 1</span>
+                        <span>•</span>
+                        <span id="upload-ep-last-uploaded">Last Uploaded: Ep 0</span>
+                    </div>
+                    <div id="upload-ep-sub-badge" style="font-size: 11px; color: #ffbc00; margin-top: 4px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                        <span>🔔</span>
+                        <span id="upload-ep-sub-count">0 Subscribers will be notified</span>
+                    </div>
+                </div>
+            </div>
+
+            <form id="upload-episode-form" onsubmit="event.preventDefault(); submitEpisodeUpload();">
+                <input type="hidden" id="upload-ep-csv-id">
+                <input type="hidden" id="upload-ep-tmdb-id">
+
+                <div class="form-row" style="margin-bottom: 12px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="upload-ep-season">Season Number</label>
+                        <input type="number" id="upload-ep-season" min="1" value="1" required style="padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="upload-ep-number" style="color: #ffbc00;">Episode Number to Upload</label>
+                        <input type="number" id="upload-ep-number" min="1" value="1" required style="padding: 10px; background: var(--input-bg); border: 1px solid rgba(255, 188, 0, 0.4); border-radius: 4px; color: #fff; font-size: 13px; font-weight: 700;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="upload-ep-title-input">Episode Title (Optional)</label>
+                    <input type="text" id="upload-ep-title-input" placeholder="e.g. Chapter 4: The Battle" style="padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label for="upload-ep-stream" style="margin: 0; font-weight: 600; color: #ffbc00; font-size: 11px; text-transform: uppercase;">▶️ Stream Link or Token (Online Cinema)</label>
+                        <span style="font-size: 9px; color: #4cd964; background: rgba(76, 217, 100, 0.12); padding: 1px 6px; border-radius: 10px; font-weight: 700;">Monetag Stream</span>
+                    </div>
+                    <input type="text" id="upload-ep-stream" placeholder="Paste FileStream token (e.g. 6adee561a4b67b48703250e2) or URL" style="padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace;">
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Enables in-app "▶️ Stream S[X]E[Y]" instant playback inside Telegram.</div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="upload-ep-download" style="font-weight: 600; font-size: 11px; text-transform: uppercase;">⬇️ Telegram Direct Download Link (Optional)</label>
+                    <input type="text" id="upload-ep-download" placeholder="e.g. https://t.me/c/123456789/100 or post URL" style="padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px;">
+                </div>
+
+                <div style="background: rgba(0, 136, 204, 0.08); border: 1px solid rgba(0, 136, 204, 0.25); border-radius: 6px; padding: 10px 12px; margin-bottom: 12px;">
+                    <label for="upload-ep-notify-checkbox" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="upload-ep-notify-checkbox" checked style="width: 16px; height: 16px; accent-color: #0088cc; cursor: pointer;">
+                        <span>🔔 Send Instant Telegram Push to Subscribed Users</span>
+                    </label>
+                </div>
+
+                <div style="background: rgba(255, 188, 0, 0.06); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 6px; padding: 10px 12px; margin-bottom: 18px;">
+                    <label for="upload-ep-finale-checkbox" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 12px; font-weight: 600; color: #ffbc00; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="upload-ep-finale-checkbox" style="width: 16px; height: 16px; accent-color: #ffbc00; cursor: pointer;">
+                        <span>🏁 Mark Season as Completed (Purges subscriptions automatically)</span>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeUploadEpisodeModal()" style="flex: 1; height: 42px; font-weight: 600; border-radius: var(--border-radius-md);">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-upload-ep" style="flex: 2; height: 42px; font-weight: 700; border-radius: var(--border-radius-md); background: linear-gradient(135deg, #ffbc00 0%, #ff8800 100%); color: #000;">
+                        <span>🚀 Upload Episode &amp; Notify</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <svg style="display:none;">
         <g id="icon-close">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
@@ -1422,6 +1554,10 @@
     
     <!-- MOBILE QUICK ACTION BAR FOR ADMINS -->
     <div class="admin-mobile-quick-bar" id="admin-mobile-quick-bar">
+        <button type="button" class="admin-quick-btn" onclick="scrollToOngoingSeries()">
+            <span style="font-size: 15px;">📺</span>
+            <span>Series</span>
+        </button>
         <button type="button" class="admin-quick-btn" onclick="document.getElementById('btn-add-movie-modal').click()">
             <span style="font-size: 15px;">➕</span>
             <span>+ Movie</span>
@@ -1447,6 +1583,7 @@
         </button>
     </div>
 
-    <script src="admin.js?v=117"></script>
+    <script src="seriesSchema.js?v=2"></script>
+    <script src="admin.js?v=118"></script>
 </body>
 </html>

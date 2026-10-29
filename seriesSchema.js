@@ -89,6 +89,13 @@ function getSeriesCountdownBadge(series = {}) {
     return null;
 }
 
+if (typeof window !== "undefined") {
+    window.SeriesStatus = SeriesStatus;
+    window.buildSubscriptionDocId = buildSubscriptionDocId;
+    window.sanitizeSeriesTrackerData = sanitizeSeriesTrackerData;
+    window.getSeriesCountdownBadge = getSeriesCountdownBadge;
+}
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         SeriesStatus,
@@ -97,3 +104,4 @@ if (typeof module !== "undefined" && module.exports) {
         getSeriesCountdownBadge
     };
 }
+

@@ -2791,6 +2791,7 @@ async function loadCatalog() {
                         renderEditorsChoiceSelectionList();
                         renderRequestsList();
                         if (typeof updateStatsCounters === 'function') updateStatsCounters();
+                        if (typeof initOngoingSeriesTracker === 'function') initOngoingSeriesTracker();
                         return;
                     } else {
                         localStorage.removeItem("filmhouse_unpublished_catalog");
@@ -2851,6 +2852,7 @@ async function loadCatalog() {
         renderEditorsChoiceSelectionList();
         renderRequestsList();
         if (typeof updateStatsCounters === 'function') updateStatsCounters();
+        if (typeof initOngoingSeriesTracker === 'function') initOngoingSeriesTracker();
     } catch (e) {
         console.error("Failed to load catalog:", e);
         if (listContainer) {
@@ -9431,5 +9433,536 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// ==============================================================================
+// 📺 ONGOING SERIES TRACKER & EPISODE UPLOADER LOGIC (PHASE 3)
+// ==============================================================================
+
+let ongoingSeriesList = [];
+let seriesSubscriptionsMap = {};
+let activeSeriesFilter = "all"; // all | awaiting | ongoing | break | completed
+let isSeriesTrackerInitialized = false;
+
+window.scrollToOngoingSeries = function() {
+    const panel = document.getElementById("ongoing-series-panel");
+    if (panel) {
+        panel.scrollIntoView({ behavior: "smooth", block: "start" });
+        const content = document.getElementById("ongoing-series-content");
+        if (content && content.style.display === "none") {
+            togglePanel('ongoing-series-content', 'ongoing-series-chevron');
+        }
+    }
+};
+
+window.refreshOngoingSeries = function() {
+    initOngoingSeriesTracker(true);
+};
+
+async function initOngoingSeriesTracker(forceRefresh = false) {
+    const listContainer = document.getElementById("ongoing-series-list");
+    const counterBadge = document.getElementById("ongoing-series-counter");
+    if (!listContainer) return;
+
+    if (!allCatalogMovies || allCatalogMovies.length === 0) {
+        listContainer.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-secondary);">Waiting for catalog database...</div>`;
+        return;
+    }
+
+    listContainer.innerHTML = `<div style="padding: 28px; text-align: center; color: var(--text-secondary);">Syncing ongoing series tracker... ⏳</div>`;
+
+    try {
+        // 1. Filter all series from catalog
+        const seriesCatalog = allCatalogMovies.filter(m => {
+            const t = (m.type || "").toLowerCase();
+            return t === "series" || t === "tv";
+        });
+
+        // 2. Fetch series tracker fields from Firestore "movies" collection where status is tracked
+        // We use targeted query to avoid full collection reads: status in ['Ongoing', 'On Break', 'Completed']
+        const firestoreSeriesMap = {};
+        if (typeof db !== "undefined" && db) {
+            try {
+                const trackedSnap = await db.collection("movies")
+                    .where("status", "in", ["Ongoing", "On Break", "Completed"])
+                    .limit(100)
+                    .get();
+
+                trackedSnap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data) {
+                        const key = String(data.csv_id || docSnap.id);
+                        const tmdbKey = String(data.tmdb_id || "");
+                        firestoreSeriesMap[key] = data;
+                        if (tmdbKey) firestoreSeriesMap[tmdbKey] = data;
+                    }
+                });
+            } catch (err) {
+                console.warn("[SeriesTracker] Firestore tracked movies read:", err.message);
+            }
+
+            // 3. Query subscriptions count efficiently (limit 500)
+            try {
+                const subSnap = await db.collection("subscriptions").limit(500).get();
+                seriesSubscriptionsMap = {};
+                subSnap.forEach(sDoc => {
+                    const sData = sDoc.data();
+                    if (sData && sData.tmdb_id) {
+                        const tid = String(sData.tmdb_id);
+                        seriesSubscriptionsMap[tid] = (seriesSubscriptionsMap[tid] || 0) + 1;
+                    }
+                });
+            } catch (subErr) {
+                console.warn("[SeriesTracker] Subscriptions count read:", subErr.message);
+            }
+        }
+
+        // 4. Combine catalog items with Firestore tracker data
+        ongoingSeriesList = seriesCatalog.map(item => {
+            const csvKey = String(item.csv_id || "");
+            const tmdbKey = String(item.tmdb_id || item.csv_id || "");
+            const fsData = firestoreSeriesMap[csvKey] || firestoreSeriesMap[tmdbKey] || {};
+
+            const numTmdbId = item.tmdb_id || (parseInt(item.csv_id, 10) || null);
+            const status = fsData.status || item.status || (item.is_ongoing ? "Ongoing" : null);
+            const currentSeason = fsData.current_season || item.current_season || 1;
+            const lastUploaded = typeof fsData.last_uploaded_episode === "number" ? fsData.last_uploaded_episode : (item.last_uploaded_episode || 0);
+            const totalEpisodes = typeof fsData.total_episodes === "number" ? fsData.total_episodes : (item.total_episodes || 0);
+            const nextAirDate = fsData.next_air_date || item.next_air_date || null;
+            const subCount = seriesSubscriptionsMap[String(numTmdbId)] || 0;
+
+            return {
+                ...item,
+                tmdb_id: numTmdbId,
+                status: status,
+                current_season: currentSeason,
+                last_uploaded_episode: lastUploaded,
+                total_episodes: totalEpisodes,
+                next_air_date: nextAirDate,
+                subscriber_count: subCount,
+                stream_links: fsData.stream_links || item.stream_links || [],
+                links: fsData.links || item.links || []
+            };
+        }).filter(item => {
+            // Show any series that has status 'Ongoing', 'On Break', 'Completed', or has active subscribers, or next_air_date
+            return item.status || item.subscriber_count > 0 || item.next_air_date;
+        });
+
+        // Sort: items awaiting upload first, then ongoing, then on break, then completed
+        ongoingSeriesList.sort((a, b) => {
+            const badgeA = typeof getSeriesCountdownBadge === "function" ? getSeriesCountdownBadge(a) : null;
+            const badgeB = typeof getSeriesCountdownBadge === "function" ? getSeriesCountdownBadge(b) : null;
+            const isTodayA = badgeA && badgeA.variant === "today" ? 1 : 0;
+            const isTodayB = badgeB && badgeB.variant === "today" ? 1 : 0;
+            if (isTodayB !== isTodayA) return isTodayB - isTodayA;
+
+            if (a.status === "Ongoing" && b.status !== "Ongoing") return -1;
+            if (b.status === "Ongoing" && a.status !== "Ongoing") return 1;
+            return (b.subscriber_count || 0) - (a.subscriber_count || 0);
+        });
+
+        if (counterBadge) {
+            const activeCount = ongoingSeriesList.filter(s => s.status === "Ongoing" || s.status === "On Break").length;
+            counterBadge.textContent = `${activeCount} ACTIVE SHOWS`;
+        }
+
+        renderOngoingSeriesList();
+
+        if (!isSeriesTrackerInitialized) {
+            setupSeriesTrackerEventListeners();
+            isSeriesTrackerInitialized = true;
+        }
+
+    } catch (err) {
+        console.error("[SeriesTracker] Failed to initialize ongoing series tracker:", err);
+        listContainer.innerHTML = `<div style="padding: 24px; text-align: center; color: #ff3b30;">Error loading series: ${escapeHTML(err.message)}</div>`;
+    }
+}
+
+function setupSeriesTrackerEventListeners() {
+    const searchInput = document.getElementById("series-search-input");
+    if (searchInput) {
+        searchInput.addEventListener("input", createAdminDebounce(() => {
+            renderOngoingSeriesList();
+        }, 200));
+    }
+
+    const filterTabsContainer = document.getElementById("series-filter-tabs");
+    if (filterTabsContainer) {
+        filterTabsContainer.querySelectorAll(".series-filter-tab").forEach(tab => {
+            tab.addEventListener("click", () => {
+                activeSeriesFilter = tab.getAttribute("data-filter") || "all";
+                filterTabsContainer.querySelectorAll(".series-filter-tab").forEach(t => {
+                    t.style.background = "rgba(255,255,255,0.03)";
+                    t.style.color = "var(--text-secondary)";
+                    t.classList.remove("active");
+                });
+                tab.style.background = "var(--primary-gradient)";
+                tab.style.color = "#000";
+                tab.classList.add("active");
+                renderOngoingSeriesList();
+            });
+        });
+    }
+}
+
+function renderOngoingSeriesList() {
+    const listContainer = document.getElementById("ongoing-series-list");
+    if (!listContainer) return;
+
+    listContainer.replaceChildren();
+
+    const searchQuery = (document.getElementById("series-search-input")?.value || "").toLowerCase().trim();
+
+    const filtered = ongoingSeriesList.filter(s => {
+        // 1. Text filter
+        if (searchQuery) {
+            const title = (s.title || "").toLowerCase();
+            const id = String(s.csv_id || s.tmdb_id || "").toLowerCase();
+            if (!title.includes(searchQuery) && !id.includes(searchQuery)) return false;
+        }
+
+        // 2. Tab filter
+        const badge = typeof getSeriesCountdownBadge === "function" ? getSeriesCountdownBadge(s) : null;
+        if (activeSeriesFilter === "awaiting") {
+            return badge && (badge.variant === "today" || badge.variant === "tomorrow");
+        } else if (activeSeriesFilter === "ongoing") {
+            return s.status === "Ongoing";
+        } else if (activeSeriesFilter === "break") {
+            return s.status === "On Break";
+        } else if (activeSeriesFilter === "completed") {
+            return s.status === "Completed";
+        }
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        listContainer.innerHTML = `<div style="padding: 32px; text-align: center; color: var(--text-secondary);">No ongoing series match the selected filter.</div>`;
+        return;
+    }
+
+    filtered.forEach(series => {
+        const row = document.createElement("div");
+        row.className = "list-row";
+        row.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border-color); gap: 14px; flex-wrap: wrap;";
+
+        const badge = typeof getSeriesCountdownBadge === "function" ? getSeriesCountdownBadge(series) : null;
+        let badgeHtml = "";
+        if (badge) {
+            let bg = "rgba(255, 188, 0, 0.12)";
+            let color = "#ffbc00";
+            let border = "rgba(255, 188, 0, 0.3)";
+            let pulseStyle = "";
+
+            if (badge.variant === "today") {
+                bg = "rgba(255, 59, 48, 0.18)";
+                color = "#ff453a";
+                border = "rgba(255, 59, 48, 0.45)";
+                pulseStyle = "animation: pulse 1.5s infinite;";
+            } else if (badge.variant === "tomorrow") {
+                bg = "rgba(0, 200, 255, 0.15)";
+                color = "#00c8ff";
+                border = "rgba(0, 200, 255, 0.35)";
+            } else if (badge.variant === "break") {
+                bg = "rgba(168, 85, 247, 0.15)";
+                color = "#c084fc";
+                border = "rgba(168, 85, 247, 0.35)";
+            } else if (badge.variant === "completed") {
+                bg = "rgba(76, 217, 100, 0.15)";
+                color = "#4cd964";
+                border = "rgba(76, 217, 100, 0.35)";
+            }
+
+            badgeHtml = `<span style="font-size: 10px; font-weight: 800; background: ${bg}; color: ${color}; border: 1px solid ${border}; padding: 3px 8px; border-radius: 12px; white-space: nowrap; ${pulseStyle}">${escapeHTML(badge.label)}</span>`;
+        }
+
+        const subCount = series.subscriber_count || 0;
+        const subBadgeHtml = subCount > 0 
+            ? `<span style="font-size: 10px; font-weight: 700; color: #ffbc00; background: rgba(255, 188, 0, 0.1); border: 1px solid rgba(255, 188, 0, 0.25); padding: 2px 7px; border-radius: 10px; display: inline-flex; align-items: center; gap: 4px;">🔔 ${subCount} Subs</span>`
+            : `<span style="font-size: 10px; color: var(--text-muted); padding: 2px 6px;">🔔 0 Subs</span>`;
+
+        const totalEpsStr = series.total_episodes ? `${series.total_episodes}` : "?";
+        const progressStr = `Season ${series.current_season || 1} • Ep ${series.last_uploaded_episode || 0} of ${totalEpsStr} uploaded`;
+        const nextAirStr = series.next_air_date ? `📅 Next: <strong>${escapeHTML(series.next_air_date)}</strong>` : "";
+
+        const posterSrc = getPosterUrl(series.poster);
+
+        row.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 240px; flex: 1;">
+                <img src="${escapeHTML(posterSrc)}" alt="Poster" style="width: 44px; height: 62px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                <div style="min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h5 style="margin: 0; font-size: 14px; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(series.title)}</h5>
+                        ${badgeHtml}
+                        ${subBadgeHtml}
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span>${progressStr}</span>
+                        ${nextAirStr ? `<span>•</span><span>${nextAirStr}</span>` : ""}
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary btn-sm btn-upload-next-ep" style="font-size: 11px; padding: 6px 14px; font-weight: 700; background: linear-gradient(135deg, #ffbc00 0%, #ff8800 100%); color: #000; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <span>⚡ Upload Ep ${(series.last_uploaded_episode || 0) + 1}</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm btn-finish-season" title="Mark Season Complete & Purge Subscriptions" style="font-size: 11px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer;">
+                    <span>🏁 Complete</span>
+                </button>
+            </div>
+        `;
+
+        // Wire button events
+        row.querySelector(".btn-upload-next-ep")?.addEventListener("click", () => {
+            openUploadEpisodeModal(series);
+        });
+
+        row.querySelector(".btn-finish-season")?.addEventListener("click", () => {
+            markSeasonCompleted(series);
+        });
+
+        listContainer.appendChild(row);
+    });
+}
+
+window.openUploadEpisodeModal = function(series) {
+    if (!series) return;
+    const modal = document.getElementById("upload-episode-modal");
+    if (!modal) return;
+
+    const posterEl = document.getElementById("upload-ep-poster");
+    const titleEl = document.getElementById("upload-ep-title");
+    const seasonMetaEl = document.getElementById("upload-ep-current-season");
+    const lastEpMetaEl = document.getElementById("upload-ep-last-uploaded");
+    const subCountEl = document.getElementById("upload-ep-sub-count");
+
+    const csvIdInput = document.getElementById("upload-ep-csv-id");
+    const tmdbIdInput = document.getElementById("upload-ep-tmdb-id");
+    const seasonInput = document.getElementById("upload-ep-season");
+    const epInput = document.getElementById("upload-ep-number");
+    const titleInput = document.getElementById("upload-ep-title-input");
+    const streamInput = document.getElementById("upload-ep-stream");
+    const downloadInput = document.getElementById("upload-ep-download");
+    const notifyCheckbox = document.getElementById("upload-ep-notify-checkbox");
+    const finaleCheckbox = document.getElementById("upload-ep-finale-checkbox");
+
+    const posterSrc = getPosterUrl(series.poster);
+    if (posterEl) posterEl.src = posterSrc;
+    if (titleEl) titleEl.textContent = series.title || "Series";
+    if (seasonMetaEl) seasonMetaEl.textContent = `Season ${series.current_season || 1}`;
+    if (lastEpMetaEl) lastEpMetaEl.textContent = `Last Uploaded: Ep ${series.last_uploaded_episode || 0}${series.total_episodes ? ` of ${series.total_episodes}` : ""}`;
+    
+    const subs = series.subscriber_count || 0;
+    if (subCountEl) subCountEl.textContent = `${subs} Subscriber${subs === 1 ? '' : 's'} will receive Telegram push`;
+
+    if (csvIdInput) csvIdInput.value = series.csv_id || "";
+    if (tmdbIdInput) tmdbIdInput.value = series.tmdb_id || series.csv_id || "";
+    if (seasonInput) seasonInput.value = series.current_season || 1;
+
+    const nextEpisode = (series.last_uploaded_episode || 0) + 1;
+    if (epInput) epInput.value = nextEpisode;
+    if (titleInput) titleInput.value = "";
+    if (streamInput) streamInput.value = "";
+    if (downloadInput) downloadInput.value = "";
+    if (notifyCheckbox) notifyCheckbox.checked = true;
+
+    // If nextEpisode >= total_episodes, check finale box automatically
+    if (finaleCheckbox) {
+        finaleCheckbox.checked = series.total_episodes > 0 && nextEpisode >= series.total_episodes;
+    }
+
+    modal.classList.add("active");
+};
+
+window.closeUploadEpisodeModal = function() {
+    const modal = document.getElementById("upload-episode-modal");
+    if (modal) modal.classList.remove("active");
+};
+
+window.submitEpisodeUpload = async function() {
+    const csvId = document.getElementById("upload-ep-csv-id")?.value.trim();
+    const tmdbIdVal = document.getElementById("upload-ep-tmdb-id")?.value.trim();
+    const seasonNum = parseInt(document.getElementById("upload-ep-season")?.value, 10) || 1;
+    const epNum = parseInt(document.getElementById("upload-ep-number")?.value, 10) || 1;
+    const epTitle = document.getElementById("upload-ep-title-input")?.value.trim() || "";
+    const rawStream = document.getElementById("upload-ep-stream")?.value.trim() || "";
+    const downloadUrl = document.getElementById("upload-ep-download")?.value.trim() || "";
+    const notifySubscribers = document.getElementById("upload-ep-notify-checkbox")?.checked !== false;
+    const isFinale = document.getElementById("upload-ep-finale-checkbox")?.checked === true;
+
+    if (!rawStream && !downloadUrl) {
+        alert("Please provide at least an Online Stream token/link OR a Telegram Download Link!");
+        return;
+    }
+
+    const cleanStream = rawStream ? cleanStreamInput(rawStream) : "";
+    const tmdbId = parseInt(tmdbIdVal, 10) || parseInt(csvId, 10);
+
+    const submitBtn = document.getElementById("btn-submit-upload-ep");
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "<span>Uploading &amp; Syncing... ⏳</span>";
+    }
+
+    try {
+        const series = ongoingSeriesList.find(s => s.csv_id === csvId || String(s.tmdb_id) === String(tmdbId)) || {};
+        const seriesTitle = series.title || document.getElementById("upload-ep-title")?.textContent || "Series";
+
+        // 1. Update Firestore movies document
+        if (typeof db !== "undefined" && db) {
+            const movieDocRef = db.collection("movies").doc(csvId);
+            const docSnap = await movieDocRef.get();
+            const existingData = docSnap.exists ? docSnap.data() : {};
+
+            const streamLinks = Array.isArray(existingData.stream_links) ? [...existingData.stream_links] : [];
+            const links = Array.isArray(existingData.links) ? [...existingData.links] : [];
+
+            if (cleanStream) {
+                // If this episode slot already exists, update it; otherwise push
+                const existingIdx = streamLinks.findIndex(s => (s.episode === epNum || s.episode === String(epNum)) && (s.season === seasonNum || s.season === String(seasonNum)));
+                if (existingIdx !== -1) {
+                    streamLinks[existingIdx].stream_url = cleanStream;
+                    streamLinks[existingIdx].url = cleanStream;
+                } else {
+                    streamLinks.push({
+                        episode: epNum,
+                        season: seasonNum,
+                        quality: "720p",
+                        stream_url: cleanStream,
+                        url: cleanStream
+                    });
+                }
+            }
+
+            if (downloadUrl) {
+                const seasonLabel = `Season ${seasonNum} Ep ${epNum}`;
+                const existingLIdx = links.findIndex(l => l.season === seasonLabel);
+                if (existingLIdx !== -1) {
+                    links[existingLIdx].url = downloadUrl;
+                } else {
+                    links.push({
+                        url: downloadUrl,
+                        season: seasonLabel
+                    });
+                }
+            }
+
+            const newStatus = isFinale ? "Completed" : "Ongoing";
+
+            await movieDocRef.set({
+                status: newStatus,
+                current_season: seasonNum,
+                last_uploaded_episode: epNum,
+                last_updated_timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                stream_links: streamLinks,
+                links: links
+            }, { merge: true });
+
+            console.log(`[SeriesTracker] Updated series ${csvId} in Firestore: Season ${seasonNum} Ep ${epNum}`);
+
+            // 2. Queue Telegram Push Notification to Subscribed Users
+            if (notifySubscribers && tmdbId) {
+                const currentAdminId = sessionStorage.getItem("admin_auth_id") || "1175336733";
+                const streamMiniAppUrl = `https://dans123456.github.io/filmhouse/?stream_id=${encodeURIComponent(csvId)}&season=${seasonNum}&ep=${epNum}`;
+
+                await db.collection("admin_broadcast_queue").add({
+                    type: "series_episode_broadcast",
+                    tmdb_id: tmdbId,
+                    csv_id: csvId,
+                    series_title: seriesTitle,
+                    season: seasonNum,
+                    episode: epNum,
+                    episode_title: epTitle,
+                    stream_url: streamMiniAppUrl,
+                    download_url: downloadUrl,
+                    purge_subscriptions: isFinale,
+                    status: "pending",
+                    adminId: String(currentAdminId),
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log(`[SeriesTracker] Queued episode broadcast in admin_broadcast_queue for TMDB ${tmdbId}`);
+            }
+
+            // 3. If finale, purge subscriptions directly from client as well
+            if (isFinale && tmdbId) {
+                try {
+                    const purgeSnap = await db.collection("subscriptions").where("tmdb_id", "in", [tmdbId, String(tmdbId)]).get();
+                    if (!purgeSnap.empty) {
+                        const batch = db.batch();
+                        purgeSnap.forEach(d => batch.delete(d.ref));
+                        await batch.commit();
+                        console.log(`[SeriesTracker] Purged ${purgeSnap.size} subscriber records for completed season.`);
+                    }
+                } catch (purgeErr) {
+                    console.warn("[SeriesTracker] Client-side subscriber purge warning:", purgeErr.message);
+                }
+            }
+        }
+
+        // 4. Update memory cache and catalog
+        const catIdx = allCatalogMovies.findIndex(m => m.csv_id === csvId);
+        if (catIdx !== -1) {
+            allCatalogMovies[catIdx].last_uploaded_episode = epNum;
+            allCatalogMovies[catIdx].current_season = seasonNum;
+            allCatalogMovies[catIdx].status = isFinale ? "Completed" : "Ongoing";
+            if (!newlyUpdatedIds.includes(csvId)) {
+                newlyUpdatedIds.push(csvId);
+            }
+            catalogChangesMade = true;
+            updatePublishButtonState();
+        }
+
+        closeUploadEpisodeModal();
+        showToast(`🎉 S${seasonNum}E${epNum} uploaded! Telegram notifications queued for subscribers. 🚀`, "success");
+
+        // Refresh UI
+        setTimeout(() => {
+            initOngoingSeriesTracker();
+        }, 800);
+
+    } catch (err) {
+        console.error("[SeriesTracker] Failed to upload episode:", err);
+        alert("Upload failed: " + err.message);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "<span>🚀 Upload Episode &amp; Notify</span>";
+        }
+    }
+};
+
+window.markSeasonCompleted = async function(series) {
+    if (!series) return;
+    const sTitle = series.title || "this series";
+    const season = series.current_season || 1;
+    const confirmFinish = confirm(`Mark Season ${season} of "${sTitle}" as Completed?\n\nThis will tag the series as 'Completed' and automatically clean up subscriber records from the database.`);
+    if (!confirmFinish) return;
+
+    try {
+        if (typeof db !== "undefined" && db) {
+            await db.collection("movies").doc(series.csv_id).set({
+                status: "Completed",
+                last_updated_timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+
+            if (series.tmdb_id) {
+                const purgeSnap = await db.collection("subscriptions").where("tmdb_id", "in", [series.tmdb_id, String(series.tmdb_id)]).get();
+                if (!purgeSnap.empty) {
+                    const batch = db.batch();
+                    purgeSnap.forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                }
+            }
+        }
+
+        series.status = "Completed";
+        series.subscriber_count = 0;
+        showToast(`"${sTitle}" marked as Season Completed & subscribers purged! ✅`, "success");
+        renderOngoingSeriesList();
+
+    } catch (err) {
+        console.error("[SeriesTracker] Error completing season:", err);
+        alert("Failed to mark season complete: " + err.message);
+    }
+};
 
 

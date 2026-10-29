@@ -4442,6 +4442,151 @@ async function init() {
                                 error: bErr.message
                             }).catch(() => {});
                         }
+                    } else if (data.type === "series_episode_broadcast") {
+                        try {
+                            const tmdbId = parseInt(data.tmdb_id, 10);
+                            const seriesTitle = data.series_title || "Ongoing Series";
+                            const season = parseInt(data.season, 10) || 1;
+                            const episode = parseInt(data.episode, 10) || 1;
+                            const episodeTitle = data.episode_title || "";
+                            const csvId = data.csv_id || String(tmdbId);
+
+                            console.log(`[SeriesBroadcast] Processing episode broadcast for "${seriesTitle}" S${season}E${episode} (TMDB: ${tmdbId})...`);
+
+                            // 1. Fetch all subscribers for this series
+                            let subscribers = [];
+                            try {
+                                const numSnap = await db.collection("subscriptions").where("tmdb_id", "==", tmdbId).get();
+                                numSnap.forEach(d => {
+                                    const s = d.data();
+                                    if (s && s.user_telegram_id) subscribers.push(s);
+                                });
+
+                                if (subscribers.length === 0) {
+                                    const strSnap = await db.collection("subscriptions").where("tmdb_id", "==", String(tmdbId)).get();
+                                    strSnap.forEach(d => {
+                                        const s = d.data();
+                                        if (s && s.user_telegram_id) subscribers.push(s);
+                                    });
+                                }
+                            } catch (subErr) {
+                                console.error(`[SeriesBroadcast] Failed to query subscriptions for ${tmdbId}:`, subErr.message);
+                            }
+
+                            console.log(`[SeriesBroadcast] Found ${subscribers.length} subscriber(s) for "${seriesTitle}".`);
+
+                            const cleanSafe = (t) => String(t || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                            const epTitleLine = episodeTitle ? ` - <i>${cleanSafe(episodeTitle)}</i>` : "";
+
+                            const messageText = 
+                                `🍿 <b>New Episode Available!</b>\n\n` +
+                                `📺 <b>${cleanSafe(seriesTitle)}</b>\n` +
+                                `🎬 <b>Season ${season}, Episode ${episode}</b>${epTitleLine} is now ready to watch!\n\n` +
+                                `<i>Tap below to stream instantly in Full HD or download directly on Telegram.</i>`;
+
+                            const streamMiniAppUrl = data.stream_url || `https://dans123456.github.io/filmhouse/?stream_id=${encodeURIComponent(csvId)}&season=${season}&ep=${episode}`;
+                            const actionRow = [
+                                { text: `▶️ Stream S${season}E${episode}`, web_app: { url: streamMiniAppUrl } }
+                            ];
+
+                            if (data.download_url && (data.download_url.startsWith("http://") || data.download_url.startsWith("https://") || data.download_url.startsWith("t.me/"))) {
+                                const dlUrl = data.download_url.startsWith("t.me/") ? `https://${data.download_url}` : data.download_url;
+                                actionRow.push({ text: `⬇️ Download S${season}E${episode}`, url: dlUrl });
+                            }
+
+                            const replyMarkup = {
+                                inline_keyboard: [
+                                    actionRow,
+                                    [{ text: "🍿 Open Film House Mini App", web_app: { url: "https://dans123456.github.io/filmhouse/" } }]
+                                ]
+                            };
+
+                            let sent = 0;
+                            let failed = 0;
+
+                            for (const sub of subscribers) {
+                                const targetId = String(sub.user_telegram_id);
+                                try {
+                                    await callTelegramWithRetry('sendMessage', targetId, messageText, {
+                                        parse_mode: 'HTML',
+                                        reply_markup: replyMarkup
+                                    });
+                                    sent++;
+                                } catch (sendErr) {
+                                    failed++;
+                                    if (sendErr.message && (sendErr.message.includes("blocked") || sendErr.message.includes("deactivated"))) {
+                                        localStore.setBlocked(targetId, true);
+                                    }
+                                }
+                                await new Promise(r => setTimeout(r, 40));
+                            }
+
+                            console.log(`[SeriesBroadcast] Broadcast finished. Delivered: ${sent}, Failed: ${failed}`);
+
+                            // If this was marked to purge subscriptions (season completed)
+                            if (data.purge_subscriptions === true) {
+                                try {
+                                    console.log(`[SeriesBroadcast] Season complete. Purging subscriptions for TMDB ${tmdbId}...`);
+                                    const purgeDocs = [];
+                                    const pSnap1 = await db.collection("subscriptions").where("tmdb_id", "==", tmdbId).get();
+                                    pSnap1.forEach(d => purgeDocs.push(d.ref));
+                                    const pSnap2 = await db.collection("subscriptions").where("tmdb_id", "==", String(tmdbId)).get();
+                                    pSnap2.forEach(d => purgeDocs.push(d.ref));
+
+                                    if (purgeDocs.length > 0) {
+                                        const pBatch = db.batch();
+                                        purgeDocs.forEach(ref => pBatch.delete(ref));
+                                        await pBatch.commit();
+                                        console.log(`[SeriesBroadcast] Purged ${purgeDocs.length} subscription records for completed series.`);
+                                    }
+                                } catch (pErr) {
+                                    console.error(`[SeriesBroadcast] Subscriber purge failed:`, pErr.message);
+                                }
+                            }
+
+                            await db.collection("admin_broadcast_queue").doc(docId).update({
+                                status: "completed",
+                                subscriberCount: subscribers.length,
+                                deliveredCount: sent,
+                                failedCount: failed,
+                                processedAt: admin.firestore.FieldValue.serverTimestamp()
+                            }).catch(() => {});
+
+                        } catch (epErr) {
+                            console.error(`[SecurityQueue] Series episode broadcast failed for task ${docId}:`, epErr.message);
+                            await db.collection("admin_broadcast_queue").doc(docId).update({
+                                status: "failed",
+                                error: epErr.message
+                            }).catch(() => {});
+                        }
+                    } else if (data.type === "series_purge_subscriptions") {
+                        try {
+                            const tmdbId = parseInt(data.tmdb_id, 10);
+                            console.log(`[SecurityQueue] Standalone subscriber purge for TMDB ${tmdbId}...`);
+                            const purgeDocs = [];
+                            const pSnap1 = await db.collection("subscriptions").where("tmdb_id", "==", tmdbId).get();
+                            pSnap1.forEach(d => purgeDocs.push(d.ref));
+                            const pSnap2 = await db.collection("subscriptions").where("tmdb_id", "==", String(tmdbId)).get();
+                            pSnap2.forEach(d => purgeDocs.push(d.ref));
+
+                            if (purgeDocs.length > 0) {
+                                const pBatch = db.batch();
+                                purgeDocs.forEach(ref => pBatch.delete(ref));
+                                await pBatch.commit();
+                            }
+
+                            await db.collection("admin_broadcast_queue").doc(docId).update({
+                                status: "completed",
+                                purgedCount: purgeDocs.length,
+                                processedAt: admin.firestore.FieldValue.serverTimestamp()
+                            }).catch(() => {});
+                        } catch (purgeErr) {
+                            console.error(`[SecurityQueue] Standalone subscriber purge failed:`, purgeErr.message);
+                            await db.collection("admin_broadcast_queue").doc(docId).update({
+                                status: "failed",
+                                error: purgeErr.message
+                            }).catch(() => {});
+                        }
                     }
                 }
             });
