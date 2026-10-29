@@ -47,6 +47,11 @@ service cloud.firestore {
       allow update, delete: if false;
     }
     
+    // Active Streams: Real-time presence and heartbeat for streaming viewers
+    match /active_streams/{streamId} {
+      allow read, write: if true;
+    }
+    
     // Default fallback: Deny all other collections
     match /{document=**} {
       allow read, write: if false;

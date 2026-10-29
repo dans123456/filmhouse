@@ -709,6 +709,25 @@
             <div class="stat-lbl" style="color: #ffbc00; font-weight: 700;">Admin Rankings</div>
             <div id="stat-top-admin-sub" style="font-size: 10px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Active in last 24h</div>
         </div>
+        <div class="stat-card stat-card-interactive" id="stat-live-streamers-card" onclick="openLiveStreamersModal()" style="cursor: pointer; background: linear-gradient(135deg, rgba(255, 59, 48, 0.08) 0%, rgba(22, 24, 35, 0.6) 100%); border-color: rgba(255, 59, 48, 0.35);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div class="stat-num" id="stat-live-streamers-num" style="color: #ff453a; display: flex; align-items: center; gap: 8px;">
+                    <span style="display: inline-block; width: 10px; height: 10px; background: #ff453a; border-radius: 50%; box-shadow: 0 0 10px #ff453a; animation: pulse 1.5s infinite;"></span>
+                    <span id="stat-live-count">0</span>
+                </div>
+                <span style="font-size: 9px; background: rgba(255, 59, 48, 0.18); color: #ff453a; padding: 2px 6px; border-radius: 6px; font-weight: 800; letter-spacing: 0.5px;">LIVE ❯</span>
+            </div>
+            <div class="stat-lbl" style="color: #ff453a; font-weight: 700;">Live Streamers</div>
+            <div id="stat-live-streamers-sub" style="font-size: 10px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">0 active viewers right now</div>
+        </div>
+        <div class="stat-card stat-card-interactive" id="stat-stream-plays-card" onclick="openLiveStreamersModal()" style="cursor: pointer; background: linear-gradient(135deg, rgba(0, 188, 212, 0.08) 0%, rgba(22, 24, 35, 0.6) 100%); border-color: rgba(0, 188, 212, 0.35);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div class="stat-num" id="stat-stream-plays-num" style="color: #00bcd4;">0</div>
+                <span style="font-size: 9px; background: rgba(0, 188, 212, 0.18); color: #00bcd4; padding: 2px 6px; border-radius: 6px; font-weight: 800; letter-spacing: 0.5px;">STATS ❯</span>
+            </div>
+            <div class="stat-lbl" style="color: #00bcd4; font-weight: 700;">Total Stream Plays</div>
+            <div id="stat-stream-plays-sub" style="font-size: 10px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Across all catalog titles</div>
+        </div>
     </div>
 
     <!-- CATALOG MANAGER SECTION -->
@@ -1390,6 +1409,44 @@
         </div>
     </div>
 
+    <!-- LIVE STREAMERS & AUDIENCE PRESENCE MODAL -->
+    <div class="admin-modal-overlay" id="live-streamers-modal">
+        <div class="admin-modal-container" style="max-width: 620px; width: 95%;">
+            <div class="modal-header">
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <span style="display: inline-block; width: 10px; height: 10px; background: #ff453a; border-radius: 50%; box-shadow: 0 0 10px #ff453a; animation: pulse 1.5s infinite;"></span>
+                    <span>Live Streamers &amp; Viewer Presence</span>
+                </h3>
+                <button type="button" class="close-modal-btn" onclick="closeLiveStreamersModal()" title="Close" aria-label="Close" style="cursor: pointer; z-index: 10;">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;pointer-events:none;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+                </button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+                <div style="background: rgba(255, 59, 48, 0.08); border: 1px solid rgba(255, 59, 48, 0.25); border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 26px; font-weight: 800; color: #ff453a;" id="modal-live-streamers-count">0</div>
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-top: 2px;">Streaming Right Now</div>
+                </div>
+                <div style="background: rgba(0, 188, 212, 0.08); border: 1px solid rgba(0, 188, 212, 0.25); border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 26px; font-weight: 800; color: #00bcd4;" id="modal-total-streams-count">0</div>
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-top: 2px;">Total Stream Plays</div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px;">Active Viewers</span>
+                <span style="font-size: 10px; color: #4cd964; display: flex; align-items: center; gap: 4px;">
+                    <span style="width: 6px; height: 6px; background: #4cd964; border-radius: 50%; display: inline-block;"></span>
+                    <span>Live Sync Active</span>
+                </span>
+            </div>
+
+            <div id="live-streamers-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto; padding-right: 2px;">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
     <svg style="display:none;">
         <g id="icon-close">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
@@ -1397,6 +1454,6 @@
     </svg>
 
     <script src="./MOVIE/PapaParse-5.0.2/papaparse.min.js"></script>
-    <script src="admin.js?v=112"></script>
+    <script src="admin.js?v=113"></script>
 </body>
 </html>

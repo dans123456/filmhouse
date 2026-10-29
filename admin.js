@@ -1834,6 +1834,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     loadCatalog();
     initAdminLeaderboardListener();
+    listenToActiveStreamers();
     
     // 2. Fetch token from Firestore to sync/update
     if (db) {
@@ -6393,6 +6394,161 @@ window.closeAdminPerfModal = function() {
 
 // Bind modal background for admin perf modal
 const adminPerfModal = document.getElementById("admin-perf-modal");
+
+// --- LIVE STREAMERS & AUDIENCE PRESENCE TRACKING ---
+let activeStreamersUnsubscribe = null;
+let currentActiveStreamersList = [];
+let totalStreamPlaysCount = 0;
+
+function listenToActiveStreamers() {
+    if (typeof firebase === "undefined" || !db) return;
+
+    // Listen to stream metrics
+    db.collection("settings").doc("stream_metrics").onSnapshot(doc => {
+        if (doc && doc.exists) {
+            const data = doc.data();
+            totalStreamPlaysCount = data.totalStreamPlays || 0;
+            const statPlaysEl = document.getElementById("stat-stream-plays-num");
+            if (statPlaysEl) statPlaysEl.textContent = totalStreamPlaysCount.toLocaleString();
+            const modalPlaysEl = document.getElementById("modal-total-streams-count");
+            if (modalPlaysEl) modalPlaysEl.textContent = totalStreamPlaysCount.toLocaleString();
+        }
+    }, err => {
+        console.warn("stream_metrics listener error:", err);
+    });
+
+    // Listen to real-time active_streams
+    if (activeStreamersUnsubscribe) activeStreamersUnsubscribe();
+    activeStreamersUnsubscribe = db.collection("active_streams").onSnapshot(snapshot => {
+        const now = Date.now();
+        const activeList = [];
+        
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            let lastHeartbeatMs = 0;
+            if (data.lastHeartbeat && data.lastHeartbeat.toMillis) {
+                lastHeartbeatMs = data.lastHeartbeat.toMillis();
+            } else if (data.lastHeartbeat instanceof Date) {
+                lastHeartbeatMs = data.lastHeartbeat.getTime();
+            } else if (typeof data.lastHeartbeat === "number") {
+                lastHeartbeatMs = data.lastHeartbeat;
+            } else {
+                lastHeartbeatMs = now;
+            }
+
+            // Kept active if heartbeat within last 90 seconds
+            if (now - lastHeartbeatMs < 90000) {
+                activeList.push({
+                    id: doc.id,
+                    ...data,
+                    lastHeartbeatMs
+                });
+            } else {
+                // Clean up stale doc
+                doc.ref.delete().catch(() => {});
+            }
+        });
+
+        currentActiveStreamersList = activeList;
+        renderActiveStreamersUI();
+    }, err => {
+        console.warn("active_streams listener error:", err);
+    });
+}
+
+function renderActiveStreamersUI() {
+    const activeCount = currentActiveStreamersList.length;
+    
+    // Update dashboard counter
+    const liveCountEl = document.getElementById("stat-live-count");
+    if (liveCountEl) liveCountEl.textContent = activeCount;
+
+    const liveSubEl = document.getElementById("stat-live-streamers-sub");
+    if (liveSubEl) {
+        liveSubEl.textContent = activeCount === 1 
+            ? "1 active viewer right now" 
+            : `${activeCount} active viewers right now`;
+    }
+
+    const modalCountEl = document.getElementById("modal-live-streamers-count");
+    if (modalCountEl) modalCountEl.textContent = activeCount;
+
+    // Render list in modal
+    const listEl = document.getElementById("live-streamers-list");
+    if (!listEl) return;
+
+    if (activeCount === 0) {
+        listEl.innerHTML = `
+            <div style="padding: 32px 16px; text-align: center; color: var(--text-muted); font-size: 13px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.08);">
+                <div style="font-size: 32px; margin-bottom: 8px;">📺</div>
+                <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">No Active Streamers Right Now</div>
+                <div style="font-size: 11px;">When a user opens the video player in the Film House app, their live presence will show up here instantly.</div>
+            </div>
+        `;
+        return;
+    }
+
+    const now = Date.now();
+    listEl.innerHTML = currentActiveStreamersList.map(st => {
+        let startedMs = now;
+        if (st.startedAt && st.startedAt.toMillis) startedMs = st.startedAt.toMillis();
+        else if (st.startedAt instanceof Date) startedMs = st.startedAt.getTime();
+        
+        const elapsedMinutes = Math.max(0, Math.floor((now - startedMs) / 60000));
+        const durationText = elapsedMinutes === 0 ? "Just started" : `Streaming for ${elapsedMinutes}m`;
+        
+        const avatarInitial = (st.name && st.name.charAt(0) ? st.name.charAt(0) : "V").toUpperCase();
+        const tgLink = st.username ? `https://t.me/${st.username}` : (st.userId && !st.userId.startsWith("guest") ? `tg://user?id=${st.userId}` : "");
+
+        return `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; gap: 10px; transition: border-color 0.2s;">
+                <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,59,48,0.2) 0%, rgba(255,188,0,0.2) 100%); border: 1px solid rgba(255,59,48,0.4); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #ffbc00; flex-shrink: 0;">
+                        ${escapeHTML(avatarInitial)}
+                    </div>
+                    <div style="min-width: 0; flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(st.name || "Viewer")}</span>
+                            ${tgLink ? `<a href="${tgLink}" target="_blank" style="font-size: 11px; color: #00c8ff; text-decoration: none;" title="Open on Telegram">✈️</a>` : ''}
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                            <span style="font-size: 11px; color: #ffbc00; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🎬 ${escapeHTML(st.title || "Cinema Stream")}</span>
+                            <span style="font-size: 9px; padding: 1px 4px; border-radius: 3px; background: rgba(255,255,255,0.06); color: var(--text-muted);">${escapeHTML(st.type || "Movie")}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 3px;">
+                    <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 700; background: rgba(255,59,48,0.15); border: 1px solid rgba(255,59,48,0.3); color: #ff453a; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                        <span style="width: 5px; height: 5px; background: #ff453a; border-radius: 50%; box-shadow: 0 0 5px #ff453a; animation: pulse 1.5s infinite;"></span>
+                        <span>LIVE</span>
+                    </span>
+                    <span style="font-size: 10px; color: var(--text-muted);">${durationText}</span>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+window.openLiveStreamersModal = function() {
+    const modal = document.getElementById("live-streamers-modal");
+    if (modal) {
+        modal.classList.add("active");
+        renderActiveStreamersUI();
+    }
+};
+
+window.closeLiveStreamersModal = function() {
+    const modal = document.getElementById("live-streamers-modal");
+    if (modal) modal.classList.remove("active");
+};
+
+const liveStreamersModal = document.getElementById("live-streamers-modal");
+if (liveStreamersModal) {
+    liveStreamersModal.addEventListener("click", (e) => {
+        if (e.target === liveStreamersModal) closeLiveStreamersModal();
+    });
+}
 if (adminPerfModal) {
     adminPerfModal.addEventListener("click", (e) => {
         if (e.target === adminPerfModal) closeAdminPerfModal();

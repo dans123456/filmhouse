@@ -5785,10 +5785,79 @@ function openTrailerModal(videoKey) {
 }
 
 // Admin Whitelist for Streaming Beta Testing
+let currentStreamSessionId = null;
+let activeStreamHeartbeatInterval = null;
+
+// Start or update live streaming presence in Firestore
+function startStreamingPresence(movie, title) {
+    if (typeof firebase === "undefined" || !db) return;
+    
+    if (activeStreamHeartbeatInterval) {
+        clearInterval(activeStreamHeartbeatInterval);
+        activeStreamHeartbeatInterval = null;
+    }
+
+    const userId = (state.user && state.user.id) ? String(state.user.id) : ("guest_" + Math.random().toString(36).substring(2, 9));
+    currentStreamSessionId = userId;
+
+    const displayName = (state.user && [state.user.first_name, state.user.last_name].filter(Boolean).join(" ")) 
+        || (state.user && state.user.username ? "@" + state.user.username : "") 
+        || "Guest Viewer";
+    const username = (state.user && state.user.username) ? state.user.username : "";
+
+    const streamData = {
+        userId: userId,
+        name: displayName,
+        username: username,
+        title: title || movie?.title || "Cinema Stream",
+        movieId: movie?.csv_id || movie?.tmdb_id || movie?.id || "",
+        type: movie?.type || "Movie",
+        poster: movie?.poster || "",
+        startedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastHeartbeat: firebase.firestore.FieldValue.serverTimestamp(),
+        status: "streaming"
+    };
+
+    db.collection("active_streams").doc(userId).set(streamData).catch(err => {
+        console.warn("Could not register stream presence:", err);
+    });
+
+    db.collection("settings").doc("stream_metrics").set({
+        totalStreamPlays: firebase.firestore.FieldValue.increment(1),
+        lastStreamedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch(() => {});
+
+    activeStreamHeartbeatInterval = setInterval(() => {
+        if (!currentStreamSessionId || typeof firebase === "undefined" || !db) return;
+        db.collection("active_streams").doc(currentStreamSessionId).update({
+            lastHeartbeat: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(err => {
+            console.warn("Stream heartbeat error:", err);
+        });
+    }, 25000);
+}
+
+// Stop live streaming presence in Firestore
+function stopStreamingPresence() {
+    if (activeStreamHeartbeatInterval) {
+        clearInterval(activeStreamHeartbeatInterval);
+        activeStreamHeartbeatInterval = null;
+    }
+    if (currentStreamSessionId && typeof firebase !== "undefined" && db) {
+        const idToDelete = currentStreamSessionId;
+        currentStreamSessionId = null;
+        db.collection("active_streams").doc(idToDelete).delete().catch(() => {});
+    }
+}
+
+window.addEventListener("beforeunload", stopStreamingPresence);
+window.addEventListener("pagehide", stopStreamingPresence);
+
 const STREAMING_ADMIN_IDS = ["1175336733", "1329840839"];
 
 // Close In-App Cinema Modal & Reset State
 function closeCinemaModal() {
+    stopStreamingPresence();
     const modal = document.getElementById("cinema-modal");
     const container = document.getElementById("cinema-iframe-container");
     const theater = document.querySelector(".cinema-theater-container");
@@ -5843,6 +5912,7 @@ function openCinemaModal(movie, customStreamUrl, customTitle) {
         iframe.setAttribute("allowfullscreen", "true");
         container.appendChild(iframe);
         if (titleEl) titleEl.textContent = currentTitle || initialTitle;
+        startStreamingPresence(movie, currentTitle || initialTitle);
     }
 
     // Resolve initial stream parameter: custom URL -> link.stream_url -> movie.stream_url
