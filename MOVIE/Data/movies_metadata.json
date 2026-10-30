@@ -1,5 +1,102 @@
 [
   {
+    "csv_id": "276161-teach-you-a-lesson",
+    "tmdb_id": 276161,
+    "imdb_id": "",
+    "title": "Teach You a Lesson",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama",
+      "Teen/High-School"
+    ],
+    "genres": [
+      "Action & Adventure",
+      "Drama",
+      "Comedy"
+    ],
+    "overview": "An inspector from the Educational Rights Protection Bureau (ERPB) who is authorized by the government to use physical intervention and unconventional methods to discipline delinquent students and reform the educational system.",
+    "poster": "https://image.tmdb.org/t/p/w500/fMECSPrTmRClSViMsXFYmiYIcWP.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/vyG93jhmPL7tBIhRtCLa5mdBKob.jpg",
+    "rating": 9.4,
+    "release_date": "2026-06-05",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "LdezlX84py0",
+    "runtime": "",
+    "stream_url": "MzU6ODNiMGZhMDljZGQ2YzBhOA",
+    "stream_links": [
+      {
+        "episode": 1,
+        "season": 1,
+        "stream_url": "MzU6ODNiMGZhMDljZGQ2YzBhOA",
+        "url": "MzU6ODNiMGZhMDljZGQ2YzBhOA"
+      },
+      {
+        "episode": 2,
+        "season": 1,
+        "stream_url": "MzY6M2MzYTk2NGY4OThlZjQxMw",
+        "url": "MzY6M2MzYTk2NGY4OThlZjQxMw"
+      },
+      {
+        "episode": 3,
+        "season": 1,
+        "stream_url": "Mzc6N2Y3ZjJmMzM2NmFiYjI1NQ",
+        "url": "Mzc6N2Y3ZjJmMzM2NmFiYjI1NQ"
+      },
+      {
+        "episode": 4,
+        "season": 1,
+        "stream_url": "Mzg6OTkxMjg1YTc5MGI3NzExZA",
+        "url": "Mzg6OTkxMjg1YTc5MGI3NzExZA"
+      },
+      {
+        "episode": 5,
+        "season": 1,
+        "stream_url": "Mzk6NWFjNDY0MGFlYmFkMjVhMg",
+        "url": "Mzk6NWFjNDY0MGFlYmFkMjVhMg"
+      },
+      {
+        "episode": 6,
+        "season": 1,
+        "stream_url": "NDA6OGY0N2FlMzRiNDVmZDBmZg",
+        "url": "NDA6OGY0N2FlMzRiNDVmZDBmZg"
+      },
+      {
+        "episode": 7,
+        "season": 1,
+        "stream_url": "NDE6MjE0ZDU0MWQ3ODUwYTlhMg",
+        "url": "NDE6MjE0ZDU0MWQ3ODUwYTlhMg"
+      },
+      {
+        "episode": 8,
+        "season": 1,
+        "stream_url": "NDI6NjE1NzA0Yzc5N2ZjYTJlNw",
+        "url": "NDI6NjE1NzA0Yzc5N2ZjYTJlNw"
+      },
+      {
+        "episode": 9,
+        "season": 1,
+        "stream_url": "NDM6ZGM1ZDk1Zjc5ZGVhOWExYg",
+        "url": "NDM6ZGM1ZDk1Zjc5ZGVhOWExYg"
+      },
+      {
+        "episode": 10,
+        "season": 1,
+        "stream_url": "NDQ6NmFjM2Y5ODEzMDkxODM5Yw",
+        "url": "NDQ6NmFjM2Y5ODEzMDkxODM5Yw"
+      }
+    ],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADyBEAAtiqIEf3u5dNHh3JvRYE",
+        "season": "Season 1",
+        "stream_url": "MzU6ODNiMGZhMDljZGQ2YzBhOA"
+      }
+    ]
+  },
+  {
     "csv_id": "255848-zane-s-sex-chronicles",
     "tmdb_id": 255848,
     "imdb_id": "",
