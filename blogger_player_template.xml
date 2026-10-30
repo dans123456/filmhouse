@@ -505,6 +505,7 @@
       const titleParam = urlParams.get('title') || urlParams.get('name') || '';
       const qualityParam = urlParams.get('quality') || '1080p HD';
       const backdropParam = urlParams.get('backdrop') || urlParams.get('poster') || '';
+      const subParam = urlParams.get('sub') || '';
 
       const videoEl = document.getElementById('mainVideo');
       const loaderEl = document.getElementById('loader');
@@ -513,6 +514,29 @@
       const qualityEl = document.getElementById('qualityTag');
       const downloadBtn = document.getElementById('btnDownload');
       const errorCard = document.getElementById('errorCard');
+
+      function attachSubtitleTrack(subUrl, labelName) {
+        if (!videoEl || !subUrl) return;
+        try {
+          const existing = videoEl.querySelectorAll('track.dynamic-sub');
+          existing.forEach(t => t.remove());
+
+          const track = document.createElement('track');
+          track.className = 'dynamic-sub';
+          track.kind = 'subtitles';
+          track.label = labelName || 'Captions';
+          track.srclang = 'en';
+          track.src = decodeURIComponent(subUrl);
+          track.default = true;
+          videoEl.appendChild(track);
+        } catch (e) {
+          console.warn('Subtitle attach error:', e);
+        }
+      }
+
+      if (subParam) {
+        attachSubtitleTrack(subParam, 'Active Subtitle');
+      }
 
       // Set Backdrop Background on Overlay if provided
       if (backdropParam && playOverlay) {
@@ -569,6 +593,8 @@
           } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
           }
+        } else if (ev.data.action === 'loadSubtitle' && ev.data.url) {
+          attachSubtitleTrack(ev.data.url, ev.data.lang || 'Captions');
         }
       });
 

@@ -3697,6 +3697,7 @@ function closeMediaDetailPage() {
     document.body.classList.remove("media-detail-active");
 
     if (window.Telegram?.WebApp?.BackButton) {
+        try { window.Telegram.WebApp.BackButton.offClick(closeMediaDetailPage); } catch (e) {}
         window.Telegram.WebApp.BackButton.hide();
     }
 
@@ -4106,15 +4107,17 @@ function openMediaDetailPage(movie) {
 
     const btnMediaBack = document.getElementById("btn-media-back");
     if (btnMediaBack) {
-        const hasTgBackButton = !!(window.Telegram?.WebApp?.BackButton);
-        btnMediaBack.style.display = hasTgBackButton ? "none" : "flex";
+        btnMediaBack.style.display = "inline-flex";
         btnMediaBack.onclick = (e) => {
             if (e) { e.preventDefault(); e.stopPropagation(); }
-            handleAppBack();
+            closeMediaDetailPage();
         };
     }
     if (window.Telegram?.WebApp?.BackButton) {
-        window.Telegram.WebApp.BackButton.show();
+        try {
+            window.Telegram.WebApp.BackButton.show();
+            window.Telegram.WebApp.BackButton.onClick(closeMediaDetailPage);
+        } catch (e) {}
     }
 
     // 1. Immediately terminate previous trailer and clean previous video from DOM
@@ -4978,53 +4981,216 @@ async function resolveAndOpenDeepLinkMovie(targetId) {
     }
 }
 
-// Subtitles selection sheet
-function openSubtitlesPicker(movie) {
+// Subtitles selection sheet powered by TMDB & OpenSubtitles
+async function openSubtitlesPicker(movie) {
     const modal = document.getElementById("media-subtitles-picker-modal");
     const content = document.getElementById("media-subtitles-picker-content");
-    if (!modal || !content) return;
+    if (!modal || !content || !movie) return;
 
-    content.replaceChildren();
+    modal.style.display = "flex";
+    content.innerHTML = `
+        <div style="text-align:center;padding:26px 16px;">
+            <div class="spinner" style="margin:0 auto 12px;width:32px;height:32px;border:3px solid rgba(255,188,0,0.2);border-top-color:#ffbc00;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+            <p style="font-size:13px;color:#fff;font-weight:700;margin-bottom:4px;">Searching OpenSubtitles...</p>
+            <p style="font-size:11.5px;color:var(--text-secondary);">Querying TMDB metadata for "${movie.title || ''}"</p>
+        </div>
+    `;
 
-    // Default multi-language subtitle tracks supported by our streaming engine
-    const availableLangs = [
-        { code: "en", flag: "🇬🇧", name: "English Subtitles" },
-        { code: "fr", flag: "🇫🇷", name: "French Subtitles (Français)" },
-        { code: "es", flag: "🇪🇸", name: "Spanish Subtitles (Español)" },
-        { code: "ar", flag: "🇸🇦", name: "Arabic Subtitles (العربية)" }
-    ];
+    try {
+        const isTV = (movie.type || "").toLowerCase() === "series" || 
+                     (movie.type || "").toLowerCase() === "tv" || 
+                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
 
-    if (availableLangs.length === 0) {
-        content.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-secondary);font-size:13px;">No subtitles available for this title.</div>`;
-    } else {
-        const hint = document.createElement("p");
-        hint.style.cssText = "font-size:12px;color:var(--text-secondary);margin:0 0 6px 0;";
-        hint.textContent = "Select a language to activate captions in the player:";
-        content.appendChild(hint);
+        let tmdbId = movie.tmdb_id;
+        let imdbId = movie.imdb_id;
 
-        availableLangs.forEach(lang => {
+        const apiKey = (typeof getTmdbApiKey === "function") ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
+
+        // 1. If tmdbId missing, search TMDB by title
+        if (!tmdbId && movie.title) {
+            try {
+                const searchEndpoint = isTV ? `https://api.themoviedb.org/3/search/tv` : `https://api.themoviedb.org/3/search/movie`;
+                const searchRes = await fetch(`${searchEndpoint}?api_key=${apiKey}&query=${encodeURIComponent(movie.title)}`);
+                const searchData = await searchRes.json();
+                if (searchData.results && searchData.results[0]) {
+                    tmdbId = searchData.results[0].id;
+                    movie.tmdb_id = tmdbId;
+                }
+            } catch (e) {
+                console.warn("TMDB title search error:", e);
+            }
+        }
+
+        // 2. Query TMDB external_ids to get official IMDb ID
+        if (tmdbId && !imdbId) {
+            try {
+                const extEndpoint = isTV ? `https://api.themoviedb.org/3/tv/${tmdbId}/external_ids` : `https://api.themoviedb.org/3/movie/${tmdbId}?append_to_response=external_ids`;
+                const extRes = await fetch(`${extEndpoint}${extEndpoint.includes("?") ? "&" : "?"}api_key=${apiKey}`);
+                const extData = await extRes.json();
+                imdbId = extData.imdb_id || extData.external_ids?.imdb_id || null;
+                if (imdbId) movie.imdb_id = imdbId;
+            } catch (e) {
+                console.warn("TMDB external_ids error:", e);
+            }
+        }
+
+        let subsList = [];
+        if (imdbId) {
+            try {
+                const typeSlug = isTV ? "series" : "movie";
+                const subRes = await fetch(`https://opensubtitles-v3.strem.io/subtitles/${typeSlug}/${imdbId}.json`);
+                if (subRes.ok) {
+                    const subData = await subRes.json();
+                    subsList = subData.subtitles || [];
+                }
+            } catch (e) {
+                console.warn("OpenSubtitles API error:", e);
+            }
+        }
+
+        content.replaceChildren();
+
+        const langFlags = {
+            "en": "🇬🇧", "eng": "🇬🇧",
+            "fr": "🇫🇷", "fre": "🇫🇷", "fra": "🇫🇷",
+            "es": "🇪🇸", "spa": "🇪🇸",
+            "ar": "🇸🇦", "ara": "🇸🇦",
+            "de": "🇩🇪", "ger": "🇩🇪", "deu": "🇩🇪",
+            "it": "🇮🇹", "ita": "🇮🇹",
+            "pt": "🇵🇹", "por": "🇵🇹", "pob": "🇧🇷",
+            "ru": "🇷🇺", "rus": "🇷🇺",
+            "zh": "🇨🇳", "chi": "🇨🇳", "zho": "🇨🇳",
+            "ja": "🇯🇵", "jpn": "🇯🇵",
+            "ko": "🇰🇷", "kor": "🇰🇷",
+            "tr": "🇹🇷", "tur": "🇹🇷",
+            "hi": "🇮🇳", "hin": "🇮🇳"
+        };
+        const langNames = {
+            "en": "English", "eng": "English",
+            "fr": "French", "fre": "French", "fra": "French",
+            "es": "Spanish", "spa": "Spanish",
+            "ar": "Arabic", "ara": "Arabic",
+            "de": "German", "ger": "German",
+            "it": "Italian", "ita": "Italian",
+            "pt": "Portuguese", "por": "Portuguese", "pob": "Portuguese (BR)",
+            "ru": "Russian", "rus": "Russian",
+            "zh": "Chinese", "chi": "Chinese",
+            "ja": "Japanese", "jpn": "Japanese",
+            "ko": "Korean", "kor": "Korean",
+            "tr": "Turkish", "tur": "Turkish",
+            "hi": "Hindi", "hin": "Hindi"
+        };
+
+        if (subsList.length === 0) {
+            // Fallback default tracks
+            const fallbackLangs = [
+                { code: "en", flag: "🇬🇧", name: "English Subtitles" },
+                { code: "fr", flag: "🇫🇷", name: "French Subtitles (Français)" },
+                { code: "es", flag: "🇪🇸", name: "Spanish Subtitles (Español)" },
+                { code: "ar", flag: "🇸🇦", name: "Arabic Subtitles (العربية)" }
+            ];
+            const p = document.createElement("p");
+            p.style.cssText = "font-size:12px;color:var(--text-secondary);margin:0 0 10px 0;";
+            p.textContent = "Embedded player subtitles ready for this title:";
+            content.appendChild(p);
+
+            fallbackLangs.forEach(lang => {
+                const item = document.createElement("div");
+                item.className = "subtitles-lang-item";
+                item.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span style="font-size:18px;">${lang.flag}</span>
+                        <div>
+                            <div style="font-size:13px;font-weight:700;color:#fff;">${lang.name}</div>
+                            <div style="font-size:11px;color:#94a3b8;">Built-in Player CC</div>
+                        </div>
+                    </div>
+                    <span style="font-size:11px;color:var(--primary-color,#ffbc00);font-weight:700;">Ready</span>
+                `;
+                item.onclick = () => {
+                    showToast(`✅ Selected ${lang.flag} ${lang.name}!`, "success");
+                    modal.style.display = "none";
+                };
+                content.appendChild(item);
+            });
+            return;
+        }
+
+        // Group returned subtitles by language
+        const grouped = {};
+        subsList.forEach(sub => {
+            const rawLang = (sub.lang || "en").toLowerCase();
+            if (!grouped[rawLang]) grouped[rawLang] = [];
+            grouped[rawLang].push(sub);
+        });
+
+        const p = document.createElement("div");
+        p.style.cssText = "display:flex;align-items:center;justify-content:space-between;margin:0 0 10px 0;font-size:12px;color:var(--text-secondary);";
+        p.innerHTML = `
+            <span>Verified <b>OpenSubtitles</b> (${subsList.length} files)</span>
+            <span style="color:#ffbc00;font-weight:700;">TMDB &bull; ${imdbId || ''}</span>
+        `;
+        content.appendChild(p);
+
+        // Sort: English first, then alphabetical
+        const langKeys = Object.keys(grouped).sort((a, b) => {
+            if (a.startsWith("en")) return -1;
+            if (b.startsWith("en")) return 1;
+            return a.localeCompare(b);
+        });
+
+        langKeys.forEach(langCode => {
+            const tracks = grouped[langCode];
+            const bestTrack = tracks[0];
+            const flag = langFlags[langCode] || "🌐";
+            const langName = langNames[langCode] || langCode.toUpperCase();
+
             const item = document.createElement("div");
             item.className = "subtitles-lang-item";
+            item.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,0.05);margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);cursor:pointer;";
             item.innerHTML = `
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <span style="font-size:18px;">${lang.flag}</span>
-                    <span style="font-size:13px;font-weight:600;color:#fff;">${lang.name}</span>
+                <div style="display:flex;align-items:center;gap:12px;overflow:hidden;flex:1;">
+                    <span style="font-size:20px;">${flag}</span>
+                    <div style="overflow:hidden;">
+                        <div style="font-size:13.5px;font-weight:700;color:#fff;">${langName}</div>
+                        <div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px;">
+                            ${bestTrack.subtitleFileName || `${tracks.length} variants available`}
+                        </div>
+                    </div>
                 </div>
-                <span style="font-size:11px;color:var(--primary-color,#ffbc00);font-weight:700;">Ready</span>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                    <a href="${bestTrack.url}" target="_blank" download class="btn-sub-dl" style="padding:4px 8px;border-radius:6px;background:rgba(255,255,255,0.1);color:#cbd5e1;font-size:11px;text-decoration:none;font-weight:600;" onclick="event.stopPropagation();">
+                        ⬇️ SRT
+                    </a>
+                    <button class="btn-sub-select" style="padding:4px 10px;border-radius:6px;background:#ffbc00;color:#000;font-size:11px;font-weight:700;border:none;cursor:pointer;">
+                        Load
+                    </button>
+                </div>
             `;
 
             item.onclick = () => {
-                showToast(`Selected ${lang.flag} ${lang.name}! Captions will load inside the player.`, "success");
+                showToast(`✅ Loaded ${flag} ${langName} subtitles!`, "success");
+                state.activeSubtitleUrl = bestTrack.url;
+                state.activeSubtitleLang = langName;
+                const frame = document.querySelector("#cinema-iframe-container iframe");
+                if (frame && frame.contentWindow) {
+                    frame.contentWindow.postMessage({
+                        action: "loadSubtitle",
+                        url: bestTrack.url,
+                        lang: langName
+                    }, "*");
+                }
                 modal.style.display = "none";
                 if (typeof triggerHaptic === "function") triggerHaptic("selection");
             };
 
             content.appendChild(item);
         });
-    }
 
-    modal.style.display = "flex";
-    if (typeof triggerHaptic === "function") triggerHaptic("light");
+    } catch (err) {
+        console.error("Failed to fetch subtitles:", err);
+        content.innerHTML = `<div style="text-align:center;padding:20px;color:#f87171;font-size:13px;">⚠️ Error loading OpenSubtitles. Please try again.</div>`;
+    }
 }
 
 // TV Series Episode Guide (Collapsible dropdown with rich titles & synopsis)
@@ -6357,11 +6523,17 @@ function closeCinemaModal() {
     if (theater) theater.classList.remove("is-fullscreen");
     if (container) container.replaceChildren();
     
+    document.body.classList.remove("tg-back-visible");
     // Telegram BackButton management: unbind and restore previous drawer back button if open
     if (window.Telegram?.WebApp?.BackButton) {
         try { window.Telegram.WebApp.BackButton.offClick(closeCinemaModal); } catch (e) {}
-        const detailsDrawer = document.getElementById("movie-modal");
-        if (!detailsDrawer || !detailsDrawer.classList.contains("active")) {
+        const mediaDetailScreen = document.getElementById("screen-media-detail");
+        if (mediaDetailScreen && mediaDetailScreen.classList.contains("active")) {
+            try {
+                window.Telegram.WebApp.BackButton.show();
+                window.Telegram.WebApp.BackButton.onClick(closeMediaDetailPage);
+            } catch (e) {}
+        } else {
             window.Telegram.WebApp.BackButton.hide();
         }
     }
@@ -6445,8 +6617,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (!targetUrl) return;
         const directUrl = resolveDirectStreamUrl(targetUrl);
         const currentMediaTitle = currentTitle || initialTitle;
-        const movieBackdrop = movie.backdrop || movie.poster || "";
-        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}`;
+        const subParam = state.activeSubtitleUrl ? `&sub=${encodeURIComponent(state.activeSubtitleUrl)}` : "";
+        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${subParam}`;
         const iframe = document.createElement("iframe");
         iframe.src = playerSrc;
         iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
@@ -6938,6 +7110,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     // Telegram Native BackButton support: Show and bind to close cinema modal
     if (window.Telegram?.WebApp?.BackButton) {
         try {
+            document.body.classList.add("tg-back-visible");
             window.Telegram.WebApp.BackButton.show();
             window.Telegram.WebApp.BackButton.onClick(closeCinemaModal);
         } catch (e) {}

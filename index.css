@@ -1763,10 +1763,14 @@ img {
     justify-content: space-between;
     padding-top: calc(var(--tg-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 6px);
     padding-bottom: 6px;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: max(12px, calc(var(--tg-safe-area-inset-left, 0px) + 8px));
+    padding-right: max(16px, calc(var(--tg-safe-area-inset-right, 0px) + 76px));
     gap: 10px;
     position: relative;
+}
+
+body.tg-back-visible #btn-close-cinema {
+    display: none !important;
 }
 
 /* Universal Action Buttons (Back, Fullscreen, Close) */
@@ -2338,7 +2342,7 @@ img {
 @media (orientation: landscape) and (max-height: 540px) {
     #cinema-modal.active {
         padding: 0 !important;
-        background: #000 !important;
+        background: #000000 !important;
     }
     .cinema-theater-container {
         width: 100vw !important;
@@ -2353,7 +2357,7 @@ img {
         left: 0 !important;
         display: flex !important;
         flex-direction: column !important;
-        background: #000 !important;
+        background: #000000 !important;
         z-index: 3000 !important;
     }
     .cinema-header-wrapper {
@@ -2361,37 +2365,51 @@ img {
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 70%, transparent 100%) !important;
+        background: linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.3) 70%, transparent 100%) !important;
         border-bottom: none !important;
         z-index: 100 !important;
         opacity: 1;
-        transition: opacity 0.35s ease;
+        transform: translateY(0);
+        transition: opacity 0.35s ease, transform 0.35s ease;
         pointer-events: none !important;
-    }
-    .cinema-sub-bar {
-        background: transparent !important;
-        border-top: none !important;
     }
     .cinema-header-wrapper * {
         pointer-events: auto !important;
     }
+    .cinema-top-bar {
+        padding-top: max(6px, calc(var(--tg-safe-area-inset-top, 0px) + 2px)) !important;
+        padding-bottom: 6px !important;
+        padding-left: max(10px, calc(var(--tg-safe-area-inset-left, 0px) + 8px)) !important;
+        padding-right: max(16px, calc(var(--tg-safe-area-inset-right, 0px) + 82px)) !important; /* Clear Telegram's menu */
+        height: 44px !important;
+    }
+    /* Hide second tier in landscape mode to prevent covering the video */
+    .cinema-sub-bar {
+        display: none !important;
+    }
+    .cinema-brand-group {
+        display: none !important;
+    }
     .cinema-theater-container.controls-hidden .cinema-header-wrapper {
         opacity: 0 !important;
+        transform: translateY(-100%) !important;
         pointer-events: none !important;
     }
     .cinema-sticky-player {
-        width: 100% !important;
-        height: 100% !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
         flex: 1 !important;
         position: relative !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        background: #000 !important;
+        background: #000000 !important;
     }
     .cinema-iframe-wrapper {
-        width: 100% !important;
-        height: 100% !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
         padding-top: 0 !important;
         display: flex !important;
         align-items: center !important;
@@ -5284,25 +5302,41 @@ body.media-detail-active .app-content-container {
 }
 
 .media-nav-back-icon-btn {
-    pointer-events: auto;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(22, 24, 35, 0.65);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    pointer-events: auto !important;
+    height: 38px;
+    padding: 0 14px 0 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(14, 17, 26, 0.82);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
     color: #ffffff;
-    display: flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
     cursor: pointer;
-    transition: all 0.2s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55), 0 0 12px rgba(255, 188, 0, 0.15);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 100;
 }
 
 .media-nav-back-icon-btn:hover {
-    background: rgba(30, 34, 50, 0.85);
-    transform: scale(1.06);
+    background: rgba(255, 188, 0, 0.2);
+    border-color: rgba(255, 188, 0, 0.5);
+    color: #ffbc00;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(255, 188, 0, 0.25);
+}
+
+.media-nav-back-icon-btn:active {
+    transform: scale(0.95);
 }
 
 .media-nav-back-icon-btn svg {
