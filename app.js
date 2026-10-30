@@ -6559,6 +6559,16 @@ function closeCinemaModal() {
     if (modal) modal.classList.remove("active");
     if (theater) theater.classList.remove("is-fullscreen");
     if (container) container.replaceChildren();
+
+    // Reset Next Episode Card & Subtitle Hub Modal
+    const nextCard = document.getElementById("cinema-next-ep-card");
+    if (nextCard) nextCard.style.display = "none";
+    const subModal = document.getElementById("cinema-sub-hub-modal");
+    if (subModal) subModal.style.display = "none";
+    if (window._nextEpCountdownTimer) {
+        clearInterval(window._nextEpCountdownTimer);
+        window._nextEpCountdownTimer = null;
+    }
     
     document.body.classList.remove("tg-back-visible");
     // Telegram BackButton management: unbind and restore previous drawer back button if open
@@ -6591,6 +6601,54 @@ function triggerMonetagSmartLink() {
     } catch (err) {
         console.warn("SmartLink trigger error:", err);
     }
+}
+
+// Function to get "More Like This" recommended movies based on genres & media type (Suggestion D)
+function getMoreLikeThisMovies(currentMovie, limit = 8) {
+    if (!state.movies || !Array.isArray(state.movies) || state.movies.length === 0) return [];
+    const curId = currentMovie.csv_id || currentMovie.id;
+    let curGenres = [];
+    if (Array.isArray(currentMovie.genres)) {
+        curGenres = currentMovie.genres.map(g => (typeof g === 'string' ? g : (g.name || "")).toLowerCase()).filter(Boolean);
+    } else if (typeof currentMovie.genre === "string") {
+        curGenres = currentMovie.genre.split(/[,/]/).map(g => g.trim().toLowerCase()).filter(Boolean);
+    }
+
+    const isCurrentSeries = (currentMovie.type || "").toLowerCase() === "series" || 
+                           (currentMovie.type || "").toLowerCase() === "tv" || 
+                           (currentMovie.categories && currentMovie.categories.some(c => c.toLowerCase().includes("series")));
+
+    const candidates = state.movies.filter(m => {
+        const mId = m.csv_id || m.id;
+        if (mId === curId) return false;
+        if (!m.poster && !m.poster_path) return false;
+        return true;
+    });
+
+    const scored = candidates.map(m => {
+        let score = 0;
+        const mIsSeries = (m.type || "").toLowerCase() === "series" || (m.type || "").toLowerCase() === "tv";
+        if (mIsSeries === isCurrentSeries) score += 2;
+
+        let mGenres = [];
+        if (Array.isArray(m.genres)) {
+            mGenres = m.genres.map(g => (typeof g === 'string' ? g : (g.name || "")).toLowerCase()).filter(Boolean);
+        } else if (typeof m.genre === "string") {
+            mGenres = m.genre.split(/[,/]/).map(g => g.trim().toLowerCase()).filter(Boolean);
+        }
+
+        if (curGenres.length > 0 && mGenres.length > 0) {
+            const common = curGenres.filter(g => mGenres.includes(g));
+            score += common.length * 4;
+        }
+
+        const rating = parseFloat(m.rating || m.imdb_rating || m.vote_average || 0);
+        score += rating * 0.4;
+        return { movie: m, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, limit).map(s => s.movie);
 }
 
 // Open In-App Cinema Streaming Player Modal directly with trailer cleanup
@@ -6641,6 +6699,100 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         });
     }
 
+    // Bind Subtitle Quick Badge & Subtitle Hub Modal (Suggestion C)
+    const subQuickBtn = document.getElementById("cinema-sub-quick-btn");
+    const subModal = document.getElementById("cinema-sub-hub-modal");
+    const subCloseBtn = document.getElementById("cinema-sub-hub-close");
+    const subBackdrop = document.getElementById("cinema-sub-hub-backdrop");
+    const subFileInput = document.getElementById("cinema-sub-file-input");
+    const subQuickLabel = document.getElementById("cinema-sub-quick-label");
+    const subTrackList = document.getElementById("cinema-sub-track-list");
+
+    if (subQuickBtn && !subQuickBtn._bound) {
+        subQuickBtn._bound = true;
+        subQuickBtn.addEventListener("click", () => {
+            if (subModal) subModal.style.display = "flex";
+        });
+    }
+
+    const closeSubHub = () => {
+        if (subModal) subModal.style.display = "none";
+    };
+
+    if (subCloseBtn && !subCloseBtn._bound) {
+        subCloseBtn._bound = true;
+        subCloseBtn.addEventListener("click", closeSubHub);
+    }
+    if (subBackdrop && !subBackdrop._bound) {
+        subBackdrop._bound = true;
+        subBackdrop.addEventListener("click", closeSubHub);
+    }
+
+    if (subTrackList && !subTrackList._bound) {
+        subTrackList._bound = true;
+        subTrackList.addEventListener("click", (e) => {
+            const btn = e.target.closest(".cinema-sub-track-item");
+            if (!btn) return;
+            subTrackList.querySelectorAll(".cinema-sub-track-item").forEach(item => {
+                item.classList.remove("active");
+                const chk = item.querySelector(".sub-check");
+                if (chk) chk.textContent = "";
+            });
+            btn.classList.add("active");
+            const chk = btn.querySelector(".sub-check");
+            if (chk) chk.textContent = "✓";
+
+            const subLang = btn.getAttribute("data-sub") || "off";
+            const frame = container.querySelector("iframe");
+
+            if (subLang === "off") {
+                if (subQuickLabel) subQuickLabel.textContent = "CC Off";
+                if (frame && frame.contentWindow) {
+                    frame.contentWindow.postMessage({ action: "loadSubtitle", url: "" }, "*");
+                }
+                showToast("Captions turned off", "info");
+            } else {
+                const langLabel = btn.querySelector("span")?.textContent || subLang.toUpperCase();
+                if (subQuickLabel) subQuickLabel.textContent = `CC ${subLang.toUpperCase()}`;
+                showToast(`Switched subtitle track to: ${langLabel}`, "success");
+            }
+            closeSubHub();
+        });
+    }
+
+    if (subFileInput && !subFileInput._bound) {
+        subFileInput._bound = true;
+        subFileInput.addEventListener("change", (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                try {
+                    let text = evt.target.result;
+                    if (file.name.endsWith(".srt")) {
+                        text = "WEBVTT\n\n" + text.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, "$1.$2");
+                    }
+                    const blob = new Blob([text], { type: "text/vtt" });
+                    const blobUrl = URL.createObjectURL(blob);
+                    const frame = container.querySelector("iframe");
+                    if (frame && frame.contentWindow) {
+                        frame.contentWindow.postMessage({
+                            action: "loadSubtitle",
+                            url: blobUrl,
+                            lang: file.name.replace(/\.[^/.]+$/, "")
+                        }, "*");
+                    }
+                    if (subQuickLabel) subQuickLabel.textContent = `CC ${file.name.slice(0, 8)}...`;
+                    showToast(`✅ Loaded subtitles: ${file.name}`, "success");
+                    closeSubHub();
+                } catch (err) {
+                    showToast("Could not parse subtitle file", "error");
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
+
     const baseTitle = movie.title || "Film House Cinema";
     const initialTitle = customTitle || baseTitle;
     const isTVShow = (movie.type || "").toLowerCase() === "series" || 
@@ -6664,6 +6816,35 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         container.appendChild(iframe);
         if (titleEl) titleEl.textContent = currentMediaTitle;
         startStreamingPresence(movie, currentTitle || initialTitle);
+
+        // Update Dynamic Ambilight Effect (Suggestion A)
+        const ambilightEl = document.getElementById("cinema-ambilight-glow");
+        if (ambilightEl) {
+            if (movieBackdrop) {
+                ambilightEl.style.backgroundImage = `url("${movieBackdrop}")`;
+                ambilightEl.style.opacity = "0.55";
+            } else {
+                ambilightEl.style.backgroundImage = "none";
+                ambilightEl.style.opacity = "0";
+            }
+        }
+
+        // Update Personalized User Tag in Speed Indicator (Suggestion C)
+        const userTag = document.getElementById("cinema-user-tag");
+        const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+        const firstName = tgUser?.first_name || (state.user && state.user.fullName && state.user.fullName !== "Demo User" ? state.user.fullName : (state.user?.username || "VIP Member"));
+        if (userTag) {
+            userTag.textContent = firstName;
+        }
+
+        // Hide any pending Next Episode card on new stream
+        const nextCard = document.getElementById("cinema-next-ep-card");
+        if (nextCard) nextCard.style.display = "none";
+        if (window._nextEpCountdownTimer) {
+            clearInterval(window._nextEpCountdownTimer);
+            window._nextEpCountdownTimer = null;
+        }
+
         // Update Quality Pill in sub-bar
         const qPill = document.getElementById("cinema-top-quality-pill");
         if (qPill) {
@@ -6889,7 +7070,109 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             const episodesGrid = document.createElement("div");
             episodesGrid.className = "cinema-episodes-grid";
 
-            // Async function to fetch and render episodes for the selected season
+            // TV Series Episode State & Next Episode Autoplay Controller (Suggestion B)
+            let currentCinemaEpisodes = [];
+            let currentCinemaEpIndex = 0;
+
+            // Trigger autoplay binge prompt
+            window.triggerNextEpisodeAutoplay = function() {
+                if (!isTVShow || currentCinemaEpisodes.length === 0) return;
+                const nextIndex = currentCinemaEpIndex + 1;
+                if (nextIndex >= currentCinemaEpisodes.length) return; // End of season
+
+                const nextEp = currentCinemaEpisodes[nextIndex];
+                if (!nextEp) return;
+
+                const card = document.getElementById("cinema-next-ep-card");
+                const thumb = document.getElementById("cinema-next-ep-thumb");
+                const title = document.getElementById("cinema-next-ep-title");
+                const countEl = document.getElementById("cinema-next-ep-countdown");
+                const fillEl = document.getElementById("cinema-next-ep-progress-fill");
+                if (!card) return;
+
+                const nextEpNum = nextEp.episode_number || (nextIndex + 1);
+                const nextEpTitle = nextEp.name || `Episode ${nextEpNum}`;
+                const nextEpThumb = nextEp.still_path ? `https://image.tmdb.org/t/p/w500${nextEp.still_path}` : (movie.backdrop || movie.poster || "");
+
+                if (thumb) thumb.style.backgroundImage = nextEpThumb ? `url("${nextEpThumb}")` : "none";
+                if (title) title.textContent = `EP ${nextEpNum}: ${nextEpTitle}`;
+
+                card.style.display = "flex";
+
+                let remaining = 8;
+                if (countEl) countEl.textContent = `${remaining}s`;
+                if (fillEl) {
+                    fillEl.style.transition = "none";
+                    fillEl.style.width = "0%";
+                    setTimeout(() => {
+                        fillEl.style.transition = "width 8s linear";
+                        fillEl.style.width = "100%";
+                    }, 50);
+                }
+
+                clearInterval(window._nextEpCountdownTimer);
+                window._nextEpCountdownTimer = setInterval(() => {
+                    remaining--;
+                    if (countEl) countEl.textContent = `${remaining}s`;
+                    if (remaining <= 0) {
+                        clearInterval(window._nextEpCountdownTimer);
+                        card.style.display = "none";
+                        playNext();
+                    }
+                }, 1000);
+
+                const playBtn = document.getElementById("cinema-next-ep-play-btn");
+                if (playBtn) {
+                    playBtn.onclick = () => {
+                        clearInterval(window._nextEpCountdownTimer);
+                        card.style.display = "none";
+                        playNext();
+                    };
+                }
+
+                const cancelBtn = document.getElementById("cinema-next-ep-cancel-btn");
+                if (cancelBtn) {
+                    cancelBtn.onclick = () => {
+                        clearInterval(window._nextEpCountdownTimer);
+                        card.style.display = "none";
+                    };
+                }
+
+                function playNext() {
+                    const cardEl = episodesGrid.querySelector(`.cinema-episode-card[data-ep="${nextEpNum}"]`);
+                    if (cardEl) {
+                        cardEl.click();
+                        cardEl.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                    }
+                }
+            };
+
+            // Global Message Listener for Player Iframe Events (Progress & Video End)
+            if (!window._cinemaMessageListenerBound) {
+                window._cinemaMessageListenerBound = true;
+                window.addEventListener("message", (e) => {
+                    if (!e.data) return;
+                    if (e.data.action === "videoEnded") {
+                        if (typeof window.triggerNextEpisodeAutoplay === "function") {
+                            window.triggerNextEpisodeAutoplay();
+                        }
+                    } else if (e.data.action === "videoTimeUpdate") {
+                        if (e.data.duration > 30 && (e.data.duration - e.data.currentTime) <= 10) {
+                            if (typeof window.triggerNextEpisodeAutoplay === "function") {
+                                window.triggerNextEpisodeAutoplay();
+                            }
+                        }
+                        if (window._currentActiveEpKey && e.data.currentTime > 5 && e.data.duration > 0) {
+                            const ratio = Math.min(100, Math.round((e.data.currentTime / e.data.duration) * 100));
+                            localStorage.setItem(window._currentActiveEpKey, ratio);
+                            const activeFill = document.querySelector(".cinema-episode-card.active .cinema-ep-progress-fill");
+                            if (activeFill) activeFill.style.width = ratio + "%";
+                        }
+                    }
+                });
+            }
+
+            // Async function to fetch and render visual episode cards for the selected season
             async function renderSeasonEpisodes(seasonObj) {
                 episodesGrid.replaceChildren();
                 const badgeEl = seriesSection.querySelector("#cinema-ep-count-badge");
@@ -6946,41 +7229,113 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     }
                 }
 
+                currentCinemaEpisodes = episodes;
+
                 if (badgeEl) {
                     badgeEl.textContent = `${episodes.length} Episodes`;
                 }
 
-                episodes.forEach(ep => {
-                    const epNum = ep.episode_number || 1;
+                episodes.forEach((ep, idx) => {
+                    const epNum = ep.episode_number || (idx + 1);
                     const isEpActive = (currentSeason.seasonNumber === seasonObj.seasonNumber && currentEpisodeNum === epNum);
+                    if (isEpActive) currentCinemaEpIndex = idx;
+
                     const epCard = document.createElement("div");
                     epCard.className = `cinema-episode-card ${isEpActive ? "active" : ""}`;
+                    epCard.setAttribute("data-ep", epNum);
 
-                    const cardLeft = document.createElement("div");
-                    cardLeft.className = "cinema-episode-card-left";
+                    // Episode thumbnail with fallback
+                    const thumbUrl = ep.still_path 
+                        ? `https://image.tmdb.org/t/p/w500${ep.still_path}` 
+                        : (movie.backdrop || movie.poster || "");
 
-                    const epTag = document.createElement("span");
-                    epTag.className = "cinema-ep-tag";
-                    epTag.textContent = `EP ${epNum}`;
+                    const thumbWrap = document.createElement("div");
+                    thumbWrap.className = "cinema-ep-thumb-wrap";
+
+                    if (thumbUrl) {
+                        const img = document.createElement("img");
+                        img.className = "cinema-ep-thumb-img";
+                        img.src = thumbUrl;
+                        img.alt = ep.name || `Episode ${epNum}`;
+                        img.loading = "lazy";
+                        thumbWrap.appendChild(img);
+                    }
+
+                    // Play Overlay
+                    const playOverlay = document.createElement("div");
+                    playOverlay.className = "cinema-ep-play-overlay";
+                    playOverlay.innerHTML = `<svg><use href="#icon-play"></use></svg>`;
+                    thumbWrap.appendChild(playOverlay);
+
+                    // Now Playing Tag
+                    if (isEpActive) {
+                        const nowTag = document.createElement("span");
+                        nowTag.className = "cinema-ep-now-playing-tag";
+                        nowTag.textContent = "Playing";
+                        thumbWrap.appendChild(nowTag);
+                    }
+
+                    // Runtime Tag
+                    const runtimeVal = ep.runtime ? `${ep.runtime}m` : "45m";
+                    const runtimeTag = document.createElement("span");
+                    runtimeTag.className = "cinema-ep-runtime-tag";
+                    runtimeTag.textContent = runtimeVal;
+                    thumbWrap.appendChild(runtimeTag);
+
+                    // Watched progress bar
+                    const progKey = `filmhouse_progress_${movie.id || movie.csv_id}_${seasonObj.seasonNumber}_${epNum}`;
+                    if (isEpActive) window._currentActiveEpKey = progKey;
+                    const savedProg = parseInt(localStorage.getItem(progKey) || (isEpActive ? "20" : "0"), 10);
+                    const progBar = document.createElement("div");
+                    progBar.className = "cinema-ep-progress-bar";
+                    const progFill = document.createElement("div");
+                    progFill.className = "cinema-ep-progress-fill";
+                    progFill.style.width = `${savedProg}%`;
+                    progBar.appendChild(progFill);
+                    thumbWrap.appendChild(progBar);
+
+                    epCard.appendChild(thumbWrap);
+
+                    // Card Body
+                    const cardBody = document.createElement("div");
+                    cardBody.className = "cinema-ep-card-body";
+
+                    const epNumEl = document.createElement("span");
+                    epNumEl.className = "cinema-ep-card-num";
+                    epNumEl.textContent = `EPISODE ${epNum}`;
+                    cardBody.appendChild(epNumEl);
 
                     const epTitleEl = document.createElement("span");
-                    epTitleEl.className = "cinema-ep-title";
+                    epTitleEl.className = "cinema-ep-card-title";
                     epTitleEl.textContent = ep.name || `Episode ${epNum}`;
                     epTitleEl.title = ep.name || `Episode ${epNum}`;
+                    cardBody.appendChild(epTitleEl);
 
-                    cardLeft.appendChild(epTag);
-                    cardLeft.appendChild(epTitleEl);
-                    epCard.appendChild(cardLeft);
+                    const epMeta = document.createElement("div");
+                    epMeta.className = "cinema-ep-card-meta";
+                    const airDateYear = ep.air_date ? ep.air_date.split("-")[0] : "";
+                    epMeta.innerHTML = `<span>${runtimeVal}</span>${airDateYear ? `<span>•</span><span>${airDateYear}</span>` : ""}<span>•</span><span>HD</span>`;
+                    cardBody.appendChild(epMeta);
 
-                    const playIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                    playIcon.setAttribute("class", "cinema-ep-play-icon");
-                    playIcon.innerHTML = `<use href="#icon-play"></use>`;
-                    epCard.appendChild(playIcon);
+                    epCard.appendChild(cardBody);
 
                     epCard.addEventListener("click", () => {
-                        episodesGrid.querySelectorAll(".cinema-episode-card").forEach(c => c.classList.remove("active"));
+                        episodesGrid.querySelectorAll(".cinema-episode-card").forEach(c => {
+                            c.classList.remove("active");
+                            const tag = c.querySelector(".cinema-ep-now-playing-tag");
+                            if (tag) tag.remove();
+                        });
                         epCard.classList.add("active");
+
+                        // Add now playing tag
+                        const newTag = document.createElement("span");
+                        newTag.className = "cinema-ep-now-playing-tag";
+                        newTag.textContent = "Playing";
+                        thumbWrap.appendChild(newTag);
+
                         currentEpisodeNum = epNum;
+                        currentCinemaEpIndex = idx;
+                        window._currentActiveEpKey = progKey;
 
                         let epTarget = ep.stream_url || seasonObj.streamUrl || movie.stream_url || streamTarget;
                         if (movie.stream_links && Array.isArray(movie.stream_links)) {
@@ -7060,7 +7415,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
         detailsContainer.appendChild(actionsGrid);
 
-        // 3. Synopsis Card
+        // 5. Synopsis Card
         const synopsis = movie.synopsis || movie.overview || movie.description;
         if (synopsis) {
             const synCard = document.createElement("div");
@@ -7077,6 +7432,81 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             synCard.appendChild(synBody);
 
             detailsContainer.appendChild(synCard);
+        }
+
+        // 6. "More Like This" Recommendations Carousel (Suggestion D)
+        const recMovies = getMoreLikeThisMovies(movie, 8);
+        if (recMovies && recMovies.length > 0) {
+            const recSection = document.createElement("div");
+            recSection.className = "cinema-recommendations-section";
+
+            const recHeader = document.createElement("div");
+            recHeader.className = "cinema-rec-header";
+            recHeader.innerHTML = `
+                <div class="cinema-rec-title-group">
+                    <svg><use href="#icon-tv"></use></svg>
+                    <span>More Like This</span>
+                </div>
+                <span class="cinema-rec-count">${recMovies.length} Titles</span>
+            `;
+            recSection.appendChild(recHeader);
+
+            const recGrid = document.createElement("div");
+            recGrid.className = "cinema-rec-grid";
+
+            recMovies.forEach(rec => {
+                const recCard = document.createElement("div");
+                recCard.className = "cinema-rec-card";
+
+                const posterWrap = document.createElement("div");
+                posterWrap.className = "cinema-rec-poster-wrap";
+
+                const posterImg = document.createElement("img");
+                posterImg.className = "cinema-rec-poster-img";
+                posterImg.src = rec.poster || rec.poster_path || "img/FilmHouse3_nobg.png";
+                posterImg.alt = rec.title || "Movie";
+                posterImg.loading = "lazy";
+                posterWrap.appendChild(posterImg);
+
+                const recRating = rec.rating || rec.imdb_rating || rec.vote_average;
+                if (recRating) {
+                    const ratingBadge = document.createElement("span");
+                    ratingBadge.className = "cinema-rec-rating-badge";
+                    ratingBadge.innerHTML = `★ ${typeof recRating === 'number' ? recRating.toFixed(1) : recRating}`;
+                    posterWrap.appendChild(ratingBadge);
+                }
+
+                const qualBadge = document.createElement("span");
+                qualBadge.className = "cinema-rec-quality-badge";
+                qualBadge.textContent = "1080p";
+                posterWrap.appendChild(qualBadge);
+
+                recCard.appendChild(posterWrap);
+
+                const titleEl = document.createElement("span");
+                titleEl.className = "cinema-rec-title";
+                titleEl.textContent = rec.title || "";
+                recCard.appendChild(titleEl);
+
+                const metaEl = document.createElement("div");
+                metaEl.className = "cinema-rec-meta";
+                const recYear = rec.year || (rec.release_date ? rec.release_date.split("-")[0] : "");
+                const isRecSeries = (rec.type || "").toLowerCase() === "series" || (rec.type || "").toLowerCase() === "tv";
+                metaEl.innerHTML = `<span>${recYear || (isRecSeries ? "Series" : "Movie")}</span><span>${isRecSeries ? "Series" : "HD"}</span>`;
+                recCard.appendChild(metaEl);
+
+                recCard.addEventListener("click", () => {
+                    openCinemaModalCore(rec);
+                    const theater = document.querySelector(".cinema-theater-container");
+                    if (theater) theater.scrollTop = 0;
+                    if (typeof triggerHaptic === "function") triggerHaptic("selection");
+                });
+
+                recGrid.appendChild(recCard);
+            });
+
+            recSection.appendChild(recGrid);
+            detailsContainer.appendChild(recSection);
         }
     }
 

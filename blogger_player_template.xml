@@ -694,6 +694,23 @@
         if (videoEl.currentTime > 5 && videoEl.duration && (videoEl.duration - videoEl.currentTime) > 15) {
           localStorage.setItem(resumeKey, videoEl.currentTime);
         }
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+              action: 'videoTimeUpdate',
+              currentTime: videoEl.currentTime,
+              duration: videoEl.duration || 0
+            }, '*');
+          }
+        } catch (e) {}
+      });
+
+      videoEl.addEventListener('ended', function() {
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ action: 'videoEnded' }, '*');
+          }
+        } catch (e) {}
       });
 
       // 2. Custom Subtitles (.srt/.vtt) Loader

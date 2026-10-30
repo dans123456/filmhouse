@@ -1744,16 +1744,17 @@ img {
     overflow: hidden;
 }
 
-/* Top App Bar & Header Wrapper */
+/* Top App Bar & Header Wrapper (Ultra-Thin Softened Glass Capsule) */
 .cinema-header-wrapper {
     display: flex;
     flex-direction: column;
-    background: linear-gradient(180deg, rgba(14, 17, 26, 0.98) 0%, rgba(10, 12, 19, 0.95) 100%);
-    border-bottom: 1px solid rgba(255, 188, 0, 0.15);
+    background: rgba(6, 8, 13, 0.78);
+    border-bottom: 1px solid rgba(255, 188, 0, 0.12);
     flex-shrink: 0;
-    z-index: 30;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    z-index: 40;
+    backdrop-filter: blur(24px) saturate(190%);
+    -webkit-backdrop-filter: blur(24px) saturate(190%);
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 /* Tier 1: Top Navigation Bar */
@@ -1862,15 +1863,22 @@ body.tg-back-visible #btn-close-cinema {
     text-transform: uppercase;
 }
 
-/* Tier 2: Sub-Bar Streaming Info & Marquee Row */
+/* Tier 2: Sub-Bar Streaming Info, Quick Controls & Marquee Row */
 .cinema-sub-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
     padding: 6px 14px 8px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    background: rgba(0, 0, 0, 0.25);
+    background: linear-gradient(180deg, rgba(8, 10, 16, 0.9) 0%, rgba(6, 8, 13, 0.6) 100%);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.cinema-sub-bar::-webkit-scrollbar {
+    display: none;
 }
 
 .cinema-sub-badge-group {
@@ -1917,6 +1925,88 @@ body.tg-back-visible #btn-close-cinema {
     flex-shrink: 0;
 }
 
+/* Quick Subtitle / CC Trigger Badge */
+.cinema-sub-quick-btn {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e2e8f0;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 11px;
+    font-size: 10.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-sub-quick-btn svg {
+    width: 13px;
+    height: 13px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.cinema-sub-quick-btn .sub-arrow-carat {
+    font-size: 8px;
+    opacity: 0.7;
+    margin-left: 1px;
+}
+
+.cinema-sub-quick-btn:hover {
+    background: rgba(255, 188, 0, 0.16);
+    border-color: rgba(255, 188, 0, 0.45);
+    color: #ffbc00;
+    transform: translateY(-1px);
+}
+
+.cinema-sub-quick-btn:active {
+    transform: scale(0.96);
+}
+
+/* Personalized CDN Speed & Health Indicator */
+.cinema-sub-center-group {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.cinema-speed-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 2.5px 9px;
+    border-radius: 12px;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+    user-select: none;
+}
+
+.cinema-speed-indicator .speed-pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+    animation: livePulse 1.5s infinite;
+    flex-shrink: 0;
+}
+
+.cinema-speed-indicator .speed-text b {
+    color: #ffbc00;
+    font-weight: 800;
+}
+
 .cinema-sub-title-wrapper {
     flex: 1;
     min-width: 0;
@@ -1935,7 +2025,7 @@ body.tg-back-visible #btn-close-cinema {
     max-width: 100%;
 }
 
-/* Sticky Video Viewport (Fixed at Top of Screen) */
+/* Sticky Video Viewport (Fixed at Top with Dynamic Ambilight) */
 .cinema-sticky-player {
     width: 100%;
     background: #000000;
@@ -1943,11 +2033,41 @@ body.tg-back-visible #btn-close-cinema {
     top: 0;
     z-index: 20;
     flex-shrink: 0;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
+}
+
+/* Dynamic Ambilight Glow Effect Behind & Beneath Video */
+.cinema-ambilight-glow {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -35px;
+    background-size: cover;
+    background-position: center;
+    filter: blur(55px) saturate(220%) brightness(0.7);
+    opacity: 0.52;
+    z-index: 1;
+    pointer-events: none;
+    transform: translateZ(0);
+    transition: background-image 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+    animation: ambilightBreath 8s infinite alternate ease-in-out;
+}
+
+@keyframes ambilightBreath {
+    0% {
+        opacity: 0.44;
+        transform: scale(1) translateZ(0);
+    }
+    100% {
+        opacity: 0.62;
+        transform: scale(1.04) translateZ(0);
+    }
 }
 
 .cinema-iframe-wrapper {
     position: relative;
+    z-index: 2;
     width: 100%;
     padding-top: 56.25%; /* 16:9 Aspect Ratio */
     background: #000000;
@@ -2287,6 +2407,720 @@ body.tg-back-visible #btn-close-cinema {
     font-size: 13px;
     line-height: 1.6;
     color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   TV SERIES VISUAL EPISODE CAROUSEL & NEXT EPISODE AUTOPLAY (SUGGESTION B)
+   ========================================================================== */
+.cinema-series-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.cinema-series-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cinema-series-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+}
+
+.cinema-series-header-title svg {
+    width: 17px;
+    height: 17px;
+    fill: #ffbc00;
+}
+
+.cinema-series-count-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.cinema-seasons-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cinema-seasons-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.cinema-season-tab {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #94a3b8;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-season-tab:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+}
+
+.cinema-season-tab.active {
+    background: linear-gradient(135deg, #ffbc00 0%, #f59e0b 100%);
+    color: #06080d;
+    border-color: #ffbc00;
+    box-shadow: 0 4px 14px rgba(255, 188, 0, 0.35);
+}
+
+/* Horizontal Visual Episode Cards Carousel */
+.cinema-episodes-grid {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 4px 2px 14px 2px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cinema-episodes-grid::-webkit-scrollbar {
+    height: 5px;
+}
+
+.cinema-episodes-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 3px;
+}
+
+.cinema-episodes-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 188, 0, 0.3);
+    border-radius: 3px;
+}
+
+.cinema-episode-card {
+    flex: 0 0 200px;
+    width: 200px;
+    scroll-snap-align: start;
+    background: rgba(16, 20, 31, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-episode-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 188, 0, 0.5);
+    background: rgba(22, 27, 43, 0.9);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.cinema-episode-card.active {
+    border-color: #ffbc00;
+    box-shadow: 0 0 20px rgba(255, 188, 0, 0.35);
+    background: rgba(25, 30, 48, 0.95);
+}
+
+/* Card Thumbnail Viewport */
+.cinema-ep-thumb-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    position: relative;
+    overflow: hidden;
+    background: #0a0d14;
+}
+
+.cinema-ep-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.cinema-episode-card:hover .cinema-ep-thumb-img {
+    transform: scale(1.05);
+}
+
+.cinema-ep-play-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.cinema-episode-card:hover .cinema-ep-play-overlay,
+.cinema-episode-card.active .cinema-ep-play-overlay {
+    opacity: 1;
+}
+
+.cinema-ep-play-overlay svg {
+    width: 28px;
+    height: 28px;
+    fill: #ffbc00;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
+}
+
+.cinema-ep-now-playing-tag {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: #10b981;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.cinema-ep-runtime-tag {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #e2e8f0;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+}
+
+/* Episode Progress Bar */
+.cinema-ep-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.cinema-ep-progress-fill {
+    height: 100%;
+    background: #ffbc00;
+    border-radius: 0 2px 2px 0;
+    transition: width 0.3s ease;
+}
+
+/* Card Body */
+.cinema-ep-card-body {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.cinema-ep-card-num {
+    font-size: 10px;
+    font-weight: 800;
+    color: #ffbc00;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.cinema-ep-card-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+.cinema-ep-card-meta {
+    font-size: 10.5px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+/* Next Episode Autoplay Binge Card Overlay */
+.cinema-next-ep-card {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    z-index: 50;
+    width: calc(100% - 28px);
+    max-width: 330px;
+    background: rgba(10, 13, 22, 0.96);
+    border: 1px solid rgba(255, 188, 0, 0.45);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 188, 0, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    overflow: hidden;
+    animation: slideUpEp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUpEp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cinema-next-ep-thumb {
+    width: 60px;
+    height: 42px;
+    border-radius: 6px;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+    background-color: #121622;
+}
+
+.cinema-next-ep-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cinema-next-ep-badge {
+    font-size: 9px;
+    font-weight: 800;
+    color: #ffbc00;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.cinema-next-ep-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.cinema-next-ep-timer {
+    font-size: 10.5px;
+    color: #94a3b8;
+}
+
+.cinema-next-ep-timer b {
+    color: #10b981;
+}
+
+.cinema-next-ep-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.cinema-next-ep-play-btn {
+    background: #ffbc00;
+    color: #06080d;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cinema-next-ep-play-btn:hover {
+    background: #ffd043;
+    transform: scale(1.04);
+}
+
+.cinema-next-ep-cancel-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cinema-next-ep-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.cinema-next-ep-progress-fill {
+    height: 100%;
+    background: #ffbc00;
+    width: 0%;
+    transition: width 1s linear;
+}
+
+/* ==========================================================================
+   SUBTITLE & AUDIO HUB MODAL (SUGGESTION C)
+   ========================================================================== */
+.cinema-sub-hub-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.cinema-sub-hub-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.cinema-sub-hub-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 360px;
+    background: rgba(14, 18, 28, 0.97);
+    border: 1px solid rgba(255, 188, 0, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: scaleInSub 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes scaleInSub {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.cinema-sub-hub-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cinema-sub-hub-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.cinema-sub-hub-title svg {
+    width: 18px;
+    height: 18px;
+    fill: #ffbc00;
+}
+
+.cinema-sub-hub-close {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #94a3b8;
+    width: 26px;
+    height: 26px;
+    border-radius: 13px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.cinema-sub-hub-close:hover {
+    background: rgba(255, 69, 58, 0.2);
+    color: #ff453a;
+}
+
+.cinema-sub-hub-section-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+    margin-bottom: 4px;
+}
+
+.cinema-sub-track-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cinema-sub-track-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: #e2e8f0;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cinema-sub-track-item:hover {
+    background: rgba(255, 188, 0, 0.1);
+    border-color: rgba(255, 188, 0, 0.3);
+    color: #ffbc00;
+}
+
+.cinema-sub-track-item.active {
+    background: rgba(255, 188, 0, 0.15);
+    border-color: #ffbc00;
+    color: #ffbc00;
+}
+
+.cinema-sub-track-item .sub-check {
+    font-weight: 800;
+    color: #ffbc00;
+    font-size: 13px;
+}
+
+.cinema-sub-upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px dashed rgba(255, 188, 0, 0.4);
+    border-radius: 10px;
+    color: #ffd043;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cinema-sub-upload-btn:hover {
+    background: rgba(255, 188, 0, 0.14);
+    border-color: #ffbc00;
+}
+
+.cinema-sub-upload-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* ==========================================================================
+   "MORE LIKE THIS" RECOMMENDATIONS CAROUSEL (SUGGESTION D)
+   ========================================================================== */
+.cinema-recommendations-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+    margin-bottom: 24px;
+}
+
+.cinema-rec-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cinema-rec-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+}
+
+.cinema-rec-title-group svg {
+    width: 18px;
+    height: 18px;
+    fill: #ffbc00;
+}
+
+.cinema-rec-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.cinema-rec-grid {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 4px 2px 14px 2px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cinema-rec-grid::-webkit-scrollbar {
+    height: 5px;
+}
+
+.cinema-rec-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 3px;
+}
+
+.cinema-rec-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 188, 0, 0.3);
+    border-radius: 3px;
+}
+
+.cinema-rec-card {
+    flex: 0 0 135px;
+    width: 135px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-rec-card:hover {
+    transform: translateY(-4px);
+}
+
+.cinema-rec-poster-wrap {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    background: #101422;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cinema-rec-card:hover .cinema-rec-poster-wrap {
+    border-color: rgba(255, 188, 0, 0.5);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 188, 0, 0.2);
+}
+
+.cinema-rec-poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.cinema-rec-card:hover .cinema-rec-poster-img {
+    transform: scale(1.05);
+}
+
+.cinema-rec-rating-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: rgba(0, 0, 0, 0.78);
+    color: #ffbc00;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.cinema-rec-quality-badge {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(16, 185, 129, 0.9);
+    color: #ffffff;
+    font-size: 8.5px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 3px;
+}
+
+.cinema-rec-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+.cinema-rec-meta {
+    font-size: 10.5px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .cinema-back-btn svg {
