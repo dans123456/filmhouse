@@ -268,26 +268,30 @@
             gap: 8px;
         }
 
-        /* Floating action modal for adding movies */
+        /* Floating action modal for admin operations - Hidden by default to eliminate dark tap flashes */
         .admin-modal-overlay {
+            display: none !important;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            display: flex;
+            background: rgba(4, 5, 8, 0.76);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            box-sizing: border-box;
+            touch-action: manipulation;
         }
         .admin-modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
+            display: flex !important;
+            animation: adminOverlayFadeIn 0.16s ease-out forwards;
+        }
+        @keyframes adminOverlayFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         .admin-modal-container {
             background: var(--bg-dark-elevated);
@@ -300,6 +304,14 @@
             max-height: 90vh;
             overflow-y: auto;
             box-sizing: border-box;
+            transform: translateZ(0);
+        }
+        .admin-modal-overlay.active .admin-modal-container {
+            animation: adminModalPopIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes adminModalPopIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .modal-header {
             display: flex;
@@ -385,10 +397,12 @@
         }
 
         /* Mobile responsive updates & Anti-Glitch Touch Protection */
+        *, *::before, *::after {
+            -webkit-tap-highlight-color: transparent !important;
+        }
         html, body {
             overflow-x: hidden;
             touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
         }
         button, a, input, select, .stat-card, .list-row, .admin-quick-btn, .settings-tab-btn, .series-filter-tab, .req-filter-tab {
             touch-action: manipulation;

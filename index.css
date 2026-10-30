@@ -2425,42 +2425,87 @@ body.tg-back-visible #btn-close-cinema {
     }
 }
 
-/* Responsive Cinema Theater: Desktop & Large Tablets (min-width: 900px, normal height) */
+/* Responsive Cinema Theater: Full-Page Immersive View on Desktop & Large Tablets (min-width: 900px, normal height) */
 @media (min-width: 900px) and (min-height: 541px) {
     #cinema-modal.active {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 24px !important;
-        background: rgba(4, 6, 12, 0.88) !important;
-        backdrop-filter: blur(24px) !important;
-        -webkit-backdrop-filter: blur(24px) !important;
+        display: block !important;
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
+        height: 100dvh !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #06080d !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
         z-index: 2500 !important;
         opacity: 1 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
     }
     #cinema-modal.active.has-fullscreen,
     #cinema-modal.active:has(.is-fullscreen) {
         padding: 0 !important;
         background: #000000 !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
+        overflow: hidden !important;
     }
     .cinema-theater-container {
         width: 100% !important;
-        max-width: 1000px !important;
-        height: 92vh !important;
-        max-height: 880px !important;
-        border-radius: 20px !important;
-        border: 1px solid rgba(255, 188, 0, 0.22) !important;
-        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 188, 0, 0.08) !important;
+        max-width: 100% !important;
+        min-height: 100vh !important;
+        height: auto !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
         display: flex !important;
         flex-direction: column !important;
-        overflow: hidden !important;
+        overflow: visible !important;
+        background: #06080d !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .cinema-header-wrapper {
+        position: sticky !important;
+        top: 0 !important;
+        width: 100% !important;
+        z-index: 100 !important;
+        background: rgba(8, 10, 16, 0.96) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-bottom: 1px solid rgba(255, 188, 0, 0.15) !important;
+    }
+    .cinema-sticky-player {
+        position: relative !important;
+        width: 100% !important;
+        max-width: 1100px !important;
+        margin: 0 auto !important;
+        background: #000 !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9) !important;
+        flex-shrink: 0 !important;
+    }
+    .cinema-iframe-wrapper {
+        position: relative !important;
+        width: 100% !important;
+        padding-top: 56.25% !important; /* Full 16:9 cinematic widescreen stage */
+        height: 0 !important;
+        background: #000 !important;
+    }
+    .cinema-details-scroll-body {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 1100px !important;
+        margin: 0 auto !important;
+        padding: 24px 20px 80px 20px !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        height: auto !important;
+        flex: none !important;
+        gap: 18px !important;
+        background: transparent !important;
     }
     .cinema-theater-container.is-fullscreen {
         width: 100vw !important;
@@ -2476,21 +2521,11 @@ body.tg-back-visible #btn-close-cinema {
         left: 0 !important;
         z-index: 3500 !important;
         background: #000000 !important;
-    }
-    .cinema-sticky-player {
-        position: relative !important;
-        width: 100% !important;
-        background: #000 !important;
-        flex-shrink: 0 !important;
-    }
-    .cinema-iframe-wrapper {
-        position: relative !important;
-        width: 100% !important;
-        padding-top: 52% !important; /* Elegant cinematic aspect ratio on desktop */
-        height: 0 !important;
+        overflow: hidden !important;
     }
     .cinema-theater-container.is-fullscreen .cinema-sticky-player {
         width: 100% !important;
+        max-width: 100vw !important;
         height: 100% !important;
         flex: 1 !important;
         display: flex !important;
@@ -2513,13 +2548,6 @@ body.tg-back-visible #btn-close-cinema {
     }
     .cinema-theater-container.is-fullscreen .cinema-details-scroll-body {
         display: none !important;
-    }
-    .cinema-details-scroll-body {
-        display: flex !important;
-        flex-direction: column !important;
-        flex: 1 1 auto !important;
-        overflow-y: auto !important;
-        padding: 20px 28px 48px !important;
     }
 }
 
