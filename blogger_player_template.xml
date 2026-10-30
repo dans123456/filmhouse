@@ -577,6 +577,50 @@
       }
 
       // Listen for parent Mini App fullscreen requests
+      // Detect and broadcast embedded subtitles and audio tracks to parent app
+      function detectAndBroadcastTracks() {
+        if (!videoEl) return;
+        const subTracks = [];
+        if (videoEl.textTracks) {
+          for (let i = 0; i < videoEl.textTracks.length; i++) {
+            const t = videoEl.textTracks[i];
+            subTracks.push({
+              index: i,
+              label: t.label || t.language || `Track ${i + 1}`,
+              lang: t.language || 'en',
+              kind: t.kind || 'subtitles',
+              mode: t.mode
+            });
+          }
+        }
+
+        const audioTracks = [];
+        if (videoEl.audioTracks) {
+          for (let i = 0; i < videoEl.audioTracks.length; i++) {
+            const a = videoEl.audioTracks[i];
+            audioTracks.push({
+              index: i,
+              label: a.label || a.language || `Audio ${i + 1}`,
+              lang: a.language || '',
+              enabled: a.enabled
+            });
+          }
+        }
+
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+              action: 'videoTracksDetected',
+              subtitles: subTracks,
+              audios: audioTracks
+            }, '*');
+          }
+        } catch (e) {}
+      }
+
+      videoEl.addEventListener('loadedmetadata', detectAndBroadcastTracks);
+      videoEl.addEventListener('canplay', detectAndBroadcastTracks);
+
       window.addEventListener('message', function(ev) {
         if (!ev.data) return;
         if (ev.data.action === 'enterFullscreen' && videoEl) {
@@ -595,6 +639,23 @@
           }
         } else if (ev.data.action === 'loadSubtitle' && ev.data.url) {
           attachSubtitleTrack(ev.data.url, ev.data.lang || 'Captions');
+          detectAndBroadcastTracks();
+        } else if (ev.data.action === 'selectSubtitleTrack') {
+          const targetIndex = ev.data.index; // -1 to turn off
+          if (videoEl.textTracks) {
+            for (let i = 0; i < videoEl.textTracks.length; i++) {
+              videoEl.textTracks[i].mode = (i === targetIndex) ? 'showing' : 'disabled';
+            }
+          }
+        } else if (ev.data.action === 'selectAudioTrack') {
+          const targetIndex = ev.data.index;
+          if (videoEl.audioTracks) {
+            for (let i = 0; i < videoEl.audioTracks.length; i++) {
+              videoEl.audioTracks[i].enabled = (i === targetIndex);
+            }
+          }
+        } else if (ev.data.action === 'requestTracks') {
+          detectAndBroadcastTracks();
         }
       });
 
@@ -711,6 +772,81 @@
             window.parent.postMessage({ action: 'videoEnded' }, '*');
           }
         } catch (e) {}
+      });
+
+      // 1b. Inbuilt Audio & Subtitle Tracks Detection & Extraction
+      function broadcastDetectedTracks() {
+        try {
+          if (!window.parent || window.parent === window) return;
+
+          const textTracks = [];
+          if (videoEl.textTracks && videoEl.textTracks.length > 0) {
+            for (let i = 0; i < videoEl.textTracks.length; i++) {
+              const t = videoEl.textTracks[i];
+              textTracks.push({
+                index: i,
+                label: t.label || t.language || ('Subtitles ' + (i + 1)),
+                language: t.language || 'en',
+                kind: t.kind || 'subtitles',
+                mode: t.mode
+              });
+            }
+          }
+
+          const audioTracks = [];
+          if (videoEl.audioTracks && videoEl.audioTracks.length > 0) {
+            for (let i = 0; i < videoEl.audioTracks.length; i++) {
+              const a = videoEl.audioTracks[i];
+              audioTracks.push({
+                index: i,
+                label: a.label || a.language || ('Audio ' + (i + 1)),
+                language: a.language || '',
+                enabled: a.enabled
+              });
+            }
+          }
+
+          window.parent.postMessage({
+            action: 'videoTracksDetected',
+            subtitles: textTracks,
+            audioTracks: audioTracks
+          }, '*');
+        } catch (e) {
+          console.warn("Track broadcast error:", e);
+        }
+      }
+
+      videoEl.addEventListener('loadedmetadata', broadcastDetectedTracks);
+      videoEl.addEventListener('canplay', broadcastDetectedTracks);
+      if (videoEl.textTracks && typeof videoEl.textTracks.addEventListener === 'function') {
+        videoEl.textTracks.addEventListener('addtrack', broadcastDetectedTracks);
+      }
+
+      // Track switcher listener from FilmHouse parent frame
+      window.addEventListener('message', function(e) {
+        if (!e.data || typeof e.data !== 'object') return;
+
+        if (e.data.action === 'selectSubtitleTrack') {
+          const targetIdx = parseInt(e.data.index, 10);
+          if (videoEl.textTracks) {
+            for (let i = 0; i < videoEl.textTracks.length; i++) {
+              if (i === targetIdx) {
+                videoEl.textTracks[i].mode = 'showing';
+              } else {
+                videoEl.textTracks[i].mode = 'disabled';
+              }
+            }
+          }
+        }
+
+        if (e.data.action === 'selectAudioTrack') {
+          const targetIdx = parseInt(e.data.index, 10);
+          if (videoEl.audioTracks) {
+            for (let i = 0; i < videoEl.audioTracks.length; i++) {
+              videoEl.audioTracks[i].enabled = (i === targetIdx);
+            }
+          }
+        }
       });
 
       // 2. Custom Subtitles (.srt/.vtt) Loader

@@ -1726,32 +1726,36 @@ img {
     z-index: 2500 !important; /* Above all other layers */
     padding: 0 !important;
     margin: 0 !important;
-    background: #000000 !important;
+    background: #06080d !important;
     align-items: stretch !important;
     justify-content: flex-start !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 
 .cinema-theater-container {
     width: 100%;
-    max-width: 920px;
-    height: 100%;
-    max-height: 100vh;
+    max-width: 960px;
+    min-height: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     background: #080a10;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
-/* Top App Bar & Header Wrapper (Ultra-Thin Softened Glass Capsule) */
+/* Top App Bar & Header Wrapper (Sticky Thin Glass Capsule) */
 .cinema-header-wrapper {
     display: flex;
     flex-direction: column;
-    background: rgba(6, 8, 13, 0.78);
-    border-bottom: 1px solid rgba(255, 188, 0, 0.12);
+    background: rgba(6, 8, 13, 0.94);
+    border-bottom: 1px solid rgba(255, 188, 0, 0.15);
     flex-shrink: 0;
-    z-index: 40;
+    z-index: 100;
+    position: sticky;
+    top: 0;
     backdrop-filter: blur(24px) saturate(190%);
     -webkit-backdrop-filter: blur(24px) saturate(190%);
     transition: background 0.3s ease, border-color 0.3s ease;
@@ -1831,6 +1835,8 @@ body.tg-back-visible #btn-close-cinema {
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+    margin-left: auto !important;
+    z-index: 5;
 }
 
 /* Brand Wordmark in Cinema Header */
@@ -1863,28 +1869,31 @@ body.tg-back-visible #btn-close-cinema {
     text-transform: uppercase;
 }
 
-/* Tier 2: Sub-Bar Streaming Info, Quick Controls & Marquee Row */
-.cinema-sub-bar {
+/* Dedicated Player Control & Status Strip (Directly Below Video) */
+.cinema-player-controls-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 16px 12px;
+    background: linear-gradient(180deg, rgba(14, 18, 30, 0.95) 0%, rgba(8, 10, 16, 0.98) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    z-index: 15;
+    flex-shrink: 0;
+}
+
+.cinema-controls-row-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 6px 14px 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    background: linear-gradient(180deg, rgba(8, 10, 16, 0.9) 0%, rgba(6, 8, 13, 0.6) 100%);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    flex-wrap: wrap;
 }
 
-.cinema-sub-bar::-webkit-scrollbar {
-    display: none;
-}
-
-.cinema-sub-badge-group {
+.cinema-live-group {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex-shrink: 0;
 }
 
@@ -1894,12 +1903,12 @@ body.tg-back-visible #btn-close-cinema {
     color: #10b981;
     background: rgba(16, 185, 129, 0.12);
     border: 1px solid rgba(16, 185, 129, 0.35);
-    padding: 2px 7px;
+    padding: 3px 8px;
     border-radius: 12px;
     letter-spacing: 0.5px;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     flex-shrink: 0;
 }
 
@@ -1916,63 +1925,12 @@ body.tg-back-visible #btn-close-cinema {
 .cinema-quality-pill {
     font-size: 10px;
     font-weight: 800;
-    color: #ffbc00;
-    background: rgba(255, 188, 0, 0.12);
-    border: 1px solid rgba(255, 188, 0, 0.35);
-    padding: 2px 7px;
+    color: #00bcd4;
+    background: rgba(0, 188, 212, 0.12);
+    border: 1px solid rgba(0, 188, 212, 0.35);
+    padding: 3px 8px;
     border-radius: 12px;
     letter-spacing: 0.5px;
-    flex-shrink: 0;
-}
-
-/* Quick Subtitle / CC Trigger Badge */
-.cinema-sub-quick-btn {
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #e2e8f0;
-    height: 22px;
-    padding: 0 8px;
-    border-radius: 11px;
-    font-size: 10.5px;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    flex-shrink: 0;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.cinema-sub-quick-btn svg {
-    width: 13px;
-    height: 13px;
-    fill: currentColor;
-    flex-shrink: 0;
-}
-
-.cinema-sub-quick-btn .sub-arrow-carat {
-    font-size: 8px;
-    opacity: 0.7;
-    margin-left: 1px;
-}
-
-.cinema-sub-quick-btn:hover {
-    background: rgba(255, 188, 0, 0.16);
-    border-color: rgba(255, 188, 0, 0.45);
-    color: #ffbc00;
-    transform: translateY(-1px);
-}
-
-.cinema-sub-quick-btn:active {
-    transform: scale(0.96);
-}
-
-/* Personalized CDN Speed & Health Indicator */
-.cinema-sub-center-group {
-    display: flex;
-    align-items: center;
     flex-shrink: 0;
 }
 
@@ -1985,7 +1943,7 @@ body.tg-back-visible #btn-close-cinema {
     color: #10b981;
     background: rgba(16, 185, 129, 0.08);
     border: 1px solid rgba(16, 185, 129, 0.25);
-    padding: 2.5px 9px;
+    padding: 3px 10px;
     border-radius: 12px;
     white-space: nowrap;
     letter-spacing: 0.3px;
@@ -2007,30 +1965,76 @@ body.tg-back-visible #btn-close-cinema {
     font-weight: 800;
 }
 
-.cinema-sub-title-wrapper {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-align: right;
+.cinema-controls-row-tracks {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
 }
 
-.cinema-top-title {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: #f1f5f9;
+.cinema-controls-row-tracks::-webkit-scrollbar {
+    display: none;
+}
+
+.cinema-track-trigger-btn {
+    flex: 1 1 0;
+    min-width: 140px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    padding: 8px 12px;
+    color: #e2e8f0;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-track-trigger-btn:hover {
+    background: rgba(255, 188, 0, 0.12);
+    border-color: rgba(255, 188, 0, 0.45);
+    color: #ffbc00;
+}
+
+.cinema-track-trigger-btn:active {
+    transform: scale(0.97);
+}
+
+.cinema-track-trigger-btn svg {
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.cinema-track-trigger-btn .track-label {
+    flex: 1;
+    text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: inline-block;
-    max-width: 100%;
 }
 
-/* Sticky Video Viewport (Fixed at Top with Dynamic Ambilight) */
+.cinema-track-trigger-btn .track-arrow {
+    font-size: 10px;
+    opacity: 0.6;
+    flex-shrink: 0;
+}
+
+/* Video Stage Viewport (Dynamic Ambilight Behind & Beneath) */
 .cinema-sticky-player {
     width: 100%;
     background: #000000;
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 20;
     flex-shrink: 0;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
@@ -2151,12 +2155,11 @@ body.tg-back-visible #btn-close-cinema {
     display: none !important;
 }
 
-/* Scrollable Movie Details (Beneath the Video) */
+/* Movie Details Stream Page Body (Directly Beneath the Video Controls) */
 .cinema-details-scroll-body {
     flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 16px 18px 48px;
+    overflow: visible;
+    padding: 16px 18px 60px;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -2497,27 +2500,19 @@ body.tg-back-visible #btn-close-cinema {
     overflow-x: auto;
     padding: 4px 2px 14px 2px;
     scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch;
 }
 
 .cinema-episodes-grid::-webkit-scrollbar {
-    height: 5px;
-}
-
-.cinema-episodes-grid::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 3px;
-}
-
-.cinema-episodes-grid::-webkit-scrollbar-thumb {
-    background: rgba(255, 188, 0, 0.3);
-    border-radius: 3px;
+    display: none;
 }
 
 .cinema-episode-card {
     flex: 0 0 200px;
     width: 200px;
+    flex-shrink: 0;
     scroll-snap-align: start;
     background: rgba(16, 20, 31, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.09);
@@ -2530,6 +2525,17 @@ body.tg-back-visible #btn-close-cinema {
     position: relative;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 600px) {
+    .cinema-episodes-grid {
+        gap: 10px;
+        padding: 4px 2px 10px 2px;
+    }
+    .cinema-episode-card {
+        flex: 0 0 160px;
+        width: 160px;
+    }
 }
 
 .cinema-episode-card:hover {
@@ -3137,23 +3143,23 @@ body.tg-back-visible #btn-close-cinema {
     flex-shrink: 0;
 }
 
-/* Responsive Cinema Theater: Portrait Mode (Sticky Top Player + Scrollable Details) */
+/* Responsive Cinema Theater: Portrait Mode (Seamless Full-Page Natural Scroll) */
 @media (orientation: portrait) {
     .cinema-theater-container {
         display: flex !important;
         flex-direction: column !important;
-        height: 100% !important;
-        height: 100dvh !important;
-        max-height: 100dvh !important;
-        overflow: hidden !important;
+        height: auto !important;
+        min-height: 100% !important;
+        max-height: none !important;
+        overflow: visible !important;
     }
     .cinema-sticky-player {
-        position: sticky !important;
+        position: relative !important;
         top: 0 !important;
         width: 100% !important;
         height: auto !important;
         flex-shrink: 0 !important;
-        z-index: 30 !important;
+        z-index: 20 !important;
         background: #000 !important;
     }
     .cinema-iframe-wrapper {
@@ -3165,10 +3171,10 @@ body.tg-back-visible #btn-close-cinema {
     .cinema-details-scroll-body {
         display: flex !important;
         flex-direction: column !important;
-        flex: 1 1 auto !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        padding: 16px 18px 48px !important;
+        flex: none !important;
+        overflow: visible !important;
+        height: auto !important;
+        padding: 14px 14px 60px !important;
     }
 }
 
@@ -3578,83 +3584,7 @@ body.tg-back-visible #btn-close-cinema {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), var(--primary-glow, 0 0 10px rgba(225, 29, 72, 0.4));
 }
 
-.cinema-episodes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 8px;
-    max-height: 220px;
-    overflow-y: auto;
-    padding-right: 4px;
-}
 
-.cinema-episode-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    color: #e2e8f0;
-    cursor: pointer;
-    font-size: 11.5px;
-    transition: all 0.2s ease;
-    text-align: left;
-}
-
-.cinema-episode-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.18);
-}
-
-.cinema-episode-card.active {
-    background: linear-gradient(135deg, rgba(255, 188, 0, 0.18) 0%, rgba(255, 152, 0, 0.08) 100%);
-    border-color: #ffbc00;
-    color: #ffffff;
-    box-shadow: 0 0 16px rgba(255, 188, 0, 0.35);
-}
-
-.cinema-episode-card-left {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    overflow: hidden;
-}
-
-.cinema-ep-tag {
-    font-weight: 700;
-    font-size: 11px;
-    color: var(--accent, #ffcc00);
-}
-
-.cinema-episode-card.active .cinema-ep-tag {
-    color: #ffffff;
-}
-
-.cinema-ep-title {
-    font-size: 11px;
-    color: #94a3b8;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.cinema-episode-card.active .cinema-ep-title {
-    color: #f1f5f9;
-}
-
-.cinema-ep-play-icon {
-    width: 14px;
-    height: 14px;
-    fill: currentColor;
-    opacity: 0.6;
-    flex-shrink: 0;
-}
-
-.cinema-episode-card.active .cinema-ep-play-icon {
-    opacity: 1;
-    fill: #ffffff;
-}
 
 /* Detail Modal Hero Stream Button (Themed to Active Color Palette) */
 .detail-actions-row .btn.btn-stream-hero {

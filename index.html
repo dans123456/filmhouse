@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=91">
+    <link rel="stylesheet" href="index.css?v=92">
 </head>
 <body>
 
@@ -110,6 +110,9 @@
             </symbol>
             <symbol id="icon-subtitles" viewBox="0 0 24 24">
                 <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z" fill="currentColor"/>
+            </symbol>
+            <symbol id="icon-speaker" viewBox="0 0 24 24">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor"/>
             </symbol>
         </defs>
     </svg>
@@ -931,9 +934,8 @@
     <!-- IN-APP CINEMA PLAYER THEATER MODAL -->
     <div class="modal-overlay" id="cinema-modal">
         <div class="cinema-theater-container">
-            <!-- Two-Tier Cinematic Header (Shifted cleanly below Telegram safe area) -->
+            <!-- Minimal Cinematic Navigation Bar (Shifted cleanly below Telegram safe area) -->
             <div class="cinema-header-wrapper">
-                <!-- Tier 1: Main Brand Navigation Bar -->
                 <div class="cinema-top-bar">
                     <button class="cinema-nav-btn cinema-back-btn" id="btn-close-cinema" aria-label="Go Back">
                         <svg><use href="#icon-arrow-left"></use></svg>
@@ -952,31 +954,9 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- Tier 2: Dedicated Streaming Status & Context Carousel Strip -->
-                <div class="cinema-sub-bar">
-                    <div class="cinema-sub-badge-group">
-                        <span class="cinema-stream-badge"><span class="dot-live"></span> STREAMING</span>
-                        <span class="cinema-quality-pill" id="cinema-top-quality-pill">1080p FHD</span>
-                        <button type="button" class="cinema-sub-quick-btn" id="cinema-sub-quick-btn" aria-label="Subtitles &amp; Audio">
-                            <svg><use href="#icon-subtitles"></use></svg>
-                            <span id="cinema-sub-quick-label">CC Subtitles</span>
-                            <span class="sub-arrow-carat">▾</span>
-                        </button>
-                    </div>
-                    <div class="cinema-sub-center-group">
-                        <div class="cinema-speed-indicator" id="cinema-speed-indicator" title="Stream CDN Health">
-                            <span class="speed-pulse-dot"></span>
-                            <span class="speed-text" id="cinema-speed-text">⚡ FilmHouse Speed • <b id="cinema-user-tag">VIP Member</b></span>
-                        </div>
-                    </div>
-                    <div class="cinema-sub-title-wrapper">
-                        <span class="cinema-top-title" id="cinema-modal-title">Film House Cinema</span>
-                    </div>
-                </div>
             </div>
 
-            <!-- Sticky Video Player (At Top) -->
+            <!-- Video Player (At Top of Viewport) -->
             <div class="cinema-sticky-player">
                 <!-- Dynamic Ambilight Glow Effect Behind & Beneath Video -->
                 <div class="cinema-ambilight-glow" id="cinema-ambilight-glow"></div>
@@ -1001,42 +981,72 @@
                 </div>
             </div>
 
-            <!-- Subtitle & Audio Hub Modal -->
+            <!-- Dedicated Player Control & Status Strip (Directly Below Video) -->
+            <div class="cinema-player-controls-bar">
+                <div class="cinema-controls-row-top">
+                    <div class="cinema-live-group">
+                        <span class="cinema-stream-badge"><span class="dot-live"></span> STREAMING</span>
+                        <span class="cinema-quality-pill" id="cinema-top-quality-pill">1080p FHD</span>
+                    </div>
+                    <div class="cinema-speed-indicator" id="cinema-speed-indicator" title="Stream CDN Health">
+                        <span class="speed-pulse-dot"></span>
+                        <span class="speed-text" id="cinema-speed-text">⚡ FilmHouse Speed • <b id="cinema-user-tag">VIP Member</b></span>
+                    </div>
+                </div>
+                <div class="cinema-controls-row-tracks">
+                    <!-- Direct Subtitle Hub Trigger Button -->
+                    <button type="button" class="cinema-track-trigger-btn" id="cinema-sub-quick-btn" aria-label="Subtitles &amp; Captions">
+                        <svg><use href="#icon-subtitles"></use></svg>
+                        <span class="track-label" id="cinema-sub-quick-label">Subtitles: Auto</span>
+                        <span class="track-arrow">▾</span>
+                    </button>
+                    <!-- Direct Audio Track Selector Button -->
+                    <button type="button" class="cinema-track-trigger-btn" id="cinema-audio-quick-btn" aria-label="Audio Track">
+                        <svg><use href="#icon-speaker"></use></svg>
+                        <span class="track-label" id="cinema-audio-quick-label">Audio: Original (Auto)</span>
+                        <span class="track-arrow">▾</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Unified Audio & Subtitle Hub Modal -->
             <div class="cinema-sub-hub-modal" id="cinema-sub-hub-modal" style="display: none;">
                 <div class="cinema-sub-hub-backdrop" id="cinema-sub-hub-backdrop"></div>
                 <div class="cinema-sub-hub-card">
                     <div class="cinema-sub-hub-header">
                         <div class="cinema-sub-hub-title">
                             <svg><use href="#icon-subtitles"></use></svg>
-                            <span>Subtitles &amp; Captions</span>
+                            <span>Audio &amp; Subtitles Hub</span>
                         </div>
                         <button type="button" class="cinema-sub-hub-close" id="cinema-sub-hub-close">&times;</button>
                     </div>
                     <div class="cinema-sub-hub-body">
-                        <div class="cinema-sub-hub-section-label">SELECT LANGUAGE</div>
-                        <div class="cinema-sub-track-list" id="cinema-sub-track-list">
-                            <button type="button" class="cinema-sub-track-item active" data-sub="off">
-                                <span>Captions Off</span>
+                        <!-- Inbuilt Audio Tracks -->
+                        <div class="cinema-sub-hub-section-label">AUDIO TRACK</div>
+                        <div class="cinema-track-list" id="cinema-audio-track-list">
+                            <button type="button" class="cinema-sub-track-item active" data-audio-idx="0">
+                                <div class="track-item-left">
+                                    <svg><use href="#icon-speaker"></use></svg>
+                                    <span class="track-name">Original Audio (Auto)</span>
+                                </div>
                                 <span class="sub-check">✓</span>
                             </button>
-                            <button type="button" class="cinema-sub-track-item" data-sub="en">
-                                <span>English (Official / Auto)</span>
-                                <span class="sub-check"></span>
-                            </button>
-                            <button type="button" class="cinema-sub-track-item" data-sub="es">
-                                <span>Spanish (Español)</span>
-                                <span class="sub-check"></span>
-                            </button>
-                            <button type="button" class="cinema-sub-track-item" data-sub="fr">
-                                <span>French (Français)</span>
-                                <span class="sub-check"></span>
-                            </button>
-                            <button type="button" class="cinema-sub-track-item" data-sub="ar">
-                                <span>Arabic (العربية)</span>
-                                <span class="sub-check"></span>
+                        </div>
+
+                        <!-- Inbuilt & Detected Subtitles -->
+                        <div class="cinema-sub-hub-section-label" style="margin-top: 14px;">SUBTITLES &amp; CAPTIONS</div>
+                        <div class="cinema-track-list" id="cinema-sub-track-list">
+                            <button type="button" class="cinema-sub-track-item active" data-sub-idx="-1">
+                                <div class="track-item-left">
+                                    <svg><use href="#icon-subtitles"></use></svg>
+                                    <span class="track-name">Captions Off</span>
+                                </div>
+                                <span class="sub-check">✓</span>
                             </button>
                         </div>
-                        <div class="cinema-sub-hub-section-label" style="margin-top: 14px;">CUSTOM SUBTITLE (.SRT / .VTT)</div>
+
+                        <!-- Load Custom Subtitles -->
+                        <div class="cinema-sub-hub-section-label" style="margin-top: 14px;">LOAD EXTERNAL SUBTITLE (.SRT / .VTT)</div>
                         <label class="cinema-sub-upload-btn">
                             <svg><use href="#icon-download"></use></svg>
                             <span>Choose Subtitle File</span>
@@ -1657,6 +1667,6 @@
     </div>
 
     <script src="seriesSchema.js?v=2"></script>
-    <script src="app.js?v=127"></script>
+    <script src="app.js?v=128"></script>
 </body>
 </html>

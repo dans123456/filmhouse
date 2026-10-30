@@ -6699,26 +6699,33 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         });
     }
 
-    // Bind Subtitle Quick Badge & Subtitle Hub Modal (Suggestion C)
+    // Bind Subtitle & Audio Track Triggers & Hub Modal (Auto-Extracted from Video)
     const subQuickBtn = document.getElementById("cinema-sub-quick-btn");
+    const audioQuickBtn = document.getElementById("cinema-audio-quick-btn");
     const subModal = document.getElementById("cinema-sub-hub-modal");
     const subCloseBtn = document.getElementById("cinema-sub-hub-close");
     const subBackdrop = document.getElementById("cinema-sub-hub-backdrop");
     const subFileInput = document.getElementById("cinema-sub-file-input");
     const subQuickLabel = document.getElementById("cinema-sub-quick-label");
+    const audioQuickLabel = document.getElementById("cinema-audio-quick-label");
     const subTrackList = document.getElementById("cinema-sub-track-list");
+    const audioTrackList = document.getElementById("cinema-audio-track-list");
 
-    if (subQuickBtn && !subQuickBtn._bound) {
-        subQuickBtn._bound = true;
-        subQuickBtn.addEventListener("click", () => {
-            if (subModal) subModal.style.display = "flex";
-        });
-    }
-
+    const openSubHub = () => {
+        if (subModal) subModal.style.display = "flex";
+    };
     const closeSubHub = () => {
         if (subModal) subModal.style.display = "none";
     };
 
+    if (subQuickBtn && !subQuickBtn._bound) {
+        subQuickBtn._bound = true;
+        subQuickBtn.addEventListener("click", openSubHub);
+    }
+    if (audioQuickBtn && !audioQuickBtn._bound) {
+        audioQuickBtn._bound = true;
+        audioQuickBtn.addEventListener("click", openSubHub);
+    }
     if (subCloseBtn && !subCloseBtn._bound) {
         subCloseBtn._bound = true;
         subCloseBtn.addEventListener("click", closeSubHub);
@@ -6728,6 +6735,74 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         subBackdrop.addEventListener("click", closeSubHub);
     }
 
+    // Dynamic Track Population & Switching from Inbuilt Video Tracks
+    window.updateCinemaDetectedTracks = function(data) {
+        if (!data) return;
+
+        // 1. Inbuilt Subtitles from Video Stream
+        if (data.subtitles && Array.isArray(data.subtitles) && subTrackList) {
+            subTrackList.replaceChildren();
+
+            // Default 'Off' Track
+            const offBtn = document.createElement("button");
+            offBtn.type = "button";
+            offBtn.className = "cinema-sub-track-item" + (!data.subtitles.some(s => s.mode === "showing") ? " active" : "");
+            offBtn.setAttribute("data-sub-idx", "-1");
+            offBtn.innerHTML = `
+                <div class="track-item-left">
+                    <svg><use href="#icon-subtitles"></use></svg>
+                    <span class="track-name">Captions Off</span>
+                </div>
+                <span class="sub-check">${!data.subtitles.some(s => s.mode === "showing") ? "✓" : ""}</span>
+            `;
+            subTrackList.appendChild(offBtn);
+
+            data.subtitles.forEach((s) => {
+                const sBtn = document.createElement("button");
+                sBtn.type = "button";
+                const isShowing = (s.mode === "showing");
+                sBtn.className = "cinema-sub-track-item" + (isShowing ? " active" : "");
+                sBtn.setAttribute("data-sub-idx", s.index);
+                const sLabel = s.label || (s.language ? s.language.toUpperCase() : `Subtitles ${s.index + 1}`);
+                sBtn.innerHTML = `
+                    <div class="track-item-left">
+                        <svg><use href="#icon-subtitles"></use></svg>
+                        <span class="track-name">${sLabel}</span>
+                    </div>
+                    <span class="sub-check">${isShowing ? "✓" : ""}</span>
+                `;
+                subTrackList.appendChild(sBtn);
+                if (isShowing && subQuickLabel) {
+                    subQuickLabel.textContent = `CC: ${sLabel}`;
+                }
+            });
+        }
+
+        // 2. Inbuilt Audio Tracks from Video Stream
+        if (data.audioTracks && Array.isArray(data.audioTracks) && audioTrackList && data.audioTracks.length > 0) {
+            audioTrackList.replaceChildren();
+            data.audioTracks.forEach((a) => {
+                const aBtn = document.createElement("button");
+                aBtn.type = "button";
+                aBtn.className = "cinema-sub-track-item" + (a.enabled ? " active" : "");
+                aBtn.setAttribute("data-audio-idx", a.index);
+                const aLabel = a.label || (a.language ? a.language.toUpperCase() : `Audio ${a.index + 1}`);
+                aBtn.innerHTML = `
+                    <div class="track-item-left">
+                        <svg><use href="#icon-speaker"></use></svg>
+                        <span class="track-name">${aLabel}</span>
+                    </div>
+                    <span class="sub-check">${a.enabled ? "✓" : ""}</span>
+                `;
+                audioTrackList.appendChild(aBtn);
+                if (a.enabled && audioQuickLabel) {
+                    audioQuickLabel.textContent = `Audio: ${aLabel}`;
+                }
+            });
+        }
+    };
+
+    // Subtitle Track Selection Click Handler
     if (subTrackList && !subTrackList._bound) {
         subTrackList._bound = true;
         subTrackList.addEventListener("click", (e) => {
@@ -6742,20 +6817,56 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             const chk = btn.querySelector(".sub-check");
             if (chk) chk.textContent = "✓";
 
-            const subLang = btn.getAttribute("data-sub") || "off";
+            const trackIdx = parseInt(btn.getAttribute("data-sub-idx") ?? "-1", 10);
             const frame = container.querySelector("iframe");
+            const trackName = btn.querySelector(".track-name")?.textContent || "Track";
 
-            if (subLang === "off") {
+            if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage({
+                    action: "selectSubtitleTrack",
+                    index: trackIdx
+                }, "*");
+            }
+
+            if (trackIdx === -1) {
                 if (subQuickLabel) subQuickLabel.textContent = "CC Off";
-                if (frame && frame.contentWindow) {
-                    frame.contentWindow.postMessage({ action: "loadSubtitle", url: "" }, "*");
-                }
                 showToast("Captions turned off", "info");
             } else {
-                const langLabel = btn.querySelector("span")?.textContent || subLang.toUpperCase();
-                if (subQuickLabel) subQuickLabel.textContent = `CC ${subLang.toUpperCase()}`;
-                showToast(`Switched subtitle track to: ${langLabel}`, "success");
+                if (subQuickLabel) subQuickLabel.textContent = `CC: ${trackName}`;
+                showToast(`Subtitles: ${trackName}`, "success");
             }
+            closeSubHub();
+        });
+    }
+
+    // Audio Track Selection Click Handler
+    if (audioTrackList && !audioTrackList._bound) {
+        audioTrackList._bound = true;
+        audioTrackList.addEventListener("click", (e) => {
+            const btn = e.target.closest(".cinema-sub-track-item");
+            if (!btn) return;
+            audioTrackList.querySelectorAll(".cinema-sub-track-item").forEach(item => {
+                item.classList.remove("active");
+                const chk = item.querySelector(".sub-check");
+                if (chk) chk.textContent = "";
+            });
+            btn.classList.add("active");
+            const chk = btn.querySelector(".sub-check");
+            if (chk) chk.textContent = "✓";
+
+            const trackIdx = parseInt(btn.getAttribute("data-audio-idx") ?? "0", 10);
+            const frame = container.querySelector("iframe");
+            const trackName = btn.querySelector(".track-name")?.textContent || "Audio";
+
+            if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage({
+                    action: "selectAudioTrack",
+                    index: trackIdx
+                }, "*");
+            }
+
+            if (audioQuickLabel) audioQuickLabel.textContent = `Audio: ${trackName}`;
+            showToast(`Audio Track: ${trackName}`, "success");
             closeSubHub();
         });
     }
@@ -6850,6 +6961,58 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (qPill) {
             const is4K = movie.links && movie.links.some(l => (l.quality || '').includes('4K') || (l.quality || '').includes('2160'));
             qPill.textContent = is4K ? '4K UHD' : '1080p FHD';
+        }
+
+        // Initialize default audio & subtitle tracks based on movie metadata
+        const detectedLang = (movie.language || movie.lang || (movie.categories && movie.categories.find(c => /korean|k-drama|anime|hindi/i.test(c))) || "").toUpperCase();
+        if (subQuickLabel) subQuickLabel.textContent = "Subtitles: Auto";
+        if (audioQuickLabel) {
+            audioQuickLabel.textContent = detectedLang ? `Audio: ${detectedLang}` : "Audio: Original";
+        }
+
+        if (audioTrackList) {
+            audioTrackList.innerHTML = `
+                <button type="button" class="cinema-sub-track-item active" data-audio-idx="0">
+                    <div class="track-item-left">
+                        <svg><use href="#icon-speaker"></use></svg>
+                        <span class="track-name">Original Audio (${detectedLang || 'Auto'})</span>
+                    </div>
+                    <span class="sub-check">✓</span>
+                </button>
+                <button type="button" class="cinema-sub-track-item" data-audio-idx="1">
+                    <div class="track-item-left">
+                        <svg><use href="#icon-speaker"></use></svg>
+                        <span class="track-name">English Audio (Dub)</span>
+                    </div>
+                    <span class="sub-check"></span>
+                </button>
+            `;
+        }
+        if (subTrackList) {
+            subTrackList.innerHTML = `
+                <button type="button" class="cinema-sub-track-item active" data-sub-idx="-1">
+                    <div class="track-item-left">
+                        <svg><use href="#icon-subtitles"></use></svg>
+                        <span class="track-name">Captions Off</span>
+                    </div>
+                    <span class="sub-check">✓</span>
+                </button>
+                <button type="button" class="cinema-sub-track-item" data-sub-idx="0">
+                    <div class="track-item-left">
+                        <svg><use href="#icon-subtitles"></use></svg>
+                        <span class="track-name">English Subtitles (Auto)</span>
+                    </div>
+                    <span class="sub-check"></span>
+                </button>
+                ${detectedLang && detectedLang !== 'EN' ? `
+                <button type="button" class="cinema-sub-track-item" data-sub-idx="1">
+                    <div class="track-item-left">
+                        <svg><use href="#icon-subtitles"></use></svg>
+                        <span class="track-name">${detectedLang} Subtitles</span>
+                    </div>
+                    <span class="sub-check"></span>
+                </button>` : ''}
+            `;
         }
     }
 
@@ -7167,6 +7330,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                             localStorage.setItem(window._currentActiveEpKey, ratio);
                             const activeFill = document.querySelector(".cinema-episode-card.active .cinema-ep-progress-fill");
                             if (activeFill) activeFill.style.width = ratio + "%";
+                        }
+                    } else if (e.data.action === "videoTracksDetected") {
+                        if (typeof window.updateCinemaDetectedTracks === "function") {
+                            window.updateCinemaDetectedTracks(e.data);
                         }
                     }
                 });
