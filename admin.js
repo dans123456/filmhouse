@@ -657,62 +657,99 @@ function isRequestFulfilled(r) {
     return false;
 }
 
-// Helper: Check if a pending request already has matching content with active links in the catalog (for UI badge and one-click fulfillment)
-function hasCatalogMatch(r) {
-    if (!r || !allCatalogMovies || allCatalogMovies.length === 0) return false;
+let catalogLookupCache = null;
 
-    const reqSpecClean = (r.seasonOrPart || "").toLowerCase().trim();
-    const isQualityReq = reqSpecClean.includes("quality") || reqSpecClean.includes("1080") || reqSpecClean.includes("720") || reqSpecClean.includes("2160") || reqSpecClean.includes("4k") || reqSpecClean.includes("480");
-    const isSeasonReq = reqSpecClean.includes("season") || !!reqSpecClean.match(/\bs\d+\b/i);
-    const isReqSeries = (r.type || "").toLowerCase() === 'series' || (r.type || "").toLowerCase() === 'tv';
+function invalidateCatalogLookupCache() {
+    catalogLookupCache = null;
+}
 
-    return allCatalogMovies.some(m => {
+function getCatalogLookupCache() {
+    if (catalogLookupCache) return catalogLookupCache;
+    if (!allCatalogMovies || allCatalogMovies.length === 0) return null;
+
+    const idMap = new Map();
+    const titleMap = new Map();
+    const collapsedMap = new Map();
+
+    allCatalogMovies.forEach(m => {
         const hasLinks = Array.isArray(m.links) && m.links.length > 0 && m.links.some(l => {
             const url = typeof l === 'object' && l !== null ? (l.url || l.link) : l;
             return url && String(url).trim() !== "";
         });
-        if (!hasLinks) return false;
+        if (!hasLinks) return;
 
-        const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
         const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
-        const isSeriesMedia = isReqSeries || (m.type || "").toLowerCase() === 'series' || (m.type || "").toLowerCase() === 'tv';
-
-        const hasValidRId = rId && !isNaN(rId);
-        const hasValidMId = mId && !isNaN(mId);
-        const isIdMatch = hasValidRId && hasValidMId && rId === mId;
-        const isTitleMatch = (!hasValidRId || !hasValidMId) && titlesMatch(m.title, r.title);
-        if (!isIdMatch && !isTitleMatch) return false;
-
-        // 1. If user requested a specific season for a series, verify the catalog actually has that season
-        if (isSeriesMedia && isSeasonReq) {
-            const sMatch = reqSpecClean.match(/season\s*(\d+)/i) || reqSpecClean.match(/\bs(\d+)\b/i);
-            const sNum = sMatch ? sMatch[1] : null;
-            return m.links.some(link => {
-                const sLabel = (typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "").toLowerCase();
-                const lUrl = typeof link === 'object' && link !== null ? (link.url || link.link) : link;
-                const hasValidUrl = lUrl && String(lUrl).trim() !== "";
-                if (!hasValidUrl) return false;
-                if (sNum) {
-                    return sLabel.includes(`season ${sNum}`) || sLabel.includes(`s${sNum}`);
-                }
-                return sLabel.includes(reqSpecClean);
-            });
+        if (mId && !isNaN(mId)) {
+            idMap.set(mId, m);
         }
-
-        // 2. If user requested a specific quality for a movie, verify the catalog actually has that quality
-        if (!isSeriesMedia && isQualityReq) {
-            const qMatch = reqSpecClean.match(/(2160p|4k|1080p|720p|480p)/i);
-            const targetQ = qMatch ? qMatch[1].toLowerCase() : reqSpecClean;
-            return m.links.some(link => {
-                const lQuality = (typeof link === 'object' && link !== null ? (link.quality || link.season || "") : "").toLowerCase();
-                const lUrl = typeof link === 'object' && link !== null ? (link.url || link.link) : link;
-                return lQuality.includes(targetQ) && lUrl && String(lUrl).trim() !== "";
-            });
+        if (m.title) {
+            const norm = normalizeTitleForComparison(m.title);
+            if (norm) titleMap.set(norm, m);
+            const col = getCollapsedTitle(m.title);
+            if (col) collapsedMap.set(col, m);
         }
-
-        // 3. For general requests without specific season/quality, catalog having active links fulfills it
-        return true;
     });
+
+    catalogLookupCache = { idMap, titleMap, collapsedMap };
+    return catalogLookupCache;
+}
+
+// Helper: Check if a pending request already has matching content with active links in the catalog (for UI badge and one-click fulfillment)
+function hasCatalogMatch(r) {
+    if (!r || !allCatalogMovies || allCatalogMovies.length === 0) return false;
+    const cache = getCatalogLookupCache();
+    if (!cache) return false;
+
+    const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
+    let matchedMovie = null;
+    if (rId && !isNaN(rId) && cache.idMap.has(rId)) {
+        matchedMovie = cache.idMap.get(rId);
+    } else if (r.title) {
+        const norm = normalizeTitleForComparison(r.title);
+        if (norm && cache.titleMap.has(norm)) {
+            matchedMovie = cache.titleMap.get(norm);
+        } else {
+            const col = getCollapsedTitle(r.title);
+            if (col && cache.collapsedMap.has(col)) {
+                matchedMovie = cache.collapsedMap.get(col);
+            }
+        }
+    }
+
+    if (!matchedMovie) return false;
+
+    // Check specific season / quality constraints if requested
+    const reqSpecClean = (r.seasonOrPart || "").toLowerCase().trim();
+    const isSeasonReq = reqSpecClean.includes("season") || !!reqSpecClean.match(/\bs\d+\b/i);
+    const isQualityReq = reqSpecClean.includes("quality") || reqSpecClean.includes("1080") || reqSpecClean.includes("720") || reqSpecClean.includes("2160") || reqSpecClean.includes("4k") || reqSpecClean.includes("480");
+    const isReqSeries = (r.type || "").toLowerCase() === 'series' || (r.type || "").toLowerCase() === 'tv';
+    const isSeriesMedia = isReqSeries || (matchedMovie.type || "").toLowerCase() === 'series' || (matchedMovie.type || "").toLowerCase() === 'tv';
+
+    if (isSeriesMedia && isSeasonReq) {
+        const sMatch = reqSpecClean.match(/season\s*(\d+)/i) || reqSpecClean.match(/\bs(\d+)\b/i);
+        const sNum = sMatch ? sMatch[1] : null;
+        return matchedMovie.links.some(link => {
+            const sLabel = (typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "").toLowerCase();
+            const lUrl = typeof link === 'object' && link !== null ? (link.url || link.link) : link;
+            if (!lUrl || String(lUrl).trim() === "") return false;
+            if (sNum) {
+                return sLabel.includes(`season ${sNum}`) || sLabel.includes(`s${sNum}`);
+            }
+            return sLabel.includes(reqSpecClean);
+        });
+    }
+
+    if (!isSeriesMedia && isQualityReq) {
+        const qMatch = reqSpecClean.match(/(2160p|4k|1080p|720p|480p)/i);
+        const targetQ = qMatch ? qMatch[1].toLowerCase() : reqSpecClean;
+        return matchedMovie.links.some(link => {
+            const lQuality = (typeof link === 'object' && link !== null ? (link.quality || link.season || "") : "").toLowerCase();
+            const lUrl = typeof link === 'object' && link !== null ? (link.url || link.link) : link;
+            return lQuality.includes(targetQ) && lUrl && String(lUrl).trim() !== "";
+        });
+    }
+
+    return true;
 }
 
 // Calculate Stats and Update Counters
@@ -2441,7 +2478,7 @@ if (typeof db !== "undefined" && db) {
                         ? "Ubuntu server is running the latest build with 0 syntax errors." 
                         : "Latest code pulled and PM2 zero-downtime reload initiated.";
                     const outputSnippet = task.output 
-                        ? `<pre style="font-family: monospace; font-size: 10px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 4px; margin: 6px 0 0 0; overflow-x: auto; max-height: 80px; white-space: pre-wrap; color: #a0aec0;">${formatSafeHtml(task.output.trim().slice(0, 300))}</pre>` 
+                        ? `<pre style="font-family: monospace; font-size: 10px; background: rgba(0,0,0,0.4); padding: 6px 8px; border-radius: 4px; margin: 6px 0 0 0; overflow-x: auto; max-height: 80px; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; box-sizing: border-box; max-width: 100%; color: #a0aec0;">${formatSafeHtml(task.output.trim().slice(0, 300))}</pre>` 
                         : "";
                     serverBotStatusText.innerHTML = `${header}<br><span style="font-size: 10px; color: var(--text-secondary);">${subtitle}</span>${outputSnippet}`;
                     serverBotStatusText.style.color = "#28a745";
@@ -2781,6 +2818,7 @@ async function loadCatalog() {
                 if (draft && draft.allCatalogMovies && draft.allCatalogMovies.length > 0) {
                     if (confirm("You have unpublished changes (added/edited/deleted movies) from your last session. Would you like to restore them? Click Cancel to start fresh with the live catalog.")) {
                         allCatalogMovies = draft.allCatalogMovies;
+                        invalidateCatalogLookupCache();
                         newlyAddedIds = draft.newlyAddedIds || [];
                         newlyUpdatedIds = draft.newlyUpdatedIds || [];
                         newlyDeletedIds = draft.newlyDeletedIds || [];
@@ -2847,6 +2885,7 @@ async function loadCatalog() {
         }
         
         allCatalogMovies = responseData;
+        invalidateCatalogLookupCache();
         originalCatalogCount = allCatalogMovies.length;
         renderCatalogList();
         renderEditorsChoiceSelectionList();
@@ -3953,6 +3992,7 @@ function renderCatalogList() {
 
 function deleteMovie(csvId) {
     allCatalogMovies = allCatalogMovies.filter(m => m.csv_id !== csvId);
+    invalidateCatalogLookupCache();
     if (!newlyDeletedIds.includes(csvId)) {
         newlyDeletedIds.push(csvId);
     }
@@ -5273,6 +5313,7 @@ if (publishBtn) {
                     });
                     
                     if (mergedCount > 0) {
+                        invalidateCatalogLookupCache();
                         console.log(`Auto-merged ${mergedCount} remote movies into local list to prevent overwrite deletion!`);
                         // Ensure lists are sorted consistently
                         allCatalogMovies.sort((a, b) => a.title.localeCompare(b.title));
