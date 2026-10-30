@@ -3540,6 +3540,12 @@ let currentMediaDetailMovie = null;
 
 // Centralized App Back & Escape Handler (supports Telegram Native BackButton & In-App Back)
 function handleAppBack() {
+    // 0. Cinema Sub Hub modal open?
+    const cinemaSubHub = document.getElementById("cinema-sub-hub-modal");
+    if (cinemaSubHub && cinemaSubHub.style.display !== "none") {
+        cinemaSubHub.style.display = "none";
+        return;
+    }
     // 1. Cinema modal active?
     const cinemaModal = document.getElementById("cinema-modal");
     if (cinemaModal && cinemaModal.classList.contains("active")) {
@@ -6571,17 +6577,13 @@ function closeCinemaModal() {
     }
     
     document.body.classList.remove("tg-back-visible");
-    // Telegram BackButton management: unbind and restore previous drawer back button if open
+    // Telegram BackButton management: Keep visible if media detail page is active
     if (window.Telegram?.WebApp?.BackButton) {
-        try { window.Telegram.WebApp.BackButton.offClick(closeCinemaModal); } catch (e) {}
         const mediaDetailScreen = document.getElementById("screen-media-detail");
         if (mediaDetailScreen && mediaDetailScreen.classList.contains("active")) {
-            try {
-                window.Telegram.WebApp.BackButton.show();
-                window.Telegram.WebApp.BackButton.onClick(closeMediaDetailPage);
-            } catch (e) {}
+            try { window.Telegram.WebApp.BackButton.show(); } catch (e) {}
         } else {
-            window.Telegram.WebApp.BackButton.hide();
+            try { window.Telegram.WebApp.BackButton.hide(); } catch (e) {}
         }
     }
     if (document.fullscreenElement && document.exitFullscreen) {
@@ -6711,7 +6713,36 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     const subTrackList = document.getElementById("cinema-sub-track-list");
     const audioTrackList = document.getElementById("cinema-audio-track-list");
 
-    const openSubHub = () => {
+    const tabAudio = document.getElementById("cinema-hub-tab-audio");
+    const tabSubs = document.getElementById("cinema-hub-tab-subs");
+    const paneAudio = document.getElementById("cinema-hub-pane-audio");
+    const paneSubs = document.getElementById("cinema-hub-pane-subs");
+
+    function switchHubTab(tabName) {
+        if (tabName === "audio") {
+            if (tabAudio) tabAudio.classList.add("active");
+            if (tabSubs) tabSubs.classList.remove("active");
+            if (paneAudio) paneAudio.style.display = "flex";
+            if (paneSubs) paneSubs.style.display = "none";
+        } else {
+            if (tabSubs) tabSubs.classList.add("active");
+            if (tabAudio) tabAudio.classList.remove("active");
+            if (paneSubs) paneSubs.style.display = "flex";
+            if (paneAudio) paneAudio.style.display = "none";
+        }
+    }
+
+    if (tabAudio && !tabAudio._bound) {
+        tabAudio._bound = true;
+        tabAudio.addEventListener("click", () => switchHubTab("audio"));
+    }
+    if (tabSubs && !tabSubs._bound) {
+        tabSubs._bound = true;
+        tabSubs.addEventListener("click", () => switchHubTab("subs"));
+    }
+
+    const openSubHub = (defaultTab = "audio") => {
+        switchHubTab(defaultTab);
         if (subModal) subModal.style.display = "flex";
     };
     const closeSubHub = () => {
@@ -6720,11 +6751,11 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
     if (subQuickBtn && !subQuickBtn._bound) {
         subQuickBtn._bound = true;
-        subQuickBtn.addEventListener("click", openSubHub);
+        subQuickBtn.addEventListener("click", () => openSubHub("subs"));
     }
     if (audioQuickBtn && !audioQuickBtn._bound) {
         audioQuickBtn._bound = true;
-        audioQuickBtn.addEventListener("click", openSubHub);
+        audioQuickBtn.addEventListener("click", () => openSubHub("audio"));
     }
     if (subCloseBtn && !subCloseBtn._bound) {
         subCloseBtn._bound = true;
@@ -6733,6 +6764,40 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     if (subBackdrop && !subBackdrop._bound) {
         subBackdrop._bound = true;
         subBackdrop.addEventListener("click", closeSubHub);
+    }
+
+    // Language code to human readable name mapper
+    const LANG_NAME_MAP = {
+        KO: "Korean",
+        KOREAN: "Korean",
+        EN: "English",
+        ENGLISH: "English",
+        JA: "Japanese",
+        JAPANESE: "Japanese",
+        ZH: "Chinese",
+        CHINESE: "Chinese",
+        ES: "Spanish",
+        SPANISH: "Spanish",
+        FR: "French",
+        FRENCH: "French",
+        HI: "Hindi",
+        HINDI: "Hindi",
+        DE: "German",
+        GERMAN: "German",
+        IT: "Italian",
+        PT: "Portuguese",
+        RU: "Russian",
+        AR: "Arabic",
+        TR: "Turkish",
+        TH: "Thai",
+        VI: "Vietnamese",
+        ID: "Indonesian"
+    };
+
+    function getCleanLangName(code) {
+        if (!code) return "";
+        const u = String(code).toUpperCase().trim();
+        return LANG_NAME_MAP[u] || (u.length <= 3 ? u : u.charAt(0) + u.slice(1).toLowerCase());
     }
 
     // Dynamic Track Population & Switching from Inbuilt Video Tracks
@@ -6964,10 +7029,11 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         }
 
         // Initialize default audio & subtitle tracks based on movie metadata
-        const detectedLang = (movie.language || movie.lang || (movie.categories && movie.categories.find(c => /korean|k-drama|anime|hindi/i.test(c))) || "").toUpperCase();
+        const rawLang = (movie.language || movie.lang || (movie.categories && movie.categories.find(c => /korean|k-drama|anime|hindi/i.test(c))) || "").toUpperCase();
+        const detectedLang = getCleanLangName(rawLang) || "Original";
         if (subQuickLabel) subQuickLabel.textContent = "Subtitles: Auto";
         if (audioQuickLabel) {
-            audioQuickLabel.textContent = detectedLang ? `Audio: ${detectedLang}` : "Audio: Original";
+            audioQuickLabel.textContent = `Audio: ${detectedLang}`;
         }
 
         if (audioTrackList) {
@@ -6975,7 +7041,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 <button type="button" class="cinema-sub-track-item active" data-audio-idx="0">
                     <div class="track-item-left">
                         <svg><use href="#icon-speaker"></use></svg>
-                        <span class="track-name">Original Audio (${detectedLang || 'Auto'})</span>
+                        <span class="track-name">Original Audio (${detectedLang})</span>
                     </div>
                     <span class="sub-check">✓</span>
                 </button>
@@ -7004,7 +7070,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     </div>
                     <span class="sub-check"></span>
                 </button>
-                ${detectedLang && detectedLang !== 'EN' ? `
+                ${detectedLang && detectedLang !== 'English' ? `
                 <button type="button" class="cinema-sub-track-item" data-sub-idx="1">
                     <div class="track-item-left">
                         <svg><use href="#icon-subtitles"></use></svg>
@@ -7213,7 +7279,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             }
             let currentEpisodeNum = 1;
 
-            // Header: Title + Episode Count Badge
+            // Header: Title + Episode Count Badge + Carousel Nav Arrows for PC
             const seriesHeader = document.createElement("div");
             seriesHeader.className = "cinema-series-header";
             seriesHeader.innerHTML = `
@@ -7221,7 +7287,13 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     <svg><use href="#icon-tv"></use></svg>
                     <span>Seasons &amp; Episodes</span>
                 </div>
-                <span class="cinema-series-count-badge" id="cinema-ep-count-badge">Loading...</span>
+                <div class="cinema-series-header-right">
+                    <span class="cinema-series-count-badge" id="cinema-ep-count-badge">Loading...</span>
+                    <div class="cinema-carousel-arrows">
+                        <button type="button" class="cinema-carousel-arrow-btn prev" id="cinema-ep-prev-btn" aria-label="Previous Episodes" title="Previous Episodes">‹</button>
+                        <button type="button" class="cinema-carousel-arrow-btn next" id="cinema-ep-next-btn" aria-label="Next Episodes" title="Next Episodes">›</button>
+                    </div>
+                </div>
             `;
             seriesSection.appendChild(seriesHeader);
 
@@ -7232,6 +7304,19 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             // Episodes Grid Container
             const episodesGrid = document.createElement("div");
             episodesGrid.className = "cinema-episodes-grid";
+
+            const prevArrow = seriesHeader.querySelector("#cinema-ep-prev-btn");
+            const nextArrow = seriesHeader.querySelector("#cinema-ep-next-btn");
+            if (prevArrow) {
+                prevArrow.addEventListener("click", () => {
+                    episodesGrid.scrollBy({ left: -360, behavior: "smooth" });
+                });
+            }
+            if (nextArrow) {
+                nextArrow.addEventListener("click", () => {
+                    episodesGrid.scrollBy({ left: 360, behavior: "smooth" });
+                });
+            }
 
             // TV Series Episode State & Next Episode Autoplay Controller (Suggestion B)
             let currentCinemaEpisodes = [];
@@ -7546,18 +7631,9 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             detailsContainer.appendChild(seriesSection);
         }
 
-        // 4. Action Buttons Grid (Download, Watchlist, Share)
+        // 4. Action Buttons Grid (Watchlist, Share)
         const actionsGrid = document.createElement("div");
         actionsGrid.className = "cinema-actions-grid";
-
-        // Download Action
-        const dlBtn = document.createElement("button");
-        dlBtn.className = "cinema-action-btn";
-        dlBtn.innerHTML = `<svg><use href="#icon-download"></use></svg><span>Download</span>`;
-        dlBtn.addEventListener("click", () => {
-            openDownloadModal(movie);
-        });
-        actionsGrid.appendChild(dlBtn);
 
         // Watchlist Action
         const inWl = state.watchlist && state.watchlist.includes(movie.csv_id || movie.id);
@@ -7764,12 +7840,11 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         });
     }
 
-    // Telegram Native BackButton support: Show and bind to close cinema modal
+    // Telegram Native BackButton support: Ensure shown for cinema modal
     if (window.Telegram?.WebApp?.BackButton) {
         try {
             document.body.classList.add("tg-back-visible");
             window.Telegram.WebApp.BackButton.show();
-            window.Telegram.WebApp.BackButton.onClick(closeCinemaModal);
         } catch (e) {}
     }
 

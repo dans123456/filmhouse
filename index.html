@@ -27,7 +27,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=92">
+    <link rel="stylesheet" href="index.css?v=93">
 </head>
 <body>
 
@@ -946,9 +946,6 @@
                         <span class="cinema-brand-cinema-pill">CINEMA</span>
                     </div>
                     <div class="cinema-top-actions">
-                        <button class="cinema-nav-btn cinema-fs-btn" id="btn-cinema-fullscreen" aria-label="Fullscreen">
-                            <svg><use href="#icon-maximize"></use></svg>
-                        </button>
                         <button class="cinema-nav-btn cinema-close-btn" id="btn-cinema-minimize" aria-label="Close Theater">
                             <span>&times;</span>
                         </button>
@@ -988,9 +985,15 @@
                         <span class="cinema-stream-badge"><span class="dot-live"></span> STREAMING</span>
                         <span class="cinema-quality-pill" id="cinema-top-quality-pill">1080p FHD</span>
                     </div>
-                    <div class="cinema-speed-indicator" id="cinema-speed-indicator" title="Stream CDN Health">
-                        <span class="speed-pulse-dot"></span>
-                        <span class="speed-text" id="cinema-speed-text">⚡ FilmHouse Speed • <b id="cinema-user-tag">VIP Member</b></span>
+                    <div class="cinema-top-right-group">
+                        <div class="cinema-speed-indicator" id="cinema-speed-indicator" title="Stream CDN Health">
+                            <span class="speed-pulse-dot"></span>
+                            <span class="speed-text" id="cinema-speed-text">⚡ FilmHouse Speed • <b id="cinema-user-tag">VIP Member</b></span>
+                        </div>
+                        <button type="button" class="cinema-player-fs-btn" id="btn-cinema-fullscreen" aria-label="Fullscreen" title="Toggle Fullscreen">
+                            <svg><use href="#icon-maximize"></use></svg>
+                            <span>Fullscreen</span>
+                        </button>
                     </div>
                 </div>
                 <div class="cinema-controls-row-tracks">
@@ -1016,42 +1019,59 @@
                     <div class="cinema-sub-hub-header">
                         <div class="cinema-sub-hub-title">
                             <svg><use href="#icon-subtitles"></use></svg>
-                            <span>Audio &amp; Subtitles Hub</span>
+                            <span>Audio &amp; Subtitles</span>
                         </div>
                         <button type="button" class="cinema-sub-hub-close" id="cinema-sub-hub-close">&times;</button>
                     </div>
+
+                    <!-- Clean Audio vs Subtitles Switcher Tabs -->
+                    <div class="cinema-sub-hub-tabs">
+                        <button type="button" class="cinema-hub-tab active" id="cinema-hub-tab-audio" data-tab="audio">
+                            <svg><use href="#icon-speaker"></use></svg>
+                            <span>Audio Tracks</span>
+                        </button>
+                        <button type="button" class="cinema-hub-tab" id="cinema-hub-tab-subs" data-tab="subs">
+                            <svg><use href="#icon-subtitles"></use></svg>
+                            <span>Subtitles &amp; CC</span>
+                        </button>
+                    </div>
+
                     <div class="cinema-sub-hub-body">
-                        <!-- Inbuilt Audio Tracks -->
-                        <div class="cinema-sub-hub-section-label">AUDIO TRACK</div>
-                        <div class="cinema-track-list" id="cinema-audio-track-list">
-                            <button type="button" class="cinema-sub-track-item active" data-audio-idx="0">
-                                <div class="track-item-left">
-                                    <svg><use href="#icon-speaker"></use></svg>
-                                    <span class="track-name">Original Audio (Auto)</span>
-                                </div>
-                                <span class="sub-check">✓</span>
-                            </button>
+                        <!-- Inbuilt Audio Tracks Pane -->
+                        <div class="cinema-hub-pane active" id="cinema-hub-pane-audio">
+                            <div class="cinema-sub-hub-section-label">AVAILABLE AUDIO TRACKS</div>
+                            <div class="cinema-track-list" id="cinema-audio-track-list">
+                                <button type="button" class="cinema-sub-track-item active" data-audio-idx="0">
+                                    <div class="track-item-left">
+                                        <svg><use href="#icon-speaker"></use></svg>
+                                        <span class="track-name">Original Audio (Auto)</span>
+                                    </div>
+                                    <span class="sub-check">✓</span>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- Inbuilt & Detected Subtitles -->
-                        <div class="cinema-sub-hub-section-label" style="margin-top: 14px;">SUBTITLES &amp; CAPTIONS</div>
-                        <div class="cinema-track-list" id="cinema-sub-track-list">
-                            <button type="button" class="cinema-sub-track-item active" data-sub-idx="-1">
-                                <div class="track-item-left">
-                                    <svg><use href="#icon-subtitles"></use></svg>
-                                    <span class="track-name">Captions Off</span>
-                                </div>
-                                <span class="sub-check">✓</span>
-                            </button>
-                        </div>
+                        <!-- Inbuilt & Detected Subtitles Pane -->
+                        <div class="cinema-hub-pane" id="cinema-hub-pane-subs" style="display: none;">
+                            <div class="cinema-sub-hub-section-label">SUBTITLES &amp; CAPTIONS</div>
+                            <div class="cinema-track-list" id="cinema-sub-track-list">
+                                <button type="button" class="cinema-sub-track-item active" data-sub-idx="-1">
+                                    <div class="track-item-left">
+                                        <svg><use href="#icon-subtitles"></use></svg>
+                                        <span class="track-name">Captions Off</span>
+                                    </div>
+                                    <span class="sub-check">✓</span>
+                                </button>
+                            </div>
 
-                        <!-- Load Custom Subtitles -->
-                        <div class="cinema-sub-hub-section-label" style="margin-top: 14px;">LOAD EXTERNAL SUBTITLE (.SRT / .VTT)</div>
-                        <label class="cinema-sub-upload-btn">
-                            <svg><use href="#icon-download"></use></svg>
-                            <span>Choose Subtitle File</span>
-                            <input type="file" id="cinema-sub-file-input" accept=".srt,.vtt" style="display:none;">
-                        </label>
+                            <!-- Load Custom Subtitles -->
+                            <div class="cinema-sub-hub-section-label" style="margin-top: 14px;">LOAD EXTERNAL SUBTITLE (.SRT / .VTT)</div>
+                            <label class="cinema-sub-upload-btn">
+                                <svg><use href="#icon-download"></use></svg>
+                                <span>Choose Subtitle File</span>
+                                <input type="file" id="cinema-sub-file-input" accept=".srt,.vtt" style="display:none;">
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1667,6 +1687,6 @@
     </div>
 
     <script src="seriesSchema.js?v=2"></script>
-    <script src="app.js?v=128"></script>
+    <script src="app.js?v=129"></script>
 </body>
 </html>

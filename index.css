@@ -1897,6 +1897,47 @@ body.tg-back-visible #btn-close-cinema {
     flex-shrink: 0;
 }
 
+.cinema-top-right-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.cinema-player-fs-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 188, 0, 0.12);
+    border: 1px solid rgba(255, 188, 0, 0.35);
+    color: #ffbc00;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-player-fs-btn:hover {
+    background: rgba(255, 188, 0, 0.22);
+    border-color: #ffbc00;
+    transform: translateY(-1px);
+}
+
+.cinema-player-fs-btn:active {
+    transform: scale(0.96);
+}
+
+.cinema-player-fs-btn svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
 .cinema-stream-badge {
     font-size: 10px;
     font-weight: 800;
@@ -2351,12 +2392,12 @@ body.tg-back-visible #btn-close-cinema {
     fill: #ffffff;
 }
 
-/* Action Buttons Grid in Cinema View */
+/* Action Buttons Grid in Cinema View (Watchlist & Share) */
 .cinema-actions-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin: 6px 0;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 8px 0;
 }
 
 .cinema-action-btn {
@@ -2365,13 +2406,13 @@ body.tg-back-visible #btn-close-cinema {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 10px 8px;
+    padding: 12px 10px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     color: #ffffff;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     transition: all 0.2s ease;
 }
@@ -2442,6 +2483,46 @@ body.tg-back-visible #btn-close-cinema {
     width: 17px;
     height: 17px;
     fill: #ffbc00;
+}
+
+.cinema-series-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cinema-carousel-arrows {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cinema-carousel-arrow-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e2e8f0;
+    font-size: 15px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.cinema-carousel-arrow-btn:hover {
+    background: #ffbc00;
+    border-color: #ffbc00;
+    color: #06080d;
+    transform: scale(1.1);
+}
+
+.cinema-carousel-arrow-btn:active {
+    transform: scale(0.92);
 }
 
 .cinema-series-count-badge {
@@ -2897,6 +2978,56 @@ body.tg-back-visible #btn-close-cinema {
     color: #ff453a;
 }
 
+.cinema-sub-hub-tabs {
+    display: flex;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 6px;
+}
+
+.cinema-hub-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cinema-hub-tab svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.cinema-hub-tab:hover {
+    color: #ffffff;
+}
+
+.cinema-hub-tab.active {
+    background: rgba(255, 188, 0, 0.18);
+    color: #ffbc00;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.cinema-hub-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 .cinema-sub-hub-section-label {
     font-size: 10px;
     font-weight: 800;
@@ -2905,17 +3036,21 @@ body.tg-back-visible #btn-close-cinema {
     margin-bottom: 4px;
 }
 
+.cinema-track-list,
 .cinema-sub-track-list {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 2px;
 }
 
 .cinema-sub-track-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 9px 12px;
+    padding: 10px 14px;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
@@ -2924,6 +3059,8 @@ body.tg-back-visible #btn-close-cinema {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .cinema-sub-track-item:hover {
@@ -2938,10 +3075,37 @@ body.tg-back-visible #btn-close-cinema {
     color: #ffbc00;
 }
 
+.track-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.cinema-sub-track-item svg {
+    width: 18px !important;
+    height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+    fill: currentColor !important;
+    flex-shrink: 0 !important;
+}
+
+.cinema-sub-track-item .track-name {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .cinema-sub-track-item .sub-check {
     font-weight: 800;
     color: #ffbc00;
-    font-size: 13px;
+    font-size: 14px;
+    margin-left: 8px;
+    flex-shrink: 0;
 }
 
 .cinema-sub-upload-btn {
@@ -2966,9 +3130,10 @@ body.tg-back-visible #btn-close-cinema {
 }
 
 .cinema-sub-upload-btn svg {
-    width: 16px;
-    height: 16px;
-    fill: currentColor;
+    width: 16px !important;
+    height: 16px !important;
+    fill: currentColor !important;
+    flex-shrink: 0 !important;
 }
 
 /* ==========================================================================
