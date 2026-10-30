@@ -8,6 +8,7 @@ echo "  FILM HOUSE - 1-CLICK SERVER BOT SAFE UPDATER"
 echo "----------------------------------------------------"
 
 echo "[1/4] Pulling latest code from GitHub main branch..."
+git stash push -u -m 'auto-stash-updater' || true
 git pull origin main
 
 echo "[2/4] Verifying node dependencies..."

@@ -172,9 +172,9 @@ setInterval(syncStreamingServerConfig, 30000);
 function performServerGitUpdate(onProgress) {
     return new Promise((resolve) => {
         const projectDir = path.resolve(__dirname);
-        if (typeof onProgress === "function") onProgress("Pulling latest code from GitHub main branch...");
-        
-        exec("git pull origin main", { cwd: projectDir, timeout: 25000 }, (pullErr, pullOut, pullErrOut) => {
+        // Safely stash local modifications (like movies_metadata.json) before pulling so dirty files never block git pull
+        const pullCmd = "git stash push -u -m 'auto-stash-updater' || true; git pull origin main";
+        exec(pullCmd, { cwd: projectDir, timeout: 25000 }, (pullErr, pullOut, pullErrOut) => {
             if (pullErr) {
                 console.error("[ServerUpdater] git pull failed:", pullErr);
                 return resolve({
