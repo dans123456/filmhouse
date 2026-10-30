@@ -4073,6 +4073,27 @@ function updateMediaSeriesTracker(movie, isTVShow) {
 
 function openMediaDetailPage(movie) {
     if (!movie) return;
+
+    // Auto-enrich movie from state.movies if available (preserves stream_url, links, quality, backdrop, trailers)
+    if (state.movies && Array.isArray(state.movies)) {
+        const localMatch = state.movies.find(m => 
+            (m.id && (m.id === movie.id || m.id === movie.csv_id)) ||
+            (m.csv_id && (m.csv_id === movie.id || m.csv_id === movie.csv_id)) ||
+            (m.tmdb_id && movie.tmdb_id && String(m.tmdb_id) === String(movie.tmdb_id)) ||
+            (m.title && movie.title && m.title.trim().toLowerCase() === movie.title.trim().toLowerCase())
+        );
+        if (localMatch) {
+            movie.stream_url = movie.stream_url || localMatch.stream_url;
+            movie.stream_links = movie.stream_links || localMatch.stream_links;
+            movie.links = (movie.links && movie.links.length > 0) ? movie.links : localMatch.links;
+            movie.csv_id = movie.csv_id || localMatch.csv_id || localMatch.id;
+            movie.id = movie.id || localMatch.id || localMatch.csv_id;
+            if (!movie.backdrop || movie.backdrop.includes("FilmHouse.png")) movie.backdrop = localMatch.backdrop || movie.backdrop;
+            if (!movie.poster || movie.poster.includes("FilmHouse3_nobg.png")) movie.poster = localMatch.poster || movie.poster;
+            if (!movie.trailer) movie.trailer = localMatch.trailer;
+        }
+    }
+
     currentMediaDetailMovie = movie;
 
     const currentActiveScreen = Array.from(document.querySelectorAll(".app-screen")).find(s => s.classList.contains("active") && s.id !== "screen-media-detail");
@@ -4294,6 +4315,31 @@ function openMediaDetailPage(movie) {
             }
         }
 
+        // Secondary catalog fallback: search state.movies
+        if (!streamTarget && state.movies && Array.isArray(state.movies)) {
+            const localMatch = state.movies.find(m => 
+                (m.id && (m.id === movie.id || m.id === movie.csv_id)) ||
+                (m.csv_id && (m.csv_id === movie.id || m.csv_id === movie.csv_id)) ||
+                (m.tmdb_id && movie.tmdb_id && String(m.tmdb_id) === String(movie.tmdb_id)) ||
+                (m.title && movie.title && m.title.trim().toLowerCase() === movie.title.trim().toLowerCase())
+            );
+            if (localMatch) {
+                streamTarget = localMatch.stream_url || "";
+                if (!streamTarget && localMatch.stream_links && Array.isArray(localMatch.stream_links)) {
+                    const sl = localMatch.stream_links.find(s => s && (s.stream_url || s.url));
+                    if (sl) streamTarget = sl.stream_url || sl.url;
+                }
+                if (!streamTarget && localMatch.links && Array.isArray(localMatch.links)) {
+                    const sl = localMatch.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
+                    if (sl) streamTarget = sl.stream_url || sl.url;
+                }
+                if (streamTarget) {
+                    movie.stream_url = streamTarget;
+                    movie.links = localMatch.links || movie.links;
+                }
+            }
+        }
+
         // Real-time Firestore fallback: If stream link was just added in Admin without re-publishing, pick it up live
         if (!streamTarget && typeof db !== "undefined" && db && (movie.csv_id || movie.id)) {
             try {
@@ -4325,34 +4371,25 @@ function openMediaDetailPage(movie) {
             }
         }
 
-        // Instantly kill and pause any background hero trailer
-        if (typeof currentHeroTrailerCleanup === "function") {
-            try { currentHeroTrailerCleanup(); } catch (e) {}
-            currentHeroTrailerCleanup = null;
-        }
-        const heroTrailerIframe = document.getElementById("media-stream-iframe-container");
-        if (heroTrailerIframe) {
-            heroTrailerIframe.replaceChildren();
-            heroTrailerIframe.style.display = "none";
-        }
+        // Only stop/clean up the trailer if we actually have a valid stream or TV Show to play
+        if (isTVShow || streamTarget) {
+            if (typeof currentHeroTrailerCleanup === "function") {
+                try { currentHeroTrailerCleanup(); } catch (e) {}
+                currentHeroTrailerCleanup = null;
+            }
+            const heroTrailerIframe = document.getElementById("media-stream-iframe-container");
+            if (heroTrailerIframe) {
+                heroTrailerIframe.replaceChildren();
+                heroTrailerIframe.style.display = "none";
+            }
 
-        // TV Series: Always open Option 2 Dedicated Cinema Theater modal
-        if (isTVShow) {
             openCinemaModal(movie, streamTarget, optTitle);
             addWatchHistory(movie.csv_id || movie.id);
             if (typeof triggerHaptic === "function") triggerHaptic("selection");
             return;
         }
 
-        // Movies with available stream: Open Option 2 Dedicated Cinema Theater modal
-        if (streamTarget) {
-            openCinemaModal(movie, streamTarget, optTitle);
-            addWatchHistory(movie.csv_id || movie.id);
-            if (typeof triggerHaptic === "function") triggerHaptic("selection");
-            return;
-        }
-
-        // Movies without stream: Open honest Stream Request Confirmation modal
+        // Movies without stream: Do NOT kill the hero trailer! Show friendly Stream Request Confirmation modal
         const streamModal = document.getElementById("stream-request-modal");
         const streamDesc = document.getElementById("stream-request-modal-desc");
         const btnConfirm = document.getElementById("btn-confirm-stream-request");
@@ -6618,6 +6655,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const directUrl = resolveDirectStreamUrl(targetUrl);
         const currentMediaTitle = currentTitle || initialTitle;
         const subParam = state.activeSubtitleUrl ? `&sub=${encodeURIComponent(state.activeSubtitleUrl)}` : "";
+        const movieBackdrop = movie.backdrop || movie.poster || "";
         const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${subParam}`;
         const iframe = document.createElement("iframe");
         iframe.src = playerSrc;
@@ -7048,15 +7086,24 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         fsBtn._bound = true;
         fsBtn.addEventListener("click", () => {
             const theater = document.querySelector(".cinema-theater-container");
+            const cinemaModal = document.getElementById("cinema-modal");
             const frame = document.querySelector("#cinema-iframe-container iframe");
             if (theater) {
                 const isFs = theater.classList.toggle("is-fullscreen");
+                if (cinemaModal) cinemaModal.classList.toggle("has-fullscreen", isFs);
+
                 if (isFs) {
                     try {
                         if (window.Telegram?.WebApp?.requestFullscreen) {
                             window.Telegram.WebApp.requestFullscreen();
                         }
                     } catch (e) {}
+                    // PC / Desktop browser HTML5 Fullscreen API
+                    if (theater.requestFullscreen) {
+                        theater.requestFullscreen().catch(() => {});
+                    } else if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen().catch(() => {});
+                    }
                     if (frame && frame.contentWindow) {
                         frame.contentWindow.postMessage({ action: "enterFullscreen" }, "*");
                     }
@@ -7073,6 +7120,19 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         frame.contentWindow.postMessage({ action: "exitFullscreen" }, "*");
                     }
                 }
+            }
+        });
+    }
+
+    // Auto-sync fullscreen state when exited via keyboard Escape or browser UI
+    if (!window._cinemaFsListenerBound) {
+        window._cinemaFsListenerBound = true;
+        document.addEventListener("fullscreenchange", () => {
+            const theater = document.querySelector(".cinema-theater-container");
+            const cinemaModal = document.getElementById("cinema-modal");
+            if (!document.fullscreenElement) {
+                if (theater) theater.classList.remove("is-fullscreen");
+                if (cinemaModal) cinemaModal.classList.remove("has-fullscreen");
             }
         });
     }
