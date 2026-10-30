@@ -6406,11 +6406,30 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     const detailsContainer = document.getElementById("cinema-details-container");
     if (!modal || !container || !movie) return;
 
-    // In-app Back Button Binding (for non-Telegram desktop/browser fallbacks)
+    // In-app Back and Minimize Button Bindings
     const closeBtn = document.getElementById("btn-close-cinema");
     if (closeBtn && !closeBtn._bound) {
         closeBtn._bound = true;
         closeBtn.addEventListener("click", closeCinemaModal);
+    }
+
+    const minimizeBtn = document.getElementById("btn-cinema-minimize");
+    if (minimizeBtn && !minimizeBtn._bound) {
+        minimizeBtn._bound = true;
+        minimizeBtn.addEventListener("click", closeCinemaModal);
+    }
+
+    // Keyboard Escape key to exit/minimize cinema modal on desktop
+    if (!window._cinemaKeyBound) {
+        window._cinemaKeyBound = true;
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                const cModal = document.getElementById("cinema-modal");
+                if (cModal && cModal.classList.contains("active")) {
+                    closeCinemaModal();
+                }
+            }
+        });
     }
 
     const baseTitle = movie.title || "Film House Cinema";
@@ -6426,7 +6445,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (!targetUrl) return;
         const directUrl = resolveDirectStreamUrl(targetUrl);
         const currentMediaTitle = currentTitle || initialTitle;
-        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&server=${encodeURIComponent(activeStreamingServerUrl)}`;
+        const movieBackdrop = movie.backdrop || movie.poster || "";
+        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}`;
         const iframe = document.createElement("iframe");
         iframe.src = playerSrc;
         iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
@@ -6434,19 +6454,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         container.appendChild(iframe);
         if (titleEl) titleEl.textContent = currentMediaTitle;
         startStreamingPresence(movie, currentTitle || initialTitle);
-        // Update or add Quality Pill
-        let qPill = document.querySelector(".cinema-top-center .cinema-quality-pill");
-        if (!qPill) {
-            qPill = document.createElement("span");
-            qPill.className = "cinema-quality-pill";
-            const topCenter = document.querySelector(".cinema-top-center");
-            if (topCenter) topCenter.appendChild(qPill);
-        }
+        // Update Quality Pill in sub-bar
+        const qPill = document.getElementById("cinema-top-quality-pill");
         if (qPill) {
             const is4K = movie.links && movie.links.some(l => (l.quality || '').includes('4K') || (l.quality || '').includes('2160'));
             qPill.textContent = is4K ? '4K UHD' : '1080p FHD';
         }
-
     }
 
     // Resolve initial stream parameter: custom URL -> link.stream_url -> movie.stream_url
@@ -6863,14 +6876,31 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         fsBtn._bound = true;
         fsBtn.addEventListener("click", () => {
             const theater = document.querySelector(".cinema-theater-container");
-            if (theater) {
-                theater.classList.toggle("is-fullscreen");
-            }
-
-            // Signal iframe to trigger native video fullscreen
             const frame = document.querySelector("#cinema-iframe-container iframe");
-            if (frame && frame.contentWindow) {
-                frame.contentWindow.postMessage({ action: "enterFullscreen" }, "*");
+            if (theater) {
+                const isFs = theater.classList.toggle("is-fullscreen");
+                if (isFs) {
+                    try {
+                        if (window.Telegram?.WebApp?.requestFullscreen) {
+                            window.Telegram.WebApp.requestFullscreen();
+                        }
+                    } catch (e) {}
+                    if (frame && frame.contentWindow) {
+                        frame.contentWindow.postMessage({ action: "enterFullscreen" }, "*");
+                    }
+                } else {
+                    try {
+                        if (window.Telegram?.WebApp?.exitFullscreen) {
+                            window.Telegram.WebApp.exitFullscreen();
+                        }
+                    } catch (e) {}
+                    if (document.fullscreenElement && document.exitFullscreen) {
+                        document.exitFullscreen().catch(() => {});
+                    }
+                    if (frame && frame.contentWindow) {
+                        frame.contentWindow.postMessage({ action: "exitFullscreen" }, "*");
+                    }
+                }
             }
         });
     }

@@ -1744,113 +1744,144 @@ img {
     overflow: hidden;
 }
 
-/* Top App Bar */
+/* Top App Bar & Header Wrapper */
+.cinema-header-wrapper {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, rgba(14, 17, 26, 0.98) 0%, rgba(10, 12, 19, 0.95) 100%);
+    border-bottom: 1px solid rgba(255, 188, 0, 0.15);
+    flex-shrink: 0;
+    z-index: 30;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* Tier 1: Top Navigation Bar */
 .cinema-top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: calc(var(--tg-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 8px);
-    padding-bottom: 8px;
-    padding-left: 14px;
-    padding-right: 14px;
-    background: #0c0f17;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: calc(var(--tg-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 6px);
+    padding-bottom: 6px;
+    padding-left: 12px;
+    padding-right: 12px;
     gap: 10px;
-    flex-shrink: 0;
-    z-index: 30;
+    position: relative;
 }
 
-/* In-App Back Button - Hidden in Telegram Mini App to prevent duplicate back buttons */
-body.telegram-app-ready .cinema-back-btn,
-.is-telegram-env .cinema-back-btn {
-    display: none !important;
-}
-
-.cinema-back-btn {
+/* Universal Action Buttons (Back, Fullscreen, Close) */
+.cinema-nav-btn {
     background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: #ffffff;
-    padding: 6px 12px;
-    border-radius: 8px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 17px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-nav-btn svg {
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
     flex-shrink: 0;
 }
 
-.cinema-back-btn:hover, .cinema-back-btn:active {
-    background: rgba(255, 59, 48, 0.2);
-    border-color: rgba(255, 59, 48, 0.5);
-    color: #ff3b30;
+.cinema-nav-btn:hover {
+    background: rgba(255, 188, 0, 0.18);
+    border-color: rgba(255, 188, 0, 0.5);
+    color: #ffbc00;
+    transform: translateY(-1px);
 }
 
-/* Film House Brand Group in Cinema Header */
+.cinema-nav-btn:active {
+    transform: scale(0.95);
+}
+
+.cinema-close-btn {
+    width: 34px;
+    padding: 0;
+    font-size: 19px;
+    line-height: 1;
+}
+
+.cinema-close-btn:hover {
+    background: rgba(255, 69, 58, 0.2);
+    border-color: rgba(255, 69, 58, 0.5);
+    color: #ff453a;
+}
+
+.cinema-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Brand Wordmark in Cinema Header */
 .cinema-brand-group {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-shrink: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
 }
 
-.cinema-brand-logo {
-    width: 26px;
-    height: 26px;
-    object-fit: contain;
-    border-radius: 6px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-}
-
-.cinema-brand-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.1;
-}
-
-.cinema-brand-title {
-    font-size: 13px;
+.cinema-brand-wordmark {
+    font-size: 16px;
     font-weight: 900;
-    letter-spacing: 0.5px;
-    color: #ffbc00;
+    letter-spacing: 1.2px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.cinema-brand-cinema-pill {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: #0b0d14;
+    background: linear-gradient(135deg, #ffbc00 0%, #ff9800 100%);
+    padding: 2px 6px;
+    border-radius: 4px;
     text-transform: uppercase;
 }
 
-.cinema-brand-subtitle {
-    font-size: 8.5px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: #94a3b8;
-    text-transform: uppercase;
-}
-
-.cinema-top-center {
+/* Tier 2: Sub-Bar Streaming Info & Marquee Row */
+.cinema-sub-bar {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex: 1;
-    overflow: hidden;
-    min-width: 0;
-    justify-content: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 14px 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.25);
 }
 
-.cinema-top-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #ffffff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.cinema-sub-badge-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
 }
 
 .cinema-stream-badge {
     font-size: 10px;
     font-weight: 800;
-    color: var(--primary-color);
-    background: rgba(255, 188, 0, 0.12);
-    border: 1px solid var(--border-color-glow);
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
     padding: 2px 7px;
     border-radius: 12px;
     letter-spacing: 0.5px;
@@ -1870,23 +1901,34 @@ body.telegram-app-ready .cinema-back-btn,
     animation: livePulse 1.5s infinite;
 }
 
-.cinema-fs-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #ffffff;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+.cinema-quality-pill {
+    font-size: 10px;
+    font-weight: 800;
+    color: #ffbc00;
+    background: rgba(255, 188, 0, 0.12);
+    border: 1px solid rgba(255, 188, 0, 0.35);
+    padding: 2px 7px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
     flex-shrink: 0;
-    transition: background 0.2s ease;
 }
 
-.cinema-fs-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
+.cinema-sub-title-wrapper {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-align: right;
+}
+
+.cinema-top-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 100%;
 }
 
 /* Sticky Video Viewport (Fixed at Top of Screen) */
@@ -1916,6 +1958,73 @@ body.telegram-app-ready .cinema-back-btn,
     height: 100%;
     border: none;
     background: #000000;
+}
+
+/* Cinema Fullscreen Mode (Mobile & Desktop) */
+.cinema-theater-container.is-fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    z-index: 3500 !important;
+    background: #000000 !important;
+}
+
+.cinema-theater-container.is-fullscreen .cinema-header-wrapper {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 70%, transparent 100%) !important;
+    border-bottom: none !important;
+    z-index: 50 !important;
+    opacity: 1;
+    transition: opacity 0.35s ease;
+    pointer-events: none !important;
+}
+
+.cinema-theater-container.is-fullscreen .cinema-header-wrapper * {
+    pointer-events: auto !important;
+}
+
+.cinema-theater-container.is-fullscreen.controls-hidden .cinema-header-wrapper {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.cinema-theater-container.is-fullscreen .cinema-sticky-player {
+    width: 100% !important;
+    height: 100% !important;
+    flex: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #000000 !important;
+}
+
+.cinema-theater-container.is-fullscreen .cinema-iframe-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    padding-top: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.cinema-theater-container.is-fullscreen .cinema-iframe-wrapper iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+}
+
+.cinema-theater-container.is-fullscreen .cinema-details-scroll-body {
+    display: none !important;
 }
 
 /* Scrollable Movie Details (Beneath the Video) */
@@ -2225,8 +2334,8 @@ body.telegram-app-ready .cinema-back-btn,
     }
 }
 
-/* Responsive Cinema Theater: Landscape Immersive Mode & Fullscreen Mode */
-@media (orientation: landscape) {
+/* Responsive Cinema Theater: Mobile Landscape Immersive Mode (Only on small mobile phone screens rotated horizontally) */
+@media (orientation: landscape) and (max-height: 540px) {
     #cinema-modal.active {
         padding: 0 !important;
         background: #000 !important;
@@ -2247,23 +2356,26 @@ body.telegram-app-ready .cinema-back-btn,
         background: #000 !important;
         z-index: 3000 !important;
     }
-    .cinema-top-bar {
+    .cinema-header-wrapper {
         position: absolute !important;
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        background: linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.4) 65%, transparent 100%) !important;
+        background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 70%, transparent 100%) !important;
         border-bottom: none !important;
-        padding: calc(var(--tg-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 10px) 18px 12px !important;
         z-index: 100 !important;
         opacity: 1;
         transition: opacity 0.35s ease;
         pointer-events: none !important;
     }
-    .cinema-top-bar > * {
+    .cinema-sub-bar {
+        background: transparent !important;
+        border-top: none !important;
+    }
+    .cinema-header-wrapper * {
         pointer-events: auto !important;
     }
-    .cinema-theater-container.controls-hidden .cinema-top-bar {
+    .cinema-theater-container.controls-hidden .cinema-header-wrapper {
         opacity: 0 !important;
         pointer-events: none !important;
     }
@@ -2295,7 +2407,51 @@ body.telegram-app-ready .cinema-back-btn,
     }
 }
 
-/* Explicit Fullscreen Mode (e.g. toggled via fullscreen button) */
+/* Responsive Cinema Theater: Desktop & Large Tablets (min-width: 900px, normal height) */
+@media (min-width: 900px) and (min-height: 541px) {
+    #cinema-modal.active {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 24px !important;
+        background: rgba(4, 6, 12, 0.88) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+    }
+    .cinema-theater-container {
+        width: 100% !important;
+        max-width: 1000px !important;
+        height: 92vh !important;
+        max-height: 880px !important;
+        border-radius: 20px !important;
+        border: 1px solid rgba(255, 188, 0, 0.22) !important;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 188, 0, 0.08) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+    .cinema-sticky-player {
+        position: relative !important;
+        width: 100% !important;
+        background: #000 !important;
+        flex-shrink: 0 !important;
+    }
+    .cinema-iframe-wrapper {
+        position: relative !important;
+        width: 100% !important;
+        padding-top: 52% !important; /* Elegant cinematic aspect ratio on desktop */
+        height: 0 !important;
+    }
+    .cinema-details-scroll-body {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+        overflow-y: auto !important;
+        padding: 20px 28px 48px !important;
+    }
+}
+
+/* Explicit Fullscreen Mode (toggled via fullscreen button) */
 .cinema-theater-container.is-fullscreen {
     width: 100vw !important;
     max-width: 100vw !important;
@@ -2312,23 +2468,26 @@ body.telegram-app-ready .cinema-back-btn,
     background: #000 !important;
     z-index: 3000 !important;
 }
-.cinema-theater-container.is-fullscreen .cinema-top-bar {
+.cinema-theater-container.is-fullscreen .cinema-header-wrapper {
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
     width: 100% !important;
-    background: linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.4) 65%, transparent 100%) !important;
+    background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 70%, transparent 100%) !important;
     border-bottom: none !important;
-    padding: 12px 18px !important;
     z-index: 100 !important;
     opacity: 1;
     transition: opacity 0.35s ease;
     pointer-events: none !important;
 }
-.cinema-theater-container.is-fullscreen .cinema-top-bar > * {
+.cinema-theater-container.is-fullscreen .cinema-sub-bar {
+    background: transparent !important;
+    border-top: none !important;
+}
+.cinema-theater-container.is-fullscreen .cinema-header-wrapper * {
     pointer-events: auto !important;
 }
-.cinema-theater-container.is-fullscreen.controls-hidden .cinema-top-bar {
+.cinema-theater-container.is-fullscreen.controls-hidden .cinema-header-wrapper {
     opacity: 0 !important;
     pointer-events: none !important;
 }

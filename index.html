@@ -927,26 +927,38 @@
     <!-- IN-APP CINEMA PLAYER THEATER MODAL -->
     <div class="modal-overlay" id="cinema-modal">
         <div class="cinema-theater-container">
-            <!-- Fixed Top Bar (Sits below Telegram Safe Area) -->
-            <div class="cinema-top-bar">
-                <button class="cinema-back-btn" id="btn-close-cinema" aria-label="Close cinema player">
-                    <svg><use href="#icon-arrow-left"></use></svg>
-                    <span>Back</span>
-                </button>
-                <div class="cinema-brand-group">
-                    <img src="./MOVIE/m.png" alt="Film House Logo" class="cinema-brand-logo">
-                    <div class="cinema-brand-text">
-                        <span class="cinema-brand-title">FILM HOUSE</span>
-                        <span class="cinema-brand-subtitle">CINEMA</span>
+            <!-- Two-Tier Cinematic Header (Shifted cleanly below Telegram safe area) -->
+            <div class="cinema-header-wrapper">
+                <!-- Tier 1: Main Brand Navigation Bar -->
+                <div class="cinema-top-bar">
+                    <button class="cinema-nav-btn cinema-back-btn" id="btn-close-cinema" aria-label="Go Back">
+                        <svg><use href="#icon-arrow-left"></use></svg>
+                        <span>Back</span>
+                    </button>
+                    <div class="cinema-brand-group">
+                        <span class="cinema-brand-wordmark"><span class="brand-text-film">FILM</span><span class="brand-text-house">HOUSE</span></span>
+                        <span class="cinema-brand-cinema-pill">CINEMA</span>
+                    </div>
+                    <div class="cinema-top-actions">
+                        <button class="cinema-nav-btn cinema-fs-btn" id="btn-cinema-fullscreen" aria-label="Fullscreen">
+                            <svg><use href="#icon-maximize"></use></svg>
+                        </button>
+                        <button class="cinema-nav-btn cinema-close-btn" id="btn-cinema-minimize" aria-label="Close Theater">
+                            <span>&times;</span>
+                        </button>
                     </div>
                 </div>
-                <div class="cinema-top-center">
-                    <span class="cinema-stream-badge"><span class="dot-live"></span> STREAMING</span>
-                    <span class="cinema-top-title" id="cinema-modal-title">Film House Cinema</span>
+
+                <!-- Tier 2: Dedicated Streaming Status & Context Carousel Strip -->
+                <div class="cinema-sub-bar">
+                    <div class="cinema-sub-badge-group">
+                        <span class="cinema-stream-badge"><span class="dot-live"></span> STREAMING</span>
+                        <span class="cinema-quality-pill" id="cinema-top-quality-pill">1080p FHD</span>
+                    </div>
+                    <div class="cinema-sub-title-wrapper">
+                        <span class="cinema-top-title" id="cinema-modal-title">Film House Cinema</span>
+                    </div>
                 </div>
-                <button class="cinema-fs-btn" id="btn-cinema-fullscreen" aria-label="Fullscreen">
-                    <svg><use href="#icon-maximize"></use></svg>
-                </button>
             </div>
 
             <!-- Sticky Video Player (At Top) -->
