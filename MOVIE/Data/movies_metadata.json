@@ -1,5 +1,40 @@
 [
   {
+    "csv_id": "132979-bad-and-crazy",
+    "tmdb_id": 132979,
+    "imdb_id": "",
+    "title": "Bad and Crazy",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Action & Adventure",
+      "Crime",
+      "Drama",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "A superhero drama about Soo-yeol who has lived his whole life as a materialistic police detective, but changes into a champion for justice and fights against police corruption when a hidden persona called \"K\" awakens inside him.",
+    "poster": "https://image.tmdb.org/t/p/w500/gN5UG5Cf31NJJDH5aSv1mNOXFlT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/6MQaS4mMnM2WPvsAdQvZDOTxRK9.jpg",
+    "rating": 7.9,
+    "release_date": "2021-12-17",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "VLSIGKr7f9E",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADjAwAAm3uMEfqfJwbu3HTORYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "276161-teach-you-a-lesson",
     "tmdb_id": 276161,
     "imdb_id": "",
