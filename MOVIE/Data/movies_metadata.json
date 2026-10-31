@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "290699-shadow-punisher",
+    "tmdb_id": 290699,
+    "imdb_id": "",
+    "title": "Shadow Punisher",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama",
+      "Comic"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "Lord Qingyang's son, Li Si, devised a plan to infiltrate the Imperial Detective Division to uncover the truth behind the death of the Fourth Prince. There, he met and joined forces with Bai Zhenzhu, the finest female forensic expert in the land; and Meng Rui, a ghost-catcher renowned for his martial prowess but burdened with a deep-seated vendetta. Together, they formed the Divine Detectives. With seamless teamwork and unwavering determination, this trio ventured through perilous challenges, solving eight enigmatic and bizarre cases.",
+    "poster": "https://image.tmdb.org/t/p/w500/9JmtjS94oVvlamKJPtXeUtEENdx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/Amn1fw4akG9jOZNTP1J4Xadry4T.jpg",
+    "rating": 6.8,
+    "release_date": "2026-10-02",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "k7qT03oqjxk",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADrQwAAm3uMEf3WJ1x2KBBLBYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "132979-bad-and-crazy",
     "tmdb_id": 132979,
     "imdb_id": "",
