@@ -1,5 +1,44 @@
 [
   {
+    "csv_id": "539681-dc-league-of-super-pets",
+    "tmdb_id": 539681,
+    "imdb_id": "",
+    "title": "DC League of Super-Pets",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Family",
+      "Comedy",
+      "Adventure",
+      "Animation",
+      "Science Fiction",
+      "Action"
+    ],
+    "overview": "When Superman and the rest of the Justice League are kidnapped, Krypto the Super-Dog must convince a rag-tag shelter pack - Ace the hound, PB the potbellied pig, Merton the turtle and Chip the squirrel - to master their own newfound powers and help him rescue the superheroes.",
+    "poster": "https://image.tmdb.org/t/p/w500/qpPMewlugFaejXjz4YNDnpTniFX.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xfNHRI2f5kHGvogxLd0C5sB90L7.jpg",
+    "rating": 7.1,
+    "release_date": "2022-07-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "xEbpPP-_1Ig",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD-QwAAm3uMEe11oxCT-rlMxYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "290699-shadow-punisher",
     "tmdb_id": 290699,
     "imdb_id": "",
