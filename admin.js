@@ -5920,6 +5920,9 @@ document.addEventListener("keydown", (e) => {
             closeFulfillRequestModal();
         }
         closeAdminPerfModal();
+        if (typeof closeAddTrackSeriesModal === "function") {
+            closeAddTrackSeriesModal();
+        }
     }
 });
 
@@ -9765,7 +9768,20 @@ function renderOngoingSeriesList() {
     });
 
     if (filtered.length === 0) {
-        listContainer.innerHTML = `<div style="padding: 32px; text-align: center; color: var(--text-secondary);">No ongoing series match the selected filter.</div>`;
+        if (ongoingSeriesList.length === 0) {
+            listContainer.innerHTML = `
+                <div style="padding: 40px 20px; text-align: center; color: var(--text-secondary);">
+                    <div style="font-size: 32px; margin-bottom: 10px;">📺</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px;">No Series Currently Tracked</div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">Track airing seasons from your catalog to monitor weekly episode drops and notify users.</div>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="openAddTrackSeriesModal()" style="font-size: 11px; padding: 7px 16px; font-weight: 700; border-radius: 6px;">
+                        <span>+ Track Your First Series</span>
+                    </button>
+                </div>
+            `;
+        } else {
+            listContainer.innerHTML = `<div style="padding: 32px; text-align: center; color: var(--text-secondary);">No ongoing series match the selected filter.</div>`;
+        }
         return;
     }
 
@@ -10170,6 +10186,19 @@ window.renderTrackSeriesSearch = function(query = "") {
         list.appendChild(card);
     });
 };
+
+
+// Track Series Modal Backdrop Listener
+document.addEventListener("DOMContentLoaded", () => {
+    const trackModal = document.getElementById("track-series-modal");
+    if (trackModal) {
+        trackModal.addEventListener("click", (e) => {
+            if (e.target === trackModal) {
+                closeAddTrackSeriesModal();
+            }
+        });
+    }
+});
 
 window.startTrackingSeries = async function(csvId, tmdbId) {
     if (!csvId) return;
