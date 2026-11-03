@@ -434,6 +434,44 @@
         <div class='stream-play-sub' id='streamPlaySub'>Full 1080p HD • Online Cinema</div>
       </div>
 
+      <!-- 4-Hour Ad Pass Live Meter Pill -->
+      <div class='watch-pass-pill' id='watchPassPill' style='display:flex;position:absolute;top:12px;right:12px;z-index:16;align-items:center;gap:6px;background:rgba(12,15,24,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;font-size:11px;color:#cbd5e1;box-shadow:0 4px 15px rgba(0,0,0,0.5);'>
+        <span id='passDot' style='width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;display:inline-block;'></span>
+        <span id='passTimerText' style='font-weight:600;color:#fff;'>Pass: 04:00:00</span>
+        <button id='btnGetPassPill' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:800;cursor:pointer;margin-left:2px;' type='button'>⚡ 4h Pass</button>
+      </div>
+
+      <!-- In-Player Pre-Roll Sponsor Overlay -->
+      <div id='preRollOverlay' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.92);backdrop-filter:blur(14px);z-index:18;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;text-align:center;'>
+        <div style='background:rgba(255,188,0,0.1);border:1px solid rgba(255,188,0,0.3);color:#ffbc00;font-size:11px;font-weight:800;padding:3px 10px;border-radius:12px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;'>
+          Sponsor Presentation
+        </div>
+        <h3 style='margin:0 0 8px 0;font-size:17px;font-weight:700;color:#fff;'>Your Stream Starts In <span id='preRollCount' style='color:#ffd700;font-size:20px;font-weight:800;'>8</span>s</h3>
+        <p style='margin:0 0 16px 0;font-size:12px;color:#94a3b8;max-width:320px;line-height:1.4;'>
+          Enjoying Film House? Unlock 4 full hours of continuous, zero-ad streaming right now!
+        </p>
+        <div style='display:flex;gap:10px;flex-wrap:wrap;justify-content:center;'>
+          <button id='btnClaimPassInPreRoll' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 4px 15px rgba(255,188,0,0.3);' type='button'>
+            ⚡ Get 4-Hour Ad-Free Pass
+          </button>
+          <button id='btnSkipPreRoll' style='display:none;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;' type='button'>
+            Skip Ad ❯
+          </button>
+        </div>
+      </div>
+
+      <!-- Pass Expired Modal -->
+      <div id='passExpiredModal' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.94);backdrop-filter:blur(16px);z-index:20;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;text-align:center;'>
+        <div style='font-size:32px;margin-bottom:8px;'>⏱️</div>
+        <h3 style='margin:0 0 8px 0;font-size:18px;font-weight:700;color:#fff;'>Your 4-Hour Pass Has Ended</h3>
+        <p style='margin:0 0 18px 0;font-size:12px;color:#94a3b8;max-width:320px;line-height:1.4;'>
+          You've streamed for 4 hours! Tap below to visit our sponsor and unlock another 4 hours of uninterrupted cinema.
+        </p>
+        <button id='btnRenewPassModal' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,188,0,0.4);' type='button'>
+          ⚡ Unlock Another 4 Hours
+        </button>
+      </div>
+
       <!-- Resume Playback Toast -->
       <div id='resumeToast' style='display:none;position:absolute;bottom:70px;left:50%;transform:translateX(-50%);background:rgba(18,20,29,0.95);backdrop-filter:blur(12px);padding:10px 18px;border-radius:10px;border:1px solid rgba(255,188,0,0.5);box-shadow:0 8px 25px rgba(0,0,0,0.8);z-index:15;align-items:center;gap:10px;font-size:13px;color:#fff;'>
         <span>⏱️ Resume from <b id='resumeTimeText' style='color:#ffbc00;'>00:00</b>?</span>
@@ -551,20 +589,162 @@
         }
       }
 
-      // Click-to-Play Overlay (Starts HTML5 video & triggers SmartLink for web visitors)
+      // =======================================================================
+      // 4-Hour Watch-Time Ad Pass (Option B) & Pre-Roll Engine
+      // =======================================================================
+      const FOUR_HOURS_SEC = 4 * 3600; // 14,400 seconds
+      let passSec = parseInt(localStorage.getItem('filmhouse_watch_pass_sec') || '0', 10);
+      if (isNaN(passSec) || passSec < 0) passSec = 0;
+
+      function updatePassUI() {
+        const pill = document.getElementById('watchPassPill');
+        const dot = document.getElementById('passDot');
+        const timerText = document.getElementById('passTimerText');
+        const btnGet = document.getElementById('btnGetPassPill');
+        if (!pill || !timerText) return;
+
+        if (passSec > 0) {
+          pill.style.display = 'flex';
+          const h = Math.floor(passSec / 3600);
+          const m = Math.floor((passSec % 3600) / 60);
+          const s = passSec % 60;
+          const pad = n => (n < 10 ? '0' : '') + n;
+          timerText.textContent = `Pass: ${pad(h)}:${pad(m)}:${pad(s)}`;
+
+          if (passSec <= 600) {
+            // Warning: <= 10m left
+            if (dot) {
+              dot.style.background = '#f59e0b';
+              dot.style.boxShadow = '0 0 6px #f59e0b';
+            }
+            timerText.style.color = '#f59e0b';
+          } else {
+            if (dot) {
+              dot.style.background = '#10b981';
+              dot.style.boxShadow = '0 0 6px #10b981';
+            }
+            timerText.style.color = '#fff';
+          }
+          if (btnGet) btnGet.textContent = '⚡ +4h';
+        } else {
+          pill.style.display = 'flex';
+          if (dot) {
+            dot.style.background = '#64748b';
+            dot.style.boxShadow = 'none';
+          }
+          timerText.textContent = 'No Pass';
+          timerText.style.color = '#94a3b8';
+          if (btnGet) btnGet.textContent = '⚡ Get 4h';
+        }
+      }
+
+      function activateWatchPass() {
+        passSec = FOUR_HOURS_SEC;
+        localStorage.setItem('filmhouse_watch_pass_sec', passSec);
+        updatePassUI();
+
+        const expiredModal = document.getElementById('passExpiredModal');
+        if (expiredModal) expiredModal.style.display = 'none';
+
+        const preRoll = document.getElementById('preRollOverlay');
+        if (preRoll) preRoll.style.display = 'none';
+
+        if (videoEl && videoEl.paused) {
+          videoEl.play().catch(() => {});
+        }
+      }
+
+      function triggerMonetagPassUnlock() {
+        try {
+          window.open(MONETAG_SMARTLINK, '_blank');
+        } catch (e) {}
+        activateWatchPass();
+      }
+
+      const btnGetPill = document.getElementById('btnGetPassPill');
+      if (btnGetPill) btnGetPill.addEventListener('click', triggerMonetagPassUnlock);
+
+      const btnClaimPreRoll = document.getElementById('btnClaimPassInPreRoll');
+      if (btnClaimPreRoll) btnClaimPreRoll.addEventListener('click', triggerMonetagPassUnlock);
+
+      const btnRenewModal = document.getElementById('btnRenewPassModal');
+      if (btnRenewModal) btnRenewModal.addEventListener('click', triggerMonetagPassUnlock);
+
+      // Decrement watch-time ONLY while video is actively playing (Option B: Actual Watch-Time!)
+      setInterval(function() {
+        if (videoEl && !videoEl.paused && !videoEl.ended && passSec > 0) {
+          passSec--;
+          localStorage.setItem('filmhouse_watch_pass_sec', passSec);
+          updatePassUI();
+
+          if (passSec <= 0) {
+            videoEl.pause();
+            const expiredModal = document.getElementById('passExpiredModal');
+            if (expiredModal) expiredModal.style.display = 'flex';
+          }
+        }
+      }, 1000);
+
+      updatePassUI();
+
+      function showPreRollAd() {
+        const preRoll = document.getElementById('preRollOverlay');
+        const countSpan = document.getElementById('preRollCount');
+        const skipBtn = document.getElementById('btnSkipPreRoll');
+        if (!preRoll) {
+          if (videoEl) videoEl.play().catch(() => {});
+          return;
+        }
+
+        // Open Monetag SmartLink sponsor in new tab
+        try {
+          window.open(MONETAG_SMARTLINK, '_blank');
+        } catch (e) {}
+
+        preRoll.style.display = 'flex';
+        let countdown = 8;
+        if (countSpan) countSpan.textContent = countdown;
+        if (skipBtn) skipBtn.style.display = 'none';
+
+        const timer = setInterval(function() {
+          countdown--;
+          if (countSpan) countSpan.textContent = countdown;
+
+          if (countdown <= 4 && skipBtn) {
+            skipBtn.style.display = 'inline-flex';
+          }
+
+          if (countdown <= 0) {
+            clearInterval(timer);
+            preRoll.style.display = 'none';
+            if (videoEl) videoEl.play().catch(() => {});
+          }
+        }, 1000);
+
+        if (skipBtn) {
+          skipBtn.onclick = function() {
+            clearInterval(timer);
+            preRoll.style.display = 'none';
+            if (videoEl) videoEl.play().catch(() => {});
+          };
+        }
+      }
+
+      // Click-to-Play Overlay (Starts video if 4-Hour Pass is active, otherwise triggers Pre-Roll)
       if (playOverlay) {
         playOverlay.addEventListener('click', function() {
           playOverlay.style.opacity = '0';
           setTimeout(() => { playOverlay.style.display = 'none'; }, 300);
-          if (videoEl) {
-            videoEl.play().catch(err => console.log("Play error handled:", err));
-          }
-          // If on web (outside Telegram iframe), open Monetag SmartLink in new tab
-          try {
-            if (!window.self || window.self === window.top) {
-              window.open(MONETAG_SMARTLINK, '_blank');
+
+          if (passSec > 0) {
+            // 4-Hour Pass is active! 0 pre-roll ads, instant playback!
+            if (videoEl) {
+              videoEl.play().catch(err => console.log("Play error handled:", err));
             }
-          } catch (e) {}
+          } else {
+            // No active pass: show 8s Pre-roll sponsor overlay with option to claim 4h pass
+            showPreRollAd();
+          }
         });
       }
 
