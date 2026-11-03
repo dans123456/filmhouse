@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "1384216-the-dog-stars",
+    "tmdb_id": 1384216,
+    "imdb_id": "",
+    "title": "The Dog Stars",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Action",
+      "Thriller",
+      "Science Fiction"
+    ],
+    "overview": "After the world's population has been ravaged by a pandemic, a man lives a lonesome existence in a Colorado airplane hangar with his dog and a dour gunman he has befriended. When a mysterious transmission comes through on the radio while he’s flying his old Cessna, it sparks a hunt for the provenance of the sound.",
+    "poster": "https://image.tmdb.org/t/p/w500/5O616X9vmRzQdB68PHzBewPittd.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/3k7GzxOdLZkN3eZsuhLi2eRzkXO.jpg",
+    "rating": 7.2,
+    "release_date": "2026-08-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "-xSxaE1ClEE",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD6Q8AAlG0UUcwu7W6dbK-5BYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "539681-dc-league-of-super-pets",
     "tmdb_id": 539681,
     "imdb_id": "",
