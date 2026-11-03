@@ -9469,9 +9469,18 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADjhYAArgzoEW2-5Ty6QJlohYE",
-        "quality": "720p"
+        "quality": "720p",
+        "stream_url": "NDY6ODQ2Mzg3NTc5ZmNiYjVhMA"
       }
-    ]
+    ],
+    "stream_links": [
+      {
+        "quality": "720p",
+        "stream_url": "NDY6ODQ2Mzg3NTc5ZmNiYjVhMA",
+        "url": "NDY6ODQ2Mzg3NTc5ZmNiYjVhMA"
+      }
+    ],
+    "stream_url": "NDY6ODQ2Mzg3NTc5ZmNiYjVhMA"
   },
   {
     "csv_id": "71668-piranha-3dd",
@@ -22424,13 +22433,23 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD5w8AAv_ccEfzid6QAVhEdxYE",
-        "quality": "720p"
+        "quality": "720p",
+        "stream_url": "MzI6M2ZkYWVjMmUzNDllZTBlMg"
       },
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADzBkAAsQ16EbzzpwsrkWmQBYE",
-        "quality": "1080p"
+        "quality": "1080p",
+        "stream_url": ""
       }
-    ]
+    ],
+    "stream_links": [
+      {
+        "quality": "720p",
+        "stream_url": "MzI6M2ZkYWVjMmUzNDllZTBlMg",
+        "url": "MzI6M2ZkYWVjMmUzNDllZTBlMg"
+      }
+    ],
+    "stream_url": "MzI6M2ZkYWVjMmUzNDllZTBlMg"
   },
   {
     "csv_id": "307226-carrossel-o-filme",
