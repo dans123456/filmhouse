@@ -923,9 +923,9 @@ function setupBot(bot, adminBot) {
             }
 
             const movieId = movieInfo.csv_id || movieInfo.tmdb_id || movieInfo.id || "";
-            const deepLinkUrl = movieId 
+            const deepLinkUrl = movieInfo.downloadLink || movieInfo.stream_url || (movieId 
                 ? `https://t.me/Filmhouseappbot?start=dl_${movieId}` 
-                : `https://t.me/Filmhouseappbot`;
+                : `https://t.me/Filmhouseappbot`);
 
             // Build high-impact announcement header badge and update callout
             let headerBadge = "🍿 <b>NEW RELEASE ADDED!</b> 🎬";
@@ -1029,12 +1029,24 @@ function setupBot(bot, adminBot) {
 
             console.log(`[CHANNEL PUBLISH] Publishing "${cleanTitle}" announcement to channel...`);
 
+            const miniAppUrl = movieId 
+                ? `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${movieId}`
+                : `https://t.me/Filmhouseappbot/filmhouseapp`;
+            const shareText = encodeURIComponent(`🍿 Watch "${cleanTitle}" on Film House!\nStream and download in HD:`);
+            const shareUrl = encodeURIComponent(miniAppUrl);
+
             const channelReplyMarkup = {
                 inline_keyboard: [
                     [
                         {
                             text: "🎬 Watch / Download in App 🍿",
-                            url: `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${movieId}`
+                            url: miniAppUrl
+                        }
+                    ],
+                    [
+                        {
+                            text: "📢 Share with Friends",
+                            url: `https://t.me/share/url?url=${shareUrl}&text=${shareText}`
                         }
                     ]
                 ]
@@ -1529,6 +1541,428 @@ function setupBot(bot, adminBot) {
     }
 
     // ==========================================
+    // AUTO-TMDB MEDIA PARSER & SHOWCASE POSTER ENGINE (Phase 2)
+    // ==========================================
+    const TMDB_GENRES = {
+        28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime",
+        99: "Documentary", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History",
+        27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Sci-Fi",
+        10770: "TV Movie", 53: "Thriller", 10752: "War", 37: "Western",
+        10759: "Action & Adventure", 10762: "Kids", 10763: "News", 10764: "Reality",
+        10765: "Sci-Fi & Fantasy", 10766: "Soap", 10767: "Talk", 10768: "War & Politics"
+    };
+
+    function parseMediaFilename(rawInput) {
+        if (!rawInput) return { cleanTitle: '', year: null, quality: 'HD', isSeries: false, seasonOrPart: null };
+
+        let s = String(rawInput).replace(/\.(mkv|mp4|avi|mov|wmv|flv|webm|ts|m4v)$/i, '');
+        s = s.replace(/[\._]/g, ' ');
+
+        let quality = 'HD';
+        const qMatch = s.match(/\b(2160p|4k|1080p|720p|480p|uhd|camrip|cam|hdrip|webrip|web-dl|bluray|brrip|bdrip|telesync|ts|hdts|hdcam)\b/i);
+        if (qMatch) {
+            quality = qMatch[1].toUpperCase();
+            if (quality === '4K') quality = '2160P';
+        }
+
+        let isSeries = false;
+        let seasonOrPart = null;
+        const sEpMatch = s.match(/\bS(\d{1,2})\s*E(\d{1,2})\b/i);
+        const sMatch = s.match(/\b(?:Season|S)\s*(\d{1,2})\b/i);
+        const compMatch = s.match(/\b(complete|complete\s*series|all\s*seasons)\b/i);
+
+        if (sEpMatch) {
+            isSeries = true;
+            seasonOrPart = 'S' + sEpMatch[1].padStart(2, '0') + 'E' + sEpMatch[2].padStart(2, '0');
+        } else if (sMatch) {
+            isSeries = true;
+            seasonOrPart = 'Season ' + parseInt(sMatch[1], 10);
+        } else if (compMatch) {
+            isSeries = true;
+            seasonOrPart = 'Complete Series';
+        }
+
+        let year = null;
+        const yearMatch = s.match(/\b(19\d\d|20\d\d)\b/);
+        if (yearMatch) {
+            year = yearMatch[1];
+        }
+
+        s = s.replace(/\[[^\]]*\]/g, ' ').replace(/\{[^\}]*\}/g, ' ');
+
+        const cutoffRegex = /\b(19\d\d|20\d\d|s\d{1,2}e\d{1,2}|season\s*\d{1,2}|s\d{1,2}|complete|2160p|4k|1080p|720p|480p|uhd|webrip|web-dl|bluray|bdrip|brrip|camrip|cam|x264|x265|hevc|h264|h265|aac|dts|ddp5\.1)\b/i;
+        const cutIdx = s.search(cutoffRegex);
+        let titlePart = cutIdx !== -1 ? s.substring(0, cutIdx) : s;
+        titlePart = titlePart.replace(/[()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
+
+        return {
+            cleanTitle: titlePart || s.trim(),
+            year: year,
+            quality: quality,
+            isSeries: isSeries,
+            seasonOrPart: seasonOrPart
+        };
+    }
+
+    async function fetchTmdbMetadata(cleanTitle, year, isSeries) {
+        try {
+            const fetchModule = await import('node-fetch').catch(() => null);
+            const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
+            if (!fetchFn) return null;
+
+            const tmdbApiKey = process.env.TMDB_API_KEY || "d638f7775bfa1b8d456dfd028ccbef19";
+            const endpoint = isSeries ? 'tv' : 'movie';
+            const yearParam = year ? (isSeries ? `&first_air_date_year=${year}` : `&primary_release_year=${year}`) : '';
+            const url = `https://api.themoviedb.org/3/search/${endpoint}?api_key=${tmdbApiKey}&query=${encodeURIComponent(cleanTitle)}${yearParam}`;
+
+            let res = await fetchFn(url);
+            let data = res.ok ? await res.json() : null;
+
+            if (!data || !data.results || data.results.length === 0) {
+                const multiUrl = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbApiKey}&query=${encodeURIComponent(cleanTitle)}`;
+                res = await fetchFn(multiUrl);
+                data = res.ok ? await res.json() : null;
+            }
+
+            if (data && data.results && data.results.length > 0) {
+                const first = data.results[0];
+                const genres = (first.genre_ids || []).map(id => TMDB_GENRES[id]).filter(Boolean);
+                const rDate = first.release_date || first.first_air_date || "";
+                const parsedYear = rDate ? rDate.substring(0, 4) : (year || "");
+                const title = first.title || first.name || cleanTitle;
+
+                return {
+                    tmdb_id: first.id,
+                    title: title,
+                    year: parsedYear,
+                    type: (first.media_type === 'tv' || isSeries) ? 'Series' : 'Movie',
+                    rating: first.vote_average ? Math.round(first.vote_average * 10) / 10 : 0,
+                    vote_count: first.vote_count || 0,
+                    overview: first.overview || "No overview available.",
+                    genres: genres,
+                    poster: first.poster_path ? `https://image.tmdb.org/t/p/w1280${first.poster_path}` : null,
+                    backdrop: first.backdrop_path ? `https://image.tmdb.org/t/p/w1280${first.backdrop_path}` : null
+                };
+            }
+        } catch (e) {
+            console.warn("[TMDB Parse Metadata Error]:", e.message);
+        }
+        return null;
+    }
+
+    const pendingMediaShowcases = new Map();
+
+    async function handleAdminMediaForward(ctx) {
+        try {
+            const msg = ctx.message;
+            if (!msg) return false;
+
+            const fileObj = msg.video || msg.document || msg.animation;
+            if (!fileObj) return false;
+
+            const senderId = String(ctx.from ? ctx.from.id : "");
+            const authorized = await isAdmin(senderId);
+            if (!authorized) return false;
+
+            const rawFilename = fileObj.file_name || msg.caption || "";
+            const parsed = parseMediaFilename(rawFilename);
+
+            if (!parsed.cleanTitle) {
+                await ctx.reply(
+                    "🎬 <b>Video file received!</b>\n\nTelegram did not include a filename. Please reply to this message with the movie or series title (e.g. <code>Dune Part Two 2024</code>) or forward it with a caption.",
+                    { parse_mode: "HTML" }
+                );
+                return true;
+            }
+
+            const initialMsg = await ctx.reply(
+                `🔍 <b>Analyzing:</b> <code>${escapeHtml(parsed.cleanTitle)}</code> ${parsed.year ? `(${escapeHtml(parsed.year)})` : ""}\n` +
+                `<i>Fetching official TMDB posters, ratings & synopsis...</i>`,
+                { parse_mode: "HTML" }
+            );
+
+            const tmdbData = await fetchTmdbMetadata(parsed.cleanTitle, parsed.year, parsed.isSeries);
+            const tmdb = tmdbData || {
+                tmdb_id: Date.now(),
+                title: parsed.cleanTitle,
+                year: parsed.year || new Date().getFullYear().toString(),
+                type: parsed.isSeries ? 'Series' : 'Movie',
+                rating: 0,
+                vote_count: 0,
+                overview: 'No synopsis available.',
+                genres: [],
+                poster: 'https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png',
+                backdrop: 'https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png'
+            };
+
+            let fileSizeStr = "";
+            if (fileObj.file_size) {
+                const mb = fileObj.file_size / (1024 * 1024);
+                fileSizeStr = mb >= 1000 ? (mb / 1024).toFixed(2) + " GB" : Math.round(mb) + " MB";
+            }
+
+            const sessionId = "f_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 6);
+            pendingMediaShowcases.set(sessionId, {
+                fileObj,
+                parsed,
+                tmdb,
+                adminId: senderId,
+                adminName: ctx.from.username ? `@${ctx.from.username}` : (ctx.from.first_name || "Admin")
+            });
+            setTimeout(() => pendingMediaShowcases.delete(sessionId), 30 * 60 * 1000);
+
+            const genresStr = (tmdb.genres && tmdb.genres.length > 0) ? tmdb.genres.slice(0, 3).join(", ") : (tmdb.type || "Movie");
+            const ratingStr = tmdb.rating ? `⭐ <b>${tmdb.rating}/10</b>` : "⭐ <i>Unrated</i>";
+            const yearStr = tmdb.year ? ` (${tmdb.year})` : "";
+            const sizeStr = fileSizeStr ? ` • 💾 <code>${fileSizeStr}</code>` : "";
+
+            let overviewSnippet = tmdb.overview || "No synopsis available.";
+            if (overviewSnippet.length > 200) {
+                overviewSnippet = overviewSnippet.substring(0, 197) + "...";
+            }
+
+            const previewCaption = 
+                `🎬 <b>TMDB Matched:</b> <b>${escapeHtml(tmdb.title)}</b>${escapeHtml(yearStr)}\n` +
+                `${ratingStr} | 🎭 ${escapeHtml(genresStr)}\n` +
+                `📁 <b>Format:</b> ${escapeHtml(parsed.quality || "HD")}${sizeStr}\n` +
+                (parsed.seasonOrPart ? `📺 <b>Season/Episode:</b> ${escapeHtml(parsed.seasonOrPart)}\n` : "") +
+                `\n📖 <i>${escapeHtml(overviewSnippet)}</i>\n\n` +
+                `🔗 <b>File ID:</b> <code>${fileObj.file_id}</code>\n` +
+                `📥 <b>Bot Deep-Link:</b> <code>https://t.me/Filmhouseappbot?start=${fileObj.file_id}</code>\n\n` +
+                `👇 <b>Choose an action:</b>`;
+
+            const showcaseKeyboard = {
+                inline_keyboard: [
+                    [
+                        { text: "📢 Post Showcase to Updates Channel", callback_data: `fwd_post:${sessionId}` }
+                    ],
+                    [
+                        { text: "➕ Add to Movies Catalog", callback_data: `fwd_cat:${sessionId}` }
+                    ],
+                    [
+                        { text: "❌ Dismiss", callback_data: `fwd_dis:${sessionId}` }
+                    ]
+                ]
+            };
+
+            if (initialMsg && initialMsg.message_id) {
+                ctx.telegram.deleteMessage(ctx.chat.id, initialMsg.message_id).catch(() => {});
+            }
+
+            const photoUrl = tmdb.backdrop || tmdb.poster;
+            if (photoUrl && photoUrl.startsWith("http")) {
+                try {
+                    await ctx.replyWithPhoto(photoUrl, {
+                        caption: previewCaption,
+                        parse_mode: "HTML",
+                        reply_markup: showcaseKeyboard
+                    });
+                    return true;
+                } catch (photoErr) {
+                    console.warn("[Media Forward] Photo preview fallback to text:", photoErr.message);
+                }
+            }
+
+            await ctx.reply(previewCaption, {
+                parse_mode: "HTML",
+                reply_markup: showcaseKeyboard
+            });
+            return true;
+        } catch (err) {
+            console.error("[Media Forward Error]:", err);
+            return false;
+        }
+    }
+
+    async function handleMediaShowcaseCallback(ctx) {
+        try {
+            const action = ctx.match[1];
+            const sessionId = ctx.match[2];
+            await ctx.answerCbQuery().catch(() => {});
+
+            const session = pendingMediaShowcases.get(sessionId);
+            if (!session && action !== 'dis') {
+                return ctx.reply("⚠️ <b>This session has expired.</b> Please forward or upload the file again.", { parse_mode: "HTML" });
+            }
+
+            if (action === "dis") {
+                pendingMediaShowcases.delete(sessionId);
+                try {
+                    await ctx.deleteMessage();
+                } catch {
+                    await ctx.editMessageCaption("❌ <b>Showcase preview dismissed.</b>", { reply_markup: { inline_keyboard: [] } }).catch(() => {});
+                }
+                return;
+            }
+
+            const { fileObj, parsed, tmdb, adminId, adminName } = session;
+
+            if (action === "post") {
+                await ctx.reply("🚀 <b>Publishing showcase announcement to Updates Channel...</b>", { parse_mode: "HTML" });
+                const cleanT = (tmdb.title || "").trim();
+                const slug = cleanT.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'movie';
+                const docKey = `${tmdb.tmdb_id || Date.now()}-${slug}`;
+
+                const res = await publishMovieToChannel({
+                    ...tmdb,
+                    id: docKey,
+                    csv_id: docKey,
+                    seasonOrPart: parsed.seasonOrPart || (parsed.quality + " HD"),
+                    downloadLink: `https://t.me/Filmhouseappbot?start=${fileObj.file_id}`,
+                    stream_url: `https://t.me/Filmhouseappbot?start=${fileObj.file_id}`,
+                    forceBroadcast: true
+                });
+
+                if (res && res.message_id) {
+                    try {
+                        if (adminId) {
+                            const adminKey = adminId.replace(/[^a-zA-Z0-9_]/g, "_");
+                            const statsRef = db.collection("settings").doc("admin_stats");
+                            const statsDoc = await statsRef.get();
+                            const currentStats = statsDoc.exists ? statsDoc.data() : {};
+                            const adm = currentStats[adminKey] || { id: adminId, name: adminName, fulfillments: 0, publications: 0, titles: [] };
+                            adm.name = adminName;
+                            adm.titles = adm.titles || [];
+                            if (!adm.titles.some(t => t.title && t.title.toLowerCase() === cleanT.toLowerCase())) {
+                                adm.titles.unshift({ type: "publication", title: cleanT, date: new Date().toISOString() });
+                            }
+                            if (adm.titles.length > 30) adm.titles = adm.titles.slice(0, 30);
+                            adm.publications = (adm.publications || 0) + 1;
+                            adm.lastActiveAt = Date.now();
+                            currentStats[adminKey] = adm;
+                            await statsRef.set(currentStats, { merge: true });
+                        }
+                    } catch (statErr) {
+                        console.warn("[Media Forward Showcase] Admin stats update warning:", statErr.message);
+                    }
+
+                    pendingMediaShowcases.delete(sessionId);
+                    return ctx.reply(
+                        `🎉 <b>Showcase Published Successfully!</b>\n\n` +
+                        `🎬 <b>Title:</b> ${escapeHtml(tmdb.title)} (${escapeHtml(tmdb.year)})\n` +
+                        `📢 <b>Channel:</b> Film House Updates Channel\n` +
+                        `🔗 <b>Message ID:</b> <code>${res.message_id}</code>\n\n` +
+                        `📊 <i>Publication task successfully credited to your Work Share!</i>`,
+                        { parse_mode: "HTML" }
+                    );
+                } else {
+                    return ctx.reply(
+                        `⚠️ <b>Notice:</b> Could not post to Updates Channel.\n\nPlease verify that the bot is added to your Updates Channel as an <b>Administrator</b> with <b>Post Messages</b> permission enabled.`,
+                        { parse_mode: "HTML" }
+                    );
+                }
+            }
+
+            if (action === "cat") {
+                await ctx.reply("💾 <b>Saving title & streaming link to Movies Catalog...</b>", { parse_mode: "HTML" });
+                try {
+                    const cleanTitle = (tmdb.title || "").trim();
+                    const slug = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'movie';
+                    const docKey = `${tmdb.tmdb_id || Date.now()}-${slug}`;
+                    const movieRef = db.collection("movies").doc(docKey);
+
+                    const fileDeepLink = `https://t.me/Filmhouseappbot?start=${fileObj.file_id}`;
+                    const newQualityEntry = {
+                        quality: parsed.quality || "1080P",
+                        url: fileDeepLink,
+                        ...(parsed.seasonOrPart ? { season: parsed.seasonOrPart } : {})
+                    };
+
+                    const docSnap = await movieRef.get();
+                    if (docSnap.exists) {
+                        const existing = docSnap.data() || {};
+                        const currentLinks = Array.isArray(existing.links) ? existing.links : [];
+                        const linkIdx = currentLinks.findIndex(l => {
+                            if (typeof l === 'string') return false;
+                            return (l.quality || '').toUpperCase() === newQualityEntry.quality && (l.season || '') === (newQualityEntry.season || '');
+                        });
+                        if (linkIdx >= 0) {
+                            currentLinks[linkIdx] = newQualityEntry;
+                        } else {
+                            currentLinks.push(newQualityEntry);
+                        }
+                        await movieRef.set({
+                            links: currentLinks,
+                            stream_url: existing.stream_url || fileDeepLink,
+                            downloadLink: existing.downloadLink || fileDeepLink,
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true });
+                    } else {
+                        await movieRef.set({
+                            csv_id: docKey,
+                            tmdb_id: tmdb.tmdb_id,
+                            title: tmdb.title,
+                            year: tmdb.year,
+                            type: tmdb.type,
+                            overview: tmdb.overview,
+                            genres: tmdb.genres,
+                            rating: tmdb.rating,
+                            poster: tmdb.poster,
+                            backdrop: tmdb.backdrop,
+                            stream_url: fileDeepLink,
+                            downloadLink: fileDeepLink,
+                            links: [newQualityEntry],
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        });
+                    }
+
+                    if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                        const idx = cachedMoviesMetadata.findIndex(m => m.csv_id === docKey || String(m.tmdb_id) === String(tmdb.tmdb_id));
+                        const catalogEntry = {
+                            csv_id: docKey,
+                            tmdb_id: tmdb.tmdb_id,
+                            title: tmdb.title,
+                            year: tmdb.year,
+                            type: tmdb.type,
+                            overview: tmdb.overview,
+                            genres: tmdb.genres,
+                            rating: tmdb.rating,
+                            poster: tmdb.poster,
+                            backdrop: tmdb.backdrop,
+                            stream_url: fileDeepLink,
+                            downloadLink: fileDeepLink,
+                            links: [newQualityEntry]
+                        };
+                        if (idx >= 0) {
+                            cachedMoviesMetadata[idx] = { ...cachedMoviesMetadata[idx], ...catalogEntry };
+                        } else {
+                            cachedMoviesMetadata.unshift(catalogEntry);
+                        }
+                    }
+
+                    return ctx.reply(
+                        `✅ <b>Added to Movies Catalog!</b>\n\n` +
+                        `🎬 <b>Title:</b> ${escapeHtml(tmdb.title)}\n` +
+                        `📁 <b>Quality:</b> ${escapeHtml(parsed.quality || "1080P")}\n` +
+                        `🔗 <b>Direct Link:</b> <code>${fileDeepLink}</code>\n\n` +
+                        `🍿 Users can now search, stream, and download it in the Film House Mini App!`,
+                        {
+                            parse_mode: "HTML",
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [
+                                        { text: "📢 Post Showcase to Updates Channel", callback_data: `fwd_post:${sessionId}` }
+                                    ],
+                                    [
+                                        { text: "❌ Close", callback_data: `fwd_dis:${sessionId}` }
+                                    ]
+                                ]
+                            }
+                        }
+                    );
+                } catch (catErr) {
+                    console.error("[Catalog Add Error]:", catErr);
+                    return ctx.reply(`❌ <b>Failed to save to catalog:</b> ${escapeHtml(catErr.message)}`, { parse_mode: "HTML" });
+                }
+            }
+        } catch (cbErr) {
+            console.error("[Media Showcase Callback Error]:", cbErr);
+            return ctx.reply(`❌ <b>Action failed:</b> ${escapeHtml(cbErr.message)}`, { parse_mode: "HTML" });
+        }
+    }
+
+    // ==========================================
     // DEDICATED ADMIN BOT SUITE (@Fiimhouse_adminBot)
     // ==========================================
     if (adminBot) {
@@ -1583,6 +2017,21 @@ function setupBot(bot, adminBot) {
                 if (handled) return;
             }
             return next();
+        });
+
+        // Admin Forward/Upload media handler for dedicated admin bot
+        adminBot.on(['video', 'document', 'animation'], async (ctx, next) => {
+            if (ctx.message && ctx.message.reply_to_message) {
+                const handled = await handleAdminReplyToFulfill(ctx);
+                if (handled) return;
+            }
+            const handled = await handleAdminMediaForward(ctx);
+            if (!handled && typeof next === 'function') return next();
+        });
+
+        // Action handler for forward showcase buttons
+        adminBot.action(/^fwd_(post|cat|dis):(.+)$/, async (ctx) => {
+            await handleMediaShowcaseCallback(ctx);
         });
 
         // Helper to read PM2 logs safely from disk
@@ -1974,10 +2423,11 @@ function setupBot(bot, adminBot) {
                 `• Tap <b>Pending Requests</b> below or run <code>/pending</code> to inspect the queue.\n` +
                 `• Open the <b>Admin Panel</b> (button above), search for the requested title, and click <b>Claim & Fulfill</b>.\n` +
                 `• Paste the stream/download link. The bot automatically delivers direct fulfillment to the user with no ads and credits your account!\n\n` +
-                `📢 <b>2. Publishing Titles as Duty (/post):</b>\n` +
-                `• Admins also publish movies and series as regular duty (not just on request).\n` +
-                `• Use /post [Title] (e.g. /post Inception) in this chat to generate a poster announcement with deep link in Updates Channel.\n` +
-                `• Or add titles directly in the Admin Panel. Every title you publish counts toward your team Work Share!\n\n` +
+                `🎬 <b>2. Auto-TMDB Video Forwarding & Publishing:</b>\n` +
+                `• Simply forward or upload any movie/series video file (e.g. <code>Dune.Part.Two.2024.1080p.mkv</code>) directly to this bot!\n` +
+                `• The bot parses the title, fetches official TMDB poster, backdrop, rating, and synopsis in 0.2s.\n` +
+                `• Tap <b>Post Showcase to Channel</b> to publish an instant announcement card, or <b>Add to Catalog</b> to save it!\n` +
+                `• Or run <code>/post &lt;Title&gt;</code> to manually announce any title. Every publication credits your Work Share!\n\n` +
                 `🏆 <b>3. Work Share Rankings (% vs Points):</b>\n` +
                 `• Rankings show your percentage share of total team output (fulfillments + duty publications).\n` +
                 `• Run <code>/topadmins</code> to view the live team contribution leaderboard.\n\n` +
@@ -3569,6 +4019,21 @@ function setupBot(bot, adminBot) {
             if (handled) return;
         }
         return next();
+    });
+
+    // Admin Media Forward / Upload Handler for main bot
+    bot.on(['video', 'document', 'animation'], async (ctx, next) => {
+        if (ctx.message && ctx.message.reply_to_message) {
+            const handled = await handleAdminReplyToFulfill(ctx);
+            if (handled) return;
+        }
+        const handled = await handleAdminMediaForward(ctx);
+        if (!handled && typeof next === 'function') return next();
+    });
+
+    // Action handler for forward showcase buttons on main bot
+    bot.action(/^fwd_(post|cat|dis):(.+)$/, async (ctx) => {
+        await handleMediaShowcaseCallback(ctx);
     });
 
     // Default reply for regular text messages (Automation)
