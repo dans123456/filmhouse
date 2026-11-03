@@ -28465,11 +28465,30 @@
     "trailer": "l4lP8roLz3I",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD3RIAAjMruEaBZMvL7xmJzhYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADOBQAAjMruEbNOLYOqtMbOhYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADyBQAAjMruEaLTDTpaKI3fhYE",
-      "https://t.me/FilmHouseFile2bot?start=BQADAQADOxUAAjMruEY1RZ2Y4R3X0hYE",
-      "https://t.me/filmHouseFile1bot?start=BQADAQADqxUAAjMruEZurVA8-6jY5RYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD3RIAAjMruEaBZMvL7xmJzhYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADOBQAAjMruEbNOLYOqtMbOhYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyBQAAjMruEaLTDTpaKI3fhYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADOxUAAjMruEY1RZ2Y4R3X0hYE",
+        "season": "Season 4"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADqxUAAjMruEZurVA8-6jY5RYE",
+        "season": "Season 5"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADcxAAAhzcUEdXrQ1anzsZDBYE",
+        "season": "Season 6"
+      }
     ]
   },
   {
