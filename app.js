@@ -9211,6 +9211,47 @@ async function fetchTmdbSearchResults(query, apiKey) {
         }
     }
 
+    // Smart Typo & Fuzzy Fallback for Cloud Search (e.g. "the other bennett sister" -> "The Other Bennet Sister")
+    if (allResults.length === 0 && query && query.trim().length >= 4) {
+        const rawTerm = (cleanFullStr || query).trim();
+        const fallbackCandidates = [];
+
+        // Candidate A: Collapse common double consonants (e.g. "bennett" -> "bennet", "tt" -> "t", "nn" -> "n")
+        const singleDoubles = rawTerm.replace(/([a-zA-Z])\1+/g, '$1');
+        if (singleDoubles && singleDoubles.toLowerCase() !== rawTerm.toLowerCase()) {
+            fallbackCandidates.push(singleDoubles);
+        }
+
+        // Candidate B: Remove leading stop words ("the ", "a ", "an ")
+        const noArticles = rawTerm.replace(/^(the|a|an)\s+/i, "").trim();
+        if (noArticles && noArticles.toLowerCase() !== rawTerm.toLowerCase() && !fallbackCandidates.includes(noArticles)) {
+            fallbackCandidates.push(noArticles);
+        }
+
+        // Candidate C: Both combined ("other bennet sister")
+        const both = noArticles.replace(/([a-zA-Z])\1+/g, '$1');
+        if (both && both.toLowerCase() !== rawTerm.toLowerCase() && !fallbackCandidates.includes(both)) {
+            fallbackCandidates.push(both);
+        }
+
+        for (const candidate of fallbackCandidates) {
+            try {
+                const fbUrl = `${TMDB_BASE_URL}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(candidate)}`;
+                const fbRes = await fetch(fbUrl);
+                if (fbRes.ok) {
+                    const fbData = await fbRes.json();
+                    const fbResults = (fbData.results || []).filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+                    if (fbResults.length > 0) {
+                        allResults = fbResults;
+                        break;
+                    }
+                }
+            } catch (fbErr) {
+                // Ignore fallback error
+            }
+        }
+    }
+
     return allResults;
 }
 
@@ -13075,6 +13116,27 @@ function initPremiumSearchOverlay() {
             triggerOverlaySearch(query);
         }, 150);
     });
+
+    // Native mobile paste synchronization
+    overlayInput.addEventListener("paste", () => {
+        setTimeout(() => {
+            triggerOverlaySearch(overlayInput.value);
+        }, 20);
+    });
+
+    // Ensure native Android copy/paste contextmenu is never blocked
+    overlayInput.addEventListener("contextmenu", (e) => {
+        e.stopPropagation();
+    });
+
+    const overlayInputWrapper = document.querySelector(".search-overlay-input-wrapper");
+    if (overlayInputWrapper) {
+        overlayInputWrapper.addEventListener("click", (e) => {
+            if (e.target !== overlayInput && e.target !== clearBtn && !clearBtn?.contains(e.target)) {
+                overlayInput.focus();
+            }
+        });
+    }
 
     // Scope select change
     if (scopeSelect) {

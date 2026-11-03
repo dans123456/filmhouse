@@ -1405,49 +1405,70 @@
                 </button>
             </div>
             <form id="fulfill-request-form" onsubmit="event.preventDefault();">
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Telegram Download Links (Seasons / Qualities)</label>
-                    <div id="fulfill-links-container" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-top: 6px;">
-                        <div id="fulfill-links-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
-                            <!-- Dynamic inputs loaded here -->
+                <!-- OPTION A: ACCORDION FOLDER 1 - TELEGRAM DOWNLOAD LINKS -->
+                <div class="fulfill-folder-card" id="fulfill-links-folder" style="border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; background: rgba(22, 24, 35, 0.5); margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s;">
+                    <div class="fulfill-folder-header" id="fulfill-links-folder-header" onclick="toggleFulfillFolder('links')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; cursor: pointer; user-select: none; background: rgba(255, 255, 255, 0.03); transition: background 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 14px;">📁</span>
+                            <span style="font-size: 11px; color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Telegram Download Links</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button type="button" class="btn btn-secondary btn-sm" id="btn-add-fulfill-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">+ Add Another Season / Link</button>
-                            <button type="button" class="btn btn-secondary btn-sm" id="btn-fulfill-bulk-links-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span id="fulfill-links-badge" style="font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.3); color: #ffbc00;">1 Link</span>
+                            <span id="fulfill-links-chevron" style="color: var(--text-secondary); font-size: 11px; transition: transform 0.25s;">▼</span>
                         </div>
-                        <div id="fulfill-bulk-links-wrapper" style="display: none; margin-top: 10px;">
-                            <textarea id="fulfill-bulk-links-input" placeholder="Paste multiple links (one per line)...&#10;Line 1 -> Season 1&#10;Line 2 -> Season 2..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
-                            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
-                                <button type="button" class="btn btn-primary btn-sm" id="btn-apply-fulfill-bulk-links" style="font-size: 11px; padding: 4px 10px;">Apply Links</button>
+                    </div>
+                    <div id="fulfill-links-folder-content" style="padding: 12px; border-top: 1px solid rgba(255, 255, 255, 0.06);">
+                        <div id="fulfill-links-container">
+                            <div id="fulfill-links-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
+                                <!-- Dynamic inputs loaded here -->
                             </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" class="btn btn-secondary btn-sm" id="btn-add-fulfill-link-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">+ Add Another Season / Link</button>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btn-fulfill-bulk-links-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
+                            </div>
+                            <div id="fulfill-bulk-links-wrapper" style="display: none; margin-top: 10px;">
+                                <textarea id="fulfill-bulk-links-input" placeholder="Paste multiple links (one per line)...&#10;Line 1 -> Season 1&#10;Line 2 -> Season 2..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btn-apply-fulfill-bulk-links" style="font-size: 11px; padding: 4px 10px;">Apply Links</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.4; margin-top: 10px;">
+                            💡 Season 1 link will be sent directly to Telegram users. All published seasons will be saved into their exact slots in the Film House App!
                         </div>
                     </div>
                 </div>
-                <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 14px;">
-                    💡 Season 1 link will be sent directly to Telegram users. All published seasons will be saved into their exact slots in the Film House App!
-                </div>
-                <div class="form-group" style="margin-bottom: 14px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <label style="margin: 0; font-size: 11px; font-weight: 700; color: #ffbc00; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
-                            <span>▶️ Online Streaming Links (Qualities / Episodes)</span>
-                        </label>
-                        <span style="font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.12); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 700;">Monetag Stream</span>
+
+                <!-- OPTION A: ACCORDION FOLDER 2 - ONLINE STREAMING LINKS -->
+                <div class="fulfill-folder-card" id="fulfill-streams-folder" style="border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; background: rgba(22, 24, 35, 0.5); margin-bottom: 14px; overflow: hidden; transition: border-color 0.2s;">
+                    <div class="fulfill-folder-header" id="fulfill-streams-folder-header" onclick="toggleFulfillFolder('streams')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; cursor: pointer; user-select: none; background: rgba(255, 255, 255, 0.03); transition: background 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 14px;">▶️</span>
+                            <span style="font-size: 11px; color: #ffbc00; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Online Streaming Links</span>
+                            <span style="font-size: 9px; color: #4cd964; background: rgba(76, 217, 100, 0.12); border: 1px solid rgba(76, 217, 100, 0.3); padding: 1px 6px; border-radius: 8px; font-weight: 700;">Monetag Stream</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span id="fulfill-streams-badge" style="font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-secondary);">+ Click to input</span>
+                            <span id="fulfill-streams-chevron" style="color: var(--text-secondary); font-size: 11px; transition: transform 0.25s;">▶</span>
+                        </div>
                     </div>
-                    <div id="fulfill-streams-container" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
-                        <div id="fulfill-streams-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
-                            <!-- Dynamic stream inputs loaded here -->
-                        </div>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button type="button" class="btn btn-secondary btn-sm" id="btn-add-fulfill-stream-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">+ Add Stream / Episode</button>
-                            <button type="button" class="btn btn-secondary btn-sm" id="btn-fulfill-bulk-streams-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
-                        </div>
-                        <div id="fulfill-bulk-streams-wrapper" style="display: none; margin-top: 10px;">
-                            <textarea id="fulfill-bulk-streams-input" placeholder="Paste multiple stream tokens or FileStream URLs (one per line)...&#10;For Series: Line 1 -> Ep 1, Line 2 -> Ep 2...&#10;For Movies: Line 1 -> 720p, Line 2 -> 1080p..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
-                            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
-                                <button type="button" class="btn btn-primary btn-sm" id="btn-apply-fulfill-bulk-streams" style="font-size: 11px; padding: 4px 10px;">Apply Streams</button>
+                    <div id="fulfill-streams-folder-content" style="display: none; padding: 12px; border-top: 1px solid rgba(255, 255, 255, 0.06);">
+                        <div id="fulfill-streams-container">
+                            <div id="fulfill-streams-inputs-wrapper" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
+                                <!-- Dynamic stream inputs loaded here -->
+                            </div>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button type="button" class="btn btn-secondary btn-sm" id="btn-add-fulfill-stream-input" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00;">+ Add Stream / Episode</button>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btn-fulfill-bulk-streams-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
+                            </div>
+                            <div id="fulfill-bulk-streams-wrapper" style="display: none; margin-top: 10px;">
+                                <textarea id="fulfill-bulk-streams-input" placeholder="Paste multiple stream tokens or FileStream URLs (one per line)...&#10;For Series: Line 1 -> Ep 1, Line 2 -> Ep 2...&#10;For Movies: Line 1 -> 720p, Line 2 -> 1080p..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
+                                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btn-apply-fulfill-bulk-streams" style="font-size: 11px; padding: 4px 10px;">Apply Streams</button>
+                                </div>
                             </div>
                         </div>
-                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 8px; line-height: 1.4;">
                             💡 Attaches streaming to this title so users can watch online. For Series: enter episode-by-episode stream tokens. Leave blank if only providing Telegram download.
                         </div>
                     </div>

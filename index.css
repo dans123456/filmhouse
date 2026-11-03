@@ -6016,6 +6016,9 @@ select option {
     font-family: inherit;
     outline: none;
     padding: 0;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    -webkit-touch-callout: default !important;
 }
 
 #overlay-search-input::placeholder {

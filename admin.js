@@ -5811,6 +5811,71 @@ const fulfillForm = document.getElementById("fulfill-request-form");
 const fulfillRequestModal = document.getElementById("fulfill-request-modal");
 const closeFulfillModalBtn = document.getElementById("btn-close-fulfill-modal");
 
+// Accordion Folder Toggle & Badges for Fulfill Request Modal
+window.toggleFulfillFolder = function(folderType) {
+    const content = document.getElementById(`fulfill-${folderType}-folder-content`);
+    const chevron = document.getElementById(`fulfill-${folderType}-chevron`);
+    if (!content) return;
+    const isClosed = content.style.display === "none";
+    if (isClosed) {
+        content.style.display = "block";
+        if (chevron) chevron.textContent = "▼";
+    } else {
+        content.style.display = "none";
+        if (chevron) chevron.textContent = "▶";
+    }
+    if (typeof updateFulfillFolderBadges === "function") {
+        updateFulfillFolderBadges();
+    }
+};
+
+window.updateFulfillFolderBadges = function() {
+    const linkRows = document.querySelectorAll("#fulfill-links-inputs-wrapper .fulfill-link-row");
+    const streamRows = document.querySelectorAll("#fulfill-streams-inputs-wrapper .fulfill-stream-row");
+    
+    let filledLinksCount = 0;
+    linkRows.forEach(r => {
+        const inp = r.querySelector(".fulfill-link-url-input");
+        if (inp && inp.value.trim()) filledLinksCount++;
+    });
+    
+    let filledStreamsCount = 0;
+    streamRows.forEach(r => {
+        const inp = r.querySelector(".fulfill-stream-url-input");
+        if (inp && inp.value.trim()) filledStreamsCount++;
+    });
+
+    const linksBadge = document.getElementById("fulfill-links-badge");
+    if (linksBadge) {
+        if (filledLinksCount > 0) {
+            linksBadge.textContent = `${filledLinksCount} Link${filledLinksCount > 1 ? 's' : ''}`;
+            linksBadge.style.background = "rgba(255, 188, 0, 0.15)";
+            linksBadge.style.color = "#ffbc00";
+            linksBadge.style.borderColor = "rgba(255, 188, 0, 0.3)";
+        } else {
+            linksBadge.textContent = `${linkRows.length} Slot${linkRows.length > 1 ? 's' : ''}`;
+            linksBadge.style.background = "rgba(255, 255, 255, 0.05)";
+            linksBadge.style.color = "var(--text-secondary)";
+            linksBadge.style.borderColor = "rgba(255, 255, 255, 0.1)";
+        }
+    }
+
+    const streamsBadge = document.getElementById("fulfill-streams-badge");
+    if (streamsBadge) {
+        if (filledStreamsCount > 0) {
+            streamsBadge.textContent = `${filledStreamsCount} Stream${filledStreamsCount > 1 ? 's' : ''}`;
+            streamsBadge.style.background = "rgba(76, 217, 100, 0.15)";
+            streamsBadge.style.color = "#4cd964";
+            streamsBadge.style.borderColor = "rgba(76, 217, 100, 0.3)";
+        } else {
+            streamsBadge.textContent = "+ Click to input";
+            streamsBadge.style.background = "rgba(255, 255, 255, 0.05)";
+            streamsBadge.style.color = "var(--text-secondary)";
+            streamsBadge.style.borderColor = "rgba(255, 255, 255, 0.1)";
+        }
+    }
+};
+
 window.closeFulfillRequestModal = function() {
     if (currentFulfillDocIds && currentFulfillDocIds.length > 0) {
         releaseClaimLock(currentFulfillTitle, currentFulfillDocIds);
@@ -6833,11 +6898,13 @@ function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", i
     urlInput.placeholder = isSeries ? `Paste download URL for Season ${seasonNum}...` : `Paste download URL for ${normQuality}...`;
     urlInput.style.cssText = "flex: 1; min-width: 140px; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; outline: none; box-sizing: border-box;";
 
+    urlInput.addEventListener("input", () => { if (typeof updateFulfillFolderBadges === "function") updateFulfillFolderBadges(); });
     if (isRequested && !defaultUrl) {
         setTimeout(() => urlInput.focus(), 100);
     }
 
     row.appendChild(labelBadge);
+    urlInput.addEventListener("input", () => { if (typeof updateFulfillFolderBadges === "function") updateFulfillFolderBadges(); });
     row.appendChild(urlInput);
 
     if (!isSeries) {
@@ -6959,6 +7026,27 @@ function renderFulfillStreamLinksInputs(existingMovie, isSeries = true, reqSpec 
         });
     } else {
         addFulfillStreamLinkInputRow(0, "", "720p", isSeries, true, 1);
+    }
+    const hasAnyRealStream = existingStreams.some(s => s && (s.url || s.stream_url));
+    const streamsFolderContent = document.getElementById("fulfill-streams-folder-content");
+    const streamsChevron = document.getElementById("fulfill-streams-chevron");
+    if (streamsFolderContent) {
+        if (hasAnyRealStream) {
+            streamsFolderContent.style.display = "block";
+            if (streamsChevron) streamsChevron.textContent = "▼";
+        } else {
+            streamsFolderContent.style.display = "none";
+            if (streamsChevron) streamsChevron.textContent = "▶";
+        }
+    }
+    const linksFolderContent = document.getElementById("fulfill-links-folder-content");
+    const linksChevron = document.getElementById("fulfill-links-chevron");
+    if (linksFolderContent) {
+        linksFolderContent.style.display = "block";
+        if (linksChevron) linksChevron.textContent = "▼";
+    }
+    if (typeof updateFulfillFolderBadges === "function") {
+        updateFulfillFolderBadges();
     }
 }
 
