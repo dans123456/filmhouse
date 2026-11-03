@@ -36512,7 +36512,14 @@
     "trailer": "l7zAV_MDC68",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQADHBoAAnavkUb4FrjTd-1dOxYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADHBoAAnavkUb4FrjTd-1dOxYE",
+        "quality": "720p"
+      },
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADYRcAAhzcUEejW-lcWK_HtRYE",
+        "quality": "2160p (4K)"
+      }
     ]
   },
   {
