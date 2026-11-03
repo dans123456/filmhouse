@@ -10095,3 +10095,107 @@ window.markSeasonCompleted = async function(series) {
 };
 
 
+
+// ==========================================
+// ONGOING SERIES TRACKER - ADD SERIES MODAL
+// ==========================================
+window.openAddTrackSeriesModal = function() {
+    const modal = document.getElementById("track-series-modal");
+    if (!modal) return;
+    modal.classList.add("active");
+    const input = document.getElementById("track-series-search-input");
+    if (input) {
+        input.value = "";
+        setTimeout(() => input.focus(), 100);
+        if (!input._bound) {
+            input._bound = true;
+            input.addEventListener("input", (e) => {
+                renderTrackSeriesSearch(e.target.value);
+            });
+        }
+    }
+    renderTrackSeriesSearch("");
+};
+
+window.closeAddTrackSeriesModal = function() {
+    const modal = document.getElementById("track-series-modal");
+    if (modal) modal.classList.remove("active");
+};
+
+window.renderTrackSeriesSearch = function(query = "") {
+    const list = document.getElementById("track-series-results-list");
+    if (!list) return;
+    list.replaceChildren();
+
+    const q = (query || "").toLowerCase().trim();
+    const seriesOnly = allCatalogMovies.filter(m => {
+        const t = (m.type || "").toLowerCase();
+        return t === "series" || t === "tv";
+    });
+
+    const matches = seriesOnly.filter(m => {
+        if (!q) return true;
+        const titleMatch = (m.title || "").toLowerCase().includes(q);
+        const tmdbMatch = String(m.tmdb_id || "").includes(q) || String(m.csv_id || "").includes(q);
+        return titleMatch || tmdbMatch;
+    }).slice(0, 30);
+
+    if (matches.length === 0) {
+        list.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 12px;">No matching series found in catalog.</div>';
+        return;
+    }
+
+    matches.forEach(m => {
+        const card = document.createElement("div");
+        card.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; gap: 10px;";
+        
+        const isAlreadyOngoing = m.status === "Ongoing";
+
+        card.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                <img src="${m.poster || 'img/FilmHouse3_nobg.png'}" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" onerror="this.src='img/FilmHouse3_nobg.png'">
+                <div style="min-width: 0;">
+                    <div style="font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(m.title)}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); display: flex; gap: 8px; margin-top: 2px;">
+                        <span>${m.year || 'Series'}</span>
+                        <span>TMDB: ${m.tmdb_id || m.csv_id || 'N/A'}</span>
+                        <span style="color: ${isAlreadyOngoing ? '#4cd964' : 'var(--text-muted)'}; font-weight: 600;">${m.status || 'Not Tracked'}</span>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm ${isAlreadyOngoing ? 'btn-secondary' : 'btn-primary'}" style="padding: 6px 12px; font-size: 11px; font-weight: 700; flex-shrink: 0; border-radius: 6px;" onclick="startTrackingSeries('${m.csv_id}', '${m.tmdb_id || m.csv_id}')">
+                ${isAlreadyOngoing ? '✓ Tracked' : '+ Track'}
+            </button>
+        `;
+        list.appendChild(card);
+    });
+};
+
+window.startTrackingSeries = async function(csvId, tmdbId) {
+    if (!csvId) return;
+    try {
+        const movieIndex = allCatalogMovies.findIndex(m => String(m.csv_id) === String(csvId));
+        if (movieIndex !== -1) {
+            allCatalogMovies[movieIndex].status = "Ongoing";
+            allCatalogMovies[movieIndex].is_ongoing = true;
+        }
+
+        if (typeof db !== "undefined" && db) {
+            await db.collection("movies").doc(String(csvId)).set({
+                status: "Ongoing",
+                is_ongoing: true,
+                tmdb_id: parseInt(tmdbId, 10) || tmdbId,
+                last_updated_timestamp: new Date().toISOString()
+            }, { merge: true });
+        }
+
+        if (typeof showToast === "function") showToast("Series is now tracked as Ongoing! 📺", "success");
+        closeAddTrackSeriesModal();
+        if (typeof initOngoingSeriesTracker === "function") {
+            initOngoingSeriesTracker(true);
+        }
+    } catch (err) {
+        console.error("Failed to track series:", err);
+        if (typeof showToast === "function") showToast("Error tracking series: " + err.message, "error");
+    }
+};

@@ -11,23 +11,38 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY || "d638f7775bfa1b8d456dfd028ccbef
 const DEFAULT_ADMIN_IDS = ["1175336733", "1329840839"];
 
 /**
- * Resolves list of admin IDs to alert.
+ * Resolves list of admin IDs to alert (including dynamic admins stored in Firestore settings).
  */
-function getAdminRecipientIds() {
+async function getAdminRecipientIds(db = null) {
     const envIds = (process.env.ADMIN_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
-    return Array.from(new Set([...DEFAULT_ADMIN_IDS, ...envIds]));
+    const ids = new Set([...DEFAULT_ADMIN_IDS, ...envIds]);
+
+    if (db) {
+        try {
+            const adminDoc = await db.collection("settings").doc("admins").get();
+            if (adminDoc.exists) {
+                const data = adminDoc.data() || {};
+                const list = Array.isArray(data.admin_ids) ? data.admin_ids : (Array.isArray(data.list) ? data.list : []);
+                list.forEach(id => { if (id) ids.add(String(id)); });
+                if (data.master_id) ids.add(String(data.master_id));
+            }
+        } catch (e) {
+            console.warn("[SeriesTracker] Note reading settings/admins:", e.message);
+        }
+    }
+    return Array.from(ids);
 }
 
 /**
  * Sends a Telegram alert to all admins.
  */
-async function sendAdminSeriesAlert(botInstance, message, inlineKeyboard = null) {
+async function sendAdminSeriesAlert(botInstance, message, inlineKeyboard = null, db = null) {
     if (!botInstance) {
         console.log("[SeriesTracker] (Dry-Run Alert):", message);
         return;
     }
 
-    const adminIds = getAdminRecipientIds();
+    const adminIds = await getAdminRecipientIds(db);
     const extra = inlineKeyboard ? { reply_markup: { inline_keyboard: inlineKeyboard } } : {};
 
     for (const adminId of adminIds) {
@@ -166,7 +181,7 @@ async function runSeriesTrackerCycle(db, botInstance = null) {
                                 `📦 Upload Status: Episode ${lastUploaded} of ${updatedTotalEpisodes || "?"}\n\n` +
                                 `👉 <i>Please upload the streaming token and download link in Admin Panel.</i>`;
 
-                            await sendAdminSeriesAlert(botInstance, alertMsg);
+                            await sendAdminSeriesAlert(botInstance, alertMsg, null, db);
                             stats.alertsSent++;
                             console.log(`[SeriesTracker] Alerted admins for ${seriesTitle} S${airedSeason}E${airedEpNumber}`);
 
