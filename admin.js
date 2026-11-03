@@ -413,17 +413,22 @@ function parseBulkStreams(rawText, isSeries) {
 function extractMovieStreams(targetMovie) {
     if (!targetMovie) return [];
     
-    if (Array.isArray(targetMovie.stream_links) && targetMovie.stream_links.length > 0) {
-        return targetMovie.stream_links.map((s, idx) => {
-            const token = cleanStreamInput(typeof s === 'object' && s !== null ? (s.stream_url || s.url || '') : s);
-            return {
-                episode: (typeof s === 'object' && s !== null && s.episode) ? parseInt(s.episode, 10) : (idx + 1),
-                season: (typeof s === 'object' && s !== null && s.season) ? parseInt(s.season, 10) : 1,
-                quality: (typeof s === 'object' && s !== null && s.quality) ? s.quality : '720p',
-                stream_url: token,
-                url: token
-            };
-        }).filter(s => !!s.stream_url);
+    if (Array.isArray(targetMovie.stream_links)) {
+        if (targetMovie.stream_links.length > 0) {
+            return targetMovie.stream_links.map((s, idx) => {
+                const token = cleanStreamInput(typeof s === 'object' && s !== null ? (s.stream_url || s.url || '') : s);
+                return {
+                    episode: (typeof s === 'object' && s !== null && s.episode) ? parseInt(s.episode, 10) : (idx + 1),
+                    season: (typeof s === 'object' && s !== null && s.season) ? parseInt(s.season, 10) : 1,
+                    quality: (typeof s === 'object' && s !== null && s.quality) ? s.quality : '720p',
+                    stream_url: token,
+                    url: token
+                };
+            }).filter(s => !!s.stream_url);
+        } else if (targetMovie.stream_url === "" || targetMovie.stream_url === undefined) {
+            // Explicitly cleared empty streams array, do not resurrect old stream_url from links
+            return [];
+        }
     }
     
     // Check links array for stream_urls
@@ -2994,6 +2999,15 @@ function showMovieDetails(movie) {
                         <option value="Series" ${(movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv' ? 'selected' : ''}>Series (TV)</option>
                     </select>
                 </div>
+                <div id="edit-series-status-wrapper" style="flex: 1; display: ${isSeries ? 'flex' : 'none'}; flex-direction: column; gap: 4px; min-width: 140px;">
+                    <label style="font-size: 11px; color: #ffbc00; text-transform: uppercase; font-weight: bold;">Series Tracker Status</label>
+                    <select id="edit-movie-status" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid rgba(255, 188, 0, 0.4); border-radius: 4px; color: #fff; font-size: 13px; width: 100%;">
+                        <option value="" ${!movie.status ? 'selected' : ''}>⚪ Standard / Untracked</option>
+                        <option value="Ongoing" ${movie.status === 'Ongoing' ? 'selected' : ''}>🟢 Ongoing (Active Releases)</option>
+                        <option value="On Break" ${movie.status === 'On Break' ? 'selected' : ''}>🟡 On Break (Between Seasons)</option>
+                        <option value="Completed" ${movie.status === 'Completed' ? 'selected' : ''}>🔵 Completed (Finished Series)</option>
+                    </select>
+                </div>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%;">
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
@@ -3167,6 +3181,7 @@ function showMovieDetails(movie) {
                     <span style="font-size: 10px; color: var(--text-muted);">Saves immediately to this title in your catalog</span>
                     <div style="display: flex; gap: 8px;">
                         <button type="button" class="btn btn-secondary btn-sm" id="btn-quick-streams-cancel" style="font-size: 11px; padding: 4px 10px; cursor: pointer;">Cancel</button>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-quick-streams" style="font-size: 11px; padding: 4px 10px; cursor: pointer; color: #ff3b30; border-color: rgba(255, 59, 48, 0.35); background: rgba(255, 59, 48, 0.08);">🗑️ Clear Streams</button>
                         <button type="button" class="btn btn-primary btn-sm" id="btn-save-quick-streams" style="font-size: 11px; padding: 4px 14px; cursor: pointer; font-weight: 700;">💾 Save Streams</button>
                     </div>
                 </div>
@@ -3389,6 +3404,7 @@ function showMovieDetails(movie) {
     const quickStreamsDrawer = document.getElementById("details-quick-streams-drawer");
     const quickStreamsInput = document.getElementById("details-quick-streams-input");
     const quickStreamsCancel = document.getElementById("btn-quick-streams-cancel");
+    const quickStreamsClear = document.getElementById("btn-clear-quick-streams");
     const quickStreamsSave = document.getElementById("btn-save-quick-streams");
 
     if (quickStreamsToggle && quickStreamsDrawer) {
@@ -3407,18 +3423,74 @@ function showMovieDetails(movie) {
         });
     }
 
+    if (quickStreamsClear) {
+        quickStreamsClear.addEventListener("click", () => {
+            const movieIndex = allCatalogMovies.findIndex(m => m.csv_id === movie.csv_id);
+            if (movieIndex === -1) return;
+            if (!confirm(`Are you sure you want to remove all streaming links from "${allCatalogMovies[movieIndex].title}"?`)) return;
+
+            allCatalogMovies[movieIndex].stream_links = [];
+            allCatalogMovies[movieIndex].stream_url = "";
+            if (Array.isArray(allCatalogMovies[movieIndex].links)) {
+                allCatalogMovies[movieIndex].links.forEach(l => {
+                    if (typeof l === 'object' && l !== null) {
+                        delete l.stream_url;
+                        l.stream_url = "";
+                    }
+                });
+            }
+
+            const currentId = allCatalogMovies[movieIndex].csv_id;
+            if (!newlyUpdatedIds.includes(currentId) && !newlyAddedIds.includes(currentId)) {
+                newlyUpdatedIds.push(currentId);
+            }
+
+            currentStreams = [];
+            currentEditStreams = [isSeries ? { episode: 1, season: 1, stream_url: "" } : { quality: "720p", stream_url: "" }];
+
+            catalogChangesMade = true;
+            renderCatalogList();
+            updatePublishButtonState();
+
+            // Refresh read-only list & badge
+            const viewList = document.getElementById("details-streams-view-list");
+            if (viewList) {
+                viewList.innerHTML = renderDetailsStreamsReadOnlyHTML([], allCatalogMovies[movieIndex], isSeries);
+            }
+            const statusBadge = document.getElementById("details-streaming-status-badge");
+            if (statusBadge) {
+                statusBadge.textContent = "⚪ No Streams Attached";
+                statusBadge.style.cssText = "font-size: 10px; color: var(--text-muted); background: rgba(255, 255, 255, 0.05); padding: 2px 8px; border-radius: 10px;";
+            }
+
+            quickStreamsDrawer.style.display = "none";
+            if (quickStreamsToggle) quickStreamsToggle.textContent = "⚡ Quick Add / Update Streams";
+            if (quickStreamsInput) quickStreamsInput.value = "";
+
+            if (typeof showToast === 'function') {
+                showToast(`🗑️ Removed all streams from "${allCatalogMovies[movieIndex].title}". Remember to Publish!`, "info");
+            } else {
+                alert(`🗑️ Removed all streams from "${allCatalogMovies[movieIndex].title}". Click 'Publish Changes 🚀' to save to GitHub.`);
+            }
+        });
+    }
+
     if (quickStreamsSave && quickStreamsInput) {
         quickStreamsSave.addEventListener("click", () => {
             const isCurrentSeries = (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
             const parsed = parseBulkStreams(quickStreamsInput.value, isCurrentSeries);
-            if (parsed.length === 0) {
-                alert("Please paste at least one valid stream token or URL!");
-                return;
-            }
-
             const movieIndex = allCatalogMovies.findIndex(m => m.csv_id === movie.csv_id);
             if (movieIndex === -1) {
                 alert("Error: Title not found in catalog.");
+                return;
+            }
+
+            if (parsed.length === 0) {
+                if (confirm(`No stream tokens entered. Would you like to clear all streaming links for "${allCatalogMovies[movieIndex].title}"?`)) {
+                    if (quickStreamsClear) quickStreamsClear.click();
+                } else {
+                    alert("Please paste at least one valid stream token or URL!");
+                }
                 return;
             }
 
@@ -3432,8 +3504,22 @@ function showMovieDetails(movie) {
 
             allCatalogMovies[movieIndex].stream_links = formattedStreams;
             allCatalogMovies[movieIndex].stream_url = formattedStreams[0].stream_url;
-            if (allCatalogMovies[movieIndex].links && allCatalogMovies[movieIndex].links.length > 0) {
-                allCatalogMovies[movieIndex].links[0].stream_url = formattedStreams[0].stream_url;
+            if (Array.isArray(allCatalogMovies[movieIndex].links)) {
+                allCatalogMovies[movieIndex].links.forEach((l, idx) => {
+                    if (typeof l === 'object' && l !== null) {
+                        if (idx === 0) {
+                            l.stream_url = formattedStreams[0].stream_url;
+                        } else if (!isCurrentSeries) {
+                            const match = formattedStreams.find(fs => normalizeQualityName(fs.quality) === normalizeQualityName(l.quality));
+                            if (match) l.stream_url = match.stream_url;
+                            else { delete l.stream_url; l.stream_url = ""; }
+                        } else {
+                            const match = formattedStreams.find(fs => (fs.episode || 1) === (idx + 1));
+                            if (match) l.stream_url = match.stream_url;
+                            else { delete l.stream_url; l.stream_url = ""; }
+                        }
+                    }
+                });
             }
 
             const currentId = allCatalogMovies[movieIndex].csv_id;
@@ -3741,6 +3827,10 @@ function showMovieDetails(movie) {
     const editTypeSelect = document.getElementById("edit-movie-type");
     if (editTypeSelect) {
         editTypeSelect.addEventListener("change", () => {
+            const statusWrapper = document.getElementById("edit-series-status-wrapper");
+            if (statusWrapper) {
+                statusWrapper.style.display = editTypeSelect.value === 'Series' ? 'flex' : 'none';
+            }
             renderLinkInputs();
             renderDetailsStreamInputs();
         });
@@ -3778,6 +3868,7 @@ function showMovieDetails(movie) {
             const newTitle = document.getElementById("edit-movie-title")?.value.trim();
             const newId = document.getElementById("edit-movie-id")?.value.trim();
             const newType = document.getElementById("edit-movie-type")?.value;
+            const newStatus = document.getElementById("edit-movie-status")?.value || "";
             const newPoster = document.getElementById("edit-movie-poster")?.value.trim();
             const newBackdrop = document.getElementById("edit-movie-backdrop")?.value.trim();
             const newOverview = document.getElementById("edit-movie-overview")?.value.trim() || "";
@@ -3803,8 +3894,56 @@ function showMovieDetails(movie) {
                 allCatalogMovies[movieIndex].links = finalLinks;
                 allCatalogMovies[movieIndex].stream_links = finalStreams;
                 allCatalogMovies[movieIndex].stream_url = cleanStreamVal;
-                if (cleanStreamVal && allCatalogMovies[movieIndex].links && allCatalogMovies[movieIndex].links.length > 0) {
-                    allCatalogMovies[movieIndex].links[0].stream_url = cleanStreamVal;
+
+                // Synchronize stream_url across movie links, or completely clear if removed
+                if (Array.isArray(allCatalogMovies[movieIndex].links)) {
+                    allCatalogMovies[movieIndex].links.forEach((l, idx) => {
+                        if (typeof l === 'object' && l !== null) {
+                            if (!cleanStreamVal) {
+                                delete l.stream_url;
+                                l.stream_url = "";
+                            } else if (idx === 0) {
+                                l.stream_url = cleanStreamVal;
+                            } else if (!isSeriesType) {
+                                const match = finalStreams.find(fs => normalizeQualityName(fs.quality) === normalizeQualityName(l.quality));
+                                if (match) l.stream_url = match.stream_url;
+                                else { delete l.stream_url; l.stream_url = ""; }
+                            } else {
+                                const match = finalStreams.find(fs => (fs.episode || 1) === (idx + 1));
+                                if (match) l.stream_url = match.stream_url;
+                                else { delete l.stream_url; l.stream_url = ""; }
+                            }
+                        }
+                    });
+                }
+
+                // Handle Series Ongoing tracker status
+                if (newType === 'Series') {
+                    if (newStatus) {
+                        allCatalogMovies[movieIndex].status = newStatus;
+                        allCatalogMovies[movieIndex].is_ongoing = (newStatus === "Ongoing" || newStatus === "On Break");
+                    } else {
+                        delete allCatalogMovies[movieIndex].status;
+                        allCatalogMovies[movieIndex].is_ongoing = false;
+                    }
+                } else {
+                    delete allCatalogMovies[movieIndex].status;
+                    allCatalogMovies[movieIndex].is_ongoing = false;
+                }
+
+                // Sync status to Firestore in the background if db is initialized
+                if (typeof db !== "undefined" && db) {
+                    const updatePayload = {
+                        last_updated_timestamp: new Date().toISOString()
+                    };
+                    if (newType === 'Series' && newStatus) {
+                        updatePayload.status = newStatus;
+                        updatePayload.is_ongoing = (newStatus === "Ongoing" || newStatus === "On Break");
+                    } else {
+                        updatePayload.status = null;
+                        updatePayload.is_ongoing = false;
+                    }
+                    db.collection("movies").doc(String(newId)).set(updatePayload, { merge: true }).catch(() => {});
                 }
                 allCatalogMovies[movieIndex].poster = newPoster || "img/FilmHouse3_nobg.png";
                 allCatalogMovies[movieIndex].backdrop = newBackdrop || "img/FilmHouse.png";
@@ -7125,6 +7264,9 @@ function addFulfillStreamLinkInputRow(idx, defaultUrl = "", defaultQuality = "72
         } else {
             testBtn.style.display = "none";
         }
+        if (typeof updateFulfillFolderBadges === "function") {
+            updateFulfillFolderBadges();
+        }
     });
 
     row.appendChild(testBtn);
@@ -7134,7 +7276,12 @@ function addFulfillStreamLinkInputRow(idx, defaultUrl = "", defaultQuality = "72
     removeBtn.textContent = "✕";
     removeBtn.title = "Remove Stream";
     removeBtn.style.cssText = "background: rgba(255, 59, 48, 0.2); color: #ff3b30; border: none; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;";
-    removeBtn.onclick = () => row.remove();
+    removeBtn.onclick = () => {
+        row.remove();
+        if (typeof updateFulfillFolderBadges === "function") {
+            updateFulfillFolderBadges();
+        }
+    };
     row.appendChild(removeBtn);
 
     wrapper.appendChild(row);
@@ -7297,13 +7444,32 @@ if (fulfillForm && fulfillRequestModal) {
                 existingMovie.stream_url = cleanStreamVal;
                 existingMovie.stream_links = validFulfillStreams;
                 if (existingMovie.links && existingMovie.links.length > 0) {
-                    existingMovie.links[0].stream_url = cleanStreamVal;
-                    if (!isSeries) {
-                        existingMovie.links.forEach(l => {
-                            const match = validFulfillStreams.find(vs => normalizeQualityName(vs.quality) === normalizeQualityName(l.quality));
-                            if (match) l.stream_url = match.stream_url;
-                        });
-                    }
+                    existingMovie.links.forEach((l, idx) => {
+                        if (typeof l === 'object' && l !== null) {
+                            if (idx === 0) {
+                                l.stream_url = cleanStreamVal;
+                            } else if (!isSeries) {
+                                const match = validFulfillStreams.find(vs => normalizeQualityName(vs.quality) === normalizeQualityName(l.quality));
+                                if (match) l.stream_url = match.stream_url;
+                                else { delete l.stream_url; l.stream_url = ""; }
+                            } else {
+                                const match = validFulfillStreams.find(vs => (vs.episode || 1) === (idx + 1));
+                                if (match) l.stream_url = match.stream_url;
+                                else { delete l.stream_url; l.stream_url = ""; }
+                            }
+                        }
+                    });
+                }
+            } else {
+                existingMovie.stream_url = "";
+                existingMovie.stream_links = [];
+                if (existingMovie.links && existingMovie.links.length > 0) {
+                    existingMovie.links.forEach(l => {
+                        if (typeof l === 'object' && l !== null) {
+                            delete l.stream_url;
+                            l.stream_url = "";
+                        }
+                    });
                 }
             }
 

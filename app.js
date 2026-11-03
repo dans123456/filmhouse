@@ -3910,6 +3910,39 @@ function updateMediaSeriesTracker(movie, isTVShow) {
         return;
     }
 
+    const status = movie.status || null;
+    const isExplicitOngoing = status === "Ongoing" || status === "On Break" || movie.is_ongoing === true;
+    const hasUpcomingAirDate = !!(movie.next_air_date && new Date(movie.next_air_date) >= new Date());
+
+    if (!isExplicitOngoing && !hasUpcomingAirDate) {
+        // Untracked series, finished classic show (e.g. 1990 series), or ended series: hide tracker banner!
+        banner.style.display = "none";
+        
+        // Background check: did admin mark it Ongoing in Firestore?
+        if (typeof db !== "undefined" && db && movie.csv_id) {
+            db.collection("movies").doc(String(movie.csv_id)).get()
+                .then(docSnap => {
+                    if (docSnap && docSnap.exists) {
+                        const d = docSnap.data() || {};
+                        if (d.status === "Ongoing" || d.status === "On Break" || d.is_ongoing) {
+                            movie.status = d.status || "Ongoing";
+                            movie.is_ongoing = true;
+                            if (d.next_air_date) movie.next_air_date = d.next_air_date;
+                            if (d.total_episodes) movie.total_episodes = d.total_episodes;
+                            if (d.last_uploaded_episode) movie.last_uploaded_episode = d.last_uploaded_episode;
+                            updateMediaSeriesTracker(movie, true);
+                        }
+                    }
+                }).catch(() => {});
+        }
+        return;
+    }
+
+    if (status === "Completed") {
+        banner.style.display = "none";
+        return;
+    }
+
     banner.style.display = "flex";
 
     const statusPill = document.getElementById("media-series-status-pill");
@@ -4122,11 +4155,20 @@ function openMediaDetailPage(movie) {
     movie.rating = movie.rating || 0;
     movie.release_date = movie.release_date || "";
 
-    const isTVShow = (movie.type || "").toLowerCase() === "series" || 
-                     (movie.type || "").toLowerCase() === "tv" || 
-                     (movie.type || "").toLowerCase() === "show" ||
-                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series"))) ||
-                     (movie.links && Array.isArray(movie.links) && movie.links.some(l => l && (l.season || l.episode)));
+    const explicitType = (movie.type || "").toLowerCase();
+    const hasExplicitSeriesCategory = movie.categories && movie.categories.some(c => {
+        const lc = c.toLowerCase();
+        return lc === "hollywood/british series" || lc === "anime series" || lc === "asian drama" || lc === "korean drama";
+    });
+    const hasSeasonLinks = movie.links && Array.isArray(movie.links) && movie.links.some(l => l && (l.season || l.episode));
+    
+    // An item is a TV series only if explicitly marked as Series/TV/Show, or has season links,
+    // or has a dedicated series category while NOT explicitly marked as Movie.
+    const isTVShow = explicitType === "series" || 
+                     explicitType === "tv" || 
+                     explicitType === "show" || 
+                     hasSeasonLinks || 
+                     (hasExplicitSeriesCategory && explicitType !== "movie");
     movie.type = isTVShow ? "Series" : "Movie";
 
     navigateToScreen("media-detail");
@@ -5564,8 +5606,10 @@ function fetchTmdbDetailsForMedia(movie) {
                         movie.status = "Completed";
                     } else if (data.next_episode_to_air) {
                         movie.status = "Ongoing";
-                    } else {
+                    } else if (data.in_production) {
                         movie.status = "On Break";
+                    } else {
+                        movie.status = "Completed";
                     }
                 }
             }
