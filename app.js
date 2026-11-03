@@ -4110,6 +4110,198 @@ function updateMediaSeriesTracker(movie, isTVShow) {
     }
 }
 
+// =========================================================================
+// Unreleased Movie Premiere Tracker & Push Notification System
+// =========================================================================
+
+function isMovieUnreleased(movie) {
+    if (!movie) return false;
+    
+    // If the movie has streaming or uploaded download links, it is already released
+    const hasUploadedLinks = movie.links && Array.isArray(movie.links) && movie.links.some(l => {
+        const u = typeof l === 'object' && l !== null ? (l.url || l.stream_url) : l;
+        return u && String(u).trim().length > 0;
+    });
+    if (hasUploadedLinks || movie.stream_url) return false;
+
+    // Check release date against current date
+    if (movie.release_date) {
+        const rel = new Date(movie.release_date);
+        if (!isNaN(rel.getTime())) {
+            const today = new Date();
+            const utcToday = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+            const utcRel = Date.UTC(rel.getFullYear(), rel.getMonth(), rel.getDate());
+            if (utcRel > utcToday) return true;
+        }
+    }
+
+    // Check TMDB production status
+    const status = (movie.status || "").toLowerCase();
+    if (status === "planned" || status === "in production" || status === "post production") {
+        return true;
+    }
+
+    // Future year detection if release date is just a year
+    if (movie.year) {
+        const yr = parseInt(String(movie.year).replace(/\D/g, '').slice(0, 4), 10);
+        const currentYear = new Date().getFullYear();
+        if (yr > currentYear) return true;
+    }
+
+    return false;
+}
+
+function formatFriendlyReleaseDate(dateStr) {
+    if (!dateStr) return "Coming Soon";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
+function getLocalMovieReleaseReminders() {
+    try {
+        const val = localStorage.getItem("filmhouse_movie_reminders");
+        return val ? JSON.parse(val) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function setLocalMovieReleaseReminder(tmdbId, isSubscribed) {
+    try {
+        let subs = getLocalMovieReleaseReminders();
+        const numId = Number(tmdbId);
+        if (isSubscribed) {
+            if (!subs.includes(numId)) subs.push(numId);
+        } else {
+            subs = subs.filter(id => id !== numId);
+        }
+        localStorage.setItem("filmhouse_movie_reminders", JSON.stringify(subs));
+    } catch (e) {}
+}
+
+function updateMovieReleaseTracker(movie, isTVShow) {
+    const banner = document.getElementById("media-movie-unreleased-banner");
+    if (!banner) return;
+
+    if (isTVShow || !isMovieUnreleased(movie)) {
+        banner.style.display = "none";
+        return;
+    }
+
+    banner.style.display = "flex";
+
+    const pill = document.getElementById("media-movie-unreleased-pill");
+    const pillText = document.getElementById("media-movie-unreleased-text");
+    const dateText = document.getElementById("media-movie-unreleased-date");
+    const notifyBtn = document.getElementById("btn-movie-unreleased-notify");
+    const notifyIcon = document.getElementById("movie-unreleased-notify-icon");
+    const notifyLabel = document.getElementById("movie-unreleased-notify-label");
+
+    // Extract TMDB ID
+    let tmdbId = movie.tmdb_id;
+    if (!tmdbId && movie.id && !isNaN(parseInt(movie.id, 10))) tmdbId = parseInt(movie.id, 10);
+    if (!tmdbId && movie.csv_id) {
+        const p = parseInt(String(movie.csv_id).split("-")[0], 10);
+        if (!isNaN(p)) tmdbId = p;
+    }
+
+    const friendlyDate = formatFriendlyReleaseDate(movie.release_date);
+    if (pillText) pillText.textContent = `In Theatres: ${friendlyDate}`;
+    if (dateText) dateText.textContent = "Unreleased title • Automatic Telegram notification on release";
+
+    const userId = (state.user && state.user.id) ? String(state.user.id).trim() : null;
+
+    function renderReminderState(isSub) {
+        if (!notifyBtn) return;
+        if (isSub) {
+            notifyBtn.classList.add("is-subscribed");
+            if (notifyIcon) notifyIcon.textContent = "🔕";
+            if (notifyLabel) notifyLabel.textContent = "Subscribed";
+            notifyBtn.setAttribute("aria-label", "Unsubscribe from Release Alerts");
+        } else {
+            notifyBtn.classList.remove("is-subscribed");
+            if (notifyIcon) notifyIcon.textContent = "🔔";
+            if (notifyLabel) notifyLabel.textContent = "Notify Me";
+            notifyBtn.setAttribute("aria-label", "Notify Me on Official Release");
+        }
+    }
+
+    const localReminders = getLocalMovieReleaseReminders();
+    const isInitiallySubbed = tmdbId ? localReminders.includes(Number(tmdbId)) : false;
+    renderReminderState(isInitiallySubbed);
+
+    // Sync from Firestore in background
+    if (userId && tmdbId && typeof db !== "undefined" && db) {
+        const docId = `${userId}_${tmdbId}`;
+        db.collection("release_reminders").doc(docId).get()
+            .then(docSnap => {
+                if (docSnap && docSnap.exists) {
+                    renderReminderState(true);
+                    setLocalMovieReleaseReminder(tmdbId, true);
+                } else {
+                    renderReminderState(false);
+                    setLocalMovieReleaseReminder(tmdbId, false);
+                }
+            })
+            .catch(() => {});
+    }
+
+    if (notifyBtn) {
+        notifyBtn.onclick = async (e) => {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            if (!tmdbId) {
+                if (typeof showToast === "function") showToast("Movie ID missing for release notification", "error");
+                return;
+            }
+
+            const isCurrentSub = notifyBtn.classList.contains("is-subscribed");
+            const targetSub = !isCurrentSub;
+
+            if (typeof triggerHaptic === "function") triggerHaptic(targetSub ? "medium" : "light");
+
+            renderReminderState(targetSub);
+            setLocalMovieReleaseReminder(tmdbId, targetSub);
+
+            if (targetSub) {
+                if (typeof showToast === "function") {
+                    showToast(`🔔 Release reminder set! You'll be alerted on Telegram when "${movie.title}" premieres! 🍿`, "success");
+                }
+            } else {
+                if (typeof showToast === "function") {
+                    showToast("🔕 Release reminder cancelled.", "info");
+                }
+            }
+
+            if (typeof db !== "undefined" && db && userId) {
+                const docId = `${userId}_${tmdbId}`;
+                const docRef = db.collection("release_reminders").doc(docId);
+                try {
+                    if (targetSub) {
+                        await docRef.set({
+                            user_id: String(userId),
+                            user_name: state.user.username || state.user.fullName || state.user.firstName || `User ${userId}`,
+                            tmdb_id: Number(tmdbId),
+                            movie_title: movie.title || "Upcoming Movie",
+                            release_date: movie.release_date || "",
+                            poster: movie.poster || "",
+                            status: "pending",
+                            subscribed_at: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        await docRef.delete();
+                    }
+                } catch (err) {
+                    console.error("Firestore release reminder error:", err);
+                    renderReminderState(isCurrentSub);
+                    setLocalMovieReleaseReminder(tmdbId, isCurrentSub);
+                }
+            }
+        };
+    }
+}
+
 function openMediaDetailPage(movie) {
     if (!movie) return;
 
@@ -4437,6 +4629,17 @@ function openMediaDetailPage(movie) {
             return;
         }
 
+        // Unreleased movies: Do not show stream request modal, trigger release notification instead
+        if (!streamTarget && !isTVShow && isMovieUnreleased(movie)) {
+            const btnNotify = document.getElementById("btn-movie-unreleased-notify");
+            if (btnNotify) {
+                btnNotify.click();
+            } else if (typeof showToast === "function") {
+                showToast(`🎬 "${movie.title}" hasn't premiered yet (${formatFriendlyReleaseDate(movie.release_date)}). Tap 'Notify Me' for release alerts!`, "info");
+            }
+            return;
+        }
+
         // Movies without stream: Do NOT kill the hero trailer! Show friendly Stream Request Confirmation modal
         const streamModal = document.getElementById("stream-request-modal");
         const streamDesc = document.getElementById("stream-request-modal-desc");
@@ -4513,6 +4716,7 @@ function openMediaDetailPage(movie) {
 
     // 7.5 TV Series Tracker & Notification Hub (Airing Status, Countdown, Subscribe)
     updateMediaSeriesTracker(movie, isTVShow);
+    updateMovieReleaseTracker(movie, isTVShow);
 
     // 8. Wire 5-Column Quick Actions (Watchlist, Watched, Subtitles, Like, Share)
     updateMediaQuickActions(movie);
@@ -4559,6 +4763,32 @@ function renderMediaDownloadRows(movie, container) {
         r.title && titlesMatch(r.title, movie.title) &&
         r.status === "fulfilled"
     );
+
+    // Unreleased movie check: Block impossible fulfillment downloads & requests, show release reminder box instead
+    if (!isTVShow && isMovieUnreleased(movie)) {
+        const unreleasedBox = document.createElement("div");
+        unreleasedBox.style.cssText = "text-align: center; padding: 22px 16px; color: var(--text-secondary); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 10px; background: rgba(255, 188, 0, 0.04); border: 1px dashed rgba(255, 188, 0, 0.3); border-radius: 8px;";
+        const friendlyDate = formatFriendlyReleaseDate(movie.release_date);
+        unreleasedBox.innerHTML = `
+            <div style="font-size: 26px;">🎬</div>
+            <strong style="color: #ffbc00; font-size: 14px;">Theatrical Release: ${friendlyDate}</strong>
+            <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4; max-width: 320px;">
+                "${escapeHTML(movie.title)}" has not premiered yet. Download options and quality files will open automatically once released!
+            </p>
+            <button type="button" class="btn btn-primary" id="btn-unreleased-reminder-action" style="padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 4px; display: inline-flex; align-items: center; gap: 6px;">
+                <span>🔔 Set Release Reminder</span>
+            </button>
+        `;
+        const actBtn = unreleasedBox.querySelector("#btn-unreleased-reminder-action");
+        if (actBtn) {
+            actBtn.onclick = () => {
+                const notifyBtn = document.getElementById("btn-movie-unreleased-notify");
+                if (notifyBtn) notifyBtn.click();
+            };
+        }
+        container.appendChild(unreleasedBox);
+        return;
+    }
 
     if (isTVShow) {
         // --- TV SHOW: Season downloads ---
@@ -10455,6 +10685,27 @@ function initManualRequestModal() {
             const enteredYear = (yearInput?.value || "").trim();
             const specs = selectedType === "Series" ? "All Seasons" : "Full Movie";
 
+            const yrNum = parseInt(enteredYear, 10);
+            const currentYear = new Date().getFullYear();
+            if (selectedType === "Movie" && !isNaN(yrNum) && yrNum > currentYear) {
+                // Future movie - register as release reminder instead of impossible admin request!
+                const userId = (state.user && state.user.id) ? String(state.user.id).trim() : null;
+                if (userId && typeof db !== "undefined" && db) {
+                    db.collection("release_reminders").add({
+                        user_id: String(userId),
+                        user_name: state.user.username || state.user.fullName || state.user.firstName || `User ${userId}`,
+                        movie_title: rawTitle,
+                        release_date: `${yrNum}-01-01`,
+                        status: "pending",
+                        subscribed_at: firebase.firestore.FieldValue.serverTimestamp()
+                    }).catch(() => {});
+                }
+                closeManualRequestModal();
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Submit Request 📩"; }
+                showToast(`🔔 "${rawTitle}" is scheduled for release in ${yrNum}. We've registered a Telegram release reminder for you!`, "success");
+                return;
+            }
+
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.textContent = "Submitting... ⏳";
@@ -11417,6 +11668,15 @@ function logMovieRequestToFirestore(movie, specs = "") {
 
 function showRequestSpecsDrawer(movie) {
     if (!movie) return;
+    if (isMovieUnreleased(movie)) {
+        const notifyBtn = document.getElementById("btn-movie-unreleased-notify");
+        if (notifyBtn) {
+            notifyBtn.click();
+        } else if (typeof showToast === "function") {
+            showToast(`🔔 "${movie.title}" hasn't premiered yet (${formatFriendlyReleaseDate(movie.release_date)}). We've set a release reminder for you instead!`, "info");
+        }
+        return;
+    }
     logMovieRequestToFirestore(movie);
     showConnectionDrawer("https://t.me/+09ahNmGdB1U2MzFk", ADSGRAM_REQUEST_BLOCK_ID);
 }
@@ -13465,6 +13725,7 @@ function createSearchOverlayCard(m) {
                     <span class="meta-tag genre-tag">${escapeHTML(genreStr)}</span>
                     <span class="meta-item">${m.release_date ? m.release_date.substring(0, 4) : (m.year || 'N/A')}</span>
                     <span class="meta-item rating-item">⭐ ${m.rating || 'N/A'}</span>
+                    ${isMovieUnreleased(m) ? `<span class="meta-tag" style="background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.4); color: #ffbc00; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px;">🗓️ In Theatres ${m.release_date ? m.release_date.substring(0, 7) : 'Soon'}</span>` : ''}
                 </div>
             </div>
             <button class="result-card-expand-btn" style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; color: rgba(255,255,255,0.4);" aria-label="Expand description">

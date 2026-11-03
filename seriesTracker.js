@@ -237,6 +237,57 @@ async function runSeriesTrackerCycle(db, botInstance = null) {
         console.warn("[SeriesTracker] Completed tag cleanup note:", cleanErr.message);
     }
 
+    // =========================================================================
+    // 3. MOVIE RELEASE REMINDERS DISPATCHER
+    // =========================================================================
+    try {
+        const remindersSnap = await db.collection("release_reminders")
+            .where("status", "==", "pending")
+            .limit(50)
+            .get();
+
+        for (const rDoc of remindersSnap.docs) {
+            const rData = rDoc.data();
+            const relDate = rData.release_date ? String(rData.release_date).split("T")[0] : null;
+            
+            // Check if release date has arrived (<= today)
+            if (relDate && relDate <= todayIso) {
+                const userTelegramId = rData.user_id;
+                const movieTitle = rData.movie_title || "Your requested movie";
+                
+                if (botInstance && userTelegramId) {
+                    try {
+                        const alertMsg = 
+                            `🍿 <b>"${movieTitle}" is Officially Released!</b>\n\n` +
+                            `Great news! The movie you asked to be alerted about has officially premiered (${relDate}).\n\n` +
+                            `👉 Open Film House now to stream or download:`;
+                        
+                        const miniAppUrl = "https://t.me/Filmhouse_robot/app";
+                        const keyboard = [[{ text: "🎬 Open Film House", url: miniAppUrl }]];
+                        
+                        if (typeof botInstance.telegram?.sendMessage === "function") {
+                            await botInstance.telegram.sendMessage(userTelegramId, alertMsg, { parse_mode: "HTML", reply_markup: { inline_keyboard: keyboard } });
+                        } else if (typeof botInstance.sendMessage === "function") {
+                            await botInstance.sendMessage(userTelegramId, alertMsg, { parse_mode: "HTML", reply_markup: { inline_keyboard: keyboard } });
+                        }
+                    } catch (sendErr) {
+                        console.warn(`[ReleaseReminder] Could not send reminder to user ${userTelegramId}:`, sendErr.message);
+                    }
+                }
+                
+                // Mark as notified
+                await rDoc.ref.set({
+                    status: "notified",
+                    notified_at: new Date().toISOString()
+                }, { merge: true });
+                stats.alertsSent++;
+                console.log(`[ReleaseReminder] Sent release alert for "${movieTitle}" to user ${userTelegramId}`);
+            }
+        }
+    } catch (reminderErr) {
+        console.warn("[ReleaseReminder] Error dispatching reminders:", reminderErr.message);
+    }
+
     console.log(`[SeriesTracker] Cycle Complete. Stats: Polled=${stats.polled}, Alerts=${stats.alertsSent}, Hiatus=${stats.hiatusMarked}, Cleaned=${stats.completedCleaned}, Errors=${stats.errors}\n`);
     return { success: true, stats };
 }

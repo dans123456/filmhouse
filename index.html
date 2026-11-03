@@ -805,6 +805,25 @@
                     </button>
                 </div>
 
+                <!-- Unreleased Movie Premiere Tracker & Push Notification Hub -->
+                <div class="series-tracker-banner unreleased-movie-banner" id="media-movie-unreleased-banner" style="display: none; background: linear-gradient(135deg, rgba(255, 188, 0, 0.12), rgba(255, 87, 34, 0.08)); border-color: rgba(255, 188, 0, 0.35);">
+                    <div class="series-tracker-info">
+                        <div class="series-tracker-badge-wrapper">
+                            <span class="series-status-pill variant-upcoming" id="media-movie-unreleased-pill" style="border-color: rgba(255, 188, 0, 0.4); color: #ffbc00; background: rgba(255, 188, 0, 0.15);">
+                                <span class="series-pulse-dot" style="background: #ffbc00;"></span>
+                                <span id="media-movie-unreleased-text">Coming Soon</span>
+                            </span>
+                        </div>
+                        <div class="series-tracker-meta">
+                            <span class="series-progress-text" id="media-movie-unreleased-date">Not yet released in cinemas</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-series-notify" id="btn-movie-unreleased-notify" aria-label="Toggle Movie Release Notification">
+                        <span class="notify-icon" id="movie-unreleased-notify-icon">🔔</span>
+                        <span class="notify-label" id="movie-unreleased-notify-label">Notify Me</span>
+                    </button>
+                </div>
+
                 <!-- 5-Column Quick Actions Grid (Watchlist, Watched, Subtitles, Like, Share) -->
                 <div class="media-quick-actions-grid">
                     <button type="button" class="media-quick-btn" id="btn-media-watchlist">
