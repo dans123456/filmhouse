@@ -52923,50 +52923,6 @@
     "tmdb_id": 214080
   },
   {
-    "title": "Lupin",
-    "csv_id": "96677-lupin",
-    "type": "Series",
-    "links": [
-      {
-        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADMQgAAka6CUQaznRRONLYuBYE",
-        "season": "Season 1"
-      },
-      {
-        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADNAgAAka6CUQiTdkalYzqGxYE",
-        "season": "Season 2"
-      },
-      {
-        "url": "https://t.me/FilmHouseFilebot?start=BQADAQADOAgAAka6CURztvLGSoJjoBYE",
-        "season": "Season 3"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADXhkAAsQ16EbjNYm6Hs5pexYE",
-        "season": "Season 4"
-      }
-    ],
-    "poster": "https://image.tmdb.org/t/p/w500/h6Z2oogE4mJk2uffdtIlLhb0EHx.jpg",
-    "rating": 7.7,
-    "release_date": "2021-01-08",
-    "genres": [
-      "Crime",
-      "Drama",
-      "Mystery"
-    ],
-    "categories": [
-      "Main",
-      "Hollywood/British Series"
-    ],
-    "tmdb_id": 96677,
-    "overview": "Inspired by the adventures of Arsène Lupin, gentleman thief Assane Diop sets out to avenge his father for an injustice inflicted by a wealthy family.",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/aY7zv2pfk9H0QxaaL3PBjvalbKQ.jpg",
-    "language": "fr",
-    "cast": [
-      "Omar Sy"
-    ],
-    "director": "George Kay",
-    "trailer": "ga0iTWXCGa0"
-  },
-  {
     "csv_id": "104859-mac-devin-go-to-high-school",
     "tmdb_id": 104859,
     "imdb_id": "",
