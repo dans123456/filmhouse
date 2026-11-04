@@ -4779,7 +4779,15 @@ async function init() {
                     const type = data.type;
                     
                     if (type === "mine" && userId) {
-                        const text = `👋 *Hey there!*\n\nOur team noticed your mining rig is idle! 🪙 Don't forget to launch the app, start your mining session, and complete your daily missions to earn *Loyalty Points*! \n\n🎁 *Did you know?* You can use your points to redeem a **24-Hour Ad-Free VIP Pass** in the rewards center, allowing you to bypass all ads and get instant direct downloads for a whole day! 🎫🚀`;
+                        const text = `🍿 <b>FilmHouse Cinema & Loyalty Hub Alert!</b> 🍿\n\n` +
+                            `👋 <b>Hey Movie Lover!</b>\n` +
+                            `Your mining rig is currently idle! Don't let your free daily <b>Loyalty Points</b> slip away. 🪙\n\n` +
+                            `💎 <b>Why Mine Your Daily Points?</b>\n` +
+                            `• Redeem points for <b>Ad-Free Cinema Streaming Passes</b> 🎬\n` +
+                            `• Unlock high-speed VIP servers & FHD streaming ⚡\n` +
+                            `• Enjoy unlimited uninterrupted series & movies 🍿\n\n` +
+                            `⛏️ <i>Every minute without mining is points left on the table!</i>\n` +
+                            `Tap below to start your session, claim your points, and stream your favorite movies:`;
                         
                         if (userId === "all_idle") {
                             console.log("Triggering bulk mine reminder to all idle users...");
@@ -4799,12 +4807,12 @@ async function init() {
                                     if (isIdle) {
                                         try {
                                             await callTelegramWithRetry('sendMessage', uid, text, {
-                                                parse_mode: "Markdown",
+                                                parse_mode: "HTML",
                                                 reply_markup: {
                                                     inline_keyboard: [
                                                         [
                                                             {
-                                                                text: "Launch App & Start Mining 🪙",
+                                                                text: "⛏️ Mine Loyalty Points & Stream Now",
                                                                 url: "https://t.me/Filmhouseappbot/filmhouseapp?startapp=mining"
                                                             }
                                                         ]
@@ -4829,12 +4837,12 @@ async function init() {
                         } else {
                             try {
                                 await callTelegramWithRetry('sendMessage', userId, text, {
-                                    parse_mode: "Markdown",
+                                    parse_mode: "HTML",
                                     reply_markup: {
                                         inline_keyboard: [
                                             [
                                                 {
-                                                    text: "Launch App & Start Mining 🪙",
+                                                    text: "⛏️ Mine Loyalty Points & Stream Now",
                                                     url: "https://t.me/Filmhouseappbot/filmhouseapp?startapp=mining"
                                                 }
                                             ]
@@ -5761,14 +5769,17 @@ async function init() {
                         await callTelegramWithRetry(
                             'sendMessage',
                             userId,
-                            `⚡ <b>Mining Session Complete!</b> ⚡\n\nYour 8-hour session has finished. Launch the app now to claim your <b>80 Loyalty Points</b> and start your next session! 🍿\n\n🎁 <b>Tip:</b> Save up 1,500 points to unlock a <b>24-Hour Ad-Free Day Pass</b> in the rewards center! 🎫`,
+                            `✅ <b>Mining Cycle Complete!</b> 💎\n\n` +
+                            `Awesome job! Your 8-hour session has finished and your <b>Loyalty Points</b> are ready to claim. ⛏️\n\n` +
+                            `🍿 <b>Cinema Perk:</b> Redeem your Loyalty Points for an <b>Ad-Free Cinema Streaming Pass</b> or VIP High-Speed streaming! 🎬\n\n` +
+                            `Tap below to claim your points and dive into your favorite movies:`,
                             {
                                 parse_mode: "HTML",
                                 reply_markup: {
                                     inline_keyboard: [
                                         [
                                             {
-                                                text: "Claim Points 🪙",
+                                                text: "Claim Points & Watch 🍿",
                                                 url: "https://t.me/Filmhouseappbot/filmhouseapp?startapp=mining"
                                             }
                                         ]

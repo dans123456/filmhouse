@@ -6909,6 +6909,13 @@ function closeCinemaModal() {
         clearInterval(window._nextEpCountdownTimer);
         window._nextEpCountdownTimer = null;
     }
+
+    // Reset subtitle session to prevent subtitle leakage across movies
+    state.activeSubtitleUrl = null;
+    state.activeSubtitleLang = null;
+    state.activeSubtitleMovieId = null;
+    const subQuickLabel = document.getElementById("cinema-sub-quick-label");
+    if (subQuickLabel) subQuickLabel.textContent = "Subtitles: Auto";
     
     // Unlock screen orientation if locked
     try {
@@ -7018,6 +7025,16 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
     // Track active cinema movie for seamless return to movie detail page
     state.lastCinemaMovie = movie;
+
+    // Subtitle isolation per movie/series (Prevents subtitle leak across titles)
+    const currentMovieKey = String(movie.id || movie.tmdb_id || movie.imdb_id || movie.title);
+    if (state.activeSubtitleMovieId !== currentMovieKey) {
+        state.activeSubtitleUrl = null;
+        state.activeSubtitleLang = null;
+        state.activeSubtitleMovieId = currentMovieKey;
+        const subQuickLabel = document.getElementById("cinema-sub-quick-label");
+        if (subQuickLabel) subQuickLabel.textContent = "Subtitles: Auto";
+    }
 
     // In-app Back and Minimize Button Bindings
     const closeBtn = document.getElementById("btn-close-cinema");
@@ -7213,11 +7230,31 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
         subTrackList.innerHTML = html;
 
+        // Wire Captions Off button
+        const offBtn = subTrackList.querySelector('.cinema-sub-track-item[data-sub-idx="-1"]');
+        if (offBtn) {
+            offBtn.onclick = () => {
+                state.activeSubtitleUrl = null;
+                state.activeSubtitleLang = null;
+                state.activeSubtitleMovieId = null;
+                const frame = container.querySelector("iframe");
+                if (frame && frame.contentWindow) {
+                    frame.contentWindow.postMessage({ action: "removeSubtitle" }, "*");
+                }
+                if (subQuickLabel) subQuickLabel.textContent = "Subtitles: Off";
+                showToast("Subtitles turned off", "info");
+                closeSubHub();
+            };
+        }
+
         // Wire dynamic sub click
         subTrackList.querySelectorAll(".cinema-hub-dynamic-sub").forEach(btn => {
             btn.onclick = () => {
                 const url = decodeURIComponent(btn.getAttribute("data-sub-url") || "");
                 const name = btn.getAttribute("data-sub-name") || "Captions";
+                state.activeSubtitleUrl = url;
+                state.activeSubtitleLang = name;
+                state.activeSubtitleMovieId = movie.id || movie.tmdb_id || movie.imdb_id || movie.title;
                 const frame = container.querySelector("iframe");
                 if (frame && frame.contentWindow) {
                     frame.contentWindow.postMessage({
@@ -7565,7 +7602,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (!targetUrl) return;
         const directUrl = resolveDirectStreamUrl(targetUrl);
         const currentMediaTitle = currentTitle || initialTitle;
-        const subParam = state.activeSubtitleUrl ? `&sub=${encodeURIComponent(state.activeSubtitleUrl)}` : "";
+        const currentMovieKey = String(movie.id || movie.tmdb_id || movie.imdb_id || movie.title);
+        const subParam = (state.activeSubtitleUrl && state.activeSubtitleMovieId === currentMovieKey) 
+            ? `&sub=${encodeURIComponent(state.activeSubtitleUrl)}` 
+            : "";
         const movieBackdrop = movie.backdrop || movie.poster || "";
         const imdbParam = movie.imdb_id ? `&imdb=${encodeURIComponent(movie.imdb_id)}` : "";
         const tmdbParam = movie.tmdb_id ? `&tmdb=${encodeURIComponent(movie.tmdb_id)}` : "";
@@ -10138,6 +10178,70 @@ function bindEvents() {
                     awardPoints(FARMING_REWARD, "mining");
                     updateFarmingUI();
                 }
+            }
+        });
+    }
+
+    // Loyalty Points Cinema Pass Redemption inside Mining screen (Option 1)
+    const btnRedeemPassMining = document.getElementById("btn-redeem-cinema-pass-mining");
+    if (btnRedeemPassMining && !btnRedeemPassMining._bound) {
+        btnRedeemPassMining._bound = true;
+        btnRedeemPassMining.addEventListener("click", () => {
+            const currentPoints = (state.user && state.user.points) || 0;
+            if (currentPoints < 100) {
+                showToast(`⚠️ You need 100 Loyalty Points to redeem a 4-Hour Cinema Pass! Current: ${currentPoints} pts`, "error");
+                if (typeof triggerHaptic === "function") triggerHaptic("error");
+                return;
+            }
+
+            // Deduct 100 Loyalty Points
+            state.user.points -= 100;
+            if (typeof updateUserUI === "function") updateUserUI();
+
+            // Persist points deduction to local storage
+            try {
+                const saved = localStorage.getItem("filmhouse_user_profile");
+                let profile = {};
+                if (saved) {
+                    try { profile = JSON.parse(saved); } catch (e) {}
+                }
+                profile.points = state.user.points;
+                localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+            } catch (e) {}
+
+            // Persist points deduction to Firestore
+            if (typeof firebase !== "undefined" && db && state.user && state.user.id) {
+                try {
+                    db.collection("users").doc(state.user.id).update({
+                        points: firebase.firestore.FieldValue.increment(-100)
+                    }).catch(e => console.warn("Firestore points deduction error:", e));
+                } catch (e) {}
+            }
+
+            // Activate 4-Hour Ad-Free Pass (14400 seconds)
+            const passDurationMs = 4 * 60 * 60 * 1000;
+            const passExpiresAt = Date.now() + passDurationMs;
+            localStorage.setItem("filmhouse_watch_pass_sec", "14400");
+            localStorage.setItem("filmhouse_watch_pass_until", passExpiresAt.toString());
+
+            const passPill = document.getElementById("mining-pass-active-pill");
+            if (passPill) {
+                passPill.textContent = "⚡ Pass Active (4h)";
+                passPill.style.background = "rgba(16, 185, 129, 0.25)";
+                passPill.style.color = "#34d399";
+            }
+
+            showToast("🎉 Redeemed 4-Hour Ad-Free Cinema Pass! Enjoy uninterrupted streaming!", "success");
+            if (typeof triggerHaptic === "function") triggerHaptic("success");
+        });
+    }
+
+    const btnMiningGotoCinema = document.getElementById("btn-mining-goto-cinema");
+    if (btnMiningGotoCinema && !btnMiningGotoCinema._bound) {
+        btnMiningGotoCinema._bound = true;
+        btnMiningGotoCinema.addEventListener("click", () => {
+            if (typeof navigateTo === "function") {
+                navigateTo("screen-home");
             }
         });
     }
@@ -12994,6 +13098,23 @@ function updateFarmingUI() {
     const progressPercent = document.getElementById("mining-progress-percent");
 
     if (!btn) return;
+
+    // Refresh Loyalty Points Cinema Pass pill on mining screen
+    const passPill = document.getElementById("mining-pass-active-pill");
+    if (passPill) {
+        const passUntil = parseInt(localStorage.getItem("filmhouse_watch_pass_until") || "0", 10);
+        const passSec = parseInt(localStorage.getItem("filmhouse_watch_pass_sec") || "0", 10);
+        const isPassActive = (passUntil > Date.now()) || (passSec > 0);
+        if (isPassActive) {
+            passPill.textContent = "⚡ Pass Active (4h)";
+            passPill.style.background = "rgba(16, 185, 129, 0.25)";
+            passPill.style.color = "#34d399";
+        } else {
+            passPill.textContent = "100 Pts = 4h Pass";
+            passPill.style.background = "rgba(255, 188, 0, 0.2)";
+            passPill.style.color = "#ffbc00";
+        }
+    }
 
     const startedAt = state.user.farmingStartedAt || 0;
 

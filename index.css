@@ -1819,13 +1819,21 @@ body.tg-back-visible #btn-close-cinema {
 }
 
 .cinema-close-btn {
-    width: 34px;
+    width: 32px;
+    height: 32px;
     padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 19px;
     line-height: 1;
+    border-radius: 50%;
+    cursor: pointer;
+    pointer-events: auto !important;
 }
 
-.cinema-close-btn:hover {
+.cinema-close-btn:hover,
+.cinema-close-btn:active {
     background: rgba(255, 69, 58, 0.2);
     border-color: rgba(255, 69, 58, 0.5);
     color: #ff453a;
@@ -1837,7 +1845,8 @@ body.tg-back-visible #btn-close-cinema {
     gap: 8px;
     flex-shrink: 0;
     margin-left: auto !important;
-    z-index: 5;
+    margin-right: max(46px, calc(var(--tg-safe-area-inset-right, 0px) + 42px)) !important;
+    z-index: 10;
 }
 
 /* Brand Wordmark in Cinema Header */
@@ -1849,6 +1858,7 @@ body.tg-back-visible #btn-close-cinema {
     left: 50%;
     transform: translateX(-50%);
     pointer-events: none;
+    z-index: 5;
 }
 
 .cinema-brand-wordmark {
@@ -3452,6 +3462,9 @@ body.tg-back-visible #btn-close-cinema {
     }
     .cinema-brand-group {
         display: none !important;
+    }
+    .cinema-top-actions {
+        margin-right: max(42px, calc(var(--tg-safe-area-inset-right, 0px) + 36px)) !important;
     }
     .cinema-theater-container.controls-hidden .cinema-header-wrapper {
         opacity: 0 !important;
