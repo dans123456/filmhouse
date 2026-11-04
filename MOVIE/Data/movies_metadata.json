@@ -1,5 +1,51 @@
 [
   {
+    "csv_id": "96677-lupin",
+    "tmdb_id": 96677,
+    "imdb_id": "",
+    "title": "Lupin",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Crime",
+      "Drama",
+      "Mystery"
+    ],
+    "overview": "Inspired by the adventures of Arsène Lupin, gentleman thief Assane Diop sets out to avenge his father for an injustice inflicted by a wealthy family.",
+    "poster": "https://image.tmdb.org/t/p/w500/h6Z2oogE4mJk2uffdtIlLhb0EHx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/jgAZYiuRV37pCxmhx8NTdhE36RL.jpg",
+    "rating": 7.7,
+    "release_date": "2021-01-08",
+    "language": "fr",
+    "cast": [],
+    "director": "",
+    "trailer": "ga0iTWXCGa0",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD7gkAAhzcYEdWLThDOAcR9hYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD8AkAAhzcYEf9Vp2WV-Se9xYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD8QkAAhzcYEdJ499sgaYMOxYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFilebot?start=BQADAQAD8gkAAhzcYEfTMokW-ms-UxYE",
+        "season": "Season 4"
+      }
+    ]
+  },
+  {
     "csv_id": "200875-it-welcome-to-derry",
     "tmdb_id": 200875,
     "imdb_id": "",
