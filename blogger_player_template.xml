@@ -434,11 +434,7 @@
         <div class='stream-play-sub' id='streamPlaySub'>Full 1080p HD • Online Cinema</div>
       </div>
 
-      <!-- Floating Subtitles CC Button -->
-      <button class='subtitles-cc-btn' id='btnOpenSubtitlesModal' style='display:flex;position:absolute;top:12px;left:12px;z-index:16;align-items:center;gap:5px;background:rgba(12,15,24,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;font-size:11px;color:#cbd5e1;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.5);' title='Select Multi-Language Subtitles' type='button'>
-        <span style='background:#ffbc00;color:#000;font-weight:900;font-size:9px;padding:1px 4px;border-radius:4px;'>CC</span>
-        <span id='activeSubLabel' style='font-weight:600;color:#fff;'>Subtitles</span>
-      </button>
+
 
       <!-- 4-Hour Ad Pass Live Meter Pill -->
       <div class='watch-pass-pill' id='watchPassPill' style='display:flex;position:absolute;top:12px;right:12px;z-index:16;align-items:center;gap:6px;background:rgba(12,15,24,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;font-size:11px;color:#cbd5e1;box-shadow:0 4px 15px rgba(0,0,0,0.5);'>
@@ -1152,6 +1148,14 @@
       // Detect and broadcast embedded subtitles and audio tracks to parent app
       function detectAndBroadcastTracks() {
         if (!videoEl) return;
+        // Ensure soft subtitles default to disabled unless explicitly activated
+        if (!window._subtitlesExplicitlyActive && videoEl.textTracks) {
+          for (let i = 0; i < videoEl.textTracks.length; i++) {
+            if (videoEl.textTracks[i].mode !== 'disabled') {
+              videoEl.textTracks[i].mode = 'disabled';
+            }
+          }
+        }
         const subTracks = [];
         if (videoEl.textTracks) {
           for (let i = 0; i < videoEl.textTracks.length; i++) {
@@ -1214,10 +1218,15 @@
           detectAndBroadcastTracks();
         } else if (ev.data.action === 'selectSubtitleTrack') {
           const targetIndex = ev.data.index; // -1 to turn off
+          window._subtitlesExplicitlyActive = (targetIndex !== -1);
           if (videoEl.textTracks) {
             for (let i = 0; i < videoEl.textTracks.length; i++) {
               videoEl.textTracks[i].mode = (i === targetIndex) ? 'showing' : 'disabled';
             }
+          }
+          if (targetIndex === -1) {
+            const tracks = videoEl.querySelectorAll('track');
+            tracks.forEach(t => { t.mode = 'disabled'; });
           }
         } else if (ev.data.action === 'selectAudioTrack') {
           const targetIndex = ev.data.index;

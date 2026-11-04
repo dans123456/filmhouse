@@ -7615,12 +7615,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             }
         }
 
-        // Initialize default audio & subtitle tracks based on movie metadata
-        const rawLang = (movie.language || movie.lang || (movie.categories && movie.categories.find(c => /korean|k-drama|anime|hindi/i.test(c))) || "").toUpperCase();
-        const detectedLang = getCleanLangName(rawLang) || "Original";
-        if (subQuickLabel) subQuickLabel.textContent = "Subtitles: Auto";
+        // Initialize default audio & subtitle tracks cleanly (avoiding false language guesses)
+        const rawLang = (movie.language || movie.lang || "").toUpperCase();
+        const detectedLang = rawLang ? (getCleanLangName(rawLang) || rawLang) : "Original (Auto)";
+        if (subQuickLabel) subQuickLabel.textContent = "CC Off";
         if (audioQuickLabel) {
-            audioQuickLabel.textContent = `Audio: ${detectedLang}`;
+            audioQuickLabel.textContent = "Audio: Auto";
         }
 
         if (audioTrackList) {
@@ -7790,9 +7790,6 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     <span class="server-chip-zap">⚡</span>
                     <span>Server 2 (VIP)</span>
                 </button>
-            </div>
-            <div class="cinema-server-cdn-badge">
-                <span class="cdn-dot"></span> Multi-CDN
             </div>
         `;
         detailsContainer.appendChild(serverStrip);

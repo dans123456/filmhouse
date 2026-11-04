@@ -1766,12 +1766,13 @@ img {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: calc(var(--tg-safe-area-inset-top, var(--tg-content-safe-area-inset-top, 0px)) + 6px);
-    padding-bottom: 6px;
+    padding-top: max(2px, calc(var(--tg-safe-area-inset-top, 0px) + 1px));
+    padding-bottom: 2px;
     padding-left: max(12px, calc(var(--tg-safe-area-inset-left, 0px) + 8px));
-    padding-right: max(16px, calc(var(--tg-safe-area-inset-right, 0px) + 76px));
+    padding-right: max(14px, calc(var(--tg-safe-area-inset-right, 0px) + 14px));
     gap: 10px;
     position: relative;
+    min-height: 38px;
 }
 
 body.tg-back-visible #btn-close-cinema {
@@ -3439,11 +3440,11 @@ body.tg-back-visible #btn-close-cinema {
         pointer-events: auto !important;
     }
     .cinema-top-bar {
-        padding-top: max(6px, calc(var(--tg-safe-area-inset-top, 0px) + 2px)) !important;
-        padding-bottom: 6px !important;
+        padding-top: max(2px, calc(var(--tg-safe-area-inset-top, 0px) + 1px)) !important;
+        padding-bottom: 2px !important;
         padding-left: max(10px, calc(var(--tg-safe-area-inset-left, 0px) + 8px)) !important;
-        padding-right: max(16px, calc(var(--tg-safe-area-inset-right, 0px) + 82px)) !important; /* Clear Telegram's menu */
-        height: 44px !important;
+        padding-right: max(14px, calc(var(--tg-safe-area-inset-right, 0px) + 14px)) !important;
+        height: 38px !important;
     }
     /* Hide second tier in landscape mode to prevent covering the video */
     .cinema-sub-bar {
@@ -8227,4 +8228,9 @@ body.desktop-wide-layout .mining-card-container {
         opacity: 0 !important;
         pointer-events: none !important;
     }
+}
+
+
+.cinema-server-cdn-badge {
+    display: none !important;
 }
