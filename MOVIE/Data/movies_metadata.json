@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "289517-dead-end-job",
+    "tmdb_id": 289517,
+    "imdb_id": "",
+    "title": "Dead-End Job",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Mystery"
+    ],
+    "overview": "Drowning in debt, a young man takes lucrative part-time jobs from a mysterious agency — only to find his hustle for more money turning nightmarish.",
+    "poster": "https://image.tmdb.org/t/p/w500/wUvzMC7EToPgci31ZZRCeqCmQ6d.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/cyH2fZUjIJjLmgpF3tgA5CSGz4L.jpg",
+    "rating": 7.7,
+    "release_date": "2026-10-30",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "Sn2ZCxOxsN0",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADPQ8AAvEfYEf78bB7_1imfhYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "96677-lupin",
     "tmdb_id": 96677,
     "imdb_id": "",
