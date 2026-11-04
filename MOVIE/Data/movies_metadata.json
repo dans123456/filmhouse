@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "200875-it-welcome-to-derry",
+    "tmdb_id": 200875,
+    "imdb_id": "",
+    "title": "IT: Welcome to Derry",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Teen/High-School",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama",
+      "Mystery"
+    ],
+    "overview": "In 1962, amid a spate of unexplained disappearances of local children, a group of misfit friends begin to suspect a long-buried ancient evil lurking. As the kids set out to determine what's really going on, a rising unease prompts several townspeople to work together to restore peace – all while a U.S. military operation seeks to exploit Derry for its own objectives.",
+    "poster": "https://image.tmdb.org/t/p/w500/nyy3BITeIjviv6PFIXtqvc8i6xi.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2fOKVDoc2O3eZmBZesWPuE5kgPN.jpg",
+    "rating": 8.3,
+    "release_date": "2025-10-26",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "u4JE2AyqDII",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADyhgAAhzcWEcanzc8eZl42xYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "7869-the-penguins-of-madagascar",
     "tmdb_id": 7869,
     "imdb_id": "",
