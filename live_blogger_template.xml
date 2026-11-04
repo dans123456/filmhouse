@@ -600,7 +600,7 @@
 
       const typeParam = (urlParams.get('type') || '').toLowerCase();
       const serverParam = urlParams.get('server') || '';
-      const defaultStreamServer = (serverParam || "https://contributed-travel-buyer-drop.trycloudflare.com").replace(/\/+$/, "");
+      const defaultStreamServer = (serverParam || "https://filmhouse-stream.duckdns.org").replace(/\/+$/, "");
       const isSeries = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
 
       const playTitleEl = document.getElementById('streamPlayTitle');

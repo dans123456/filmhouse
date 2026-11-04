@@ -1231,7 +1231,7 @@
 
       const typeParam = (urlParams.get('type') || '').toLowerCase();
       const serverParam = urlParams.get('server') || '';
-      const defaultStreamServer = (serverParam || "https://contributed-travel-buyer-drop.trycloudflare.com").replace(/\/+$/, "");
+      const defaultStreamServer = (serverParam || "https://filmhouse-stream.duckdns.org").replace(/\/+$/, "");
       const isSeries = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
 
       const playTitleEl = document.getElementById('streamPlayTitle');
@@ -1277,6 +1277,14 @@
           } else if (clean.includes('/watch/')) {
             // Replace /watch/ with /dl/ for direct video stream
             finalStreamUrl = clean.replace('/watch/', '/dl/');
+          } else if (clean.includes('.trycloudflare.com/dl/') || clean.includes('herokuapp.com/dl/')) {
+            // Upgrade expired Cloudflare/Heroku tunnels directly to defaultStreamServer
+            const tMatch = clean.match(/\/dl\/([a-zA-Z0-9_\-]+)/);
+            if (tMatch && tMatch[1]) {
+              finalStreamUrl = defaultStreamServer + "/dl/" + tMatch[1];
+            } else {
+              finalStreamUrl = clean;
+            }
           } else {
             finalStreamUrl = clean;
           }

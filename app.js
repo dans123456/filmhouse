@@ -6845,7 +6845,7 @@ window.addEventListener("pagehide", stopStreamingPresence);
 const STREAMING_ADMIN_IDS = ["1175336733", "1329840839"];
 
 // Active Streaming Server state & Real-time Firestore synchronizer
-let activeStreamingServerUrl = "https://contributed-travel-buyer-drop.trycloudflare.com";
+let activeStreamingServerUrl = "https://filmhouse-stream.duckdns.org";
 
 if (typeof db !== "undefined" && db) {
     try {
