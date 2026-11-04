@@ -434,11 +434,59 @@
         <div class='stream-play-sub' id='streamPlaySub'>Full 1080p HD • Online Cinema</div>
       </div>
 
+      <!-- Floating Subtitles CC Button -->
+      <button class='subtitles-cc-btn' id='btnOpenSubtitlesModal' style='display:flex;position:absolute;top:12px;left:12px;z-index:16;align-items:center;gap:5px;background:rgba(12,15,24,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;font-size:11px;color:#cbd5e1;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.5);' title='Select Multi-Language Subtitles' type='button'>
+        <span style='background:#ffbc00;color:#000;font-weight:900;font-size:9px;padding:1px 4px;border-radius:4px;'>CC</span>
+        <span id='activeSubLabel' style='font-weight:600;color:#fff;'>Subtitles</span>
+      </button>
+
       <!-- 4-Hour Ad Pass Live Meter Pill -->
       <div class='watch-pass-pill' id='watchPassPill' style='display:flex;position:absolute;top:12px;right:12px;z-index:16;align-items:center;gap:6px;background:rgba(12,15,24,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;font-size:11px;color:#cbd5e1;box-shadow:0 4px 15px rgba(0,0,0,0.5);'>
         <span id='passDot' style='width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;display:inline-block;'></span>
         <span id='passTimerText' style='font-weight:600;color:#fff;'>Pass: 04:00:00</span>
         <button id='btnGetPassPill' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:800;cursor:pointer;margin-left:2px;' type='button'>⚡ 4h Pass</button>
+      </div>
+
+      <!-- Multi-Language Subtitles Modal (60+ Languages) -->
+      <div id='subtitlesModal' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.94);backdrop-filter:blur(16px);z-index:22;flex-direction:column;padding:16px;box-sizing:border-box;'>
+        <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;'>
+          <div style='display:flex;align-items:center;gap:8px;'>
+            <span style='background:#ffbc00;color:#000;font-weight:900;font-size:10px;padding:2px 5px;border-radius:4px;'>CC</span>
+            <span style='font-size:14px;font-weight:800;color:#fff;'>Multi-Language Subtitles (60+)</span>
+          </div>
+          <button id='btnCloseSubtitlesModal' style='background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;' type='button'>✕</button>
+        </div>
+
+        <!-- Search Bar -->
+        <div style='margin-bottom:8px;'>
+          <input id='subSearchInput' placeholder='🔍 Search language (e.g. English, Korean, Spanish...)' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:7px 12px;border-radius:8px;color:#fff;font-size:12px;outline:none;' type='text'/>
+        </div>
+
+        <!-- Quick Language Filter Pills -->
+        <div id='subLangPills' style='display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;scrollbar-width:none;'>
+          <button class='sub-pill active' data-lang='all' style='white-space:nowrap;background:#ffbc00;color:#000;border:1px solid #ffbc00;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:800;cursor:pointer;' type='button'>All</button>
+        </div>
+
+        <!-- Subtitles List -->
+        <div id='subtitlesList' style='flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:2px;'>
+          <div id='subListLoading' style='text-align:center;padding:30px 10px;color:#94a3b8;font-size:12px;'>
+            <div class='spinner' style='margin:0 auto 10px;'></div>
+            Connecting to OpenSubtitles (60+ languages)...
+          </div>
+        </div>
+
+        <!-- Bottom Action Row -->
+        <div style='display:flex;justify-content:flex-end;align-items:center;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);margin-top:6px;'>
+          <button id='btnDisableSubs' style='background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;' type='button'>
+            ✕ Turn Off Subtitles
+          </button>
+        </div>
+      </div>
+
+      <!-- In-Player Subtitle Notification Toast -->
+      <div id='subNotificationToast' style='display:none;position:absolute;top:50px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);border:1px solid rgba(255,188,0,0.4);border-radius:20px;padding:6px 14px;font-size:11.5px;color:#fff;z-index:25;box-shadow:0 6px 20px rgba(0,0,0,0.6);align-items:center;gap:6px;'>
+        <span id='subToastIcon'>🟢</span>
+        <span id='subToastText'>Subtitles Active</span>
       </div>
 
       <!-- In-Player Pre-Roll Sponsor Overlay -->
@@ -500,10 +548,9 @@
 
       <!-- Action Buttons Row -->
       <div class='action-row'>
-        <label for='bloggerSubInput' class='btn btn-secondary' style='cursor:pointer;' title='Load Subtitles'>
-          💬 Subtitles (.srt/.vtt)
-          <input type='file' id='bloggerSubInput' accept='.srt,.vtt' style='display:none;'/>
-        </label>
+        <button class='btn btn-secondary' id='btnOpenSubtitlesModal2' style='cursor:pointer;' title='Select Multi-Language Subtitles' type='button'>
+          💬 Subtitles (60+ Langs)
+        </button>
         <a class='btn btn-gold' href='#' id='btnDownload' target='_blank'>
           ⬇️ Direct Download File
         </a>
@@ -554,9 +601,107 @@
       const downloadBtn = document.getElementById('btnDownload');
       const errorCard = document.getElementById('errorCard');
 
-      function attachSubtitleTrack(subUrl, labelName) {
-        if (!videoEl || !subUrl) return;
+      // ==========================================
+      // GLOBAL MULTI-LANGUAGE SUBTITLES (60+ LANGUAGES) ENGINE
+      // ==========================================
+      const SUB_LANG_MAP = {
+        "en": { flag: "🇬🇧", name: "English" }, "eng": { flag: "🇬🇧", name: "English" },
+        "ko": { flag: "🇰🇷", name: "Korean (한국어)" }, "kor": { flag: "🇰🇷", name: "Korean (한국어)" },
+        "ja": { flag: "🇯🇵", name: "Japanese (日本語)" }, "jpn": { flag: "🇯🇵", name: "Japanese (日本語)" },
+        "es": { flag: "🇪🇸", name: "Spanish (Español)" }, "spa": { flag: "🇪🇸", name: "Spanish (Español)" },
+        "fr": { flag: "🇫🇷", name: "French (Français)" }, "fre": { flag: "🇫🇷", name: "French (Français)" }, "fra": { flag: "🇫🇷", name: "French (Français)" },
+        "ar": { flag: "🇸🇦", name: "Arabic (العربية)" }, "ara": { flag: "🇸🇦", name: "Arabic (العربية)" },
+        "hi": { flag: "🇮🇳", name: "Hindi (हिन्दी)" }, "hin": { flag: "🇮🇳", name: "Hindi (हिन्दी)" },
+        "pt": { flag: "🇵🇹", name: "Portuguese (Português)" }, "por": { flag: "🇵🇹", name: "Portuguese (Português)" }, "pob": { flag: "🇧🇷", name: "Portuguese (Brasil)" },
+        "de": { flag: "🇩🇪", name: "German (Deutsch)" }, "ger": { flag: "🇩🇪", name: "German (Deutsch)" }, "deu": { flag: "🇩🇪", name: "German (Deutsch)" },
+        "zh": { flag: "🇨🇳", name: "Chinese (Simplified)" }, "chi": { flag: "🇨🇳", name: "Chinese (Simplified)" }, "zho": { flag: "🇨🇳", name: "Chinese (Simplified)" },
+        "zht": { flag: "🇹🇼", name: "Chinese (Traditional)" },
+        "ru": { flag: "🇷🇺", name: "Russian (Русский)" }, "rus": { flag: "🇷🇺", name: "Russian (Русский)" },
+        "it": { flag: "🇮🇹", name: "Italian (Italiano)" }, "ita": { flag: "🇮🇹", name: "Italian (Italiano)" },
+        "id": { flag: "🇮🇩", name: "Indonesian (Bahasa)" }, "ind": { flag: "🇮🇩", name: "Indonesian (Bahasa)" },
+        "tr": { flag: "🇹🇷", name: "Turkish (Türkçe)" }, "tur": { flag: "🇹🇷", name: "Turkish (Türkçe)" },
+        "vi": { flag: "🇻🇳", name: "Vietnamese (Tiếng Việt)" }, "vie": { flag: "🇻🇳", name: "Vietnamese (Tiếng Việt)" },
+        "th": { flag: "🇹🇭", name: "Thai (ไทย)" }, "tha": { flag: "🇹🇭", name: "Thai (ไทย)" },
+        "tl": { flag: "🇵🇭", name: "Tagalog (Filipino)" }, "tgl": { flag: "🇵🇭", name: "Tagalog (Filipino)" },
+        "nl": { flag: "🇳🇱", name: "Dutch (Nederlands)" }, "nld": { flag: "🇳🇱", name: "Dutch (Nederlands)" },
+        "pl": { flag: "🇵🇱", name: "Polish (Polski)" }, "pol": { flag: "🇵🇱", name: "Polish (Polski)" },
+        "sv": { flag: "🇸🇪", name: "Swedish (Svenska)" }, "swe": { flag: "🇸🇪", name: "Swedish (Svenska)" },
+        "da": { flag: "🇩🇰", name: "Danish (Dansk)" }, "dan": { flag: "🇩🇰", name: "Danish (Dansk)" },
+        "no": { flag: "🇳🇴", name: "Norwegian (Norsk)" }, "nor": { flag: "🇳🇴", name: "Norwegian (Norsk)" },
+        "fi": { flag: "🇫🇮", name: "Finnish (Suomi)" }, "fin": { flag: "🇫🇮", name: "Finnish (Suomi)" },
+        "el": { flag: "🇬🇷", name: "Greek (Ελληνικά)" }, "ell": { flag: "🇬🇷", name: "Greek (Ελληνικά)" },
+        "he": { flag: "🇮🇱", name: "Hebrew (עברית)" }, "heb": { flag: "🇮🇱", name: "Hebrew (עברית)" },
+        "ro": { flag: "🇷🇴", name: "Romanian (Română)" }, "ron": { flag: "🇷🇴", name: "Romanian (Română)" },
+        "hu": { flag: "🇭🇺", name: "Hungarian (Magyar)" }, "hun": { flag: "🇭🇺", name: "Hungarian (Magyar)" },
+        "cs": { flag: "🇨🇿", name: "Czech (Čeština)" }, "cze": { flag: "🇨🇿", name: "Czech (Čeština)" },
+        "sk": { flag: "🇸🇰", name: "Slovak (Slovenčina)" }, "slo": { flag: "🇸🇰", name: "Slovak (Slovenčina)" },
+        "uk": { flag: "🇺🇦", name: "Ukrainian (Українська)" }, "ukr": { flag: "🇺🇦", name: "Ukrainian (Українська)" },
+        "hr": { flag: "🇭🇷", name: "Croatian (Hrvatski)" }, "hrv": { flag: "🇭🇷", name: "Croatian (Hrvatski)" },
+        "sr": { flag: "🇷🇸", name: "Serbian (Српски)" }, "srp": { flag: "🇷🇸", name: "Serbian (Српски)" },
+        "bg": { flag: "🇧🇬", name: "Bulgarian (Български)" }, "bul": { flag: "🇧🇬", name: "Bulgarian (Български)" },
+        "ms": { flag: "🇲🇾", name: "Malay (Bahasa Melayu)" }, "may": { flag: "🇲🇾", name: "Malay (Bahasa Melayu)" },
+        "fa": { flag: "🇮🇷", name: "Persian (Farsi)" }, "per": { flag: "🇮🇷", name: "Persian (Farsi)" },
+        "bn": { flag: "🇧🇩", name: "Bengali (বাংলা)" }, "ben": { flag: "🇧🇩", name: "Bengali (বাংলা)" },
+        "te": { flag: "🇮🇳", name: "Telugu (తెలుగు)" }, "tel": { flag: "🇮🇳", name: "Telugu (తెలుగు)" },
+        "ta": { flag: "🇮🇳", name: "Tamil (தமிழ்)" }, "tam": { flag: "🇮🇳", name: "Tamil (தமிழ்)" },
+        "ml": { flag: "🇮🇳", name: "Malayalam (മലയാളം)" }, "mal": { flag: "🇮🇳", name: "Malayalam (മലയാളം)" },
+        "ur": { flag: "🇵🇰", name: "Urdu (اردو)" }, "urd": { flag: "🇵🇰", name: "Urdu (اردو)" },
+        "sw": { flag: "🇰🇪", name: "Swahili (Kiswahili)" }, "swa": { flag: "🇰🇪", name: "Swahili (Kiswahili)" }
+      };
+
+      let loadedSubtitlesList = [];
+      let activeSubLangFilter = 'all';
+
+      function convertSrtToVtt(srtText) {
+        if (!srtText) return "";
+        let clean = String(srtText).replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim();
+        if (clean.startsWith("WEBVTT")) return clean;
+        clean = clean.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, "$1.$2");
+        return "WEBVTT\n\n" + clean;
+      }
+
+      function showSubToast(text, icon) {
+        const toast = document.getElementById('subNotificationToast');
+        const tText = document.getElementById('subToastText');
+        const tIcon = document.getElementById('subToastIcon');
+        if (!toast) return;
+        if (tText) tText.textContent = text;
+        if (tIcon) tIcon.textContent = icon || '🟢';
+        toast.style.display = 'flex';
+        clearTimeout(window._subToastTimer);
+        window._subToastTimer = setTimeout(() => { toast.style.display = 'none'; }, 3200);
+      }
+
+      async function attachSubtitleTrack(subUrlOrContent, labelName, isRawContent) {
+        if (!videoEl || !subUrlOrContent) return;
         try {
+          let vttBlobUrl = null;
+
+          if (isRawContent) {
+            const vttText = convertSrtToVtt(subUrlOrContent);
+            const blob = new Blob([vttText], { type: 'text/vtt' });
+            vttBlobUrl = URL.createObjectURL(blob);
+          } else {
+            const cleanUrl = decodeURIComponent(subUrlOrContent).trim();
+            try {
+              let res = await fetch(cleanUrl).catch(() => null);
+              if (!res || !res.ok) {
+                res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(cleanUrl)).catch(() => null);
+              }
+              if (res && res.ok) {
+                const srtData = await res.text();
+                const vttText = convertSrtToVtt(srtData);
+                const blob = new Blob([vttText], { type: 'text/vtt' });
+                vttBlobUrl = URL.createObjectURL(blob);
+              } else {
+                vttBlobUrl = cleanUrl;
+              }
+            } catch (dlErr) {
+              console.warn("Subtitle fetch fallback to direct URL:", dlErr.message);
+              vttBlobUrl = cleanUrl;
+            }
+          }
+
           const existing = videoEl.querySelectorAll('track.dynamic-sub');
           existing.forEach(t => t.remove());
 
@@ -565,16 +710,260 @@
           track.kind = 'subtitles';
           track.label = labelName || 'Captions';
           track.srclang = 'en';
-          track.src = decodeURIComponent(subUrl);
+          track.src = vttBlobUrl;
           track.default = true;
           videoEl.appendChild(track);
+
+          setTimeout(() => {
+            if (videoEl.textTracks && videoEl.textTracks.length > 0) {
+              for (let i = 0; i < videoEl.textTracks.length; i++) {
+                const tt = videoEl.textTracks[i];
+                if (tt.label === (labelName || 'Captions') || i === videoEl.textTracks.length - 1) {
+                  tt.mode = 'showing';
+                }
+              }
+            }
+          }, 150);
+
+          const activeLabel = document.getElementById('activeSubLabel');
+          if (activeLabel) activeLabel.textContent = labelName || 'Active';
+          showSubToast(`${labelName || 'Subtitles'} Loaded`, '🟢');
         } catch (e) {
           console.warn('Subtitle attach error:', e);
         }
       }
 
+      async function fetchMovieSubtitles() {
+        const subListContainer = document.getElementById('subtitlesList');
+        if (!subListContainer) return;
+
+        let imdbId = urlParams.get('imdb') || '';
+        const tmdbId = urlParams.get('tmdb') || '';
+        const rawTitle = titleParam ? decodeURIComponent(titleParam).trim() : '';
+        const isSeriesMode = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
+
+        if (!imdbId && (tmdbId || rawTitle)) {
+          try {
+            const tmdbKey = 'd638f7775bfa1b8d456dfd028ccbef19';
+            if (tmdbId) {
+              const extEndpoint = isSeriesMode ? `https://api.themoviedb.org/3/tv/${tmdbId}/external_ids` : `https://api.themoviedb.org/3/movie/${tmdbId}?append_to_response=external_ids`;
+              const res = await fetch(`${extEndpoint}${extEndpoint.includes('?') ? '&' : '?'}api_key=${tmdbKey}`);
+              if (res.ok) {
+                const data = await res.json();
+                imdbId = data.imdb_id || data.external_ids?.imdb_id || '';
+              }
+            }
+            if (!imdbId && rawTitle) {
+              const sEndpoint = isSeriesMode ? `https://api.themoviedb.org/3/search/tv` : `https://api.themoviedb.org/3/search/movie`;
+              const res = await fetch(`${sEndpoint}?api_key=${tmdbKey}&query=${encodeURIComponent(rawTitle)}`);
+              if (res.ok) {
+                const sData = await res.json();
+                if (sData.results && sData.results[0] && sData.results[0].id) {
+                  const fId = sData.results[0].id;
+                  const extRes = await fetch(`https://api.themoviedb.org/3/${isSeriesMode ? 'tv' : 'movie'}/${fId}?append_to_response=external_ids&api_key=${tmdbKey}`);
+                  if (extRes.ok) {
+                    const extData = await extRes.json();
+                    imdbId = extData.imdb_id || extData.external_ids?.imdb_id || '';
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.warn('IMDb ID resolve error:', e.message);
+          }
+        }
+
+        if (!imdbId) {
+          subListContainer.innerHTML = `
+            <div style="text-align:center;padding:24px 10px;color:#94a3b8;font-size:12px;">
+              <p style="margin:0 0 8px 0;font-weight:700;color:#fff;">ℹ️ No IMDb ID found for "${escapeHtml ? escapeHtml(rawTitle) : rawTitle}".</p>
+              <p style="margin:0;">You can upload your own <b>.srt</b> or <b>.vtt</b> file below.</p>
+            </div>
+          `;
+          return;
+        }
+
+        try {
+          const typeSlug = isSeriesMode ? 'series' : 'movie';
+          const epSuffix = isSeriesMode ? ':1:1' : '';
+          const subUrl = `https://opensubtitles-v3.strem.io/subtitles/${typeSlug}/${imdbId}${epSuffix}.json`;
+          const subRes = await fetch(subUrl);
+          if (subRes.ok) {
+            const data = await subRes.json();
+            loadedSubtitlesList = data.subtitles || [];
+            renderSubtitlesPills();
+            renderSubtitlesList();
+          } else {
+            throw new Error(`HTTP ${subRes.status}`);
+          }
+        } catch (subErr) {
+          console.warn('OpenSubtitles fetch error:', subErr.message);
+          subListContainer.innerHTML = `
+            <div style="text-align:center;padding:24px 10px;color:#fca5a5;font-size:12px;">
+              ⚠️ Could not connect to OpenSubtitles server. Please upload a local .srt/.vtt file or try again later.
+            </div>
+          `;
+        }
+      }
+
+      function renderSubtitlesPills() {
+        const pillsContainer = document.getElementById('subLangPills');
+        if (!pillsContainer) return;
+
+        const availableLangs = new Set();
+        loadedSubtitlesList.forEach(s => {
+          if (s.lang) availableLangs.add(s.lang.toLowerCase());
+        });
+
+        const popularCodes = ['all', 'eng', 'kor', 'jpn', 'spa', 'fre', 'ara', 'hin', 'por', 'pob', 'ger', 'zho', 'rus', 'ind', 'tur', 'vie', 'tha'];
+        const renderedCodes = ['all'];
+
+        popularCodes.forEach(c => {
+          if (c !== 'all' && (availableLangs.has(c) || availableLangs.has(c.substring(0, 2)))) {
+            renderedCodes.push(c);
+          }
+        });
+
+        pillsContainer.innerHTML = renderedCodes.map(code => {
+          const meta = SUB_LANG_MAP[code] || { flag: "🌐", name: code.toUpperCase() };
+          const label = code === 'all' ? `All (${loadedSubtitlesList.length})` : `${meta.flag} ${meta.name.split(' ')[0]}`;
+          const isActive = activeSubLangFilter === code;
+          return `
+            <button class="sub-pill ${isActive ? 'active' : ''}" data-lang="${code}" style="white-space:nowrap;background:${isActive ? '#ffbc00' : 'rgba(255,255,255,0.08)'};color:${isActive ? '#000' : '#cbd5e1'};border:1px solid ${isActive ? '#ffbc00' : 'rgba(255,255,255,0.12)'};padding:4px 10px;border-radius:14px;font-size:11px;font-weight:${isActive ? '800' : '600'};cursor:pointer;" type="button">
+              ${label}
+            </button>
+          `;
+        }).join('');
+
+        pillsContainer.querySelectorAll('.sub-pill').forEach(btn => {
+          btn.onclick = () => {
+            activeSubLangFilter = btn.getAttribute('data-lang');
+            renderSubtitlesPills();
+            renderSubtitlesList();
+          };
+        });
+      }
+
+      function renderSubtitlesList() {
+        const subListContainer = document.getElementById('subtitlesList');
+        const searchVal = (document.getElementById('subSearchInput')?.value || '').toLowerCase().trim();
+        if (!subListContainer) return;
+
+        let filtered = loadedSubtitlesList;
+
+        if (activeSubLangFilter && activeSubLangFilter !== 'all') {
+          filtered = filtered.filter(s => {
+            const l = (s.lang || '').toLowerCase();
+            return l === activeSubLangFilter || l.startsWith(activeSubLangFilter.substring(0, 2));
+          });
+        }
+
+        if (searchVal) {
+          filtered = filtered.filter(s => {
+            const l = (s.lang || '').toLowerCase();
+            const meta = SUB_LANG_MAP[l] || { name: l };
+            const fName = (s.subtitleFileName || '').toLowerCase();
+            const relName = (s.movieReleaseName || '').toLowerCase();
+            return meta.name.toLowerCase().includes(searchVal) || fName.includes(searchVal) || relName.includes(searchVal) || l.includes(searchVal);
+          });
+        }
+
+        if (filtered.length === 0) {
+          subListContainer.innerHTML = `
+            <div style="text-align:center;padding:24px 10px;color:#94a3b8;font-size:12px;">
+              No subtitles found matching "${searchVal || activeSubLangFilter}".
+            </div>
+          `;
+          return;
+        }
+
+        subListContainer.innerHTML = filtered.map((sub, idx) => {
+          const l = (sub.lang || 'en').toLowerCase();
+          const meta = SUB_LANG_MAP[l] || { flag: "🌐", name: l.toUpperCase() };
+          const releaseText = sub.movieReleaseName || sub.subtitleFileName || "Standard Release";
+          return `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;overflow:hidden;flex:1;">
+                <span style="font-size:18px;">${meta.flag}</span>
+                <div style="overflow:hidden;">
+                  <div style="font-size:12px;font-weight:700;color:#fff;">${meta.name}</div>
+                  <div style="font-size:10.5px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px;">
+                    ${releaseText}
+                  </div>
+                </div>
+              </div>
+              <button class="btn-load-sub" data-idx="${idx}" style="background:#ffbc00;color:#000;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;" type="button">
+                Load CC
+              </button>
+            </div>
+          `;
+        }).join('');
+
+        subListContainer.querySelectorAll('.btn-load-sub').forEach(btn => {
+          btn.onclick = async () => {
+            const idx = parseInt(btn.getAttribute('data-idx'), 10);
+            const sub = filtered[idx];
+            if (!sub) return;
+
+            btn.textContent = 'Loading...';
+            btn.style.opacity = '0.7';
+
+            const l = (sub.lang || 'en').toLowerCase();
+            const meta = SUB_LANG_MAP[l] || { flag: "🌐", name: l.toUpperCase() };
+            const label = `${meta.flag} ${meta.name.split(' ')[0]}`;
+
+            await attachSubtitleTrack(sub.url, label, false);
+
+            const modal = document.getElementById('subtitlesModal');
+            if (modal) modal.style.display = 'none';
+          };
+        });
+      }
+
+      // Wire Subtitle Modal Controls
+      const modalSubs = document.getElementById('subtitlesModal');
+      const openSubBtn1 = document.getElementById('btnOpenSubtitlesModal');
+      const openSubBtn2 = document.getElementById('btnOpenSubtitlesModal2');
+      const closeSubBtn = document.getElementById('btnCloseSubtitlesModal');
+      const subSearchInput = document.getElementById('subSearchInput');
+      const btnDisableSubs = document.getElementById('btnDisableSubs');
+
+      function openSubtitlesModalView() {
+        if (!modalSubs) return;
+        modalSubs.style.display = 'flex';
+        if (loadedSubtitlesList.length === 0) {
+          fetchMovieSubtitles();
+        }
+      }
+
+      if (openSubBtn1) openSubBtn1.onclick = openSubtitlesModalView;
+      if (openSubBtn2) openSubBtn2.onclick = openSubtitlesModalView;
+      if (closeSubBtn) closeSubBtn.onclick = () => { modalSubs.style.display = 'none'; };
+
+      if (subSearchInput) {
+        subSearchInput.addEventListener('input', () => {
+          renderSubtitlesList();
+        });
+      }
+
+      if (btnDisableSubs) {
+        btnDisableSubs.onclick = () => {
+          if (videoEl && videoEl.textTracks) {
+            for (let i = 0; i < videoEl.textTracks.length; i++) {
+              videoEl.textTracks[i].mode = 'disabled';
+            }
+          }
+          const dynamicSubs = videoEl.querySelectorAll('track.dynamic-sub');
+          dynamicSubs.forEach(t => t.remove());
+          const activeLabel = document.getElementById('activeSubLabel');
+          if (activeLabel) activeLabel.textContent = 'Subtitles';
+          showSubToast('Subtitles Disabled', 'ℹ️');
+          if (modalSubs) modalSubs.style.display = 'none';
+        };
+      }
+
       if (subParam) {
-        attachSubtitleTrack(subParam, 'Active Subtitle');
+        attachSubtitleTrack(subParam, 'Active Subtitle', false);
       }
 
       // Set Backdrop Background on Overlay if provided
@@ -1029,32 +1418,6 @@
           }
         }
       });
-
-      // 2. Custom Subtitles (.srt/.vtt) Loader
-      const subInput = document.getElementById('bloggerSubInput');
-      if (subInput) {
-        subInput.addEventListener('change', function(e) {
-          const file = e.target.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = function(evt) {
-            let content = evt.target.result;
-            if (file.name.endsWith('.srt')) {
-              content = "WEBVTT\n\n" + content.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, "$1.$2");
-            }
-            const blob = new Blob([content], { type: 'text/vtt' });
-            const track = document.createElement('track');
-            track.kind = 'subtitles';
-            track.label = file.name.replace(/\.[^/.]+$/, "");
-            track.srclang = 'en';
-            track.src = URL.createObjectURL(blob);
-            track.default = true;
-            videoEl.appendChild(track);
-            alert("✅ Subtitles loaded: " + file.name);
-          };
-          reader.readAsText(file);
-        });
-      }
 
       if (finalStreamUrl) {
         // Multi-engine stream resolver with native HLS fallback

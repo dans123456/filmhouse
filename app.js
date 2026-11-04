@@ -5365,69 +5365,59 @@ async function openSubtitlesPicker(movie) {
 
         content.replaceChildren();
 
-        const langFlags = {
-            "en": "🇬🇧", "eng": "🇬🇧",
-            "fr": "🇫🇷", "fre": "🇫🇷", "fra": "🇫🇷",
-            "es": "🇪🇸", "spa": "🇪🇸",
-            "ar": "🇸🇦", "ara": "🇸🇦",
-            "de": "🇩🇪", "ger": "🇩🇪", "deu": "🇩🇪",
-            "it": "🇮🇹", "ita": "🇮🇹",
-            "pt": "🇵🇹", "por": "🇵🇹", "pob": "🇧🇷",
-            "ru": "🇷🇺", "rus": "🇷🇺",
-            "zh": "🇨🇳", "chi": "🇨🇳", "zho": "🇨🇳",
-            "ja": "🇯🇵", "jpn": "🇯🇵",
-            "ko": "🇰🇷", "kor": "🇰🇷",
-            "tr": "🇹🇷", "tur": "🇹🇷",
-            "hi": "🇮🇳", "hin": "🇮🇳"
-        };
-        const langNames = {
-            "en": "English", "eng": "English",
-            "fr": "French", "fre": "French", "fra": "French",
-            "es": "Spanish", "spa": "Spanish",
-            "ar": "Arabic", "ara": "Arabic",
-            "de": "German", "ger": "German",
-            "it": "Italian", "ita": "Italian",
-            "pt": "Portuguese", "por": "Portuguese", "pob": "Portuguese (BR)",
-            "ru": "Russian", "rus": "Russian",
-            "zh": "Chinese", "chi": "Chinese",
-            "ja": "Japanese", "jpn": "Japanese",
-            "ko": "Korean", "kor": "Korean",
-            "tr": "Turkish", "tur": "Turkish",
-            "hi": "Hindi", "hin": "Hindi"
+        const langMeta = {
+            "en": { flag: "🇬🇧", name: "English" }, "eng": { flag: "🇬🇧", name: "English" },
+            "ko": { flag: "🇰🇷", name: "Korean (한국어)" }, "kor": { flag: "🇰🇷", name: "Korean (한국어)" },
+            "ja": { flag: "🇯🇵", name: "Japanese (日本語)" }, "jpn": { flag: "🇯🇵", name: "Japanese (日本語)" },
+            "es": { flag: "🇪🇸", name: "Spanish (Español)" }, "spa": { flag: "🇪🇸", name: "Spanish (Español)" },
+            "fr": { flag: "🇫🇷", name: "French (Français)" }, "fre": { flag: "🇫🇷", name: "French (Français)" }, "fra": { flag: "🇫🇷", name: "French (Français)" },
+            "ar": { flag: "🇸🇦", name: "Arabic (العربية)" }, "ara": { flag: "🇸🇦", name: "Arabic (العربية)" },
+            "hi": { flag: "🇮🇳", name: "Hindi (हिन्दी)" }, "hin": { flag: "🇮🇳", name: "Hindi (हिन्दी)" },
+            "pt": { flag: "🇵🇹", name: "Portuguese (Português)" }, "por": { flag: "🇵🇹", name: "Portuguese (Português)" }, "pob": { flag: "🇧🇷", name: "Portuguese (Brasil)" },
+            "de": { flag: "🇩🇪", name: "German (Deutsch)" }, "ger": { flag: "🇩🇪", name: "German (Deutsch)" }, "deu": { flag: "🇩🇪", name: "German (Deutsch)" },
+            "zh": { flag: "🇨🇳", name: "Chinese (Simplified)" }, "chi": { flag: "🇨🇳", name: "Chinese (Simplified)" }, "zho": { flag: "🇨🇳", name: "Chinese (Simplified)" },
+            "zht": { flag: "🇹🇼", name: "Chinese (Traditional)" },
+            "ru": { flag: "🇷🇺", name: "Russian (Русский)" }, "rus": { flag: "🇷🇺", name: "Russian (Русский)" },
+            "it": { flag: "🇮🇹", name: "Italian (Italiano)" }, "ita": { flag: "🇮🇹", name: "Italian (Italiano)" },
+            "id": { flag: "🇮🇩", name: "Indonesian (Bahasa)" }, "ind": { flag: "🇮🇩", name: "Indonesian (Bahasa)" },
+            "tr": { flag: "🇹🇷", name: "Turkish (Türkçe)" }, "tur": { flag: "🇹🇷", name: "Turkish (Türkçe)" },
+            "vi": { flag: "🇻🇳", name: "Vietnamese (Tiếng Việt)" }, "vie": { flag: "🇻🇳", name: "Vietnamese (Tiếng Việt)" },
+            "th": { flag: "🇹🇭", name: "Thai (ไทย)" }, "tha": { flag: "🇹🇭", name: "Thai (ไทย)" },
+            "tl": { flag: "🇵🇭", name: "Tagalog (Filipino)" }, "tgl": { flag: "🇵🇭", name: "Tagalog (Filipino)" },
+            "nl": { flag: "🇳🇱", name: "Dutch (Nederlands)" }, "nld": { flag: "🇳🇱", name: "Dutch (Nederlands)" },
+            "pl": { flag: "🇵🇱", name: "Polish (Polski)" }, "pol": { flag: "🇵🇱", name: "Polish (Polski)" },
+            "sv": { flag: "🇸🇪", name: "Swedish (Svenska)" }, "swe": { flag: "🇸🇪", name: "Swedish (Svenska)" },
+            "da": { flag: "🇩🇰", name: "Danish (Dansk)" }, "dan": { flag: "🇩🇰", name: "Danish (Dansk)" },
+            "no": { flag: "🇳🇴", name: "Norwegian (Norsk)" }, "nor": { flag: "🇳🇴", name: "Norwegian (Norsk)" },
+            "fi": { flag: "🇫🇮", name: "Finnish (Suomi)" }, "fin": { flag: "🇫🇮", name: "Finnish (Suomi)" },
+            "el": { flag: "🇬🇷", name: "Greek (Ελληνικά)" }, "ell": { flag: "🇬🇷", name: "Greek (Ελληνικά)" },
+            "he": { flag: "🇮🇱", name: "Hebrew (עברית)" }, "heb": { flag: "🇮🇱", name: "Hebrew (עברית)" },
+            "ro": { flag: "🇷🇴", name: "Romanian (Română)" }, "ron": { flag: "🇷🇴", name: "Romanian (Română)" },
+            "hu": { flag: "🇭🇺", name: "Hungarian (Magyar)" }, "hun": { flag: "🇭🇺", name: "Hungarian (Magyar)" },
+            "cs": { flag: "🇨🇿", name: "Czech (Čeština)" }, "cze": { flag: "🇨🇿", name: "Czech (Čeština)" },
+            "sk": { flag: "🇸🇰", name: "Slovak (Slovenčina)" }, "slo": { flag: "🇸🇰", name: "Slovak (Slovenčina)" },
+            "uk": { flag: "🇺🇦", name: "Ukrainian (Українська)" }, "ukr": { flag: "🇺🇦", name: "Ukrainian (Українська)" },
+            "hr": { flag: "🇭🇷", name: "Croatian (Hrvatski)" }, "hrv": { flag: "🇭🇷", name: "Croatian (Hrvatski)" },
+            "sr": { flag: "🇷🇸", name: "Serbian (Српски)" }, "srp": { flag: "🇷🇸", name: "Serbian (Српски)" },
+            "bg": { flag: "🇧🇬", name: "Bulgarian (Български)" }, "bul": { flag: "🇧🇬", name: "Bulgarian (Български)" },
+            "ms": { flag: "🇲🇾", name: "Malay (Bahasa Melayu)" }, "may": { flag: "🇲🇾", name: "Malay (Bahasa Melayu)" },
+            "fa": { flag: "🇮🇷", name: "Persian (Farsi)" }, "per": { flag: "🇮🇷", name: "Persian (Farsi)" },
+            "bn": { flag: "🇧🇩", name: "Bengali (বাংলা)" }, "ben": { flag: "🇧🇩", name: "Bengali (বাংলা)" },
+            "te": { flag: "🇮🇳", name: "Telugu (తెలుగు)" }, "tel": { flag: "🇮🇳", name: "Telugu (తెలుగు)" },
+            "ta": { flag: "🇮🇳", name: "Tamil (தமிழ்)" }, "tam": { flag: "🇮🇳", name: "Tamil (தமிழ்)" },
+            "ml": { flag: "🇮🇳", name: "Malayalam (മലയാളം)" }, "mal": { flag: "🇮🇳", name: "Malayalam (മലയാളം)" },
+            "ur": { flag: "🇵🇰", name: "Urdu (اردو)" }, "urd": { flag: "🇵🇰", name: "Urdu (اردو)" },
+            "sw": { flag: "🇰🇪", name: "Swahili (Kiswahili)" }, "swa": { flag: "🇰🇪", name: "Swahili (Kiswahili)" }
         };
 
         if (subsList.length === 0) {
-            // Fallback default tracks
-            const fallbackLangs = [
-                { code: "en", flag: "🇬🇧", name: "English Subtitles" },
-                { code: "fr", flag: "🇫🇷", name: "French Subtitles (Français)" },
-                { code: "es", flag: "🇪🇸", name: "Spanish Subtitles (Español)" },
-                { code: "ar", flag: "🇸🇦", name: "Arabic Subtitles (العربية)" }
-            ];
-            const p = document.createElement("p");
-            p.style.cssText = "font-size:12px;color:var(--text-secondary);margin:0 0 10px 0;";
-            p.textContent = "Embedded player subtitles ready for this title:";
+            const p = document.createElement("div");
+            p.style.cssText = "text-align:center;padding:20px 10px;color:#94a3b8;font-size:12.5px;";
+            p.innerHTML = `
+                <p style="margin:0 0 6px 0;font-weight:700;color:#fff;">ℹ️ No online subtitles found on OpenSubtitles.</p>
+                <p style="margin:0;font-size:11.5px;">You can select embedded audio tracks or load a custom .srt file in the player controls.</p>
+            `;
             content.appendChild(p);
-
-            fallbackLangs.forEach(lang => {
-                const item = document.createElement("div");
-                item.className = "subtitles-lang-item";
-                item.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span style="font-size:18px;">${lang.flag}</span>
-                        <div>
-                            <div style="font-size:13px;font-weight:700;color:#fff;">${lang.name}</div>
-                            <div style="font-size:11px;color:#94a3b8;">Built-in Player CC</div>
-                        </div>
-                    </div>
-                    <span style="font-size:11px;color:var(--primary-color,#ffbc00);font-weight:700;">Ready</span>
-                `;
-                item.onclick = () => {
-                    showToast(`✅ Selected ${lang.flag} ${lang.name}!`, "success");
-                    modal.style.display = "none";
-                };
-                content.appendChild(item);
-            });
             return;
         }
 
@@ -5439,13 +5429,24 @@ async function openSubtitlesPicker(movie) {
             grouped[rawLang].push(sub);
         });
 
-        const p = document.createElement("div");
-        p.style.cssText = "display:flex;align-items:center;justify-content:space-between;margin:0 0 10px 0;font-size:12px;color:var(--text-secondary);";
-        p.innerHTML = `
-            <span>Verified <b>OpenSubtitles</b> (${subsList.length} files)</span>
-            <span style="color:#ffbc00;font-weight:700;">TMDB &bull; ${imdbId || ''}</span>
+        // Header with count & search
+        const headerEl = document.createElement("div");
+        headerEl.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:12px;color:var(--text-secondary);">
+                <span>Verified <b>OpenSubtitles</b> (${subsList.length} files • 60+ Langs)</span>
+                <span style="color:#ffbc00;font-weight:700;">TMDB &bull; ${imdbId || ''}</span>
+            </div>
+            <input id="app-sub-search-input" type="text" placeholder="🔍 Filter language (e.g. English, Korean, Spanish...)" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:7px 12px;border-radius:8px;color:#fff;font-size:12px;margin-bottom:8px;outline:none;"/>
+            <div id="app-sub-filter-pills" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;scrollbar-width:none;"></div>
+            <div id="app-sub-cards-container" style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;padding-right:2px;"></div>
         `;
-        content.appendChild(p);
+        content.appendChild(headerEl);
+
+        const searchInput = headerEl.querySelector("#app-sub-search-input");
+        const pillsContainer = headerEl.querySelector("#app-sub-filter-pills");
+        const cardsContainer = headerEl.querySelector("#app-sub-cards-container");
+
+        let activeLangCode = "all";
 
         // Sort: English first, then alphabetical
         const langKeys = Object.keys(grouped).sort((a, b) => {
@@ -5454,53 +5455,107 @@ async function openSubtitlesPicker(movie) {
             return a.localeCompare(b);
         });
 
-        langKeys.forEach(langCode => {
-            const tracks = grouped[langCode];
-            const bestTrack = tracks[0];
-            const flag = langFlags[langCode] || "🌐";
-            const langName = langNames[langCode] || langCode.toUpperCase();
+        const popularPills = ["all", "eng", "kor", "jpn", "spa", "fre", "ara", "hin", "por", "pob", "ger", "zho", "rus", "ind", "tur", "vie", "tha"];
+        const renderPillCodes = ["all"];
+        popularPills.forEach(c => {
+            if (c !== "all" && (grouped[c] || grouped[c.substring(0, 2)])) {
+                renderPillCodes.push(c);
+            }
+        });
 
-            const item = document.createElement("div");
-            item.className = "subtitles-lang-item";
-            item.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,0.05);margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);cursor:pointer;";
-            item.innerHTML = `
-                <div style="display:flex;align-items:center;gap:12px;overflow:hidden;flex:1;">
-                    <span style="font-size:20px;">${flag}</span>
-                    <div style="overflow:hidden;">
-                        <div style="font-size:13.5px;font-weight:700;color:#fff;">${langName}</div>
-                        <div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px;">
-                            ${bestTrack.subtitleFileName || `${tracks.length} variants available`}
+        function renderPills() {
+            pillsContainer.innerHTML = renderPillCodes.map(code => {
+                const meta = langMeta[code] || { flag: "🌐", name: code.toUpperCase() };
+                const label = code === "all" ? `All (${subsList.length})` : `${meta.flag} ${meta.name.split(" ")[0]}`;
+                const isActive = activeLangCode === code;
+                return `
+                    <button class="app-sub-pill" data-code="${code}" style="white-space:nowrap;background:${isActive ? "#ffbc00" : "rgba(255,255,255,0.08)"};color:${isActive ? "#000" : "#cbd5e1"};border:1px solid ${isActive ? "#ffbc00" : "rgba(255,255,255,0.12)"};padding:4px 10px;border-radius:14px;font-size:11px;font-weight:${isActive ? "800" : "600"};cursor:pointer;" type="button">
+                        ${label}
+                    </button>
+                `;
+            }).join("");
+
+            pillsContainer.querySelectorAll(".app-sub-pill").forEach(btn => {
+                btn.onclick = () => {
+                    activeLangCode = btn.getAttribute("data-code");
+                    renderPills();
+                    renderCards();
+                };
+            });
+        }
+
+        function renderCards() {
+            const query = (searchInput.value || "").toLowerCase().trim();
+            cardsContainer.replaceChildren();
+
+            let targetLangs = langKeys;
+            if (activeLangCode && activeLangCode !== "all") {
+                targetLangs = targetLangs.filter(code => code === activeLangCode || code.startsWith(activeLangCode.substring(0, 2)));
+            }
+
+            if (query) {
+                targetLangs = targetLangs.filter(code => {
+                    const meta = langMeta[code] || { name: code };
+                    return meta.name.toLowerCase().includes(query) || code.includes(query);
+                });
+            }
+
+            if (targetLangs.length === 0) {
+                cardsContainer.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">No languages match "${query}".</div>`;
+                return;
+            }
+
+            targetLangs.forEach(langCode => {
+                const tracks = grouped[langCode];
+                const bestTrack = tracks[0];
+                const meta = langMeta[langCode] || { flag: "🌐", name: langCode.toUpperCase() };
+
+                const item = document.createElement("div");
+                item.className = "subtitles-lang-item";
+                item.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);cursor:pointer;gap:10px;";
+                item.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:10px;overflow:hidden;flex:1;">
+                        <span style="font-size:18px;">${meta.flag}</span>
+                        <div style="overflow:hidden;">
+                            <div style="font-size:13px;font-weight:700;color:#fff;">${meta.name}</div>
+                            <div style="font-size:10.5px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px;">
+                                ${bestTrack.subtitleFileName || bestTrack.movieReleaseName || `${tracks.length} variants available`}
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                    <a href="${bestTrack.url}" target="_blank" download class="btn-sub-dl" style="padding:4px 8px;border-radius:6px;background:rgba(255,255,255,0.1);color:#cbd5e1;font-size:11px;text-decoration:none;font-weight:600;" onclick="event.stopPropagation();">
-                        ⬇️ SRT
-                    </a>
-                    <button class="btn-sub-select" style="padding:4px 10px;border-radius:6px;background:#ffbc00;color:#000;font-size:11px;font-weight:700;border:none;cursor:pointer;">
-                        Load
-                    </button>
-                </div>
-            `;
+                    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                        <a href="${bestTrack.url}" target="_blank" download class="btn-sub-dl" style="padding:3px 7px;border-radius:6px;background:rgba(255,255,255,0.1);color:#cbd5e1;font-size:10.5px;text-decoration:none;font-weight:600;" onclick="event.stopPropagation();">
+                            ⬇️ SRT
+                        </a>
+                        <button class="btn-sub-select" style="padding:4px 10px;border-radius:6px;background:#ffbc00;color:#000;font-size:11px;font-weight:800;border:none;cursor:pointer;">
+                            Load CC
+                        </button>
+                    </div>
+                `;
 
-            item.onclick = () => {
-                showToast(`✅ Loaded ${flag} ${langName} subtitles!`, "success");
-                state.activeSubtitleUrl = bestTrack.url;
-                state.activeSubtitleLang = langName;
-                const frame = document.querySelector("#cinema-iframe-container iframe");
-                if (frame && frame.contentWindow) {
-                    frame.contentWindow.postMessage({
-                        action: "loadSubtitle",
-                        url: bestTrack.url,
-                        lang: langName
-                    }, "*");
-                }
-                modal.style.display = "none";
-                if (typeof triggerHaptic === "function") triggerHaptic("selection");
-            };
+                item.onclick = () => {
+                    showToast(`✅ Loaded ${meta.flag} ${meta.name} subtitles!`, "success");
+                    state.activeSubtitleUrl = bestTrack.url;
+                    state.activeSubtitleLang = meta.name;
+                    const frame = document.querySelector("#cinema-iframe-container iframe");
+                    if (frame && frame.contentWindow) {
+                        frame.contentWindow.postMessage({
+                            action: "loadSubtitle",
+                            url: bestTrack.url,
+                            lang: `${meta.flag} ${meta.name.split(" ")[0]}`
+                        }, "*");
+                    }
+                    modal.style.display = "none";
+                    if (typeof triggerHaptic === "function") triggerHaptic("selection");
+                };
 
-            content.appendChild(item);
-        });
+                cardsContainer.appendChild(item);
+            });
+        }
+
+        searchInput.addEventListener("input", renderCards);
+        renderPills();
+        renderCards();
 
     } catch (err) {
         console.error("Failed to fetch subtitles:", err);
@@ -7258,7 +7313,9 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const currentMediaTitle = currentTitle || initialTitle;
         const subParam = state.activeSubtitleUrl ? `&sub=${encodeURIComponent(state.activeSubtitleUrl)}` : "";
         const movieBackdrop = movie.backdrop || movie.poster || "";
-        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${subParam}`;
+        const imdbParam = movie.imdb_id ? `&imdb=${encodeURIComponent(movie.imdb_id)}` : "";
+        const tmdbParam = movie.tmdb_id ? `&tmdb=${encodeURIComponent(movie.tmdb_id)}` : "";
+        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${subParam}`;
         const iframe = document.createElement("iframe");
         iframe.src = playerSrc;
         iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
