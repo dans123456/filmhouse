@@ -6892,31 +6892,43 @@ function closeCinemaModal() {
     const container = document.getElementById("cinema-iframe-container");
     const theater = document.querySelector(".cinema-theater-container");
     if (modal) modal.classList.remove("active");
-    if (theater) theater.classList.remove("is-fullscreen");
+    if (theater) {
+        theater.classList.remove("is-fullscreen");
+        theater.classList.remove("controls-hidden");
+    }
     if (container) container.replaceChildren();
 
-    // Reset Next Episode Card & Subtitle Hub Modal
+    // Reset Next Episode Card & Subtitle / Quality Hub Modals
     const nextCard = document.getElementById("cinema-next-ep-card");
     if (nextCard) nextCard.style.display = "none";
     const subModal = document.getElementById("cinema-sub-hub-modal");
     if (subModal) subModal.style.display = "none";
+    const qModal = document.getElementById("cinema-quality-modal");
+    if (qModal) qModal.style.display = "none";
     if (window._nextEpCountdownTimer) {
         clearInterval(window._nextEpCountdownTimer);
         window._nextEpCountdownTimer = null;
     }
     
-    document.body.classList.remove("tg-back-visible");
-    // Telegram BackButton management: Keep visible if media detail page is active
-    if (window.Telegram?.WebApp?.BackButton) {
-        const mediaDetailScreen = document.getElementById("screen-media-detail");
-        if (mediaDetailScreen && mediaDetailScreen.classList.contains("active")) {
-            try { window.Telegram.WebApp.BackButton.show(); } catch (e) {}
-        } else {
-            try { window.Telegram.WebApp.BackButton.hide(); } catch (e) {}
+    // Unlock screen orientation if locked
+    try {
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
         }
-    }
+    } catch (e) {}
+
     if (document.fullscreenElement && document.exitFullscreen) {
         document.exitFullscreen().catch(() => {});
+    }
+
+    document.body.classList.remove("tg-back-visible");
+
+    // UX FIX: ALWAYS return to the movie detail page of the movie streamed, NOT the dashboard!
+    const targetMovie = state.lastCinemaMovie || currentMediaDetailMovie;
+    if (targetMovie) {
+        openMediaDetailPage(targetMovie);
+    } else {
+        navigateToScreen(state.previousScreen || "home");
     }
 }
 
@@ -7004,6 +7016,9 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     const detailsContainer = document.getElementById("cinema-details-container");
     if (!modal || !container || !movie) return;
 
+    // Track active cinema movie for seamless return to movie detail page
+    state.lastCinemaMovie = movie;
+
     // In-app Back and Minimize Button Bindings
     const closeBtn = document.getElementById("btn-close-cinema");
     if (closeBtn && !closeBtn._bound) {
@@ -7070,10 +7085,183 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         tabSubs.addEventListener("click", () => switchHubTab("subs"));
     }
 
+    // Multi-Language Subtitles (60+ Languages via OpenSubtitles)
+    let loadedHubSubtitles = [];
+    let activeHubSubFilter = "all";
+
+    const SUB_FLAGS = {
+        en: "🇬🇧", eng: "🇬🇧", ko: "🇰🇷", kor: "🇰🇷", ja: "🇯🇵", jpn: "🇯🇵",
+        es: "🇪🇸", spa: "🇪🇸", fr: "🇫🇷", fre: "🇫🇷", fra: "🇫🇷", ar: "🇸🇦", ara: "🇸🇦",
+        hi: "🇮🇳", hin: "🇮🇳", pt: "🇵🇹", por: "🇵🇹", pob: "🇧🇷", de: "🇩🇪", ger: "🇩🇪", deu: "🇩🇪",
+        zh: "🇨🇳", chi: "🇨🇳", zho: "🇨🇳", ru: "🇷🇺", rus: "🇷🇺", it: "🇮🇹", ita: "🇮🇹",
+        id: "🇮🇩", ind: "🇮🇩", tr: "🇹🇷", tur: "🇹🇷", vi: "🇻🇳", vie: "🇻🇳", th: "🇹🇭", tha: "🇹🇭",
+        tl: "🇵🇭", tgl: "🇵🇭", nl: "🇳🇱", dut: "🇳🇱", nla: "🇳🇱", pl: "🇵🇱", pol: "🇵🇱",
+        sv: "🇸🇪", swe: "🇸🇪", no: "🇳🇴", nor: "🇳🇴", fi: "🇫🇮", fin: "🇫🇮", el: "🇬🇷", ell: "🇬🇷",
+        he: "🇮🇱", heb: "🇮🇱", ro: "🇷🇴", ron: "🇷🇴", hu: "🇭🇺", hun: "🇭🇺", cs: "🇨🇿", cze: "🇨🇿",
+        uk: "🇺🇦", ukr: "🇺🇦", fa: "🇮🇷", per: "🇮🇷", bn: "🇧🇩", ben: "🇧🇩", ur: "🇵🇰", urd: "🇵🇰",
+        sw: "🇰🇪", swa: "🇰🇪"
+    };
+
+    async function loadOpenSubtitlesForHub() {
+        if (loadedHubSubtitles.length > 0) {
+            renderHubSubtitlesList();
+            return;
+        }
+        let imdbId = movie.imdb_id || "";
+        const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
+        const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
+
+        if (!imdbId && tmdbId) {
+            try {
+                const endpoint = isTVShow 
+                    ? `https://api.themoviedb.org/3/tv/${tmdbId}/external_ids?api_key=${apiKey}`
+                    : `https://api.themoviedb.org/3/movie/${tmdbId}?append_to_response=external_ids&api_key=${apiKey}`;
+                const res = await fetch(endpoint);
+                if (res.ok) {
+                    const data = await res.json();
+                    imdbId = data.imdb_id || data.external_ids?.imdb_id || "";
+                }
+            } catch (e) {}
+        }
+
+        if (!imdbId && movie.title) {
+            try {
+                const sEndpoint = isTVShow ? `https://api.themoviedb.org/3/search/tv` : `https://api.themoviedb.org/3/search/movie`;
+                const sRes = await fetch(`${sEndpoint}?api_key=${apiKey}&query=${encodeURIComponent(movie.title)}`);
+                if (sRes.ok) {
+                    const sData = await sRes.json();
+                    if (sData.results && sData.results[0] && sData.results[0].id) {
+                        const foundId = sData.results[0].id;
+                        const extRes = await fetch(`https://api.themoviedb.org/3/${isTVShow ? 'tv' : 'movie'}/${foundId}?append_to_response=external_ids&api_key=${apiKey}`);
+                        if (extRes.ok) {
+                            const extData = await extRes.json();
+                            imdbId = extData.imdb_id || extData.external_ids?.imdb_id || "";
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+
+        if (imdbId) {
+            try {
+                const typeSlug = isTVShow ? "series" : "movie";
+                const epSuffix = isTVShow ? `:1:${typeof currentEpisodeNum !== 'undefined' ? currentEpisodeNum : 1}` : "";
+                const subUrl = `https://opensubtitles-v3.strem.io/subtitles/${typeSlug}/${imdbId}${epSuffix}.json`;
+                const subRes = await fetch(subUrl);
+                if (subRes.ok) {
+                    const data = await subRes.json();
+                    if (data && Array.isArray(data.subtitles)) {
+                        loadedHubSubtitles = data.subtitles;
+                    }
+                }
+            } catch (e) {
+                console.warn("OpenSubtitles fetch error for hub:", e);
+            }
+        }
+        renderHubSubtitlesList();
+    }
+
+    function renderHubSubtitlesList() {
+        if (!subTrackList) return;
+        const searchVal = (document.getElementById("cinema-hub-sub-search")?.value || "").toLowerCase().trim();
+
+        let filtered = loadedHubSubtitles;
+        if (activeHubSubFilter && activeHubSubFilter !== "all") {
+            filtered = filtered.filter(s => {
+                const l = (s.lang || "").toLowerCase();
+                return l === activeHubSubFilter || l.startsWith(activeHubSubFilter.slice(0, 2));
+            });
+        }
+        if (searchVal) {
+            filtered = filtered.filter(s => {
+                const l = (s.lang || "").toLowerCase();
+                const cleanName = getCleanLangName(l) || l;
+                const fName = (s.subtitleFileName || "").toLowerCase();
+                return cleanName.toLowerCase().includes(searchVal) || fName.includes(searchVal) || l.includes(searchVal);
+            });
+        }
+
+        // Keep standard Captions Off button at top
+        let html = `
+            <button type="button" class="cinema-sub-track-item active" data-sub-idx="-1">
+                <div class="track-item-left">
+                    <svg><use href="#icon-subtitles"></use></svg>
+                    <span class="track-name">Captions Off</span>
+                </div>
+                <span class="sub-check">✓</span>
+            </button>
+        `;
+
+        filtered.slice(0, 40).forEach(sub => {
+            const rawLang = (sub.lang || "en").toLowerCase();
+            const flag = SUB_FLAGS[rawLang] || SUB_FLAGS[rawLang.slice(0, 2)] || "🌐";
+            const name = getCleanLangName(rawLang) || rawLang.toUpperCase();
+            const release = sub.movieReleaseName || sub.subtitleFileName || "Standard Release";
+            html += `
+                <button type="button" class="cinema-sub-track-item cinema-hub-dynamic-sub" data-sub-url="${encodeURIComponent(sub.url)}" data-sub-name="${name}">
+                    <div class="track-item-left">
+                        <span style="font-size:16px;">${flag}</span>
+                        <div style="display:flex;flex-direction:column;align-items:flex-start;overflow:hidden;text-align:left;">
+                            <span class="track-name" style="font-weight:700;">${name} Subtitles</span>
+                            <span style="font-size:10px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">${release}</span>
+                        </div>
+                    </div>
+                    <span class="sub-check" style="font-size:11px;font-weight:800;color:#ffbc00;">Load CC</span>
+                </button>
+            `;
+        });
+
+        subTrackList.innerHTML = html;
+
+        // Wire dynamic sub click
+        subTrackList.querySelectorAll(".cinema-hub-dynamic-sub").forEach(btn => {
+            btn.onclick = () => {
+                const url = decodeURIComponent(btn.getAttribute("data-sub-url") || "");
+                const name = btn.getAttribute("data-sub-name") || "Captions";
+                const frame = container.querySelector("iframe");
+                if (frame && frame.contentWindow) {
+                    frame.contentWindow.postMessage({
+                        action: "loadSubtitle",
+                        url: url,
+                        lang: name
+                    }, "*");
+                }
+                if (subQuickLabel) subQuickLabel.textContent = `CC: ${name}`;
+                showToast(`✅ Loaded ${name} Subtitles`, "success");
+                closeSubHub();
+            };
+        });
+    }
+
+    // Bind sub search and filter pills
+    const hubSubSearch = document.getElementById("cinema-hub-sub-search");
+    if (hubSubSearch && !hubSubSearch._bound) {
+        hubSubSearch._bound = true;
+        hubSubSearch.addEventListener("input", renderHubSubtitlesList);
+    }
+
+    const hubSubPills = document.getElementById("cinema-hub-sub-pills");
+    if (hubSubPills && !hubSubPills._bound) {
+        hubSubPills._bound = true;
+        hubSubPills.addEventListener("click", (e) => {
+            const btn = e.target.closest(".sub-pill");
+            if (!btn) return;
+            hubSubPills.querySelectorAll(".sub-pill").forEach(p => p.classList.remove("active"));
+            btn.classList.add("active");
+            activeHubSubFilter = btn.getAttribute("data-sub-filter") || "all";
+            renderHubSubtitlesList();
+        });
+    }
+
     const openSubHub = (defaultTab = "audio") => {
         switchHubTab(defaultTab);
+        if (defaultTab === "subs") {
+            loadOpenSubtitlesForHub();
+        }
         if (subModal) subModal.style.display = "flex";
     };
+
+    window.openCinemaSubtitlesHub = () => openSubHub("subs");
     const closeSubHub = () => {
         if (subModal) subModal.style.display = "none";
     };
@@ -7881,6 +8069,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         if (typeof window.updateCinemaDetectedTracks === "function") {
                             window.updateCinemaDetectedTracks(e.data);
                         }
+                    } else if (e.data.action === "openSubtitlesHub") {
+                        if (typeof window.openCinemaSubtitlesHub === "function") {
+                            window.openCinemaSubtitlesHub();
+                        }
                     }
                 });
             }
@@ -8197,7 +8389,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         }
     }
 
-    // Fullscreen Toggle Button Binding
+    // Fullscreen Toggle Button Binding (with auto-orientation lock and floating controls)
     const fsBtn = document.getElementById("btn-cinema-fullscreen");
     if (fsBtn && !fsBtn._bound) {
         fsBtn._bound = true;
@@ -8205,14 +8397,23 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             const theater = document.querySelector(".cinema-theater-container");
             const cinemaModal = document.getElementById("cinema-modal");
             const frame = document.querySelector("#cinema-iframe-container iframe");
+            const fsLabel = fsBtn.querySelector(".tool-label") || fsBtn.querySelector("span");
             if (theater) {
                 const isFs = theater.classList.toggle("is-fullscreen");
                 if (cinemaModal) cinemaModal.classList.toggle("has-fullscreen", isFs);
 
                 if (isFs) {
+                    if (fsLabel) fsLabel.textContent = "Exit";
+                    showToast("⛶ Fullscreen Active (Tap screen to toggle controls)", "info");
                     try {
                         if (window.Telegram?.WebApp?.requestFullscreen) {
                             window.Telegram.WebApp.requestFullscreen();
+                        }
+                    } catch (e) {}
+                    // Automatically lock to landscape orientation for true edge-to-edge mobile viewing
+                    try {
+                        if (screen.orientation && screen.orientation.lock) {
+                            screen.orientation.lock("landscape").catch(() => {});
                         }
                     } catch (e) {}
                     // PC / Desktop browser HTML5 Fullscreen API
@@ -8224,10 +8425,17 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     if (frame && frame.contentWindow) {
                         frame.contentWindow.postMessage({ action: "enterFullscreen" }, "*");
                     }
+                    if (typeof refreshCinemaControls === "function") refreshCinemaControls();
                 } else {
+                    if (fsLabel) fsLabel.textContent = "Full";
                     try {
                         if (window.Telegram?.WebApp?.exitFullscreen) {
                             window.Telegram.WebApp.exitFullscreen();
+                        }
+                    } catch (e) {}
+                    try {
+                        if (screen.orientation && screen.orientation.unlock) {
+                            screen.orientation.unlock();
                         }
                     } catch (e) {}
                     if (document.fullscreenElement && document.exitFullscreen) {
@@ -8236,6 +8444,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     if (frame && frame.contentWindow) {
                         frame.contentWindow.postMessage({ action: "exitFullscreen" }, "*");
                     }
+                    theater.classList.remove("controls-hidden");
                 }
             }
         });

@@ -8040,3 +8040,191 @@ body.desktop-wide-layout .mining-card-container {
         width: 150px;
     }
 }
+
+
+/* Subtitle Hub Modal Search & Filter Additions */
+.cinema-sub-search-wrap {
+    margin-bottom: 6px;
+}
+
+.cinema-sub-search-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 7px 12px;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 11.5px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.cinema-sub-search-input:focus {
+    border-color: #ffbc00;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.cinema-sub-pills-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cinema-sub-pills-row::-webkit-scrollbar {
+    display: none;
+}
+
+.cinema-sub-pills-row .sub-pill {
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.cinema-sub-pills-row .sub-pill:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
+.cinema-sub-pills-row .sub-pill.active {
+    background: #ffbc00;
+    color: #0b0d14;
+    border-color: #ffbc00;
+    font-weight: 800;
+}
+
+/* Fullscreen Overlay Styling for the Utility Bar */
+.cinema-theater-container.is-fullscreen .cinema-player-controls-bar {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 70%, transparent 100%) !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    z-index: 100 !important;
+    opacity: 1;
+    transition: opacity 0.35s ease;
+    pointer-events: none !important;
+}
+
+.cinema-theater-container.is-fullscreen .cinema-player-controls-bar * {
+    pointer-events: auto !important;
+}
+
+.cinema-theater-container.is-fullscreen.controls-hidden .cinema-player-controls-bar {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Immersive Edge-to-Edge Mobile Landscape Mode (Phone turned sideways) */
+@media (orientation: landscape) and (max-height: 550px) {
+    #cinema-modal.active {
+        padding: 0 !important;
+        background: #000000 !important;
+        overflow: hidden !important;
+    }
+
+    .cinema-theater-container {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        background: #000000 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        z-index: 3500 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .cinema-sticky-player {
+        width: 100% !important;
+        height: 100% !important;
+        flex: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #000000 !important;
+    }
+
+    .cinema-iframe-wrapper {
+        width: 100% !important;
+        height: 100% !important;
+        padding-top: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .cinema-iframe-wrapper iframe {
+        width: 100% !important;
+        height: 100% !important;
+        border: none !important;
+    }
+
+    .cinema-details-scroll-body {
+        display: none !important;
+    }
+
+    /* Floating auto-hiding top bar in landscape */
+    .cinema-header-wrapper {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 70%, transparent 100%) !important;
+        border-bottom: none !important;
+        z-index: 100 !important;
+        opacity: 1;
+        transition: opacity 0.35s ease;
+        pointer-events: none !important;
+    }
+
+    .cinema-header-wrapper * {
+        pointer-events: auto !important;
+    }
+
+    /* Floating auto-hiding bottom bar in landscape */
+    .cinema-player-controls-bar {
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 70%, transparent 100%) !important;
+        border: none !important;
+        z-index: 100 !important;
+        opacity: 1;
+        transition: opacity 0.35s ease;
+        pointer-events: none !important;
+    }
+
+    .cinema-player-controls-bar * {
+        pointer-events: auto !important;
+    }
+
+    .cinema-theater-container.controls-hidden .cinema-header-wrapper,
+    .cinema-theater-container.controls-hidden .cinema-player-controls-bar {
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+}

@@ -1091,9 +1091,24 @@
                             </div>
                         </div>
 
-                        <!-- Inbuilt & Detected Subtitles Pane -->
+                        <!-- Inbuilt & Detected Subtitles Pane (60+ Languages) -->
                         <div class="cinema-hub-pane" id="cinema-hub-pane-subs" style="display: none;">
-                            <div class="cinema-sub-hub-section-label">SUBTITLES &amp; CAPTIONS</div>
+                            <div class="cinema-sub-hub-section-label">SUBTITLES &amp; CC (60+ LANGUAGES)</div>
+                            <!-- Search Bar -->
+                            <div class="cinema-sub-search-wrap">
+                                <input type="text" id="cinema-hub-sub-search" placeholder="🔍 Search language (e.g. English, Korean, Spanish...)" class="cinema-sub-search-input">
+                            </div>
+                            <!-- Quick Filter Pills -->
+                            <div class="cinema-sub-pills-row" id="cinema-hub-sub-pills">
+                                <button type="button" class="sub-pill active" data-sub-filter="all">All</button>
+                                <button type="button" class="sub-pill" data-sub-filter="en">🇬🇧 English</button>
+                                <button type="button" class="sub-pill" data-sub-filter="ko">🇰🇷 Korean</button>
+                                <button type="button" class="sub-pill" data-sub-filter="ja">🇯🇵 Japanese</button>
+                                <button type="button" class="sub-pill" data-sub-filter="es">🇪🇸 Spanish</button>
+                                <button type="button" class="sub-pill" data-sub-filter="fr">🇫🇷 French</button>
+                                <button type="button" class="sub-pill" data-sub-filter="ar">🇸🇦 Arabic</button>
+                                <button type="button" class="sub-pill" data-sub-filter="hi">🇮🇳 Hindi</button>
+                            </div>
                             <div class="cinema-track-list" id="cinema-sub-track-list">
                                 <button type="button" class="cinema-sub-track-item active" data-sub-idx="-1">
                                     <div class="track-item-left">
@@ -1103,8 +1118,7 @@
                                     <span class="sub-check">✓</span>
                                 </button>
                             </div>
-
-                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

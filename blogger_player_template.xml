@@ -448,38 +448,34 @@
       </div>
 
       <!-- Multi-Language Subtitles Modal (60+ Languages) -->
-      <div id='subtitlesModal' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.94);backdrop-filter:blur(16px);z-index:22;flex-direction:column;padding:16px;box-sizing:border-box;'>
-        <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;'>
-          <div style='display:flex;align-items:center;gap:8px;'>
-            <span style='background:#ffbc00;color:#000;font-weight:900;font-size:10px;padding:2px 5px;border-radius:4px;'>CC</span>
-            <span style='font-size:14px;font-weight:800;color:#fff;'>Multi-Language Subtitles (60+)</span>
+      <div id='subtitlesModal' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.96);backdrop-filter:blur(18px);z-index:22;flex-direction:column;padding:8px 12px;box-sizing:border-box;overflow:hidden;'>
+        <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-shrink:0;'>
+          <div style='display:flex;align-items:center;gap:6px;'>
+            <span style='background:#ffbc00;color:#000;font-weight:900;font-size:9.5px;padding:1px 5px;border-radius:4px;'>CC</span>
+            <span style='font-size:12.5px;font-weight:800;color:#fff;'>Subtitles (60+ Languages)</span>
           </div>
-          <button id='btnCloseSubtitlesModal' style='background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;' type='button'>✕</button>
+          <div style='display:flex;align-items:center;gap:6px;'>
+            <button id='btnDisableSubs' style='background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;' type='button'>Off</button>
+            <button id='btnCloseSubtitlesModal' style='background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;' type='button'>✕</button>
+          </div>
         </div>
 
         <!-- Search Bar -->
-        <div style='margin-bottom:8px;'>
-          <input id='subSearchInput' placeholder='🔍 Search language (e.g. English, Korean, Spanish...)' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:7px 12px;border-radius:8px;color:#fff;font-size:12px;outline:none;' type='text'/>
+        <div style='margin-bottom:5px;flex-shrink:0;'>
+          <input id='subSearchInput' placeholder='🔍 Search language...' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);padding:5px 10px;border-radius:6px;color:#fff;font-size:11px;outline:none;' type='text'/>
         </div>
 
         <!-- Quick Language Filter Pills -->
-        <div id='subLangPills' style='display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;scrollbar-width:none;'>
-          <button class='sub-pill active' data-lang='all' style='white-space:nowrap;background:#ffbc00;color:#000;border:1px solid #ffbc00;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:800;cursor:pointer;' type='button'>All</button>
+        <div id='subLangPills' style='display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-bottom:5px;scrollbar-width:none;flex-shrink:0;'>
+          <button class='sub-pill active' data-lang='all' style='white-space:nowrap;background:#ffbc00;color:#000;border:1px solid #ffbc00;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800;cursor:pointer;' type='button'>All</button>
         </div>
 
         <!-- Subtitles List -->
-        <div id='subtitlesList' style='flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:2px;'>
-          <div id='subListLoading' style='text-align:center;padding:30px 10px;color:#94a3b8;font-size:12px;'>
-            <div class='spinner' style='margin:0 auto 10px;'></div>
+        <div id='subtitlesList' style='flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding-right:2px;-webkit-overflow-scrolling:touch;'>
+          <div id='subListLoading' style='text-align:center;padding:20px 10px;color:#94a3b8;font-size:11.5px;'>
+            <div class='spinner' style='margin:0 auto 8px;width:20px;height:20px;'></div>
             Connecting to OpenSubtitles (60+ languages)...
           </div>
-        </div>
-
-        <!-- Bottom Action Row -->
-        <div style='display:flex;justify-content:flex-end;align-items:center;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);margin-top:6px;'>
-          <button id='btnDisableSubs' style='background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;' type='button'>
-            ✕ Turn Off Subtitles
-          </button>
         </div>
       </div>
 
@@ -929,6 +925,12 @@
       const btnDisableSubs = document.getElementById('btnDisableSubs');
 
       function openSubtitlesModalView() {
+        if (window.parent && window.parent !== window) {
+          try {
+            window.parent.postMessage({ action: 'openSubtitlesHub' }, '*');
+            return;
+          } catch (e) {}
+        }
         if (!modalSubs) return;
         modalSubs.style.display = 'flex';
         if (loadedSubtitlesList.length === 0) {
