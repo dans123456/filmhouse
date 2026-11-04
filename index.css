@@ -1869,109 +1869,38 @@ body.tg-back-visible #btn-close-cinema {
     text-transform: uppercase;
 }
 
-/* Dedicated Player Control & Status Strip (Directly Below Video) */
+/* Dedicated Player Control & Status Strip (Single-Row Hollywood Utility Bar) */
 .cinema-player-controls-bar {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px 16px 12px;
-    background: linear-gradient(180deg, rgba(14, 18, 30, 0.95) 0%, rgba(8, 10, 16, 0.98) 100%);
+    align-items: center;
+    padding: 7px 12px;
+    background: linear-gradient(180deg, rgba(14, 18, 30, 0.98) 0%, rgba(8, 10, 16, 0.99) 100%);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     position: relative;
     z-index: 15;
     flex-shrink: 0;
+    min-height: 44px;
 }
 
-.cinema-controls-row-top {
+.cinema-controls-single-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
 }
 
-.cinema-live-group {
+.cinema-controls-left {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     flex-shrink: 0;
 }
 
-.cinema-top-right-group {
+.cinema-controls-right {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-.cinema-player-fs-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: rgba(255, 188, 0, 0.12);
-    border: 1px solid rgba(255, 188, 0, 0.35);
-    color: #ffbc00;
-    padding: 3px 9px;
-    border-radius: 12px;
-    font-size: 10.5px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.cinema-player-fs-btn:hover {
-    background: rgba(255, 188, 0, 0.22);
-    border-color: #ffbc00;
-    transform: translateY(-1px);
-}
-
-.cinema-player-fs-btn:active {
-    transform: scale(0.96);
-}
-
-.cinema-player-fs-btn svg {
-    width: 12px;
-    height: 12px;
-    fill: currentColor;
-    flex-shrink: 0;
-}
-
-.cinema-stream-badge {
-    font-size: 10px;
-    font-weight: 800;
-    color: #10b981;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.35);
-    padding: 3px 8px;
-    border-radius: 12px;
-    letter-spacing: 0.5px;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    flex-shrink: 0;
-}
-
-.cinema-stream-badge .dot-live {
-    width: 6px;
-    height: 6px;
-    background: #10b981;
-    border-radius: 50%;
-    display: inline-block;
-    box-shadow: 0 0 6px #10b981;
-    animation: livePulse 1.5s infinite;
-}
-
-.cinema-quality-pill {
-    font-size: 10px;
-    font-weight: 800;
-    color: #00bcd4;
-    background: rgba(0, 188, 212, 0.12);
-    border: 1px solid rgba(0, 188, 212, 0.35);
-    padding: 3px 8px;
-    border-radius: 12px;
-    letter-spacing: 0.5px;
+    gap: 6px;
     flex-shrink: 0;
 }
 
@@ -1979,13 +1908,13 @@ body.tg-back-visible #btn-close-cinema {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 10.5px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 800;
     color: #10b981;
-    background: rgba(16, 185, 129, 0.08);
-    border: 1px solid rgba(16, 185, 129, 0.25);
-    padding: 3px 10px;
-    border-radius: 12px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.32);
+    padding: 5px 9px;
+    border-radius: 9999px;
     white-space: nowrap;
     letter-spacing: 0.3px;
     user-select: none;
@@ -2001,74 +1930,202 @@ body.tg-back-visible #btn-close-cinema {
     flex-shrink: 0;
 }
 
-.cinema-speed-indicator .speed-text b {
-    color: #ffbc00;
+.cinema-speed-indicator .speed-text {
     font-weight: 800;
+    letter-spacing: 0.3px;
 }
 
-.cinema-controls-row-tracks {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 2px;
-}
-
-.cinema-controls-row-tracks::-webkit-scrollbar {
-    display: none;
-}
-
-.cinema-track-trigger-btn {
-    flex: 1 1 0;
-    min-width: 140px;
+.cinema-quality-btn {
     display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 10px;
-    padding: 8px 12px;
-    color: #e2e8f0;
-    font-size: 12px;
-    font-weight: 600;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #22d3ee;
+    background: rgba(0, 188, 212, 0.12);
+    border: 1px solid rgba(0, 188, 212, 0.35);
+    padding: 5px 10px;
+    border-radius: 9999px;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
 
-.cinema-track-trigger-btn:hover {
-    background: rgba(255, 188, 0, 0.12);
+.cinema-quality-btn:hover {
+    background: rgba(0, 188, 212, 0.22);
+    border-color: #22d3ee;
+    transform: translateY(-1px);
+}
+
+.cinema-quality-btn:active {
+    transform: scale(0.96);
+}
+
+.cinema-quality-btn .quality-dot {
+    font-size: 8px;
+    color: #22d3ee;
+    line-height: 1;
+}
+
+.cinema-quality-btn .quality-arrow {
+    font-size: 9px;
+    color: #67e8f9;
+    opacity: 0.8;
+}
+
+.cinema-tool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #e2e8f0;
+    padding: 5px 9px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-tool-btn:hover {
+    background: rgba(255, 188, 0, 0.16);
     border-color: rgba(255, 188, 0, 0.45);
     color: #ffbc00;
+    transform: translateY(-1px);
 }
 
-.cinema-track-trigger-btn:active {
-    transform: scale(0.97);
+.cinema-tool-btn:active {
+    transform: scale(0.96);
 }
 
-.cinema-track-trigger-btn svg {
-    width: 15px;
-    height: 15px;
+.cinema-tool-btn svg {
+    width: 12px;
+    height: 12px;
     fill: currentColor;
     flex-shrink: 0;
 }
 
-.cinema-track-trigger-btn .track-label {
-    flex: 1;
-    text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.cinema-fs-tool-btn {
+    background: rgba(255, 188, 0, 0.1);
+    border-color: rgba(255, 188, 0, 0.32);
+    color: #ffbc00;
 }
 
-.cinema-track-trigger-btn .track-arrow {
-    font-size: 10px;
-    opacity: 0.6;
+.cinema-fs-tool-btn:hover {
+    background: rgba(255, 188, 0, 0.22);
+    border-color: #ffbc00;
+}
+
+/* Quality Switcher Modal Additions */
+.cinema-quality-modal-body {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 16px;
+    gap: 8px;
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.cinema-quality-pass-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    background: linear-gradient(135deg, rgba(255, 188, 0, 0.12), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(255, 188, 0, 0.3);
+    border-radius: 10px;
+    margin-bottom: 6px;
+}
+
+.cinema-quality-pass-banner .pass-icon {
+    font-size: 16px;
     flex-shrink: 0;
+}
+
+.cinema-quality-pass-banner .pass-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.cinema-quality-pass-banner .pass-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #ffbc00;
+}
+
+.cinema-quality-pass-banner .pass-desc {
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+.cinema-quality-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #e2e8f0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-quality-item:hover {
+    background: rgba(0, 188, 212, 0.1);
+    border-color: rgba(0, 188, 212, 0.35);
+    color: #22d3ee;
+}
+
+.cinema-quality-item.active {
+    background: rgba(0, 188, 212, 0.16);
+    border-color: #00bcd4;
+    color: #22d3ee;
+    font-weight: 800;
+}
+
+.cinema-quality-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cinema-quality-item-badge {
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    letter-spacing: 0.5px;
+}
+
+.cinema-quality-item.active .cinema-quality-item-badge {
+    background: #00bcd4;
+    color: #05131a;
+}
+
+.cinema-quality-item-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.cinema-quality-item .quality-check {
+    font-size: 13px;
+    font-weight: 900;
+    color: #22d3ee;
+    min-width: 14px;
+    text-align: center;
 }
 
 /* Video Stage Viewport (Dynamic Ambilight Behind & Beneath) */
@@ -7735,4 +7792,251 @@ body.desktop-wide-layout .hero-carousel-container {
 body.desktop-wide-layout .profile-card-container,
 body.desktop-wide-layout .mining-card-container {
     max-width: 600px !important;
+}
+
+
+/* Compact Streaming Server Strip */
+.cinema-server-compact-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    margin: 4px 0 10px;
+}
+
+.cinema-server-compact-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #94a3b8;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.cinema-server-compact-label svg {
+    width: 13px;
+    height: 13px;
+    fill: currentColor;
+    color: #ffbc00;
+}
+
+.cinema-server-compact-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cinema-server-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 7px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-server-chip:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.cinema-server-chip.active {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(225, 29, 72, 0.4);
+}
+
+.cinema-server-chip.premium {
+    border-color: rgba(255, 204, 0, 0.3);
+    color: #ffbc00;
+}
+
+.cinema-server-chip.premium.active {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-color: #fde68a;
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.45);
+}
+
+.cinema-server-chip .server-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.cinema-server-chip.active .server-chip-dot {
+    background: #ffffff;
+}
+
+.cinema-server-cdn-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: #10b981;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cinema-server-cdn-badge .cdn-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 5px #10b981;
+}
+
+/* Curated 1-Line Hollywood Metadata & Expandable Synopsis */
+.cinema-details-header {
+    margin-bottom: 8px;
+}
+
+.cinema-details-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+    line-height: 1.25;
+    margin: 0 0 6px;
+}
+
+.cinema-meta-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px 8px;
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.cinema-meta-line .meta-rating {
+    color: #ffbc00;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.cinema-meta-line .meta-sep {
+    color: rgba(255, 255, 255, 0.22);
+    font-size: 9px;
+}
+
+.cinema-meta-line .meta-year,
+.cinema-meta-line .meta-type,
+.cinema-meta-line .meta-genres {
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+.cinema-meta-line .meta-quality-tag {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.32);
+    color: #10b981;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+}
+
+.cinema-meta-line .meta-sub-tag {
+    background: rgba(0, 188, 212, 0.1);
+    border: 1px solid rgba(0, 188, 212, 0.28);
+    color: #22d3ee;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+.cinema-synopsis-wrap {
+    position: relative;
+    margin: 4px 0 10px;
+}
+
+.cinema-synopsis-compact {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #94a3b8;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.cinema-synopsis-compact.expanded {
+    display: block;
+    -webkit-line-clamp: unset;
+    color: #cbd5e1;
+}
+
+.cinema-synopsis-toggle-btn {
+    background: none;
+    border: none;
+    padding: 3px 0 0;
+    color: #ffbc00;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    user-select: none;
+}
+
+/* Mobile Responsive Tweaks for Cinema Player (Under 480px) */
+@media (max-width: 480px) {
+    .cinema-player-controls-bar {
+        padding: 6px 10px;
+        min-height: 40px;
+    }
+    .cinema-speed-indicator {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    .cinema-quality-btn {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    .cinema-tool-btn {
+        font-size: 10.5px;
+        padding: 4px 8px;
+    }
+    .cinema-server-compact-strip {
+        padding: 5px 8px;
+    }
+    .cinema-server-chip {
+        padding: 4px 8px;
+        font-size: 10.5px;
+    }
+    .cinema-details-title {
+        font-size: 17px;
+    }
+    .cinema-meta-line {
+        font-size: 11px;
+        gap: 4px 6px;
+    }
+    .cinema-episode-card {
+        flex: 0 0 150px;
+        width: 150px;
+    }
 }

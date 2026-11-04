@@ -7095,6 +7095,72 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         subBackdrop.addEventListener("click", closeSubHub);
     }
 
+    // Quality Switcher Modal Bindings
+    const qModal = document.getElementById("cinema-quality-modal");
+    const qCloseBtn = document.getElementById("cinema-quality-close");
+    const qBackdrop = document.getElementById("cinema-quality-backdrop");
+    const qTopBtn = document.getElementById("cinema-top-quality-pill");
+    const qList = document.getElementById("cinema-quality-track-list");
+    const qPassStatus = document.getElementById("cinema-quality-pass-status");
+
+    let currentSelectedQualityUrl = null;
+    let currentSelectedQualityLabel = null;
+
+    const openQualityModal = () => {
+        if (!qModal || !qList) return;
+        const passSec = parseInt(localStorage.getItem('filmhouse_watch_pass_sec') || "0", 10);
+        if (qPassStatus) {
+            qPassStatus.textContent = passSec > 0 
+                ? "⚡ 4-Hour Ad-Free Pass Active (Instant 0-Ad Switch)" 
+                : "Switching quality will open sponsor link (or get 4-Hour Pass)";
+        }
+
+        const qualities = getMovieAvailableQualities();
+        qList.replaceChildren();
+
+        qualities.forEach((q, idx) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            const isActive = currentSelectedQualityUrl 
+                ? (currentSelectedQualityUrl === q.url) 
+                : (idx === 0);
+            btn.className = `cinema-quality-item ${isActive ? 'active' : ''}`;
+            btn.innerHTML = `
+                <div class="cinema-quality-item-left">
+                    <span class="cinema-quality-item-badge">${q.badge}</span>
+                    <span class="track-name">${q.label}</span>
+                </div>
+                <div class="cinema-quality-item-right">
+                    ${q.size ? `<span class="quality-size">${q.size}</span>` : ''}
+                    <span class="quality-check">${isActive ? '✓' : ''}</span>
+                </div>
+            `;
+            btn.addEventListener("click", () => {
+                selectQualityOption(q);
+            });
+            qList.appendChild(btn);
+        });
+
+        qModal.style.display = "flex";
+    };
+
+    const closeQualityModal = () => {
+        if (qModal) qModal.style.display = "none";
+    };
+
+    if (qTopBtn && !qTopBtn._bound) {
+        qTopBtn._bound = true;
+        qTopBtn.addEventListener("click", openQualityModal);
+    }
+    if (qCloseBtn && !qCloseBtn._bound) {
+        qCloseBtn._bound = true;
+        qCloseBtn.addEventListener("click", closeQualityModal);
+    }
+    if (qBackdrop && !qBackdrop._bound) {
+        qBackdrop._bound = true;
+        qBackdrop.addEventListener("click", closeQualityModal);
+    }
+
     // Language code to human readable name mapper
     const LANG_NAME_MAP = {
         KO: "Korean",
@@ -7336,12 +7402,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             }
         }
 
-        // Update Personalized User Tag in Speed Indicator (Suggestion C)
-        const userTag = document.getElementById("cinema-user-tag");
-        const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-        const firstName = tgUser?.first_name || (state.user && state.user.fullName && state.user.fullName !== "Demo User" ? state.user.fullName : (state.user?.username || "VIP Member"));
-        if (userTag) {
-            userTag.textContent = firstName;
+        // Strict FH Speed Branding (Suggestion & Request 8)
+        const speedTextEl = document.getElementById("cinema-speed-text");
+        if (speedTextEl) {
+            speedTextEl.textContent = "⚡ FH Speed";
         }
 
         // Hide any pending Next Episode card on new stream
@@ -7352,11 +7416,15 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             window._nextEpCountdownTimer = null;
         }
 
-        // Update Quality Pill in sub-bar
-        const qPill = document.getElementById("cinema-top-quality-pill");
-        if (qPill) {
-            const is4K = movie.links && movie.links.some(l => (l.quality || '').includes('4K') || (l.quality || '').includes('2160'));
-            qPill.textContent = is4K ? '4K UHD' : '1080p FHD';
+        // Update Quality Label in utility bar
+        const qLabelEl = document.getElementById("cinema-quality-label");
+        if (qLabelEl) {
+            if (currentSelectedQualityLabel) {
+                qLabelEl.textContent = currentSelectedQualityLabel;
+            } else {
+                const is4K = movie.links && movie.links.some(l => (l.quality || '').includes('4K') || (l.quality || '').includes('2160'));
+                qLabelEl.textContent = is4K ? '4K UHD' : '1080p FHD';
+            }
         }
 
         // Initialize default audio & subtitle tracks based on movie metadata
@@ -7447,34 +7515,102 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     if (detailsContainer) {
         detailsContainer.replaceChildren();
 
-        // 1. Streaming Server Switcher Bar (Server 1 vs Server 2 VIP High-Speed)
-        const serverBar = document.createElement("div");
-        serverBar.className = "cinema-servers-bar";
-        serverBar.innerHTML = `
-            <div class="cinema-servers-header">
-                <div class="cinema-servers-header-left">
-                    <svg><use href="#icon-server"></use></svg>
-                    <span>Streaming Server</span>
-                </div>
-                <div class="cinema-servers-hint">
-                    <span>● Multi-CDN Active</span>
-                </div>
+        // Dynamic Quality Extractor function (Matches uploaded qualities e.g. 1080p & 720p)
+        function getMovieAvailableQualities() {
+            const list = [];
+            let sourceLinks = [];
+            if (Array.isArray(movie.links)) sourceLinks = movie.links;
+            else if (Array.isArray(movie.stream_links)) sourceLinks = movie.stream_links;
+
+            // If it is a TV series and current episode is set, prioritize links matching this episode
+            if (isTVShow && typeof currentEpisodeNum !== 'undefined' && sourceLinks.length > 0) {
+                const epLinks = sourceLinks.filter(l => (l.episode == currentEpisodeNum || l.ep == currentEpisodeNum || (l.name && l.name.includes('E' + currentEpisodeNum))));
+                if (epLinks.length > 0) sourceLinks = epLinks;
+            }
+
+            sourceLinks.forEach((l, idx) => {
+                const isObj = typeof l === 'object' && l !== null;
+                const rawUrl = isObj ? (l.stream_url || l.url || "") : String(l);
+                if (!rawUrl) return;
+
+                let qName = isObj && l.quality ? String(l.quality).trim() : "";
+                if (!qName) {
+                    const text = `${isObj ? (l.name || l.title || "") : ""} ${rawUrl}`.toLowerCase();
+                    if (/4k|2160/i.test(text)) qName = "4K UHD";
+                    else if (/1080/i.test(text)) qName = "1080p FHD";
+                    else if (/720/i.test(text)) qName = "720p HD";
+                    else if (/480/i.test(text)) qName = "480p SD";
+                    else qName = idx === 0 ? "1080p FHD" : `Stream Quality ${idx + 1}`;
+                }
+                const cleanBadge = /4k|2160/i.test(qName) ? "4K" : (/720/i.test(qName) ? "720P" : (/480|360/i.test(qName) ? "SD" : "1080P"));
+                list.push({
+                    label: qName,
+                    badge: cleanBadge,
+                    url: rawUrl,
+                    size: isObj && l.size ? l.size : ""
+                });
+            });
+
+            // If no explicit qualities found in links, offer Master HD & Data Saver streams
+            if (list.length === 0) {
+                const activeTarget = customStreamUrl || movie.stream_url || streamTarget || "";
+                list.push({ label: "1080p FHD (Master)", badge: "1080P", url: activeTarget, size: "High Definition" });
+                list.push({ label: "720p HD (Data Saver)", badge: "720P", url: activeTarget, size: "Fast Stream" });
+            }
+            return list;
+        }
+
+        // Quality Switch Handler with Monetag Ad Gate for Non-Pass Users
+        function selectQualityOption(qObj) {
+            currentSelectedQualityUrl = qObj.url;
+            currentSelectedQualityLabel = qObj.label.replace(/\s*\(.*\)/, '');
+            const qLabelEl = document.getElementById("cinema-quality-label");
+            if (qLabelEl) qLabelEl.textContent = currentSelectedQualityLabel;
+
+            const passSec = parseInt(localStorage.getItem('filmhouse_watch_pass_sec') || "0", 10);
+            const hasPass = passSec > 0;
+
+            if (hasPass) {
+                // Ad-free pass holder: switch instantly
+                setCinemaStream(qObj.url, initialTitle);
+                showToast(`⚡ Switched to ${qObj.label} (Ad-Free Pass Active)`, "success");
+            } else {
+                // Non-pass user: trigger Monetag SmartLink visit & switch stream
+                showToast(`⚡ Switching to ${qObj.label}... (Ad Sponsor)`, "info");
+                triggerMonetagSmartLink();
+                setTimeout(() => {
+                    setCinemaStream(qObj.url, initialTitle);
+                }, 400);
+            }
+            closeQualityModal();
+        }
+
+        // 1. Sleek Compact Streaming Server Strip (Only ~34px height)
+        const serverStrip = document.createElement("div");
+        serverStrip.className = "cinema-server-compact-strip";
+        serverStrip.innerHTML = `
+            <div class="cinema-server-compact-label">
+                <svg><use href="#icon-server"></use></svg>
+                <span>Server</span>
             </div>
-            <div class="cinema-servers-list">
-                <button type="button" class="cinema-server-pill active" id="cinema-server-1">
-                    <span class="server-status-dot"></span>
-                    <span>Server 1 (Default HD)</span>
+            <div class="cinema-server-compact-toggle">
+                <button type="button" class="cinema-server-chip active" id="cinema-server-1">
+                    <span class="server-chip-dot"></span>
+                    <span>Server 1</span>
                 </button>
-                <button type="button" class="cinema-server-pill premium" id="cinema-server-2">
-                    <svg><use href="#icon-zap"></use></svg>
-                    <span>Server 2 (VIP High-Speed ⚡)</span>
+                <button type="button" class="cinema-server-chip premium" id="cinema-server-2">
+                    <span class="server-chip-zap">⚡</span>
+                    <span>Server 2 (VIP)</span>
                 </button>
+            </div>
+            <div class="cinema-server-cdn-badge">
+                <span class="cdn-dot"></span> Multi-CDN
             </div>
         `;
-        detailsContainer.appendChild(serverBar);
+        detailsContainer.appendChild(serverStrip);
 
-        const s1Btn = serverBar.querySelector("#cinema-server-1");
-        const s2Btn = serverBar.querySelector("#cinema-server-2");
+        const s1Btn = serverStrip.querySelector("#cinema-server-1");
+        const s2Btn = serverStrip.querySelector("#cinema-server-2");
 
         if (s1Btn && s2Btn) {
             s1Btn.addEventListener("click", () => {
@@ -7491,7 +7627,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             });
         }
 
-        // 2. Movie Header with Title & Metadata Chips
+        // 2. Curated 1-Line Hollywood Metadata Header & Expandable Synopsis
         const headerEl = document.createElement("div");
         headerEl.className = "cinema-details-header";
 
@@ -7500,65 +7636,59 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         movieTitle.textContent = baseTitle;
         headerEl.appendChild(movieTitle);
 
-        const chipsEl = document.createElement("div");
-        chipsEl.className = "cinema-details-chips";
+        const metaLine = document.createElement("div");
+        metaLine.className = "cinema-meta-line";
 
         const ratingVal = movie.rating || movie.imdb_rating || movie.vote_average;
+        let metaHtml = "";
         if (ratingVal) {
-            const ratingChip = document.createElement("span");
-            ratingChip.className = "cinema-chip cinema-chip-rating";
-            ratingChip.textContent = `★ IMDb ${typeof ratingVal === 'number' ? ratingVal.toFixed(1) : ratingVal}`;
-            chipsEl.appendChild(ratingChip);
+            metaHtml += `<span class="meta-rating">★ IMDb ${typeof ratingVal === 'number' ? ratingVal.toFixed(1) : ratingVal}</span><span class="meta-sep">•</span>`;
         }
-
-        const typeChip = document.createElement("span");
-        typeChip.className = "cinema-chip";
-        typeChip.textContent = isTVShow ? "Series" : "Movie";
-        chipsEl.appendChild(typeChip);
 
         const yearVal = movie.year || (movie.release_date ? movie.release_date.split("-")[0] : "");
         if (yearVal) {
-            const yearChip = document.createElement("span");
-            yearChip.className = "cinema-chip";
-            yearChip.textContent = yearVal;
-            chipsEl.appendChild(yearChip);
+            metaHtml += `<span class="meta-year">${yearVal}</span><span class="meta-sep">•</span>`;
         }
 
-        const qualityChip = document.createElement("span");
-        qualityChip.className = "cinema-chip cinema-chip-quality";
-        qualityChip.textContent = isTVShow ? "Series HD" : "1080p HD";
-        chipsEl.appendChild(qualityChip);
-
-        const subChip = document.createElement("span");
-        subChip.className = "cinema-chip cinema-chip-sub";
-        subChip.textContent = "SUB";
-        subChip.title = "Subtitles Available";
-        chipsEl.appendChild(subChip);
-
-        const langChip = document.createElement("span");
-        langChip.className = "cinema-chip cinema-chip-lang";
-        langChip.textContent = String(movie.language || "EN").toUpperCase();
-        chipsEl.appendChild(langChip);
-
-        const specChip = document.createElement("span");
-        specChip.className = "cinema-chip cinema-chip-spec";
-        specChip.textContent = "H.264 / AAC";
-        chipsEl.appendChild(specChip);
+        const typeText = isTVShow ? "Series" : "Movie";
+        metaHtml += `<span class="meta-type">${typeText}</span>`;
 
         let genres = [];
         if (Array.isArray(movie.genres)) {
-            genres = movie.genres;
+            genres = movie.genres.map(g => typeof g === 'string' ? g : (g.name || "")).filter(Boolean);
         } else if (typeof movie.genre === "string") {
             genres = movie.genre.split(/[,/]/).map(g => g.trim()).filter(Boolean);
         }
-        genres.forEach(g => {
-            const gChip = document.createElement("span");
-            gChip.className = "cinema-chip";
-            gChip.textContent = g;
-            chipsEl.appendChild(gChip);
-        });
+        if (genres.length > 0) {
+            metaHtml += `<span class="meta-sep">•</span><span class="meta-genres">${genres.slice(0, 3).join(", ")}</span>`;
+        }
 
-        headerEl.appendChild(chipsEl);
+        metaHtml += `<span class="meta-sep">•</span><span class="meta-quality-tag">HD</span>`;
+        metaHtml += `<span class="meta-sub-tag">SUB</span>`;
+
+        metaLine.innerHTML = metaHtml;
+        headerEl.appendChild(metaLine);
+
+        // Compact Expandable Synopsis directly below title
+        const synopsis = movie.synopsis || movie.overview || movie.description;
+        if (synopsis) {
+            const synWrap = document.createElement("div");
+            synWrap.className = "cinema-synopsis-wrap";
+            synWrap.innerHTML = `
+                <div class="cinema-synopsis-compact" id="cinema-synopsis-text">${synopsis}</div>
+                <button type="button" class="cinema-synopsis-toggle-btn" id="cinema-synopsis-toggle">More ▾</button>
+            `;
+            const toggleBtn = synWrap.querySelector("#cinema-synopsis-toggle");
+            const textEl = synWrap.querySelector("#cinema-synopsis-text");
+            if (toggleBtn && textEl) {
+                toggleBtn.addEventListener("click", () => {
+                    const isExp = textEl.classList.toggle("expanded");
+                    toggleBtn.textContent = isExp ? "Less ▴" : "More ▾";
+                });
+            }
+            headerEl.appendChild(synWrap);
+        }
+
         detailsContainer.appendChild(headerEl);
 
         // 3. Series Seasons & Episodes Selector (Option 3 Hybrid)
@@ -7989,24 +8119,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
         detailsContainer.appendChild(actionsGrid);
 
-        // 5. Synopsis Card
-        const synopsis = movie.synopsis || movie.overview || movie.description;
-        if (synopsis) {
-            const synCard = document.createElement("div");
-            synCard.className = "cinema-synopsis-card";
 
-            const synHead = document.createElement("div");
-            synHead.className = "cinema-synopsis-heading";
-            synHead.textContent = "Synopsis";
-            synCard.appendChild(synHead);
-
-            const synBody = document.createElement("div");
-            synBody.className = "cinema-synopsis-text";
-            synBody.textContent = synopsis;
-            synCard.appendChild(synBody);
-
-            detailsContainer.appendChild(synCard);
-        }
 
         // 6. "More Like This" Recommendations Carousel (Suggestion D)
         const recMovies = getMoreLikeThisMovies(movie, 8);

@@ -538,7 +538,7 @@
         <h1 class='movie-title' id='movieTitle'>Film House Cinema Stream</h1>
         <div class='meta-tags'>
           <span class='tag-quality' id='qualityTag'>1080p HD</span>
-          <span class='tag-server'><span class='dot-live'></span> FAST CDN</span>
+          <span class='tag-server'><span class='dot-live'></span> FH SPEED</span>
         </div>
       </div>
 

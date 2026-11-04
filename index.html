@@ -1000,35 +1000,55 @@
 
             <!-- Dedicated Player Control & Status Strip (Directly Below Video) -->
             <div class="cinema-player-controls-bar">
-                <div class="cinema-controls-row-top">
-                    <div class="cinema-live-group">
-                        <span class="cinema-stream-badge"><span class="dot-live"></span> STREAMING</span>
-                        <span class="cinema-quality-pill" id="cinema-top-quality-pill">1080p FHD</span>
-                    </div>
-                    <div class="cinema-top-right-group">
-                        <div class="cinema-speed-indicator" id="cinema-speed-indicator" title="Stream CDN Health">
+                <div class="cinema-controls-single-row">
+                    <div class="cinema-controls-left">
+                        <div class="cinema-speed-indicator" id="cinema-speed-indicator" title="FilmHouse High-Speed CDN Active">
                             <span class="speed-pulse-dot"></span>
-                            <span class="speed-text" id="cinema-speed-text">⚡ FilmHouse Speed • <b id="cinema-user-tag">VIP Member</b></span>
+                            <span class="speed-text" id="cinema-speed-text">⚡ FH Speed</span>
                         </div>
-                        <button type="button" class="cinema-player-fs-btn" id="btn-cinema-fullscreen" aria-label="Fullscreen" title="Toggle Fullscreen">
+                        <button type="button" class="cinema-quality-btn" id="cinema-top-quality-pill" aria-label="Stream Quality" title="Change Stream Quality">
+                            <span class="quality-dot">●</span>
+                            <span id="cinema-quality-label">1080p FHD</span>
+                            <span class="quality-arrow">▾</span>
+                        </button>
+                    </div>
+                    <div class="cinema-controls-right">
+                        <button type="button" class="cinema-tool-btn" id="cinema-sub-quick-btn" aria-label="Subtitles &amp; Audio" title="Audio &amp; Subtitles Hub">
+                            <svg><use href="#icon-subtitles"></use></svg>
+                            <span class="tool-label" id="cinema-sub-quick-label">CC</span>
+                        </button>
+                        <button type="button" class="cinema-tool-btn cinema-fs-tool-btn" id="btn-cinema-fullscreen" aria-label="Fullscreen" title="Toggle Fullscreen">
                             <svg><use href="#icon-maximize"></use></svg>
-                            <span>Fullscreen</span>
+                            <span class="tool-label">Full</span>
                         </button>
                     </div>
                 </div>
-                <div class="cinema-controls-row-tracks">
-                    <!-- Direct Subtitle Hub Trigger Button -->
-                    <button type="button" class="cinema-track-trigger-btn" id="cinema-sub-quick-btn" aria-label="Subtitles &amp; Captions">
-                        <svg><use href="#icon-subtitles"></use></svg>
-                        <span class="track-label" id="cinema-sub-quick-label">Subtitles: Auto</span>
-                        <span class="track-arrow">▾</span>
-                    </button>
-                    <!-- Direct Audio Track Selector Button -->
-                    <button type="button" class="cinema-track-trigger-btn" id="cinema-audio-quick-btn" aria-label="Audio Track">
-                        <svg><use href="#icon-speaker"></use></svg>
-                        <span class="track-label" id="cinema-audio-quick-label">Audio: Original (Auto)</span>
-                        <span class="track-arrow">▾</span>
-                    </button>
+            </div>
+
+            <!-- Unified Quality Switcher Modal -->
+            <div class="cinema-sub-hub-modal" id="cinema-quality-modal" style="display: none;">
+                <div class="cinema-sub-hub-backdrop" id="cinema-quality-backdrop"></div>
+                <div class="cinema-sub-hub-card">
+                    <div class="cinema-sub-hub-header">
+                        <div class="cinema-sub-hub-title">
+                            <svg><use href="#icon-play"></use></svg>
+                            <span>Stream Quality</span>
+                        </div>
+                        <button type="button" class="cinema-sub-hub-close" id="cinema-quality-close">&times;</button>
+                    </div>
+                    <div class="cinema-quality-modal-body">
+                        <div class="cinema-quality-pass-banner" id="cinema-quality-pass-banner">
+                            <span class="pass-icon">⚡</span>
+                            <div class="pass-info">
+                                <span class="pass-title">Instant Quality Switch</span>
+                                <span class="pass-desc" id="cinema-quality-pass-status">Ad-Free Pass Active</span>
+                            </div>
+                        </div>
+                        <div class="cinema-sub-hub-section-label">AVAILABLE QUALITIES</div>
+                        <div class="cinema-track-list" id="cinema-quality-track-list">
+                            <!-- Dynamically generated from movie.links -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1084,14 +1104,7 @@
                                 </button>
                             </div>
 
-                            <!-- Load Custom Subtitles -->
-                            <div class="cinema-sub-hub-section-label" style="margin-top: 14px;">LOAD EXTERNAL SUBTITLE (.SRT / .VTT)</div>
-                            <label class="cinema-sub-upload-btn">
-                                <svg><use href="#icon-download"></use></svg>
-                                <span>Choose Subtitle File</span>
-                                <input type="file" id="cinema-sub-file-input" accept=".srt,.vtt" style="display:none;">
-                            </label>
-                        </div>
+                            </div>
                     </div>
                 </div>
             </div>
