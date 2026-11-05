@@ -1755,15 +1755,19 @@ function setupBot(bot, adminBot) {
             if (!fileObj && !streamUrl) return false;
 
             // Security Authorization:
-            // 1. If from channel: verify chat ID matches configured Ingest Channel
+            // 1. If from channel: verify chat ID matches configured Ingest Channel OR auto-detected via keywords (Vault, Ingest, Storage, Stream, Upload, Files)
             // 2. If direct forward: verify sender is an authorized Administrator
             const senderId = String(ctx.from ? ctx.from.id : "");
             const chatId = String(ctx.chat ? ctx.chat.id : "");
+            const chatTitle = String(ctx.chat?.title || "").toLowerCase();
+            const chatUsername = String(ctx.chat?.username || "").toLowerCase();
             const configuredIngestId = await getIngestChannelId();
 
             if (isFromChannel) {
-                if (!configuredIngestId || chatId !== configuredIngestId) {
-                    return false; // Not the ingest channel, ignore silently
+                const isConfiguredChannel = configuredIngestId && (chatId === configuredIngestId);
+                const isKeywordMatchedChannel = /vault|ingest|storage|stream|upload|files/i.test(chatTitle) || /vault|ingest|storage|stream|upload|files/i.test(chatUsername);
+                if (!isConfiguredChannel && !isKeywordMatchedChannel) {
+                    return false; // Not an ingest channel, ignore silently
                 }
             } else {
                 const authorized = await isAdmin(senderId);
@@ -1872,21 +1876,20 @@ function setupBot(bot, adminBot) {
             const previewCaption = 
                 `🎬 <b>TMDB Matched:</b> <b>${escapeHtml(tmdb.title)}</b>${escapeHtml(yearStr)}\n` +
                 `${ratingStr} | 🎭 ${escapeHtml(genresStr)}\n` +
-                `📁 <b>Quality:</b> <code>${escapeHtml(parsed.quality || "1080P")}</code>${sizeStr}\n` +
+                `📁 <b>Stream Quality:</b> <code>${escapeHtml(parsed.quality || "1080P")}</code>${sizeStr}\n` +
                 episodeLine +
                 `\n${statusLine}\n\n` +
-                `🔗 <b>Stream Link:</b> <code>${escapeHtml(streamUrl || "Auto-stream")}</code>\n` +
-                `📥 <b>Telegram Download:</b> <code>${escapeHtml(fileDeepLink || "In-Bot")}</code>\n\n` +
+                `🔗 <b>Stream URL:</b> <code>${escapeHtml(streamUrl || "Auto-stream")}</code>\n\n` +
                 `📖 <i>${escapeHtml(overviewSnippet)}</i>\n\n` +
-                `👇 <b>Confirm publishing to FilmHouse:</b>`;
+                `👇 <b>Confirm publishing streaming link:</b>`;
 
             const showcaseKeyboard = {
                 inline_keyboard: [
                     [
-                        { text: "✅ Confirm & Publish to App", callback_data: `fwd_cat:${sessionId}` }
+                        { text: "🚀 Confirm, Publish & Broadcast", callback_data: `fwd_post:${sessionId}` }
                     ],
                     [
-                        { text: "📢 Publish & Broadcast to Channel", callback_data: `fwd_post:${sessionId}` }
+                        { text: "💾 Publish to App Only", callback_data: `fwd_cat:${sessionId}` }
                     ],
                     [
                         { text: "✏️ Edit Title / TMDB", callback_data: `fwd_edit:${sessionId}` },
@@ -2163,10 +2166,9 @@ function setupBot(bot, adminBot) {
             return ctx.reply(
                 `🎉 <b>Successfully Published to FilmHouse Catalogue!</b>\n\n` +
                 `🎬 <b>Title:</b> ${escapeHtml(tmdb.title)} (${escapeHtml(tmdb.year)})\n` +
-                `📁 <b>Quality:</b> <code>${escapeHtml(parsed.quality || "1080P")}</code>\n` +
-                `🔗 <b>Stream URL:</b> <code>${escapeHtml(streamUrl)}</code>\n` +
-                `📥 <b>Telegram Download:</b> <code>${escapeHtml(fileDeepLink)}</code>\n\n` +
-                `🍿 Users can now stream it in the Mini App and switch qualities seamlessly!\n\n` +
+                `📁 <b>Stream Quality:</b> <code>${escapeHtml(parsed.quality || "1080P")}</code>\n` +
+                `🔗 <b>Stream URL:</b> <code>${escapeHtml(streamUrl)}</code>\n\n` +
+                `🍿 Live now in FilmHouse Cinema Player with multi-quality switching!\n\n` +
                 `<i>Optional: Tap below if you would like to broadcast it to your Updates Channel:</i>`,
                 {
                     parse_mode: "HTML",
@@ -2751,6 +2753,48 @@ function setupBot(bot, adminBot) {
         adminBot.on('channel_post', async (ctx, next) => {
             const handled = await handleAdminMediaForward(ctx, true);
             if (!handled && typeof next === 'function') return next();
+        });
+
+        // 1-Click Vault Setup Action from Channel Member Add
+        adminBot.action(/^set_vault:(.+)$/, async (ctx) => {
+            const chatId = ctx.match[1];
+            dynamicIngestChannelId = chatId;
+            try {
+                await db.collection("system").doc("ingest_config").set({
+                    channelId: chatId,
+                    setBy: String(ctx.from?.id || ""),
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+                await ctx.editMessageText(`✅ <b>Ingest Vault Configured!</b>\n\nThis channel is now your automated Ingest Channel. Whenever files are posted or dropped here, FilmHouse will automatically index, extract stream links, match TMDB, and send you confirmation cards!`, { parse_mode: "HTML" });
+            } catch (err) {
+                await ctx.reply(`❌ Error setting ingest channel: ${err.message}`);
+            }
+        });
+
+        adminBot.on('my_chat_member', async (ctx) => {
+            try {
+                const member = ctx.myChatMember;
+                if (!member) return;
+                const newStatus = member.new_chat_member?.status;
+                if (newStatus === 'administrator') {
+                    const chatId = String(ctx.chat.id);
+                    const chatTitle = ctx.chat.title || "Channel";
+                    await ctx.reply(
+                        `🤖 <b>Film House Bot Connected!</b>\n\n` +
+                        `Would you like to set <b>${escapeHtml(chatTitle)}</b> as your <b>Automated Ingest Vault</b>? Every movie/series dropped here will be indexed automatically.`,
+                        {
+                            parse_mode: "HTML",
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [
+                                        { text: "📥 Set as Auto-Ingest Vault", callback_data: `set_vault:${chatId}` }
+                                    ]
+                                ]
+                            }
+                        }
+                    );
+                }
+            } catch (e) {}
         });
 
         adminBot.command(['start', 'menu'], async (ctx) => {
@@ -4312,6 +4356,48 @@ function setupBot(bot, adminBot) {
     bot.on('channel_post', async (ctx, next) => {
         const handled = await handleAdminMediaForward(ctx, true);
         if (!handled && typeof next === 'function') return next();
+    });
+
+    // 1-Click Vault Setup Action from Channel Member Add
+    bot.action(/^set_vault:(.+)$/, async (ctx) => {
+        const chatId = ctx.match[1];
+        dynamicIngestChannelId = chatId;
+        try {
+            await db.collection("system").doc("ingest_config").set({
+                channelId: chatId,
+                setBy: String(ctx.from?.id || ""),
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+            await ctx.editMessageText(`✅ <b>Ingest Vault Configured!</b>\n\nThis channel is now your automated Ingest Channel. Whenever files are posted or dropped here, FilmHouse will automatically index, extract stream links, match TMDB, and send you confirmation cards!`, { parse_mode: "HTML" });
+        } catch (err) {
+            await ctx.reply(`❌ Error setting ingest channel: ${err.message}`);
+        }
+    });
+
+    bot.on('my_chat_member', async (ctx) => {
+        try {
+            const member = ctx.myChatMember;
+            if (!member) return;
+            const newStatus = member.new_chat_member?.status;
+            if (newStatus === 'administrator') {
+                const chatId = String(ctx.chat.id);
+                const chatTitle = ctx.chat.title || "Channel";
+                await ctx.reply(
+                    `🤖 <b>Film House Bot Connected!</b>\n\n` +
+                    `Would you like to set <b>${escapeHtml(chatTitle)}</b> as your <b>Automated Ingest Vault</b>? Every movie/series dropped here will be indexed automatically.`,
+                    {
+                        parse_mode: "HTML",
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: "📥 Set as Auto-Ingest Vault", callback_data: `set_vault:${chatId}` }
+                                ]
+                            ]
+                        }
+                    }
+                );
+            }
+        } catch (e) {}
     });
 
     // /setingest command for main bot
