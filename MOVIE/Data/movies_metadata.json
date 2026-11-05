@@ -189,20 +189,180 @@
     "director": "",
     "trailer": "np4JwN73hTU",
     "runtime": "",
-    "stream_url": "",
-    "stream_links": [],
+    "stream_url": "MTU4OmUwMWUxMGU2YTM4ZDZmYWE",
+    "stream_links": [
+      {
+        "episode": 1,
+        "season": 1,
+        "stream_url": "MTU4OmUwMWUxMGU2YTM4ZDZmYWE",
+        "url": "MTU4OmUwMWUxMGU2YTM4ZDZmYWE"
+      },
+      {
+        "episode": 2,
+        "season": 1,
+        "stream_url": "MTU5OjAzOGM0ZWZiZjhhYjk2YzE",
+        "url": "MTU5OjAzOGM0ZWZiZjhhYjk2YzE"
+      },
+      {
+        "episode": 3,
+        "season": 1,
+        "stream_url": "MTYwOjRmMTRhM2M5NTJhMjM3ODc",
+        "url": "MTYwOjRmMTRhM2M5NTJhMjM3ODc"
+      },
+      {
+        "episode": 4,
+        "season": 1,
+        "stream_url": "MTYxOjA2YzRkZDA0MDBmMjhhMGE",
+        "url": "MTYxOjA2YzRkZDA0MDBmMjhhMGE"
+      },
+      {
+        "episode": 5,
+        "season": 1,
+        "stream_url": "MTYyOjY1N2IzNDg5NDNkZGQ4ZTY",
+        "url": "MTYyOjY1N2IzNDg5NDNkZGQ4ZTY"
+      },
+      {
+        "episode": 6,
+        "season": 1,
+        "stream_url": "MTYzOmVmMzI3N2JjNjQ2MGQ1NTM",
+        "url": "MTYzOmVmMzI3N2JjNjQ2MGQ1NTM"
+      },
+      {
+        "episode": 7,
+        "season": 1,
+        "stream_url": "MTY0OmZlYTMzMGRjYmYyNDc3MjU",
+        "url": "MTY0OmZlYTMzMGRjYmYyNDc3MjU"
+      },
+      {
+        "episode": 8,
+        "season": 1,
+        "stream_url": "MTY1OmU0NzUwMjQxZWIxMDMxYTg",
+        "url": "MTY1OmU0NzUwMjQxZWIxMDMxYTg"
+      },
+      {
+        "episode": 9,
+        "season": 1,
+        "stream_url": "MTY2OjBkNDU2NjFlNzNiZThiZTQ",
+        "url": "MTY2OjBkNDU2NjFlNzNiZThiZTQ"
+      },
+      {
+        "episode": 10,
+        "season": 1,
+        "stream_url": "MTY3OjIwNmUwOGE2Y2JkMzdmMWU",
+        "url": "MTY3OjIwNmUwOGE2Y2JkMzdmMWU"
+      },
+      {
+        "episode": 11,
+        "season": 1,
+        "stream_url": "MTY4OmM3NzNmNGY2YTkyY2M4NmE",
+        "url": "MTY4OmM3NzNmNGY2YTkyY2M4NmE"
+      },
+      {
+        "episode": 12,
+        "season": 1,
+        "stream_url": "MTY5OmYyOTkxMTg5OTcxYmMyZDg",
+        "url": "MTY5OmYyOTkxMTg5OTcxYmMyZDg"
+      },
+      {
+        "episode": 13,
+        "season": 1,
+        "stream_url": "MTcwOjUxOWU5MWNmYjBhNzI3Njc",
+        "url": "MTcwOjUxOWU5MWNmYjBhNzI3Njc"
+      },
+      {
+        "episode": 14,
+        "season": 1,
+        "stream_url": "MTcxOmYxYTIyNDA0YTg5ZDY4YmY",
+        "url": "MTcxOmYxYTIyNDA0YTg5ZDY4YmY"
+      },
+      {
+        "episode": 15,
+        "season": 1,
+        "stream_url": "MTcyOjlkM2EwZWNiZmVjZDAzOTU",
+        "url": "MTcyOjlkM2EwZWNiZmVjZDAzOTU"
+      },
+      {
+        "episode": 16,
+        "season": 1,
+        "stream_url": "MTczOmI3MTM1ZDFiZDgzM2RhZTk",
+        "url": "MTczOmI3MTM1ZDFiZDgzM2RhZTk"
+      },
+      {
+        "episode": 17,
+        "season": 1,
+        "stream_url": "MTc0OmVkNTJhOGQ0OWJlZmJhZGM",
+        "url": "MTc0OmVkNTJhOGQ0OWJlZmJhZGM"
+      },
+      {
+        "episode": 18,
+        "season": 1,
+        "stream_url": "MTc1OmE3MWQxYTAwNGZiNzhhNGQ",
+        "url": "MTc1OmE3MWQxYTAwNGZiNzhhNGQ"
+      },
+      {
+        "episode": 19,
+        "season": 1,
+        "stream_url": "MTc2OmJiY2FhOTkzYmMwNTgzM2Y",
+        "url": "MTc2OmJiY2FhOTkzYmMwNTgzM2Y"
+      },
+      {
+        "episode": 20,
+        "season": 1,
+        "stream_url": "MTc3OjVlYmJjODM4NTZjZTI0Y2E",
+        "url": "MTc3OjVlYmJjODM4NTZjZTI0Y2E"
+      },
+      {
+        "episode": 21,
+        "season": 1,
+        "stream_url": "MTc4OjI2ODMwMTgyNTczOTc0NDg",
+        "url": "MTc4OjI2ODMwMTgyNTczOTc0NDg"
+      },
+      {
+        "episode": 22,
+        "season": 1,
+        "stream_url": "MTc5OmYwZDE3YzRjYTQyNmY0Mjk",
+        "url": "MTc5OmYwZDE3YzRjYTQyNmY0Mjk"
+      },
+      {
+        "episode": 23,
+        "season": 1,
+        "stream_url": "MTgwOmE1ZDNkNTQ1NjYzYTdiZmY",
+        "url": "MTgwOmE1ZDNkNTQ1NjYzYTdiZmY"
+      },
+      {
+        "episode": 24,
+        "season": 1,
+        "stream_url": "MTgxOjYwZTNkNDA4N2UyYzQyODI",
+        "url": "MTgxOjYwZTNkNDA4N2UyYzQyODI"
+      },
+      {
+        "episode": 25,
+        "season": 1,
+        "stream_url": "MTgyOjI2YmQ1MjllZWJkODI3N2E",
+        "url": "MTgyOjI2YmQ1MjllZWJkODI3N2E"
+      },
+      {
+        "episode": 26,
+        "season": 1,
+        "stream_url": "MTgzOjkxZmQ2M2ZjZmU0YWFlYzk",
+        "url": "MTgzOjkxZmQ2M2ZjZmU0YWFlYzk"
+      }
+    ],
     "links": [
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADyQwAAhzcWEf3eBDP0RLPqhYE",
-        "season": "Season 1"
+        "season": "Season 1",
+        "stream_url": "MTU4OmUwMWUxMGU2YTM4ZDZmYWE"
       },
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADzAwAAhzcWEeyTW1Fi0p5RxYE",
-        "season": "Season 2"
+        "season": "Season 2",
+        "stream_url": "MTU5OjAzOGM0ZWZiZjhhYjk2YzE"
       },
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADzwwAAhzcWEey68gkddUUyxYE",
-        "season": "Season 3"
+        "season": "Season 3",
+        "stream_url": "MTYwOjRmMTRhM2M5NTJhMjM3ODc"
       }
     ]
   },
