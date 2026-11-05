@@ -39,6 +39,8 @@ function normalizeTitleForComparison(title) {
     s = s.replace(/&/g, " and ");
     s = s.replace(/^(the|a|an)\s+/i, "");
     s = s.replace(/\bthe\b/gi, " ");
+    s = s.replace(/\b(star\s*wars|marvel|disney)\b/gi, " ");
+    s = s.replace(/\b(iq|iqiyi|dual|fil|filmh|filmhouse)\b/gi, " ");
     s = s.replace(/[^\p{L}\p{N}\s]/gu, " ");
     s = s.replace(/\b([a-z]{3,})s\b/gi, "$1");
     s = s.replace(/\s+/g, " ").trim();
@@ -53,7 +55,7 @@ function getCollapsedTitle(title) {
 
 const STOP_WORDS = new Set([
     'the', 'a', 'an', 'and', 'of', 'in', 'to', 'for', 'on', 'at', 'by', 'with', 'from',
-    'part', 'chapter', 'vol', 'volume', 'pt', 's'
+    'part', 'chapter', 'vol', 'volume', 'pt', 's', 'movie', 'film'
 ]);
 
 function titlesMatch(titleA, titleB) {
@@ -66,6 +68,16 @@ function titlesMatch(titleA, titleB) {
     const colA = getCollapsedTitle(titleA);
     const colB = getCollapsedTitle(titleB);
     if (colA && colB && colA === colB) return true;
+
+    // Subtitle / Prefix match: e.g. "Maxton Hall — The World Between Us" vs "Maxton Hall"
+    // or "Brand New Cherry Flavor" vs "Brand New Cherry"
+    // or "All Quiet on the Western Front" vs "All Quiet on the Western"
+    const shortStr = normA.length < normB.length ? normA : normB;
+    const longStr = normA.length < normB.length ? normB : normA;
+    const shortWords = shortStr.split(/\s+/).filter(w => !STOP_WORDS.has(w));
+    if (shortWords.length >= 2 && shortStr.length >= 7 && longStr.startsWith(shortStr)) {
+        return true;
+    }
 
     // Keyword-level comparison with stop-word filtering
     const toksA = normA.split(/\s+/).filter(Boolean);
@@ -88,10 +100,22 @@ function titlesMatch(titleA, titleB) {
         return true;
     }
 
-    // High Jaccard similarity (>= 85%) on content keywords with at least 2 shared keywords
+    // Moderate Jaccard similarity (>= 60%) on content keywords with at least 2 shared keywords
+    // Handles e.g. "The SpongeBob Movie: Sponge on the Run" vs "The Spongebob Sponge On The Run"
     const jaccard = intersection.length / union.size;
-    if (jaccard >= 0.85 && intersection.length >= 2) {
+    if (jaccard >= 0.60 && intersection.length >= 2) {
         return true;
+    }
+
+    // Sub-phrase overlap: if all content words of the shorter title are contained in the longer title (min 2 words)
+    // Handles e.g. "How To Make Millions" vs "How to Make Millions Before Grandma Dies"
+    if (effA.length >= 2 && effB.length >= 2) {
+        const shorter = effA.length < effB.length ? setA : setB;
+        const longer = effA.length < effB.length ? setB : setA;
+        const allContained = [...shorter].every(t => longer.has(t));
+        if (allContained && shorter.size >= 2) {
+            return true;
+        }
     }
 
     return false;
@@ -1621,6 +1645,19 @@ function setupBot(bot, adminBot) {
         const cutIdx = s.search(cutoffRegex);
         let titlePart = cutIdx !== -1 ? s.substring(0, cutIdx) : s;
         titlePart = titlePart.replace(/[()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
+
+        // Strip leftover ripper, audio, and platform tags
+        titlePart = titlePart.replace(/\b(iq|iqiyi|dual\s*audio|dual|fil|filmh|filmhouse|telefilm|stream)\b/gi, ' ');
+        titlePart = titlePart.replace(/\b(nf|amzn|dsnp|hulu|zee5|hotstar)\b/gi, ' ');
+        titlePart = titlePart.replace(/\s+/g, ' ').trim();
+
+        // Specific aliases
+        if (titlePart.toLowerCase() === 'bel' && isSeries) {
+            titlePart = 'Bel-Air';
+        }
+        if (titlePart.toLowerCase() === 'matchbox the') {
+            titlePart = 'Matchbox';
+        }
 
         return {
             cleanTitle: titlePart || s.trim(),
