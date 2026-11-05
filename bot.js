@@ -2991,34 +2991,76 @@ function setupBot(bot, adminBot) {
         });
 
         // ─────────────────────────────────────────────────────────────────────────
-        // /scanlibrary — Auto-scan ingest vault channel and assign stream links
+        // /scanlibrary — Auto-scan Streamer Engine database & assign stream links
         // to matching movies/series in the catalogue. No manual work needed.
         // ─────────────────────────────────────────────────────────────────────────
-        adminBot.command('scanlibrary', async (ctx) => {
-            const senderId = String(ctx.from?.id || '');
-            const isAuthorized = await isAdmin(senderId).catch(() => false);
-            if (!isAuthorized) {
-                return ctx.reply('⛔ <b>Unauthorized.</b> This command is for admins only.', { parse_mode: 'HTML' });
+        function generateSecureStreamToken(messageId, secretKey = "filmhouse_secure_streaming_key_8f92a10b7c3d4e5f6") {
+            const crypto = require('crypto');
+            const msgStr = String(messageId);
+            const signature = crypto.createHmac('sha256', secretKey).update(msgStr).digest('hex').substring(0, 16);
+            const rawPayload = `${msgStr}:${signature}`;
+            return Buffer.from(rawPayload, 'utf-8').toString('base64url').replace(/=/g, '');
+        }
+
+        async function fetchStreamEngineMediaRecords() {
+            // Source 1: Read local tracked_media.json from disk on the server
+            const candidatePaths = [
+                "/home/ubuntu/filmhouse-stream-bot/data/tracked_media.json",
+                path.join(__dirname, "..", "filmhouse-stream-bot", "data", "tracked_media.json"),
+                path.join(__dirname, "..", "filmhousestream", "data", "tracked_media.json"),
+                path.join(__dirname, "data", "tracked_media.json")
+            ];
+
+            for (const p of candidatePaths) {
+                try {
+                    if (fs.existsSync(p)) {
+                        const raw = fs.readFileSync(p, 'utf8');
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            console.log(`[ScanLibrary] Loaded ${parsed.length} items from ${p}`);
+                            return { source: `local database (${path.basename(p)})`, items: parsed };
+                        }
+                    }
+                } catch (_) {}
             }
 
-            const ingestChannelId = await getIngestChannelId();
-            if (!ingestChannelId) {
-                return ctx.reply(
-                    '⚠️ <b>No Ingest Vault configured!</b>\n\nPlease run <code>/setingest</code> in your storage channel first so I know which channel to scan.',
-                    { parse_mode: 'HTML' }
-                );
+            // Source 2: Query Stream Server API (/api/media) with Admin Key
+            const apiEndpoints = [
+                "http://127.0.0.1:8080/api/media",
+                "https://filmhouse-stream.duckdns.org/api/media"
+            ];
+
+            for (const ep of apiEndpoints) {
+                try {
+                    const fetchModule = await import('node-fetch').catch(() => null);
+                    const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
+                    if (!fetchFn) continue;
+
+                    const res = await fetchFn(ep, {
+                        headers: {
+                            "X-Admin-Key": "filmhouse_admin_2026_pass"
+                        },
+                        timeout: 10000
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data) && data.length > 0) {
+                            console.log(`[ScanLibrary] Loaded ${data.length} items from API: ${ep}`);
+                            return { source: `Stream API (${ep})`, items: data };
+                        }
+                    }
+                } catch (_) {}
             }
 
-            // Send a live progress card that we'll edit as we go
-            const progressMsg = await ctx.reply(
-                '🔍 <b>Library Scan Starting...</b>\n\n' +
-                '📡 Connecting to your Ingest Vault channel...\n' +
-                '<i>This may take a moment for large libraries.</i>',
-                { parse_mode: 'HTML' }
-            );
+            return { source: 'none', items: [] };
+        }
 
-            const baseServer = (typeof lastSyncedTunnelUrl === 'string' && lastSyncedTunnelUrl)
-                || 'https://filmhouse-stream.duckdns.org';
+        async function processBatchMediaItems(items, ctx, progressMsg, baseServer) {
+            let totalScanned = 0;
+            let matched = 0;
+            let unmatched = 0;
+            let skipped = 0;
+            const unmatchedFiles = [];
 
             const updateProgress = async (text) => {
                 try {
@@ -3026,261 +3068,317 @@ function setupBot(bot, adminBot) {
                 } catch (_) {}
             };
 
-            let totalScanned = 0;
-            let matched = 0;
-            let unmatched = 0;
-            let skipped = 0;
-            const unmatchedFiles = [];
-            const matchedTitles = [];
+            for (const item of items) {
+                if (!item) continue;
+                totalScanned++;
 
-            try {
-                // Pull messages from the ingest channel in batches of 100
-                // We use getUpdates offset trick via forwardMessages; instead use telegram.callApi
-                let offsetMsgId = 0;
-                let batchSize = 100;
-                let keepScanning = true;
-                let batchNum = 0;
+                const rawFilename = item.file_name || item.filename || item.title || '';
+                if (!rawFilename) { skipped++; continue; }
 
-                while (keepScanning) {
-                    batchNum++;
-                    let messages = [];
-
-                    try {
-                        // Telegram Bot API: use getChatHistory via raw API call
-                        const result = await ctx.telegram.callApi('getChatHistory', {
-                            chat_id: ingestChannelId,
-                            offset: offsetMsgId,
-                            limit: batchSize
-                        }).catch(() => null);
-
-                        if (result && Array.isArray(result.messages)) {
-                            messages = result.messages;
-                        }
-                    } catch (_) {}
-
-                    // Fallback: use getMessages with offset_id if getChatHistory not available
-                    if (!messages.length) {
-                        try {
-                            const result2 = await ctx.telegram.callApi('getMessages', {
-                                chat_id: ingestChannelId,
-                                message_ids: Array.from({ length: batchSize }, (_, i) => offsetMsgId + i + 1)
-                            }).catch(() => null);
-                            if (result2 && Array.isArray(result2.messages)) {
-                                messages = result2.messages.filter(m => m && m.message_id);
-                            }
-                        } catch (_) {}
-                    }
-
-                    if (!messages.length) {
-                        keepScanning = false;
-                        break;
-                    }
-
-                    for (const msg of messages) {
-                        if (!msg) continue;
-                        const doc = msg.document || msg.video || msg.audio;
-                        if (!doc) { skipped++; continue; }
-
-                        const rawFilename = doc.file_name || doc.fileName || '';
-                        if (!rawFilename) { skipped++; continue; }
-
-                        totalScanned++;
-                        const msgId = msg.message_id || msg.id;
-                        const fileId = doc.file_id || doc.fileId || '';
-
-                        // Build stream URL from file_id (same logic as ingest handler)
-                        const streamUrl = fileId
-                            ? `${baseServer}/watch/${fileId}`
-                            : null;
-
-                        if (!streamUrl) { unmatched++; unmatchedFiles.push(rawFilename); continue; }
-
-                        // Parse the filename
-                        const parsed = parseMediaFilename(rawFilename);
-                        if (!parsed.cleanTitle) {
-                            unmatched++;
-                            unmatchedFiles.push(rawFilename);
-                            continue;
-                        }
-
-                        // Try to find matching movie in catalogue
-                        let catalogMatch = null;
-                        if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
-                            // First try: exact tmdb title match (fastest)
-                            catalogMatch = cachedMoviesMetadata.find(m =>
-                                m.title && titlesMatch(m.title, parsed.cleanTitle)
-                            );
-                            // Second try: also check year if first pass gave no result
-                            if (!catalogMatch && parsed.year) {
-                                catalogMatch = cachedMoviesMetadata.find(m => {
-                                    if (!m.title) return false;
-                                    const titleOk = titlesMatch(m.title, parsed.cleanTitle);
-                                    const mYear = m.year ? String(m.year).substring(0, 4) : '';
-                                    const yearOk = mYear === String(parsed.year).substring(0, 4);
-                                    return titleOk || (yearOk && m.title.toLowerCase().includes(parsed.cleanTitle.toLowerCase().split(' ')[0]));
-                                });
-                            }
-                        }
-                        // Also try Firestore if not found in cache
-                        if (!catalogMatch) {
-                            try {
-                                const snap = await db.collection('movies')
-                                    .where('title', '>=', parsed.cleanTitle)
-                                    .where('title', '<=', parsed.cleanTitle + '\uf8ff')
-                                    .limit(5).get();
-                                if (!snap.empty) {
-                                    const fsMatch = snap.docs.find(d => d.data().title && titlesMatch(d.data().title, parsed.cleanTitle));
-                                    if (fsMatch) catalogMatch = { ...fsMatch.data(), _docId: fsMatch.id, _ref: fsMatch.ref };
-                                }
-                            } catch (_) {}
-                        }
-
-                        if (!catalogMatch) {
-                            unmatched++;
-                            unmatchedFiles.push(`${rawFilename} (title: "${parsed.cleanTitle}")`);
-                            continue;
-                        }
-
-                        // Build the link entry (same structure as handleAdminMediaForward)
-                        let newLinkEntry;
-                        if (parsed.isSeries && parsed.episodeNum) {
-                            newLinkEntry = {
-                                season: parsed.seasonNum || 1,
-                                seasonOrPart: parsed.seasonOrPart || `Season ${parsed.seasonNum || 1}`,
-                                episode: parsed.episodeNum,
-                                episodeNum: parsed.episodeNum,
-                                quality: parsed.quality || '720p',
-                                name: `Episode ${parsed.episodeNum}`,
-                                url: streamUrl,
-                                stream_url: streamUrl
-                            };
-                        } else {
-                            newLinkEntry = {
-                                quality: parsed.quality || '1080P',
-                                url: streamUrl,
-                                stream_url: streamUrl,
-                                ...(parsed.seasonOrPart ? { season: parsed.seasonOrPart } : {})
-                            };
-                        }
-
-                        // Write to Firestore
-                        try {
-                            const docId = catalogMatch._docId || catalogMatch.csv_id;
-                            let movieRef = catalogMatch._ref || null;
-                            if (!movieRef && docId) movieRef = db.collection('movies').doc(docId);
-                            if (!movieRef && catalogMatch.tmdb_id) {
-                                const snap = await db.collection('movies').where('tmdb_id', '==', catalogMatch.tmdb_id).limit(1).get();
-                                if (!snap.empty) movieRef = snap.docs[0].ref;
-                            }
-                            if (!movieRef) { unmatched++; unmatchedFiles.push(rawFilename); continue; }
-
-                            const docSnap = await movieRef.get();
-                            const existing = docSnap.exists ? (docSnap.data() || {}) : {};
-                            const currentLinks = Array.isArray(existing.links) ? [...existing.links] : [];
-
-                            // Find slot to update (or append)
-                            let slotIdx = -1;
-                            if (parsed.isSeries && parsed.episodeNum) {
-                                slotIdx = currentLinks.findIndex(l =>
-                                    (l.season == (parsed.seasonNum || 1)) &&
-                                    (l.episode == parsed.episodeNum || l.episodeNum == parsed.episodeNum)
-                                );
-                            } else {
-                                slotIdx = currentLinks.findIndex(l =>
-                                    (l.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase() &&
-                                    (l.season || '') === (parsed.seasonOrPart || '')
-                                );
-                            }
-
-                            if (slotIdx >= 0) {
-                                currentLinks[slotIdx] = { ...currentLinks[slotIdx], ...newLinkEntry };
-                            } else {
-                                currentLinks.push(newLinkEntry);
-                            }
-
-                            await movieRef.set({
-                                links: currentLinks,
-                                stream_url: existing.stream_url || streamUrl,
-                                updatedAt: new Date().toISOString()
-                            }, { merge: true });
-
-                            // Update in-memory cache
-                            if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
-                                const cIdx = cachedMoviesMetadata.findIndex(m =>
-                                    m.csv_id === docId || (catalogMatch.tmdb_id && String(m.tmdb_id) === String(catalogMatch.tmdb_id))
-                                );
-                                if (cIdx >= 0) {
-                                    const cLinks = Array.isArray(cachedMoviesMetadata[cIdx].links) ? [...cachedMoviesMetadata[cIdx].links] : [];
-                                    if (slotIdx >= 0 && slotIdx < cLinks.length) {
-                                        cLinks[slotIdx] = { ...cLinks[slotIdx], ...newLinkEntry };
-                                    } else {
-                                        cLinks.push(newLinkEntry);
-                                    }
-                                    cachedMoviesMetadata[cIdx] = { ...cachedMoviesMetadata[cIdx], links: cLinks, stream_url: cachedMoviesMetadata[cIdx].stream_url || streamUrl };
-                                }
-                            }
-
-                            matched++;
-                            matchedTitles.push(`${catalogMatch.title}${parsed.isSeries && parsed.episodeNum ? ` S${String(parsed.seasonNum||1).padStart(2,'0')}E${String(parsed.episodeNum).padStart(2,'0')}` : ` (${parsed.quality})`}`);
-                        } catch (writeErr) {
-                            console.warn('[ScanLibrary] Write error for', rawFilename, writeErr.message);
-                            unmatched++;
-                            unmatchedFiles.push(rawFilename);
-                        }
-
-                        // Update live progress card every 20 files
-                        if (totalScanned % 20 === 0) {
-                            await updateProgress(
-                                `🔍 <b>Library Scan In Progress...</b>\n\n` +
-                                `📂 Scanned: <b>${totalScanned}</b> files\n` +
-                                `✅ Matched & Updated: <b>${matched}</b>\n` +
-                                `⚠️ No Match: <b>${unmatched}</b>\n` +
-                                `⏭️ Skipped (non-media): <b>${skipped}</b>\n\n` +
-                                `<i>Please wait...</i>`
-                            );
-                        }
-
-                        // Small delay to avoid Telegram/Firestore rate limits
-                        await new Promise(r => setTimeout(r, 120));
-                    }
-
-                    // Advance offset past this batch
-                    const lastMsg = messages[messages.length - 1];
-                    const newOffset = lastMsg ? (lastMsg.message_id || lastMsg.id || 0) : 0;
-                    if (!newOffset || newOffset <= offsetMsgId) {
-                        keepScanning = false;
-                    } else {
-                        offsetMsgId = newOffset;
-                    }
-
-                    // Safety cap: max 20 batches (2,000 messages)
-                    if (batchNum >= 20) keepScanning = false;
+                let streamUrl = item.stream_url || item.url || '';
+                if (!streamUrl && item.message_id) {
+                    const token = generateSecureStreamToken(item.message_id);
+                    streamUrl = `${baseServer}/dl/${token}`;
                 }
 
-                // ── Final Report ──────────────────────────────────────────────────
-                const unmatchedPreview = unmatchedFiles.slice(0, 15).map(f => `• <code>${escapeHtml(f)}</code>`).join('\n');
-                const hasMore = unmatchedFiles.length > 15;
+                if (!streamUrl) {
+                    unmatched++;
+                    unmatchedFiles.push(rawFilename);
+                    continue;
+                }
 
-                const finalReport =
-                    `📡 <b>Library Scan Complete!</b>\n` +
-                    `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                    `📂 Total Files Scanned: <b>${totalScanned}</b>\n` +
-                    `✅ Matched & Updated: <b>${matched}</b>\n` +
-                    `⚠️ No Catalogue Match: <b>${unmatched}</b>\n` +
-                    `⏭️ Skipped (non-media): <b>${skipped}</b>\n` +
-                    (unmatchedFiles.length > 0
-                        ? `\n📋 <b>Unmatched Files${hasMore ? ` (first 15 of ${unmatchedFiles.length})` : ''}:</b>\n${unmatchedPreview}\n\n<i>Tip: Rename these to Movie.Title.Year.1080p.mkv format and re-scan.</i>`
-                        : '\n🎉 <b>Perfect match rate! All files assigned.</b>') +
-                    `\n\n🍿 <i>Stream links are now live in FilmHouse!</i>`;
+                // Parse filename for clean title, year, season, episode, quality
+                const parsed = parseMediaFilename(rawFilename);
+                if (!parsed.cleanTitle) {
+                    unmatched++;
+                    unmatchedFiles.push(rawFilename);
+                    continue;
+                }
 
-                await updateProgress(finalReport);
+                // Match against catalog
+                let catalogMatch = null;
+                if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                    catalogMatch = cachedMoviesMetadata.find(m =>
+                        m.title && titlesMatch(m.title, parsed.cleanTitle)
+                    );
+                    if (!catalogMatch && parsed.year) {
+                        catalogMatch = cachedMoviesMetadata.find(m => {
+                            if (!m.title) return false;
+                            const titleOk = titlesMatch(m.title, parsed.cleanTitle);
+                            const mYear = m.year ? String(m.year).substring(0, 4) : '';
+                            const yearOk = mYear === String(parsed.year).substring(0, 4);
+                            return titleOk || (yearOk && m.title.toLowerCase().includes(parsed.cleanTitle.toLowerCase().split(' ')[0]));
+                        });
+                    }
+                }
 
-            } catch (scanErr) {
-                console.error('[ScanLibrary] Fatal error:', scanErr);
-                await updateProgress(
-                    `❌ <b>Scan failed:</b> ${escapeHtml(scanErr.message)}\n\n` +
-                    `<i>Progress so far — Scanned: ${totalScanned} | Matched: ${matched} | Unmatched: ${unmatched}</i>`
+                if (!catalogMatch) {
+                    try {
+                        const snap = await db.collection('movies')
+                            .where('title', '>=', parsed.cleanTitle)
+                            .where('title', '<=', parsed.cleanTitle + '\uf8ff')
+                            .limit(5).get();
+                        if (!snap.empty) {
+                            const fsMatch = snap.docs.find(d => d.data().title && titlesMatch(d.data().title, parsed.cleanTitle));
+                            if (fsMatch) catalogMatch = { ...fsMatch.data(), _docId: fsMatch.id, _ref: fsMatch.ref };
+                        }
+                    } catch (_) {}
+                }
+
+                if (!catalogMatch) {
+                    unmatched++;
+                    unmatchedFiles.push(`${rawFilename} (parsed: "${parsed.cleanTitle}")`);
+                    continue;
+                }
+
+                // Build link slot entry
+                let newLinkEntry;
+                if (parsed.isSeries && parsed.episodeNum) {
+                    newLinkEntry = {
+                        season: parsed.seasonNum || 1,
+                        seasonOrPart: parsed.seasonOrPart || `Season ${parsed.seasonNum || 1}`,
+                        episode: parsed.episodeNum,
+                        episodeNum: parsed.episodeNum,
+                        quality: parsed.quality || '720p',
+                        name: `Episode ${parsed.episodeNum}`,
+                        url: streamUrl,
+                        stream_url: streamUrl
+                    };
+                } else {
+                    newLinkEntry = {
+                        quality: parsed.quality || '1080P',
+                        url: streamUrl,
+                        stream_url: streamUrl,
+                        ...(parsed.seasonOrPart ? { season: parsed.seasonOrPart } : {})
+                    };
+                }
+
+                // Write to Firestore
+                try {
+                    const docId = catalogMatch._docId || catalogMatch.csv_id;
+                    let movieRef = catalogMatch._ref || null;
+                    if (!movieRef && docId) movieRef = db.collection('movies').doc(docId);
+                    if (!movieRef && catalogMatch.tmdb_id) {
+                        const snap = await db.collection('movies').where('tmdb_id', '==', catalogMatch.tmdb_id).limit(1).get();
+                        if (!snap.empty) movieRef = snap.docs[0].ref;
+                    }
+                    if (!movieRef) { unmatched++; unmatchedFiles.push(rawFilename); continue; }
+
+                    const docSnap = await movieRef.get();
+                    const existing = docSnap.exists ? (docSnap.data() || {}) : {};
+                    const currentLinks = Array.isArray(existing.links) ? [...existing.links] : [];
+
+                    let slotIdx = -1;
+                    if (parsed.isSeries && parsed.episodeNum) {
+                        slotIdx = currentLinks.findIndex(l =>
+                            (l.season == (parsed.seasonNum || 1)) &&
+                            (l.episode == parsed.episodeNum || l.episodeNum == parsed.episodeNum)
+                        );
+                    } else {
+                        slotIdx = currentLinks.findIndex(l =>
+                            (l.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase() &&
+                            (l.season || '') === (parsed.seasonOrPart || '')
+                        );
+                    }
+
+                    if (slotIdx >= 0) {
+                        currentLinks[slotIdx] = { ...currentLinks[slotIdx], ...newLinkEntry };
+                    } else {
+                        currentLinks.push(newLinkEntry);
+                    }
+
+                    await movieRef.set({
+                        links: currentLinks,
+                        stream_url: existing.stream_url || streamUrl,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+
+                    // Update local cache
+                    if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                        const cIdx = cachedMoviesMetadata.findIndex(m =>
+                            m.csv_id === docId || (catalogMatch.tmdb_id && String(m.tmdb_id) === String(catalogMatch.tmdb_id))
+                        );
+                        if (cIdx >= 0) {
+                            const cLinks = Array.isArray(cachedMoviesMetadata[cIdx].links) ? [...cachedMoviesMetadata[cIdx].links] : [];
+                            if (slotIdx >= 0 && slotIdx < cLinks.length) {
+                                cLinks[slotIdx] = { ...cLinks[slotIdx], ...newLinkEntry };
+                            } else {
+                                cLinks.push(newLinkEntry);
+                            }
+                            cachedMoviesMetadata[cIdx] = { ...cachedMoviesMetadata[cIdx], links: cLinks, stream_url: cachedMoviesMetadata[cIdx].stream_url || streamUrl };
+                        }
+                    }
+
+                    matched++;
+                } catch (writeErr) {
+                    console.warn('[ScanLibrary] Write error for', rawFilename, writeErr.message);
+                    unmatched++;
+                    unmatchedFiles.push(rawFilename);
+                }
+
+                if (totalScanned % 25 === 0) {
+                    await updateProgress(
+                        `🔍 <b>Library Matching in Progress...</b>\n\n` +
+                        `📂 Processed: <b>${totalScanned} / ${items.length}</b>\n` +
+                        `✅ Matched & Updated: <b>${matched}</b>\n` +
+                        `⚠️ No Match: <b>${unmatched}</b>\n\n` +
+                        `<i>Updating database...</i>`
+                    );
+                }
+
+                await new Promise(r => setTimeout(r, 80));
+            }
+
+            const unmatchedPreview = unmatchedFiles.slice(0, 15).map(f => `• <code>${escapeHtml(f)}</code>`).join('\n');
+            const hasMore = unmatchedFiles.length > 15;
+
+            return (
+                `📡 <b>Library Scan Complete!</b>\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `📂 Total Files Processed: <b>${totalScanned}</b>\n` +
+                `✅ Matched & Assigned: <b>${matched}</b>\n` +
+                `⚠️ Unmatched: <b>${unmatched}</b>\n` +
+                `⏭️ Skipped: <b>${skipped}</b>\n` +
+                (unmatchedFiles.length > 0
+                    ? `\n📋 <b>Unmatched Files${hasMore ? ` (first 15 of ${unmatchedFiles.length})` : ''}:</b>\n${unmatchedPreview}`
+                    : '\n🎉 <b>All files matched and streaming links assigned successfully!</b>') +
+                `\n\n🍿 <i>Stream links are now live in FilmHouse cinema!</i>`
+            );
+        }
+
+        adminBot.command('scanlibrary', async (ctx) => {
+            const senderId = String(ctx.from?.id || '');
+            const isAuthorized = await isAdmin(senderId).catch(() => false);
+            if (!isAuthorized) {
+                return ctx.reply('⛔ <b>Unauthorized.</b> This command is for admins only.', { parse_mode: 'HTML' });
+            }
+
+            const progressMsg = await ctx.reply(
+                '🔍 <b>Connecting to Stream Engine Database...</b>\n\n' +
+                '📡 Reading indexed media files from local database & Stream API...',
+                { parse_mode: 'HTML' }
+            );
+
+            const baseServer = (typeof lastSyncedTunnelUrl === 'string' && lastSyncedTunnelUrl)
+                || 'https://filmhouse-stream.duckdns.org';
+
+            try {
+                const { source, items } = await fetchStreamEngineMediaRecords();
+
+                if (!items || items.length === 0) {
+                    return ctx.telegram.editMessageText(
+                        ctx.chat.id,
+                        progressMsg.message_id,
+                        undefined,
+                        '⚠️ <b>No Files Found in Stream Engine Database!</b>\n\n' +
+                        'The Stream Bot hasn\'t written files to its local ledger yet.\n\n' +
+                        '💡 <b>Alternative 1-Click Method:</b>\n' +
+                        'You can send your stream links directly here!\n\n' +
+                        '• Send a <b>.txt file</b> containing your links/filenames, OR\n' +
+                        '• Type: <code>/importlinks &lt;paste lines&gt;</code>\n' +
+                        '• Or forward the summary message from your Streamer Bot directly here!',
+                        { parse_mode: 'HTML' }
+                    ).catch(() => {});
+                }
+
+                await ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    progressMsg.message_id,
+                    undefined,
+                    `📡 <b>Found ${items.length} files from ${escapeHtml(source)}!</b>\n\nStarting automated catalogue matching...`,
+                    { parse_mode: 'HTML' }
+                ).catch(() => {});
+
+                const report = await processBatchMediaItems(items, ctx, progressMsg, baseServer);
+                await ctx.telegram.editMessageText(ctx.chat.id, progressMsg.message_id, undefined, report, { parse_mode: 'HTML' }).catch(() => {});
+            } catch (err) {
+                console.error('[ScanLibrary Error]:', err);
+                await ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    progressMsg.message_id,
+                    undefined,
+                    `❌ <b>Scan Error:</b> ${escapeHtml(err.message)}`,
+                    { parse_mode: 'HTML' }
+                ).catch(() => {});
+            }
+        });
+
+        // Command: /importlinks <paste or forward>
+        adminBot.command(['importlinks', 'bulklinks', 'importstreams'], async (ctx) => {
+            const senderId = String(ctx.from?.id || '');
+            const isAuthorized = await isAdmin(senderId).catch(() => false);
+            if (!isAuthorized) return;
+
+            const text = (ctx.message?.text || '').replace(/^\/(importlinks|bulklinks|importstreams)(@\w+)?/i, '').trim();
+            if (!text) {
+                return ctx.reply(
+                    '📋 <b>Usage:</b>\n' +
+                    'Paste your links below the command, like:\n' +
+                    '<code>/importlinks\n' +
+                    'Gladiator.II.2024.1080p.mkv https://filmhouse-stream.duckdns.org/dl/...\n' +
+                    'Severance.S02E05.1080p.mkv https://filmhouse-stream.duckdns.org/dl/...</code>\n\n' +
+                    '<i>Or simply upload a .txt file containing the links!</i>',
+                    { parse_mode: 'HTML' }
                 );
+            }
+
+            const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+            const items = lines.map(line => {
+                const urlMatch = line.match(/https?:\/\/[^\s]+/i);
+                const url = urlMatch ? urlMatch[0] : '';
+                const filename = line.replace(url, '').replace(/[->:|]+/g, ' ').trim() || (url ? path.basename(url) : '');
+                return { file_name: filename, stream_url: url };
+            }).filter(it => it.file_name && it.stream_url);
+
+            if (items.length === 0) {
+                return ctx.reply('⚠️ Could not extract valid filename + stream URL pairs from your text.');
+            }
+
+            const waitMsg = await ctx.reply(`🔍 <b>Processing ${items.length} stream links...</b>`, { parse_mode: 'HTML' });
+            const baseServer = (typeof lastSyncedTunnelUrl === 'string' && lastSyncedTunnelUrl) || 'https://filmhouse-stream.duckdns.org';
+            const report = await processBatchMediaItems(items, ctx, waitMsg, baseServer);
+            await ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, report, { parse_mode: 'HTML' }).catch(() => {});
+        });
+
+        // Document upload: Accept .txt files with links
+        adminBot.on('document', async (ctx, next) => {
+            const doc = ctx.message?.document;
+            const filename = doc?.file_name || '';
+            const senderId = String(ctx.from?.id || '');
+            const isAuthorized = await isAdmin(senderId).catch(() => false);
+
+            if (!isAuthorized || !filename.endsWith('.txt')) {
+                return next ? next() : false;
+            }
+
+            try {
+                const waitMsg = await ctx.reply(`📄 <b>Reading ${escapeHtml(filename)}...</b>`, { parse_mode: 'HTML' });
+                const fileLink = await ctx.telegram.getFileLink(doc.file_id);
+                const fetchModule = await import('node-fetch').catch(() => null);
+                const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
+                if (!fetchFn) return ctx.reply('❌ Network fetch module unavailable.');
+
+                const res = await fetchFn(fileLink.href);
+                const textContent = await res.text();
+                const lines = textContent.split('\n').map(l => l.trim()).filter(Boolean);
+                const items = lines.map(line => {
+                    const urlMatch = line.match(/https?:\/\/[^\s]+/i);
+                    const url = urlMatch ? urlMatch[0] : '';
+                    const name = line.replace(url, '').replace(/[->:|]+/g, ' ').trim();
+                    return { file_name: name, stream_url: url };
+                }).filter(it => it.file_name && it.stream_url);
+
+                if (items.length === 0) {
+                    return ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, '⚠️ No valid stream link + filename pairs found in this file.', { parse_mode: 'HTML' }).catch(() => {});
+                }
+
+                await ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, `🔍 <b>Parsed ${items.length} items from ${escapeHtml(filename)}. Matching to catalogue...</b>`, { parse_mode: 'HTML' }).catch(() => {});
+                const baseServer = (typeof lastSyncedTunnelUrl === 'string' && lastSyncedTunnelUrl) || 'https://filmhouse-stream.duckdns.org';
+                const report = await processBatchMediaItems(items, ctx, waitMsg, baseServer);
+                await ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, report, { parse_mode: 'HTML' }).catch(() => {});
+            } catch (docErr) {
+                console.error('[Document Import Error]:', docErr);
+                return ctx.reply(`❌ Failed to process text file: ${escapeHtml(docErr.message)}`, { parse_mode: 'HTML' });
             }
         });
 
@@ -3289,7 +3387,6 @@ function setupBot(bot, adminBot) {
             const senderId = String(ctx.from?.id || '');
             const isAuthorized = await isAdmin(senderId).catch(() => false);
             if (!isAuthorized) return;
-            // Forward to adminBot handler by re-triggering via adminBot
             return ctx.reply(
                 '📡 <b>Library Scanner</b> is best run from your Admin Bot.\n\nPlease send <code>/scanlibrary</code> to <b>@FilmHouseAdminBot</b> (your admin bot DM) to begin the scan.',
                 { parse_mode: 'HTML' }
