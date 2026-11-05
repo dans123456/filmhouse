@@ -2730,12 +2730,14 @@ function setupBot(bot, adminBot) {
 
         // Command: /start and /menu
         
-        // /setingest: Set current channel/chat as automated Ingest Vault
+        // /setingest: Set current channel/chat as automated Ingest Vault (or pass channel ID in DM)
         adminBot.command('setingest', async (ctx) => {
             const senderId = String(ctx.from ? ctx.from.id : "");
             const authorized = await isAdmin(senderId);
             if (!authorized) return ctx.reply("⛔ Unauthorized.");
-            const targetChatId = String(ctx.chat.id);
+            const textParts = (ctx.message?.text || "").trim().split(/\s+/);
+            const argId = textParts[1];
+            const targetChatId = (argId && (argId.startsWith("-100") || argId.startsWith("@"))) ? argId.trim() : String(ctx.chat.id);
             dynamicIngestChannelId = targetChatId;
             try {
                 await db.collection("system").doc("ingest_config").set({
@@ -2743,7 +2745,7 @@ function setupBot(bot, adminBot) {
                     setBy: senderId,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
-                return ctx.reply(`✅ <b>Ingest Vault Configured!</b>\n\nChat ID <code>${targetChatId}</code> is now your automated Ingest Channel. Whenever files are posted or dropped here, FilmHouse will automatically index, extract stream links, match TMDB, and send you confirmation cards!`, { parse_mode: "HTML" });
+                return ctx.reply(`✅ <b>Ingest Vault Configured!</b>\n\nChannel ID <code>${targetChatId}</code> is now your automated Ingest Channel. Whenever files are posted or dropped here, FilmHouse will automatically index, extract stream links, match TMDB, and send you confirmation cards!`, { parse_mode: "HTML" });
             } catch (err) {
                 return ctx.reply(`❌ Error configuring ingest channel: ${err.message}`);
             }
@@ -4400,12 +4402,14 @@ function setupBot(bot, adminBot) {
         } catch (e) {}
     });
 
-    // /setingest command for main bot
+    // /setingest command for main bot (in-channel or pass channel ID in DM)
     bot.command('setingest', async (ctx) => {
         const senderId = String(ctx.from ? ctx.from.id : "");
         const authorized = await isAdmin(senderId);
         if (!authorized) return ctx.reply("⛔ Unauthorized.");
-        const targetChatId = String(ctx.chat.id);
+        const textParts = (ctx.message?.text || "").trim().split(/\s+/);
+        const argId = textParts[1];
+        const targetChatId = (argId && (argId.startsWith("-100") || argId.startsWith("@"))) ? argId.trim() : String(ctx.chat.id);
         dynamicIngestChannelId = targetChatId;
         try {
             await db.collection("system").doc("ingest_config").set({
@@ -4413,7 +4417,7 @@ function setupBot(bot, adminBot) {
                 setBy: senderId,
                 updatedAt: new Date().toISOString()
             }, { merge: true });
-            return ctx.reply(`✅ <b>Ingest Vault Configured!</b>\n\nChat ID <code>${targetChatId}</code> is now your automated Ingest Channel. Whenever files are posted or dropped here, FilmHouse will automatically index, extract stream links, match TMDB, and send you confirmation cards!`, { parse_mode: "HTML" });
+            return ctx.reply(`✅ <b>Ingest Vault Configured!</b>\n\nChannel ID <code>${targetChatId}</code> is now your automated Ingest Channel. Whenever files are posted or dropped here, FilmHouse will automatically index, extract stream links, match TMDB, and send you confirmation cards!`, { parse_mode: "HTML" });
         } catch (err) {
             return ctx.reply(`❌ Error configuring ingest channel: ${err.message}`);
         }
