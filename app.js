@@ -4819,7 +4819,37 @@ function renderMediaDownloadRows(movie, container) {
 
     if (isTVShow) {
         // --- TV SHOW: Season downloads ---
-        if (uploadedLinks.length === 0) {
+        // Deduplicate & group links by Season (Season 1, Season 2, etc.)
+        const seasonMap = new Map();
+
+        uploadedLinks.forEach((link, idx) => {
+            const isObj = typeof link === "object" && link !== null;
+            const linkUrl = isObj ? (link.downloadLink || link.url) : link;
+            if (!linkUrl || !String(linkUrl).trim()) return;
+
+            // Extract season number safely (handles number 1, "1", "Season 1", "S1")
+            let rawSeason = isObj && (link.season || link.seasonOrPart) ? (link.season || link.seasonOrPart) : (idx + 1);
+            let sNum = 1;
+            const sMatch = String(rawSeason).match(/\d+/);
+            if (sMatch) sNum = parseInt(sMatch[0], 10);
+
+            const seasonKey = `Season ${sNum}`;
+            const estimatedSize = (isObj && link.size) ? link.size : "~3.2 GB";
+
+            // If season already exists, prioritize official Telegram download bot links (t.me) over stream URLs
+            if (seasonMap.has(seasonKey)) {
+                const existing = seasonMap.get(seasonKey);
+                const isExistingTg = String(existing.url).includes("t.me");
+                const isNewTg = String(linkUrl).includes("t.me");
+                if (!isExistingTg && isNewTg) {
+                    seasonMap.set(seasonKey, { url: linkUrl, size: estimatedSize, seasonLabel: seasonKey });
+                }
+            } else {
+                seasonMap.set(seasonKey, { url: linkUrl, size: estimatedSize, seasonLabel: seasonKey });
+            }
+        });
+
+        if (seasonMap.size === 0) {
             const emptyBox = document.createElement("div");
             emptyBox.style.cssText = "text-align: center; padding: 18px 12px; color: var(--text-secondary); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px;";
             emptyBox.innerHTML = `
@@ -4842,12 +4872,14 @@ function renderMediaDownloadRows(movie, container) {
             return;
         }
 
-        uploadedLinks.forEach((link, idx) => {
-            const isObj = typeof link === "object" && link !== null;
-            const linkUrl = isObj ? link.url : link;
-            const seasonLabel = isObj && link.season ? link.season : `Season ${idx + 1}`;
-            const estimatedSize = (isObj && link.size) ? link.size : "~3.2 GB";
+        // Sort seasons sequentially (Season 1, Season 2, Season 3...)
+        const sortedSeasons = Array.from(seasonMap.values()).sort((a, b) => {
+            const numA = parseInt((a.seasonLabel.match(/\d+/) || [0])[0], 10);
+            const numB = parseInt((b.seasonLabel.match(/\d+/) || [0])[0], 10);
+            return numA - numB;
+        });
 
+        sortedSeasons.forEach(sItem => {
             const row = document.createElement("div");
             row.className = "media-download-row";
 
@@ -4856,11 +4888,11 @@ function renderMediaDownloadRows(movie, container) {
 
             const titleSpan = document.createElement("span");
             titleSpan.className = "media-download-quality-title";
-            titleSpan.textContent = seasonLabel;
+            titleSpan.textContent = sItem.seasonLabel;
 
             const sizeBadge = document.createElement("span");
             sizeBadge.className = "media-download-size-badge";
-            sizeBadge.textContent = estimatedSize;
+            sizeBadge.textContent = sItem.size;
 
             leftCol.appendChild(titleSpan);
             leftCol.appendChild(sizeBadge);
@@ -4874,9 +4906,9 @@ function renderMediaDownloadRows(movie, container) {
                 logAppEvent("download", movie.csv_id || movie.id, movie.title);
                 if (matchingRequest) {
                     showToast("Fulfillment download unlocked! Connecting...", "success");
-                    window.open(linkUrl, "_blank");
+                    window.open(sItem.url, "_blank");
                 } else {
-                    showConnectionDrawer(linkUrl, ADSGRAM_DOWNLOAD_BLOCK_ID);
+                    showConnectionDrawer(sItem.url, ADSGRAM_DOWNLOAD_BLOCK_ID);
                 }
             };
 
@@ -8822,15 +8854,17 @@ function openDownloadModal(movie) {
             if (isTVShow) {
                 // --- TV SERIES: Season layout ---
                 const isObj = typeof link === 'object' && link !== null;
-                const seasonLabel = isObj && link.season ? link.season : `Season ${idx + 1}`;
-                const badgeText = isObj && link.shortLabel ? link.shortLabel : (isObj && link.season ? (link.season.replace(/[^0-9]/g, '') ? `S${link.season.replace(/[^0-9]/g, '')}` : link.season.substring(0, 4)) : `S${idx + 1}`);
+                const rawS = isObj && (link.season || link.seasonOrPart) ? (link.season || link.seasonOrPart) : (idx + 1);
+                const sMatch = String(rawS).match(/\d+/);
+                const sNum = sMatch ? parseInt(sMatch[0], 10) : (idx + 1);
 
-                const sMatch = seasonLabel.match(/\d+/);
-                if (sMatch) {
-                    uploadedSeasonNums.add(parseInt(sMatch[0], 10));
-                } else {
-                    uploadedSeasonNums.add(idx + 1);
+                if (uploadedSeasonNums.has(sNum)) {
+                    return; // Skip duplicate link entries for the same season
                 }
+                uploadedSeasonNums.add(sNum);
+
+                const seasonLabel = `Season ${sNum}`;
+                const badgeText = `S${sNum}`;
 
                 const badge = document.createElement("span");
                 badge.className = "download-link-badge season-badge";
