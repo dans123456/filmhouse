@@ -3205,17 +3205,26 @@ function setupBot(bot, adminBot) {
                     const docSnap = await movieRef.get();
                     const existing = docSnap.exists ? (docSnap.data() || {}) : {};
                     const currentLinks = Array.isArray(existing.links) ? [...existing.links] : [];
+                    const currentStreamLinks = Array.isArray(existing.stream_links) ? [...existing.stream_links] : [];
 
                     let slotIdx = -1;
+                    let streamSlotIdx = -1;
                     if (parsed.isSeries && parsed.episodeNum) {
                         slotIdx = currentLinks.findIndex(l =>
                             (l.season == (parsed.seasonNum || 1)) &&
                             (l.episode == parsed.episodeNum || l.episodeNum == parsed.episodeNum)
                         );
+                        streamSlotIdx = currentStreamLinks.findIndex(s =>
+                            (s.season == (parsed.seasonNum || 1)) &&
+                            (s.episode == parsed.episodeNum || s.episodeNum == parsed.episodeNum)
+                        );
                     } else {
                         slotIdx = currentLinks.findIndex(l =>
                             (l.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase() &&
                             (l.season || '') === (parsed.seasonOrPart || '')
+                        );
+                        streamSlotIdx = currentStreamLinks.findIndex(s =>
+                            (s.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase()
                         );
                     }
 
@@ -3225,9 +3234,16 @@ function setupBot(bot, adminBot) {
                         currentLinks.push(newLinkEntry);
                     }
 
+                    if (streamSlotIdx >= 0) {
+                        currentStreamLinks[streamSlotIdx] = { ...currentStreamLinks[streamSlotIdx], ...newLinkEntry };
+                    } else {
+                        currentStreamLinks.push(newLinkEntry);
+                    }
+
                     await movieRef.set({
                         links: currentLinks,
-                        stream_url: existing.stream_url || streamUrl,
+                        stream_links: currentStreamLinks,
+                        stream_url: streamUrl || existing.stream_url,
                         updatedAt: new Date().toISOString()
                     }, { merge: true });
 
@@ -3237,13 +3253,9 @@ function setupBot(bot, adminBot) {
                             m.csv_id === docId || (catalogMatch.tmdb_id && String(m.tmdb_id) === String(catalogMatch.tmdb_id))
                         );
                         if (cIdx >= 0) {
-                            const cLinks = Array.isArray(cachedMoviesMetadata[cIdx].links) ? [...cachedMoviesMetadata[cIdx].links] : [];
-                            if (slotIdx >= 0 && slotIdx < cLinks.length) {
-                                cLinks[slotIdx] = { ...cLinks[slotIdx], ...newLinkEntry };
-                            } else {
-                                cLinks.push(newLinkEntry);
-                            }
-                            cachedMoviesMetadata[cIdx] = { ...cachedMoviesMetadata[cIdx], links: cLinks, stream_url: cachedMoviesMetadata[cIdx].stream_url || streamUrl };
+                            cachedMoviesMetadata[cIdx].links = currentLinks;
+                            cachedMoviesMetadata[cIdx].stream_links = currentStreamLinks;
+                            cachedMoviesMetadata[cIdx].stream_url = streamUrl || cachedMoviesMetadata[cIdx].stream_url;
                         }
                     }
 
@@ -3265,6 +3277,16 @@ function setupBot(bot, adminBot) {
                 }
 
                 await new Promise(r => setTimeout(r, 80));
+            }
+
+            // Flush updated metadata to disk so Admin Panel, website, and local loaders immediately see the stream links
+            try {
+                if (cachedMoviesMetadata && localMetaPathGlobal) {
+                    fs.writeFileSync(localMetaPathGlobal, JSON.stringify(cachedMoviesMetadata, null, 2), 'utf8');
+                    console.log(`[ScanLibrary] Flushed ${cachedMoviesMetadata.length} movies with stream links to disk.`);
+                }
+            } catch (diskErr) {
+                console.warn('[ScanLibrary] Could not flush to disk:', diskErr.message);
             }
 
             return {
