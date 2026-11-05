@@ -414,14 +414,32 @@ function normalizeTargetString(str) {
     return String(str).toLowerCase().replace(/&/g, " and ").replace(/[^\p{L}\p{N}\s]/gu, " ");
 }
 
+// Roman numeral & number converter for flexible title/sequel search
+function convertRomanNumerals(str) {
+    if (!str) return "";
+    return str
+        .replace(/\b(part|chapter|season|ep|episode|volume|vol)\s+ii\b/gi, "$1 2")
+        .replace(/\b(part|chapter|season|ep|episode|volume|vol)\s+two\b/gi, "$1 2")
+        .replace(/\b(part|chapter|season|ep|episode|volume|vol)\s+iii\b/gi, "$1 3")
+        .replace(/\b(part|chapter|season|ep|episode|volume|vol)\s+three\b/gi, "$1 3")
+        .replace(/\b(part|chapter|season|ep|episode|volume|vol)\s+iv\b/gi, "$1 4")
+        .replace(/\b(part|chapter|season|ep|episode|volume|vol)\s+four\b/gi, "$1 4")
+        .replace(/\b(part|chapter|season|ep|episode|volume|vol)\s+i\b/gi, "$1 1")
+        .replace(/\b(part|chapter|season|ep|episode|volume|vol)\s+one\b/gi, "$1 1")
+        .replace(/\bii\b/gi, "2")
+        .replace(/\biii\b/gi, "3")
+        .replace(/\biv\b/gi, "4");
+}
+
 // Stop words to prevent common function words ("of", "the") from dominating search relevance
-const SEARCH_STOP_WORDS = new Set(['the', 'a', 'an', 'of', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'with', 'from', 'by', 'is', 'it']);
+const SEARCH_STOP_WORDS = new Set(['the', 'a', 'an', 'of', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'with', 'from', 'by', 'is']);
 
 // Universal search query normalizer: strips symbols, extracts year, strips video tags, isolates keywords
 function sanitizeSearchQuery(query) {
     if (!query) return { cleanTokens: [], significantTokens: [], titleOnlyTokens: [], searchTitleStr: "", targetYear: null, cleanFullStr: "", collapsedQuery: "", rawCollapsedQuery: "" };
     
     let raw = String(query).toLowerCase();
+    raw = convertRomanNumerals(raw);
     raw = raw.replace(/&/g, " and ");
     
     const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
@@ -446,7 +464,12 @@ function sanitizeSearchQuery(query) {
     const rawCollapsedQuery = cleanTokens.join("").replace(/[^a-z0-9]/gi, "");
     
     // Filter significant keyword tokens (excluding stop words and target year)
-    const significantTokens = cleanTokens.filter(t => t !== targetYear && !SEARCH_STOP_WORDS.has(t));
+    let significantTokens = cleanTokens.filter(t => t !== targetYear && !SEARCH_STOP_WORDS.has(t));
+    // If all tokens were stop words (e.g. "IT", "Us", "Up", "Her"), preserve them so they are never lost!
+    if (significantTokens.length === 0) {
+        significantTokens = cleanTokens.filter(t => t !== targetYear);
+        if (significantTokens.length === 0) significantTokens = cleanTokens;
+    }
     
     return { cleanTokens, significantTokens, titleOnlyTokens, searchTitleStr, targetYear, cleanFullStr, collapsedQuery, rawCollapsedQuery };
 }
@@ -482,10 +505,15 @@ function calculateSearchScore(movie, queryInfo) {
     const rawTitle = movie.title || "";
     const rawColTitle = getRawCollapsed(rawTitle);
     const normTitle = normalizeTitleForComparison(rawTitle);
+    const numNormTitle = convertRomanNumerals(normTitle);
     const colTitle = getCollapsedTitle(rawTitle);
+    const numColTitle = colTitle ? convertRomanNumerals(colTitle).replace(/[^a-z0-9]/gi, "") : "";
 
     const titleTokens = normTitle.split(/\s+/).filter(Boolean);
     const titleTokenSet = new Set(titleTokens);
+    if (numNormTitle !== normTitle) {
+        numNormTitle.split(/\s+/).filter(Boolean).forEach(t => titleTokenSet.add(t));
+    }
 
     const releaseYear = movie.release_date ? String(movie.release_date).substring(0, 4) : (movie.year ? String(movie.year) : "");
     const hasLinks = Boolean(movie.links && movie.links.length > 0);
@@ -493,18 +521,18 @@ function calculateSearchScore(movie, queryInfo) {
     let score = 0;
 
     // 1. EXACT TITLE MATCH (10,000 pts) - checks both normalized and raw collapsed to guarantee exact hits
-    if ((colTitle && collapsedQuery && colTitle === collapsedQuery) ||
+    if ((colTitle && collapsedQuery && (colTitle === collapsedQuery || numColTitle === collapsedQuery)) ||
         (rawColTitle && rawCollapsedQuery && rawColTitle === rawCollapsedQuery)) {
         score = 10000;
     }
     // 2. TITLE STARTS WITH QUERY (8,500 pts)
-    else if ((colTitle && collapsedQuery && colTitle.startsWith(collapsedQuery)) ||
+    else if ((colTitle && collapsedQuery && (colTitle.startsWith(collapsedQuery) || numColTitle.startsWith(collapsedQuery))) ||
              (rawColTitle && rawCollapsedQuery && rawColTitle.startsWith(rawCollapsedQuery))) {
         score = 8500;
     }
     // 3. COLLAPSED TITLE CONTAINS QUERY (7,500 pts)
-    else if ((colTitle && collapsedQuery && collapsedQuery.length >= 3 && colTitle.includes(collapsedQuery)) ||
-             (rawColTitle && rawCollapsedQuery && rawCollapsedQuery.length >= 3 && rawColTitle.includes(rawCollapsedQuery))) {
+    else if ((colTitle && collapsedQuery && collapsedQuery.length >= 2 && (colTitle.includes(collapsedQuery) || numColTitle.includes(collapsedQuery))) ||
+             (rawColTitle && rawCollapsedQuery && rawCollapsedQuery.length >= 2 && rawColTitle.includes(rawCollapsedQuery))) {
         score = 7500;
     }
     else {
@@ -515,13 +543,13 @@ function calculateSearchScore(movie, queryInfo) {
         cleanTokens.forEach(tok => {
             // Whole-word regex matching prevents "the" from matching inside "theft" or "of" inside "off"
             const wordRegex = new RegExp(`\\b${tok}\\b`, 'i');
-            if (wordRegex.test(rawTitle) || wordRegex.test(normTitle) || titleTokenSet.has(tok)) {
+            if (wordRegex.test(rawTitle) || wordRegex.test(normTitle) || wordRegex.test(numNormTitle) || titleTokenSet.has(tok)) {
                 matchedAllTokens++;
                 if (!SEARCH_STOP_WORDS.has(tok)) {
                     matchedSigTokens++;
                 }
-            } else if (tok.length >= 3 && (normTitle.includes(tok) || colTitle.includes(tok))) {
-                // Partial token match (min 3 chars to prevent 2-letter stop words matching)
+            } else if (tok.length >= 2 && (normTitle.includes(tok) || colTitle.includes(tok) || numNormTitle.includes(tok))) {
+                // Partial token match
                 matchedAllTokens += 0.8;
                 if (!SEARCH_STOP_WORDS.has(tok)) {
                     matchedSigTokens += 0.8;
@@ -533,31 +561,30 @@ function calculateSearchScore(movie, queryInfo) {
         const sigMatchRatio = matchedSigTokens / sigTokenCount;
 
         // CRITICAL: If there are significant tokens in the query, the title MUST match at least one significant token!
-        // Matching only stop words ("the", "of") is REJECTED.
         if (significantTokens.length > 0 && matchedSigTokens === 0) {
-            return -1;
-        }
-
-        // 4. ALL SIGNIFICANT QUERY TOKENS IN TITLE (6,500 pts)
-        if (sigMatchRatio >= 1) {
-            score = 6500;
-        }
-        // 5. MAJORITY OF SIGNIFICANT TOKENS IN TITLE (4,000 pts * ratio)
-        else if (sigMatchRatio >= 0.5) {
-            score = 4000 * sigMatchRatio;
-        }
-        // 6. AT LEAST ONE SIGNIFICANT TOKEN (2,000 pts * ratio)
-        else if (matchedSigTokens > 0) {
-            score = 2000 * sigMatchRatio;
-        }
-        // 7. TITLE DOES NOT MATCH -> Check Overview, Genres, Cast (FALLBACK ONLY!) (300 pts)
-        else {
+            // Check cast, director, overview fallback
             const searchTarget = (movie._searchStr || "").toLowerCase();
-            const matchesAllSigInMeta = significantTokens.length > 0 && significantTokens.every(tok => searchTarget.includes(tok));
+            const matchesAllSigInMeta = significantTokens.every(tok => searchTarget.includes(tok));
             if (matchesAllSigInMeta) {
-                score = 300;
+                const castStr = Array.isArray(movie.cast) ? movie.cast.join(" ").toLowerCase() : "";
+                const dirStr = (movie.director || "").toLowerCase();
+                const isCastOrDirMatch = significantTokens.some(tok => castStr.includes(tok) || dirStr.includes(tok));
+                score = isCastOrDirMatch ? 2800 : 700;
             } else {
                 return -1;
+            }
+        } else {
+            // 4. ALL SIGNIFICANT QUERY TOKENS IN TITLE (6,500 pts)
+            if (sigMatchRatio >= 1) {
+                score = 6500;
+            }
+            // 5. MAJORITY OF SIGNIFICANT TOKENS IN TITLE (4,000 pts * ratio)
+            else if (sigMatchRatio >= 0.5) {
+                score = 4000 * sigMatchRatio;
+            }
+            // 6. AT LEAST ONE SIGNIFICANT TOKEN (2,000 pts * ratio)
+            else if (matchedSigTokens > 0) {
+                score = 2000 * sigMatchRatio;
             }
         }
     }
@@ -603,15 +630,15 @@ function getPrecisionSearchResults(moviesList, query) {
     scored.sort((a, b) => b.score - a.score);
 
     // If we have Tier 1 or Tier 2 exact/prefix/phrase matches (score >= 6000),
-    // only return high quality matches (score >= 4000) and prune weak single-token noise!
+    // return high quality matches and strong cast/director hits (score >= 2500)
     const topScore = scored.length > 0 ? scored[0].score : 0;
     if (topScore >= 6000) {
-        const highQuality = scored.filter(s => s.score >= 4000);
+        const highQuality = scored.filter(s => s.score >= 2500);
         return highQuality.map(s => s.movie);
     }
 
-    // Otherwise if strong title matches exist (score >= 1000), filter out weak synopsis-only matches
-    const strongTitleMatches = scored.filter(s => s.score >= 1000);
+    // Otherwise if strong title or meta matches exist (score >= 700), filter out noise
+    const strongTitleMatches = scored.filter(s => s.score >= 700);
     if (strongTitleMatches.length >= 1) {
         return strongTitleMatches.map(s => s.movie);
     }
@@ -7610,10 +7637,36 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const imdbParam = movie.imdb_id ? `&imdb=${encodeURIComponent(movie.imdb_id)}` : "";
         const tmdbParam = movie.tmdb_id ? `&tmdb=${encodeURIComponent(movie.tmdb_id)}` : "";
         const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${subParam}`;
+        
+        // Fast pre-buffering animation overlay for instant visual feedback
+        const loader = document.createElement("div");
+        loader.className = "cinema-stream-loader";
+        loader.id = "cinema-stream-loader";
+        loader.innerHTML = `
+            <div class="cinema-loader-spinner"></div>
+            <div class="cinema-loader-title">Connecting Fast Stream...</div>
+            <div class="cinema-loader-sub">⚡ Film House High-Speed Engine</div>
+        `;
+        container.appendChild(loader);
+
         const iframe = document.createElement("iframe");
         iframe.src = playerSrc;
         iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
         iframe.setAttribute("allowfullscreen", "true");
+        
+        let loaderDismissed = false;
+        const dismissLoader = () => {
+            if (loaderDismissed) return;
+            loaderDismissed = true;
+            loader.classList.add("fade-out");
+            setTimeout(() => { if (loader.parentNode) loader.remove(); }, 400);
+        };
+
+        iframe.addEventListener("load", () => {
+            setTimeout(dismissLoader, 400);
+        });
+        setTimeout(dismissLoader, 2500);
+
         container.appendChild(iframe);
         if (titleEl) titleEl.textContent = currentMediaTitle;
         startStreamingPresence(movie, currentTitle || initialTitle);
@@ -12897,10 +12950,7 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
             if (tg && tg.openTelegramLink) {
                 try {
                     tg.openTelegramLink(targetLink);
-                    // Close the mini app so Telegram switches directly to the bot chat with the START button!
-                    setTimeout(() => {
-                        try { tg.close(); } catch (e) {}
-                    }, 500);
+                    // Keep mini-app alive in background so user doesn't get kicked out
                     return;
                 } catch (e) {
                     console.warn("tg.openTelegramLink failed:", e);

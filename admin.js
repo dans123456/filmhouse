@@ -2944,6 +2944,7 @@ function renderDetailsStreamsReadOnlyHTML(streams, movie, isSeries) {
                 <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
                     <button type="button" class="btn-copy-stream-token" data-token="${escapeHTML(tokenVal)}" style="font-size: 10px; padding: 2px 7px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff; border-radius: 4px; cursor: pointer;" title="Copy Token">📋 Copy</button>
                     <a href="${playUrl}" target="_blank" style="font-size: 10px; color: #ffbc00; text-decoration: none; padding: 2px 8px; border: 1px solid rgba(255, 188, 0, 0.35); border-radius: 4px; font-weight: 600; background: rgba(255, 188, 0, 0.08); white-space: nowrap;" title="Test Stream in Monetag Player">Test ▶️</a>
+                    <button type="button" class="btn-delete-stream-token" data-index="${idx}" style="font-size: 10px; padding: 2px 7px; background: rgba(255, 59, 48, 0.12); border: 1px solid rgba(255, 59, 48, 0.35); color: #ff3b30; border-radius: 4px; cursor: pointer;" title="Delete this stream link">🗑️</button>
                 </div>
             </div>
         `;
@@ -3399,6 +3400,84 @@ function showMovieDetails(movie) {
     }
     bindCopyTokenButtons();
 
+    // Bind Delete Stream Link buttons in read-only view
+    function bindDeleteStreamButtons() {
+        document.querySelectorAll(".btn-delete-stream-token").forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.getAttribute("data-index"), 10);
+                const movieIndex = allCatalogMovies.findIndex(m => m.csv_id === movie.csv_id);
+                if (movieIndex === -1 || isNaN(idx)) return;
+                
+                const targetMovie = allCatalogMovies[movieIndex];
+                let streams = extractMovieStreams(targetMovie);
+                if (!streams[idx]) return;
+                
+                const epNum = streams[idx].episode || (idx + 1);
+                const removedLabel = isSeries ? `Episode ${epNum}` : (streams[idx].quality || `Stream ${idx + 1}`);
+                if (!confirm(`Are you sure you want to delete the streaming link for "${removedLabel}"?`)) return;
+                
+                streams.splice(idx, 1);
+                
+                // Re-sequence series episode numbers
+                if (isSeries) {
+                    streams = streams.map((s, newIdx) => ({
+                        ...s,
+                        episode: newIdx + 1
+                    }));
+                }
+                
+                targetMovie.stream_links = streams;
+                targetMovie.stream_url = streams.length > 0 ? (streams[0].stream_url || streams[0].url || "") : "";
+                
+                // Keep links in sync if structured
+                if (Array.isArray(targetMovie.links)) {
+                    targetMovie.links.forEach((l, lIdx) => {
+                        if (typeof l === 'object' && l !== null) {
+                            if (streams[lIdx]) {
+                                l.stream_url = streams[lIdx].stream_url || streams[lIdx].url || "";
+                            } else {
+                                delete l.stream_url;
+                            }
+                        }
+                    });
+                }
+                
+                currentStreams = streams;
+                catalogChangesMade = true;
+                if (!newlyUpdatedIds.includes(targetMovie.csv_id) && !newlyAddedIds.includes(targetMovie.csv_id)) {
+                    newlyUpdatedIds.push(targetMovie.csv_id);
+                }
+                updatePublishButtonState();
+                
+                // Re-render the view list
+                const viewList = document.getElementById("details-streams-view-list");
+                if (viewList) {
+                    viewList.innerHTML = renderDetailsStreamsReadOnlyHTML(currentStreams, targetMovie, isSeries);
+                }
+                const statusBadge = document.getElementById("details-streaming-status-badge");
+                if (statusBadge) {
+                    if (currentStreams.length > 0) {
+                        statusBadge.textContent = isSeries ? `🟢 ${currentStreams.length} Episode Stream(s) Ready` : `🟢 Stream Active (${currentStreams.length} Qualities)`;
+                        statusBadge.style.cssText = "font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.15); border: 1px solid rgba(76, 217, 100, 0.3); font-weight: 700; padding: 2px 8px; border-radius: 10px;";
+                    } else {
+                        statusBadge.textContent = "⚪ No Streams Attached";
+                        statusBadge.style.cssText = "font-size: 10px; color: var(--text-muted); background: rgba(255, 255, 255, 0.05); padding: 2px 8px; border-radius: 10px;";
+                    }
+                }
+                
+                bindCopyTokenButtons();
+            bindDeleteStreamButtons();
+                bindDeleteStreamButtons();
+                
+                if (typeof showToast === 'function') {
+                    showToast(`🗑️ Removed ${removedLabel} streaming link! Click 'Publish' to push live.`, "info");
+                }
+            };
+        });
+    }
+    bindDeleteStreamButtons();
+
     // Quick Streams Drawer in Read-Only View (Instant Save without Edit mode)
     const quickStreamsToggle = document.getElementById("btn-quick-streams-toggle");
     const quickStreamsDrawer = document.getElementById("details-quick-streams-drawer");
@@ -3546,6 +3625,7 @@ function showMovieDetails(movie) {
             }
 
             bindCopyTokenButtons();
+            bindDeleteStreamButtons();
             quickStreamsDrawer.style.display = "none";
             if (quickStreamsToggle) quickStreamsToggle.textContent = "⚡ Quick Add / Update Streams";
             quickStreamsInput.value = "";
@@ -4053,6 +4133,7 @@ function renderCatalogList() {
     const searchQuery = (document.getElementById("catalog-search-input")?.value || "").toLowerCase().trim();
     const cleanCatQ = normalizeTitleForComparison(searchQuery);
     const colCatQ = getCollapsedTitle(searchQuery);
+    const qTokens = searchQuery.split(/\s+/).filter(Boolean);
     const filtered = allCatalogMovies.filter(m => {
         if (!searchQuery) return true;
         const title = (m.title || "").toLowerCase();
@@ -4063,6 +4144,7 @@ function renderCatalogList() {
         const colTitle = getCollapsedTitle(title);
         if (colCatQ && colTitle && colTitle.includes(colCatQ)) return true;
         if (cleanCatQ && normTitle && normTitle.includes(cleanCatQ)) return true;
+        if (qTokens.length > 1 && qTokens.every(tok => title.includes(tok) || normTitle.includes(tok) || id.includes(tok))) return true;
         return false;
     });
 
@@ -5380,6 +5462,11 @@ if (publishBtn) {
         
         publishBtn.disabled = true;
         publishBtn.textContent = "Publishing... ⏳";
+        const quickPub = document.getElementById("quick-bar-publish-btn");
+        if (quickPub) {
+            quickPub.disabled = true;
+            quickPub.innerHTML = '<span style="font-size: 15px;">⏳</span><span>Publishing...</span>';
+        }
         
         const owner = "dans123456";
         const repo = "filmhouse";
@@ -5570,6 +5657,11 @@ if (publishBtn) {
         } finally {
             publishBtn.disabled = false;
             publishBtn.textContent = "Publish Changes 🚀";
+            const quickPub = document.getElementById("quick-bar-publish-btn");
+            if (quickPub) {
+                quickPub.disabled = false;
+                quickPub.innerHTML = '<span style="font-size: 15px;">🚀</span><span>Publish</span>';
+            }
         }
     });
 }

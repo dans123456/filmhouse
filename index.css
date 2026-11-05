@@ -1845,8 +1845,22 @@ body.tg-back-visible #btn-close-cinema {
     gap: 8px;
     flex-shrink: 0;
     margin-left: auto !important;
-    margin-right: max(46px, calc(var(--tg-safe-area-inset-right, 0px) + 42px)) !important;
+    margin-right: max(12px, calc(var(--tg-safe-area-inset-right, 0px) + 36px)) !important;
     z-index: 10;
+}
+
+@media (max-width: 440px) {
+    .cinema-top-actions {
+        margin-right: max(8px, calc(var(--tg-safe-area-inset-right, 0px) + 26px)) !important;
+    }
+    .cinema-brand-wordmark {
+        font-size: 13.5px !important;
+        letter-spacing: 0.6px !important;
+    }
+    .cinema-brand-cinema-pill {
+        font-size: 7.5px !important;
+        padding: 1px 4px !important;
+    }
 }
 
 /* Brand Wordmark in Cinema Header */
@@ -7552,16 +7566,17 @@ body.media-detail-active .app-content-container {
         bottom: 0;
         left: 0;
         width: 100%;
-        background: rgba(11, 13, 20, 0.94);
+        background: rgba(11, 13, 20, 0.96);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 8px 12px;
+        padding: 5px 6px calc(6px + var(--tg-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))) 6px;
         box-sizing: border-box;
         z-index: 999;
         justify-content: space-around;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
+        min-height: 48px;
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
     }
 
@@ -7571,13 +7586,13 @@ body.media-detail-active .app-content-container {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 3px;
+        gap: 2px;
         background: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 6px 4px;
+        border-radius: 7px;
+        padding: 5px 2px;
         color: #fff;
-        font-size: 10px;
+        font-size: 9.5px;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -7612,6 +7627,49 @@ body.media-detail-active .app-content-container {
         border-radius: 10px;
         line-height: 1;
     }
+}
+
+/* Cinematic Pre-buffering and fast stream loader */
+.cinema-stream-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, rgba(16, 20, 32, 0.95) 0%, rgba(5, 7, 12, 0.98) 100%);
+    z-index: 5;
+    pointer-events: none;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+.cinema-stream-loader.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+.cinema-loader-spinner {
+    width: 38px;
+    height: 38px;
+    border: 3px solid rgba(255, 188, 0, 0.2);
+    border-top-color: #ffbc00;
+    border-radius: 50%;
+    animation: cinemaSpin 0.85s linear infinite;
+    margin-bottom: 12px;
+}
+@keyframes cinemaSpin {
+    to { transform: rotate(360deg); }
+}
+.cinema-loader-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+.cinema-loader-sub {
+    font-size: 11px;
+    color: #ffbc00;
+    font-weight: 600;
+    opacity: 0.9;
 }
 
 
