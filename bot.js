@@ -1710,11 +1710,31 @@ function setupBot(bot, adminBot) {
         const text = msg.text || msg.caption || "";
         const rawFilename = fileObj?.file_name || text.split(/\r?\n/)[0] || "";
 
-        // Detect any HTTP stream URL in text or caption (e.g. from Streamer Bot)
+        // Collect all potential URLs from text, entities, and inline keyboard buttons
+        const collectedUrls = [];
+        const textMatches = text.match(/https?:\/\/[^\s]+/gi) || [];
+        collectedUrls.push(...textMatches);
+
+        const allEntities = [...(msg.entities || []), ...(msg.caption_entities || [])];
+        allEntities.forEach(ent => {
+            if (ent && ent.url) collectedUrls.push(ent.url);
+        });
+
+        if (msg.reply_markup && Array.isArray(msg.reply_markup.inline_keyboard)) {
+            msg.reply_markup.inline_keyboard.forEach(row => {
+                if (Array.isArray(row)) {
+                    row.forEach(btn => {
+                        if (btn && btn.url) collectedUrls.push(btn.url);
+                    });
+                }
+            });
+        }
+
+        // Detect any HTTP stream URL in text, caption, entities or buttons (e.g. from Streamer Bot)
         const streamRegex = /https?:\/\/[^\s]+(?:\/watch\/|\/dl\/)[^\s]*/i;
         const generalHttpRegex = /https?:\/\/(?:filmhouse-stream|trycloudflare|herokuapp|duckdns)[^\s]*/i;
-        const streamMatch = text.match(streamRegex) || text.match(generalHttpRegex);
-        let streamUrl = streamMatch ? streamMatch[0].trim() : null;
+        const foundStream = collectedUrls.find(u => streamRegex.test(u) || generalHttpRegex.test(u));
+        let streamUrl = foundStream ? foundStream.trim() : null;
 
         // Active streaming server fallback
         const baseServer = (typeof lastSyncedTunnelUrl === "string" && lastSyncedTunnelUrl) || "https://filmhouse-stream.duckdns.org";
@@ -1724,11 +1744,12 @@ function setupBot(bot, adminBot) {
         }
 
         let fileDeepLink = "";
-        if (fileObj?.file_id) {
+        const tgLinkRegex = /https?:\/\/(?:t\.me|telegram\.me)\/[a-zA-Z0-9_]+bot\?start=[a-zA-Z0-9_-]+/i;
+        const tgMatch = collectedUrls.find(u => tgLinkRegex.test(u));
+        if (tgMatch) {
+            fileDeepLink = tgMatch.trim();
+        } else if (fileObj?.file_id) {
             fileDeepLink = `https://t.me/Filmhouseappbot?start=${fileObj.file_id}`;
-        } else {
-            const tgMatch = text.match(/https?:\/\/(?:t\.me|telegram\.me)\/[a-zA-Z0-9_]+bot\?start=[a-zA-Z0-9_-]+/i);
-            if (tgMatch) fileDeepLink = tgMatch[0].trim();
         }
 
         let fileSizeStr = "";
@@ -2287,9 +2308,9 @@ function setupBot(bot, adminBot) {
                     }
                 }
             }
-            if (ctx.message && ctx.message.text) {
-                const isStreamForward = /https?:\/\/[^\s]+(?:\/watch\/|\/dl\/|filmhouse-stream|duckdns)/i.test(ctx.message.text);
-                if (isStreamForward) {
+            if (ctx.message && (await isAdmin(senderId))) {
+                const info = extractMediaAndStreamInfo(ctx.message);
+                if (info && (info.streamUrl || info.fileObj)) {
                     const handled = await handleAdminMediaForward(ctx);
                     if (handled) return;
                 }
@@ -4463,10 +4484,10 @@ function setupBot(bot, adminBot) {
             }
         }
 
-        // Check if admin forwarded a text message containing a stream link (e.g. from Streamer Bot)
-        if (ctx.message && ctx.message.text && (await isAdmin(senderId))) {
-            const isStreamForward = /https?:\/\/[^\s]+(?:\/watch\/|\/dl\/|filmhouse-stream|duckdns)/i.test(ctx.message.text);
-            if (isStreamForward) {
+        // Check if admin forwarded a media/text message containing a stream link (e.g. from Streamer Bot)
+        if (ctx.message && (await isAdmin(senderId))) {
+            const info = extractMediaAndStreamInfo(ctx.message);
+            if (info && (info.streamUrl || info.fileObj)) {
                 const handled = await handleAdminMediaForward(ctx);
                 if (handled) return;
             }
