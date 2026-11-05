@@ -2942,6 +2942,54 @@ function setupBot(bot, adminBot) {
             }
         });
 
+        adminBot.command(['update', 'upgrade', 'pull'], async (ctx) => {
+            const adminId = String(ctx.from?.id || "");
+            const isAuth = await isMasterAdmin(adminId);
+            if (!isAuth) return ctx.reply("⛔ Unauthorized. Master Admins only.", { parse_mode: 'HTML' });
+
+            const statusMsg = await ctx.reply("🔄 <b>Checking for GitHub updates...</b>\nConnecting to repository on Ubuntu server...", { parse_mode: 'HTML' });
+
+            const result = await performServerGitUpdate((stepText) => {
+                ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    statusMsg.message_id,
+                    null,
+                    `🔄 <b>Updating Ubuntu Server...</b>\n\n<i>${escapeHtml(stepText)}</i>`,
+                    { parse_mode: 'HTML' }
+                ).catch(() => {});
+            });
+
+            if (!result.success) {
+                return ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    statusMsg.message_id,
+                    null,
+                    `❌ <b>Server Update Failed!</b>\n\n<code>${escapeHtml(result.error || result.output)}</code>`,
+                    { parse_mode: 'HTML' }
+                ).catch(() => {});
+            }
+
+            if (result.alreadyUpToDate) {
+                return ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    statusMsg.message_id,
+                    null,
+                    `✅ <b>Server is Already Up to Date!</b>\n\n<code>${escapeHtml(result.output)}</code>\n\n🚀 Running latest build with 0 syntax errors.`,
+                    { parse_mode: 'HTML' }
+                ).catch(() => {});
+            }
+
+            return ctx.telegram.editMessageText(
+                ctx.chat.id,
+                statusMsg.message_id,
+                null,
+                `🎉 <b>Server Successfully Updated & Reloaded!</b>\n\n` +
+                `<b>Git Commit:</b>\n<code>${escapeHtml(result.output.substring(0, 300))}</code>\n\n` +
+                `🚀 <b>PM2 Bot instance reloaded seamlessly with zero downtime.</b>`,
+                { parse_mode: 'HTML' }
+            ).catch(() => {});
+        });
+
         // ─────────────────────────────────────────────────────────────────────────
         // /scanlibrary — Auto-scan ingest vault channel and assign stream links
         // to matching movies/series in the catalogue. No manual work needed.
