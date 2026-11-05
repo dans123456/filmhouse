@@ -30,11 +30,12 @@ const crypto = require("crypto");
 const LocalUserStore = require("./localStore");
 const localStore = new LocalUserStore();
 
-// Normalize titles for comparison, matching and search: strips symbols, leading articles, handles plurals
+// Normalize titles for comparison, matching and search: strips symbols, leading articles, handles plurals, apostrophes
 function normalizeTitleForComparison(title) {
     if (!title) return "";
     let s = String(title).toLowerCase();
     s = s.replace(/\s*\([^)]+\)\s*$/g, "").trim();
+    s = s.replace(/'s\b/gi, ""); // Remove apostrophe-s (e.g. Zane's -> Zane, matching Zanes)
     s = s.replace(/&/g, " and ");
     s = s.replace(/^(the|a|an)\s+/i, "");
     s = s.replace(/\bthe\b/gi, " ");
@@ -52,7 +53,7 @@ function getCollapsedTitle(title) {
 
 const STOP_WORDS = new Set([
     'the', 'a', 'an', 'and', 'of', 'in', 'to', 'for', 'on', 'at', 'by', 'with', 'from',
-    'part', 'chapter', 'vol', 'volume', 'pt'
+    'part', 'chapter', 'vol', 'volume', 'pt', 's'
 ]);
 
 function titlesMatch(titleA, titleB) {
@@ -1616,7 +1617,7 @@ function setupBot(bot, adminBot) {
 
         s = s.replace(/\[[^\]]*\]/g, ' ').replace(/\{[^\}]*\}/g, ' ');
 
-        const cutoffRegex = /\b(19\d\d|20\d\d|s\d{1,2}e\d{1,3}|\d{1,2}x\d{1,3}|season\s*\d{1,2}|s\d{1,2}|complete|2160p|4k|1080p|720p|480p|uhd|webrip|web-dl|bluray|bdrip|brrip|camrip|cam|x264|x265|hevc|h264|h265|aac|dts|ddp5\.1)\b/i;
+        const cutoffRegex = /\b(19\d\d|20\d\d|s\d{1,2}e\d{1,3}|\d{1,2}x\d{1,3}|season\s*\d{1,2}|s\d{1,2}|e\d{1,3}|ep\d{1,3}|episode\s*\d{1,3}|complete|2160p|4k|1080p|720p|480p|uhd|webrip|web-dl|bluray|bdrip|brrip|camrip|cam|x264|x265|hevc|h264|h265|aac|dts|ddp5\.1)\b/i;
         const cutIdx = s.search(cutoffRegex);
         let titlePart = cutIdx !== -1 ? s.substring(0, cutIdx) : s;
         titlePart = titlePart.replace(/[()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -3229,22 +3230,91 @@ function setupBot(bot, adminBot) {
                 await new Promise(r => setTimeout(r, 80));
             }
 
-            const unmatchedPreview = unmatchedFiles.slice(0, 15).map(f => `• <code>${escapeHtml(f)}</code>`).join('\n');
-            const hasMore = unmatchedFiles.length > 15;
+            return {
+                totalScanned,
+                matched,
+                unmatched,
+                skipped,
+                unmatchedFiles
+            };
+        }
 
-            return (
+        const scanUnmatchedSessions = new Map();
+
+        function buildUnmatchedReportPayload(sessionId, session, page = 0) {
+            const pageSize = 15;
+            const total = session.unmatchedFiles ? session.unmatchedFiles.length : 0;
+            const totalPages = Math.max(1, Math.ceil(total / pageSize));
+            const currentPage = Math.max(0, Math.min(page, totalPages - 1));
+
+            const startIdx = currentPage * pageSize;
+            const slice = (session.unmatchedFiles || []).slice(startIdx, startIdx + pageSize);
+            const previewLines = slice.map(f => `• <code>${escapeHtml(f)}</code>`).join('\n');
+
+            const text =
                 `📡 <b>Library Scan Complete!</b>\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                `📂 Total Files Processed: <b>${totalScanned}</b>\n` +
-                `✅ Matched & Assigned: <b>${matched}</b>\n` +
-                `⚠️ Unmatched: <b>${unmatched}</b>\n` +
-                `⏭️ Skipped: <b>${skipped}</b>\n` +
-                (unmatchedFiles.length > 0
-                    ? `\n📋 <b>Unmatched Files${hasMore ? ` (first 15 of ${unmatchedFiles.length})` : ''}:</b>\n${unmatchedPreview}`
-                    : '\n🎉 <b>All files matched and streaming links assigned successfully!</b>') +
-                `\n\n🍿 <i>Stream links are now live in FilmHouse cinema!</i>`
-            );
+                `📂 Total Files Processed: <b>${session.totalScanned}</b>\n` +
+                `✅ Matched & Assigned: <b>${session.matched}</b>\n` +
+                `⚠️ Unmatched: <b>${session.unmatched}</b>\n` +
+                `⏭️ Skipped: <b>${session.skipped}</b>\n\n` +
+                (total > 0
+                    ? `📋 <b>Unmatched Files (Page ${currentPage + 1} of ${totalPages} • Items ${startIdx + 1}–${Math.min(startIdx + pageSize, total)}):</b>\n${previewLines}\n\n<i>Tap 'Next' or download the complete .txt file below to see all:</i>`
+                    : `🎉 <b>All files matched and streaming links assigned successfully!</b>\n\n🍿 <i>Stream links are now live in FilmHouse cinema!</i>`);
+
+            const navRow = [];
+            if (currentPage > 0) {
+                navRow.push({ text: "⬅️ Prev", callback_data: `scan_p:${sessionId}:${currentPage - 1}` });
+            }
+            if (totalPages > 1) {
+                navRow.push({ text: `📄 ${currentPage + 1}/${totalPages}`, callback_data: `scan_noop` });
+            }
+            if (currentPage < totalPages - 1) {
+                navRow.push({ text: "Next ➡️", callback_data: `scan_p:${sessionId}:${currentPage + 1}` });
+            }
+
+            const keyboard = [];
+            if (navRow.length > 0) keyboard.push(navRow);
+            if (total > 0) {
+                keyboard.push([{ text: `📥 Download All ${total} Unmatched (.txt)`, callback_data: `scan_f:${sessionId}` }]);
+            }
+
+            return {
+                text,
+                reply_markup: { inline_keyboard: keyboard }
+            };
         }
+
+        adminBot.action(/^scan_p:([^:]+):(\d+)$/, async (ctx) => {
+            const sessionId = ctx.match[1];
+            const page = parseInt(ctx.match[2], 10) || 0;
+            await ctx.answerCbQuery().catch(() => {});
+            const session = scanUnmatchedSessions.get(sessionId);
+            if (!session) return ctx.reply("⚠️ Scan session expired. Run /scanlibrary again.");
+            const payload = buildUnmatchedReportPayload(sessionId, session, page);
+            return ctx.editMessageText(payload.text, { parse_mode: 'HTML', reply_markup: payload.reply_markup }).catch(() => {});
+        });
+
+        adminBot.action(/^scan_f:(.+)$/, async (ctx) => {
+            const sessionId = ctx.match[1];
+            await ctx.answerCbQuery("Generating complete unmatched file list...").catch(() => {});
+            const session = scanUnmatchedSessions.get(sessionId);
+            if (!session || !session.unmatchedFiles || !session.unmatchedFiles.length) {
+                return ctx.reply("⚠️ No unmatched files found or session expired.");
+            }
+            const fullText = session.unmatchedFiles.join('\n');
+            return ctx.replyWithDocument({
+                source: Buffer.from(fullText, 'utf8'),
+                filename: `unmatched_files_${Date.now()}.txt`
+            }, {
+                caption: `📋 <b>All ${session.unmatchedFiles.length} Unmatched Files</b>\n\n<i>Add these titles to your catalogue or rename them, then run /scanlibrary again!</i>`,
+                parse_mode: 'HTML'
+            });
+        });
+
+        adminBot.action("scan_noop", async (ctx) => {
+            await ctx.answerCbQuery().catch(() => {});
+        });
 
         adminBot.command('scanlibrary', async (ctx) => {
             const senderId = String(ctx.from?.id || '');
@@ -3289,8 +3359,16 @@ function setupBot(bot, adminBot) {
                     { parse_mode: 'HTML' }
                 ).catch(() => {});
 
-                const report = await processBatchMediaItems(items, ctx, progressMsg, baseServer);
-                await ctx.telegram.editMessageText(ctx.chat.id, progressMsg.message_id, undefined, report, { parse_mode: 'HTML' }).catch(() => {});
+                const result = await processBatchMediaItems(items, ctx, progressMsg, baseServer);
+                const sessionId = "scan_" + Date.now().toString(36);
+                scanUnmatchedSessions.set(sessionId, result);
+                setTimeout(() => scanUnmatchedSessions.delete(sessionId), 60 * 60 * 1000); // 1 hour memory
+
+                const payload = buildUnmatchedReportPayload(sessionId, result, 0);
+                await ctx.telegram.editMessageText(ctx.chat.id, progressMsg.message_id, undefined, payload.text, {
+                    parse_mode: 'HTML',
+                    reply_markup: payload.reply_markup
+                }).catch(() => {});
             } catch (err) {
                 console.error('[ScanLibrary Error]:', err);
                 await ctx.telegram.editMessageText(
