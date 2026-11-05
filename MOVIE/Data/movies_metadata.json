@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "279246-the-remarried-empress",
+    "tmdb_id": 279246,
+    "imdb_id": "",
+    "title": "The Remarried Empress",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Drama",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Beloved Empress Navier rules the Eastern Empire alongside Emperor Sovieshu. But when Sovieshu falls for a runaway slave and demands a divorce, Navier will agree on one condition: that she's given approval to remarry rival Prince Heinrey of the Western Kingdom.",
+    "poster": "https://image.tmdb.org/t/p/w500/zn3IXZzGavH3qle3o3g1r32eXDy.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/1ptukf8gx19U1HcBv3aRzzlXuyJ.jpg",
+    "rating": 8.3,
+    "release_date": "2026-11-03",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "aScUjuKvHSo",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADOhcAAvEfaEcoAAEgk17P-n8WBA",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "289517-dead-end-job",
     "tmdb_id": 289517,
     "imdb_id": "",
