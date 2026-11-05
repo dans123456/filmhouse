@@ -13076,8 +13076,9 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
 
         container.appendChild(actionBtn);
 
-        // Attempt automatic redirect as a convenience fallback (may be blocked by browser popup settings)
-        openLink();
+        // NOTE: Do NOT auto-call openLink() here — tg.openTelegramLink() closes the mini-app.
+        // The user must tap the action button above to open Telegram themselves.
+        // openLink() is only triggered by the button click (line above).
     }, 800);
 }
 
