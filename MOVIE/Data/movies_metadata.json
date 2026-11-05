@@ -1,34 +1,33 @@
 [
   {
-    "csv_id": "279246-the-remarried-empress",
-    "tmdb_id": 279246,
+    "csv_id": "Accra-Medic",
+    "tmdb_id": null,
     "imdb_id": "",
-    "title": "The Remarried Empress",
-    "type": "Series",
+    "title": "Accra Medic",
+    "type": "Movie",
     "categories": [
       "Main",
-      "Asian Drama"
+      "African"
     ],
     "genres": [
-      "Drama",
-      "Sci-Fi & Fantasy"
+      "African"
     ],
-    "overview": "Beloved Empress Navier rules the Eastern Empire alongside Emperor Sovieshu. But when Sovieshu falls for a runaway slave and demands a divorce, Navier will agree on one condition: that she's given approval to remarry rival Prince Heinrey of the Western Kingdom.",
-    "poster": "https://image.tmdb.org/t/p/w500/zn3IXZzGavH3qle3o3g1r32eXDy.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/1ptukf8gx19U1HcBv3aRzzlXuyJ.jpg",
-    "rating": 8.3,
-    "release_date": "2026-11-03",
-    "language": "ko",
+    "overview": "An original TV medical drama following the lives of the staff at an Accra hospital, as they navigate the challenges of their lives while saving patients.",
+    "poster": "https://constitutional-tropical-dat-forums.trycloudflare.com/p/poster_9c2e9f4f.jpg",
+    "backdrop": "https://constitutional-tropical-dat-forums.trycloudflare.com/p/poster_9c2e9f4f.jpg",
+    "rating": 0,
+    "release_date": "",
+    "language": "en",
     "cast": [],
     "director": "",
-    "trailer": "aScUjuKvHSo",
+    "trailer": "",
     "runtime": "",
     "stream_url": "",
     "stream_links": [],
     "links": [
       {
-        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADOhcAAvEfaEcoAAEgk17P-n8WBA",
-        "season": "Season 1"
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADNRcAAvEfaEcs5zT9pjsZHRYE",
+        "quality": "720p"
       }
     ]
   },
