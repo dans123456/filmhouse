@@ -106,8 +106,10 @@ function titlesMatch(titleA, titleB) {
     if (normA === normB) return true;
 
     // Check alias mapping
-    if (TITLE_ALIASES[normA] && (TITLE_ALIASES[normA] === normB || TITLE_ALIASES[normA] === normalizeTitleForComparison(TITLE_ALIASES[normA]))) return true;
-    if (TITLE_ALIASES[normB] && (TITLE_ALIASES[normB] === normA || TITLE_ALIASES[normB] === normalizeTitleForComparison(TITLE_ALIASES[normB]))) return true;
+    const aliasA = TITLE_ALIASES[normA];
+    const aliasB = TITLE_ALIASES[normB];
+    if (aliasA && (aliasA === normB || normalizeTitleForComparison(aliasA) === normB)) return true;
+    if (aliasB && (aliasB === normA || normalizeTitleForComparison(aliasB) === normA)) return true;
 
     const colA = getCollapsedTitle(titleA);
     const colB = getCollapsedTitle(titleB);
@@ -3137,20 +3139,58 @@ function setupBot(bot, adminBot) {
             return { source: 'none', items: [] };
         }
 
-        async function processBatchMediaItems(items, ctx, progressMsg, baseServer) {
+        const activeScanSessions = new Map();
+
+        async function processBatchMediaItems(items, ctx, progressMsg, baseServer, sessionId, isForce = false) {
             let totalScanned = 0;
             let matched = 0;
+            let newlyMatched = 0;
+            let alreadyLinked = 0;
             let unmatched = 0;
             let skipped = 0;
+            let wasCancelled = false;
             const unmatchedFiles = [];
+
+            const scanSessionState = { cancelled: false };
+            activeScanSessions.set(sessionId, scanSessionState);
+
+            // Pre-compile already assigned stream URLs for instant O(1) lookups
+            const assignedUrls = new Set();
+            if (!isForce && cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                for (const m of cachedMoviesMetadata) {
+                    if (m.stream_url) assignedUrls.add(String(m.stream_url).trim());
+                    if (Array.isArray(m.stream_links)) {
+                        m.stream_links.forEach(s => {
+                            if (s && s.stream_url) assignedUrls.add(String(s.stream_url).trim());
+                            if (s && s.url) assignedUrls.add(String(s.url).trim());
+                        });
+                    }
+                    if (Array.isArray(m.links)) {
+                        m.links.forEach(l => {
+                            if (l && l.stream_url) assignedUrls.add(String(l.stream_url).trim());
+                        });
+                    }
+                }
+            }
 
             const updateProgress = async (text) => {
                 try {
-                    await ctx.telegram.editMessageText(ctx.chat.id, progressMsg.message_id, undefined, text, { parse_mode: 'HTML' });
+                    await ctx.telegram.editMessageText(ctx.chat.id, progressMsg.message_id, undefined, text, {
+                        parse_mode: 'HTML',
+                        reply_markup: {
+                            inline_keyboard: [
+                                [{ text: "❌ Cancel Scan", callback_data: `scan_cancel:${sessionId}` }]
+                            ]
+                        }
+                    });
                 } catch (_) {}
             };
 
             for (const item of items) {
+                if (scanSessionState.cancelled) {
+                    wasCancelled = true;
+                    break;
+                }
                 if (!item) continue;
                 totalScanned++;
 
@@ -3166,6 +3206,13 @@ function setupBot(bot, adminBot) {
                 if (!streamUrl) {
                     unmatched++;
                     unmatchedFiles.push(rawFilename);
+                    continue;
+                }
+
+                // ⚡ Instant skip if stream link is already assigned (finishes in 0.001ms!)
+                if (!isForce && assignedUrls.has(streamUrl)) {
+                    alreadyLinked++;
+                    matched++;
                     continue;
                 }
 
@@ -3304,6 +3351,8 @@ function setupBot(bot, adminBot) {
                     }
 
                     matched++;
+                    newlyMatched++;
+                    assignedUrls.add(streamUrl);
                 } catch (writeErr) {
                     console.warn('[ScanLibrary] Write error for', rawFilename, writeErr.message);
                     unmatched++;
@@ -3336,8 +3385,11 @@ function setupBot(bot, adminBot) {
             return {
                 totalScanned,
                 matched,
+                newlyMatched,
+                alreadyLinked,
                 unmatched,
                 skipped,
+                wasCancelled,
                 unmatchedFiles
             };
         }
@@ -3355,12 +3407,15 @@ function setupBot(bot, adminBot) {
             const previewLines = slice.map(f => `• <code>${escapeHtml(f)}</code>`).join('\n');
 
             const text =
-                `📡 <b>Library Scan Complete!</b>\n` +
+                (session.wasCancelled
+                    ? `🛑 <b>Library Scan Cancelled by Admin!</b>\n`
+                    : `📡 <b>Library Scan Complete!</b>\n`) +
                 `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
                 `📂 Total Files Processed: <b>${session.totalScanned}</b>\n` +
-                `✅ Matched & Assigned: <b>${session.matched}</b>\n` +
+                `⚡ Already Linked (Skipped): <b>${session.alreadyLinked || 0}</b>\n` +
+                `✅ Newly Matched & Saved: <b>${session.newlyMatched || 0}</b>\n` +
                 `⚠️ Unmatched: <b>${session.unmatched}</b>\n` +
-                `⏭️ Skipped: <b>${session.skipped}</b>\n\n` +
+                `⏭️ Skipped (Empty): <b>${session.skipped}</b>\n\n` +
                 (total > 0
                     ? `📋 <b>Unmatched Files (Page ${currentPage + 1} of ${totalPages} • Items ${startIdx + 1}–${Math.min(startIdx + pageSize, total)}):</b>\n${previewLines}\n\n<i>Tap 'Next' or download the complete .txt file below to see all:</i>`
                     : `🎉 <b>All files matched and streaming links assigned successfully!</b>\n\n🍿 <i>Stream links are now live in FilmHouse cinema!</i>`);
@@ -3387,6 +3442,21 @@ function setupBot(bot, adminBot) {
                 reply_markup: { inline_keyboard: keyboard }
             };
         }
+
+        adminBot.action(/^scan_cancel:(.+)$/, async (ctx) => {
+            const sId = ctx.match[1];
+            await ctx.answerCbQuery("Cancelling library scan...").catch(() => {});
+            const sess = activeScanSessions.get(sId);
+            if (sess) {
+                sess.cancelled = true;
+            }
+            try {
+                await ctx.editMessageText(
+                    "⏳ <b>Cancelling Scan...</b>\n\nFinalizing remaining operations and generating report...",
+                    { parse_mode: 'HTML' }
+                );
+            } catch (_) {}
+        });
 
         adminBot.action(/^scan_p:([^:]+):(\d+)$/, async (ctx) => {
             const sessionId = ctx.match[1];
@@ -3462,8 +3532,10 @@ function setupBot(bot, adminBot) {
                     { parse_mode: 'HTML' }
                 ).catch(() => {});
 
-                const result = await processBatchMediaItems(items, ctx, progressMsg, baseServer);
                 const sessionId = "scan_" + Date.now().toString(36);
+                const cmdText = String(ctx.message?.text || '').toLowerCase();
+                const isForce = cmdText.includes('force') || cmdText.includes('all');
+                const result = await processBatchMediaItems(items, ctx, progressMsg, baseServer, sessionId, isForce);
                 scanUnmatchedSessions.set(sessionId, result);
                 setTimeout(() => scanUnmatchedSessions.delete(sessionId), 60 * 60 * 1000); // 1 hour memory
 
