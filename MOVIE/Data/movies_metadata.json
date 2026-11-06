@@ -1,5 +1,45 @@
 [
   {
+    "csv_id": "70128-genius",
+    "tmdb_id": 70128,
+    "imdb_id": "",
+    "title": "Genius",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "The life stories of history's greatest minds. From their days as young adults to their final years we see their discoveries, loves, relationships, causes, flaws and genius.",
+    "poster": "https://image.tmdb.org/t/p/w500/waCykVbku2Amh0revf535SOnlmm.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/rzijyomlauJbIEhgWLUfrEINJx0.jpg",
+    "rating": 7.5,
+    "release_date": "2017-04-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "SICLBlHizUY",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADxgoAAkwOeUfRRrgfb8tx8RYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADywoAAkwOeUen9R40lVpFuBYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD1QoAAkwOeUeGNSSK5lFpvBYE",
+        "season": "Season 3"
+      }
+    ]
+  },
+  {
     "csv_id": "1323475-champagne-problems",
     "tmdb_id": 1323475,
     "imdb_id": "",
