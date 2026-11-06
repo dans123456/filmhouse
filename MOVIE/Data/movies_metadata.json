@@ -1,5 +1,44 @@
 [
   {
+    "csv_id": "1738735-ed-gein-the-house-of-horrors",
+    "tmdb_id": 1738735,
+    "imdb_id": "",
+    "title": "Ed Gein: The House of Horrors",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Horror"
+    ],
+    "overview": "After his domineering mother dies, reclusive farmer Ed Gein descends into madness, hearing her voice urging him to punish sinful women and turning his home into a house of horrors.",
+    "poster": "https://image.tmdb.org/t/p/w500/dwvZeZKo59AluZlNQCtlMaGMyWA.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/4RMBmfGWSqyD7sG3ftnyOUy2crc.jpg",
+    "rating": 3,
+    "release_date": "2026-09-07",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "mbRy6RMKfeo",
+    "runtime": "",
+    "stream_url": "BQACAgQAAyEFAAMBC6_7fgACA8Vq7GMXx6kzorxrUJMaY52N7jJQDQACQx0AAgMlYVKC8xJos_Wodz0E",
+    "stream_links": [
+      {
+        "quality": "720p",
+        "stream_url": "BQACAgQAAyEFAAMBC6_7fgACA8Vq7GMXx6kzorxrUJMaY52N7jJQDQACQx0AAgMlYVKC8xJos_Wodz0E",
+        "url": "BQACAgQAAyEFAAMBC6_7fgACA8Vq7GMXx6kzorxrUJMaY52N7jJQDQACQx0AAgMlYVKC8xJos_Wodz0E"
+      }
+    ],
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADfgkAAkwOeUeCJfHVIbWPxRYE",
+        "quality": "720p",
+        "stream_url": "BQACAgQAAyEFAAMBC6_7fgACA8Vq7GMXx6kzorxrUJMaY52N7jJQDQACQx0AAgMlYVKC8xJos_Wodz0E"
+      }
+    ]
+  },
+  {
     "csv_id": "Accra-Medic",
     "tmdb_id": null,
     "imdb_id": "",
