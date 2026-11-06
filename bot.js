@@ -43,7 +43,9 @@ const TITLE_ALIASES = {
     "bel": "bel air",
     "bel air": "bel",
     "matchbox the": "matchbox",
-    "the matchbox": "matchbox"
+    "the matchbox": "matchbox",
+    "chassing lullaby": "chasing lullaby",
+    "chasing lullaby": "chassing lullaby"
 };
 
 function romanToNum(roman) {
@@ -114,6 +116,13 @@ function titlesMatch(titleA, titleB) {
     const colA = getCollapsedTitle(titleA);
     const colB = getCollapsedTitle(titleB);
     if (colA && colB && colA === colB) return true;
+
+    // Double consonant tolerance (e.g. "chassing" vs "chasing")
+    if (colA && colB) {
+        const dedupA = colA.replace(/(.)\1+/g, (m, c) => c);
+        const dedupB = colB.replace(/(.)\1+/g, (m, c) => c);
+        if (dedupA.length >= 5 && dedupA === dedupB) return true;
+    }
 
     // Subtitle / Prefix match: e.g. "Maxton Hall — The World Between Us" vs "Maxton Hall"
     // or "Brand New Cherry Flavor" vs "Brand New Cherry"
