@@ -1685,6 +1685,12 @@ function setupBot(bot, adminBot) {
             seasonOrPart = 'Complete Series';
         }
 
+        const partMatch = s.match(/\b(part\s*\d+|pt\s*\d+|cd\s*\d+)\b/i);
+        if (partMatch && !seasonOrPart) {
+            seasonOrPart = partMatch[1].replace(/pt\s*/i, 'Part ').replace(/cd\s*/i, 'Part ').replace(/part\s*/i, 'Part ');
+            seasonOrPart = seasonOrPart.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
         let year = null;
         const yearMatch = s.match(/\b(19\d\d|20\d\d)\b/);
         if (yearMatch) {
@@ -1697,6 +1703,10 @@ function setupBot(bot, adminBot) {
         const cutIdx = s.search(cutoffRegex);
         let titlePart = cutIdx !== -1 ? s.substring(0, cutIdx) : s;
         titlePart = titlePart.replace(/[()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
+
+        if (partMatch && titlePart) {
+            titlePart = titlePart.replace(/\b(part\s*\d+|pt\s*\d+|cd\s*\d+)\b/i, '').replace(/\s+/g, ' ').trim();
+        }
 
         // Strip leftover ripper, audio, and platform tags
         titlePart = titlePart.replace(/\b(iq|iqiyi|dual\s*audio|dual|fil|filmh|filmhouse|telefilm|stream)\b/gi, ' ');
@@ -1732,36 +1742,75 @@ function setupBot(bot, adminBot) {
 
             const tmdbApiKey = process.env.TMDB_API_KEY || "d638f7775bfa1b8d456dfd028ccbef19";
             const endpoint = isSeries ? 'tv' : 'movie';
-            const yearParam = year ? (isSeries ? `&first_air_date_year=${year}` : `&primary_release_year=${year}`) : '';
-            const url = `https://api.themoviedb.org/3/search/${endpoint}?api_key=${tmdbApiKey}&query=${encodeURIComponent(cleanTitle)}${yearParam}`;
 
-            let res = await fetchFn(url);
-            let data = res.ok ? await res.json() : null;
+            const queriesToTry = [cleanTitle];
+            const partMatch = cleanTitle.match(/^(.+?)(?:\s+Part\s+\d+)/i);
+            if (partMatch) queriesToTry.push(partMatch[1].trim());
+            if (cleanTitle.includes(' ')) queriesToTry.push(cleanTitle.replace(/\s+/g, ''));
 
-            if (!data || !data.results || data.results.length === 0) {
-                const multiUrl = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbApiKey}&query=${encodeURIComponent(cleanTitle)}`;
-                res = await fetchFn(multiUrl);
-                data = res.ok ? await res.json() : null;
+            let foundResult = null;
+            let targetType = isSeries ? 'Series' : 'Movie';
+
+            for (const q of queriesToTry) {
+                // 1. Try endpoint with year if provided
+                if (year) {
+                    const yearParam = isSeries ? `&first_air_date_year=${year}` : `&primary_release_year=${year}`;
+                    const url = `https://api.themoviedb.org/3/search/${endpoint}?api_key=${tmdbApiKey}&query=${encodeURIComponent(q)}${yearParam}`;
+                    const res = await fetchFn(url);
+                    if (res && res.ok) {
+                        const d = await res.json();
+                        if (d && d.results && d.results.length > 0) {
+                            foundResult = d.results[0];
+                            break;
+                        }
+                    }
+                }
+
+                // 2. Try endpoint without year
+                const noYearUrl = `https://api.themoviedb.org/3/search/${endpoint}?api_key=${tmdbApiKey}&query=${encodeURIComponent(q)}`;
+                const resNoYear = await fetchFn(noYearUrl);
+                if (resNoYear && resNoYear.ok) {
+                    const d = await resNoYear.json();
+                    if (d && d.results && d.results.length > 0) {
+                        foundResult = d.results[0];
+                        break;
+                    }
+                }
+
+                // 3. Try multi search
+                const multiUrl = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbApiKey}&query=${encodeURIComponent(q)}`;
+                const resMulti = await fetchFn(multiUrl);
+                if (resMulti && resMulti.ok) {
+                    const d = await resMulti.json();
+                    const filtered = (d.results || []).filter(x => x.media_type === 'movie' || x.media_type === 'tv');
+                    if (filtered.length > 0) {
+                        foundResult = filtered[0];
+                        targetType = foundResult.media_type === 'tv' ? 'Series' : 'Movie';
+                        break;
+                    }
+                }
             }
 
-            if (data && data.results && data.results.length > 0) {
-                const first = data.results[0];
-                const genres = (first.genre_ids || []).map(id => TMDB_GENRES[id]).filter(Boolean);
-                const rDate = first.release_date || first.first_air_date || "";
+            if (foundResult) {
+                const genres = (foundResult.genre_ids || []).map(id => TMDB_GENRES[id]).filter(Boolean);
+                const rDate = foundResult.release_date || foundResult.first_air_date || "";
                 const parsedYear = rDate ? rDate.substring(0, 4) : (year || "");
-                const title = first.title || first.name || cleanTitle;
+                const title = foundResult.title || foundResult.name || cleanTitle;
 
                 return {
-                    tmdb_id: first.id,
+                    tmdb_id: foundResult.id,
                     title: title,
                     year: parsedYear,
-                    type: (first.media_type === 'tv' || isSeries) ? 'Series' : 'Movie',
-                    rating: first.vote_average ? Math.round(first.vote_average * 10) / 10 : 0,
-                    vote_count: first.vote_count || 0,
-                    overview: first.overview || "No overview available.",
+                    release_date: rDate,
+                    type: (foundResult.media_type === 'tv' || isSeries) ? 'Series' : targetType,
+                    rating: foundResult.vote_average ? Math.round(foundResult.vote_average * 10) / 10 : 0,
+                    vote_count: foundResult.vote_count || 0,
+                    overview: foundResult.overview || "No overview available.",
                     genres: genres,
-                    poster: first.poster_path ? `https://image.tmdb.org/t/p/w1280${first.poster_path}` : null,
-                    backdrop: first.backdrop_path ? `https://image.tmdb.org/t/p/w1280${first.backdrop_path}` : null
+                    origin_country: foundResult.origin_country || [],
+                    original_language: foundResult.original_language || "en",
+                    poster: foundResult.poster_path ? `https://image.tmdb.org/t/p/w1280${foundResult.poster_path}` : null,
+                    backdrop: foundResult.backdrop_path ? `https://image.tmdb.org/t/p/w1280${foundResult.backdrop_path}` : null
                 };
             }
         } catch (e) {
@@ -2520,6 +2569,9 @@ function setupBot(bot, adminBot) {
                 `• 🛡 <b>Public Bot:</b> Online & Polling\n` +
                 `• 👑 <b>Admin Bot:</b> Active & Listening\n\n` +
                 `🛠 <b>Available Commands:</b>\n` +
+                `• /scanlibrary — Lightning scan & link streaming files\n` +
+                `• /autoingest — Auto-create cards from TMDB & link streams\n` +
+                `• /update — Pull latest GitHub code & reload bot\n` +
                 `• /help — Admin tutorials & duty workflows\n` +
                 `• /post [Title] — Publish title announcement to Updates Channel\n` +
                 `• /logs — View live server & bot logs\n` +
@@ -2532,6 +2584,10 @@ function setupBot(bot, adminBot) {
             const keyboard = [
                 [
                     { text: "👑 Open Admin Panel 🚀", web_app: { url: adminUrl } }
+                ],
+                [
+                    { text: "📡 Scan Library", callback_data: "admin_trigger_scan" },
+                    { text: "✨ Auto-Ingest TMDB", callback_data: "admin_trigger_autoingest" }
                 ],
                 [
                     { text: "📋 Pending Requests", callback_data: "admin_pending" },
@@ -2861,20 +2917,23 @@ function setupBot(bot, adminBot) {
 
         const getHelpScannerPayload = () => {
             const text = 
-                `📡 <b>Library Scanner Guide (/scanlibrary)</b>\n` +
+                `📡 <b>Library Scanner & Auto-Ingest Guide</b>\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
                 `The scanner connects directly to your Stream Engine ledger and automatically assigns stream links to your catalogue cards.\n\n` +
                 `⚡ <b>1. Lightning-Fast Skip (Default):</b>\n` +
                 `• Type <code>/scanlibrary</code>\n` +
                 `• The bot checks every file. Any file that is <b>already linked</b> is skipped in <b>0.001 ms</b>!\n` +
-                `• A full library scan of 1,500+ files completes in just <b>5–15 seconds</b>!\n\n` +
-                `🔄 <b>2. Forced Full Re-Scan:</b>\n` +
+                `• A full library scan of 1,700+ files completes in just <b>5–15 seconds</b>!\n\n` +
+                `✨ <b>2. Auto-Ingest from TMDB (Option B):</b>\n` +
+                `• Type <code>/autoingest</code> or <code>/scanlibrary auto</code>\n` +
+                `• Any unmatched title is automatically queried on TMDB, generating poster, backdrop, overview, rating, release date, and proper categories (African/Hollywood) on the fly, saving to Firestore, and attaching the stream link 100% automatically!\n\n` +
+                `🔄 <b>3. Forced Full Re-Scan:</b>\n` +
                 `• Type <code>/scanlibrary force</code>\n` +
                 `• Forces a complete re-check and re-assignment of all files from scratch.\n\n` +
-                `❌ <b>3. Instant Cancel:</b>\n` +
+                `❌ <b>4. Instant Cancel:</b>\n` +
                 `• Tap the red <b>[ ❌ Cancel Scan ]</b> button on the live progress message at any point to stop immediately.\n\n` +
-                `📥 <b>4. Unmatched Report (.txt):</b>\n` +
-                `• If any files cannot find a matching catalogue card, tap <b>Download All Unmatched (.txt)</b> to review them in a text file.`;
+                `📥 <b>5. Unmatched Report & 1-Click Ingest:</b>\n` +
+                `• When scan completes, tap <b>[ ✨ Auto-Ingest Unmatched ]</b> or download the complete .txt file.`;
 
             const keyboard = [
                 [
@@ -3256,11 +3315,12 @@ function setupBot(bot, adminBot) {
 
         const activeScanSessions = new Map();
 
-        async function processBatchMediaItems(items, ctx, progressMsg, baseServer, sessionId, isForce = false) {
+        async function processBatchMediaItems(items, ctx, progressMsg, baseServer, sessionId, isForce = false, isAutoIngest = false) {
             let totalScanned = 0;
             let matched = 0;
             let newlyMatched = 0;
             let alreadyLinked = 0;
+            let autoIngested = 0;
             let unmatched = 0;
             let skipped = 0;
             let wasCancelled = false;
@@ -3459,6 +3519,70 @@ function setupBot(bot, adminBot) {
                 }
 
                 if (!catalogMatch) {
+                    if (isAutoIngest && parsed.cleanTitle) {
+                        try {
+                            const tmdbData = await fetchTmdbMetadata(parsed.cleanTitle, parsed.year, parsed.isSeries);
+                            if (tmdbData && tmdbData.tmdb_id) {
+                                const slug = (tmdbData.title || parsed.cleanTitle).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                                const newCsvId = `${tmdbData.tmdb_id}-${slug}`;
+
+                                const isAfrican = (tmdbData.origin_country && (tmdbData.origin_country.includes('NG') || tmdbData.origin_country.includes('GH') || tmdbData.origin_country.includes('ZA') || tmdbData.origin_country.includes('KE'))) ||
+                                    ['yo', 'ig', 'ha', 'tw', 'ak'].includes(tmdbData.original_language) ||
+                                    (tmdbData.overview && /(nollywood|ghana|nigeria|african)/i.test(tmdbData.overview));
+
+                                const categories = ['Main'];
+                                if (isAfrican) {
+                                    categories.push('African');
+                                } else if (parsed.isSeries || tmdbData.type === 'Series') {
+                                    categories.push('Hollywood/British Series');
+                                } else if (tmdbData.genres && tmdbData.genres.includes('Animation')) {
+                                    categories.push('Animated Movies');
+                                } else {
+                                    categories.push('Hollywood/British Movies');
+                                }
+
+                                const newDocRef = (typeof db !== 'undefined' && db && typeof db.collection === 'function')
+                                    ? db.collection('movies').doc(newCsvId)
+                                    : null;
+
+                                const newCard = {
+                                    csv_id: newCsvId,
+                                    tmdb_id: tmdbData.tmdb_id,
+                                    imdb_id: "",
+                                    title: tmdbData.title || parsed.cleanTitle,
+                                    type: (parsed.isSeries || tmdbData.type === 'Series') ? "Series" : "Movie",
+                                    categories: categories,
+                                    genres: tmdbData.genres || [],
+                                    overview: tmdbData.overview || "No overview available.",
+                                    poster: tmdbData.poster || "",
+                                    backdrop: tmdbData.backdrop || "",
+                                    rating: tmdbData.rating || 0,
+                                    release_date: tmdbData.release_date || (tmdbData.year ? `${tmdbData.year}-01-01` : ""),
+                                    language: tmdbData.original_language || "en",
+                                    cast: [],
+                                    director: "",
+                                    trailer: "",
+                                    runtime: "",
+                                    stream_url: streamUrl,
+                                    stream_links: [],
+                                    links: [],
+                                    _docId: newCsvId,
+                                    _ref: newDocRef
+                                };
+
+                                if (!Array.isArray(cachedMoviesMetadata)) cachedMoviesMetadata = [];
+                                cachedMoviesMetadata.push(newCard);
+                                catalogMatch = newCard;
+                                autoIngested++;
+                                console.log(`[Auto-Ingest] Created new card "${newCard.title}" (${newCard.csv_id})`);
+                            }
+                        } catch (tmdbErr) {
+                            console.warn('[Auto-Ingest Error]:', tmdbErr.message);
+                        }
+                    }
+                }
+
+                if (!catalogMatch) {
                     unmatched++;
                     unmatchedFiles.push(`${rawFilename} (parsed: "${parsed.cleanTitle}")`);
                     continue;
@@ -3531,10 +3655,11 @@ function setupBot(bot, adminBot) {
                     } else {
                         slotIdx = currentLinks.findIndex(l =>
                             (l.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase() &&
-                            (l.season || '') === (parsed.seasonOrPart || '')
+                            (l.season || l.seasonOrPart || '') === (parsed.seasonOrPart || '')
                         );
                         streamSlotIdx = currentStreamLinks.findIndex(s =>
-                            (s.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase()
+                            (s.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase() &&
+                            (s.season || s.seasonOrPart || '') === (parsed.seasonOrPart || '')
                         );
                     }
 
@@ -3556,15 +3681,20 @@ function setupBot(bot, adminBot) {
                 catalogMatch.stream_links = currentStreamLinks;
                 catalogMatch.stream_url = streamUrl || catalogMatch.stream_url;
 
-                // Queue batch update
+                // Queue batch update (merge full card properties so newly ingested titles are saved with full metadata)
+                const batchPayload = {
+                    ...catalogMatch,
+                    links: currentLinks,
+                    stream_links: currentStreamLinks,
+                    stream_url: streamUrl || catalogMatch.stream_url,
+                    updatedAt: new Date().toISOString()
+                };
+                delete batchPayload._docId;
+                delete batchPayload._ref;
+
                 pendingBatches.set(movieRef.path, {
                     ref: movieRef,
-                    data: {
-                        links: currentLinks,
-                        stream_links: currentStreamLinks,
-                        stream_url: streamUrl || catalogMatch.stream_url,
-                        updatedAt: new Date().toISOString()
-                    }
+                    data: batchPayload
                 });
 
                 matched++;
@@ -3583,6 +3713,7 @@ function setupBot(bot, adminBot) {
                         `📂 Processed: <b>${totalScanned} / ${items.length}</b>\n` +
                         `⚡ Skipped (Already Linked): <b>${alreadyLinked}</b>\n` +
                         `✅ Newly Matched: <b>${newlyMatched}</b>\n` +
+                        (autoIngested > 0 ? `✨ Auto-Ingested (TMDB): <b>${autoIngested}</b>\n` : '') +
                         `⚠️ Unmatched: <b>${unmatched}</b>\n\n` +
                         `<i>Batch saving to database...</i>`
                     );
@@ -3615,6 +3746,7 @@ function setupBot(bot, adminBot) {
                 matched,
                 newlyMatched,
                 alreadyLinked,
+                autoIngested,
                 unmatched,
                 skipped,
                 wasCancelled,
@@ -3642,10 +3774,11 @@ function setupBot(bot, adminBot) {
                 `📂 Total Files Processed: <b>${session.totalScanned}</b>\n` +
                 `⚡ Already Linked (Skipped): <b>${session.alreadyLinked || 0}</b>\n` +
                 `✅ Newly Matched & Saved: <b>${session.newlyMatched || 0}</b>\n` +
+                (session.autoIngested ? `✨ Auto-Ingested from TMDB: <b>${session.autoIngested}</b>\n` : '') +
                 `⚠️ Unmatched: <b>${session.unmatched}</b>\n` +
                 `⏭️ Skipped (Empty): <b>${session.skipped}</b>\n\n` +
                 (total > 0
-                    ? `📋 <b>Unmatched Files (Page ${currentPage + 1} of ${totalPages} • Items ${startIdx + 1}–${Math.min(startIdx + pageSize, total)}):</b>\n${previewLines}\n\n<i>Tap 'Next' or download the complete .txt file below to see all:</i>`
+                    ? `📋 <b>Unmatched Files (Page ${currentPage + 1} of ${totalPages} • Items ${startIdx + 1}–${Math.min(startIdx + pageSize, total)}):</b>\n${previewLines}\n\n<i>Tap '✨ Auto-Ingest Unmatched' below to create missing cards from TMDB, or download the full list:</i>`
                     : `🎉 <b>All files matched and streaming links assigned successfully!</b>\n\n🍿 <i>Stream links are now live in FilmHouse cinema!</i>`);
 
             const navRow = [];
@@ -3662,7 +3795,12 @@ function setupBot(bot, adminBot) {
             const keyboard = [];
             if (navRow.length > 0) keyboard.push(navRow);
             if (total > 0) {
-                keyboard.push([{ text: `📥 Download All ${total} Unmatched (.txt)`, callback_data: `scan_f:${sessionId}` }]);
+                keyboard.push([
+                    { text: `✨ Auto-Ingest Unmatched (${total})`, callback_data: `scan_autoingest:${sessionId}` }
+                ]);
+                keyboard.push([
+                    { text: `📥 Download All ${total} Unmatched (.txt)`, callback_data: `scan_f:${sessionId}` }
+                ]);
             }
 
             return {
@@ -3713,20 +3851,71 @@ function setupBot(bot, adminBot) {
             });
         });
 
+        adminBot.action(/^scan_autoingest:(.+)$/, async (ctx) => {
+            const sessionId = ctx.match[1];
+            await ctx.answerCbQuery("Starting Auto-Ingest from TMDB...").catch(() => {});
+            const session = scanUnmatchedSessions.get(sessionId);
+            if (!session) return ctx.reply("⚠️ Scan session expired. Run /autoingest instead.");
+
+            const progressMsg = await ctx.reply(
+                "✨ <b>Auto-Ingesting Unmatched Titles from TMDB...</b>\n\n" +
+                "📡 Reading library files, creating missing catalogue cards, and syncing streams...",
+                { parse_mode: 'HTML' }
+            );
+
+            const baseServer = (typeof lastSyncedTunnelUrl === 'string' && lastSyncedTunnelUrl)
+                || 'https://filmhouse-stream.duckdns.org';
+
+            const { items } = await fetchStreamEngineMediaRecords();
+            if (!items || items.length === 0) {
+                return ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    progressMsg.message_id,
+                    undefined,
+                    "⚠️ Could not read stream engine ledger. Try /autoingest directly.",
+                    { parse_mode: 'HTML' }
+                ).catch(() => {});
+            }
+
+            const newSessionId = "auto_" + Date.now().toString(36);
+            const result = await processBatchMediaItems(items, ctx, progressMsg, baseServer, newSessionId, false, true);
+            scanUnmatchedSessions.set(newSessionId, result);
+
+            const payload = buildUnmatchedReportPayload(newSessionId, result, 0);
+            await ctx.telegram.editMessageText(ctx.chat.id, progressMsg.message_id, undefined, payload.text, {
+                parse_mode: 'HTML',
+                reply_markup: payload.reply_markup
+            }).catch(() => {});
+        });
+
+        adminBot.action("admin_trigger_scan", async (ctx) => {
+            await ctx.answerCbQuery("Starting Library Scan...").catch(() => {});
+            return executeLibraryScanWorkflow(ctx, false, false);
+        });
+
+        adminBot.action("admin_trigger_autoingest", async (ctx) => {
+            await ctx.answerCbQuery("Starting Auto-Ingest...").catch(() => {});
+            return executeLibraryScanWorkflow(ctx, false, true);
+        });
+
         adminBot.action("scan_noop", async (ctx) => {
             await ctx.answerCbQuery().catch(() => {});
         });
 
-        adminBot.command('scanlibrary', async (ctx) => {
+        async function executeLibraryScanWorkflow(ctx, isForce = false, isAutoIngest = false) {
             const senderId = String(ctx.from?.id || '');
             const isAuthorized = await isAdmin(senderId).catch(() => false);
             if (!isAuthorized) {
                 return ctx.reply('⛔ <b>Unauthorized.</b> This command is for admins only.', { parse_mode: 'HTML' });
             }
 
+            const headerTitle = isAutoIngest ? '✨ <b>Starting Auto-Ingest from TMDB...</b>' : '🔍 <b>Connecting to Stream Engine Database...</b>';
+            const subTitle = isAutoIngest 
+                ? '📡 Reading files, querying TMDB for missing cards, and syncing streams...' 
+                : '📡 Reading indexed media files from local database & Stream API...';
+
             const progressMsg = await ctx.reply(
-                '🔍 <b>Connecting to Stream Engine Database...</b>\n\n' +
-                '📡 Reading indexed media files from local database & Stream API...',
+                `${headerTitle}\n\n${subTitle}`,
                 { parse_mode: 'HTML' }
             );
 
@@ -3734,7 +3923,7 @@ function setupBot(bot, adminBot) {
                 || 'https://filmhouse-stream.duckdns.org';
 
             try {
-                // Pre-sync freshest catalog from GitHub main so recently added titles (like Avatar) are instantly in memory
+                // Pre-sync freshest catalog from GitHub main so recently added titles are instantly in memory
                 if (typeof syncCatalogFromGitHub === 'function') {
                     await syncCatalogFromGitHub().catch(e => console.warn('[ScanLibrary] Catalog pre-sync notice:', e.message));
                 }
@@ -3757,7 +3946,7 @@ function setupBot(bot, adminBot) {
                     ).catch(() => {});
                 }
 
-                const sessionId = "scan_" + Date.now().toString(36);
+                const sessionId = (isAutoIngest ? "ingest_" : "scan_") + Date.now().toString(36);
                 const cancelMarkup = {
                     inline_keyboard: [
                         [{ text: "❌ Cancel Scan", callback_data: `scan_cancel:${sessionId}` }]
@@ -3768,13 +3957,11 @@ function setupBot(bot, adminBot) {
                     ctx.chat.id,
                     progressMsg.message_id,
                     undefined,
-                    `📡 <b>Found ${items.length} files from ${escapeHtml(source)}!</b>\n\n🔍 <i>Matching catalogue entries in real-time...</i>`,
+                    `📡 <b>Found ${items.length} files from ${escapeHtml(source)}!</b>\n\n🔍 <i>${isAutoIngest ? 'Auto-ingesting missing cards & matching streams...' : 'Matching catalogue entries in real-time...'}</i>`,
                     { parse_mode: 'HTML', reply_markup: cancelMarkup }
                 ).catch(() => {});
 
-                const cmdText = String(ctx.message?.text || '').toLowerCase();
-                const isForce = cmdText.includes('force') || cmdText.includes('all');
-                const result = await processBatchMediaItems(items, ctx, progressMsg, baseServer, sessionId, isForce);
+                const result = await processBatchMediaItems(items, ctx, progressMsg, baseServer, sessionId, isForce, isAutoIngest);
                 scanUnmatchedSessions.set(sessionId, result);
                 setTimeout(() => scanUnmatchedSessions.delete(sessionId), 60 * 60 * 1000); // 1 hour memory
 
@@ -3784,15 +3971,26 @@ function setupBot(bot, adminBot) {
                     reply_markup: payload.reply_markup
                 }).catch(() => {});
             } catch (err) {
-                console.error('[ScanLibrary Error]:', err);
+                console.error('[Library Scan/Ingest Error]:', err);
                 await ctx.telegram.editMessageText(
                     ctx.chat.id,
                     progressMsg.message_id,
                     undefined,
-                    `❌ <b>Scan Error:</b> ${escapeHtml(err.message)}`,
+                    `❌ <b>Operation Error:</b> ${escapeHtml(err.message)}`,
                     { parse_mode: 'HTML' }
                 ).catch(() => {});
             }
+        }
+
+        adminBot.command('scanlibrary', async (ctx) => {
+            const cmdText = String(ctx.message?.text || '').toLowerCase();
+            const isForce = cmdText.includes('force') || cmdText.includes('all');
+            const isAutoIngest = cmdText.includes('auto') || cmdText.includes('ingest');
+            return executeLibraryScanWorkflow(ctx, isForce, isAutoIngest);
+        });
+
+        adminBot.command(['autoingest', 'ingestlibrary', 'autocatalog'], async (ctx) => {
+            return executeLibraryScanWorkflow(ctx, false, true);
         });
 
         // Command: /importlinks <paste or forward>
@@ -3899,12 +4097,12 @@ function setupBot(bot, adminBot) {
         });
 
         // Also register on main bot for convenience (admin-only guarded inside)
-        bot.command('scanlibrary', async (ctx) => {
+        bot.command(['scanlibrary', 'autoingest', 'ingestlibrary'], async (ctx) => {
             const senderId = String(ctx.from?.id || '');
             const isAuthorized = await isAdmin(senderId).catch(() => false);
             if (!isAuthorized) return;
             return ctx.reply(
-                '📡 <b>Library Scanner</b> is best run from your Admin Bot.\n\nPlease send <code>/scanlibrary</code> to <b>@FilmHouseAdminBot</b> (your admin bot DM) to begin the scan.',
+                '📡 <b>Library Scanner & Auto-Ingest</b> are best run from your Admin Bot.\n\nPlease send <code>/scanlibrary</code> or <code>/autoingest</code> to <b>@FilmHouseAdminBot</b> (your admin bot DM) to begin.',
                 { parse_mode: 'HTML' }
             );
         });
