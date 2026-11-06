@@ -512,17 +512,11 @@ async function syncCatalogFromGitHub() {
             const currentCount = cachedMoviesMetadata ? cachedMoviesMetadata.length : 0;
             const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
             
-            // Check if length differs or file doesn't exist
-            if (data.length !== currentCount || !fs.existsSync(localMetaPath)) {
-                const dir = path.dirname(localMetaPath);
-                if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-                fs.writeFileSync(localMetaPath, JSON.stringify(data, null, 2), "utf8");
-                cachedMoviesMetadata = data;
-                console.log(`[GitHubSync] Successfully synchronized ${data.length} movies from GitHub main to Ubuntu disk! (Previous in-memory: ${currentCount})`);
-            } else {
-                if (!cachedMoviesMetadata) cachedMoviesMetadata = data;
-                console.log(`[GitHubSync] Catalog is already up to date (${data.length} movies).`);
-            }
+            const dir = path.dirname(localMetaPath);
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+            fs.writeFileSync(localMetaPath, JSON.stringify(data, null, 2), "utf8");
+            cachedMoviesMetadata = data;
+            console.log(`[GitHubSync] Successfully synchronized ${data.length} movies from GitHub main to Ubuntu disk! (Previous in-memory: ${currentCount})`);
 
             // Auto-broadcast any newly published titles or new seasons/cuts added to existing titles
             if (currentCount > 0 && typeof publishMovieToChannel === 'function') {
@@ -1654,13 +1648,25 @@ function setupBot(bot, adminBot) {
         let seasonOrPart = null;
         let seasonNum = 1;
         let episodeNum = null;
+        let endEpisodeNum = null;
+        let extraEpisodes = [];
 
+        const multiEpMatch = s.match(/\bS(\d{1,2})[\s\.\-_]*E(\d{1,3})[\s\.\-_]*(?:-|to|e|E)[\s\.\-_]*(?:[eE])?(\d{1,3})\b/i) || s.match(/\b(\d{1,2})x(\d{1,3})[\s\.\-_]*(?:-|to)[\s\.\-_]*(\d{1,3})\b/i);
         const sEpMatch = s.match(/\bS(\d{1,2})\s*E(\d{1,3})\b/i) || s.match(/\b(\d{1,2})x(\d{1,3})\b/i);
         const epOnlyMatch = s.match(/\b(?:Episode|Ep|E)\s*(\d{1,3})\b/i);
         const sMatch = s.match(/\b(?:Season|S)\s*(\d{1,2})\b/i);
         const compMatch = s.match(/\b(complete|complete\s*series|all\s*seasons)\b/i);
 
-        if (sEpMatch) {
+        if (multiEpMatch) {
+            isSeries = true;
+            seasonNum = parseInt(multiEpMatch[1], 10);
+            episodeNum = parseInt(multiEpMatch[2], 10);
+            endEpisodeNum = parseInt(multiEpMatch[3], 10);
+            seasonOrPart = 'S' + String(seasonNum).padStart(2, '0') + 'E' + String(episodeNum).padStart(2, '0') + '-E' + String(endEpisodeNum).padStart(2, '0');
+            for (let e = episodeNum + 1; e <= endEpisodeNum; e++) {
+                extraEpisodes.push(e);
+            }
+        } else if (sEpMatch) {
             isSeries = true;
             seasonNum = parseInt(sEpMatch[1], 10);
             episodeNum = parseInt(sEpMatch[2], 10);
@@ -1712,7 +1718,9 @@ function setupBot(bot, adminBot) {
             isSeries: isSeries,
             seasonOrPart: seasonOrPart,
             seasonNum: seasonNum,
-            episodeNum: episodeNum
+            episodeNum: episodeNum,
+            endEpisodeNum: endEpisodeNum,
+            extraEpisodes: extraEpisodes
         };
     }
 
@@ -3426,26 +3434,41 @@ function setupBot(bot, adminBot) {
                     continue;
                 }
 
-                // Build link slot entry
-                let newLinkEntry;
+                // Build link slot entries (handles single episodes and multi-episodes like E01-E02)
+                const linkEntriesToProcess = [];
                 if (parsed.isSeries && parsed.episodeNum) {
-                    newLinkEntry = {
+                    const epLabel = parsed.endEpisodeNum ? `Episode ${parsed.episodeNum}–${parsed.endEpisodeNum}` : `Episode ${parsed.episodeNum}`;
+                    linkEntriesToProcess.push({
                         season: parsed.seasonNum || 1,
                         seasonOrPart: parsed.seasonOrPart || `Season ${parsed.seasonNum || 1}`,
                         episode: parsed.episodeNum,
                         episodeNum: parsed.episodeNum,
                         quality: parsed.quality || '720p',
-                        name: `Episode ${parsed.episodeNum}`,
+                        name: epLabel,
                         url: streamUrl,
                         stream_url: streamUrl
-                    };
+                    });
+                    if (Array.isArray(parsed.extraEpisodes)) {
+                        for (const extraEp of parsed.extraEpisodes) {
+                            linkEntriesToProcess.push({
+                                season: parsed.seasonNum || 1,
+                                seasonOrPart: parsed.seasonOrPart || `Season ${parsed.seasonNum || 1}`,
+                                episode: extraEp,
+                                episodeNum: extraEp,
+                                quality: parsed.quality || '720p',
+                                name: `Episode ${extraEp} (${epLabel})`,
+                                url: streamUrl,
+                                stream_url: streamUrl
+                            });
+                        }
+                    }
                 } else {
-                    newLinkEntry = {
+                    linkEntriesToProcess.push({
                         quality: parsed.quality || '1080P',
                         url: streamUrl,
                         stream_url: streamUrl,
                         ...(parsed.seasonOrPart ? { season: parsed.seasonOrPart } : {})
-                    };
+                    });
                 }
 
                 const docId = catalogMatch._docId || catalogMatch.csv_id;
@@ -3463,37 +3486,39 @@ function setupBot(bot, adminBot) {
                 const currentLinks = Array.isArray(catalogMatch.links) ? [...catalogMatch.links] : [];
                 const currentStreamLinks = Array.isArray(catalogMatch.stream_links) ? [...catalogMatch.stream_links] : [];
 
-                let slotIdx = -1;
-                let streamSlotIdx = -1;
-                if (parsed.isSeries && parsed.episodeNum) {
-                    slotIdx = currentLinks.findIndex(l =>
-                        (l.season == (parsed.seasonNum || 1)) &&
-                        (l.episode == parsed.episodeNum || l.episodeNum == parsed.episodeNum)
-                    );
-                    streamSlotIdx = currentStreamLinks.findIndex(s =>
-                        (s.season == (parsed.seasonNum || 1)) &&
-                        (s.episode == parsed.episodeNum || s.episodeNum == parsed.episodeNum)
-                    );
-                } else {
-                    slotIdx = currentLinks.findIndex(l =>
-                        (l.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase() &&
-                        (l.season || '') === (parsed.seasonOrPart || '')
-                    );
-                    streamSlotIdx = currentStreamLinks.findIndex(s =>
-                        (s.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase()
-                    );
-                }
+                for (const newLinkEntry of linkEntriesToProcess) {
+                    let slotIdx = -1;
+                    let streamSlotIdx = -1;
+                    if (parsed.isSeries && newLinkEntry.episodeNum) {
+                        slotIdx = currentLinks.findIndex(l =>
+                            (l.season == (parsed.seasonNum || 1)) &&
+                            (l.episode == newLinkEntry.episodeNum || l.episodeNum == newLinkEntry.episodeNum)
+                        );
+                        streamSlotIdx = currentStreamLinks.findIndex(s =>
+                            (s.season == (parsed.seasonNum || 1)) &&
+                            (s.episode == newLinkEntry.episodeNum || s.episodeNum == newLinkEntry.episodeNum)
+                        );
+                    } else {
+                        slotIdx = currentLinks.findIndex(l =>
+                            (l.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase() &&
+                            (l.season || '') === (parsed.seasonOrPart || '')
+                        );
+                        streamSlotIdx = currentStreamLinks.findIndex(s =>
+                            (s.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase()
+                        );
+                    }
 
-                if (slotIdx >= 0) {
-                    currentLinks[slotIdx] = { ...currentLinks[slotIdx], ...newLinkEntry };
-                } else {
-                    currentLinks.push(newLinkEntry);
-                }
+                    if (slotIdx >= 0) {
+                        currentLinks[slotIdx] = { ...currentLinks[slotIdx], ...newLinkEntry };
+                    } else {
+                        currentLinks.push(newLinkEntry);
+                    }
 
-                if (streamSlotIdx >= 0) {
-                    currentStreamLinks[streamSlotIdx] = { ...currentStreamLinks[streamSlotIdx], ...newLinkEntry };
-                } else {
-                    currentStreamLinks.push(newLinkEntry);
+                    if (streamSlotIdx >= 0) {
+                        currentStreamLinks[streamSlotIdx] = { ...currentStreamLinks[streamSlotIdx], ...newLinkEntry };
+                    } else {
+                        currentStreamLinks.push(newLinkEntry);
+                    }
                 }
 
                 // Update catalogMatch in memory immediately
@@ -3679,6 +3704,11 @@ function setupBot(bot, adminBot) {
                 || 'https://filmhouse-stream.duckdns.org';
 
             try {
+                // Pre-sync freshest catalog from GitHub main so recently added titles (like Avatar) are instantly in memory
+                if (typeof syncCatalogFromGitHub === 'function') {
+                    await syncCatalogFromGitHub().catch(e => console.warn('[ScanLibrary] Catalog pre-sync notice:', e.message));
+                }
+
                 const { source, items } = await fetchStreamEngineMediaRecords();
 
                 if (!items || items.length === 0) {
