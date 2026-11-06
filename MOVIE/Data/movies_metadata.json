@@ -1,5 +1,38 @@
 [
   {
+    "csv_id": "1323475-champagne-problems",
+    "tmdb_id": 1323475,
+    "imdb_id": "",
+    "title": "Champagne Problems",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Romance",
+      "Comedy"
+    ],
+    "overview": "A driven American exec heads to Paris determined to acquire a champagne brand by Christmas — and accidentally falls for the heir to the bubbly empire.",
+    "poster": "https://image.tmdb.org/t/p/w500/a66w2eVNFHMgevJlw0d6f4TTrrD.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/idRDmfGxrLD0SNBq5I2J6HC0dt5.jpg",
+    "rating": 6,
+    "release_date": "2025-11-18",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "eba-EoMPBX8",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADuwoAAkwOeUc8Ap4ai4CiQRYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "1195803-wicker",
     "tmdb_id": 1195803,
     "imdb_id": "",
