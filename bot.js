@@ -2781,47 +2781,154 @@ function setupBot(bot, adminBot) {
             return { text: msg, keyboard, parse_mode: "HTML" };
         };
 
-        // View 5: Admin Tutorials & Help Guide
+        // View 5: Admin Tutorials & Master Operations Hub
         const getAdminHelpPayload = () => {
             const text = 
-                `📚 <b>Film House Admin Tutorials & Operational Guide</b>\n\n` +
-                `Here is a quick guide to common admin duties and tools:\n\n` +
-                `📥 <b>1. Fulfilling Movie & Series Requests:</b>\n` +
-                `• Users submit movie and season requests inside the Film House app.\n` +
-                `• Tap <b>Pending Requests</b> below or run <code>/pending</code> to inspect the queue.\n` +
-                `• Open the <b>Admin Panel</b> (button above), search for the requested title, and click <b>Claim & Fulfill</b>.\n` +
-                `• Paste the stream/download link. The bot automatically delivers direct fulfillment to the user with no ads and credits your account!\n\n` +
-                `🎬 <b>2. Auto-TMDB Video Forwarding & Publishing:</b>\n` +
-                `• Simply forward or upload any movie/series video file (e.g. <code>Dune.Part.Two.2024.1080p.mkv</code>) directly to this bot!\n` +
-                `• The bot parses the title, fetches official TMDB poster, backdrop, rating, and synopsis in 0.2s.\n` +
-                `• Tap <b>Post Showcase to Channel</b> to publish an instant announcement card, or <b>Add to Catalog</b> to save it!\n` +
-                `• Or run <code>/post &lt;Title&gt;</code> to manually announce any title. Every publication credits your Work Share!\n\n` +
-                `🏆 <b>3. Work Share Rankings (% vs Points):</b>\n` +
-                `• Rankings show your percentage share of total team output (fulfillments + duty publications).\n` +
-                `• Run <code>/topadmins</code> to view the live team contribution leaderboard.\n\n` +
-                `📜 <b>4. Live Server Logs & Diagnostics:</b>\n` +
-                `• Tap <b>Server Logs</b> or type <code>/logs</code> to inspect live streams by category:\n` +
-                `  - 🖥 <code>/logs server</code> — General backend process logs\n` +
-                `  - 👑 <code>/logs admin_bot</code> — Admin bot traces & commands\n` +
-                `  - 🤖 <code>/logs user_bot</code> — User bot commands & requests\n` +
-                `  - 📱 <code>/logs user_app</code> — User web app traffic\n` +
-                `  - 💼 <code>/logs admin_app</code> — Admin web app catalog actions\n` +
-                `  - ⚠️ <code>/logs error</code> — Error exceptions\n\n` +
-                `🔄 <b>5. Catalog Sync & Backups:</b>\n` +
-                `• <code>/sync_catalog</code> — Syncs the movie metadata from GitHub into local server memory.\n` +
-                `• <code>/backup</code> — Generates and downloads a complete CSV snapshot of the database.\n\n` +
-                `💡 <i>Tap "Back to Menu" below to return to the Command Center.</i>`;
+                `📚 <b>Film House Master Operations & Bot Guide</b>\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `Choose a guide below for complete step-by-step instructions:\n\n` +
+                `🌟 <b>Golden Naming Standard:</b> Format rules to guarantee 100% automated matches\n` +
+                `📡 <b>Library Scanner:</b> How to use <code>/scanlibrary</code>, fast skip, & cancel\n` +
+                `🎬 <b>Forwarding Media:</b> Movies & TV series batch processing\n` +
+                `🖥 <b>Server & VPS:</b> Daily commands, 1-click updates, and logs\n\n` +
+                `<i>Tap any category below to read:</i>`;
 
             const keyboard = [
                 [
-                    { text: "👑 Open Admin Panel 🚀", web_app: { url: "https://dans123456.github.io/filmhouse/admin.html" } }
+                    { text: "🌟 Golden Naming Standard", callback_data: "admin_help_naming" },
+                    { text: "📡 Library Scanner Guide", callback_data: "admin_help_scanner" }
+                ],
+                [
+                    { text: "🎬 Forwarding Media Guide", callback_data: "admin_help_stream" },
+                    { text: "🖥 VPS Terminal Commands", callback_data: "admin_help_vps" }
                 ],
                 [
                     { text: "📋 Pending Requests", callback_data: "admin_pending" },
                     { text: "📜 Server Logs", callback_data: "admin_logs" }
                 ],
                 [
+                    { text: "👑 Open Admin Panel 🚀", web_app: { url: "https://dans123456.github.io/filmhouse/admin.html" } }
+                ],
+                [
                     { text: "« Back to Menu", callback_data: "admin_menu" }
+                ]
+            ];
+
+            return { text, keyboard, parse_mode: "HTML" };
+        };
+
+        const getHelpNamingPayload = () => {
+            const text = 
+                `🌟 <b>The Golden Naming Standard</b>\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `To guarantee 100% automated matching between Telegram files and your catalogue, name files using this clean dot format:\n\n` +
+                `🎬 <b>For Movies:</b>\n` +
+                `<code>Title.Year.Quality.ext</code>\n` +
+                `• <code>Gladiator.II.2024.1080p.mkv</code>\n` +
+                `• <code>Dune.Part.Two.2024.720p.mkv</code>\n` +
+                `• <code>Black.Panther.2018.4K.mkv</code>\n\n` +
+                `📺 <b>For TV Series:</b>\n` +
+                `<code>Title.S01E01.Quality.ext</code>\n` +
+                `• <code>Severance.S02E05.1080p.mkv</code>\n` +
+                `• <code>Game.of.Thrones.S01E01.720p.mkv</code>\n` +
+                `• <code>Squid.Game.S02E01.720p.mkv</code>\n\n` +
+                `✅ <b>Quick Best Practices:</b>\n` +
+                `• Use dots (<code>.</code>) between words instead of ugly symbols.\n` +
+                `• Always include the 4-digit release year for movies.\n` +
+                `• Always use <code>S01E01</code> format for series episodes.\n` +
+                `• Don't worry about special characters (<code>'</code>, <code>!</code>, <code>&</code>, <code>II</code>) — the bot handles them automatically!`;
+
+            const keyboard = [
+                [
+                    { text: "📡 Scanner Guide", callback_data: "admin_help_scanner" },
+                    { text: "🎬 Forwarding Guide", callback_data: "admin_help_stream" }
+                ],
+                [
+                    { text: "« Back to Help Menu", callback_data: "admin_help" }
+                ]
+            ];
+
+            return { text, keyboard, parse_mode: "HTML" };
+        };
+
+        const getHelpScannerPayload = () => {
+            const text = 
+                `📡 <b>Library Scanner Guide (/scanlibrary)</b>\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `The scanner connects directly to your Stream Engine ledger and automatically assigns stream links to your catalogue cards.\n\n` +
+                `⚡ <b>1. Lightning-Fast Skip (Default):</b>\n` +
+                `• Type <code>/scanlibrary</code>\n` +
+                `• The bot checks every file. Any file that is <b>already linked</b> is skipped in <b>0.001 ms</b>!\n` +
+                `• A full library scan of 1,500+ files completes in just <b>5–15 seconds</b>!\n\n` +
+                `🔄 <b>2. Forced Full Re-Scan:</b>\n` +
+                `• Type <code>/scanlibrary force</code>\n` +
+                `• Forces a complete re-check and re-assignment of all files from scratch.\n\n` +
+                `❌ <b>3. Instant Cancel:</b>\n` +
+                `• Tap the red <b>[ ❌ Cancel Scan ]</b> button on the live progress message at any point to stop immediately.\n\n` +
+                `📥 <b>4. Unmatched Report (.txt):</b>\n` +
+                `• If any files cannot find a matching catalogue card, tap <b>Download All Unmatched (.txt)</b> to review them in a text file.`;
+
+            const keyboard = [
+                [
+                    { text: "🌟 Golden Naming", callback_data: "admin_help_naming" },
+                    { text: "🖥 VPS Commands", callback_data: "admin_help_vps" }
+                ],
+                [
+                    { text: "« Back to Help Menu", callback_data: "admin_help" }
+                ]
+            ];
+
+            return { text, keyboard, parse_mode: "HTML" };
+        };
+
+        const getHelpStreamPayload = () => {
+            const text = 
+                `🎬 <b>Media Forwarding & Batch Processing Guide</b>\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `How to forward files to your Stream Bot (<b>@FilmHouseStreamer_bot</b>):\n\n` +
+                `🎥 <b>Forwarding Movies:</b>\n` +
+                `• Forward any single movie file $\rightarrow$ receives a direct stream link immediately.\n` +
+                `• Forwarding 2 qualities (e.g. 1080p and 720p) of the same movie $\rightarrow$ groups them into a single <b>Multi-Quality Movie Card</b>!\n\n` +
+                `📺 <b>Forwarding TV Series:</b>\n` +
+                `• Select up to 60 episodes in Telegram and forward all at once.\n` +
+                `• The bot buffers incoming files, automatically sorts them strictly <b>Ep 1 $\rightarrow$ Ep 60</b> in numerical order.\n` +
+                `• It sends a single continuous message with all links formatted cleanly (Option A delivery with no file attachment).\n\n` +
+                `❌ <b>How to Cancel Frozen Batches:</b>\n` +
+                `• Send <code>/cancel</code> or tap the <b>[ ❌ Cancel Batch ]</b> inline button anytime to abort a batch!`;
+
+            const keyboard = [
+                [
+                    { text: "📡 Scanner Guide", callback_data: "admin_help_scanner" },
+                    { text: "🌟 Golden Naming", callback_data: "admin_help_naming" }
+                ],
+                [
+                    { text: "« Back to Help Menu", callback_data: "admin_help" }
+                ]
+            ];
+
+            return { text, keyboard, parse_mode: "HTML" };
+        };
+
+        const getHelpVpsPayload = () => {
+            const text = 
+                `🖥 <b>Server & VPS Management Guide</b>\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `Essential commands to run in your Ubuntu VPS terminal:\n\n` +
+                `🔄 <b>1. 1-Click Update Both Bots:</b>\n` +
+                `<code>cd /home/ubuntu/filmhouse && git fetch origin main && git reset --hard origin/main && pm2 restart all</code>\n\n` +
+                `📊 <b>2. Check Live Running Status:</b>\n` +
+                `<code>pm2 status</code>\n\n` +
+                `📜 <b>3. View Real-Time Logs:</b>\n` +
+                `• All logs: <code>pm2 logs</code>\n` +
+                `• Stream Bot logs: <code>pm2 logs filmhouse-stream-bot</code>\n` +
+                `• Catalog Bot logs: <code>pm2 logs filmhouse</code>\n\n` +
+                `🔄 <b>4. Restarting Services:</b>\n` +
+                `• <code>pm2 restart all</code>`;
+
+            const keyboard = [
+                [
+                    { text: "📡 Scanner Guide", callback_data: "admin_help_scanner" },
+                    { text: "« Back to Help Menu", callback_data: "admin_help" }
                 ]
             ];
 
@@ -3970,6 +4077,22 @@ function setupBot(bot, adminBot) {
 
         adminBot.action('admin_help', async (ctx) => {
             return renderOrEdit(ctx, getAdminHelpPayload());
+        });
+
+        adminBot.action('admin_help_naming', async (ctx) => {
+            return renderOrEdit(ctx, getHelpNamingPayload());
+        });
+
+        adminBot.action('admin_help_scanner', async (ctx) => {
+            return renderOrEdit(ctx, getHelpScannerPayload());
+        });
+
+        adminBot.action('admin_help_stream', async (ctx) => {
+            return renderOrEdit(ctx, getHelpStreamPayload());
+        });
+
+        adminBot.action('admin_help_vps', async (ctx) => {
+            return renderOrEdit(ctx, getHelpVpsPayload());
         });
 
         adminBot.action(['admin_logs', 'admin_logs_menu'], async (ctx) => {
