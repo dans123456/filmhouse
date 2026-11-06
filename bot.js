@@ -3259,10 +3259,26 @@ function setupBot(bot, adminBot) {
             const unmatchedFiles = [];
 
             const scanSessionState = { cancelled: false };
-            activeScanSessions.set(sessionId, scanSessionState);
+            if (sessionId) activeScanSessions.set(sessionId, scanSessionState);
+
+            const updateProgress = async (text) => {
+                if (!ctx || !progressMsg) return;
+                try {
+                    await ctx.telegram.editMessageText(ctx.chat.id, progressMsg.message_id, undefined, text, {
+                        parse_mode: 'HTML',
+                        reply_markup: sessionId ? {
+                            inline_keyboard: [
+                                [{ text: "❌ Cancel Scan", callback_data: `scan_cancel:${sessionId}` }]
+                            ]
+                        } : undefined
+                    });
+                } catch (_) {}
+            };
 
             // Pre-compile already assigned stream URLs for instant O(1) lookups
             const assignedUrls = new Set();
+
+            // 1. Prime from local disk cache first
             if (!isForce && cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
                 for (const m of cachedMoviesMetadata) {
                     if (m.stream_url) assignedUrls.add(String(m.stream_url).trim());
@@ -3275,23 +3291,79 @@ function setupBot(bot, adminBot) {
                     if (Array.isArray(m.links)) {
                         m.links.forEach(l => {
                             if (l && l.stream_url) assignedUrls.add(String(l.stream_url).trim());
+                            if (l && l.url && (l.url.includes('/dl/') || l.url.includes('filmhouse-stream'))) {
+                                assignedUrls.add(String(l.url).trim());
+                            }
                         });
                     }
                 }
             }
 
-            const updateProgress = async (text) => {
-                try {
-                    await ctx.telegram.editMessageText(ctx.chat.id, progressMsg.message_id, undefined, text, {
-                        parse_mode: 'HTML',
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{ text: "❌ Cancel Scan", callback_data: `scan_cancel:${sessionId}` }]
-                            ]
+            // 2. Pre-fetch live catalogue from Firestore to capture all live stream links & documents
+            try {
+                if (typeof db !== 'undefined' && db && typeof db.collection === 'function') {
+                    const snap = await db.collection('movies').get();
+                    if (!snap.empty) {
+                        console.log(`[ScanLibrary] Pre-loaded ${snap.size} live catalogue documents from Firestore.`);
+                        const liveCatalog = [];
+                        snap.forEach(doc => {
+                            const data = doc.data() || {};
+                            const mObj = { ...data, _docId: doc.id, _ref: doc.ref };
+                            liveCatalog.push(mObj);
+
+                            if (!isForce) {
+                                if (data.stream_url) assignedUrls.add(String(data.stream_url).trim());
+                                if (Array.isArray(data.stream_links)) {
+                                    data.stream_links.forEach(s => {
+                                        if (s && s.stream_url) assignedUrls.add(String(s.stream_url).trim());
+                                        if (s && s.url) assignedUrls.add(String(s.url).trim());
+                                    });
+                                }
+                                if (Array.isArray(data.links)) {
+                                    data.links.forEach(l => {
+                                        if (l && l.stream_url) assignedUrls.add(String(l.stream_url).trim());
+                                        if (l && l.url && (l.url.includes('/dl/') || l.url.includes('filmhouse-stream'))) {
+                                            assignedUrls.add(String(l.url).trim());
+                                        }
+                                    });
+                                }
+                            }
+                        });
+
+                        if (liveCatalog.length > 0) {
+                            cachedMoviesMetadata = liveCatalog;
                         }
-                    });
-                } catch (_) {}
+                    }
+                }
+            } catch (snapErr) {
+                console.warn('[ScanLibrary] Could not pre-fetch movies collection:', snapErr.message);
+            }
+
+            // High-speed batch commit manager (batches of 100 docs max per write)
+            const pendingBatches = new Map();
+
+            const commitPendingBatch = async () => {
+                if (pendingBatches.size === 0) return;
+                try {
+                    const batch = db.batch();
+                    for (const [_, item] of pendingBatches) {
+                        batch.set(item.ref, item.data, { merge: true });
+                    }
+                    await batch.commit();
+                    console.log(`[ScanLibrary] Committed batch of ${pendingBatches.size} updates to Firestore.`);
+                    pendingBatches.clear();
+                } catch (bErr) {
+                    console.warn('[ScanLibrary] Batch commit error, falling back to individual writes:', bErr.message);
+                    for (const [_, item] of pendingBatches) {
+                        try {
+                            await item.ref.set(item.data, { merge: true });
+                        } catch (_) {}
+                    }
+                    pendingBatches.clear();
+                }
             };
+
+            let lastProgressUpdate = Date.now();
 
             for (const item of items) {
                 if (scanSessionState.cancelled) {
@@ -3316,7 +3388,7 @@ function setupBot(bot, adminBot) {
                     continue;
                 }
 
-                // ⚡ Instant skip if stream link is already assigned (finishes in 0.001ms!)
+                // ⚡ Instant skip if stream link is already assigned (finishes in 0.0001ms!)
                 if (!isForce && assignedUrls.has(streamUrl)) {
                     alreadyLinked++;
                     matched++;
@@ -3331,7 +3403,7 @@ function setupBot(bot, adminBot) {
                     continue;
                 }
 
-                // Match against catalog
+                // Match against in-memory catalog
                 let catalogMatch = null;
                 if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
                     catalogMatch = cachedMoviesMetadata.find(m =>
@@ -3346,19 +3418,6 @@ function setupBot(bot, adminBot) {
                             return titleOk || (yearOk && m.title.toLowerCase().includes(parsed.cleanTitle.toLowerCase().split(' ')[0]));
                         });
                     }
-                }
-
-                if (!catalogMatch) {
-                    try {
-                        const snap = await db.collection('movies')
-                            .where('title', '>=', parsed.cleanTitle)
-                            .where('title', '<=', parsed.cleanTitle + '\uf8ff')
-                            .limit(5).get();
-                        if (!snap.empty) {
-                            const fsMatch = snap.docs.find(d => d.data().title && titlesMatch(d.data().title, parsed.cleanTitle));
-                            if (fsMatch) catalogMatch = { ...fsMatch.data(), _docId: fsMatch.id, _ref: fsMatch.ref };
-                        }
-                    } catch (_) {}
                 }
 
                 if (!catalogMatch) {
@@ -3389,101 +3448,108 @@ function setupBot(bot, adminBot) {
                     };
                 }
 
-                // Write to Firestore
-                try {
-                    const docId = catalogMatch._docId || catalogMatch.csv_id;
-                    let movieRef = catalogMatch._ref || null;
-                    if (!movieRef && docId) movieRef = db.collection('movies').doc(docId);
-                    if (!movieRef && catalogMatch.tmdb_id) {
-                        const snap = await db.collection('movies').where('tmdb_id', '==', catalogMatch.tmdb_id).limit(1).get();
-                        if (!snap.empty) movieRef = snap.docs[0].ref;
-                    }
-                    if (!movieRef) { unmatched++; unmatchedFiles.push(rawFilename); continue; }
-
-                    const docSnap = await movieRef.get();
-                    const existing = docSnap.exists ? (docSnap.data() || {}) : {};
-                    const currentLinks = Array.isArray(existing.links) ? [...existing.links] : [];
-                    const currentStreamLinks = Array.isArray(existing.stream_links) ? [...existing.stream_links] : [];
-
-                    let slotIdx = -1;
-                    let streamSlotIdx = -1;
-                    if (parsed.isSeries && parsed.episodeNum) {
-                        slotIdx = currentLinks.findIndex(l =>
-                            (l.season == (parsed.seasonNum || 1)) &&
-                            (l.episode == parsed.episodeNum || l.episodeNum == parsed.episodeNum)
-                        );
-                        streamSlotIdx = currentStreamLinks.findIndex(s =>
-                            (s.season == (parsed.seasonNum || 1)) &&
-                            (s.episode == parsed.episodeNum || s.episodeNum == parsed.episodeNum)
-                        );
-                    } else {
-                        slotIdx = currentLinks.findIndex(l =>
-                            (l.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase() &&
-                            (l.season || '') === (parsed.seasonOrPart || '')
-                        );
-                        streamSlotIdx = currentStreamLinks.findIndex(s =>
-                            (s.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase()
-                        );
-                    }
-
-                    if (slotIdx >= 0) {
-                        currentLinks[slotIdx] = { ...currentLinks[slotIdx], ...newLinkEntry };
-                    } else {
-                        currentLinks.push(newLinkEntry);
-                    }
-
-                    if (streamSlotIdx >= 0) {
-                        currentStreamLinks[streamSlotIdx] = { ...currentStreamLinks[streamSlotIdx], ...newLinkEntry };
-                    } else {
-                        currentStreamLinks.push(newLinkEntry);
-                    }
-
-                    await movieRef.set({
-                        links: currentLinks,
-                        stream_links: currentStreamLinks,
-                        stream_url: streamUrl || existing.stream_url,
-                        updatedAt: new Date().toISOString()
-                    }, { merge: true });
-
-                    // Update local cache
-                    if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
-                        const cIdx = cachedMoviesMetadata.findIndex(m =>
-                            m.csv_id === docId || (catalogMatch.tmdb_id && String(m.tmdb_id) === String(catalogMatch.tmdb_id))
-                        );
-                        if (cIdx >= 0) {
-                            cachedMoviesMetadata[cIdx].links = currentLinks;
-                            cachedMoviesMetadata[cIdx].stream_links = currentStreamLinks;
-                            cachedMoviesMetadata[cIdx].stream_url = streamUrl || cachedMoviesMetadata[cIdx].stream_url;
-                        }
-                    }
-
-                    matched++;
-                    newlyMatched++;
-                    assignedUrls.add(streamUrl);
-                } catch (writeErr) {
-                    console.warn('[ScanLibrary] Write error for', rawFilename, writeErr.message);
-                    unmatched++;
-                    unmatchedFiles.push(rawFilename);
+                const docId = catalogMatch._docId || catalogMatch.csv_id;
+                let movieRef = catalogMatch._ref || null;
+                if (!movieRef && docId && typeof db !== 'undefined' && db) {
+                    movieRef = db.collection('movies').doc(String(docId));
                 }
 
-                if (totalScanned % 25 === 0) {
-                    await updateProgress(
-                        `🔍 <b>Library Matching in Progress...</b>\n\n` +
-                        `📂 Processed: <b>${totalScanned} / ${items.length}</b>\n` +
-                        `✅ Matched & Updated: <b>${matched}</b>\n` +
-                        `⚠️ No Match: <b>${unmatched}</b>\n\n` +
-                        `<i>Updating database...</i>`
+                if (!movieRef) {
+                    unmatched++;
+                    unmatchedFiles.push(rawFilename);
+                    continue;
+                }
+
+                const currentLinks = Array.isArray(catalogMatch.links) ? [...catalogMatch.links] : [];
+                const currentStreamLinks = Array.isArray(catalogMatch.stream_links) ? [...catalogMatch.stream_links] : [];
+
+                let slotIdx = -1;
+                let streamSlotIdx = -1;
+                if (parsed.isSeries && parsed.episodeNum) {
+                    slotIdx = currentLinks.findIndex(l =>
+                        (l.season == (parsed.seasonNum || 1)) &&
+                        (l.episode == parsed.episodeNum || l.episodeNum == parsed.episodeNum)
+                    );
+                    streamSlotIdx = currentStreamLinks.findIndex(s =>
+                        (s.season == (parsed.seasonNum || 1)) &&
+                        (s.episode == parsed.episodeNum || s.episodeNum == parsed.episodeNum)
+                    );
+                } else {
+                    slotIdx = currentLinks.findIndex(l =>
+                        (l.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase() &&
+                        (l.season || '') === (parsed.seasonOrPart || '')
+                    );
+                    streamSlotIdx = currentStreamLinks.findIndex(s =>
+                        (s.quality || '').toUpperCase() === (parsed.quality || '1080P').toUpperCase()
                     );
                 }
 
-                await new Promise(r => setTimeout(r, 80));
+                if (slotIdx >= 0) {
+                    currentLinks[slotIdx] = { ...currentLinks[slotIdx], ...newLinkEntry };
+                } else {
+                    currentLinks.push(newLinkEntry);
+                }
+
+                if (streamSlotIdx >= 0) {
+                    currentStreamLinks[streamSlotIdx] = { ...currentStreamLinks[streamSlotIdx], ...newLinkEntry };
+                } else {
+                    currentStreamLinks.push(newLinkEntry);
+                }
+
+                // Update catalogMatch in memory immediately
+                catalogMatch.links = currentLinks;
+                catalogMatch.stream_links = currentStreamLinks;
+                catalogMatch.stream_url = streamUrl || catalogMatch.stream_url;
+
+                // Queue batch update
+                pendingBatches.set(movieRef.path, {
+                    ref: movieRef,
+                    data: {
+                        links: currentLinks,
+                        stream_links: currentStreamLinks,
+                        stream_url: streamUrl || catalogMatch.stream_url,
+                        updatedAt: new Date().toISOString()
+                    }
+                });
+
+                matched++;
+                newlyMatched++;
+                assignedUrls.add(streamUrl);
+
+                if (pendingBatches.size >= 100) {
+                    await commitPendingBatch();
+                }
+
+                // Rate-limited Telegram progress updates (at most once every 1.5 seconds)
+                if (Date.now() - lastProgressUpdate > 1500 && (totalScanned % 20 === 0 || totalScanned === items.length)) {
+                    lastProgressUpdate = Date.now();
+                    await updateProgress(
+                        `🔍 <b>Library Matching in Progress...</b>\n\n` +
+                        `📂 Processed: <b>${totalScanned} / ${items.length}</b>\n` +
+                        `⚡ Skipped (Already Linked): <b>${alreadyLinked}</b>\n` +
+                        `✅ Newly Matched: <b>${newlyMatched}</b>\n` +
+                        `⚠️ Unmatched: <b>${unmatched}</b>\n\n` +
+                        `<i>Batch saving to database...</i>`
+                    );
+                }
+            }
+
+            // Commit any remaining pending batches
+            if (pendingBatches.size > 0) {
+                await commitPendingBatch();
             }
 
             // Flush updated metadata to disk so Admin Panel, website, and local loaders immediately see the stream links
             try {
                 if (cachedMoviesMetadata && localMetaPathGlobal) {
-                    fs.writeFileSync(localMetaPathGlobal, JSON.stringify(cachedMoviesMetadata, null, 2), 'utf8');
-                    console.log(`[ScanLibrary] Flushed ${cachedMoviesMetadata.length} movies with stream links to disk.`);
+                    const cleanToFlush = cachedMoviesMetadata.map(m => {
+                        const copy = { ...m };
+                        delete copy._docId;
+                        delete copy._ref;
+                        return copy;
+                    });
+                    fs.writeFileSync(localMetaPathGlobal, JSON.stringify(cleanToFlush, null, 2), 'utf8');
+                    console.log(`[ScanLibrary] Flushed ${cleanToFlush.length} movies with stream links to disk.`);
                 }
             } catch (diskErr) {
                 console.warn('[ScanLibrary] Could not flush to disk:', diskErr.message);
@@ -3700,10 +3766,22 @@ function setupBot(bot, adminBot) {
                 return ctx.reply('⚠️ Could not extract valid filename + stream URL pairs from your text.');
             }
 
-            const waitMsg = await ctx.reply(`🔍 <b>Processing ${items.length} stream links...</b>`, { parse_mode: 'HTML' });
+            const sessionId = "import_" + Date.now().toString(36);
+            const cancelMarkup = {
+                inline_keyboard: [
+                    [{ text: "❌ Cancel Import", callback_data: `scan_cancel:${sessionId}` }]
+                ]
+            };
+            const waitMsg = await ctx.reply(`🔍 <b>Processing ${items.length} stream links...</b>`, { parse_mode: 'HTML', reply_markup: cancelMarkup });
             const baseServer = (typeof lastSyncedTunnelUrl === 'string' && lastSyncedTunnelUrl) || 'https://filmhouse-stream.duckdns.org';
-            const report = await processBatchMediaItems(items, ctx, waitMsg, baseServer);
-            await ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, report, { parse_mode: 'HTML' }).catch(() => {});
+            const result = await processBatchMediaItems(items, ctx, waitMsg, baseServer, sessionId, false);
+            scanUnmatchedSessions.set(sessionId, result);
+            setTimeout(() => scanUnmatchedSessions.delete(sessionId), 60 * 60 * 1000);
+            const payload = buildUnmatchedReportPayload(sessionId, result, 0);
+            await ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, payload.text, {
+                parse_mode: 'HTML',
+                reply_markup: payload.reply_markup
+            }).catch(() => {});
         });
 
         // Document upload: Accept .txt files with links
@@ -3718,7 +3796,13 @@ function setupBot(bot, adminBot) {
             }
 
             try {
-                const waitMsg = await ctx.reply(`📄 <b>Reading ${escapeHtml(filename)}...</b>`, { parse_mode: 'HTML' });
+                const sessionId = "doc_" + Date.now().toString(36);
+                const cancelMarkup = {
+                    inline_keyboard: [
+                        [{ text: "❌ Cancel Import", callback_data: `scan_cancel:${sessionId}` }]
+                    ]
+                };
+                const waitMsg = await ctx.reply(`📄 <b>Reading ${escapeHtml(filename)}...</b>`, { parse_mode: 'HTML', reply_markup: cancelMarkup });
                 const fileLink = await ctx.telegram.getFileLink(doc.file_id);
                 const fetchModule = await import('node-fetch').catch(() => null);
                 const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
@@ -3738,10 +3822,16 @@ function setupBot(bot, adminBot) {
                     return ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, '⚠️ No valid stream link + filename pairs found in this file.', { parse_mode: 'HTML' }).catch(() => {});
                 }
 
-                await ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, `🔍 <b>Parsed ${items.length} items from ${escapeHtml(filename)}. Matching to catalogue...</b>`, { parse_mode: 'HTML' }).catch(() => {});
+                await ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, `🔍 <b>Parsed ${items.length} items from ${escapeHtml(filename)}. Matching to catalogue...</b>`, { parse_mode: 'HTML', reply_markup: cancelMarkup }).catch(() => {});
                 const baseServer = (typeof lastSyncedTunnelUrl === 'string' && lastSyncedTunnelUrl) || 'https://filmhouse-stream.duckdns.org';
-                const report = await processBatchMediaItems(items, ctx, waitMsg, baseServer);
-                await ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, report, { parse_mode: 'HTML' }).catch(() => {});
+                const result = await processBatchMediaItems(items, ctx, waitMsg, baseServer, sessionId, false);
+                scanUnmatchedSessions.set(sessionId, result);
+                setTimeout(() => scanUnmatchedSessions.delete(sessionId), 60 * 60 * 1000);
+                const payload = buildUnmatchedReportPayload(sessionId, result, 0);
+                await ctx.telegram.editMessageText(ctx.chat.id, waitMsg.message_id, undefined, payload.text, {
+                    parse_mode: 'HTML',
+                    reply_markup: payload.reply_markup
+                }).catch(() => {});
             } catch (docErr) {
                 console.error('[Document Import Error]:', docErr);
                 return ctx.reply(`❌ Failed to process text file: ${escapeHtml(docErr.message)}`, { parse_mode: 'HTML' });
