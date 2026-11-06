@@ -24,12 +24,19 @@
     "director": "",
     "trailer": "HlIKFktkF_s",
     "runtime": "",
-    "stream_url": "",
-    "stream_links": [],
+    "stream_url": "MjAyNjo4YzUxY2NjNjYxYzI0MmJh",
+    "stream_links": [
+      {
+        "quality": "720p",
+        "stream_url": "MjAyNjo4YzUxY2NjNjYxYzI0MmJh",
+        "url": "MjAyNjo4YzUxY2NjNjYxYzI0MmJh"
+      }
+    ],
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADrAkAAkwOeUf6PnN_a_a44xYE",
-        "quality": "720p"
+        "quality": "720p",
+        "stream_url": "MjAyNjo4YzUxY2NjNjYxYzI0MmJh"
       }
     ]
   },
