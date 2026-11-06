@@ -30,19 +30,56 @@ const crypto = require("crypto");
 const LocalUserStore = require("./localStore");
 const localStore = new LocalUserStore();
 
-// Normalize titles for comparison, matching and search: strips symbols, leading articles, handles plurals, apostrophes
+const STOP_WORDS = new Set([
+    'the', 'a', 'an', 'and', 'of', 'in', 'to', 'for', 'on', 'at', 'by', 'with', 'from',
+    'part', 'chapter', 'vol', 'volume', 'pt', 's', 'movie', 'film'
+]);
+
+const TITLE_ALIASES = {
+    "girls raised in the south": "grits",
+    "grits": "girls raised in the south",
+    "hard matter": "kill code",
+    "kill code": "hard matter",
+    "bel": "bel air",
+    "bel air": "bel",
+    "matchbox the": "matchbox",
+    "the matchbox": "matchbox"
+};
+
+function romanToNum(roman) {
+    if (!roman) return "";
+    const r = String(roman).toLowerCase().trim();
+    const map = { "i": "1", "ii": "2", "iii": "3", "iv": "4", "v": "5", "vi": "6", "vii": "7", "viii": "8", "ix": "9", "x": "10" };
+    return map[r] || r;
+}
+
+function getRawAcronym(str) {
+    if (!str) return "";
+    const clean = String(str).toLowerCase().replace(/[^a-z0-9\s]/g, " ");
+    const words = clean.split(/\s+/).filter(w => w.length > 0);
+    if (words.length < 2) return "";
+    return words.map(w => w[0]).join("");
+}
+
+// Normalize titles for comparison, matching and search: strips symbols, leading articles, handles plurals, apostrophes, Roman numerals
 function normalizeTitleForComparison(title) {
     if (!title) return "";
     let s = String(title).toLowerCase();
     s = s.replace(/\s*\([^)]+\)\s*$/g, "").trim();
-    s = s.replace(/'s\b/gi, ""); // Remove apostrophe-s (e.g. Zane's -> Zane, matching Zanes)
+
+    // Strip ALL apostrophes: It's -> its, Zane's -> zanes, Grey's -> greys
+    s = s.replace(/['’`]/g, "");
+
+    // Roman Numerals normalization: "vol. ii" -> "2", "ii" -> "2"
+    s = s.replace(/\bvol(?:ume)?[\s\.\-_]*([0-9ivxlcdm]+)\b/gi, (m, g) => romanToNum(g));
+    s = s.replace(/\b(i|ii|iii|iv|v|vi|vii|viii|ix|x)\b/gi, (m, g) => romanToNum(g));
+
     s = s.replace(/&/g, " and ");
     s = s.replace(/^(the|a|an)\s+/i, "");
     s = s.replace(/\bthe\b/gi, " ");
     s = s.replace(/\b(star\s*wars|marvel|disney)\b/gi, " ");
     s = s.replace(/\b(iq|iqiyi|dual|fil|filmh|filmhouse)\b/gi, " ");
-    s = s.replace(/[^\p{L}\p{N}\s]/gu, " ");
-    s = s.replace(/\b([a-z]{3,})s\b/gi, "$1");
+    s = s.replace(/[^\p{L}\p{N}\s]/gu, " "); // Removes all symbols (!, ?, :, -, _, ;, etc.)
     s = s.replace(/\s+/g, " ").trim();
     return s;
 }
@@ -53,17 +90,24 @@ function getCollapsedTitle(title) {
     return clean.replace(/[^a-z0-9]/gi, "");
 }
 
-const STOP_WORDS = new Set([
-    'the', 'a', 'an', 'and', 'of', 'in', 'to', 'for', 'on', 'at', 'by', 'with', 'from',
-    'part', 'chapter', 'vol', 'volume', 'pt', 's', 'movie', 'film'
-]);
-
 function titlesMatch(titleA, titleB) {
     if (!titleA || !titleB) return false;
+
+    // Direct acronym match: e.g. "Girls Raised In The South" <-> "GRITS"
+    const rawA = String(titleA).toLowerCase().replace(/[^a-z0-9]/g, "");
+    const rawB = String(titleB).toLowerCase().replace(/[^a-z0-9]/g, "");
+    const acroA = getRawAcronym(titleA);
+    const acroB = getRawAcronym(titleB);
+    if ((acroA && acroA === rawB) || (acroB && acroB === rawA)) return true;
+
     const normA = normalizeTitleForComparison(titleA);
     const normB = normalizeTitleForComparison(titleB);
     if (!normA || !normB) return false;
     if (normA === normB) return true;
+
+    // Check alias mapping
+    if (TITLE_ALIASES[normA] && (TITLE_ALIASES[normA] === normB || TITLE_ALIASES[normA] === normalizeTitleForComparison(TITLE_ALIASES[normA]))) return true;
+    if (TITLE_ALIASES[normB] && (TITLE_ALIASES[normB] === normA || TITLE_ALIASES[normB] === normalizeTitleForComparison(TITLE_ALIASES[normB]))) return true;
 
     const colA = getCollapsedTitle(titleA);
     const colB = getCollapsedTitle(titleB);
