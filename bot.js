@@ -3524,15 +3524,21 @@ function setupBot(bot, adminBot) {
                     ).catch(() => {});
                 }
 
+                const sessionId = "scan_" + Date.now().toString(36);
+                const cancelMarkup = {
+                    inline_keyboard: [
+                        [{ text: "❌ Cancel Scan", callback_data: `scan_cancel:${sessionId}` }]
+                    ]
+                };
+
                 await ctx.telegram.editMessageText(
                     ctx.chat.id,
                     progressMsg.message_id,
                     undefined,
-                    `📡 <b>Found ${items.length} files from ${escapeHtml(source)}!</b>\n\nStarting automated catalogue matching...`,
-                    { parse_mode: 'HTML' }
+                    `📡 <b>Found ${items.length} files from ${escapeHtml(source)}!</b>\n\n🔍 <i>Matching catalogue entries in real-time...</i>`,
+                    { parse_mode: 'HTML', reply_markup: cancelMarkup }
                 ).catch(() => {});
 
-                const sessionId = "scan_" + Date.now().toString(36);
                 const cmdText = String(ctx.message?.text || '').toLowerCase();
                 const isForce = cmdText.includes('force') || cmdText.includes('all');
                 const result = await processBatchMediaItems(items, ctx, progressMsg, baseServer, sessionId, isForce);
