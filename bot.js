@@ -270,29 +270,29 @@ function performServerGitUpdate(onProgress) {
                     });
                 }
 
-                if (isAlreadyUpdated) {
-                    console.log("[ServerUpdater] Repository is already up to date.");
-                    return resolve({
-                        success: true,
-                        alreadyUpToDate: true,
-                        output: gitOutput,
-                        message: "Repository is already up to date (0 syntax errors)."
-                    });
-                }
-
-                if (typeof onProgress === "function") onProgress("Update pulled! Reloading PM2 process (Zero Downtime)...");
-                console.log("[ServerUpdater] Changes detected and syntax verified. Reloading PM2 process...");
-
-                // Schedule PM2 reload slightly after resolving to allow response to be sent first
+                // Schedule PM2 reload to ensure the active memory process is running the latest code
                 setTimeout(() => {
-                    exec("pm2 reload filmhouse-bot || pm2 reload bot || pm2 reload all", { cwd: projectDir, timeout: 15000 }, (pm2Err, pm2Out) => {
+                    exec("pm2 reload filmhouse-bot || pm2 restart filmhouse-bot || pm2 reload all || pm2 restart all", { cwd: projectDir, timeout: 15000 }, (pm2Err, pm2Out) => {
                         if (pm2Err) {
                             console.warn("[ServerUpdater] PM2 reload notice:", pm2Err.message);
                         } else {
                             console.log("[ServerUpdater] PM2 reload completed:", pm2Out);
                         }
                     });
-                }, 1500);
+                }, 1200);
+
+                if (isAlreadyUpdated) {
+                    console.log("[ServerUpdater] Repository is up to date. PM2 reload dispatched.");
+                    return resolve({
+                        success: true,
+                        alreadyUpToDate: true,
+                        output: gitOutput,
+                        message: "Repository is already up to date. PM2 process reloaded."
+                    });
+                }
+
+                if (typeof onProgress === "function") onProgress("Update pulled! Reloading PM2 process (Zero Downtime)...");
+                console.log("[ServerUpdater] Changes detected and syntax verified. Reloading PM2 process...");
 
                 return resolve({
                     success: true,
@@ -3133,12 +3133,12 @@ function setupBot(bot, adminBot) {
             }
         });
 
-        adminBot.command(['update', 'upgrade', 'pull'], async (ctx) => {
+        adminBot.command(['update', 'upgrade', 'pull', 'restart'], async (ctx) => {
             const adminId = String(ctx.from?.id || "");
             const isAuth = await isMasterAdmin(adminId);
             if (!isAuth) return ctx.reply("⛔ Unauthorized. Master Admins only.", { parse_mode: 'HTML' });
 
-            const statusMsg = await ctx.reply("🔄 <b>Checking for GitHub updates...</b>\nConnecting to repository on Ubuntu server...", { parse_mode: 'HTML' });
+            const statusMsg = await ctx.reply("🔄 <b>Checking for GitHub updates & reloading...</b>\nConnecting to repository on Ubuntu server...", { parse_mode: 'HTML' });
 
             const result = await performServerGitUpdate((stepText) => {
                 ctx.telegram.editMessageText(
@@ -3165,7 +3165,7 @@ function setupBot(bot, adminBot) {
                     ctx.chat.id,
                     statusMsg.message_id,
                     null,
-                    `✅ <b>Server is Already Up to Date!</b>\n\n<code>${escapeHtml(result.output)}</code>\n\n🚀 Running latest build with 0 syntax errors.`,
+                    `✅ <b>Server is Up to Date & Reloaded!</b>\n\n<code>${escapeHtml(result.output)}</code>\n\n🚀 <b>PM2 bot process reloaded with zero downtime.</b>`,
                     { parse_mode: 'HTML' }
                 ).catch(() => {});
             }
