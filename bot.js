@@ -3283,63 +3283,92 @@ function setupBot(bot, adminBot) {
                 } catch (_) {}
             };
 
+            // Helper to clean & extract raw token from full stream URLs or raw tokens
+            const extractToken = (str) => {
+                if (!str) return "";
+                const s = String(str).trim();
+                if (s.includes("/dl/")) {
+                    return s.split("/dl/")[1].split(/[?#&]/)[0].trim();
+                }
+                return s;
+            };
+
+            const recordAssignedUrl = (val) => {
+                if (!val) return;
+                const raw = String(val).trim();
+                if (!raw) return;
+                assignedUrls.add(raw);
+                const tok = extractToken(raw);
+                if (tok) assignedUrls.add(tok);
+            };
+
             // Pre-compile already assigned stream URLs for instant O(1) lookups
             const assignedUrls = new Set();
 
-            // 1. Prime from local disk cache first
+            // 1. Prime from local disk cache first (contains all 2,200+ catalog titles)
             if (!isForce && cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
                 for (const m of cachedMoviesMetadata) {
-                    if (m.stream_url) assignedUrls.add(String(m.stream_url).trim());
+                    if (m.stream_url) recordAssignedUrl(m.stream_url);
                     if (Array.isArray(m.stream_links)) {
                         m.stream_links.forEach(s => {
-                            if (s && s.stream_url) assignedUrls.add(String(s.stream_url).trim());
-                            if (s && s.url) assignedUrls.add(String(s.url).trim());
+                            if (s && s.stream_url) recordAssignedUrl(s.stream_url);
+                            if (s && s.url) recordAssignedUrl(s.url);
                         });
                     }
                     if (Array.isArray(m.links)) {
                         m.links.forEach(l => {
-                            if (l && l.stream_url) assignedUrls.add(String(l.stream_url).trim());
+                            if (l && l.stream_url) recordAssignedUrl(l.stream_url);
                             if (l && l.url && (l.url.includes('/dl/') || l.url.includes('filmhouse-stream'))) {
-                                assignedUrls.add(String(l.url).trim());
+                                recordAssignedUrl(l.url);
                             }
                         });
                     }
                 }
             }
 
-            // 2. Pre-fetch live catalogue from Firestore to capture all live stream links & documents
+            // 2. Pre-fetch live catalogue from Firestore to MERGE live stream links without overwriting the 2,200+ catalog
             try {
                 if (typeof db !== 'undefined' && db && typeof db.collection === 'function') {
                     const snap = await db.collection('movies').get();
                     if (!snap.empty) {
-                        console.log(`[ScanLibrary] Pre-loaded ${snap.size} live catalogue documents from Firestore.`);
-                        const liveCatalog = [];
+                        console.log(`[ScanLibrary] Merging ${snap.size} live catalogue documents from Firestore.`);
+                        const fsMap = new Map();
                         snap.forEach(doc => {
                             const data = doc.data() || {};
-                            const mObj = { ...data, _docId: doc.id, _ref: doc.ref };
-                            liveCatalog.push(mObj);
+                            fsMap.set(String(doc.id).toLowerCase(), { ...data, _docId: doc.id, _ref: doc.ref });
 
                             if (!isForce) {
-                                if (data.stream_url) assignedUrls.add(String(data.stream_url).trim());
+                                if (data.stream_url) recordAssignedUrl(data.stream_url);
                                 if (Array.isArray(data.stream_links)) {
                                     data.stream_links.forEach(s => {
-                                        if (s && s.stream_url) assignedUrls.add(String(s.stream_url).trim());
-                                        if (s && s.url) assignedUrls.add(String(s.url).trim());
+                                        if (s && s.stream_url) recordAssignedUrl(s.stream_url);
+                                        if (s && s.url) recordAssignedUrl(s.url);
                                     });
                                 }
                                 if (Array.isArray(data.links)) {
                                     data.links.forEach(l => {
-                                        if (l && l.stream_url) assignedUrls.add(String(l.stream_url).trim());
+                                        if (l && l.stream_url) recordAssignedUrl(l.stream_url);
                                         if (l && l.url && (l.url.includes('/dl/') || l.url.includes('filmhouse-stream'))) {
-                                            assignedUrls.add(String(l.url).trim());
+                                            recordAssignedUrl(l.url);
                                         }
                                     });
                                 }
                             }
                         });
 
-                        if (liveCatalog.length > 0) {
-                            cachedMoviesMetadata = liveCatalog;
+                        // Merge Firestore references and links into cachedMoviesMetadata
+                        if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                            cachedMoviesMetadata.forEach(m => {
+                                const docKey = String(m.csv_id || m.id || m.tmdb_id || "").toLowerCase();
+                                const live = fsMap.get(docKey);
+                                if (live) {
+                                    m._docId = live._docId;
+                                    m._ref = live._ref;
+                                    if (live.stream_url) m.stream_url = live.stream_url;
+                                    if (Array.isArray(live.stream_links)) m.stream_links = live.stream_links;
+                                    if (Array.isArray(live.links)) m.links = live.links;
+                                }
+                            });
                         }
                     }
                 }
@@ -3396,8 +3425,9 @@ function setupBot(bot, adminBot) {
                     continue;
                 }
 
-                // ⚡ Instant skip if stream link is already assigned (finishes in 0.0001ms!)
-                if (!isForce && assignedUrls.has(streamUrl)) {
+                // ⚡ Instant skip if stream link or token is already assigned (finishes in 0.0001ms!)
+                const itemToken = extractToken(streamUrl);
+                if (!isForce && (assignedUrls.has(streamUrl) || (itemToken && assignedUrls.has(itemToken)))) {
                     alreadyLinked++;
                     matched++;
                     continue;
