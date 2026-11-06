@@ -1,0 +1,477 @@
+[
+  {
+    "id": "8hKqLwVO1jJM2tNpzHt8",
+    "type": "Movie",
+    "csv_id": "621980",
+    "title": "I Met an Angel (720p Quality)",
+    "year": "",
+    "requestedById": "8590739055",
+    "tmdb_id": 621980,
+    "seasonOrPart": "720p Quality",
+    "requestedAt": {
+      "_seconds": 1791661985,
+      "_nanoseconds": 909000000
+    },
+    "status": "pending",
+    "fullName": "@abena💕 💋",
+    "requestedBy": "@abena💕 💋"
+  },
+  {
+    "id": "8lZ1z4CUhmvxhwjjJxNx",
+    "tmdb_id": 1368337,
+    "claimed": false,
+    "requestedBy": "khaycee",
+    "fullName": "Kweku",
+    "status": "pending",
+    "requestedAt": {
+      "_seconds": 1790915113,
+      "_nanoseconds": 876000000
+    },
+    "type": "Movie",
+    "csv_id": "1368337-the-odyssey",
+    "requestedById": "6695495276",
+    "seasonOrPart": "720p Quality",
+    "year": "2026",
+    "title": "The Odyssey (720p Quality)"
+  },
+  {
+    "id": "9BrPg1FO6geVFLIaBE1D",
+    "year": "2026",
+    "fullName": "BlesS",
+    "requestedAt": {
+      "_seconds": 1791850222,
+      "_nanoseconds": 624000000
+    },
+    "seasonOrPart": "1080p Quality",
+    "type": "Movie",
+    "requestedBy": "BlesS",
+    "csv_id": "1400837-other-mommy",
+    "requestedById": "8808836385",
+    "title": "Other Mommy (1080p Quality)",
+    "claimed": false,
+    "tmdb_id": 1400837,
+    "status": "pending"
+  },
+  {
+    "id": "BR42wHATQGv0lIjy7CjM",
+    "requestedAt": {
+      "_seconds": 1790353626,
+      "_nanoseconds": 748000000
+    },
+    "status": "pending",
+    "fullName": "Ella",
+    "tmdb_id": 419329,
+    "title": "Descendants of Adultery (720p Quality)",
+    "seasonOrPart": "720p Quality",
+    "csv_id": "419329",
+    "adminClaimId": "1329840839",
+    "year": "2016",
+    "adminClaimTime": {
+      "_seconds": 1790354924,
+      "_nanoseconds": 886000000
+    },
+    "requestedBy": "just_zerah",
+    "adminClaimName": "@Siawblaze",
+    "type": "Movie",
+    "requestedById": "5664391272"
+  },
+  {
+    "id": "CuKGyDOOcAgQm6392wco",
+    "title": "Edificio Corona",
+    "seasonOrPart": "",
+    "year": "2021",
+    "requestedBy": "MS.NONCHALANT✝️🤍🇯🇲",
+    "fullName": "MS.NONCHALANT✝️🤍🇯🇲",
+    "csv_id": "116266",
+    "type": "Series",
+    "requestedAt": {
+      "_seconds": 1790265498,
+      "_nanoseconds": 111000000
+    },
+    "status": "pending",
+    "requestedById": "1522796789",
+    "tmdb_id": 116266
+  },
+  {
+    "id": "EW09e9CDCMw9R2dEM9HL",
+    "status": "pending",
+    "title": "Ethnicity (720p Quality)",
+    "requestedBy": "just_zerah",
+    "csv_id": "1650317",
+    "type": "Movie",
+    "tmdb_id": 1650317,
+    "seasonOrPart": "720p Quality",
+    "year": "2025",
+    "requestedAt": {
+      "_seconds": 1790340753,
+      "_nanoseconds": 890000000
+    },
+    "fullName": "Ella",
+    "requestedById": "5664391272"
+  },
+  {
+    "id": "TFZD1SdHYYkgSJKQXMsK",
+    "year": "2026",
+    "fullName": "Kings_tech2",
+    "requestedAt": {
+      "_seconds": 1793790869,
+      "_nanoseconds": 259000000
+    },
+    "seasonOrPart": "720p Quality",
+    "type": "Movie",
+    "csv_id": "858035",
+    "requestedBy": "Kings_tech2",
+    "title": "Klara and the Sun (720p Quality)",
+    "requestedById": "6166341499",
+    "tmdb_id": 858035,
+    "status": "pending"
+  },
+  {
+    "id": "TKCHvO7YY9vfy0zdEKEx",
+    "csv_id": "64220",
+    "requestedAt": {
+      "_seconds": 1791125157,
+      "_nanoseconds": 16000000
+    },
+    "title": "Breakthrough",
+    "type": "Series",
+    "year": "2015",
+    "requestedBy": "Monalizaa❤️",
+    "tmdb_id": 64220,
+    "requestedById": "5894324276",
+    "status": "pending",
+    "seasonOrPart": "",
+    "fullName": "Monalizaa❤️"
+  },
+  {
+    "id": "W0vfeWd9W2HuNTcb0dMm",
+    "seasonOrPart": "",
+    "csv_id": "34307",
+    "title": "Shameless",
+    "status": "pending",
+    "type": "Series",
+    "fullName": "Wo P3 Saa",
+    "requestedAt": {
+      "_seconds": 1790989544,
+      "_nanoseconds": 574000000
+    },
+    "year": "2011",
+    "requestedById": "5436814123",
+    "requestedBy": "gyimiisaa",
+    "tmdb_id": 34307
+  },
+  {
+    "id": "XOOomQIdXBQ2aVjjpgqK",
+    "title": "The Machine Gunners",
+    "year": "1983",
+    "status": "pending",
+    "fullName": "𝔾𝕖𝕠𝕗𝕗𝕣𝕖𝕪",
+    "type": "Series",
+    "seasonOrPart": "",
+    "requestedAt": {
+      "_seconds": 1789622061,
+      "_nanoseconds": 264000000
+    },
+    "tmdb_id": 34889,
+    "csv_id": "34889",
+    "requestedById": "7976519482",
+    "requestedBy": "Siz_lex"
+  },
+  {
+    "id": "ahx7jGOydoHMtoCRWbPt",
+    "requestedAt": {
+      "_seconds": 1787690528,
+      "_nanoseconds": 442000000
+    },
+    "requestedById": "6053846111",
+    "requestedBy": "ama_anab1",
+    "tmdb_id": 1722014,
+    "csv_id": "1722014",
+    "seasonOrPart": "",
+    "type": "Movie",
+    "status": "pending",
+    "year": "2026",
+    "title": "On Different Grounds"
+  },
+  {
+    "id": "aoxeu1jZA3NC695NBRmX",
+    "requestedBy": "paakwesiiiii",
+    "type": "Movie",
+    "csv_id": "1400837-other-mommy",
+    "title": "Other Mommy (1080p Quality)",
+    "fullName": "kwesi _szn❤️‍🩹",
+    "year": "2026",
+    "requestedAt": {
+      "_seconds": 1791743561,
+      "_nanoseconds": 441000000
+    },
+    "tmdb_id": 1400837,
+    "status": "pending",
+    "requestedById": "8368113927",
+    "seasonOrPart": "1080p Quality"
+  },
+  {
+    "id": "foBWbrRQl8jbqGMMmPti",
+    "status": "pending",
+    "title": "The Odyssey (720p Quality)",
+    "type": "Movie",
+    "seasonOrPart": "720p Quality",
+    "year": "2026",
+    "requestedBy": "Elite_Plutonic",
+    "claimed": false,
+    "csv_id": "1368337-the-odyssey",
+    "tmdb_id": 1368337,
+    "requestedAt": {
+      "_seconds": 1788641824,
+      "_nanoseconds": 904000000
+    },
+    "fullName": "Nana✌🏾",
+    "requestedById": "6515820436"
+  },
+  {
+    "id": "g6Lj93gENNOn9vEPJxsC",
+    "title": "Fifty Shades of Grey (720p Quality)",
+    "year": "2015",
+    "requestedAt": {
+      "_seconds": 1793907148,
+      "_nanoseconds": 185000000
+    },
+    "status": "pending",
+    "requestedById": "6932372982",
+    "type": "Movie",
+    "requestedBy": "Isaac Amen",
+    "seasonOrPart": "720p Quality",
+    "tmdb_id": 216015,
+    "csv_id": "216015-fifty-shades-of-grey",
+    "fullName": "Isaac Amen"
+  },
+  {
+    "id": "i2HhKcjOMIYggtEZRJng",
+    "requestedAt": {
+      "_seconds": 1792856122,
+      "_nanoseconds": 655000000
+    },
+    "csv_id": "1195803",
+    "requestedBy": "Esinu Nyamadi",
+    "title": "Wicker (720p Quality)",
+    "requestedById": "8689284901",
+    "tmdb_id": 1195803,
+    "seasonOrPart": "720p Quality",
+    "status": "pending",
+    "year": "2026",
+    "type": "Movie",
+    "fullName": "Esinu Nyamadi"
+  },
+  {
+    "id": "iPq6guL54z79PO3cBu2b",
+    "seasonOrPart": "",
+    "year": "2026",
+    "requestedById": "8861938652",
+    "type": "Series",
+    "fullName": "Ursular Nyame",
+    "tmdb_id": 316294,
+    "csv_id": "316294",
+    "title": "Payback",
+    "requestedAt": {
+      "_seconds": 1793379060,
+      "_nanoseconds": 986000000
+    },
+    "status": "pending",
+    "requestedBy": "Ursular Nyame"
+  },
+  {
+    "id": "lDPSilu1HXXtuVWQuJ90",
+    "requestedAt": {
+      "_seconds": 1791345665,
+      "_nanoseconds": 35000000
+    },
+    "csv_id": "1368337-the-odyssey",
+    "type": "Movie",
+    "title": "The Odyssey (2160p Quality)",
+    "year": "2026",
+    "requestedBy": "khaycee",
+    "requestedById": "6695495276",
+    "tmdb_id": 1368337,
+    "status": "pending",
+    "seasonOrPart": "2160p Quality",
+    "fullName": "Kweku"
+  },
+  {
+    "id": "mbSt2UbFNMgc9MYoKNuf",
+    "fullName": "Isaac Amen",
+    "requestedAt": {
+      "_seconds": 1793919863,
+      "_nanoseconds": 295000000
+    },
+    "status": "pending",
+    "requestedBy": "Isaac Amen",
+    "tmdb_id": 603,
+    "requestedById": "6932372982",
+    "type": "Movie",
+    "seasonOrPart": "720p Quality",
+    "csv_id": "603",
+    "title": "The Matrix (720p Quality)",
+    "year": "1999"
+  },
+  {
+    "id": "mesFDlORapqiN2xJgor6",
+    "requestedAt": {
+      "_seconds": 1790385314,
+      "_nanoseconds": 462000000
+    },
+    "year": "2020",
+    "requestedById": "7394651921",
+    "claimed": false,
+    "requestedBy": "Dave_brooks11",
+    "tmdb_id": 664413,
+    "type": "Movie",
+    "csv_id": "664413-365-days",
+    "title": "365 Days (2160p Quality)",
+    "seasonOrPart": "2160p Quality",
+    "fullName": "Dave",
+    "status": "pending"
+  },
+  {
+    "id": "ngyGx8E5xAcuTfvOCPyg",
+    "fullName": "Takyisky 🫡",
+    "status": "pending",
+    "title": "Demon Slayer: Kimetsu no Yaiba (Season 5)",
+    "csv_id": "85937",
+    "year": "2019",
+    "seasonOrPart": "Season 5",
+    "requestedBy": "takyisky_yt",
+    "tmdb_id": 85937,
+    "type": "Series",
+    "requestedAt": {
+      "_seconds": 1792594698,
+      "_nanoseconds": 854000000
+    },
+    "requestedById": "896916730"
+  },
+  {
+    "id": "oc3IQQhM20P9M7yxjMSD",
+    "fullName": "Bhoss baby",
+    "year": "",
+    "type": "Series",
+    "status": "pending",
+    "title": "Reviving Ophelia",
+    "seasonOrPart": "",
+    "tmdb_id": 58116,
+    "requestedAt": {
+      "_seconds": 1792464185,
+      "_nanoseconds": 204000000
+    },
+    "requestedById": "6938366364",
+    "csv_id": "58116",
+    "requestedBy": "Bhoss baby"
+  },
+  {
+    "id": "pzWMvIe05RH3DPPlmdzt",
+    "category": "Movie",
+    "status": "pending",
+    "title": "Klara and the Sun",
+    "tmdb_id": 858035,
+    "target": "stream_url",
+    "quality": "Stream (Online Player)",
+    "requestedById": "6166341499",
+    "csv_id": "858035",
+    "requestedAt": {
+      "_seconds": 1793790823,
+      "_nanoseconds": 826000000
+    },
+    "requestType": "stream",
+    "type": "stream",
+    "cleanTitle": "klara and sun",
+    "platform": "telegram",
+    "year": "2026",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/2Zk5jRXUlrfkU3RsutMPMHey1Y.jpg",
+    "poster": "https://image.tmdb.org/t/p/w500/xqovj2p6HRsgHxN81qYAYF4StgM.jpg",
+    "requestedBy": "Kings_tech2"
+  },
+  {
+    "id": "tZMtqPeUnxGi9A8Igfg8",
+    "type": "Movie",
+    "requestedBy": "johnamos11_w",
+    "requestedAt": {
+      "_seconds": 1792031468,
+      "_nanoseconds": 114000000
+    },
+    "tmdb_id": 1480790,
+    "year": "2026",
+    "requestedById": "5250250913",
+    "csv_id": "1480790",
+    "title": "The Sin Trade (720p Quality)",
+    "status": "pending",
+    "fullName": "Jim",
+    "seasonOrPart": "720p Quality"
+  },
+  {
+    "id": "uXo8s1ERzF5XKrZEQwj9",
+    "tmdb_id": 1242898,
+    "type": "Movie",
+    "requestedAt": {
+      "_seconds": 1793921602,
+      "_nanoseconds": 610000000
+    },
+    "year": "2025",
+    "fullName": "Isaac Amen",
+    "status": "pending",
+    "requestedBy": "Isaac Amen",
+    "title": "Predator: Badlands (720p Quality)",
+    "requestedById": "6932372982",
+    "csv_id": "1242898",
+    "seasonOrPart": "720p Quality"
+  },
+  {
+    "id": "vNsPxiqdVOyssBzWmRLI",
+    "csv_id": "83985",
+    "tmdb_id": 83985,
+    "title": "Chandragupta Maurya",
+    "fullName": "Jim",
+    "status": "pending",
+    "type": "Series",
+    "requestedAt": {
+      "_seconds": 1791146755,
+      "_nanoseconds": 797000000
+    },
+    "seasonOrPart": "",
+    "requestedById": "5250250913",
+    "year": "2018",
+    "requestedBy": "johnamos11_w"
+  },
+  {
+    "id": "xlETbPqjowci0Z3ZKHtm",
+    "csv_id": "83985",
+    "requestedBy": "johnamos11_w",
+    "requestedById": "5250250913",
+    "requestedAt": {
+      "_seconds": 1791161819,
+      "_nanoseconds": 743000000
+    },
+    "tmdb_id": 83985,
+    "title": "Chandragupta Maurya",
+    "seasonOrPart": "",
+    "status": "pending",
+    "type": "Series",
+    "fullName": "Jim",
+    "year": "2018"
+  },
+  {
+    "id": "yydVBLFesnS3Frp3pEU0",
+    "tmdb_id": 1174188,
+    "requestedAt": {
+      "_seconds": 1792053423,
+      "_nanoseconds": 276000000
+    },
+    "claimed": false,
+    "requestedBy": "anit_n1",
+    "status": "pending",
+    "requestedById": "6268409865",
+    "year": "2025",
+    "seasonOrPart": "2160p Quality",
+    "title": "It's Okay! (2160p Quality)",
+    "fullName": "Berry",
+    "type": "Movie",
+    "csv_id": "1174188-it-s-okay"
+  }
+]
