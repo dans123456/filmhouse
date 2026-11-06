@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "1195803-wicker",
+    "tmdb_id": 1195803,
+    "imdb_id": "",
+    "title": "Wicker",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Romance",
+      "Fantasy",
+      "Comedy"
+    ],
+    "overview": "On the outskirts of a village by the sea, lives a Fisherwoman; smelly, single and perpetually ridiculed. One day, fed up with her stuffy, small-minded neighbours, she commissions herself a husband to be made from wicker. In an otherwise conservative town, this unconventional romance sparks outrage, jealousy and chaos.",
+    "poster": "https://image.tmdb.org/t/p/w500/6FcBZOKvyrLCKGCyBG0ySCR4okt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/xVh1ypMoVkMf5IB7y3hnRplJ14c.jpg",
+    "rating": 7.7,
+    "release_date": "2026-10-21",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "kA9NfV4pM_Q",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseHDcams_bot?start=BQADAQADNgoAAkwOeUe2zVuDDhj9rBYE",
+        "quality": "Cinema Cut / HDCam"
+      }
+    ]
+  },
+  {
     "csv_id": "949536-kill-code",
     "tmdb_id": 949536,
     "imdb_id": "",
