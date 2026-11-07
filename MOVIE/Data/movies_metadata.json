@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "269161-bandi",
+    "tmdb_id": 269161,
+    "imdb_id": "",
+    "title": "Bandi",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "Following the death of their mother, their pillar of strength and their anchor, eleven siblings aged 7 to 23 try to stay united in the face of adversity. But for some of them, drug trafficking seems to be the only way to survive. A decision far from being unanimously accepted, and one that severely tests the strength of their family bonds.",
+    "poster": "https://image.tmdb.org/t/p/w500/bbU23S58nbHK3PkIpbbprRFTVGl.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/zRPfRuLq1eCyEvlsKhl1k96lRw9.jpg",
+    "rating": 7.7,
+    "release_date": "2026-04-09",
+    "language": "fr",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADGxMAAkwOgUfwmbE6246L0BYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "450308-deuces",
     "tmdb_id": 450308,
     "imdb_id": "",
