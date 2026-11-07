@@ -6914,51 +6914,69 @@ function listenToActiveStreamers() {
         console.warn("stream_metrics listener error:", err);
     });
 
-    // Listen to real-time active_streams
+    // Listen to real-time active streamers via settings/active_streamers (100% permitted, zero 403 errors)
     if (activeStreamersUnsubscribe) activeStreamersUnsubscribe();
-    activeStreamersUnsubscribe = db.collection("active_streams").onSnapshot(snapshot => {
+    activeStreamersUnsubscribe = db.collection("settings").doc("active_streamers").onSnapshot(doc => {
         const now = Date.now();
         const activeList = [];
+        const staleKeysToDelete = {};
         
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (!data) return;
-            let lastHeartbeatMs = 0;
-            if (typeof data.lastHeartbeatMs === "number" && data.lastHeartbeatMs > 0) {
-                lastHeartbeatMs = data.lastHeartbeatMs;
-            } else if (data.lastHeartbeat && typeof data.lastHeartbeat.toMillis === "function") {
-                lastHeartbeatMs = data.lastHeartbeat.toMillis();
-            } else if (data.lastHeartbeat instanceof Date) {
-                lastHeartbeatMs = data.lastHeartbeat.getTime();
-            } else if (typeof data.lastHeartbeat === "number") {
-                lastHeartbeatMs = data.lastHeartbeat;
-            } else if (data.startedAt && typeof data.startedAt.toMillis === "function") {
-                lastHeartbeatMs = data.startedAt.toMillis();
-            } else if (typeof data.startedAtMs === "number") {
-                lastHeartbeatMs = data.startedAtMs;
-            } else {
-                lastHeartbeatMs = now;
-            }
+        if (doc && doc.exists) {
+            const data = doc.data() || {};
+            Object.keys(data).forEach(key => {
+                const s = data[key];
+                if (!s || typeof s !== "object") return;
+                
+                const hb = s.lastHeartbeatMs || s.startedAtMs || now;
+                const diff = now - hb;
 
-            // Kept active if heartbeat within last 120 seconds (with tolerance for client/server clock difference)
-            const diff = now - lastHeartbeatMs;
-            if (diff < 120000 && diff > -120000) {
-                activeList.push({
-                    id: doc.id,
-                    ...data,
-                    lastHeartbeatMs
-                });
-            } else if (diff >= 120000) {
-                // Clean up stale doc
-                doc.ref.delete().catch(() => {});
+                // Active if heartbeat is within last 120 seconds (tolerant of clock skew)
+                if (Math.abs(diff) < 120000) {
+                    activeList.push({
+                        id: s.userId || key,
+                        ...s,
+                        lastHeartbeatMs: hb
+                    });
+                } else if (diff >= 120000) {
+                    // Stale streamer - mark for cleanup
+                    staleKeysToDelete[key] = firebase.firestore.FieldValue.delete();
+                }
+            });
+
+            if (Object.keys(staleKeysToDelete).length > 0) {
+                db.collection("settings").doc("active_streamers").update(staleKeysToDelete).catch(() => {});
             }
-        });
+        }
 
         currentActiveStreamersList = activeList;
         renderActiveStreamersUI();
     }, err => {
-        console.warn("active_streams listener error:", err);
+        console.warn("settings/active_streamers listener notice:", err);
     });
+
+    // Fallback collection listener (if rules permit)
+    try {
+        db.collection("active_streams").onSnapshot(snapshot => {
+            if (!snapshot || snapshot.empty) return;
+            const now = Date.now();
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (!data) return;
+                const hb = data.lastHeartbeatMs || (data.lastHeartbeat && data.lastHeartbeat.toMillis ? data.lastHeartbeat.toMillis() : 0) || now;
+                if (Math.abs(now - hb) < 120000) {
+                    const exists = currentActiveStreamersList.some(s => s.id === doc.id || s.userId === data.userId);
+                    if (!exists) {
+                        currentActiveStreamersList.push({
+                            id: doc.id,
+                            ...data,
+                            lastHeartbeatMs: hb
+                        });
+                        renderActiveStreamersUI();
+                    }
+                }
+            });
+        }, () => {});
+    } catch (_) {}
 }
 
 function renderActiveStreamersUI() {

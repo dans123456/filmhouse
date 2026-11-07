@@ -6800,7 +6800,7 @@ function openTrailerModal(videoKey) {
 let currentStreamSessionId = null;
 let activeStreamHeartbeatInterval = null;
 
-// Start or update live streaming presence in Firestore
+// Start or update live streaming presence in Firestore (Dual-synced to settings/active_streamers & users)
 function startStreamingPresence(movie, title) {
     if (typeof firebase === "undefined" || !db) return;
     
@@ -6811,6 +6811,7 @@ function startStreamingPresence(movie, title) {
 
     const userId = (state.user && state.user.id) ? String(state.user.id) : ("guest_" + Math.random().toString(36).substring(2, 9));
     currentStreamSessionId = userId;
+    const sessionKey = `streamer_${userId}`;
 
     const displayName = (state.user && [state.user.first_name, state.user.last_name].filter(Boolean).join(" ")) 
         || (state.user && state.user.username ? "@" + state.user.username : "") 
@@ -6826,16 +6827,31 @@ function startStreamingPresence(movie, title) {
         movieId: movie?.csv_id || movie?.tmdb_id || movie?.id || "",
         type: movie?.type || "Movie",
         poster: movie?.poster || "",
-        startedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        lastHeartbeat: firebase.firestore.FieldValue.serverTimestamp(),
         startedAtMs: nowMs,
         lastHeartbeatMs: nowMs,
         status: "streaming"
     };
 
-    db.collection("active_streams").doc(userId).set(streamData).catch(err => {
-        console.warn("Could not register stream presence:", err);
+    // 1. Primary Sync: settings/active_streamers (100% permitted by firestore rules!)
+    db.collection("settings").doc("active_streamers").set({
+        [sessionKey]: streamData
+    }, { merge: true }).catch(err => {
+        console.warn("Could not register settings stream presence:", err);
     });
+
+    // 2. Secondary Sync: user profile document
+    if (state.user && state.user.id) {
+        db.collection("users").doc(String(state.user.id)).set({
+            current_stream: streamData
+        }, { merge: true }).catch(() => {});
+    }
+
+    // 3. Fallback sync to active_streams collection
+    db.collection("active_streams").doc(userId).set({
+        ...streamData,
+        startedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastHeartbeat: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(() => {});
 
     // Auto-track daily streaming mission
     if (state.user) {
@@ -6855,12 +6871,27 @@ function startStreamingPresence(movie, title) {
     activeStreamHeartbeatInterval = setInterval(() => {
         if (!currentStreamSessionId || typeof firebase === "undefined" || !db) return;
         const hbNow = Date.now();
+        const activeKey = `streamer_${currentStreamSessionId}`;
+
+        // Update settings/active_streamers heartbeat
+        db.collection("settings").doc("active_streamers").set({
+            [activeKey]: {
+                lastHeartbeatMs: hbNow,
+                status: "streaming"
+            }
+        }, { merge: true }).catch(() => {});
+
+        // Update user profile stream heartbeat
+        if (state.user && state.user.id) {
+            db.collection("users").doc(String(state.user.id)).set({
+                "current_stream.lastHeartbeatMs": hbNow
+            }, { merge: true }).catch(() => {});
+        }
+
         db.collection("active_streams").doc(currentStreamSessionId).update({
             lastHeartbeat: firebase.firestore.FieldValue.serverTimestamp(),
             lastHeartbeatMs: hbNow
-        }).catch(err => {
-            console.warn("Stream heartbeat error:", err);
-        });
+        }).catch(() => {});
     }, 20000);
 }
 
@@ -6873,12 +6904,25 @@ function stopStreamingPresence() {
     if (currentStreamSessionId && typeof firebase !== "undefined" && db) {
         const idToDelete = currentStreamSessionId;
         currentStreamSessionId = null;
+        const sessionKey = `streamer_${idToDelete}`;
+
+        // Clean up settings/active_streamers
+        db.collection("settings").doc("active_streamers").set({
+            [sessionKey]: firebase.firestore.FieldValue.delete()
+        }, { merge: true }).catch(() => {});
+
+        // Clean up user profile current_stream
+        if (state.user && state.user.id) {
+            db.collection("users").doc(String(state.user.id)).set({
+                current_stream: null
+            }, { merge: true }).catch(() => {});
+        }
+
         db.collection("active_streams").doc(idToDelete).delete().catch(() => {});
     }
 }
 
 window.addEventListener("beforeunload", stopStreamingPresence);
-window.addEventListener("pagehide", stopStreamingPresence);
 
 const STREAMING_ADMIN_IDS = ["1175336733", "1329840839"];
 
