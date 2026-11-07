@@ -1296,13 +1296,13 @@
     </div>
 
     <!-- SHARE APP MODAL -->
-    <div class="modal-overlay" id="share-app-modal">
+    <div class="modal-overlay" id="share-app-modal" style="z-index: 1000003;">
         <div class="modal-container" style="max-width: 360px; padding: 24px; text-align: center; border-radius: var(--border-radius-md); background-color: var(--bg-dark-card); border: 1px solid var(--border-color);">
             <button class="modal-close-btn" id="btn-close-share-modal" aria-label="Close share">
                 <svg><use href="#icon-close"></use></svg>
             </button>
-            <h3 style="margin-top: 0; margin-bottom: 12px; font-family: var(--font-heading); color: #fff;">Invite Friends</h3>
-            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Share Film House with your friends and earn +5 Loyalty Points! 🏆</p>
+            <h3 id="share-modal-title" style="margin-top: 0; margin-bottom: 12px; font-family: var(--font-heading); color: #fff;">Invite Friends</h3>
+            <p id="share-modal-desc" style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Share Film House with your friends and earn +5 Loyalty Points! 🏆</p>
             
             <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
                 <button class="btn btn-block" id="share-opt-whatsapp" style="background: #25D366; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
@@ -1311,11 +1311,17 @@
                 <button class="btn btn-block" id="share-opt-telegram" style="background: #0088cc; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
                     <span>Share to Telegram ✈️</span>
                 </button>
-                <button class="btn btn-block" id="share-opt-twitter" style="background: #15181c; border: 1px solid var(--border-color); color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
+                <button class="btn btn-block" id="share-opt-twitter" style="background: #111; border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
                     <span>Share to X (Twitter) 🐦</span>
                 </button>
+                <button class="btn btn-block" id="share-opt-facebook" style="background: #1877F2; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
+                    <span>Share to Facebook 🌐</span>
+                </button>
                 <button class="btn btn-block btn-secondary" id="share-opt-copy" style="font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
-                    <span>Copy Invite Link 🔗</span>
+                    <span id="share-opt-copy-text">Copy Link 🔗</span>
+                </button>
+                <button class="btn btn-block" id="share-opt-native" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: var(--border-radius-sm); cursor: pointer; width: 100%;">
+                    <span>More Apps 📲</span>
                 </button>
             </div>
         </div>
