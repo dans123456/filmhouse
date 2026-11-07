@@ -3310,10 +3310,11 @@ function setupBot(bot, adminBot) {
                         timeout: 10000
                     });
                     if (res.ok) {
-                        const data = await res.json();
-                        if (Array.isArray(data) && data.length > 0) {
-                            console.log(`[ScanLibrary] Loaded ${data.length} items from API: ${ep}`);
-                            return { source: `Stream API (${ep})`, items: data };
+                        const rawData = await res.json();
+                        const itemsList = Array.isArray(rawData) ? rawData : (Array.isArray(rawData?.items) ? rawData.items : []);
+                        if (itemsList.length > 0) {
+                            console.log(`[ScanLibrary] Loaded ${itemsList.length} items from API: ${ep}`);
+                            return { source: `Stream API (${ep})`, items: itemsList };
                         }
                     }
                 } catch (_) {}
@@ -3673,16 +3674,22 @@ function setupBot(bot, adminBot) {
                         );
                     }
 
-                    if (slotIdx >= 0) {
-                        currentLinks[slotIdx] = { ...currentLinks[slotIdx], ...newLinkEntry };
-                    } else {
-                        currentLinks.push(newLinkEntry);
+                    // Keep Telegram download links and Stream links strictly segregated
+                    const isTelegramLink = typeof streamUrl === "string" && (streamUrl.includes("t.me/") || streamUrl.includes("telegram.me/"));
+                    if (isTelegramLink) {
+                        if (slotIdx >= 0) {
+                            currentLinks[slotIdx] = { ...currentLinks[slotIdx], ...newLinkEntry };
+                        } else {
+                            currentLinks.push(newLinkEntry);
+                        }
                     }
 
-                    if (streamSlotIdx >= 0) {
-                        currentStreamLinks[streamSlotIdx] = { ...currentStreamLinks[streamSlotIdx], ...newLinkEntry };
-                    } else {
-                        currentStreamLinks.push(newLinkEntry);
+                    if (!isTelegramLink) {
+                        if (streamSlotIdx >= 0) {
+                            currentStreamLinks[streamSlotIdx] = { ...currentStreamLinks[streamSlotIdx], ...newLinkEntry };
+                        } else {
+                            currentStreamLinks.push(newLinkEntry);
+                        }
                     }
                 }
 

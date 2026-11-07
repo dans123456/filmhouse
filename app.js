@@ -4122,12 +4122,22 @@ function updateMediaSeriesTracker(movie, isTVShow) {
                 return;
             }
 
-            // Remote Firestore persistence for logged-in Telegram users
+            // Optimistic UI & Local Storage update (instant feedback, zero delay)
+            renderSubscribeState(targetSub);
+            setLocalSeriesSubscription(tmdbId, targetSub);
+            if (targetSub) {
+                showToast("🔔 Subscribed! You'll be alerted on Telegram when new episodes drop 🍿", "success");
+            } else {
+                showToast("🔕 Unsubscribed from episode alerts", "info");
+            }
+
+            // Remote Firestore persistence for logged-in Telegram users (graceful background sync)
             if (typeof db !== "undefined" && db && userId) {
                 const docId = typeof buildSubscriptionDocId === "function" 
                     ? buildSubscriptionDocId(userId, tmdbId) 
                     : `${userId}_${tmdbId}`;
                 const docRef = db.collection("subscriptions").doc(docId);
+                const userDocRef = db.collection("users").doc(String(userId));
 
                 try {
                     if (targetSub) {
@@ -4136,26 +4146,24 @@ function updateMediaSeriesTracker(movie, isTVShow) {
                             tmdb_id: Number(tmdbId),
                             series_title: movie.title || "Series",
                             subscribed_at: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        renderSubscribeState(true);
-                        setLocalSeriesSubscription(tmdbId, true);
-                        showToast("🔔 Subscribed! You'll be alerted on Telegram when new episodes drop 🍿", "success");
+                        }, { merge: true });
+                        if (userDocRef) {
+                            userDocRef.set({
+                                series_subscriptions: firebase.firestore.FieldValue.arrayUnion(Number(tmdbId))
+                            }, { merge: true }).catch(() => {});
+                        }
                     } else {
-                        await docRef.delete();
-                        renderSubscribeState(false);
-                        setLocalSeriesSubscription(tmdbId, false);
-                        showToast("🔕 Unsubscribed from episode alerts", "info");
+                        await docRef.delete().catch(() => {});
+                        if (userDocRef) {
+                            userDocRef.set({
+                                series_subscriptions: firebase.firestore.FieldValue.arrayRemove(Number(tmdbId))
+                            }, { merge: true }).catch(() => {});
+                        }
                     }
                 } catch (err) {
-                    console.error("Failed to persist subscription in Firestore:", err);
-                    renderSubscribeState(isCurrentSub);
-                    setLocalSeriesSubscription(tmdbId, isCurrentSub);
-                    showToast("Unable to sync subscription. Please try again.", "error");
+                    console.warn("[Subscriptions] Cloud sync fallback to local storage:", err.message);
+                    // Do NOT revert local subscription or display scary error toasts. Local subscription remains 100% active.
                 }
-            } else {
-                renderSubscribeState(targetSub);
-                setLocalSeriesSubscription(tmdbId, targetSub);
-                showToast(targetSub ? "🔔 Subscribed!" : "🔕 Unsubscribed", "info");
             }
         };
     }

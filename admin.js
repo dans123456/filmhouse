@@ -4174,11 +4174,22 @@ function renderCatalogList() {
         });
         const cinemaCutBadge = hasCinemaCut ? `<span style="font-size: 9px; background: linear-gradient(135deg, rgba(255, 152, 0, 0.2), rgba(255, 87, 34, 0.2)); border: 1px solid rgba(255, 152, 0, 0.4); color: #ff9800; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 800;">📽️ Cinema Cut</span>` : "";
 
+        const isSeriesItem = String(m.type || "").toLowerCase() === "series" || String(m.type || "").toLowerCase() === "tv";
         const streamsCount = (Array.isArray(m.stream_links) && m.stream_links.length > 0) 
             ? m.stream_links.length 
             : (m.stream_url || (m.links && m.links[0] && m.links[0].stream_url) ? 1 : 0);
+        
+        let streamBadgeLabel = "▶️ No Stream";
+        if (streamsCount > 0) {
+            if (isSeriesItem) {
+                streamBadgeLabel = `▶️ Stream: ${streamsCount} Ep${streamsCount === 1 ? '' : 's'}`;
+            } else {
+                streamBadgeLabel = streamsCount > 1 ? `▶️ Stream: ${streamsCount} Qualities` : `▶️ Stream: Ready`;
+            }
+        }
+
         const streamBadge = streamsCount > 0 
-            ? `<span class="breakdown-tag" style="color: #4cd964; border-color: rgba(76, 217, 100, 0.3); background: rgba(76, 217, 100, 0.1);">▶️ Stream: ${streamsCount}</span>` 
+            ? `<span class="breakdown-tag" style="color: #4cd964; border-color: rgba(76, 217, 100, 0.3); background: rgba(76, 217, 100, 0.1);">${streamBadgeLabel}</span>` 
             : `<span class="breakdown-tag" style="color: var(--text-muted); opacity: 0.65;">▶️ No Stream</span>`;
 
         row.innerHTML = `
