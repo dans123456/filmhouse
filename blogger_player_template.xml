@@ -129,6 +129,7 @@
       justify-content: center;
       gap: 14px;
       z-index: 10;
+      pointer-events: none;
       transition: opacity 0.4s ease;
     }
     .spinner {
@@ -1467,11 +1468,34 @@
         }
         downloadBtn.href = finalStreamUrl;
 
-        // Hide loader when video can play
-        videoEl.addEventListener('canplay', function() {
-          if (loaderEl) loaderEl.style.opacity = '0';
-          setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 400);
+        function hideStreamLoader() {
+          if (!loaderEl) return;
+          loaderEl.style.opacity = '0';
+          loaderEl.style.pointerEvents = 'none';
+          setTimeout(function() { if (loaderEl) loaderEl.style.display = 'none'; }, 300);
+        }
+
+        // Hide loader on ANY playback readiness or progress event
+        ['canplay', 'canplaythrough', 'playing', 'loadeddata', 'timeupdate', 'seeked'].forEach(function(evt) {
+          videoEl.addEventListener(evt, hideStreamLoader);
         });
+
+        // Explicitly trigger browser video load
+        try {
+          videoEl.load();
+        } catch (_) {}
+
+        // Fallback: If video already buffered enough data, hide immediately
+        if (videoEl.readyState >= 2) {
+          hideStreamLoader();
+        }
+
+        // Safety fallback: Never leave loader stuck longer than 4.5 seconds
+        setTimeout(function() {
+          if (videoEl.readyState >= 1 || videoEl.currentTime > 0) {
+            hideStreamLoader();
+          }
+        }, 4500);
 
         videoEl.addEventListener('error', function(e) {
           console.warn("Video load issue:", e);
