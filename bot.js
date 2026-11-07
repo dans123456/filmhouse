@@ -3597,9 +3597,10 @@ function setupBot(bot, adminBot) {
                     continue;
                 }
 
-                // Build link slot entries (handles single episodes and multi-episodes like E01-E02)
+                // Build link slot entries (handles single episodes, multi-episodes, and strict movie types)
                 const linkEntriesToProcess = [];
-                if (parsed.isSeries && parsed.episodeNum) {
+                const isCatalogMovie = catalogMatch && String(catalogMatch.type || '').toLowerCase() === 'movie';
+                if (parsed.isSeries && parsed.episodeNum && !isCatalogMovie) {
                     const epLabel = parsed.endEpisodeNum ? `Episode ${parsed.episodeNum}–${parsed.endEpisodeNum}` : `Episode ${parsed.episodeNum}`;
                     linkEntriesToProcess.push({
                         season: parsed.seasonNum || 1,

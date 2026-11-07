@@ -41838,7 +41838,11 @@
       {
         "quality": "720p",
         "url": "https://filmhouse-stream.duckdns.org/dl/MTAyOTo5MzJjZjU2NmY2N2ViZDk0",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAyOTo5MzJjZjU2NmY2N2ViZDk0"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAyOTo5MzJjZjU2NmY2N2ViZDk0",
+        "episode": 1,
+        "episodeNum": 1,
+        "season": 1,
+        "name": "Episode 1"
       }
     ],
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAyOTo5MzJjZjU2NmY2N2ViZDk0"

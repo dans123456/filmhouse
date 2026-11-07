@@ -2365,8 +2365,14 @@ function renderHistoryGrid() {
         img.loading = "lazy";
         imgWrapper.appendChild(img);
 
+        const gridStreamBadge = getStreamBadgeElement(movie);
+        if (gridStreamBadge) imgWrapper.appendChild(gridStreamBadge);
+
         const reqBadge = getRequestedBadgeElement(movie);
         if (reqBadge) imgWrapper.appendChild(reqBadge);
+
+        const hStreamBadge = getStreamBadgeElement(movie);
+        if (hStreamBadge) imgWrapper.appendChild(hStreamBadge);
         const streamBadge = getStreamBadgeElement(movie);
         if (streamBadge) imgWrapper.appendChild(streamBadge);
 
@@ -2972,8 +2978,14 @@ function renderFeaturedGrid(preservePagination = false) {
         img.loading = "lazy";
         imgWrapper.appendChild(img);
 
+        const gridStreamBadge = getStreamBadgeElement(movie);
+        if (gridStreamBadge) imgWrapper.appendChild(gridStreamBadge);
+
         const reqBadge = getRequestedBadgeElement(movie);
         if (reqBadge) imgWrapper.appendChild(reqBadge);
+
+        const hStreamBadge = getStreamBadgeElement(movie);
+        if (hStreamBadge) imgWrapper.appendChild(hStreamBadge);
 
         const cinemaCutBadge = getCinemaCutBadgeElement(movie);
         const asianOriginBadge = getAsianOriginBadgeElement(movie);
@@ -3138,6 +3150,9 @@ function renderEditorsChoice() {
         img.loading = "lazy";
         imgWrapper.appendChild(img);
 
+        const gridStreamBadge = getStreamBadgeElement(movie);
+        if (gridStreamBadge) imgWrapper.appendChild(gridStreamBadge);
+
         const cinemaCutBadge = getCinemaCutBadgeElement(movie);
         const asianOriginBadge = getAsianOriginBadgeElement(movie);
         if (cinemaCutBadge && asianOriginBadge) {
@@ -3247,6 +3262,9 @@ function renderWatchlistGrid() {
         img.alt = movie.title;
         img.loading = "lazy";
         imgWrapper.appendChild(img);
+
+        const gridStreamBadge = getStreamBadgeElement(movie);
+        if (gridStreamBadge) imgWrapper.appendChild(gridStreamBadge);
 
         const cinemaCutBadge = getCinemaCutBadgeElement(movie);
         const asianOriginBadge = getAsianOriginBadgeElement(movie);
@@ -4091,21 +4109,20 @@ function updateMediaSeriesTracker(movie, isTVShow) {
                 triggerHaptic(targetSub ? "medium" : "light");
             }
 
-            // Optimistic instant UI flip
-            renderSubscribeState(targetSub);
-            setLocalSeriesSubscription(tmdbId, targetSub);
-
-            if (targetSub) {
-                if (typeof showToast === "function") {
-                    showToast("🔔 Subscribed! You'll be alerted on Telegram when new episodes drop 🍿", "success");
-                }
-            } else {
-                if (typeof showToast === "function") {
+            // If user is guest / not linked with a valid Telegram ID
+            const isGuest = !userId || userId === "000000000";
+            if (isGuest) {
+                renderSubscribeState(targetSub);
+                setLocalSeriesSubscription(tmdbId, targetSub);
+                if (targetSub) {
+                    showToast("🔔 Subscribed locally! Connect your Telegram account in Profile for push alerts 🍿", "info");
+                } else {
                     showToast("🔕 Unsubscribed from episode alerts", "info");
                 }
+                return;
             }
 
-            // Remote Firestore persistence
+            // Remote Firestore persistence for logged-in Telegram users
             if (typeof db !== "undefined" && db && userId) {
                 const docId = typeof buildSubscriptionDocId === "function" 
                     ? buildSubscriptionDocId(userId, tmdbId) 
@@ -4120,18 +4137,25 @@ function updateMediaSeriesTracker(movie, isTVShow) {
                             series_title: movie.title || "Series",
                             subscribed_at: firebase.firestore.FieldValue.serverTimestamp()
                         });
+                        renderSubscribeState(true);
+                        setLocalSeriesSubscription(tmdbId, true);
+                        showToast("🔔 Subscribed! You'll be alerted on Telegram when new episodes drop 🍿", "success");
                     } else {
                         await docRef.delete();
+                        renderSubscribeState(false);
+                        setLocalSeriesSubscription(tmdbId, false);
+                        showToast("🔕 Unsubscribed from episode alerts", "info");
                     }
                 } catch (err) {
                     console.error("Failed to persist subscription in Firestore:", err);
-                    // Rollback optimistic UI on failure
                     renderSubscribeState(isCurrentSub);
                     setLocalSeriesSubscription(tmdbId, isCurrentSub);
-                    if (typeof showToast === "function") {
-                        showToast("Unable to sync subscription. Please try again.", "error");
-                    }
+                    showToast("Unable to sync subscription. Please try again.", "error");
                 }
+            } else {
+                renderSubscribeState(targetSub);
+                setLocalSeriesSubscription(tmdbId, targetSub);
+                showToast(targetSub ? "🔔 Subscribed!" : "🔕 Unsubscribed", "info");
             }
         };
     }
@@ -6785,6 +6809,7 @@ function startStreamingPresence(movie, title) {
         || "Guest Viewer";
     const username = (state.user && state.user.username) ? state.user.username : "";
 
+    const nowMs = Date.now();
     const streamData = {
         userId: userId,
         name: displayName,
@@ -6795,6 +6820,8 @@ function startStreamingPresence(movie, title) {
         poster: movie?.poster || "",
         startedAt: firebase.firestore.FieldValue.serverTimestamp(),
         lastHeartbeat: firebase.firestore.FieldValue.serverTimestamp(),
+        startedAtMs: nowMs,
+        lastHeartbeatMs: nowMs,
         status: "streaming"
     };
 
@@ -6819,12 +6846,14 @@ function startStreamingPresence(movie, title) {
 
     activeStreamHeartbeatInterval = setInterval(() => {
         if (!currentStreamSessionId || typeof firebase === "undefined" || !db) return;
+        const hbNow = Date.now();
         db.collection("active_streams").doc(currentStreamSessionId).update({
-            lastHeartbeat: firebase.firestore.FieldValue.serverTimestamp()
+            lastHeartbeat: firebase.firestore.FieldValue.serverTimestamp(),
+            lastHeartbeatMs: hbNow
         }).catch(err => {
             console.warn("Stream heartbeat error:", err);
         });
-    }, 25000);
+    }, 20000);
 }
 
 // Stop live streaming presence in Firestore
@@ -7026,6 +7055,9 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
     // Track active cinema movie for seamless return to movie detail page
     state.lastCinemaMovie = movie;
+
+    // Immediately register live streaming presence
+    startStreamingPresence(movie, customTitle || movie.title);
 
     // Subtitle isolation per movie/series (Prevents subtitle leak across titles)
     const currentMovieKey = String(movie.id || movie.tmdb_id || movie.imdb_id || movie.title);
@@ -7601,6 +7633,11 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (!container) return;
         container.replaceChildren();
         if (!targetUrl) return;
+        const rawTarget = String(targetUrl).trim();
+        if (rawTarget.includes("t.me/") || rawTarget.includes("telegram.me/")) {
+            console.warn("[StreamEngine] Rejected Telegram download link from cinema video player:", rawTarget);
+            return;
+        }
         const directUrl = resolveDirectStreamUrl(targetUrl);
         const currentMediaTitle = currentTitle || initialTitle;
         const currentMovieKey = String(movie.id || movie.tmdb_id || movie.imdb_id || movie.title);
@@ -7736,14 +7773,18 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         }
     }
 
-    // Resolve initial stream parameter: custom URL -> link.stream_url -> movie.stream_url
-    let streamTarget = customStreamUrl || movie.stream_url || "";
+    // Resolve initial stream parameter: custom URL -> stream_links -> movie.stream_url (Strictly non-Telegram)
+    const isStreamLinkValid = (u) => u && typeof u === "string" && !u.includes("t.me/") && !u.includes("telegram.me/");
+    let streamTarget = isStreamLinkValid(customStreamUrl) ? customStreamUrl : "";
     if (!streamTarget && movie.stream_links && Array.isArray(movie.stream_links)) {
-        const sl = movie.stream_links.find(s => s && (s.stream_url || s.url));
+        const sl = movie.stream_links.find(s => s && isStreamLinkValid(s.stream_url || s.url));
         if (sl) streamTarget = sl.stream_url || sl.url;
     }
+    if (!streamTarget && isStreamLinkValid(movie.stream_url)) {
+        streamTarget = movie.stream_url;
+    }
     if (!streamTarget && movie.links && Array.isArray(movie.links)) {
-        const streamLink = movie.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
+        const streamLink = movie.links.find(l => l && isStreamLinkValid(l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
         if (streamLink) {
             streamTarget = streamLink.stream_url || streamLink.url;
         }
@@ -7956,7 +7997,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     const rawSeason = isObj && l.season ? String(l.season).trim() : `Season ${idx + 1}`;
                     const sMatch = rawSeason.match(/\d+/);
                     const sNum = sMatch ? parseInt(sMatch[0], 10) : idx + 1;
-                    const sStream = isObj ? (l.stream_url || l.url || "") : String(l);
+                    const sStream = isObj ? (l.stream_url || (l.url && !l.url.includes("t.me") ? l.url : "")) : (String(l).includes("t.me") ? "" : String(l));
 
                     const existing = detectedSeasons.find(s => s.seasonNumber === sNum);
                     if (!existing) {
@@ -8306,13 +8347,34 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         currentCinemaEpIndex = idx;
                         window._currentActiveEpKey = progKey;
 
-                        let epTarget = ep.stream_url || seasonObj.streamUrl || movie.stream_url || streamTarget;
+                        let epTarget = "";
                         if (movie.stream_links && Array.isArray(movie.stream_links)) {
-                            const foundStream = movie.stream_links.find(s => (s.episode == epNum || s.episode_number == epNum) && (s.season == seasonObj.seasonNumber || !s.season));
+                            const foundStream = movie.stream_links.find(s => 
+                                (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) && 
+                                (s.season == seasonObj.seasonNumber || !s.season)
+                            );
                             if (foundStream) {
-                                epTarget = foundStream.stream_url || foundStream.url || epTarget;
+                                const cand = foundStream.stream_url || foundStream.url;
+                                if (cand && !cand.includes("t.me")) epTarget = cand;
                             }
                         }
+                        if (!epTarget && ep.stream_url && !ep.stream_url.includes("t.me")) {
+                            epTarget = ep.stream_url;
+                        }
+                        if (!epTarget && seasonObj.streamUrl && !seasonObj.streamUrl.includes("t.me")) {
+                            epTarget = seasonObj.streamUrl;
+                        }
+                        // If Episode 1 and top-level movie stream_url is valid, auto-bind
+                        if (!epTarget && epNum === 1 && movie.stream_url && !movie.stream_url.includes("t.me")) {
+                            epTarget = movie.stream_url;
+                        }
+
+                        if (!epTarget) {
+                            showToast(`⚠️ Episode ${epNum} stream coming soon! Download is available in the Download tab.`, "info", 5000);
+                            if (typeof triggerHaptic === "function") triggerHaptic("warning");
+                            return;
+                        }
+
                         const epDisplayTitle = `${baseTitle} • S${seasonObj.seasonNumber}:E${epNum}`;
                         setCinemaStream(epTarget, epDisplayTitle);
                         showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
@@ -13974,6 +14036,108 @@ function initWelcomeTourHandlers() {
 }
 
 // ==========================================
+// Daily Search History Engine (Auto-expires after 24h / daily reset)
+// ==========================================
+const SEARCH_HISTORY_KEY = "fh_search_history_v1";
+
+function getDailySearchHistory() {
+    try {
+        const raw = localStorage.getItem(SEARCH_HISTORY_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        const now = Date.now();
+        const todayStr = new Date().toISOString().substring(0, 10);
+        // Retain only entries from today (last 24 hours)
+        const valid = parsed.filter(item => item && item.query && (now - item.ts < 86400000) && (item.date === todayStr));
+        if (valid.length !== parsed.length) {
+            localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(valid));
+        }
+        return valid;
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveSearchQueryToHistory(query) {
+    const q = (query || "").trim();
+    if (!q || q.length < 2) return;
+    try {
+        let history = getDailySearchHistory();
+        history = history.filter(item => item.query.toLowerCase() !== q.toLowerCase());
+        history.unshift({
+            query: q,
+            ts: Date.now(),
+            date: new Date().toISOString().substring(0, 10)
+        });
+        if (history.length > 10) history = history.slice(0, 10);
+        localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
+        renderSearchHistoryChips();
+    } catch (e) {}
+}
+
+function clearDailySearchHistory() {
+    try {
+        localStorage.removeItem(SEARCH_HISTORY_KEY);
+        renderSearchHistoryChips();
+    } catch (e) {}
+}
+
+function renderSearchHistoryChips() {
+    const section = document.getElementById("search-history-section");
+    const container = document.getElementById("search-history-chips");
+    const overlayInput = document.getElementById("overlay-search-input");
+    if (!section || !container) return;
+
+    if (overlayInput && overlayInput.value.trim().length > 0) {
+        section.style.display = "none";
+        return;
+    }
+
+    const history = getDailySearchHistory();
+    if (history.length === 0) {
+        section.style.display = "none";
+        container.innerHTML = "";
+        return;
+    }
+
+    container.innerHTML = history.map(item => `
+        <button type="button" class="search-history-chip" data-query="${escapeHTML(item.query)}" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); font-size: 11px; padding: 4px 10px; border-radius: 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+            <span>🕒 ${escapeHTML(item.query)}</span>
+            <span class="chip-delete-btn" data-delete="${escapeHTML(item.query)}" style="opacity: 0.6; font-size: 13px; line-height: 1; padding: 0 2px;">&times;</span>
+        </button>
+    `).join("");
+
+    section.style.display = "block";
+
+    container.querySelectorAll(".search-history-chip").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const delTarget = e.target.closest(".chip-delete-btn");
+            if (delTarget) {
+                e.stopPropagation();
+                const qToDel = delTarget.getAttribute("data-delete");
+                let hist = getDailySearchHistory().filter(x => x.query !== qToDel);
+                localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(hist));
+                renderSearchHistoryChips();
+                return;
+            }
+            const q = btn.getAttribute("data-query");
+            if (q && overlayInput) {
+                overlayInput.value = q;
+                triggerOverlaySearch(q);
+                overlayInput.focus();
+            }
+        });
+    });
+
+    const clearAllBtn = document.getElementById("btn-clear-search-history");
+    if (clearAllBtn && !clearAllBtn._bound) {
+        clearAllBtn._bound = true;
+        clearAllBtn.addEventListener("click", clearDailySearchHistory);
+    }
+}
+
+// ==========================================
 // Premium Glassmorphic Search Overlay Code
 // ==========================================
 let overlaySearchDebounceTimer = null;
@@ -14001,6 +14165,7 @@ function initPremiumSearchOverlay() {
         overlayInput.value = searchInput?.value || "";
         overlayInput.focus();
         triggerOverlaySearch(overlayInput.value);
+        renderSearchHistoryChips();
     };
 
     const closePremiumSearch = () => {
@@ -14047,6 +14212,13 @@ function initPremiumSearchOverlay() {
         overlaySearchDebounceTimer = setTimeout(() => {
             triggerOverlaySearch(query);
         }, 150);
+    });
+
+    overlayInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            saveSearchQueryToHistory(overlayInput.value);
+            overlayInput.blur();
+        }
     });
 
     // Native mobile paste synchronization
@@ -14096,8 +14268,12 @@ function triggerOverlaySearch(query) {
             </div>
         `;
         if (countText) countText.textContent = "Type to search...";
+        renderSearchHistoryChips();
         return;
     }
+
+    const histSection = document.getElementById("search-history-section");
+    if (histSection) histSection.style.display = "none";
 
     // Tokenize search query and extract year for precise matching
     const { cleanTokens, searchTitleStr, targetYear } = sanitizeSearchQuery(q);
@@ -14213,6 +14389,17 @@ function triggerOverlaySearch(query) {
                         `;
                         const listDiv = globalContainer.querySelector(".external-results-list");
                         uniqueExt.forEach(m => {
+                            const localMatch = state.movies.find(lm => 
+                                (lm.tmdb_id && String(lm.tmdb_id) === String(m.tmdb_id)) || 
+                                (lm.csv_id && String(lm.csv_id) === String(m.tmdb_id)) ||
+                                (lm.title && typeof titlesMatch === "function" && titlesMatch(lm.title, m.title))
+                            );
+                            if (localMatch) {
+                                m.stream_url = localMatch.stream_url || m.stream_url;
+                                m.stream_links = localMatch.stream_links || m.stream_links;
+                                m.links = localMatch.links || m.links;
+                                m.csv_id = localMatch.csv_id || m.csv_id;
+                            }
                             const card = createSearchOverlayCard(m);
                             listDiv?.appendChild(card);
                         });
@@ -14340,6 +14527,12 @@ function createSearchOverlayCard(m) {
     }
     
     const genreStr = Array.isArray(m.genres) ? m.genres.join(", ") : (m.genre || "Media");
+    const hasStream = typeof hasMovieStream === "function" && hasMovieStream(m);
+    const hasDownload = Array.isArray(m.links) && m.links.some(l => {
+        if (!l) return false;
+        const u = typeof l === 'string' ? l : (l.url || '');
+        return u && (u.includes('t.me') || u.includes('telegram'));
+    });
     
     const card = document.createElement("div");
     card.className = "search-result-card";
@@ -14353,6 +14546,8 @@ function createSearchOverlayCard(m) {
                     <span class="meta-tag genre-tag">${escapeHTML(genreStr)}</span>
                     <span class="meta-item">${m.release_date ? m.release_date.substring(0, 4) : (m.year || 'N/A')}</span>
                     <span class="meta-item rating-item">⭐ ${m.rating || 'N/A'}</span>
+                    ${hasStream ? `<span class="meta-tag stream-badge-pill" style="background: rgba(255, 188, 0, 0.18); border: 1px solid rgba(255, 188, 0, 0.5); color: #ffbc00; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;">👑 Stream</span>` : ''}
+                    ${hasDownload ? `<span class="meta-tag download-badge-pill" style="background: rgba(0, 136, 204, 0.18); border: 1px solid rgba(0, 136, 204, 0.45); color: #38bdf8; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;">📥 Download</span>` : ''}
                     ${isMovieUnreleased(m) ? `<span class="meta-tag" style="background: rgba(255, 188, 0, 0.15); border: 1px solid rgba(255, 188, 0, 0.4); color: #ffbc00; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px;">🗓️ In Theatres ${m.release_date ? m.release_date.substring(0, 7) : 'Soon'}</span>` : ''}
                 </div>
             </div>
@@ -14385,6 +14580,10 @@ function createSearchOverlayCard(m) {
     });
     
     card.addEventListener("click", () => {
+        const overlayInput = document.getElementById("overlay-search-input");
+        if (overlayInput && overlayInput.value.trim().length >= 2 && typeof saveSearchQueryToHistory === "function") {
+            saveSearchQueryToHistory(overlayInput.value.trim());
+        }
         openDetailModal(m);
         const overlay = document.getElementById("premium-search-overlay");
         if (overlay) {

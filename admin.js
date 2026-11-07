@@ -6911,25 +6911,33 @@ function listenToActiveStreamers() {
         
         snapshot.forEach(doc => {
             const data = doc.data();
+            if (!data) return;
             let lastHeartbeatMs = 0;
-            if (data.lastHeartbeat && data.lastHeartbeat.toMillis) {
+            if (typeof data.lastHeartbeatMs === "number" && data.lastHeartbeatMs > 0) {
+                lastHeartbeatMs = data.lastHeartbeatMs;
+            } else if (data.lastHeartbeat && typeof data.lastHeartbeat.toMillis === "function") {
                 lastHeartbeatMs = data.lastHeartbeat.toMillis();
             } else if (data.lastHeartbeat instanceof Date) {
                 lastHeartbeatMs = data.lastHeartbeat.getTime();
             } else if (typeof data.lastHeartbeat === "number") {
                 lastHeartbeatMs = data.lastHeartbeat;
+            } else if (data.startedAt && typeof data.startedAt.toMillis === "function") {
+                lastHeartbeatMs = data.startedAt.toMillis();
+            } else if (typeof data.startedAtMs === "number") {
+                lastHeartbeatMs = data.startedAtMs;
             } else {
                 lastHeartbeatMs = now;
             }
 
-            // Kept active if heartbeat within last 90 seconds
-            if (now - lastHeartbeatMs < 90000) {
+            // Kept active if heartbeat within last 120 seconds (with tolerance for client/server clock difference)
+            const diff = now - lastHeartbeatMs;
+            if (diff < 120000 && diff > -120000) {
                 activeList.push({
                     id: doc.id,
                     ...data,
                     lastHeartbeatMs
                 });
-            } else {
+            } else if (diff >= 120000) {
                 // Clean up stale doc
                 doc.ref.delete().catch(() => {});
             }
