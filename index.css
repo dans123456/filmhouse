@@ -2023,6 +2023,17 @@ body.tg-back-visible #btn-close-cinema {
     transform: translateY(-1px);
 }
 
+.cinema-tool-btn.active {
+    background: linear-gradient(135deg, rgba(255, 188, 0, 0.22) 0%, rgba(245, 158, 11, 0.3) 100%);
+    border-color: #ffbc00;
+    color: #ffbc00;
+    box-shadow: 0 0 12px rgba(255, 188, 0, 0.4);
+}
+
+.cinema-tool-btn.active svg {
+    fill: #ffbc00;
+}
+
 .cinema-tool-btn:active {
     transform: scale(0.96);
 }

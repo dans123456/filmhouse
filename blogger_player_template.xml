@@ -1158,9 +1158,17 @@
           }
         }
         const subTracks = [];
+        let anyShowing = false;
+        let showingLabel = '';
+
         if (videoEl.textTracks) {
           for (let i = 0; i < videoEl.textTracks.length; i++) {
             const t = videoEl.textTracks[i];
+            const isShowing = (t.mode === 'showing');
+            if (isShowing) {
+              anyShowing = true;
+              showingLabel = t.label || t.language || 'ON';
+            }
             subTracks.push({
               index: i,
               label: t.label || t.language || `Track ${i + 1}`,
@@ -1189,7 +1197,9 @@
             window.parent.postMessage({
               action: 'videoTracksDetected',
               subtitles: subTracks,
-              audios: audioTracks
+              audios: audioTracks,
+              subtitlesActive: anyShowing,
+              activeSubtitleLabel: showingLabel
             }, '*');
           }
         } catch (e) {}
@@ -1217,18 +1227,61 @@
         } else if (ev.data.action === 'loadSubtitle' && ev.data.url) {
           attachSubtitleTrack(ev.data.url, ev.data.lang || 'Captions');
           detectAndBroadcastTracks();
+        } else if (ev.data.action === 'toggleSubtitles') {
+          const enable = !!ev.data.enable;
+          window._subtitlesExplicitlyActive = enable;
+          let activeLabel = '';
+          if (videoEl.textTracks && videoEl.textTracks.length > 0) {
+            for (let i = 0; i < videoEl.textTracks.length; i++) {
+              if (enable && i === 0) {
+                videoEl.textTracks[i].mode = 'showing';
+                activeLabel = videoEl.textTracks[i].label || videoEl.textTracks[i].language || 'ON';
+              } else {
+                videoEl.textTracks[i].mode = 'disabled';
+              }
+            }
+          }
+          const tracks = videoEl.querySelectorAll('track');
+          tracks.forEach((t, i) => {
+            t.mode = (enable && i === 0) ? 'showing' : 'disabled';
+          });
+          try {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({
+                action: 'subtitleStateChanged',
+                enabled: enable,
+                label: activeLabel || (enable ? 'On' : 'Off')
+              }, '*');
+            }
+          } catch (_) {}
         } else if (ev.data.action === 'selectSubtitleTrack') {
           const targetIndex = ev.data.index; // -1 to turn off
-          window._subtitlesExplicitlyActive = (targetIndex !== -1);
+          const isEnabled = (targetIndex !== -1);
+          window._subtitlesExplicitlyActive = isEnabled;
+          let activeLabel = '';
           if (videoEl.textTracks) {
             for (let i = 0; i < videoEl.textTracks.length; i++) {
-              videoEl.textTracks[i].mode = (i === targetIndex) ? 'showing' : 'disabled';
+              if (i === targetIndex) {
+                videoEl.textTracks[i].mode = 'showing';
+                activeLabel = videoEl.textTracks[i].label || videoEl.textTracks[i].language || 'ON';
+              } else {
+                videoEl.textTracks[i].mode = 'disabled';
+              }
             }
           }
           if (targetIndex === -1) {
             const tracks = videoEl.querySelectorAll('track');
             tracks.forEach(t => { t.mode = 'disabled'; });
           }
+          try {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({
+                action: 'subtitleStateChanged',
+                enabled: isEnabled,
+                label: activeLabel || (isEnabled ? 'On' : 'Off')
+              }, '*');
+            }
+          } catch (_) {}
         } else if (ev.data.action === 'selectAudioTrack') {
           const targetIndex = ev.data.index;
           if (videoEl.audioTracks) {
