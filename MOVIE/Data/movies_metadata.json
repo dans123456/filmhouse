@@ -28,9 +28,12 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADVQsAApzcgUf-O-TQbG3D1hYE",
-        "season": "Season 1"
+        "season": "Season 1",
+        "stream_url": ""
       }
-    ]
+    ],
+    "status": "Ongoing",
+    "is_ongoing": true
   },
   {
     "csv_id": "269161-bandi",
