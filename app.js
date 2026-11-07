@@ -9487,24 +9487,37 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
             if (!resolved) { resolved = true; resolve(); }
         };
 
-        // Safety timeout: auto-resolve after 60s so user is never stuck
+        const triggerMonetagFallback = () => {
+            status("Connecting via sponsor network…");
+            triggerMonetagSmartLink();
+            setTimeout(() => {
+                status("Connection secured ✓");
+                safeResolve();
+            }, 1200);
+        };
+
+        // Safety timeout: auto-resolve after 45s so user is never stuck
         setTimeout(() => {
             if (!resolved) {
-                console.warn("Adsgram ad flow timed out after 60s, bypassing.");
+                console.warn("Ad flow timed out after 45s, continuing.");
                 status("Timed out – continuing");
                 safeResolve();
             }
-        }, 60000);
+        }, 45000);
 
+        // On Desktop / Laptop web browsers or environments where Adsgram is unavailable:
         if (!isTelegramEnv || !window.Adsgram) {
-            status("Connecting…");
-            safeResolve();
+            triggerMonetagFallback();
             return;
         }
 
         // Initialize video controller if not already done
         if (!state.adsgramControllers[id]) {
-            state.adsgramControllers[id] = window.Adsgram.init({ blockId: id });
+            try {
+                state.adsgramControllers[id] = window.Adsgram.init({ blockId: id });
+            } catch (e) {
+                console.warn("[Adsgram] Init error:", e);
+            }
         }
 
         status("Loading ad…");
@@ -9514,12 +9527,11 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
                 status("Reward received ✓");
                 safeResolve();
             }).catch((err) => {
-                console.warn("Adsgram ad skipped or error:", err);
-                status("No ad available – continuing");
-                safeResolve();
+                console.warn("Adsgram ad skipped or unavailable, falling back to Monetag:", err);
+                triggerMonetagFallback();
             });
         } else {
-            safeResolve();
+            triggerMonetagFallback();
         }
     });
 }
