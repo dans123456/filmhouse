@@ -45,7 +45,16 @@ const TITLE_ALIASES = {
     "matchbox the": "matchbox",
     "the matchbox": "matchbox",
     "chassing lullaby": "chasing lullaby",
-    "chasing lullaby": "chassing lullaby"
+    "chasing lullaby": "chassing lullaby",
+    "wings": "the wings initiative",
+    "the wings": "the wings initiative",
+    "wings initiative": "the wings",
+    "the wings initiative": "the wings",
+    "wings innovative": "the wings",
+    "the wings innovative": "the wings",
+    "low priest": "the low priest",
+    "the low priest": "low priest",
+    "koleoso": "koleoso"
 };
 
 function romanToNum(roman) {
@@ -106,6 +115,19 @@ function titlesMatch(titleA, titleB) {
     const normB = normalizeTitleForComparison(titleB);
     if (!normA || !normB) return false;
     if (normA === normB) return true;
+
+    // Wings / The Wings Initiative / Wings Innovative alias
+    if ((normA.startsWith('wings') || normA.includes('wing')) && (normB.startsWith('wings') || normB.includes('wing'))) {
+        return true;
+    }
+    // Low Priest alias
+    if (normA.startsWith('low priest') && normB.startsWith('low priest')) {
+        return true;
+    }
+    // Koleoso alias
+    if (normA.startsWith('koleoso') && normB.startsWith('koleoso')) {
+        return true;
+    }
 
     // Check alias mapping
     const aliasA = TITLE_ALIASES[normA];
@@ -211,6 +233,23 @@ if (process.env.FIREBASE_CONFIG) {
 }
 
 const db = admin.firestore();
+
+// Active GitHub token cache and disk persistence
+const GITHUB_TOKEN_FILE = path.join(__dirname, ".github_token");
+let ACTIVE_GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
+try {
+    if (!ACTIVE_GITHUB_TOKEN && fs.existsSync(GITHUB_TOKEN_FILE)) {
+        ACTIVE_GITHUB_TOKEN = fs.readFileSync(GITHUB_TOKEN_FILE, "utf8").trim();
+    }
+} catch (_) {}
+if (!ACTIVE_GITHUB_TOKEN && db) {
+    db.collection("settings").doc("github").get().then(doc => {
+        if (doc && doc.exists && doc.data()?.token) {
+            ACTIVE_GITHUB_TOKEN = doc.data().token.trim();
+            console.log("[GitHubSync] Pre-loaded GitHub token from Firestore settings/github.");
+        }
+    }).catch(() => {});
+}
 
 // Auto-synchronize live Cloudflare tunnel URL to Firestore system/streaming_config
 let lastSyncedTunnelUrl = null;
@@ -1721,6 +1760,22 @@ function setupBot(bot, adminBot) {
             seasonOrPart = 'Complete Series';
         }
 
+        // Bare numeric episodic detection for Koleoso.1.mp4 ... Koleoso.10.mp4
+        if (!isSeries) {
+            const bareMatch = s.match(/^(.*?)(?:[\s\.\-_]+(?:ep|episode|part|pt)?[\s\.\-_]*)(\d{1,3})$/i);
+            if (bareMatch) {
+                const potTitle = bareMatch[1].replace(/[()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
+                const potNum = parseInt(bareMatch[2], 10);
+                if (potTitle && (/(koleoso|yoruba|yorubahood)/i.test(potTitle) || potNum > 0)) {
+                    isSeries = true;
+                    seasonNum = 1;
+                    episodeNum = potNum;
+                    seasonOrPart = 'S01E' + String(episodeNum).padStart(2, '0');
+                    s = potTitle;
+                }
+            }
+        }
+
         const partMatch = s.match(/\b(part\s*\d+|pt\s*\d+|cd\s*\d+)\b/i);
         if (partMatch && !seasonOrPart) {
             seasonOrPart = partMatch[1].replace(/pt\s*/i, 'Part ').replace(/cd\s*/i, 'Part ').replace(/part\s*/i, 'Part ');
@@ -1755,6 +1810,17 @@ function setupBot(bot, adminBot) {
         }
         if (titlePart.toLowerCase() === 'matchbox the') {
             titlePart = 'Matchbox';
+        }
+        const lowerNorm = titlePart.toLowerCase().replace(/['’`]/g, '').replace(/&/g, 'and').trim();
+        if (lowerNorm.startsWith('wings') || (lowerNorm.includes('wing') && (lowerNorm.includes('innovat') || lowerNorm.includes('initiat')))) {
+            titlePart = 'The Wings Initiative';
+            isSeries = true;
+        } else if (lowerNorm.startsWith('low priest') || lowerNorm.startsWith('the low priest')) {
+            titlePart = 'The Low Priest';
+            isSeries = true;
+        } else if (lowerNorm.startsWith('koleoso')) {
+            titlePart = 'Koleoso';
+            isSeries = true;
         }
 
         return {
