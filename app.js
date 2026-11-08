@@ -4860,7 +4860,7 @@ function renderMediaDownloadRows(movie, container) {
             if (sMatch) sNum = parseInt(sMatch[0], 10);
 
             const seasonKey = `Season ${sNum}`;
-            const estimatedSize = (isObj && link.size) ? link.size : "~3.2 GB";
+            const estimatedSize = (isObj && link.size) ? link.size : "Full Season Pack";
 
             // If season already exists, prioritize official Telegram download bot links (t.me) over stream URLs
             if (seasonMap.has(seasonKey)) {
@@ -7118,6 +7118,15 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     const detailsContainer = document.getElementById("cinema-details-container");
     if (!modal || !container || !movie) return;
 
+    const baseTitle = movie.title || "Film House Cinema";
+    const initialTitle = customTitle || baseTitle;
+    const isTVShow = (movie.type || "").toLowerCase() === "series" || 
+                     (movie.type || "").toLowerCase() === "tv" || 
+                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+
+    let currentSeason = isTVShow ? { seasonNumber: 1, name: "Season 1" } : null;
+    let currentEpisodeNum = 1;
+
     // Track active cinema movie for seamless return to movie detail page
     state.lastCinemaMovie = movie;
 
@@ -7850,12 +7859,6 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         });
     }
 
-    const baseTitle = movie.title || "Film House Cinema";
-    const initialTitle = customTitle || baseTitle;
-    const isTVShow = (movie.type || "").toLowerCase() === "series" || 
-                     (movie.type || "").toLowerCase() === "tv" || 
-                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
-
     // Helper to switch or reload the cinema stream iframe
     function setCinemaStream(targetUrl, currentTitle) {
         if (!container) return;
@@ -8262,12 +8265,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
             detectedSeasons.sort((a, b) => a.seasonNumber - b.seasonNumber);
 
-            let currentSeason = detectedSeasons[0];
+            currentSeason = detectedSeasons[0];
             if (customStreamUrl) {
                 const matchCustom = detectedSeasons.find(s => s.streamUrl === customStreamUrl);
                 if (matchCustom) currentSeason = matchCustom;
             }
-            let currentEpisodeNum = 1;
+            currentEpisodeNum = 1;
 
             // Header: Title + Episode Count Badge + Carousel Nav Arrows for PC
             const seriesHeader = document.createElement("div");
