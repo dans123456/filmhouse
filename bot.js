@@ -523,6 +523,33 @@ async function syncCatalogFromGitHub() {
             
             const dir = path.dirname(localMetaPath);
             if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+            // Preserve locally indexed stream links so GitHub sync never clobbers newly matched streams
+            if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                const streamMap = new Map();
+                cachedMoviesMetadata.forEach(m => {
+                    const id = String(m.csv_id || m.id || "").toLowerCase().trim();
+                    if (id && (m.stream_url || (Array.isArray(m.stream_links) && m.stream_links.length > 0))) {
+                        streamMap.set(id, {
+                            stream_url: m.stream_url,
+                            stream_links: m.stream_links
+                        });
+                    }
+                });
+                if (streamMap.size > 0) {
+                    data.forEach(m => {
+                        const id = String(m.csv_id || m.id || "").toLowerCase().trim();
+                        const existing = streamMap.get(id);
+                        if (existing) {
+                            if (!m.stream_url && existing.stream_url) m.stream_url = existing.stream_url;
+                            if ((!m.stream_links || m.stream_links.length === 0) && existing.stream_links) {
+                                m.stream_links = existing.stream_links;
+                            }
+                        }
+                    });
+                }
+            }
+
             fs.writeFileSync(localMetaPath, JSON.stringify(data, null, 2), "utf8");
             cachedMoviesMetadata = data;
             console.log(`[GitHubSync] Successfully synchronized ${data.length} movies from GitHub main to Ubuntu disk! (Previous in-memory: ${currentCount})`);
@@ -2578,8 +2605,10 @@ function setupBot(bot, adminBot) {
                 `• 🛡 <b>Public Bot:</b> Online & Polling\n` +
                 `• 👑 <b>Admin Bot:</b> Active & Listening\n\n` +
                 `🛠 <b>Available Commands:</b>\n` +
-                `• /scanlibrary — Lightning scan & link streaming files\n` +
+                `• /scanquick — Ultra-fast 2s scan of newest uploads\n` +
+                `• /scanlibrary — Full scan & link streaming files\n` +
                 `• /autoingest — Auto-create cards from TMDB & link streams\n` +
+                `• /publishcatalog — Push latest stream links to GitHub main\n` +
                 `• /update — Pull latest GitHub code & reload bot\n` +
                 `• /help — Admin tutorials & duty workflows\n` +
                 `• /post [Title] — Publish title announcement to Updates Channel\n` +
@@ -2595,8 +2624,12 @@ function setupBot(bot, adminBot) {
                     { text: "👑 Open Admin Panel 🚀", web_app: { url: adminUrl } }
                 ],
                 [
-                    { text: "📡 Scan Library", callback_data: "admin_trigger_scan" },
-                    { text: "✨ Auto-Ingest TMDB", callback_data: "admin_trigger_autoingest" }
+                    { text: "⚡ Quick Scan (2s)", callback_data: "admin_trigger_scanquick" },
+                    { text: "📡 Full Scan", callback_data: "admin_trigger_scan" }
+                ],
+                [
+                    { text: "✨ Auto-Ingest TMDB", callback_data: "admin_trigger_autoingest" },
+                    { text: "🚀 Push to GitHub", callback_data: "admin_trigger_pushgithub" }
                 ],
                 [
                     { text: "📋 Pending Requests", callback_data: "admin_pending" },
@@ -2929,19 +2962,23 @@ function setupBot(bot, adminBot) {
                 `📡 <b>Library Scanner & Auto-Ingest Guide</b>\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
                 `The scanner connects directly to your Stream Engine ledger and automatically assigns stream links to your catalogue cards.\n\n` +
-                `⚡ <b>1. Lightning-Fast Skip (Default):</b>\n` +
+                `⚡ <b>1. Ultra-Fast Quick Scan (Recommended for New Uploads):</b>\n` +
+                `• Type <code>/scanquick</code>\n` +
+                `• Scans your latest uploads in ~2 seconds, assigns streaming links, and pushes directly to GitHub & Web App!\n\n` +
+                `📡 <b>2. Full Library Scan:</b>\n` +
                 `• Type <code>/scanlibrary</code>\n` +
-                `• The bot checks every file. Any file that is <b>already linked</b> is skipped in <b>0.001 ms</b>!\n` +
-                `• A full library scan of 1,700+ files completes in just <b>5–15 seconds</b>!\n\n` +
-                `✨ <b>2. Auto-Ingest from TMDB (Option B):</b>\n` +
-                `• Type <code>/autoingest</code> or <code>/scanlibrary auto</code>\n` +
-                `• Any unmatched title is automatically queried on TMDB, generating poster, backdrop, overview, rating, release date, and proper categories (African/Hollywood) on the fly, saving to Firestore, and attaching the stream link 100% automatically!\n\n` +
-                `🔄 <b>3. Forced Full Re-Scan:</b>\n` +
-                `• Type <code>/scanlibrary force</code>\n` +
-                `• Forces a complete re-check and re-assignment of all files from scratch.\n\n` +
-                `❌ <b>4. Instant Cancel:</b>\n` +
+                `• The bot checks every file. Any file that is <b>already linked</b> is skipped in <b>0.001 ms</b>!\n\n` +
+                `✨ <b>3. Auto-Ingest from TMDB:</b>\n` +
+                `• Type <code>/autoingest</code>\n` +
+                `• Any unmatched title is automatically queried on TMDB, generating posters, backdrops, and cards, and attaching streams 100% automatically!\n\n` +
+                `🚀 <b>4. Manual Push to GitHub:</b>\n` +
+                `• Type <code>/publishcatalog</code>\n` +
+                `• Instantly pushes all in-memory and Firestore streaming links to GitHub main so GitHub Pages is 100% up to date.\n\n` +
+                `🔄 <b>5. Forced Full Re-Scan:</b>\n` +
+                `• Type <code>/scanlibrary force</code>\n\n` +
+                `❌ <b>6. Instant Cancel:</b>\n` +
                 `• Tap the red <b>[ ❌ Cancel Scan ]</b> button on the live progress message at any point to stop immediately.\n\n` +
-                `📥 <b>5. Unmatched Report & 1-Click Ingest:</b>\n` +
+                `📥 <b>7. Unmatched Report & 1-Click Ingest:</b>\n` +
                 `• When scan completes, tap <b>[ ✨ Auto-Ingest Unmatched ]</b> or download the complete .txt file.`;
 
             const keyboard = [
@@ -3256,6 +3293,103 @@ function setupBot(bot, adminBot) {
                 { parse_mode: 'HTML' }
             ).catch(() => {});
         });
+
+        // Auto-publish movies_metadata.json to GitHub repository via GitHub REST API
+        async function publishMetadataToGitHub(reason = "Auto-sync stream links from Library Scan [skip ci]") {
+            if (!cachedMoviesMetadata || !Array.isArray(cachedMoviesMetadata) || cachedMoviesMetadata.length === 0) {
+                console.warn("[GitHubPublish] No cached metadata to publish.");
+                return { success: false, error: "Empty metadata" };
+            }
+
+            try {
+                let token = process.env.GITHUB_TOKEN;
+                if (!token && db) {
+                    try {
+                        const doc = await db.collection("settings").doc("github").get();
+                        if (doc.exists && doc.data()?.token) {
+                            token = doc.data().token;
+                        }
+                    } catch (err) {
+                        console.warn("[GitHubPublish] Could not read token from Firestore:", err.message);
+                    }
+                }
+
+                if (!token) {
+                    console.warn("[GitHubPublish] No GitHub Personal Access Token found. Skipping auto-publish to GitHub.");
+                    return { success: false, error: "No GitHub token configured" };
+                }
+
+                const owner = "dans123456";
+                const repo = "filmhouse";
+                const filePath = "MOVIE/Data/movies_metadata.json";
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+
+                const fetchModule = await import('node-fetch').catch(() => null);
+                const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
+                if (!fetchFn) {
+                    return { success: false, error: "Fetch API not available" };
+                }
+
+                // 1. Fetch current file SHA
+                const getRes = await fetchFn(`${apiUrl}?t=${Date.now()}`, {
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Accept": "application/vnd.github.v3+json",
+                        "User-Agent": "FilmHouse-Bot"
+                    }
+                });
+
+                if (!getRes.ok) {
+                    const errBody = await getRes.text().catch(() => "");
+                    console.warn(`[GitHubPublish] Failed to fetch current SHA (${getRes.status}):`, errBody);
+                    return { success: false, error: `SHA fetch failed HTTP ${getRes.status}` };
+                }
+
+                const fileData = await getRes.json();
+                const currentSha = fileData.sha;
+
+                // 2. Prepare clean JSON payload
+                const cleanPayload = cachedMoviesMetadata.map(m => {
+                    const copy = { ...m };
+                    delete copy._docId;
+                    delete copy._ref;
+                    return copy;
+                });
+
+                const jsonString = JSON.stringify(cleanPayload, null, 2);
+                const base64Content = Buffer.from(jsonString, 'utf-8').toString('base64');
+
+                // 3. PUT update to GitHub
+                const putRes = await fetchFn(apiUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${token}`,
+                        "Accept": "application/vnd.github.v3+json",
+                        "Content-Type": "application/json",
+                        "User-Agent": "FilmHouse-Bot"
+                    },
+                    body: JSON.stringify({
+                        message: reason,
+                        content: base64Content,
+                        sha: currentSha,
+                        branch: "main"
+                    })
+                });
+
+                if (!putRes.ok) {
+                    const putErr = await putRes.text().catch(() => "");
+                    console.warn(`[GitHubPublish] Commit failed (${putRes.status}):`, putErr);
+                    return { success: false, error: `Commit failed HTTP ${putRes.status}` };
+                }
+
+                const putResult = await putRes.json();
+                console.log(`[GitHubPublish] Successfully published updated metadata to GitHub main! (Commit: ${putResult.commit?.sha?.substring(0, 7) || 'ok'})`);
+                return { success: true, commitSha: putResult.commit?.sha };
+            } catch (err) {
+                console.error("[GitHubPublish] Unexpected error:", err.message);
+                return { success: false, error: err.message };
+            }
+        }
 
         // ─────────────────────────────────────────────────────────────────────────
         // /scanlibrary — Auto-scan Streamer Engine database & assign stream links
@@ -3758,6 +3892,23 @@ function setupBot(bot, adminBot) {
                 console.warn('[ScanLibrary] Could not flush to disk:', diskErr.message);
             }
 
+            let githubPublished = false;
+            // Auto-publish to GitHub if new stream links were matched or auto-ingested!
+            if (newlyMatched > 0 || autoIngested > 0) {
+                try {
+                    console.log(`[ScanLibrary] Auto-publishing to GitHub (${newlyMatched} new stream links, ${autoIngested} auto-ingested)...`);
+                    const pubRes = await publishMetadataToGitHub(`Auto-sync ${newlyMatched} stream links from Library Scan [skip ci]`);
+                    if (pubRes && pubRes.success) {
+                        githubPublished = true;
+                        console.log('[ScanLibrary] GitHub auto-publish succeeded!');
+                    } else {
+                        console.warn('[ScanLibrary] GitHub auto-publish notice:', pubRes?.error);
+                    }
+                } catch (pubErr) {
+                    console.warn('[ScanLibrary] Auto-publish error:', pubErr.message);
+                }
+            }
+
             return {
                 totalScanned,
                 matched,
@@ -3767,7 +3918,8 @@ function setupBot(bot, adminBot) {
                 unmatched,
                 skipped,
                 wasCancelled,
-                unmatchedFiles
+                unmatchedFiles,
+                githubPublished
             };
         }
 
@@ -3793,7 +3945,8 @@ function setupBot(bot, adminBot) {
                 `✅ Newly Matched & Saved: <b>${session.newlyMatched || 0}</b>\n` +
                 (session.autoIngested ? `✨ Auto-Ingested from TMDB: <b>${session.autoIngested}</b>\n` : '') +
                 `⚠️ Unmatched: <b>${session.unmatched}</b>\n` +
-                `⏭️ Skipped (Empty): <b>${session.skipped}</b>\n\n` +
+                `⏭️ Skipped (Empty): <b>${session.skipped}</b>\n` +
+                (session.githubPublished ? `🚀 <b>GitHub & Web App Synced:</b> ✅ Main Updated\n\n` : `\n`) +
                 (total > 0
                     ? `📋 <b>Unmatched Files (Page ${currentPage + 1} of ${totalPages} • Items ${startIdx + 1}–${Math.min(startIdx + pageSize, total)}):</b>\n${previewLines}\n\n<i>Tap '✨ Auto-Ingest Unmatched' below to create missing cards from TMDB, or download the full list:</i>`
                     : `🎉 <b>All files matched and streaming links assigned successfully!</b>\n\n🍿 <i>Stream links are now live in FilmHouse cinema!</i>`);
@@ -3905,21 +4058,61 @@ function setupBot(bot, adminBot) {
             }).catch(() => {});
         });
 
+        adminBot.action("admin_trigger_scanquick", async (ctx) => {
+            await ctx.answerCbQuery("Starting Quick Scan...").catch(() => {});
+            return executeLibraryScanWorkflow(ctx, false, false, true);
+        });
+
         adminBot.action("admin_trigger_scan", async (ctx) => {
             await ctx.answerCbQuery("Starting Library Scan...").catch(() => {});
-            return executeLibraryScanWorkflow(ctx, false, false);
+            return executeLibraryScanWorkflow(ctx, false, false, false);
         });
 
         adminBot.action("admin_trigger_autoingest", async (ctx) => {
             await ctx.answerCbQuery("Starting Auto-Ingest...").catch(() => {});
-            return executeLibraryScanWorkflow(ctx, false, true);
+            return executeLibraryScanWorkflow(ctx, false, true, false);
+        });
+
+        adminBot.action("admin_trigger_pushgithub", async (ctx) => {
+            await ctx.answerCbQuery("Publishing catalog to GitHub...").catch(() => {});
+            const waitMsg = await ctx.reply("⏳ <b>Publishing latest catalog and stream links to GitHub main...</b>", { parse_mode: 'HTML' });
+            try {
+                const pubRes = await publishMetadataToGitHub("Manual push catalog and stream links from Admin Bot");
+                if (pubRes && pubRes.success) {
+                    await ctx.telegram.editMessageText(
+                        ctx.chat.id,
+                        waitMsg.message_id,
+                        undefined,
+                        `✅ <b>Successfully Published to GitHub!</b>\n\n` +
+                        `Commit: <code>${escapeHtml(pubRes.commitSha || 'success')}</code>\n` +
+                        `🍿 <i>GitHub Pages and Web App are now updating with all stream links.</i>`,
+                        { parse_mode: 'HTML' }
+                    ).catch(() => {});
+                } else {
+                    await ctx.telegram.editMessageText(
+                        ctx.chat.id,
+                        waitMsg.message_id,
+                        undefined,
+                        `⚠️ <b>GitHub Publish Notice:</b> ${escapeHtml(pubRes?.error || 'Unknown status')}`,
+                        { parse_mode: 'HTML' }
+                    ).catch(() => {});
+                }
+            } catch (err) {
+                await ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    waitMsg.message_id,
+                    undefined,
+                    `❌ <b>Error:</b> ${escapeHtml(err.message)}`,
+                    { parse_mode: 'HTML' }
+                ).catch(() => {});
+            }
         });
 
         adminBot.action("scan_noop", async (ctx) => {
             await ctx.answerCbQuery().catch(() => {});
         });
 
-        async function executeLibraryScanWorkflow(ctx, isForce = false, isAutoIngest = false) {
+        async function executeLibraryScanWorkflow(ctx, isForce = false, isAutoIngest = false, isQuick = false) {
             const senderId = String(ctx.from?.id || '');
             const isAuthorized = await isAdmin(senderId).catch(() => false);
             if (!isAuthorized) {
@@ -3963,6 +4156,19 @@ function setupBot(bot, adminBot) {
                     ).catch(() => {});
                 }
 
+                // Order items newest first so recently uploaded media matches immediately!
+                const sortedItems = [...items].sort((a, b) => {
+                    const timeA = new Date(a.created_at || a.timestamp || 0).getTime() || (a.message_id ? Number(a.message_id) : 0);
+                    const timeB = new Date(b.created_at || b.timestamp || 0).getTime() || (b.message_id ? Number(b.message_id) : 0);
+                    if (timeA && timeB) return timeB - timeA;
+                    return 0;
+                });
+                if (sortedItems.length > 1 && (!sortedItems[0].created_at && !sortedItems[0].message_id)) {
+                    sortedItems.reverse();
+                }
+
+                const finalItems = isQuick ? sortedItems.slice(0, 50) : sortedItems;
+
                 const sessionId = (isAutoIngest ? "ingest_" : "scan_") + Date.now().toString(36);
                 const cancelMarkup = {
                     inline_keyboard: [
@@ -3970,15 +4176,18 @@ function setupBot(bot, adminBot) {
                     ]
                 };
 
+                const modeLabel = isQuick ? "⚡ <b>Quick Scan (Latest 50 Uploads)</b>" : "📡 <b>Full Library Scan</b>";
                 await ctx.telegram.editMessageText(
                     ctx.chat.id,
                     progressMsg.message_id,
                     undefined,
-                    `📡 <b>Found ${items.length} files from ${escapeHtml(source)}!</b>\n\n🔍 <i>${isAutoIngest ? 'Auto-ingesting missing cards & matching streams...' : 'Matching catalogue entries in real-time...'}</i>`,
+                    `${modeLabel}\n` +
+                    `Found <b>${items.length}</b> total files from ${escapeHtml(source)} (processing <b>${finalItems.length}</b>).\n\n` +
+                    `🔍 <i>${isAutoIngest ? 'Auto-ingesting missing cards & matching streams...' : 'Matching catalogue entries in real-time...'}</i>`,
                     { parse_mode: 'HTML', reply_markup: cancelMarkup }
                 ).catch(() => {});
 
-                const result = await processBatchMediaItems(items, ctx, progressMsg, baseServer, sessionId, isForce, isAutoIngest);
+                const result = await processBatchMediaItems(finalItems, ctx, progressMsg, baseServer, sessionId, isForce, isAutoIngest);
                 scanUnmatchedSessions.set(sessionId, result);
                 setTimeout(() => scanUnmatchedSessions.delete(sessionId), 60 * 60 * 1000); // 1 hour memory
 
@@ -3999,15 +4208,61 @@ function setupBot(bot, adminBot) {
             }
         }
 
+        adminBot.command(['scanquick', 'fastscan', 'quickscan'], async (ctx) => {
+            const cmdText = String(ctx.message?.text || '').toLowerCase();
+            const isForce = cmdText.includes('force');
+            const isAutoIngest = cmdText.includes('auto') || cmdText.includes('ingest');
+            return executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, true);
+        });
+
         adminBot.command('scanlibrary', async (ctx) => {
             const cmdText = String(ctx.message?.text || '').toLowerCase();
             const isForce = cmdText.includes('force') || cmdText.includes('all');
             const isAutoIngest = cmdText.includes('auto') || cmdText.includes('ingest');
-            return executeLibraryScanWorkflow(ctx, isForce, isAutoIngest);
+            const isQuick = cmdText.includes('quick') || cmdText.includes('fast');
+            return executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, isQuick);
         });
 
         adminBot.command(['autoingest', 'ingestlibrary', 'autocatalog'], async (ctx) => {
-            return executeLibraryScanWorkflow(ctx, false, true);
+            return executeLibraryScanWorkflow(ctx, false, true, false);
+        });
+
+        adminBot.command(['publishcatalog', 'pushcatalog', 'syncgithub'], async (ctx) => {
+            const senderId = String(ctx.from?.id || '');
+            const isAuthorized = await isAdmin(senderId).catch(() => false);
+            if (!isAuthorized) return;
+
+            const waitMsg = await ctx.reply("⏳ <b>Publishing latest catalog and stream links to GitHub main...</b>", { parse_mode: 'HTML' });
+            try {
+                const pubRes = await publishMetadataToGitHub("Manual push catalog and stream links from Admin Bot");
+                if (pubRes && pubRes.success) {
+                    await ctx.telegram.editMessageText(
+                        ctx.chat.id,
+                        waitMsg.message_id,
+                        undefined,
+                        `✅ <b>Successfully Published to GitHub!</b>\n\n` +
+                        `Commit: <code>${escapeHtml(pubRes.commitSha || 'success')}</code>\n` +
+                        `🍿 <i>GitHub Pages and Web App are now updating with all stream links.</i>`,
+                        { parse_mode: 'HTML' }
+                    ).catch(() => {});
+                } else {
+                    await ctx.telegram.editMessageText(
+                        ctx.chat.id,
+                        waitMsg.message_id,
+                        undefined,
+                        `⚠️ <b>GitHub Publish Notice:</b> ${escapeHtml(pubRes?.error || 'Unknown status')}`,
+                        { parse_mode: 'HTML' }
+                    ).catch(() => {});
+                }
+            } catch (err) {
+                await ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    waitMsg.message_id,
+                    undefined,
+                    `❌ <b>Error:</b> ${escapeHtml(err.message)}`,
+                    { parse_mode: 'HTML' }
+                ).catch(() => {});
+            }
         });
 
         // Command: /importlinks <paste or forward>
@@ -4114,12 +4369,12 @@ function setupBot(bot, adminBot) {
         });
 
         // Also register on main bot for convenience (admin-only guarded inside)
-        bot.command(['scanlibrary', 'autoingest', 'ingestlibrary'], async (ctx) => {
+        bot.command(['scanquick', 'fastscan', 'quickscan', 'scanlibrary', 'autoingest', 'ingestlibrary', 'publishcatalog'], async (ctx) => {
             const senderId = String(ctx.from?.id || '');
             const isAuthorized = await isAdmin(senderId).catch(() => false);
             if (!isAuthorized) return;
             return ctx.reply(
-                '📡 <b>Library Scanner & Auto-Ingest</b> are best run from your Admin Bot.\n\nPlease send <code>/scanlibrary</code> or <code>/autoingest</code> to <b>@FilmHouseAdminBot</b> (your admin bot DM) to begin.',
+                '📡 <b>Library Scanner, Quick Scan & Auto-Ingest</b> are best run from your Admin Bot.\n\nPlease send <code>/scanquick</code> or <code>/scanlibrary</code> to <b>@FilmHouseAdminBot</b> (your admin bot DM) to begin.',
                 { parse_mode: 'HTML' }
             );
         });

@@ -4639,30 +4639,24 @@ function openMediaDetailPage(movie) {
             }
         }
 
-        // Real-time Firestore fallback: If stream link was just added in Admin without re-publishing, pick it up live
-        if (!streamTarget && typeof db !== "undefined" && db && (movie.csv_id || movie.id)) {
+        // Real-time Firestore Sync: Pick up freshest stream links and episodes live (zero delay)
+        if (typeof db !== "undefined" && db && (movie.csv_id || movie.id)) {
             try {
-                const docKey = movie.csv_id || movie.id;
+                const docKey = String(movie.csv_id || movie.id);
                 const snap = await db.collection("movies").doc(docKey).get();
                 if (snap.exists) {
-                    const data = snap.data();
-                    if (data.stream_url) {
-                        movie.stream_url = data.stream_url;
-                        streamTarget = data.stream_url;
-                    }
-                    if (data.stream_links && Array.isArray(data.stream_links)) {
+                    const data = snap.data() || {};
+                    if (data.stream_links && Array.isArray(data.stream_links) && data.stream_links.length > 0) {
                         movie.stream_links = data.stream_links;
-                        if (!streamTarget) {
-                            const sl = data.stream_links.find(s => s && (s.stream_url || s.url));
-                            if (sl) streamTarget = sl.stream_url || sl.url;
-                        }
+                        const validStream = data.stream_links.find(s => s && (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me"));
+                        if (validStream) streamTarget = validStream.stream_url || validStream.url;
                     }
-                    if (data.links && Array.isArray(data.links)) {
+                    if (data.stream_url && !String(data.stream_url).includes("t.me")) {
+                        movie.stream_url = data.stream_url;
+                        if (!streamTarget) streamTarget = data.stream_url;
+                    }
+                    if (data.links && Array.isArray(data.links) && data.links.length > 0) {
                         movie.links = data.links;
-                        if (!streamTarget) {
-                            const sl = data.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
-                            if (sl) streamTarget = sl.stream_url || sl.url;
-                        }
                     }
                 }
             } catch (fsErr) {
@@ -8562,6 +8556,39 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         }
 
                         if (!epTarget) {
+                            // Check live Firestore document for freshly scanned episode streams before giving up
+                            if (typeof db !== "undefined" && db && (movie.csv_id || movie.id)) {
+                                const docKey = String(movie.csv_id || movie.id);
+                                db.collection("movies").doc(docKey).get().then(snap => {
+                                    if (snap.exists) {
+                                        const d = snap.data() || {};
+                                        if (Array.isArray(d.stream_links) && d.stream_links.length > 0) {
+                                            movie.stream_links = d.stream_links;
+                                            const liveFound = d.stream_links.find(s => 
+                                                (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) && 
+                                                (s.season == seasonObj.seasonNumber || !s.season)
+                                            );
+                                            if (liveFound) {
+                                                const cand = liveFound.stream_url || liveFound.url;
+                                                if (cand && !cand.includes("t.me")) {
+                                                    const epDisplayTitle = `${baseTitle} • S${seasonObj.seasonNumber}:E${epNum}`;
+                                                    setCinemaStream(cand, epDisplayTitle);
+                                                    showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
+                                                    if (typeof triggerHaptic === "function") triggerHaptic("selection");
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    showToast(`⚠️ Episode ${epNum} stream coming soon! Download is available in the Download tab.`, "info", 5000);
+                                    if (typeof triggerHaptic === "function") triggerHaptic("warning");
+                                }).catch(() => {
+                                    showToast(`⚠️ Episode ${epNum} stream coming soon! Download is available in the Download tab.`, "info", 5000);
+                                    if (typeof triggerHaptic === "function") triggerHaptic("warning");
+                                });
+                                return;
+                            }
+
                             showToast(`⚠️ Episode ${epNum} stream coming soon! Download is available in the Download tab.`, "info", 5000);
                             if (typeof triggerHaptic === "function") triggerHaptic("warning");
                             return;
