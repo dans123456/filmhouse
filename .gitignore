@@ -4,6 +4,7 @@ package-lock.json
 
 # Private configuration files & keys
 firebase-key.json
+.github_token
 .env
 *.pem
 *.key

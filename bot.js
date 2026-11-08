@@ -3378,19 +3378,26 @@ function setupBot(bot, adminBot) {
         }
 
         // Auto-publish movies_metadata.json to GitHub repository via GitHub REST API
-        async function publishMetadataToGitHub(reason = "Auto-sync stream links from Library Scan [skip ci]") {
+        async function publishMetadataToGitHub(reason = "Auto-sync stream links from Library Scan [skip ci]", explicitToken = null) {
             if (!cachedMoviesMetadata || !Array.isArray(cachedMoviesMetadata) || cachedMoviesMetadata.length === 0) {
                 console.warn("[GitHubPublish] No cached metadata to publish.");
                 return { success: false, error: "Empty metadata" };
             }
 
             try {
-                let token = process.env.GITHUB_TOKEN;
+                let token = explicitToken || ACTIVE_GITHUB_TOKEN || process.env.GITHUB_TOKEN;
+                if (!token && fs.existsSync(GITHUB_TOKEN_FILE)) {
+                    try {
+                        token = fs.readFileSync(GITHUB_TOKEN_FILE, "utf8").trim();
+                        if (token) ACTIVE_GITHUB_TOKEN = token;
+                    } catch (_) {}
+                }
                 if (!token && db) {
                     try {
                         const doc = await db.collection("settings").doc("github").get();
-                        if (doc.exists && doc.data()?.token) {
-                            token = doc.data().token;
+                        if (doc && doc.exists && doc.data()?.token) {
+                            token = doc.data().token.trim();
+                            if (token) ACTIVE_GITHUB_TOKEN = token;
                         }
                     } catch (err) {
                         console.warn("[GitHubPublish] Could not read token from Firestore:", err.message);
@@ -3404,6 +3411,7 @@ function setupBot(bot, adminBot) {
                         const tokenMatch = remoteUrl.match(/https:\/\/([^:@]+)@github\.com/i) || remoteUrl.match(/https:\/\/([^:]+):([^@]+)@github\.com/i);
                         if (tokenMatch) {
                             token = tokenMatch[2] || tokenMatch[1];
+                            if (token) ACTIVE_GITHUB_TOKEN = token;
                         }
                     } catch (_) {}
                 }
@@ -4423,6 +4431,12 @@ function setupBot(bot, adminBot) {
                     }
                 }
 
+                ACTIVE_GITHUB_TOKEN = token;
+                process.env.GITHUB_TOKEN = token;
+                try {
+                    fs.writeFileSync(GITHUB_TOKEN_FILE, token, "utf8");
+                } catch (_) {}
+
                 // Save to Firestore settings/github
                 if (db) {
                     await db.collection('settings').doc('github').set({
@@ -4443,10 +4457,12 @@ function setupBot(bot, adminBot) {
                     { parse_mode: 'HTML' }
                 );
 
-                // Immediately trigger publish
-                const pubRes = await publishMetadataToGitHub("Initial sync after connecting GitHub token");
+                // Immediately trigger publish using the verified token
+                const pubRes = await publishMetadataToGitHub("Initial sync after connecting GitHub token", token);
                 if (pubRes && pubRes.success) {
                     await ctx.reply(`✅ <b>Catalog Published to GitHub!</b> (Commit: <code>${escapeHtml(pubRes.commitSha || 'success')}</code>)`, { parse_mode: 'HTML' });
+                } else {
+                    await ctx.reply(`⚠️ <b>Initial Publish Notice:</b> ${escapeHtml(pubRes?.error || 'Unknown status')}`, { parse_mode: 'HTML' });
                 }
             } catch (err) {
                 return ctx.telegram.editMessageText(
