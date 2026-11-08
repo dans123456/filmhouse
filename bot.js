@@ -3294,6 +3294,23 @@ function setupBot(bot, adminBot) {
             ).catch(() => {});
         });
 
+        async function tryLocalGitPush(reason = "Auto-update movies_metadata.json from bot") {
+            return new Promise((resolve) => {
+                const { exec } = require('child_process');
+                const projectDir = path.resolve(__dirname);
+                const safeReason = String(reason).replace(/"/g, '\\"');
+                const cmd = `git add MOVIE/Data/movies_metadata.json && git commit -m "${safeReason}" && git push origin main`;
+                exec(cmd, { cwd: projectDir, timeout: 25000 }, (err, stdout, stderr) => {
+                    if (err) {
+                        console.warn("[GitHubPublish] Local git push fallback failed:", (stderr || err.message).trim());
+                        return resolve({ success: false, error: (stderr || err.message).trim() });
+                    }
+                    console.log("[GitHubPublish] Local git push fallback succeeded:", (stdout || '').trim());
+                    resolve({ success: true, commitSha: (stdout || '').trim() });
+                });
+            });
+        }
+
         // Auto-publish movies_metadata.json to GitHub repository via GitHub REST API
         async function publishMetadataToGitHub(reason = "Auto-sync stream links from Library Scan [skip ci]") {
             if (!cachedMoviesMetadata || !Array.isArray(cachedMoviesMetadata) || cachedMoviesMetadata.length === 0) {
@@ -3315,8 +3332,24 @@ function setupBot(bot, adminBot) {
                 }
 
                 if (!token) {
+                    try {
+                        const { execSync } = require('child_process');
+                        const remoteUrl = execSync('git config --get remote.origin.url', { cwd: path.resolve(__dirname), encoding: 'utf8' }).trim();
+                        const tokenMatch = remoteUrl.match(/https:\/\/([^:@]+)@github\.com/i) || remoteUrl.match(/https:\/\/([^:]+):([^@]+)@github\.com/i);
+                        if (tokenMatch) {
+                            token = tokenMatch[2] || tokenMatch[1];
+                        }
+                    } catch (_) {}
+                }
+
+                if (!token) {
+                    // Fallback to local git push on the server
+                    const localRes = await tryLocalGitPush(reason);
+                    if (localRes && localRes.success) {
+                        return localRes;
+                    }
                     console.warn("[GitHubPublish] No GitHub Personal Access Token found. Skipping auto-publish to GitHub.");
-                    return { success: false, error: "No GitHub token configured" };
+                    return { success: false, error: "No GitHub token configured. Send /setgithub <token> to connect!" };
                 }
 
                 const owner = "dans123456";
@@ -4267,6 +4300,96 @@ function setupBot(bot, adminBot) {
                     `❌ <b>Error:</b> ${escapeHtml(err.message)}`,
                     { parse_mode: 'HTML' }
                 ).catch(() => {});
+            }
+        });
+
+        adminBot.command(['setgithub', 'setgithubtoken', 'addgithubtoken'], async (ctx) => {
+            const senderId = String(ctx.from?.id || '');
+            const isAuthorized = await isAdmin(senderId).catch(() => false);
+            if (!isAuthorized) return;
+
+            const text = String(ctx.message?.text || '').trim();
+            const token = text.replace(/^\/(setgithub|setgithubtoken|addgithubtoken)(@\w+)?/i, '').trim();
+
+            if (!token) {
+                return ctx.reply(
+                    '🔑 <b>How to set your GitHub Token:</b>\n\n' +
+                    'Type:\n<code>/setgithub ghp_yourPersonalAccessTokenHere</code>\n\n' +
+                    '💡 <i>This token allows your Admin Bot and Admin Panel to automatically publish metadata changes directly to GitHub Pages with 0 manual work.</i>\n\n' +
+                    'Need to generate one? Go to GitHub -> Settings -> Developer Settings -> Personal Access Tokens (Tokens classic) -> check <b>repo</b>.',
+                    { parse_mode: 'HTML' }
+                );
+            }
+
+            const waitMsg = await ctx.reply('⏳ <b>Verifying GitHub token with GitHub API...</b>', { parse_mode: 'HTML' });
+            try {
+                const fetchModule = await import('node-fetch').catch(() => null);
+                const fetchFn = (typeof fetch === 'function') ? fetch : (fetchModule ? fetchModule.default : null);
+                
+                if (fetchFn) {
+                    const testRes = await fetchFn('https://api.github.com/repos/dans123456/filmhouse', {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'User-Agent': 'FilmHouse-Bot'
+                        }
+                    });
+                    if (testRes.ok) {
+                        const repoData = await testRes.json();
+                        const canPush = repoData.permissions ? repoData.permissions.push : false;
+                        if (!canPush) {
+                            return ctx.telegram.editMessageText(
+                                ctx.chat.id,
+                                waitMsg.message_id,
+                                undefined,
+                                '⚠️ <b>Token Valid, but lacks Push permission!</b>\n\nPlease ensure your Personal Access Token has the <b>repo</b> scope checked so it can push commits.',
+                                { parse_mode: 'HTML' }
+                            );
+                        }
+                    } else {
+                        return ctx.telegram.editMessageText(
+                            ctx.chat.id,
+                            waitMsg.message_id,
+                            undefined,
+                            `❌ <b>GitHub Authentication Failed (HTTP ${testRes.status}):</b>\nPlease check that your token is correct and not expired.`,
+                            { parse_mode: 'HTML' }
+                        );
+                    }
+                }
+
+                // Save to Firestore settings/github
+                if (db) {
+                    await db.collection('settings').doc('github').set({
+                        token: token,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+                }
+
+                await ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    waitMsg.message_id,
+                    undefined,
+                    '🎉 <b>GitHub Token Successfully Saved & Connected!</b> 🚀\n\n' +
+                    '• Repository: <code>dans123456/filmhouse</code>\n' +
+                    '• Permissions: <b>Push & Write (OK)</b>\n\n' +
+                    'Now whenever you run <code>/scanquick</code> or <code>/scanlibrary</code>, the bot will auto-publish to GitHub Pages!\n\n' +
+                    '<i>Publishing current catalog to GitHub now...</i>',
+                    { parse_mode: 'HTML' }
+                );
+
+                // Immediately trigger publish
+                const pubRes = await publishMetadataToGitHub("Initial sync after connecting GitHub token");
+                if (pubRes && pubRes.success) {
+                    await ctx.reply(`✅ <b>Catalog Published to GitHub!</b> (Commit: <code>${escapeHtml(pubRes.commitSha || 'success')}</code>)`, { parse_mode: 'HTML' });
+                }
+            } catch (err) {
+                return ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    waitMsg.message_id,
+                    undefined,
+                    `❌ <b>Error:</b> ${escapeHtml(err.message)}`,
+                    { parse_mode: 'HTML' }
+                );
             }
         });
 
