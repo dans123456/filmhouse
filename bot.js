@@ -4167,7 +4167,8 @@ function setupBot(bot, adminBot) {
                     sortedItems.reverse();
                 }
 
-                const finalItems = isQuick ? sortedItems.slice(0, 50) : sortedItems;
+                const quickLimit = typeof isQuick === 'number' && isQuick > 0 ? isQuick : (isQuick ? 50 : items.length);
+                const finalItems = isQuick ? sortedItems.slice(0, quickLimit) : sortedItems;
 
                 const sessionId = (isAutoIngest ? "ingest_" : "scan_") + Date.now().toString(36);
                 const cancelMarkup = {
@@ -4176,7 +4177,7 @@ function setupBot(bot, adminBot) {
                     ]
                 };
 
-                const modeLabel = isQuick ? "⚡ <b>Quick Scan (Latest 50 Uploads)</b>" : "📡 <b>Full Library Scan</b>";
+                const modeLabel = isQuick ? `⚡ <b>Quick Scan (Latest ${finalItems.length} Uploads)</b>` : "📡 <b>Full Library Scan</b>";
                 await ctx.telegram.editMessageText(
                     ctx.chat.id,
                     progressMsg.message_id,
@@ -4212,7 +4213,9 @@ function setupBot(bot, adminBot) {
             const cmdText = String(ctx.message?.text || '').toLowerCase();
             const isForce = cmdText.includes('force');
             const isAutoIngest = cmdText.includes('auto') || cmdText.includes('ingest');
-            return executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, true);
+            const matchNum = cmdText.match(/\b(\d+)\b/);
+            const customLimit = matchNum ? parseInt(matchNum[1], 10) : 50;
+            return executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, customLimit);
         });
 
         adminBot.command('scanlibrary', async (ctx) => {
@@ -4220,7 +4223,9 @@ function setupBot(bot, adminBot) {
             const isForce = cmdText.includes('force') || cmdText.includes('all');
             const isAutoIngest = cmdText.includes('auto') || cmdText.includes('ingest');
             const isQuick = cmdText.includes('quick') || cmdText.includes('fast');
-            return executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, isQuick);
+            const matchNum = cmdText.match(/\b(\d+)\b/);
+            const limit = isQuick ? (matchNum ? parseInt(matchNum[1], 10) : 50) : false;
+            return executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, limit);
         });
 
         adminBot.command(['autoingest', 'ingestlibrary', 'autocatalog'], async (ctx) => {
