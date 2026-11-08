@@ -5200,9 +5200,26 @@ function updateMediaQuickActions(movie) {
     }
 }
 
-// Submit dedicated streaming request to Firestore with admin distinction
+// Submit dedicated streaming request to Firestore with anti-duplicate guards
+let isSubmittingStreamReq = false;
 async function submitDedicatedStreamRequest(movie) {
     if (!movie) return;
+    if (isSubmittingStreamReq) return;
+
+    // Check if user already submitted a stream request for this movie
+    if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
+        const alreadyStreamReq = currentUserRequests.some(r => 
+            (r.type === "stream" || r.requestType === "stream" || r.target === "stream_url") &&
+            r.title && titlesMatch(r.title, movie.title) &&
+            r.status !== "fulfilled"
+        );
+        if (alreadyStreamReq) {
+            showToast(`You already requested a stream link for "${movie.title}"! We're on it 🍿`, "info");
+            return;
+        }
+    }
+
+    isSubmittingStreamReq = true;
     try {
         if (typeof firebase !== "undefined" && db) {
             const reqPayload = {
@@ -5234,6 +5251,8 @@ async function submitDedicatedStreamRequest(movie) {
     } catch (err) {
         console.warn("Stream request submit error:", err);
         showToast(`Stream request recorded for "${movie.title}"!`, "success");
+    } finally {
+        setTimeout(() => { isSubmittingStreamReq = false; }, 3000);
     }
 }
 
@@ -11669,10 +11688,17 @@ function initManualRequestModal() {
             };
 
             if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
-                const exists = currentUserRequests.some(r => r.title && titlesMatch(r.title, requestTitle));
-                if (!exists) {
-                    currentUserRequests.unshift(reqObj);
+                const exists = currentUserRequests.some(r => r.title && titlesMatch(r.title, requestTitle) && r.status !== "fulfilled");
+                if (exists) {
+                    showToast(`You have already requested "${requestTitle}"! It's in the queue ⏳`, "info");
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Submit Request 🚀";
+                    }
+                    closeManualRequestModal();
+                    return;
                 }
+                currentUserRequests.unshift(reqObj);
             }
 
             try {
@@ -12486,8 +12512,48 @@ function updateHeaderNotificationDot() {
         }).catch(err => console.warn("Error checking header notifications:", err));
 }
 
+const recentMovieRequestsLock = new Map();
+
 function logMovieRequestToFirestore(movie, specs = "") {
     if (!movie) return;
+
+    // Debounce / anti-spam guard: prevent rapid duplicate clicks for the same movie/quality
+    const movieReqKey = `${movie.csv_id || movie.tmdb_id || movie.title}_${specs || ''}`;
+    const lastAttempt = recentMovieRequestsLock.get(movieReqKey);
+    if (lastAttempt && (Date.now() - lastAttempt < 8000)) {
+        showToast(`Request already submitted for "${movie.title}"! ⏳`, "info");
+        return;
+    }
+    recentMovieRequestsLock.set(movieReqKey, Date.now());
+
+    // Check if this movie/spec is already requested and pending
+    let alreadyExists = false;
+    if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
+        alreadyExists = currentUserRequests.some(r => {
+            const matchTitle = r.title && titlesMatch(r.title, movie.title);
+            const matchSpec = !specs || (r.seasonOrPart && r.seasonOrPart.toLowerCase() === specs.toLowerCase()) || (r.title && r.title.toLowerCase().includes(specs.toLowerCase()));
+            return matchTitle && matchSpec && r.status !== "fulfilled";
+        });
+    }
+
+    if (alreadyExists) {
+        showToast(`"${movie.title}" is already in your request queue! ⏳`, "info");
+        const modal = document.getElementById("detail-modal");
+        if (modal && modal.classList.contains("active")) {
+            const reqBtn = modal.querySelector(".btn-request-premium");
+            if (reqBtn) {
+                reqBtn.replaceChildren();
+                reqBtn.appendChild(createSvgIcon("icon-check"));
+                const rText = document.createElement("span");
+                rText.textContent = "Requested ⏳";
+                reqBtn.appendChild(rText);
+                reqBtn.style.background = "rgba(255, 188, 0, 0.15)";
+                reqBtn.style.borderColor = "var(--primary-color)";
+            }
+        }
+        return; // Prevent duplicate Firestore write
+    }
+
     const isTVShow = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
     
     // Determine release year reliably
@@ -12535,12 +12601,7 @@ function logMovieRequestToFirestore(movie, specs = "") {
     };
 
     if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
-        const exists = currentUserRequests.some(r => 
-            r.title && titlesMatch(r.title, movie.title)
-        );
-        if (!exists) {
-            currentUserRequests.unshift(reqObj);
-        }
+        currentUserRequests.unshift(reqObj);
     }
     
     try {

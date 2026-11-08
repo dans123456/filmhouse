@@ -416,6 +416,8 @@ const PENDING_FILE = path.join(__dirname, "data", "pending_requests.json");
 let cachedPendingRequests = [];
 const _channelPostingLocks = new Set();
 const adminRequestMsgMap = new Map(); // message_id -> request info for instant reply-to-fulfill
+const notifiedRequestDocIds = new Set(); // Prevent duplicate admin alert delivery on Firestore reconnect/snapshot reload
+const recentUserRequestDedupeMap = new Map(); // key -> last alerted timestamp (prevents multi-tap spam from user)
 
 // Categorized in-memory ring buffers for live tracing
 const categorizedLogs = {
@@ -7402,9 +7404,38 @@ async function init() {
                 const yearSuffix = year ? ` (${year})` : "";
 
                 if (change.type === "added") {
+                    if (data.notifiedAdmin === true || notifiedRequestDocIds.has(docId)) {
+                        return; // Already processed and notified
+                    }
+
                     if (timestamp) {
                         const docMs = timestamp.toMillis ? timestamp.toMillis() : new Date(timestamp).getTime();
                         if (Date.now() - docMs > 60000) return; // skip historical
+                    } else if (data._localTime) {
+                        if (Date.now() - data._localTime > 60000) return;
+                    }
+
+                    // Multi-tap / rapid duplicate filter:
+                    // If this exact user just requested this title in the last 5 minutes, mark as notified and skip duplicate admin alert
+                    const userKey = userId || username || 'anon';
+                    const titleKey = String(title || '').toLowerCase().trim();
+                    const dedupeKey = `${userKey}_${titleKey}_${data.seasonOrPart || data.type || ''}`;
+                    const lastAlertTime = recentUserRequestDedupeMap.get(dedupeKey);
+                    if (lastAlertTime && (Date.now() - lastAlertTime < 5 * 60 * 1000)) {
+                        console.log(`[RequestAlert] Ignored rapid duplicate request from ${userKey} for "${titleKey}" (already alerted recently).`);
+                        notifiedRequestDocIds.add(docId);
+                        db.collection("requests").doc(docId).update({ notifiedAdmin: true, isDuplicate: true }).catch(() => {});
+                        return;
+                    }
+                    recentUserRequestDedupeMap.set(dedupeKey, Date.now());
+                    notifiedRequestDocIds.add(docId);
+                    if (recentUserRequestDedupeMap.size > 1000) {
+                        const oldestKey = recentUserRequestDedupeMap.keys().next().value;
+                        recentUserRequestDedupeMap.delete(oldestKey);
+                    }
+                    if (notifiedRequestDocIds.size > 2000) {
+                        const oldestDoc = notifiedRequestDocIds.values().next().value;
+                        notifiedRequestDocIds.delete(oldestDoc);
                     }
 
                     const cleanTitle = escapeHtml(String(title || "Movie").replace(/[*_`~]/g, '').trim());
@@ -7524,6 +7555,8 @@ async function init() {
                         console.error("Error sending new request notification to admins:", err);
                     }
 
+                    // Mark as notified in Firestore immediately to prevent repeated alerts on restarts/reconnects
+                    await db.collection("requests").doc(docId).update({ notifiedAdmin: true }).catch(() => {});
                 } else if (change.type === "modified") {
                     const isBoosted = (data.status === "priority" || data.boosted === true);
                     if (isBoosted && data.notifiedPriority !== true) {
