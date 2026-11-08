@@ -625,93 +625,30 @@ async function syncCatalogFromGitHub() {
             cachedMoviesMetadata = data;
             console.log(`[GitHubSync] Successfully synchronized ${data.length} movies from GitHub main to Ubuntu disk! (Previous in-memory: ${currentCount})`);
 
-            // Auto-broadcast any newly published titles or new seasons/cuts added to existing titles
-            if (currentCount > 0 && typeof publishMovieToChannel === 'function') {
-                const newItemsToBroadcast = [];
-                const prevMap = new Map();
-                if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
-                    cachedMoviesMetadata.forEach(m => {
-                        const k = String(m.csv_id || "").toLowerCase().trim();
-                        if (k) prevMap.set(k, m);
-                    });
-                }
-
-                for (const m of data) {
-                    const idKey = String(m.csv_id || "").toLowerCase().trim();
-                    const titleKey = String(m.title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
-                    const hasLinks = Array.isArray(m.links) && m.links.length > 0 && m.links.some(l => (typeof l === 'object' && l !== null ? (l.url || l.link) : (l && String(l).trim() !== "")));
-
-                    if (!hasLinks || !idKey) continue;
-
-                    const prevM = prevMap.get(idKey);
-                    if (!prevM) {
-                        // Entirely brand-new title
-                        if (!broadcastedCatalogIds.has(idKey) && !broadcastedCatalogIds.has(titleKey)) {
-                            newItemsToBroadcast.push(m);
-                        }
-                    } else {
-                        // Existing title: Check if new seasons or new qualities/cuts were added!
-                        const prevLinks = Array.isArray(prevM.links) ? prevM.links : [];
-                        const prevSpecKeys = new Set(prevLinks.map(l => {
-                            const spec = typeof l === 'object' && l !== null ? (l.season || l.quality || "") : "";
-                            return String(spec).toLowerCase().trim();
-                        }).filter(Boolean));
-
-                        m.links.forEach(l => {
-                            const url = typeof l === 'object' && l !== null ? (l.url || l.link) : l;
-                            if (!url || String(url).trim() === "") return;
-                            const spec = typeof l === 'object' && l !== null ? (l.season || l.quality || "") : "";
-                            const specKey = String(spec).toLowerCase().trim();
-                            if (specKey && !prevSpecKeys.has(specKey)) {
-                                const dedupeKey = `${idKey}_${specKey}`;
-                                if (!broadcastedCatalogIds.has(dedupeKey)) {
-                                    newItemsToBroadcast.push({
-                                        ...m,
-                                        seasonOrPart: spec
-                                    });
-                                }
-                            }
-                        });
-                    }
-                }
-
-                if (newItemsToBroadcast.length > 0) {
-                    console.log(`[CatalogAutoPublish] Found ${newItemsToBroadcast.length} newly published release update(s) to announce to Updates Channel!`);
-                    for (let idx = 0; idx < newItemsToBroadcast.length; idx++) {
-                        const item = newItemsToBroadcast[idx];
-                        try {
-                            const res = await publishMovieToChannel(item);
-                            if (res && res.message_id) {
-                                console.log(`[CatalogAutoPublish] Successfully announced "${item.title}" ${item.seasonOrPart || ""} to Updates Channel (msg_id: ${res.message_id})`);
-                            }
-                        } catch (pErr) {
-                            console.warn(`[CatalogAutoPublish] Error broadcasting "${item.title}":`, pErr.message);
-                        }
-
-                        const idKey = String(item.csv_id || "").toLowerCase().trim();
-                        const titleKey = String(item.title || "").toLowerCase().trim();
-                        const specKey = String(item.seasonOrPart || "").toLowerCase().trim();
+            // Catalog sync quietly updates local cache and disk.
+            // Automatic bulk spamming of library items to the channel is completely disabled.
+            // Admins can manually announce specific titles using /post or the Admin Panel broadcast tool.
+            for (const m of data) {
+                const idKey = String(m.csv_id || "").toLowerCase().trim();
+                const titleKey = String(m.title || "").toLowerCase().trim();
+                if (idKey) broadcastedCatalogIds.add(idKey);
+                if (titleKey) broadcastedCatalogIds.add(titleKey);
+                if (Array.isArray(m.links)) {
+                    m.links.forEach(l => {
+                        const spec = typeof l === 'object' && l !== null ? (l.season || l.quality || "") : "";
+                        const specKey = String(spec).toLowerCase().trim();
                         if (specKey) {
                             if (idKey) broadcastedCatalogIds.add(`${idKey}_${specKey}`);
                             if (titleKey) broadcastedCatalogIds.add(`${titleKey}_${specKey}`);
-                        } else {
-                            if (idKey) broadcastedCatalogIds.add(idKey);
-                            if (titleKey) broadcastedCatalogIds.add(titleKey);
                         }
-
-                        // Pacing delay between consecutive broadcasts to prevent Telegram rate limit (429)
-                        // and ensure Telegram's linked discussion group forwarder doesn't drop group comment threads
-                        if (idx < newItemsToBroadcast.length - 1) {
-                            await new Promise(r => setTimeout(r, 3500));
-                        }
-                    }
-                    try {
-                        const dir = path.dirname(BROADCASTED_CATALOG_FILE);
-                        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-                        fs.writeFileSync(BROADCASTED_CATALOG_FILE, JSON.stringify(Array.from(broadcastedCatalogIds)), "utf8");
-                    } catch (saveErr) {}
+                    });
                 }
             }
+            try {
+                const dir = path.dirname(BROADCASTED_CATALOG_FILE);
+                if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+                fs.writeFileSync(BROADCASTED_CATALOG_FILE, JSON.stringify(Array.from(broadcastedCatalogIds)), "utf8");
+            } catch (_) {}
 
             return { success: true, count: data.length, updated: data.length !== currentCount };
         }

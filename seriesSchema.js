@@ -83,7 +83,7 @@ function getSeriesCountdownBadge(series = {}) {
     }
 
     if (diffDays <= 0) {
-        return { label: "New Episode Today (Awaiting Upload)", variant: "today" };
+        return { label: "New Episode Today", variant: "today" };
     }
 
     return null;
