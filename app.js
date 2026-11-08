@@ -7518,6 +7518,37 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         subBackdrop.addEventListener("click", closeSubHub);
     }
 
+    // Live Subtitle Sync Tuner Controls
+    const btnSyncMinus = document.getElementById("btn-cinema-sub-minus");
+    const btnSyncReset = document.getElementById("btn-cinema-sub-reset");
+    const btnSyncPlus = document.getElementById("btn-cinema-sub-plus");
+    const syncDisplay = document.getElementById("cinema-sub-sync-display");
+
+    let cinemaSubOffset = 0;
+    function sendSubtitleOffsetDelta(delta) {
+        if (delta === 0) cinemaSubOffset = 0;
+        else cinemaSubOffset = Math.round((cinemaSubOffset + delta) * 10) / 10;
+        if (syncDisplay) syncDisplay.textContent = (cinemaSubOffset >= 0 ? "+" : "") + cinemaSubOffset.toFixed(1) + "s";
+        const frame = container.querySelector("iframe");
+        if (frame && frame.contentWindow) {
+            frame.contentWindow.postMessage({ action: "adjustSubtitleOffset", delta: delta }, "*");
+        }
+        if (typeof triggerHaptic === "function") triggerHaptic("light");
+    }
+
+    if (btnSyncMinus && !btnSyncMinus._bound) {
+        btnSyncMinus._bound = true;
+        btnSyncMinus.addEventListener("click", () => sendSubtitleOffsetDelta(-0.5));
+    }
+    if (btnSyncReset && !btnSyncReset._bound) {
+        btnSyncReset._bound = true;
+        btnSyncReset.addEventListener("click", () => sendSubtitleOffsetDelta(0));
+    }
+    if (btnSyncPlus && !btnSyncPlus._bound) {
+        btnSyncPlus._bound = true;
+        btnSyncPlus.addEventListener("click", () => sendSubtitleOffsetDelta(0.5));
+    }
+
     // Quality Switcher Modal Bindings
     const qModal = document.getElementById("cinema-quality-modal");
     const qCloseBtn = document.getElementById("cinema-quality-close");
@@ -7825,7 +7856,11 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const movieBackdrop = movie.backdrop || movie.poster || "";
         const imdbParam = movie.imdb_id ? `&imdb=${encodeURIComponent(movie.imdb_id)}` : "";
         const tmdbParam = movie.tmdb_id ? `&tmdb=${encodeURIComponent(movie.tmdb_id)}` : "";
-        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${subParam}`;
+        const mediaIdParam = `&media_id=${encodeURIComponent(movie.csv_id || movie.id || '')}`;
+        const seriesEpParam = isTVShow 
+            ? `&s=${encodeURIComponent(currentSeason ? currentSeason.seasonNumber : 1)}&ep=${encodeURIComponent(currentEpisodeNum || 1)}` 
+            : "";
+        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}`;
         
         // Fast pre-buffering animation overlay for instant visual feedback
         const loader = document.createElement("div");
@@ -8360,6 +8395,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         if (typeof window.updateCinemaSubtitleState === "function") {
                             window.updateCinemaSubtitleState(e.data.enabled, e.data.label);
                         }
+                    } else if (e.data.action === "subtitleOffsetChanged") {
+                        const syncDisplay = document.getElementById("cinema-sub-sync-display");
+                        if (syncDisplay) {
+                            const off = parseFloat(e.data.offset || 0);
+                            syncDisplay.textContent = (off >= 0 ? "+" : "") + off.toFixed(1) + "s";
+                        }
                     } else if (e.data.action === "openSubtitlesHub") {
                         if (typeof window.openCinemaSubtitlesHub === "function") {
                             window.openCinemaSubtitlesHub();
@@ -8571,6 +8612,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                                             if (liveFound) {
                                                 const cand = liveFound.stream_url || liveFound.url;
                                                 if (cand && !cand.includes("t.me")) {
+                                                    currentSeason = seasonObj;
+                                                    currentEpisodeNum = epNum;
                                                     const epDisplayTitle = `${baseTitle} • S${seasonObj.seasonNumber}:E${epNum}`;
                                                     setCinemaStream(cand, epDisplayTitle);
                                                     showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
@@ -8594,6 +8637,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                             return;
                         }
 
+                        currentSeason = seasonObj;
+                        currentEpisodeNum = epNum;
                         const epDisplayTitle = `${baseTitle} • S${seasonObj.seasonNumber}:E${epNum}`;
                         setCinemaStream(epTarget, epDisplayTitle);
                         showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
