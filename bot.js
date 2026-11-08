@@ -54,7 +54,19 @@ const TITLE_ALIASES = {
     "the wings innovative": "the wings",
     "low priest": "the low priest",
     "the low priest": "low priest",
-    "koleoso": "koleoso"
+    "koleoso": "koleoso",
+    "utd": "under the dome",
+    "under the dome": "utd",
+    "tvd": "the vampire diaries",
+    "the vampire diaries": "tvd",
+    "vampire diaries": "the vampire diaries",
+    "blackish": "black-ish",
+    "black ish": "black-ish",
+    "black-ish": "blackish",
+    "grownish": "grown-ish",
+    "grown ish": "grown-ish",
+    "mixedish": "mixed-ish",
+    "mixed ish": "mixed-ish"
 };
 
 function romanToNum(roman) {
@@ -126,6 +138,24 @@ function titlesMatch(titleA, titleB) {
     }
     // Koleoso alias
     if (normA.startsWith('koleoso') && normB.startsWith('koleoso')) {
+        return true;
+    }
+    // UTD / Under the Dome alias
+    if ((normA === 'utd' && (normB.includes('under the dome') || normB === 'under the dome')) ||
+        (normB === 'utd' && (normA.includes('under the dome') || normA === 'under the dome'))) {
+        return true;
+    }
+    // TVD / The Vampire Diaries alias
+    if ((normA === 'tvd' && (normB.includes('vampire diaries') || normB === 'the vampire diaries')) ||
+        (normB === 'tvd' && (normA.includes('vampire diaries') || normA === 'the vampire diaries'))) {
+        return true;
+    }
+    // Black-ish / Grown-ish / Mixed-ish compound match
+    const colA_pre = getCollapsedTitle(titleA);
+    const colB_pre = getCollapsedTitle(titleB);
+    if ((colA_pre === 'blackish' && colB_pre === 'blackish') ||
+        (colA_pre === 'grownish' && colB_pre === 'grownish') ||
+        (colA_pre === 'mixedish' && colB_pre === 'mixedish')) {
         return true;
     }
 
@@ -1822,6 +1852,24 @@ function setupBot(bot, adminBot) {
             isSeries = true;
         } else if (lowerNorm.startsWith('koleoso')) {
             titlePart = 'Koleoso';
+            isSeries = true;
+        }
+
+        const col = lowerNorm.replace(/[^a-z0-9]/g, '');
+        if (col === 'utd') {
+            titlePart = 'Under the Dome';
+            isSeries = true;
+        } else if (col === 'tvd') {
+            titlePart = 'The Vampire Diaries';
+            isSeries = true;
+        } else if (col === 'blackish' || (col === 'black' && isSeries && seasonNum > 1)) {
+            titlePart = 'Black-ish';
+            isSeries = true;
+        } else if (col === 'grownish') {
+            titlePart = 'Grown-ish';
+            isSeries = true;
+        } else if (col === 'mixedish') {
+            titlePart = 'Mixed-ish';
             isSeries = true;
         }
 
