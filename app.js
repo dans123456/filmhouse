@@ -7276,6 +7276,18 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             if (tabAudio) tabAudio.classList.remove("active");
             if (paneSubs) paneSubs.style.display = "flex";
             if (paneAudio) paneAudio.style.display = "none";
+            // Immediately trigger OpenSubtitles fetch if not already loaded
+            if (!loadedHubSubtitles || loadedHubSubtitles.length === 0) {
+                if (subTrackList) {
+                    subTrackList.innerHTML = `
+                        <div style="text-align: center; padding: 22px 10px; color: #94a3b8; font-size: 11.5px;">
+                            <div class="cinema-loader-spinner" style="margin: 0 auto 8px; width: 20px; height: 20px; border-width: 2px;"></div>
+                            <span>Connecting to OpenSubtitles (60+ languages)...</span>
+                        </div>
+                    `;
+                }
+                loadOpenSubtitlesForHub();
+            }
         }
     }
 
@@ -7415,6 +7427,15 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 </button>
             `;
         });
+
+        if (filtered.length === 0) {
+            html += `
+                <div style="text-align:center;padding:18px 10px;color:#94a3b8;font-size:12px;">
+                    <p style="margin:0 0 6px 0;font-weight:700;color:#fff;">ℹ️ No ${activeHubSubFilter && activeHubSubFilter !== 'all' ? activeHubSubFilter.toUpperCase() : ''} subtitles found for this title.</p>
+                    <p style="margin:0;font-size:11px;">You can upload your own <b>.srt</b> or <b>.vtt</b> file below.</p>
+                </div>
+            `;
+        }
 
         subTrackList.innerHTML = html;
 
@@ -7853,7 +7874,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const seriesEpParam = isTVShow 
             ? `&s=${encodeURIComponent(currentSeason ? currentSeason.seasonNumber : 1)}&ep=${encodeURIComponent(currentEpisodeNum || 1)}` 
             : "";
-        const playerSrc = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}`;
+        const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
+            ? "https://dans123456.github.io/filmhouse/player.html"
+            : "./player.html";
+        const playerSrc = `${playerBase}?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}`;
         
         // Fast pre-buffering animation overlay for instant visual feedback
         const loader = document.createElement("div");
