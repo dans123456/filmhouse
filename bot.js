@@ -372,8 +372,8 @@ setInterval(syncStreamingServerConfig, 30000);
 function performServerGitUpdate(onProgress) {
     return new Promise((resolve) => {
         const projectDir = path.resolve(__dirname);
-        // Safely stash local modifications (like movies_metadata.json) before pulling so dirty files never block git pull
-        const pullCmd = "git stash push -u -m 'auto-stash-updater' || true; git pull origin main";
+        // Discard local metadata cache changes and stash untracked files before pulling so dirty files never block git pull
+        const pullCmd = "git checkout -- MOVIE/Data/movies_metadata.json 2>/dev/null || true; git stash -u 2>/dev/null || true; git pull origin main";
         exec(pullCmd, { cwd: projectDir, timeout: 25000 }, (pullErr, pullOut, pullErrOut) => {
             if (pullErr) {
                 console.error("[ServerUpdater] git pull failed:", pullErr);
