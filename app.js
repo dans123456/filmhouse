@@ -6382,13 +6382,18 @@ function openDetailModal(movie) {
                 watchOnlineBtn.title = "No streaming link added yet (Admin)";
             }
 
-            watchOnlineBtn.addEventListener("click", () => {
+            let _watchOnlineThrottle = 0;
+            watchOnlineBtn.addEventListener("click", (e) => {
+                if (e) e.preventDefault();
+                const now = Date.now();
+                if (now - _watchOnlineThrottle < 800) return;
+                _watchOnlineThrottle = now;
+
                 if (!hasStreamLink) {
                     showToast(`⚠️ No streaming link added for "${movie.title}" yet. Add it via Admin Panel!`, "warning");
                     return;
                 }
                 addWatchHistory(movie.csv_id || movie.id);
-                triggerMonetagSmartLink();
                 openCinemaModal(movie);
             });
             actionsRow.appendChild(watchOnlineBtn);
@@ -9297,10 +9302,17 @@ function openDownloadModal(movie) {
                 streamBtn.type = "button";
                 streamBtn.className = "download-link-stream-btn";
                 streamBtn.innerHTML = `<span>▶️</span><span>Stream</span>`;
+                let _streamBtnThrottle = 0;
                 streamBtn.addEventListener("click", (e) => {
-                    e.stopPropagation();
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    const now = Date.now();
+                    if (now - _streamBtnThrottle < 800) return;
+                    _streamBtnThrottle = now;
+
                     closeModal(modal);
-                    triggerMonetagSmartLink();
                     openCinemaModal(movie, streamTarget);
                 });
                 actionsGroup.appendChild(streamBtn);

@@ -76,123 +76,91 @@
       font-weight: 600 !important;
       letter-spacing: 0.3px !important;
     }
-    html.in-iframe .video-viewport {
-      max-width: 100vw !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      border-radius: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-    html.in-iframe .plyr--video {
-      height: 100vh !important;
-      height: 100dvh !important;
-    }
-    html.in-iframe .plyr__video-wrapper {
-      height: 100% !important;
-    }
-    html.in-iframe .plyr__video-wrapper video {
-      height: 100% !important;
-      object-fit: contain !important;
-    }
-
-    /* Reset & Base */
+    /* Reset & Base: Dedicated 100% Edge-to-Edge Cinema Player */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    body {
-      background: radial-gradient(circle at 50% 10%, #151926 0%, #080a0f 100%);
+    html, body {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #000000 !important;
       color: #e6edf3;
       font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 16px 12px 40px;
-      overflow-x: hidden;
-    }
-
-    /* Top Brand Header */
-    .brand-header {
-      width: 100%;
-      max-width: 960px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      background: rgba(18, 22, 34, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 188, 0, 0.15);
-      border-radius: 12px;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    }
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-    .brand-logo img {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 188, 0, 0.4);
-    }
-    .brand-title {
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .brand-badge {
-      font-size: 11px;
-      font-weight: 700;
-      color: #00c8ff;
-      background: rgba(0, 200, 255, 0.1);
-      border: 1px solid rgba(0, 200, 255, 0.3);
-      padding: 4px 10px;
-      border-radius: 20px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      justify-content: center !important;
     }
 
     /* Theater Player Wrapper */
     .player-card {
-      width: 100%;
-      max-width: 960px;
-      background: rgba(15, 18, 28, 0.85);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 188, 0, 0.05);
-      display: flex;
-      flex-direction: column;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      background: #000000 !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      flex: 1 !important;
     }
 
     /* Video Viewport */
     .video-viewport {
-      position: relative;
-      width: 100%;
-      padding-top: 56.25%; /* 16:9 Aspect Ratio */
-      background: #000;
-      overflow: hidden;
+      position: relative !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      padding-top: 0 !important;
+      margin: 0 !important;
+      background: #000000;
+      background-size: cover !important;
+      background-position: center center !important;
+      background-repeat: no-repeat !important;
+      overflow: hidden !important;
+      flex: 1 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
     }
     .video-viewport video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      background: #000;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      background: #000000 !important;
+    }
+    .plyr--video {
+      width: 100% !important;
+      height: 100% !important;
+      background: #000000 !important;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    }
+    .plyr__video-wrapper {
+      width: 100% !important;
+      height: 100% !important;
+      background: #000000 !important;
+    }
+    .plyr__video-wrapper video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      background: #000000 !important;
     }
 
     /* Loading Overlay */
@@ -202,7 +170,9 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(10, 12, 18, 0.9);
+      background: rgba(8, 10, 16, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -210,15 +180,15 @@
       gap: 14px;
       z-index: 10;
       pointer-events: none;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.35s ease;
     }
     .spinner {
-      width: 46px;
-      height: 46px;
-      border: 3px solid rgba(255, 188, 0, 0.15);
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(255, 188, 0, 0.2);
       border-top-color: #ffd700;
       border-radius: 50%;
-      animation: spin 0.9s linear infinite;
+      animation: spin 0.85s linear infinite;
     }
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -226,134 +196,11 @@
     .loader-text {
       font-size: 13px;
       color: #94a3b8;
-      font-weight: 500;
-    }
-
-    /* Video Meta & Controls Below */
-    .player-meta {
-      padding: 16px 20px 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .meta-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    .movie-title {
-      font-size: 19px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.3;
-      flex: 1;
-      min-width: 200px;
-    }
-    .meta-tags {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .tag-quality {
-      font-size: 11px;
-      font-weight: 700;
-      color: #ffd700;
-      background: rgba(255, 215, 0, 0.12);
-      border: 1px solid rgba(255, 215, 0, 0.3);
-      padding: 4px 9px;
-      border-radius: 6px;
-    }
-    .tag-server {
-      font-size: 11px;
       font-weight: 600;
-      color: #10b981;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      padding: 4px 9px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .dot-live {
-      width: 6px;
-      height: 6px;
-      background: #10b981;
-      border-radius: 50%;
-      display: inline-block;
-      box-shadow: 0 0 6px #10b981;
+      letter-spacing: 0.3px;
     }
 
-    /* Action Buttons Row */
-    .action-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 6px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      transition: all 0.25s ease;
-    }
-    .btn-gold {
-      background: linear-gradient(135deg, #ffd700 0%, #ff9900 100%);
-      color: #0b0d14;
-      box-shadow: 0 4px 16px rgba(255, 188, 0, 0.3);
-    }
-    .btn-gold:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(255, 188, 0, 0.45);
-    }
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
-      color: #cbd5e1;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #fff;
-    }
-
-    /* Notice Footer */
-    .player-footer {
-      margin-top: 18px;
-      text-align: center;
-      font-size: 11px;
-      color: #64748b;
-      line-height: 1.5;
-      max-width: 600px;
-    }
-    .player-footer a {
-      color: #ffd700;
-      text-decoration: none;
-    }
-
-    /* Error Message Box */
-    .error-card {
-      display: none;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 16px;
-      border-radius: 8px;
-      color: #fca5a5;
-      font-size: 13px;
-      margin-top: 10px;
-    }
-
-    /* Stream Play & Monetag Ad Trigger Overlay with Dynamic Backdrop */
+    /* Stream Play Overlay */
     .stream-play-overlay {
       position: absolute;
       top: 0;
@@ -438,66 +285,10 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
-
-    /* Embedded In-App Mode (when inside Film House Telegram Mini App) */
-    html.in-iframe, html.in-iframe body {
-      width: 100% !important;
-      height: 100% !important;
-      max-width: 100vw !important;
-      max-height: 100vh !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      background: #000 !important;
-      overflow: hidden !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: stretch !important;
-      justify-content: center !important;
-    }
-    html.in-iframe .brand-header,
-    html.in-iframe .player-meta,
-    html.in-iframe .player-footer {
-      display: none !important;
-    }
-    html.in-iframe .player-card {
-      max-width: 100% !important;
-      width: 100% !important;
-      height: 100% !important;
-      border-radius: 0 !important;
-      border: none !important;
-      box-shadow: none !important;
-      background: #000 !important;
-      flex: 1 !important;
-      display: flex !important;
-      flex-direction: column !important;
-    }
-    html.in-iframe .video-viewport {
-      width: 100% !important;
-      height: 100% !important;
-      padding-top: 0 !important;
-      flex: 1 !important;
-      background: #000 !important;
-      position: relative !important;
-    }
-    html.in-iframe .video-viewport video {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: contain !important;
-      background: #000 !important;
-    }
   </style>
 </head>
 <body>
-  <!-- Brand Header -->
-  <header class='brand-header'>
-    <a class='brand-logo' href='https://t.me/Filmhouseappbot'>
-      <img alt='Film House' src='https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png'/>
-      <span class='brand-title'>FILM HOUSE CINEMA</span>
-    </a>
-    <span class='brand-badge'>HD STREAMING</span>
-  </header>
-
-  <!-- Cinema Card -->
+  <!-- Pure Cinema Player Card -->
   <main class='player-card'>
     <!-- Video Player Viewport -->
     <div class='video-viewport' id='viewport'>
@@ -506,7 +297,7 @@
         <div class='loader-text'>Connecting to Film House Stream Engine...</div>
       </div>
 
-      <!-- Stream Play & Monetag Ad Trigger Overlay -->
+      <!-- Stream Play & Backdrop Poster Overlay -->
       <div class='stream-play-overlay' id='playOverlay'>
         <div class='stream-play-circle'>
           <svg viewBox='0 0 24 24'><polygon points='6 3 20 12 6 21 6 3'/></svg>
@@ -622,41 +413,12 @@
       <video controls='controls' id='mainVideo' playsinline='playsinline' preload='auto'>
         Your browser does not support HTML5 video streaming.
       </video>
-    </div>
-
-    <!-- Video Meta Info -->
-    <div class='player-meta'>
-      <div class='meta-header'>
-        <h1 class='movie-title' id='movieTitle'>Film House Cinema Stream</h1>
-        <div class='meta-tags'>
-          <span class='tag-quality' id='qualityTag'>1080p HD</span>
-          <span class='tag-server'><span class='dot-live'></span> FH SPEED</span>
-        </div>
-      </div>
-
-      <div class='error-card' id='errorCard'>
-        ⚠️ <b>Stream link missing or expired.</b> Please launch this title directly from the Film House Telegram Bot.
-      </div>
-
-      <!-- Action Buttons Row -->
-      <div class='action-row'>
-        <button class='btn btn-secondary' id='btnOpenSubtitlesModal2' style='cursor:pointer;' title='Select Multi-Language Subtitles' type='button'>
-          💬 Subtitles (60+ Langs)
-        </button>
-        <a class='btn btn-gold' href='#' id='btnDownload' target='_blank'>
-          ⬇️ Direct Download File
-        </a>
-        <a class='btn btn-secondary' href='https://t.me/Filmhouseappbot' target='_blank'>
-          🍿 Open Film House Bot
-        </a>
+      <!-- Sleek Floating In-Player Error Toast -->
+      <div class='error-card' id='errorCard' style='display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(239,68,68,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.2);color:#ffffff;padding:10px 18px;border-radius:12px;font-size:12px;font-weight:600;z-index:26;box-shadow:0 8px 30px rgba(0,0,0,0.85);text-align:center;max-width:88%;pointer-events:auto;'>
+        ⚠️ <b>Stream server is warming up.</b> Reconnecting...
       </div>
     </div>
   </main>
-
-  <footer class='player-footer'>
-    Powered by <b>Film House Global Streaming Infrastructure</b>.<br/>
-    If video buffers, pause for 5 seconds to build buffer or use the direct download button above.
-  </footer>
 
   <!-- Script: Universal Smart Stream Resolver -->
   <script type='text/javascript'>
@@ -686,6 +448,26 @@
       const subParam = urlParams.get('sub') || '';
 
       const videoEl = document.getElementById('mainVideo');
+
+      // Set Backdrop immediately as video poster and background to prevent black screen!
+      if (backdropParam && videoEl) {
+        try {
+          const cleanBackdrop = decodeURIComponent(backdropParam).trim();
+          if (cleanBackdrop) {
+            videoEl.setAttribute("poster", cleanBackdrop);
+            const vp = document.getElementById("viewport");
+            if (vp) {
+              vp.style.backgroundImage = `url("${cleanBackdrop}")`;
+              vp.style.backgroundSize = "cover";
+              vp.style.backgroundPosition = "center";
+            }
+            const playOverlayEl = document.getElementById("playOverlay");
+            if (playOverlayEl) {
+              playOverlayEl.style.backgroundImage = `url("${cleanBackdrop}")`;
+            }
+          }
+        } catch (_) {}
+      }
 
       // Initialize Modern Plyr Player with Film House Gold Branding
       let plyrInstance = null;
@@ -1516,10 +1298,10 @@
       }
 
       if (titleParam) {
-        titleEl.textContent = cleanTitle;
+        if (titleEl) titleEl.textContent = cleanTitle;
         document.title = cleanTitle + " - Film House Cinema";
       }
-      if (qualityParam) {
+      if (qualityParam && qualityEl) {
         qualityEl.textContent = qualityParam;
       }
 
@@ -1744,7 +1526,7 @@
         } else {
           videoEl.src = finalStreamUrl;
         }
-        downloadBtn.href = finalStreamUrl;
+        if (downloadBtn) downloadBtn.href = finalStreamUrl;
 
         function hideStreamLoader() {
           if (!loaderEl) return;

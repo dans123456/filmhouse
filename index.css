@@ -1875,13 +1875,22 @@ body.tg-back-visible #btn-close-cinema {
     .cinema-top-actions {
         margin-right: max(10px, var(--tg-safe-area-inset-right, 10px)) !important;
     }
+    .cinema-brand-group {
+        max-width: calc(100% - 95px) !important;
+        gap: 5px !important;
+    }
     .cinema-brand-wordmark {
-        font-size: 13.5px !important;
-        letter-spacing: 0.6px !important;
+        font-size: 13px !important;
+        letter-spacing: 0.5px !important;
     }
     .cinema-brand-cinema-pill {
         font-size: 7.5px !important;
         padding: 1px 4px !important;
+    }
+    .cinema-close-btn {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 17px !important;
     }
 }
 
@@ -1895,6 +1904,9 @@ body.tg-back-visible #btn-close-cinema {
     transform: translateX(-50%);
     pointer-events: none;
     z-index: 5;
+    max-width: calc(100% - 110px);
+    justify-content: center;
+    white-space: nowrap;
 }
 
 .cinema-brand-wordmark {
@@ -3458,8 +3470,8 @@ body.tg-back-visible #btn-close-cinema {
     }
 }
 
-/* Responsive Cinema Theater: Mobile Landscape Immersive Mode (Only on small mobile phone screens rotated horizontally) */
-@media (orientation: landscape) and (max-height: 540px) {
+/* Responsive Cinema Theater: Mobile Landscape Immersive Mode (Matches mobile phone screens rotated horizontally) */
+@media (orientation: landscape) and (max-height: 850px) {
     #cinema-modal.active {
         padding: 0 !important;
         background: #000000 !important;
