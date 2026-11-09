@@ -740,6 +740,15 @@
           const activeLabel = document.getElementById('activeSubLabel');
           if (activeLabel) activeLabel.textContent = labelName || 'Active';
           showSubToast(`${labelName || 'Subtitles'} Loaded`, '🟢');
+          try {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({
+                action: 'subtitleStateChanged',
+                enabled: true,
+                label: labelName || 'Active'
+              }, '*');
+            }
+          } catch (_) {}
         } catch (e) {
           console.warn('Subtitle attach error:', e);
         }
@@ -796,8 +805,10 @@
         }
 
         try {
+          const sParam = urlParams.get('s') || '1';
+          const epParam = urlParams.get('ep') || '1';
           const typeSlug = isSeriesMode ? 'series' : 'movie';
-          const epSuffix = isSeriesMode ? ':1:1' : '';
+          const epSuffix = isSeriesMode ? `:${sParam}:${epParam}` : '';
           const subUrl = `https://opensubtitles-v3.strem.io/subtitles/${typeSlug}/${imdbId}${epSuffix}.json`;
           const subRes = await fetch(subUrl);
           if (subRes.ok) {

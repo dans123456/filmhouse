@@ -2330,6 +2330,23 @@ function getRequestedBadgeElement(movie) {
     return reqBadge;
 }
 
+// Unified Movie Card Bottom Badges Appender (Prevents overlapping badges)
+function appendBottomCardBadges(imgWrapper, movie) {
+    if (!imgWrapper || !movie) return;
+    const streamBadge = getStreamBadgeElement(movie);
+    const asianOriginBadge = getAsianOriginBadgeElement(movie);
+    const cinemaCutBadge = getCinemaCutBadgeElement(movie);
+
+    if (streamBadge || asianOriginBadge || cinemaCutBadge) {
+        const bottomContainer = document.createElement("div");
+        bottomContainer.className = "movie-card-bottom-badges";
+        if (asianOriginBadge) bottomContainer.appendChild(asianOriginBadge);
+        if (streamBadge) bottomContainer.appendChild(streamBadge);
+        if (cinemaCutBadge) bottomContainer.appendChild(cinemaCutBadge);
+        imgWrapper.appendChild(bottomContainer);
+    }
+}
+
 // Watch History Render Modal Helpers
 function renderHistoryGrid() {
     const container = document.getElementById("history-grid-container");
@@ -2365,24 +2382,10 @@ function renderHistoryGrid() {
         img.loading = "lazy";
         imgWrapper.appendChild(img);
 
-        const gridStreamBadge = getStreamBadgeElement(movie);
-        if (gridStreamBadge) imgWrapper.appendChild(gridStreamBadge);
-
         const reqBadge = getRequestedBadgeElement(movie);
         if (reqBadge) imgWrapper.appendChild(reqBadge);
 
-        const hStreamBadge = getStreamBadgeElement(movie);
-        if (hStreamBadge) imgWrapper.appendChild(hStreamBadge);
-        const streamBadge = getStreamBadgeElement(movie);
-        if (streamBadge) imgWrapper.appendChild(streamBadge);
-
-        const cinemaCutBadge = getCinemaCutBadgeElement(movie);
-        const asianOriginBadge = getAsianOriginBadgeElement(movie);
-        if (cinemaCutBadge && asianOriginBadge) {
-            asianOriginBadge.style.bottom = "28px";
-        }
-        if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
-        if (asianOriginBadge) imgWrapper.appendChild(asianOriginBadge);
+        appendBottomCardBadges(imgWrapper, movie);
 
         if (movie.rating > 0) {
             const rating = document.createElement("div");
@@ -2497,6 +2500,35 @@ function navigateToScreen(targetScreenId) {
 
     // Custom view actions
     if (targetScreenId === "home") {
+        // Reset category and genre filters so Home button returns user to clean default home
+        state.activeCategory = "Main";
+        if (state.filters) {
+            state.filters.genre = "All";
+            state.filters.genre2 = "All";
+            state.filters.year = "All";
+            state.filters.rating = 0;
+            state.filters.selectedGenres = ["All"];
+        }
+        
+        const filterGenre = document.getElementById("filter-genre");
+        if (filterGenre) filterGenre.value = "All";
+        const filterGenre2 = document.getElementById("filter-genre-2");
+        if (filterGenre2) filterGenre2.value = "All";
+        const filterYear = document.getElementById("filter-year");
+        if (filterYear) filterYear.value = "All";
+        const filterRating = document.getElementById("filter-rating");
+        if (filterRating) filterRating.value = "0";
+
+        const searchInput = document.getElementById("search-input");
+        if (searchInput && state.searchQuery) {
+            searchInput.value = "";
+            state.searchQuery = "";
+            document.body.classList.remove("search-active");
+        }
+
+        renderCategoriesBar();
+        renderGenreChips();
+
         state.visibleCount = 24;
         renderFeaturedGrid();
         renderEditorsChoice();
@@ -2978,22 +3010,10 @@ function renderFeaturedGrid(preservePagination = false) {
         img.loading = "lazy";
         imgWrapper.appendChild(img);
 
-        const gridStreamBadge = getStreamBadgeElement(movie);
-        if (gridStreamBadge) imgWrapper.appendChild(gridStreamBadge);
-
         const reqBadge = getRequestedBadgeElement(movie);
         if (reqBadge) imgWrapper.appendChild(reqBadge);
 
-        const hStreamBadge = getStreamBadgeElement(movie);
-        if (hStreamBadge) imgWrapper.appendChild(hStreamBadge);
-
-        const cinemaCutBadge = getCinemaCutBadgeElement(movie);
-        const asianOriginBadge = getAsianOriginBadgeElement(movie);
-        if (cinemaCutBadge && asianOriginBadge) {
-            asianOriginBadge.style.bottom = "28px";
-        }
-        if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
-        if (asianOriginBadge) imgWrapper.appendChild(asianOriginBadge);
+        appendBottomCardBadges(imgWrapper, movie);
 
         // Dynamic NEW Badge Overlay for top additions
         if (state.newMovieIds && state.newMovieIds.includes(movie.csv_id)) {
@@ -3150,16 +3170,7 @@ function renderEditorsChoice() {
         img.loading = "lazy";
         imgWrapper.appendChild(img);
 
-        const gridStreamBadge = getStreamBadgeElement(movie);
-        if (gridStreamBadge) imgWrapper.appendChild(gridStreamBadge);
-
-        const cinemaCutBadge = getCinemaCutBadgeElement(movie);
-        const asianOriginBadge = getAsianOriginBadgeElement(movie);
-        if (cinemaCutBadge && asianOriginBadge) {
-            asianOriginBadge.style.bottom = "28px";
-        }
-        if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
-        if (asianOriginBadge) imgWrapper.appendChild(asianOriginBadge);
+        appendBottomCardBadges(imgWrapper, movie);
 
         if (movie.rating > 0) {
             const rating = document.createElement("div");
@@ -3263,16 +3274,7 @@ function renderWatchlistGrid() {
         img.loading = "lazy";
         imgWrapper.appendChild(img);
 
-        const gridStreamBadge = getStreamBadgeElement(movie);
-        if (gridStreamBadge) imgWrapper.appendChild(gridStreamBadge);
-
-        const cinemaCutBadge = getCinemaCutBadgeElement(movie);
-        const asianOriginBadge = getAsianOriginBadgeElement(movie);
-        if (cinemaCutBadge && asianOriginBadge) {
-            asianOriginBadge.style.bottom = "28px";
-        }
-        if (cinemaCutBadge) imgWrapper.appendChild(cinemaCutBadge);
-        if (asianOriginBadge) imgWrapper.appendChild(asianOriginBadge);
+        appendBottomCardBadges(imgWrapper, movie);
 
         // Rating Badge
         if (movie.rating > 0) {
@@ -7133,14 +7135,26 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     // Immediately register live streaming presence
     startStreamingPresence(movie, customTitle || movie.title);
 
-    // Subtitle isolation per movie/series (Prevents subtitle leak across titles)
-    const currentMovieKey = String(movie.id || movie.tmdb_id || movie.imdb_id || movie.title);
+    // Helper to generate strict unique media keys ensuring subtitles & audio state NEVER leak across movies, seasons, or episodes
+    function getScopedMediaSubtitleKey(m, sNum, epNum) {
+        if (!m) return "empty_media";
+        const baseKey = String(m.csv_id || m.id || m.tmdb_id || m.imdb_id || m.title || "film").trim();
+        if (isTVShow) {
+            const seasonNumber = (sNum !== undefined && sNum !== null) ? sNum : (currentSeason ? currentSeason.seasonNumber : 1);
+            const episodeNumber = (epNum !== undefined && epNum !== null) ? epNum : (currentEpisodeNum || 1);
+            return `${baseKey}_s${seasonNumber}_e${episodeNumber}`;
+        }
+        return baseKey;
+    }
+
+    // Subtitle isolation per movie/series (Prevents subtitle leak across titles or episodes)
+    const currentMovieKey = getScopedMediaSubtitleKey(movie, currentSeason ? currentSeason.seasonNumber : 1, currentEpisodeNum);
     if (state.activeSubtitleMovieId !== currentMovieKey) {
         state.activeSubtitleUrl = null;
         state.activeSubtitleLang = null;
         state.activeSubtitleMovieId = currentMovieKey;
         const subQuickLabel = document.getElementById("cinema-sub-quick-label");
-        if (subQuickLabel) subQuickLabel.textContent = "Subtitles: Auto";
+        if (subQuickLabel) subQuickLabel.textContent = "CC Off";
     }
 
     // In-app Back and Minimize Button Bindings
@@ -7334,7 +7348,9 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (imdbId) {
             try {
                 const typeSlug = isTVShow ? "series" : "movie";
-                const epSuffix = isTVShow ? `:1:${typeof currentEpisodeNum !== 'undefined' ? currentEpisodeNum : 1}` : "";
+                const sNum = currentSeason ? (currentSeason.seasonNumber || 1) : 1;
+                const epNum = typeof currentEpisodeNum !== 'undefined' ? currentEpisodeNum : 1;
+                const epSuffix = isTVShow ? `:${sNum}:${epNum}` : "";
                 const subUrl = `https://opensubtitles-v3.strem.io/subtitles/${typeSlug}/${imdbId}${epSuffix}.json`;
                 const subRes = await fetch(subUrl);
                 if (subRes.ok) {
@@ -7474,63 +7490,16 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (subModal) subModal.style.display = "flex";
     };
 
-    window.openCinemaSubtitlesHub = () => openSubHub("subs");
+    window.openCinemaSubtitlesHub = (tab = "audio") => openSubHub(tab);
     const closeSubHub = () => {
         if (subModal) subModal.style.display = "none";
     };
 
-    let subPressTimer = null;
-    let didLongPress = false;
-
     if (subQuickBtn && !subQuickBtn._bound) {
         subQuickBtn._bound = true;
-
-        const handleShortTap = () => {
-            const frame = container.querySelector("iframe");
-            if (!isCcActive) {
-                // User wants to turn CC ON
-                executeWithCcUnlock(() => {
-                    if (frame && frame.contentWindow) {
-                        frame.contentWindow.postMessage({ action: "toggleSubtitles", enable: true }, "*");
-                    }
-                    updateCcButtonVisual(true, "CC On");
-                    showToast("💬 Subtitles Enabled (Long-press to change language)", "success");
-                    if (typeof triggerHaptic === "function") triggerHaptic("selection");
-                });
-            } else {
-                // User wants to turn CC OFF
-                if (frame && frame.contentWindow) {
-                    frame.contentWindow.postMessage({ action: "toggleSubtitles", enable: false }, "*");
-                    frame.contentWindow.postMessage({ action: "selectSubtitleTrack", index: -1 }, "*");
-                }
-                updateCcButtonVisual(false, "CC Off");
-                showToast("Captions turned off", "info");
-                if (typeof triggerHaptic === "function") triggerHaptic("light");
-            }
-        };
-
-        subQuickBtn.addEventListener("pointerdown", () => {
-            didLongPress = false;
-            subPressTimer = setTimeout(() => {
-                didLongPress = true;
-                openSubHub("subs");
-                if (typeof triggerHaptic === "function") triggerHaptic("medium");
-            }, 500);
-        });
-
-        subQuickBtn.addEventListener("pointerup", () => {
-            if (subPressTimer) clearTimeout(subPressTimer);
-            if (!didLongPress) {
-                handleShortTap();
-            }
-        });
-
-        subQuickBtn.addEventListener("pointercancel", () => {
-            if (subPressTimer) clearTimeout(subPressTimer);
-        });
-
-        subQuickBtn.addEventListener("dblclick", () => {
-            openSubHub("subs");
+        subQuickBtn.addEventListener("click", () => {
+            openSubHub("audio");
+            if (typeof triggerHaptic === "function") triggerHaptic("selection");
         });
     }
     if (audioQuickBtn && !audioQuickBtn._bound) {
@@ -7721,6 +7690,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
             if (data.subtitlesActive || data.subtitles.some(s => s.mode === "showing")) {
                 updateCcButtonVisual(true, data.activeSubtitleLabel || "On");
+            } else {
+                updateCcButtonVisual(false, "CC Off");
             }
         }
 
@@ -7871,7 +7842,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         }
         const directUrl = resolveDirectStreamUrl(targetUrl);
         const currentMediaTitle = currentTitle || initialTitle;
-        const currentMovieKey = String(movie.id || movie.tmdb_id || movie.imdb_id || movie.title);
+        const currentMovieKey = getScopedMediaSubtitleKey(movie, currentSeason ? currentSeason.seasonNumber : 1, currentEpisodeNum);
         const subParam = (state.activeSubtitleUrl && state.activeSubtitleMovieId === currentMovieKey) 
             ? `&sub=${encodeURIComponent(state.activeSubtitleUrl)}` 
             : "";
@@ -8596,6 +8567,16 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         currentCinemaEpIndex = idx;
                         window._currentActiveEpKey = progKey;
 
+                        // Reset episode-specific subtitle state so previous episode subtitles don't stick
+                        const newEpScopedKey = getScopedMediaSubtitleKey(movie, currentSeason ? currentSeason.seasonNumber : 1, currentEpisodeNum);
+                        if (state.activeSubtitleMovieId !== newEpScopedKey) {
+                            state.activeSubtitleUrl = null;
+                            state.activeSubtitleLang = null;
+                            state.activeSubtitleMovieId = newEpScopedKey;
+                            loadedHubSubtitles = [];
+                            updateCcButtonVisual(false, "CC Off");
+                        }
+
                         let epTarget = "";
                         if (movie.stream_links && Array.isArray(movie.stream_links)) {
                             const foundStream = movie.stream_links.find(s => 
@@ -8682,6 +8663,14 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     tabBtn.classList.add("active");
                     currentSeason = sObj;
                     currentEpisodeNum = 1;
+                    const newSeasonKey = getScopedMediaSubtitleKey(movie, currentSeason.seasonNumber, 1);
+                    if (state.activeSubtitleMovieId !== newSeasonKey) {
+                        state.activeSubtitleUrl = null;
+                        state.activeSubtitleLang = null;
+                        state.activeSubtitleMovieId = newSeasonKey;
+                        loadedHubSubtitles = [];
+                        updateCcButtonVisual(false, "CC Off");
+                    }
                     renderSeasonEpisodes(sObj);
                 });
                 seasonsTabs.appendChild(tabBtn);
@@ -12136,15 +12125,15 @@ function renderUserRequests(requests) {
             return (m.title && titlesMatch(m.title, r.title)) || 
                    (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
         });
-        const isMatched = matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r);
         const isExplicit = (r.status === "fulfilled" || r.status === "claimed") && r.downloadLink;
-        const isFulfilled = isMatched || isExplicit;
+        const isMatched = (r.status === "fulfilled" || r.status === "claimed") && matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r) && matchingMovie.links && matchingMovie.links.length > 0;
+        const isFulfilled = isExplicit || isMatched;
         const isClaimed = isFulfilled && (r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId));
         
         if (isClaimed) {
-            historyRequests.push({ ...r, _matchingMovie: matchingMovie, _isExplicit: isExplicit });
+            historyRequests.push({ ...r, _matchingMovie: matchingMovie, _isExplicit: isExplicit, _isMatched: isMatched });
         } else {
-            activeRequests.push({ ...r, _matchingMovie: matchingMovie, _isMatched: isMatched, _isExplicit: isExplicit });
+            activeRequests.push({ ...r, _matchingMovie: matchingMovie, _isMatched: isMatched, _isExplicit: isExplicit, _isFulfilled: isFulfilled });
             if (isFulfilled && !(r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId))) {
                 hasNewFulfillment = true;
             }
@@ -12179,14 +12168,14 @@ function renderUserRequests(requests) {
             let readyColor = "rgba(255,255,255,0.1)";
             let activeLineColor = "var(--primary-color)";
             
-            if (r._isMatched || r._isExplicit) {
+            if (r._isFulfilled || r._isMatched || r._isExplicit) {
                 step = 3;
                 progressPct = 100;
                 reviewingColor = "var(--primary-color)";
                 readyColor = "#4caf50";
                 activeLineColor = "#4caf50";
-                const rawLink = r._isExplicit ? r.downloadLink : r._matchingMovie.links[0];
-                const dlLink = typeof rawLink === 'object' && rawLink !== null ? rawLink.url : rawLink;
+                const rawLink = r._isExplicit ? r.downloadLink : (r._matchingMovie && r._matchingMovie.links ? r._matchingMovie.links[0] : "");
+                const dlLink = typeof rawLink === 'object' && rawLink !== null ? (rawLink.url || rawLink.download_url || "") : rawLink;
                 actionBtn = `
                     <button class="btn btn-primary btn-sm user-request-dl-btn" data-link="${escapeHTML(dlLink)}" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">
                         Claim 🎁
