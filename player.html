@@ -4,7 +4,9 @@
   <meta charset='utf-8'/>
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' name='viewport'/>
   <meta content='d5a6c39f06bb1c4f60a134f72a9315db' name='monetag'/>
-  <script src='https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js'></script>
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
   <title>Film House Cinema Player</title>
   <link href='https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap' rel='stylesheet'/>
   
@@ -16,6 +18,85 @@
   </script>
 
   <style>
+
+    /* Film House Custom Gold Plyr Theme */
+    :root {
+      --plyr-color-main: #ffbc00;
+      --plyr-video-control-color: #f1f5f9;
+      --plyr-video-control-color-hover: #ffffff;
+      --plyr-video-control-background-hover: rgba(255, 188, 0, 0.22);
+      --plyr-badge-text-color: #0b0d14;
+      --plyr-badge-background: #ffbc00;
+      --plyr-menu-background: rgba(15, 23, 42, 0.96);
+      --plyr-menu-color: #e2e8f0;
+      --plyr-menu-border-color: rgba(255, 188, 0, 0.25);
+      --plyr-range-fill-background: #ffbc00;
+      --plyr-video-controls-background: linear-gradient(180deg, transparent 0%, rgba(8, 10, 16, 0.92) 100%);
+      --plyr-control-spacing: 8px;
+      --plyr-control-radius: 6px;
+      --plyr-focus-ring-color: #ffbc00;
+    }
+    .plyr--video {
+      width: 100% !important;
+      height: 100% !important;
+      background: #000 !important;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    }
+    .plyr__control--overlaid {
+      background: linear-gradient(135deg, #ffd700, #ff9900) !important;
+      color: #0b0d14 !important;
+      box-shadow: 0 4px 20px rgba(255, 188, 0, 0.5) !important;
+      border-radius: 50% !important;
+      padding: 18px !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    }
+    .plyr__control--overlaid svg {
+      fill: #0b0d14 !important;
+    }
+    .plyr__control--overlaid:hover {
+      transform: scale(1.08) !important;
+      box-shadow: 0 6px 28px rgba(255, 188, 0, 0.7) !important;
+    }
+    .plyr__menu__container {
+      background: rgba(15, 23, 42, 0.96) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border: 1px solid rgba(255, 188, 0, 0.3) !important;
+      border-radius: 10px !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
+    }
+    .plyr__menu__container button[role="menuitemradio"][aria-checked="true"]::before {
+      background: #ffbc00 !important;
+    }
+    .plyr__captions .plyr__caption {
+      background: rgba(0, 0, 0, 0.8) !important;
+      border-radius: 4px !important;
+      padding: 3px 8px !important;
+      font-size: 14.5px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.3px !important;
+    }
+    html.in-iframe .video-viewport {
+      max-width: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    html.in-iframe .plyr--video {
+      height: 100vh !important;
+      height: 100dvh !important;
+    }
+    html.in-iframe .plyr__video-wrapper {
+      height: 100% !important;
+    }
+    html.in-iframe .plyr__video-wrapper video {
+      height: 100% !important;
+      object-fit: contain !important;
+    }
+
     /* Reset & Base */
     *, *::before, *::after {
       box-sizing: border-box;
@@ -605,6 +686,40 @@
       const subParam = urlParams.get('sub') || '';
 
       const videoEl = document.getElementById('mainVideo');
+
+      // Initialize Modern Plyr Player with Film House Gold Branding
+      let plyrInstance = null;
+      try {
+        if (typeof Plyr !== 'undefined') {
+          plyrInstance = new Plyr(videoEl, {
+            controls: [
+              'play-large',
+              'restart',
+              'rewind',
+              'play',
+              'fast-forward',
+              'progress',
+              'current-time',
+              'duration',
+              'mute',
+              'volume',
+              'captions',
+              'settings',
+              'pip',
+              'fullscreen'
+            ],
+            settings: ['captions', 'quality', 'speed'],
+            speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
+            seekTime: 10,
+            tooltips: { controls: true, seek: true },
+            keyboard: { focused: true, global: true }
+          });
+          window.plyrInstance = plyrInstance;
+        }
+      } catch (pErr) {
+        console.warn("Plyr init fallback:", pErr);
+      }
+
       const loaderEl = document.getElementById('loader');
       const playOverlay = document.getElementById('playOverlay');
       const titleEl = document.getElementById('movieTitle');
@@ -1291,17 +1406,19 @@
 
       window.addEventListener('message', function(ev) {
         if (!ev.data) return;
-        if (ev.data.action === 'enterFullscreen' && videoEl) {
-          if (videoEl.requestFullscreen) {
+        if (ev.data.action === 'enterFullscreen') {
+          if (window.plyrInstance && window.plyrInstance.fullscreen) {
+            window.plyrInstance.fullscreen.enter();
+          } else if (videoEl && videoEl.requestFullscreen) {
             videoEl.requestFullscreen().catch(() => {});
-          } else if (videoEl.webkitEnterFullscreen) {
-            videoEl.webkitEnterFullscreen();
-          } else if (videoEl.webkitRequestFullscreen) {
-            videoEl.webkitRequestFullscreen();
           }
         } else if (ev.data.action === 'exitFullscreen') {
-          if (document.exitFullscreen) {
+          if (window.plyrInstance && window.plyrInstance.fullscreen) {
+            window.plyrInstance.fullscreen.exit();
+          } else if (document.exitFullscreen) {
             document.exitFullscreen().catch(() => {});
+          }
+        });
           } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
           }
@@ -1474,8 +1591,7 @@
           if (resumeToast) resumeToast.style.display = 'flex';
           if (btnResume) {
             btnResume.onclick = function() {
-              videoEl.currentTime = saved;
-              videoEl.play().catch(() => {});
+              if (window.plyrInstance) { window.plyrInstance.currentTime = saved; window.plyrInstance.play(); } else { videoEl.currentTime = saved; videoEl.play().catch(() => {}); }
               if (resumeToast) resumeToast.style.display = 'none';
             };
           }
