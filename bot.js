@@ -66,7 +66,21 @@ const TITLE_ALIASES = {
     "grownish": "grown-ish",
     "grown ish": "grown-ish",
     "mixedish": "mixed-ish",
-    "mixed ish": "mixed-ish"
+    "mixed ish": "mixed-ish",
+    "noobees": "noobees",
+    "adthe bible continues": "a.d. the bible continues",
+    "ad the bible continues": "a.d. the bible continues",
+    "tonari no kaibutsu kun": "my little monster",
+    "tonari no kaibutsu": "my little monster",
+    "the testaments": "testament",
+    "testaments": "testament",
+    "testament": "the testaments",
+    "aiyetoro": "aiyetoro town",
+    "aiyetoro town": "aiyetoro",
+    "anikulapo": "aníkúlápó: rise of the spectre",
+    "the legend of aang t l a": "avatar aang: the last airbender",
+    "legend of aang": "avatar aang: the last airbender",
+    "the": "the vampire diaries"
 };
 
 function romanToNum(roman) {
@@ -88,6 +102,10 @@ function getRawAcronym(str) {
 function normalizeTitleForComparison(title) {
     if (!title) return "";
     let s = String(title).toLowerCase();
+    // Strip diacritics / accents (e.g. néro -> nero, aníkúlápó -> anikulapo)
+    try {
+        s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    } catch (_) {}
     s = s.replace(/\s*\([^)]+\)\s*$/g, "").trim();
 
     // Strip ALL apostrophes: It's -> its, Zane's -> zanes, Grey's -> greys
@@ -127,6 +145,26 @@ function titlesMatch(titleA, titleB) {
     const normB = normalizeTitleForComparison(titleB);
     if (!normA || !normB) return false;
     if (normA === normB) return true;
+
+    // Plural / singular tolerance: e.g. testament vs testaments
+    if (normA.replace(/s$/, '') === normB.replace(/s$/, '')) return true;
+
+    // The Fixies alias
+    if ((normA.includes('fixie') || normA === 'the fixies') && (normB.includes('fixie') || normB === 'the fixies')) return true;
+    // VeggieTales alias
+    if ((normA.includes('veggietales') || normA === 'veggietales') && (normB.includes('veggietales') || normB === 'veggietales')) return true;
+    // Noobees alias
+    if (normA.startsWith('noobees') && normB.startsWith('noobees')) return true;
+    // Tonari no Kaibutsu-kun <-> My Little Monster
+    if ((normA.includes('kaibutsu') && normB.includes('little monster')) || (normB.includes('kaibutsu') && normA.includes('little monster'))) return true;
+    // Anikulapo <-> Aníkúlápó: Rise of the Spectre
+    if (normA.includes('anikulapo') && normB.includes('anikulapo')) return true;
+    // Aiyetoro <-> Aiyetoro Town
+    if (normA.startsWith('aiyetoro') && normB.startsWith('aiyetoro')) return true;
+    // Avatar Aang / The Legend of Aang
+    if ((normA.includes('aang') || normA.includes('airbender')) && (normB.includes('aang') || normB.includes('airbender'))) return true;
+    // The -> The Vampire Diaries
+    if ((normA === 'the' && normB.includes('vampire diaries')) || (normB === 'the' && normA.includes('vampire diaries'))) return true;
 
     // Wings / The Wings Initiative / Wings Innovative alias
     if ((normA.startsWith('wings') || normA.includes('wing')) && (normB.startsWith('wings') || normB.includes('wing'))) {
@@ -1700,6 +1738,8 @@ function setupBot(bot, adminBot) {
         const epOnlyMatch = s.match(/\b(?:Episode|Ep|E)\s*(\d{1,3})\b/i);
         const sMatch = s.match(/\b(?:Season|S)\s*(\d{1,2})\b/i);
         const compMatch = s.match(/\b(complete|complete\s*series|all\s*seasons)\b/i);
+        const tMatch = s.match(/\b[tT](\d{1,2})[\s\.\-_]*(?:episodio|capitulo|episode|ep|e)?[\s\.\-_]*(\d{1,3})\b/i) || s.match(/\b[tT]emporada[\s\.\-_]*(\d{1,2})[\s\.\-_]*(?:episodio|capitulo|episode|ep|e)?[\s\.\-_]*(\d{1,3})\b/i);
+        const animeDashMatch = s.match(/[\s\.\-_]+-[\s\.\-_]+(\d{1,3})(?:[\s\.\-_]|\b)/i);
 
         if (multiEpMatch) {
             isSeries = true;
@@ -1727,6 +1767,16 @@ function setupBot(bot, adminBot) {
         } else if (compMatch) {
             isSeries = true;
             seasonOrPart = 'Complete Series';
+        } else if (tMatch) {
+            isSeries = true;
+            seasonNum = parseInt(tMatch[1], 10);
+            episodeNum = parseInt(tMatch[2], 10);
+            seasonOrPart = 'S' + String(seasonNum).padStart(2, '0') + 'E' + String(episodeNum).padStart(2, '0');
+        } else if (animeDashMatch) {
+            isSeries = true;
+            seasonNum = 1;
+            episodeNum = parseInt(animeDashMatch[1], 10);
+            seasonOrPart = 'S01E' + String(episodeNum).padStart(2, '0');
         }
 
         // Bare numeric episodic detection for Koleoso.1.mp4 ... Koleoso.10.mp4
@@ -1759,7 +1809,7 @@ function setupBot(bot, adminBot) {
 
         s = s.replace(/\[[^\]]*\]/g, ' ').replace(/\{[^\}]*\}/g, ' ');
 
-        const cutoffRegex = /\b(19\d\d|20\d\d|s\d{1,2}e\d{1,3}|\d{1,2}x\d{1,3}|season\s*\d{1,2}|s\d{1,2}|e\d{1,3}|ep\d{1,3}|episode\s*\d{1,3}|complete|2160p|4k|1080p|720p|480p|uhd|webrip|web-dl|bluray|bdrip|brrip|camrip|cam|x264|x265|hevc|h264|h265|aac|dts|ddp5\.1)\b/i;
+        const cutoffRegex = /\b(19\d\d|20\d\d|s\d{1,2}e\d{1,3}|\d{1,2}x\d{1,3}|t\d{1,2}[\s\.\-_]*(?:episodio|capitulo|ep)?[\s\.\-_]*\d{1,3}|episodio\s*\d{1,3}|season\s*\d{1,2}|s\d{1,2}|e\d{1,3}|ep\d{1,3}|episode\s*\d{1,3}|complete|2160p|4k|1080p|720p|480p|bd1080p|bd720p|uhd|webrip|web-dl|bluray|bdrip|brrip|camrip|cam|x264|x265|hevc|h264|h265|aac|dts|ddp5\.1)\b/i;
         const cutIdx = s.search(cutoffRegex);
         let titlePart = cutIdx !== -1 ? s.substring(0, cutIdx) : s;
         titlePart = titlePart.replace(/[()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -1807,6 +1857,44 @@ function setupBot(bot, adminBot) {
             isSeries = true;
         } else if (col === 'mixedish') {
             titlePart = 'Mixed-ish';
+            isSeries = true;
+        }
+
+        const lowerRaw = String(rawInput).toLowerCase();
+        const FIXIES_SUBSTRINGS = ["remote and the barcode", "robot and friction", "pen and noliks cube", "refrigerator and the airbag", "oven and the magnifying glass", "paper and the knots", "microphone and the mixer", "music box and modelling clay", "magnet and the doorbell", "magic wand and the chain reaction", "magifying glass and the zipper", "lever and the microwave", "lie detector and tubes", "keyboard and the catapult", "globe and the disguise", "instructions and the shadow play", "electric kettle and the hair dryer", "flashlight and the prosthesis", "drain and the motion sensor", "and the keycard", "draftsmen and the internet", "compass and the washing machine", "constructor set", "combination lock and the wires", "cartoon and the alarm", "cell phone and the night light", "can and the piggy bank", "balloon and the batteries", "armor and the dog", "baby monitor", "alarm clock and the talking doll", "aquarium and the drum", "level and the camera", "sms and the laboratory", "chess and the stain", "invisible ink and the gramophone", "candy and the chick", "tideesh", "why do fixies", "who are the fixies", "what is friction", "where do fixies", "pack-o-mat", "dangerous place for fixies", "meet professor eugenius", "how do talking dolls", "teach their kids", "save electricity", "whipped cream and the kaleidoscope", "video call and the bee", "vacuum and the manipulator", "toothbrush and the antenna", "tools and the fixiphone", "thermometer and the pack o mat", "thermos and the electric train", "stapler and the suction cup", "spare part and the team", "short circuit and gps", "solar battery and the crowbar", "scale and the mirror", "screws and the ecotester"];
+        const VEGGIE_SUBSTRINGS = ["penniless princess", "lyle the kindly viking", "stnicholas", "pistachio", "wheres god when im scared", "sweetpeabeauty", "sillysongcountdown", "girl who became queen", "autotainment", "star of christmas", "toy that saved christmas", "sumo of the opera", "little joe", "rack shack and benny", "sheerluck holmes", "moe and the big exit", "madam blueberry", "samsons hairbrush", "lord of the beans", "josh and the big wall", "king george and the ducky", "great pie war", "forgive them", "are you my neighbor", "giant pickle", "easter carol", "snoodles tale"];
+
+        if (lowerRaw.includes("fixie") || lowerRaw.includes("tideesh") || FIXIES_SUBSTRINGS.some(p => lowerRaw.includes(p)) || (/[\u0400-\u04FF]/.test(rawInput) && /(remote|robot|pen|refrigerator|oven|paper|microphone|magnet|lever|keyboard|globe|flashlight|drain|compass|alarm|aquarium|chess|candy|screws|sensor|vacuum|tools|thermometer|thermos|stapler|battery|mirror)/i.test(lowerRaw))) {
+            titlePart = "The Fixies";
+            isSeries = true;
+        } else if (lowerRaw.startsWith("veggietales") || VEGGIE_SUBSTRINGS.some(p => lowerRaw.includes(p))) {
+            titlePart = "VeggieTales";
+            isSeries = true;
+        } else if (lowerNorm === 'the' && isSeries) {
+            titlePart = 'The Vampire Diaries';
+        } else if (lowerNorm.startsWith('noobees')) {
+            titlePart = 'Noobees';
+            isSeries = true;
+        } else if (lowerNorm.includes('kaibutsu')) {
+            titlePart = 'My Little Monster';
+            isSeries = true;
+        } else if (lowerNorm.includes('adthe bible') || lowerNorm.includes('ad the bible')) {
+            titlePart = 'A.D. The Bible Continues';
+            isSeries = true;
+        } else if (lowerNorm.includes('nero the assassin') || lowerNorm.includes('néro the assassin')) {
+            titlePart = 'Néro The Assassin';
+            isSeries = true;
+        } else if (lowerNorm.startsWith('testament')) {
+            titlePart = 'The Testaments';
+            isSeries = true;
+        } else if (lowerNorm.startsWith('aiyetoro')) {
+            titlePart = 'Aiyetoro Town';
+            isSeries = true;
+        } else if (lowerNorm.startsWith('anikulapo')) {
+            titlePart = 'Aníkúlápó: Rise of the Spectre';
+            isSeries = true;
+        } else if (lowerNorm.includes('legend of aang') || lowerNorm.includes('aang t l a')) {
+            titlePart = 'Avatar Aang: The Last Airbender';
             isSeries = true;
         }
 
