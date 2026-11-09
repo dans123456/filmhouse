@@ -83,6 +83,19 @@ const TITLE_ALIASES = {
     "the": "the vampire diaries"
 };
 
+const CUSTOM_ALIASES_FILE = path.join(__dirname, 'custom_aliases.json');
+let customAliases = {};
+try {
+    if (fs.existsSync(CUSTOM_ALIASES_FILE)) {
+        customAliases = JSON.parse(fs.readFileSync(CUSTOM_ALIASES_FILE, 'utf8'));
+        for (const [k, v] of Object.entries(customAliases)) {
+            TITLE_ALIASES[k] = v;
+        }
+    }
+} catch (e) {
+    console.warn('Could not load custom_aliases.json:', e.message);
+}
+
 function romanToNum(roman) {
     if (!roman) return "";
     const r = String(roman).toLowerCase().trim();
@@ -5774,6 +5787,70 @@ function setupBot(bot, adminBot) {
         ).catch(() => {});
     });
 
+
+    // Command: /alias (Define custom filename-to-catalog aliases on the fly)
+    bot.command(['alias', 'setalias', 'addalias'], async (ctx) => {
+        const userId = String(ctx.from?.id);
+        const adminIds = await getAllAdminIds();
+        if (!adminIds.includes(userId)) return;
+
+        const text = ctx.message.text ? ctx.message.text.replace(/^\/(alias|setalias|addalias)(@\w+)?/i, "").trim() : "";
+        if (!text) {
+            const aliasEntries = Object.entries(customAliases);
+            if (aliasEntries.length === 0) {
+                return ctx.reply(
+                    "🏷️ <b>Custom Title Aliases</b>\n\nNo custom aliases set yet.\n\n<b>Usage:</b>\n<code>/alias shortcut = Real Title</code>\n\n<b>Examples:</b>\n• <code>/alias utd = Under the Dome</code>\n• <code>/alias tvd = The Vampire Diaries</code>\n• <code>/alias robot = The Fixies</code>\n\n<i>Aliases will immediately be used by /scanlibrary without touching code!</i>",
+                    { parse_mode: 'HTML' }
+                );
+            }
+            const listStr = aliasEntries.map(([k, v]) => `• <code>${escapeHtml(k)}</code> ➔ <b>${escapeHtml(v)}</b>`).join("\n");
+            return ctx.reply(
+                `🏷️ <b>Current Custom Aliases:</b>\n\n${listStr}\n\n<b>Add new:</b>\n<code>/alias short_name = Real Title</code>\n\n<b>Remove:</b>\n<code>/alias remove short_name</code>`,
+                { parse_mode: 'HTML' }
+            );
+        }
+
+        if (text.toLowerCase().startsWith("remove ") || text.toLowerCase().startsWith("delete ")) {
+            const toRemove = text.replace(/^(remove|delete)\s+/i, "").trim().toLowerCase();
+            const normKey = normalizeTitleForComparison(toRemove);
+            if (customAliases[normKey]) {
+                delete customAliases[normKey];
+                delete TITLE_ALIASES[normKey];
+                try {
+                    fs.writeFileSync(CUSTOM_ALIASES_FILE, JSON.stringify(customAliases, null, 2), 'utf8');
+                } catch (e) {}
+                return ctx.reply(`🗑️ Removed alias: <code>${escapeHtml(normKey)}</code>`, { parse_mode: 'HTML' });
+            } else {
+                return ctx.reply(`⚠️ Alias <code>${escapeHtml(normKey)}</code> not found.`, { parse_mode: 'HTML' });
+            }
+        }
+
+        const parts = text.split(/=|->|:/);
+        if (parts.length < 2) {
+            return ctx.reply("⚠️ Format incorrect. Please use:\n<code>/alias short_title = Real Show Title</code>", { parse_mode: 'HTML' });
+        }
+
+        const rawShort = parts[0].trim().toLowerCase();
+        const rawTarget = parts.slice(1).join("=").trim();
+        const normKey = normalizeTitleForComparison(rawShort);
+        const normTarget = normalizeTitleForComparison(rawTarget);
+
+        customAliases[normKey] = rawTarget;
+        TITLE_ALIASES[normKey] = normTarget;
+
+        try {
+            fs.writeFileSync(CUSTOM_ALIASES_FILE, JSON.stringify(customAliases, null, 2), 'utf8');
+        } catch (e) {
+            console.warn("Could not save custom_aliases.json:", e.message);
+        }
+
+        return ctx.reply(
+            `✅ <b>Alias Saved!</b>\n\n` +
+            `Whenever a file matches <code>${escapeHtml(normKey)}</code>, it will link to <b>${escapeHtml(rawTarget)}</b>.\n\n` +
+            `👉 Run <code>/scanlibrary</code> to immediately match and link files!`,
+            { parse_mode: 'HTML' }
+        );
+    });
 
     // Command: /pending & /requests (Admin pending queue lookup on user bot)
     bot.command(['pending', 'requests'], async (ctx) => {
