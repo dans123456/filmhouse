@@ -7175,15 +7175,42 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         minimizeBtn.addEventListener("click", closeCinemaModal);
     }
 
-    // Keyboard Escape key to exit/minimize cinema modal on desktop
+    // Keyboard shortcuts to control playback and exit cinema modal on desktop (Space, Arrows, F, M, Esc)
     if (!window._cinemaKeyBound) {
         window._cinemaKeyBound = true;
         window.addEventListener("keydown", (e) => {
+            const cModal = document.getElementById("cinema-modal");
+            if (!cModal || !cModal.classList.contains("active")) return;
+
             if (e.key === "Escape") {
-                const cModal = document.getElementById("cinema-modal");
-                if (cModal && cModal.classList.contains("active")) {
-                    closeCinemaModal();
-                }
+                closeCinemaModal();
+                return;
+            }
+
+            // Don't intercept when user is typing in search or input fields
+            const tag = (document.activeElement?.tagName || "").toLowerCase();
+            if (tag === "input" || tag === "textarea" || document.activeElement?.isContentEditable) {
+                return;
+            }
+
+            const frame = document.querySelector("#cinema-iframe-container iframe");
+            if (!frame || !frame.contentWindow) return;
+
+            if (e.code === "Space" || e.key === " " || e.key === "k" || e.key === "K") {
+                e.preventDefault();
+                frame.contentWindow.postMessage({ action: "togglePlay" }, "*");
+            } else if (e.key === "ArrowLeft" || e.key === "j" || e.key === "J") {
+                e.preventDefault();
+                frame.contentWindow.postMessage({ action: "seek", seconds: -10 }, "*");
+            } else if (e.key === "ArrowRight" || e.key === "l" || e.key === "L") {
+                e.preventDefault();
+                frame.contentWindow.postMessage({ action: "seek", seconds: 10 }, "*");
+            } else if (e.key === "f" || e.key === "F") {
+                e.preventDefault();
+                frame.contentWindow.postMessage({ action: "toggleFullscreen" }, "*");
+            } else if (e.key === "m" || e.key === "M") {
+                e.preventDefault();
+                frame.contentWindow.postMessage({ action: "toggleMute" }, "*");
             }
         });
     }
@@ -8427,6 +8454,27 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         if (typeof window.openCinemaSubtitlesHub === "function") {
                             window.openCinemaSubtitlesHub();
                         }
+                    } else if (e.data.action === "playerEnteredFullscreen") {
+                        try {
+                            if (screen.orientation && screen.orientation.lock) {
+                                screen.orientation.lock("landscape").catch(() => {});
+                            }
+                        } catch (_) {}
+                        try {
+                            if (window.Telegram?.WebApp?.requestFullscreen) {
+                                window.Telegram.WebApp.requestFullscreen();
+                            }
+                        } catch (_) {}
+                        const theater = document.querySelector(".cinema-theater-container");
+                        if (theater) theater.classList.add("is-fullscreen");
+                    } else if (e.data.action === "playerExitedFullscreen") {
+                        try {
+                            if (screen.orientation && screen.orientation.unlock) {
+                                screen.orientation.unlock();
+                            }
+                        } catch (_) {}
+                        const theater = document.querySelector(".cinema-theater-container");
+                        if (theater) theater.classList.remove("is-fullscreen");
                     }
                 });
             }
