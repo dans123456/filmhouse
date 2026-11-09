@@ -2929,7 +2929,7 @@ function renderDetailsStreamsReadOnlyHTML(streams, movie, isSeries) {
         const epNum = s.episode || (idx + 1);
         const label = isSeries ? `Episode ${epNum}` : (s.quality || `Link ${idx + 1}`);
         const tokenVal = s.stream_url || s.url || '';
-        const playUrl = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(tokenVal)}&title=${encodeURIComponent(movie.title)}${isSeries ? `&ep=${epNum}` : ''}`;
+        const playUrl = `https://dans123456.github.io/filmhouse/player.html?watch=${encodeURIComponent(tokenVal)}&title=${encodeURIComponent(movie.title)}${isSeries ? `&ep=${epNum}` : ''}`;
         
         return `
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; gap: 8px;">
@@ -3713,7 +3713,7 @@ function showMovieDetails(movie) {
             testLink.title = "Test Stream Player";
             testLink.target = "_blank";
             testLink.style.cssText = "font-size: 11px; text-decoration: none; padding: 4px 8px; border: 1px solid rgba(255, 188, 0, 0.35); border-radius: 4px; color: #ffbc00; background: rgba(255, 188, 0, 0.08); cursor: pointer; flex-shrink: 0;";
-            testLink.href = currentTokenVal ? `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(currentTokenVal)}&title=${encodeURIComponent(movie.title)}${isCurrentSeries ? `&ep=${item.episode || (idx + 1)}` : ''}` : '#';
+            testLink.href = currentTokenVal ? `https://dans123456.github.io/filmhouse/player.html?watch=${encodeURIComponent(currentTokenVal)}&title=${encodeURIComponent(movie.title)}${isCurrentSeries ? `&ep=${item.episode || (idx + 1)}` : ''}` : '#';
             if (!currentTokenVal) testLink.style.opacity = "0.4";
 
             input.addEventListener("input", (e) => {
@@ -3721,7 +3721,7 @@ function showMovieDetails(movie) {
                 currentEditStreams[idx].stream_url = cleaned;
                 currentEditStreams[idx].url = cleaned;
                 if (cleaned) {
-                    testLink.href = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(cleaned)}&title=${encodeURIComponent(movie.title)}${isCurrentSeries ? `&ep=${item.episode || (idx + 1)}` : ''}`;
+                    testLink.href = `https://dans123456.github.io/filmhouse/player.html?watch=${encodeURIComponent(cleaned)}&title=${encodeURIComponent(movie.title)}${isCurrentSeries ? `&ep=${item.episode || (idx + 1)}` : ''}`;
                     testLink.style.opacity = "1";
                 } else {
                     testLink.href = '#';
@@ -4633,7 +4633,7 @@ function renderAddMovieStreamLinks() {
                 ` : ''}
 
                 ${cleanToken ? `
-                <a href="https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(cleanToken)}" target="_blank" class="btn btn-secondary btn-sm" style="font-size: 10px; padding: 5px 8px; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00; text-decoration: none; flex-shrink: 0;" title="Test Stream Player">Test ▶️</a>
+                <a href="https://dans123456.github.io/filmhouse/player.html?watch=${encodeURIComponent(cleanToken)}" target="_blank" class="btn btn-secondary btn-sm" style="font-size: 10px; padding: 5px 8px; border-color: rgba(255, 188, 0, 0.4); color: #ffbc00; text-decoration: none; flex-shrink: 0;" title="Test Stream Player">Test ▶️</a>
                 ` : ''}
 
                 <button type="button" class="btn-remove-add-movie-stream" data-index="${idx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 6px; display: ${addMovieStreamLinksState.length > 1 ? 'block' : 'none'};">
@@ -7382,13 +7382,13 @@ function addFulfillStreamLinkInputRow(idx, defaultUrl = "", defaultQuality = "72
     testBtn.target = "_blank";
     testBtn.style.cssText = `font-size: 10px; padding: 4px 8px; border: 1px solid rgba(255, 188, 0, 0.4); border-radius: 4px; color: #ffbc00; text-decoration: none; display: ${cleanInitial ? 'inline-flex' : 'none'}; align-items: center; white-space: nowrap; flex-shrink: 0;`;
     if (cleanInitial) {
-        testBtn.href = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(cleanInitial)}&title=${encodeURIComponent(typeof currentFulfillTitle !== 'undefined' ? currentFulfillTitle : 'Movie')}`;
+        testBtn.href = `https://dans123456.github.io/filmhouse/player.html?watch=${encodeURIComponent(cleanInitial)}&title=${encodeURIComponent(typeof currentFulfillTitle !== 'undefined' ? currentFulfillTitle : 'Movie')}`;
     }
 
     urlInput.addEventListener("input", (e) => {
         const cleaned = cleanStreamInput(e.target.value.trim());
         if (cleaned) {
-            testBtn.href = `https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(cleaned)}&title=${encodeURIComponent(typeof currentFulfillTitle !== 'undefined' ? currentFulfillTitle : 'Movie')}`;
+            testBtn.href = `https://dans123456.github.io/filmhouse/player.html?watch=${encodeURIComponent(cleaned)}&title=${encodeURIComponent(typeof currentFulfillTitle !== 'undefined' ? currentFulfillTitle : 'Movie')}`;
             testBtn.style.display = "inline-flex";
         } else {
             testBtn.style.display = "none";
@@ -9275,7 +9275,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <span style="font-size: 10px; color: #ffbc00; font-weight: 700; width: 34px; flex-shrink: 0;">Ep ${epNum}:</span>
                                         <input type="text" class="batch-series-stream-input" data-item-idx="${idx}" data-stream-idx="${sIdx}" value="${escapeHTML(st.stream_url || st.url || '')}" placeholder="Ep ${epNum} token or stream link..." style="flex: 1; min-width: 0; padding: 3px 6px; background: var(--input-bg); border: 1px solid rgba(255,188,0,0.2); border-radius: 4px; color: #fff; font-size: 11px; font-family: monospace;">
                                         ${tokenVal ? `
-                                            <a href="https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(tokenVal)}&title=${encodeURIComponent(item.title + ' - Episode ' + epNum)}" target="_blank" style="font-size: 10px; color: #ffbc00; text-decoration: none; padding: 2px 5px; border: 1px solid rgba(255,188,0,0.35); border-radius: 3px; flex-shrink: 0; background: rgba(255,188,0,0.1);" title="Test Stream Player">Test ▶️</a>
+                                            <a href="https://dans123456.github.io/filmhouse/player.html?watch=${encodeURIComponent(tokenVal)}&title=${encodeURIComponent(item.title + ' - Episode ' + epNum)}" target="_blank" style="font-size: 10px; color: #ffbc00; text-decoration: none; padding: 2px 5px; border: 1px solid rgba(255,188,0,0.35); border-radius: 3px; flex-shrink: 0; background: rgba(255,188,0,0.1);" title="Test Stream Player">Test ▶️</a>
                                         ` : ''}
                                         ${item.stream_links.length > 1 ? `
                                             <button type="button" class="btn-remove-batch-series-stream" data-item-idx="${idx}" data-stream-idx="${sIdx}" style="background: none; border: none; color: #ff3b30; cursor: pointer; padding: 1px 4px; font-size: 12px; flex-shrink: 0;" title="Remove this episode stream">✕</button>
@@ -9301,7 +9301,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </span>
                         <input type="text" class="batch-stream-url-input" data-item-idx="${idx}" value="${escapeHTML(item.stream_url || '')}" placeholder="Paste File Stream Bot link or token (optional)..." style="flex: 1; min-width: 0; width: 100%; padding: 4px 7px; background: rgba(255, 188, 0, 0.04); border: 1px solid rgba(255, 188, 0, 0.25); border-radius: 4px; color: #fff; font-size: 11px; box-sizing: border-box; font-family: monospace;">
                         ${tokenVal ? `
-                            <a href="https://filmhouse-player.blogspot.com/?watch=${encodeURIComponent(tokenVal)}&title=${encodeURIComponent(item.title)}" target="_blank" style="font-size: 10px; color: #ffbc00; text-decoration: none; padding: 2px 7px; border: 1px solid rgba(255, 188, 0, 0.35); border-radius: 3px; flex-shrink: 0; white-space: nowrap; background: rgba(255, 188, 0, 0.1);" title="Test Stream Player">Test ▶️</a>
+                            <a href="https://dans123456.github.io/filmhouse/player.html?watch=${encodeURIComponent(tokenVal)}&title=${encodeURIComponent(item.title)}" target="_blank" style="font-size: 10px; color: #ffbc00; text-decoration: none; padding: 2px 7px; border: 1px solid rgba(255, 188, 0, 0.35); border-radius: 3px; flex-shrink: 0; white-space: nowrap; background: rgba(255, 188, 0, 0.1);" title="Test Stream Player">Test ▶️</a>
                         ` : ''}
                     </div>
                 `;
