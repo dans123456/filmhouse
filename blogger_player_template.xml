@@ -604,6 +604,8 @@
       const qualityParam = urlParams.get('quality') || '1080p HD';
       const backdropParam = urlParams.get('backdrop') || urlParams.get('poster') || '';
       const subParam = urlParams.get('sub') || '';
+      const typeParam = (urlParams.get('type') || '').toLowerCase();
+      const serverParam = urlParams.get('server') || '';
 
       const videoEl = document.getElementById('mainVideo');
       const loaderEl = document.getElementById('loader');
@@ -1378,8 +1380,6 @@
         }
       });
 
-      const typeParam = (urlParams.get('type') || '').toLowerCase();
-      const serverParam = urlParams.get('server') || '';
       const defaultStreamServer = (serverParam || "https://filmhouse-stream.duckdns.org").replace(/\/+$/, "");
       const isSeries = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
 

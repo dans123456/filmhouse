@@ -2456,6 +2456,9 @@ function clearWatchHistory() {
 function navigateToScreen(targetScreenId) {
     // If navigating away from media-detail, ensure proper cleanup of video and body state
     if (targetScreenId !== "media-detail") {
+        if (typeof stopAllBackgroundTrailers === "function") {
+            stopAllBackgroundTrailers();
+        }
         if (typeof closeMediaDetailPage === "function" && document.body.classList.contains("media-detail-active")) {
             closeMediaDetailPage();
         }
@@ -3700,6 +3703,9 @@ function initMediaDetailPage() {
 }
 
 function closeMediaDetailPage() {
+    if (typeof stopAllBackgroundTrailers === "function") {
+        stopAllBackgroundTrailers();
+    }
     if (document.fullscreenElement || document.webkitFullscreenElement) {
         try {
             if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
@@ -3760,8 +3766,60 @@ function closeMediaDetailPage() {
 
 let currentHeroTrailerCleanup = null;
 
+// Bulletproof Background Trailer Terminator (Kills YouTube iframes & audio completely)
+function stopAllBackgroundTrailers() {
+    window._suppressTrailerPlayback = true;
+    if (typeof currentHeroTrailerCleanup === "function") {
+        const cleanup = currentHeroTrailerCleanup;
+        currentHeroTrailerCleanup = null;
+        try { cleanup(); } catch (e) {}
+    }
+    const heroTrailerIframe = document.getElementById("media-stream-iframe-container");
+    if (heroTrailerIframe) {
+        heroTrailerIframe.querySelectorAll("iframe").forEach(f => {
+            try { f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "pauseVideo", args: [] }), "*"); } catch (_) {}
+            try { f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "stopVideo", args: [] }), "*"); } catch (_) {}
+            f.src = "about:blank";
+            f.remove();
+        });
+        heroTrailerIframe.replaceChildren();
+        heroTrailerIframe.style.display = "none";
+    }
+    const heroViewport = document.getElementById("media-hero-viewport");
+    if (heroViewport) heroViewport.classList.remove("has-active-video");
+    const detailScreen = document.getElementById("screen-media-detail");
+    if (detailScreen) detailScreen.classList.remove("video-playing");
+    const backdropContainer = document.getElementById("media-backdrop-container");
+    if (backdropContainer) {
+        backdropContainer.style.display = "block";
+        backdropContainer.classList.remove("hidden-for-playback");
+    }
+
+    // Also terminate any popup trailer in trailer-modal
+    const trailerModal = document.getElementById("trailer-modal");
+    if (trailerModal) trailerModal.classList.remove("active");
+    const trailerContainer = document.getElementById("trailer-iframe-container");
+    if (trailerContainer) {
+        trailerContainer.querySelectorAll("iframe").forEach(f => {
+            try { f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "stopVideo", args: [] }), "*"); } catch (_) {}
+            f.src = "about:blank";
+            f.remove();
+        });
+        trailerContainer.replaceChildren();
+    }
+}
+
 function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
     if (!trailerKeyOrUrl) return;
+    const cModal = document.getElementById("cinema-modal");
+    if ((cModal && cModal.classList.contains("active")) || window._suppressTrailerPlayback) {
+        console.log("[Trailer] Blocked: Cinema stream or modal is currently active");
+        return;
+    }
+    if (!document.body.classList.contains("media-detail-active")) {
+        console.log("[Trailer] Blocked: Not on media detail screen");
+        return;
+    }
     if (typeof currentHeroTrailerCleanup === "function") {
         currentHeroTrailerCleanup();
         currentHeroTrailerCleanup = null;
@@ -3905,6 +3963,9 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
         clearTimeout(crossfadeTimeout);
         if (progressPollInterval) clearInterval(progressPollInterval);
         window.removeEventListener("message", onYtMessage);
+        try { postCmd("pauseVideo"); } catch (e) {}
+        try { postCmd("stopVideo"); } catch (e) {}
+        stopAndRestoreBackdrop();
     };
 
     if (previewFab) {
@@ -4365,6 +4426,7 @@ function updateMovieReleaseTracker(movie, isTVShow) {
 
 function openMediaDetailPage(movie) {
     if (!movie) return;
+    window._suppressTrailerPlayback = false;
 
     // Auto-enrich movie from state.movies if available (preserves stream_url, links, quality, backdrop, trailers)
     if (state.movies && Array.isArray(state.movies)) {
@@ -5981,7 +6043,9 @@ function fetchTmdbDetailsForMedia(movie) {
                     trailerBtn.style.display = "flex";
                 }
                 const iframeContainer = document.getElementById("media-stream-iframe-container");
-                if (movie.trailer && iframeContainer && iframeContainer.style.display === "none") {
+                const cModal = document.getElementById("cinema-modal");
+                const isCinemaOpen = (cModal && cModal.classList.contains("active")) || window._suppressTrailerPlayback;
+                if (movie.trailer && iframeContainer && iframeContainer.style.display === "none" && !isCinemaOpen && document.body.classList.contains("media-detail-active")) {
                     embedAndPlayHeroTrailer(movie.trailer);
                 }
 
@@ -6987,6 +7051,7 @@ function resolveDirectStreamUrl(targetUrl) {
 
 // Close In-App Cinema Modal & Reset State
 function closeCinemaModal() {
+    window._suppressTrailerPlayback = false;
     stopStreamingPresence();
     const qPill = document.querySelector(".cinema-top-center .cinema-quality-pill");
     if (qPill) qPill.remove();
@@ -7105,20 +7170,12 @@ function getMoreLikeThisMovies(currentMovie, limit = 8) {
 
 // Open In-App Cinema Streaming Player Modal directly with trailer cleanup
 function openCinemaModal(movie, customStreamUrl, customTitle) {
-    // Instantly terminate background hero trailer so audio never overlaps with cinema player
-    if (typeof currentHeroTrailerCleanup === "function") {
-        try { currentHeroTrailerCleanup(); } catch (e) {}
-        currentHeroTrailerCleanup = null;
-    }
-    const heroTrailerIframe = document.getElementById("media-stream-iframe-container");
-    if (heroTrailerIframe) {
-        heroTrailerIframe.replaceChildren();
-        heroTrailerIframe.style.display = "none";
-    }
+    stopAllBackgroundTrailers();
     openCinemaModalCore(movie, customStreamUrl, customTitle);
 }
 
 function openCinemaModalCore(movie, customStreamUrl, customTitle) {
+    stopAllBackgroundTrailers();
     const modal = document.getElementById("cinema-modal");
     const container = document.getElementById("cinema-iframe-container");
     const titleEl = document.getElementById("cinema-modal-title");
