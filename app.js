@@ -7061,8 +7061,19 @@ function closeCinemaModal() {
     if (modal) modal.classList.remove("active");
     if (theater) {
         theater.classList.remove("is-fullscreen");
+        theater.classList.remove("theater-pseudo-landscape");
         theater.classList.remove("controls-hidden");
     }
+    try {
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        }
+    } catch (_) {}
+    try {
+        if (window.Telegram?.WebApp?.unlockOrientation) {
+            window.Telegram.WebApp.unlockOrientation();
+        }
+    } catch (_) {}
     if (container) container.replaceChildren();
 
     // Reset Next Episode Card & Subtitle / Quality Hub Modals
@@ -7077,12 +7088,14 @@ function closeCinemaModal() {
         window._nextEpCountdownTimer = null;
     }
 
-    // Reset subtitle session to prevent subtitle leakage across movies
+    // Reset subtitle & audio session to prevent leakage across titles
     state.activeSubtitleUrl = null;
     state.activeSubtitleLang = null;
     state.activeSubtitleMovieId = null;
     const subQuickLabel = document.getElementById("cinema-sub-quick-label");
-    if (subQuickLabel) subQuickLabel.textContent = "Subtitles: Auto";
+    if (subQuickLabel) subQuickLabel.textContent = "CC Off";
+    const audioQuickLabel = document.getElementById("cinema-audio-quick-label");
+    if (audioQuickLabel) audioQuickLabel.textContent = "🔊 Auto";
     
     // Unlock screen orientation if locked
     try {
@@ -7391,6 +7404,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
     // Multi-Language Subtitles (60+ Languages via OpenSubtitles)
     let loadedHubSubtitles = [];
+    let loadedHubSubtitlesKey = "";
     let activeHubSubFilter = "all";
 
     const SUB_FLAGS = {
@@ -7407,10 +7421,13 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     };
 
     async function loadOpenSubtitlesForHub() {
-        if (loadedHubSubtitles.length > 0) {
+        const curMediaSubKey = getScopedMediaSubtitleKey(movie, currentSeason ? currentSeason.seasonNumber : 1, currentEpisodeNum);
+        if (loadedHubSubtitles.length > 0 && loadedHubSubtitlesKey === curMediaSubKey) {
             renderHubSubtitlesList();
             return;
         }
+        loadedHubSubtitlesKey = curMediaSubKey;
+        loadedHubSubtitles = [];
         let imdbId = movie.imdb_id || "";
         const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
         const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
@@ -7554,7 +7571,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 executeWithCcUnlock(() => {
                     state.activeSubtitleUrl = url;
                     state.activeSubtitleLang = name;
-                    state.activeSubtitleMovieId = movie.id || movie.tmdb_id || movie.imdb_id || movie.title;
+                    state.activeSubtitleMovieId = getScopedMediaSubtitleKey(movie, currentSeason ? currentSeason.seasonNumber : 1, currentEpisodeNum);
                     const frame = container.querySelector("iframe");
                     if (frame && frame.contentWindow) {
                         frame.contentWindow.postMessage({
@@ -7608,7 +7625,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     if (subQuickBtn && !subQuickBtn._bound) {
         subQuickBtn._bound = true;
         subQuickBtn.addEventListener("click", () => {
-            openSubHub("audio");
+            openSubHub("subs");
             if (typeof triggerHaptic === "function") triggerHaptic("selection");
         });
     }
@@ -7823,7 +7840,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 `;
                 audioTrackList.appendChild(aBtn);
                 if (a.enabled && audioQuickLabel) {
-                    audioQuickLabel.textContent = `Audio: ${aLabel}`;
+                    audioQuickLabel.textContent = `🔊 ${aLabel}`;
                 }
             });
         }
@@ -7901,7 +7918,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 }, "*");
             }
 
-            if (audioQuickLabel) audioQuickLabel.textContent = `Audio: ${trackName}`;
+            if (audioQuickLabel) audioQuickLabel.textContent = `🔊 ${trackName.split(' ')[0]}`;
             showToast(`Audio Track: ${trackName}`, "success");
             closeSubHub();
         });
@@ -7981,7 +7998,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
         const iframe = document.createElement("iframe");
         iframe.src = playerSrc;
-        iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture");
+        iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture; orientation-lock; screen-wake-lock");
         iframe.setAttribute("allowfullscreen", "true");
         
         let loaderDismissed = false;
@@ -8522,18 +8539,52 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                                 window.Telegram.WebApp.requestFullscreen();
                             }
                         } catch (_) {}
+                        try {
+                            if (window.Telegram?.WebApp?.lockOrientation) {
+                                window.Telegram.WebApp.lockOrientation("landscape");
+                            }
+                        } catch (_) {}
                         const theater = document.querySelector(".cinema-theater-container");
-                        if (theater) theater.classList.add("is-fullscreen");
+                        if (theater) {
+                            theater.classList.add("is-fullscreen");
+                            // Auto-rotate to landscape fallback if physical orientation lock is unavailable or blocked on mobile
+                            if (window.innerWidth < window.innerHeight && window.innerWidth <= 850) {
+                                theater.classList.add("theater-pseudo-landscape");
+                            }
+                        }
                     } else if (e.data.action === "playerExitedFullscreen") {
                         try {
                             if (screen.orientation && screen.orientation.unlock) {
                                 screen.orientation.unlock();
                             }
                         } catch (_) {}
+                        try {
+                            if (window.Telegram?.WebApp?.unlockOrientation) {
+                                window.Telegram.WebApp.unlockOrientation();
+                            }
+                        } catch (_) {}
                         const theater = document.querySelector(".cinema-theater-container");
-                        if (theater) theater.classList.remove("is-fullscreen");
+                        if (theater) {
+                            theater.classList.remove("is-fullscreen");
+                            theater.classList.remove("theater-pseudo-landscape");
+                        }
                     }
                 });
+
+                if (!window._cinemaOrientationBound) {
+                    window._cinemaOrientationBound = true;
+                    const handleOrientationChange = () => {
+                        const theater = document.querySelector(".cinema-theater-container");
+                        if (!theater || !theater.classList.contains("is-fullscreen")) return;
+                        if (window.innerWidth >= window.innerHeight) {
+                            theater.classList.remove("theater-pseudo-landscape");
+                        } else if (window.innerWidth <= 850) {
+                            theater.classList.add("theater-pseudo-landscape");
+                        }
+                    };
+                    window.addEventListener("resize", handleOrientationChange);
+                    window.addEventListener("orientationchange", handleOrientationChange);
+                }
             }
 
             // Async function to fetch and render visual episode cards for the selected season
@@ -8701,6 +8752,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         currentCinemaEpIndex = idx;
                         window._currentActiveEpKey = progKey;
 
+                        // Purge existing subtitle cues from iframe video element
+                        const curEpFrame = container.querySelector("iframe");
+                        if (curEpFrame && curEpFrame.contentWindow) {
+                            curEpFrame.contentWindow.postMessage({ action: "purgeSubtitles" }, "*");
+                        }
+
                         // Reset episode-specific subtitle state so previous episode subtitles don't stick
                         const newEpScopedKey = getScopedMediaSubtitleKey(movie, currentSeason ? currentSeason.seasonNumber : 1, currentEpisodeNum);
                         if (state.activeSubtitleMovieId !== newEpScopedKey) {
@@ -8708,6 +8765,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                             state.activeSubtitleLang = null;
                             state.activeSubtitleMovieId = newEpScopedKey;
                             loadedHubSubtitles = [];
+                            loadedHubSubtitlesKey = "";
                             updateCcButtonVisual(false, "CC Off");
                         }
 
@@ -8797,12 +8855,18 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     tabBtn.classList.add("active");
                     currentSeason = sObj;
                     currentEpisodeNum = 1;
+                    // Purge existing subtitle cues from iframe video element
+                    const curSeasonFrame = container.querySelector("iframe");
+                    if (curSeasonFrame && curSeasonFrame.contentWindow) {
+                        curSeasonFrame.contentWindow.postMessage({ action: "purgeSubtitles" }, "*");
+                    }
                     const newSeasonKey = getScopedMediaSubtitleKey(movie, currentSeason.seasonNumber, 1);
                     if (state.activeSubtitleMovieId !== newSeasonKey) {
                         state.activeSubtitleUrl = null;
                         state.activeSubtitleLang = null;
                         state.activeSubtitleMovieId = newSeasonKey;
                         loadedHubSubtitles = [];
+                        loadedHubSubtitlesKey = "";
                         updateCcButtonVisual(false, "CC Off");
                     }
                     renderSeasonEpisodes(sObj);

@@ -8368,3 +8368,33 @@ body.desktop-wide-layout .mining-card-container {
 .cinema-server-cdn-badge {
     display: none !important;
 }
+
+/* Mobile Pseudo-Landscape Fallback (Forces true edge-to-edge landscape view on mobile browsers blocking OS rotation) */
+@media (max-width: 900px) and (orientation: portrait) {
+    .cinema-theater-container.theater-pseudo-landscape {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        width: 100vh !important;
+        height: 100vw !important;
+        max-width: 100vh !important;
+        max-height: 100vw !important;
+        transform: translate(-50%, -50%) rotate(90deg) !important;
+        transform-origin: center center !important;
+        z-index: 99999 !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #000 !important;
+    }
+    .cinema-theater-container.theater-pseudo-landscape .cinema-player-wrapper,
+    .cinema-theater-container.theater-pseudo-landscape .cinema-iframe-wrapper,
+    .cinema-theater-container.theater-pseudo-landscape .cinema-iframe-wrapper iframe {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+    }
+    .cinema-theater-container.theater-pseudo-landscape .cinema-details-scroll-body {
+        display: none !important;
+    }
+}

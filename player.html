@@ -1377,7 +1377,17 @@
         }
 
         const audioTracks = [];
-        if (videoEl.audioTracks) {
+        if (window._currentHls && window._currentHls.audioTracks && window._currentHls.audioTracks.length > 0) {
+          const curIdx = window._currentHls.audioTrack;
+          window._currentHls.audioTracks.forEach((at, idx) => {
+            audioTracks.push({
+              index: idx,
+              label: at.name || at.lang || `Audio ${idx + 1}`,
+              lang: at.lang || '',
+              enabled: (idx === curIdx)
+            });
+          });
+        } else if (videoEl.audioTracks) {
           for (let i = 0; i < videoEl.audioTracks.length; i++) {
             const a = videoEl.audioTracks[i];
             audioTracks.push({
@@ -1407,6 +1417,19 @@
 
       async function lockToLandscape() {
         try {
+          // 1. Native iOS / Safari / WebKit fullscreen rotation
+          if (videoEl && typeof videoEl.webkitEnterFullscreen === 'function' && !document.fullscreenElement) {
+            videoEl.webkitEnterFullscreen();
+          }
+        } catch (_) {}
+        try {
+          // 2. Telegram WebApp SDK orientation lock
+          if (window.Telegram?.WebApp?.lockOrientation) {
+            window.Telegram.WebApp.lockOrientation('landscape');
+          }
+        } catch (_) {}
+        try {
+          // 3. HTML5 Screen Orientation API
           if (screen.orientation && screen.orientation.lock) {
             await screen.orientation.lock('landscape').catch(() => {});
           } else if (screen.lockOrientation) {
@@ -1420,6 +1443,11 @@
       }
 
       function unlockFromLandscape() {
+        try {
+          if (window.Telegram?.WebApp?.unlockOrientation) {
+            window.Telegram.WebApp.unlockOrientation();
+          }
+        } catch (_) {}
         try {
           if (screen.orientation && screen.orientation.unlock) {
             screen.orientation.unlock();
@@ -1457,6 +1485,14 @@
           if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
         } else if (videoEl && videoEl.requestFullscreen) {
           videoEl.requestFullscreen().catch(() => {});
+        } else if (videoEl && typeof videoEl.webkitEnterFullscreen === 'function') {
+          videoEl.webkitEnterFullscreen();
+        }
+      }
+
+      function toggleControlsVisibility() {
+        if (window.plyrInstance && typeof window.plyrInstance.toggleControls === 'function') {
+          window.plyrInstance.toggleControls();
         }
       }
 
@@ -1497,6 +1533,7 @@
         const diff = now - lastTapTime;
 
         if (diff < 320 && lastTapZone === zone) {
+          // Double-tap detected on same zone
           clearTimeout(tapTimeout);
           lastTapTime = 0;
           lastTapZone = null;
@@ -1507,15 +1544,22 @@
           } else if (zone === 'right') {
             seekDelta(10);
             showRippleIndicator('right');
-          } else {
+          } else if (zone === 'center') {
             togglePlayState();
           }
         } else {
+          // First tap candidate
           lastTapTime = now;
           lastTapZone = zone;
           clearTimeout(tapTimeout);
           tapTimeout = setTimeout(() => {
-            togglePlayState();
+            if (zone === 'center') {
+              // ONLY middle zone single-tap toggles Play / Pause!
+              togglePlayState();
+            } else {
+              // Left & Right side taps only toggle controls HUD without pausing
+              toggleControlsVisibility();
+            }
             lastTapTime = 0;
             lastTapZone = null;
           }, 320);
@@ -1675,11 +1719,44 @@
           } catch (_) {}
         } else if (ev.data.action === 'selectAudioTrack') {
           const targetIndex = ev.data.index;
-          if (videoEl.audioTracks) {
+          if (window._currentHls && typeof window._currentHls.audioTrack !== 'undefined') {
+            window._currentHls.audioTrack = targetIndex;
+          }
+          if (videoEl && videoEl.audioTracks) {
             for (let i = 0; i < videoEl.audioTracks.length; i++) {
               videoEl.audioTracks[i].enabled = (i === targetIndex);
             }
           }
+        } else if (ev.data.action === 'purgeSubtitles') {
+          activeCues = [];
+          window._subtitlesDisabled = true;
+          window._subtitlesExplicitlyActive = false;
+          const customSubEl = document.getElementById('customSubtitleText');
+          if (customSubEl) {
+            customSubEl.textContent = '';
+            customSubEl.style.display = 'none';
+          }
+          if (videoEl && videoEl.textTracks) {
+            for (let i = 0; i < videoEl.textTracks.length; i++) {
+              videoEl.textTracks[i].mode = 'disabled';
+            }
+          }
+          const dynamicSubs = videoEl ? videoEl.querySelectorAll('track.dynamic-sub') : [];
+          dynamicSubs.forEach(t => t.remove());
+          if (window.plyrInstance) {
+            try { window.plyrInstance.toggleCaptions(false); } catch (_) {}
+          }
+          const activeLabel = document.getElementById('activeSubLabel');
+          if (activeLabel) activeLabel.textContent = 'Subtitles';
+          try {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({
+                action: 'subtitleStateChanged',
+                enabled: false,
+                label: 'Off'
+              }, '*');
+            }
+          } catch (_) {}
         } else if (ev.data.action === 'requestTracks') {
           detectAndBroadcastTracks();
         } else if (ev.data.action === 'adjustSubtitleOffset') {
