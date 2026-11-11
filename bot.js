@@ -5176,7 +5176,19 @@ function setupBot(bot, adminBot) {
                             const newPoints = currentPoints + 5;
                             const breakdown = referrerData.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
                             breakdown.shares = (breakdown.shares || 0) + 1;
-                            await referrerRef.update({ points: newPoints, pointsBreakdown: breakdown });
+                            await referrerRef.update({
+                                points: admin.firestore.FieldValue.increment(5),
+                                pointsBreakdown: breakdown
+                            });
+                            // Audit ledger entry
+                            await referrerRef.collection("loyalty_ledger").add({
+                                amount: 5,
+                                type: "earn",
+                                reason: "referral",
+                                balanceAfter: newPoints,
+                                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                                metadata: { referredUserId: userId, referredName: fullName }
+                            }).catch(() => {});
                             await ctx.telegram.sendMessage(
                                 referrerId,
                                 `🔔 *New Referral!* 🔔\n\nYour friend *${fullName}* has joined Film House using your invite link! 🎉\n\nYou have been awarded *+5 Loyalty Points*! 🏆`,
@@ -5269,10 +5281,19 @@ function setupBot(bot, adminBot) {
                                 }
                             ).catch(() => {});
                         } else {
-                            // Deduct 1,000 points
+                            // Deduct 1,000 points atomically
                             await userRef.update({
-                                points: userPoints - 1000
+                                points: admin.firestore.FieldValue.increment(-1000)
                             });
+                            // Audit ledger entry
+                            await userRef.collection("loyalty_ledger").add({
+                                amount: -1000,
+                                type: "spend",
+                                reason: "request_boost",
+                                balanceAfter: Math.max(0, userPoints - 1000),
+                                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                                metadata: { requestId: reqId, movieTitle: reqData.title }
+                            }).catch(() => {});
                             // Mark as priority in requests collection - will trigger admin DMs via real-time listener
                             await docRef.update({
                                 status: "priority",
@@ -5624,6 +5645,7 @@ function setupBot(bot, adminBot) {
             `*Commands List:*\n` +
             `/start - Open the welcome screen and launch app\n` +
             `/settings - View your profile info and points status\n` +
+            `/myid - Get your device sync ID for PC/Mac browser\n` +
             `/help - Display this help guide`;
 
         if (userIsAdmin) {
@@ -5638,6 +5660,49 @@ function setupBot(bot, adminBot) {
             parse_mode: 'Markdown',
             reply_to_message_id: ctx.message.message_id
         });
+    });
+
+    // Command: /myid or /sync (Get Telegram User ID to sync PC / Desktop browser)
+    bot.command(['myid', 'sync', 'id', 'link'], async (ctx) => {
+        try {
+            const userId = String(ctx.from.id);
+            const fullName = [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(" ") || "Film House Member";
+            
+            let points = 0;
+            const localUser = localStore.getUser(userId);
+            if (localUser && localUser.points) {
+                points = localUser.points;
+            } else {
+                try {
+                    const uDoc = await db.collection("users").doc(userId).get();
+                    if (uDoc.exists && uDoc.data().points) points = uDoc.data().points;
+                } catch (e) {}
+            }
+
+            const syncMsg = 
+                `🔗 <b>Film House Multi-Device Sync</b>\n\n` +
+                `Hello <b>${escapeHtml(fullName)}</b>,\n\n` +
+                `Your personal Telegram Sync ID is:\n` +
+                `<code>${userId}</code>\n\n` +
+                `🏆 <b>Current Loyalty Points:</b> ${points.toLocaleString()} pts\n\n` +
+                `<b>How to sync to your PC / Machine:</b>\n` +
+                `1. Open Film House in your browser on PC.\n` +
+                `2. Tap <b>"Sync Device"</b> in the Mining screen or Profile Drawer.\n` +
+                `3. Paste your ID: <code>${userId}</code>\n\n` +
+                `<i>Once linked, your loyalty points, passes, and mining timers will match on both phone and PC automatically!</i> ⚡`;
+
+            await ctx.reply(syncMsg, {
+                parse_mode: 'HTML',
+                reply_to_message_id: ctx.message.message_id,
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: "🎬 Open Film House WebApp", url: "https://t.me/Filmhouseappbot/filmhouseapp" }]
+                    ]
+                }
+            });
+        } catch (err) {
+            console.error("Error handling /myid sync command:", err);
+        }
     });
 
     // Command: /settings (Powered by Ubuntu Local Store with optional Firestore sync)

@@ -1174,6 +1174,293 @@ function anyMatch(text, arr) {
     return arr.some(el => text.includes(el));
 }
 
+// Real-time Firestore Profile & Mining Listener
+let userProfileUnsubscribe = null;
+
+function setupUserProfileListener(userId) {
+    if (typeof firebase === "undefined" || !db || !userId || userId === "000000000") return;
+    
+    if (userProfileUnsubscribe) {
+        try { userProfileUnsubscribe(); } catch (e) {}
+        userProfileUnsubscribe = null;
+    }
+    
+    try {
+        userProfileUnsubscribe = db.collection("users").doc(userId).onSnapshot(doc => {
+            if (!doc.exists) return;
+            const docData = doc.data();
+            if (!docData) return;
+            
+            if (docData.banned === true) {
+                showBannedScreen();
+                return;
+            }
+            
+            let shouldUpdateUI = false;
+            let shouldUpdateFarming = false;
+            
+            // Sync points balance in real-time across devices
+            if (docData.points !== undefined && Number(docData.points) !== state.user.points) {
+                state.user.points = Number(docData.points) || 0;
+                shouldUpdateUI = true;
+            }
+            
+            // Sync mining timer in real-time across devices
+            if (docData.farmingStartedAt !== undefined && docData.farmingStartedAt !== state.user.farmingStartedAt) {
+                state.user.farmingStartedAt = docData.farmingStartedAt;
+                shouldUpdateFarming = true;
+            }
+            
+            // Sync badges & passes in real-time
+            if (docData.badge !== undefined && docData.badge !== state.user.badge) {
+                state.user.badge = docData.badge;
+                state.user.badgeExpiresAt = docData.badgeExpiresAt || 0;
+                shouldUpdateUI = true;
+            }
+            
+            if (docData.pointsBreakdown !== undefined) {
+                state.user.pointsBreakdown = docData.pointsBreakdown;
+            }
+            if (docData.checkInStreak !== undefined) state.user.checkInStreak = docData.checkInStreak;
+            if (docData.lastCheckInDate) state.user.lastCheckInDate = docData.lastCheckInDate;
+            if (docData.dailyStats) state.user.dailyStats = docData.dailyStats;
+            
+            saveProfileToLocalStorage();
+            
+            if (shouldUpdateUI) {
+                updatePointsUI();
+                updateUserGreeting();
+                renderStreakCalendar();
+                renderDailyMissions();
+                const leaderboardScreen = document.getElementById("screen-leaderboard");
+                if (leaderboardScreen && leaderboardScreen.classList.contains("active")) {
+                    renderLeaderboard();
+                }
+            }
+            
+            if (shouldUpdateFarming) {
+                updateFarmingUI();
+            }
+        }, err => {
+            console.warn("UserProfile snapshot error:", err);
+        });
+    } catch (err) {
+        console.warn("Could not attach user profile listener:", err);
+    }
+}
+
+// Multi-Device Telegram Account Sync Helpers (For PC / Web Browser Users)
+function updateTelegramSyncUI() {
+    const isNativeTelegram = Boolean(window.Telegram?.WebApp?.initDataUnsafe?.user?.id);
+    const syncedId = localStorage.getItem("filmhouse_synced_telegram_id");
+    const isSynced = Boolean(syncedId && syncedId !== "000000000");
+
+    // Drawer button
+    const btnSyncDrawer = document.getElementById("btn-sync-telegram");
+    const btnSyncDrawerText = document.getElementById("btn-sync-telegram-text");
+    if (btnSyncDrawerText) {
+        if (isNativeTelegram) {
+            btnSyncDrawerText.textContent = "Telegram Connected ✨";
+            if (btnSyncDrawer) {
+                btnSyncDrawer.style.background = "rgba(16, 185, 129, 0.15)";
+                btnSyncDrawer.style.borderColor = "rgba(16, 185, 129, 0.4)";
+                btnSyncDrawer.style.color = "#34d399";
+            }
+        } else if (isSynced) {
+            btnSyncDrawerText.textContent = `Synced: ${syncedId} ✅`;
+            if (btnSyncDrawer) {
+                btnSyncDrawer.style.background = "rgba(16, 185, 129, 0.15)";
+                btnSyncDrawer.style.borderColor = "rgba(16, 185, 129, 0.4)";
+                btnSyncDrawer.style.color = "#34d399";
+            }
+        } else {
+            btnSyncDrawerText.textContent = "Sync with Telegram";
+            if (btnSyncDrawer) {
+                btnSyncDrawer.style.background = "rgba(255, 188, 0, 0.15)";
+                btnSyncDrawer.style.borderColor = "rgba(255, 188, 0, 0.35)";
+                btnSyncDrawer.style.color = "#ffbc00";
+            }
+        }
+    }
+
+    // Mining screen PC sync banner
+    const pcSyncBanner = document.getElementById("pc-sync-banner");
+    const pcSyncStatusPill = document.getElementById("pc-sync-status-pill");
+    const pcSyncDesc = document.getElementById("pc-sync-desc");
+    const btnOpenSyncModal = document.getElementById("btn-open-sync-modal");
+
+    if (pcSyncBanner) {
+        if (isNativeTelegram) {
+            pcSyncBanner.style.display = "none";
+        } else {
+            pcSyncBanner.style.display = "flex";
+            if (isSynced) {
+                if (pcSyncStatusPill) {
+                    pcSyncStatusPill.textContent = "Synced ✅";
+                    pcSyncStatusPill.style.background = "rgba(16, 185, 129, 0.2)";
+                    pcSyncStatusPill.style.color = "#34d399";
+                }
+                if (pcSyncDesc) {
+                    pcSyncDesc.textContent = `Linked to Telegram ID: ${syncedId}. Points and mining sync live!`;
+                }
+                if (btnOpenSyncModal) {
+                    btnOpenSyncModal.textContent = "Account Linked ⚙️";
+                    btnOpenSyncModal.style.background = "rgba(255,255,255,0.1)";
+                    btnOpenSyncModal.style.color = "#fff";
+                }
+            } else {
+                if (pcSyncStatusPill) {
+                    pcSyncStatusPill.textContent = "PC Mode";
+                    pcSyncStatusPill.style.background = "rgba(255, 188, 0, 0.2)";
+                    pcSyncStatusPill.style.color = "#ffbc00";
+                }
+                if (pcSyncDesc) {
+                    pcSyncDesc.textContent = "Link your Telegram ID so points and mining timer tally across your machine & phone!";
+                }
+                if (btnOpenSyncModal) {
+                    btnOpenSyncModal.textContent = "Sync Device ⚡";
+                    btnOpenSyncModal.style.background = "#ffbc00";
+                    btnOpenSyncModal.style.color = "#000";
+                }
+            }
+        }
+    }
+}
+
+function openTelegramSyncModal() {
+    const isNativeTelegram = Boolean(window.Telegram?.WebApp?.initDataUnsafe?.user?.id);
+    if (isNativeTelegram) {
+        showToast("You are already using Telegram WebApp! Your account is synchronized natively.", "info");
+        return;
+    }
+
+    const modal = document.getElementById("telegram-sync-modal");
+    if (!modal) return;
+
+    const input = document.getElementById("input-sync-telegram-id");
+    const activeInfoBox = document.getElementById("sync-active-info-box");
+    const activeDetails = document.getElementById("sync-active-details");
+    const btnUnlink = document.getElementById("btn-unlink-sync-modal");
+    const syncedId = localStorage.getItem("filmhouse_synced_telegram_id");
+
+    if (syncedId && syncedId !== "000000000") {
+        if (input) input.value = syncedId;
+        if (activeInfoBox) activeInfoBox.style.display = "block";
+        if (activeDetails) activeDetails.textContent = `ID: ${syncedId} (${state.user.fullName || "Telegram Member"})`;
+        if (btnUnlink) btnUnlink.style.display = "block";
+    } else {
+        if (input) input.value = "";
+        if (activeInfoBox) activeInfoBox.style.display = "none";
+        if (btnUnlink) btnUnlink.style.display = "none";
+    }
+
+    modal.style.display = "flex";
+    if (input) setTimeout(() => input.focus(), 100);
+}
+
+function closeTelegramSyncModal() {
+    const modal = document.getElementById("telegram-sync-modal");
+    if (modal) modal.style.display = "none";
+}
+
+async function linkTelegramAccount(idStr) {
+    const cleanId = String(idStr || "").trim();
+    if (!cleanId || !/^\d{5,15}$/.test(cleanId)) {
+        showToast("Please enter a valid numeric Telegram User ID (e.g. 684920192)", "error");
+        return;
+    }
+
+    const submitBtn = document.getElementById("btn-submit-sync-modal");
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Syncing... ⏳";
+    }
+
+    try {
+        if (typeof firebase !== "undefined" && db) {
+            const doc = await db.collection("users").doc(cleanId).get();
+            if (doc.exists) {
+                const docData = doc.data() || {};
+                state.user.id = cleanId;
+                state.isTelegramSynced = true;
+                if (docData.fullName) state.user.fullName = docData.fullName;
+                if (docData.username) state.user.username = docData.username;
+                if (docData.points !== undefined) state.user.points = Number(docData.points) || 0;
+                if (docData.farmingStartedAt !== undefined) state.user.farmingStartedAt = docData.farmingStartedAt;
+                if (docData.badge) state.user.badge = docData.badge;
+                if (docData.badgeExpiresAt) state.user.badgeExpiresAt = docData.badgeExpiresAt;
+
+                localStorage.setItem("filmhouse_synced_telegram_id", cleanId);
+                if (docData.fullName) localStorage.setItem("filmhouse_synced_user_name", docData.fullName);
+                if (docData.username) localStorage.setItem("filmhouse_synced_user_tag", docData.username);
+
+                saveProfileToLocalStorage();
+                setupUserProfileListener(cleanId);
+                handleTelegramAuth();
+                updatePointsUI();
+                updateFarmingUI();
+                closeTelegramSyncModal();
+                showToast(`🎉 Linked with Telegram account (${cleanId})! Points & mining timer synced.`, "success");
+            } else {
+                // New document for this ID
+                state.user.id = cleanId;
+                state.isTelegramSynced = true;
+                localStorage.setItem("filmhouse_synced_telegram_id", cleanId);
+                saveProfileToLocalStorage();
+                syncUserToFirestore(true);
+                setupUserProfileListener(cleanId);
+                handleTelegramAuth();
+                updatePointsUI();
+                updateFarmingUI();
+                closeTelegramSyncModal();
+                showToast(`✅ Created synced profile for Telegram ID ${cleanId}!`, "success");
+            }
+        } else {
+            // Offline fallback
+            state.user.id = cleanId;
+            state.isTelegramSynced = true;
+            localStorage.setItem("filmhouse_synced_telegram_id", cleanId);
+            saveProfileToLocalStorage();
+            handleTelegramAuth();
+            closeTelegramSyncModal();
+            showToast(`Saved Telegram ID ${cleanId} locally!`, "success");
+        }
+    } catch (err) {
+        console.error("Error linking Telegram ID:", err);
+        showToast("Error connecting to Firebase: " + (err.message || "Failed to sync"), "error");
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Sync Account ⚡";
+        }
+    }
+}
+
+function unlinkTelegramAccount() {
+    localStorage.removeItem("filmhouse_synced_telegram_id");
+    localStorage.removeItem("filmhouse_synced_user_name");
+    localStorage.removeItem("filmhouse_synced_user_tag");
+
+    state.user.id = "000000000";
+    state.user.fullName = "Demo User";
+    state.user.username = "demouser";
+    state.user.points = 0;
+    state.user.farmingStartedAt = 0;
+    state.isTelegramSynced = false;
+
+    if (userProfileUnsubscribe) {
+        try { userProfileUnsubscribe(); } catch (e) {}
+        userProfileUnsubscribe = null;
+    }
+
+    saveProfileToLocalStorage();
+    handleTelegramAuth();
+    updatePointsUI();
+    updateFarmingUI();
+    closeTelegramSyncModal();
+    showToast("Disconnected from Telegram account. Switched to guest mode.", "info");
+}
+
 // Telegram mini-app login handling
 function handleTelegramAuth() {
     const tg = window.Telegram?.WebApp;
@@ -1197,13 +1484,27 @@ function handleTelegramAuth() {
 
         // Get WebApp User Details
         const tgUser = tg.initDataUnsafe?.user;
-        if (tgUser) {
-            state.user.id = tgUser.id ? String(tgUser.id) : state.user.id;
+        if (tgUser && tgUser.id) {
+            state.user.id = String(tgUser.id);
             state.user.username = tgUser.username || "";
             state.user.fullName = [tgUser.first_name, tgUser.last_name].filter(n => n).join(" ") || state.user.fullName || "Telegram User";
             if (tgUser.photo_url) {
                 state.user.avatar = tgUser.photo_url;
             }
+            state.isTelegramSynced = true;
+        }
+    }
+
+    // If not running in Telegram WebApp, check if user previously synced their Telegram ID on PC
+    if (!state.isTelegramSynced) {
+        const savedSyncId = localStorage.getItem("filmhouse_synced_telegram_id");
+        if (savedSyncId && savedSyncId !== "000000000") {
+            state.user.id = savedSyncId;
+            state.isTelegramSynced = true;
+            const savedName = localStorage.getItem("filmhouse_synced_user_name");
+            if (savedName) state.user.fullName = savedName;
+            const savedTag = localStorage.getItem("filmhouse_synced_user_tag");
+            if (savedTag) state.user.username = savedTag;
         }
     }
 
@@ -1219,8 +1520,16 @@ function handleTelegramAuth() {
     if (headerName) headerName.textContent = state.user.fullName || state.user.username || "Guest";
     if (profileAvatarImg) profileAvatarImg.src = state.user.avatar;
     if (profileFullName) profileFullName.textContent = state.user.fullName;
-    if (profileTelegramTag) profileTelegramTag.textContent = state.user.username ? `@${state.user.username}` : "No handle";
+    if (profileTelegramTag) profileTelegramTag.textContent = state.user.username ? `@${state.user.username}` : (state.isTelegramSynced ? "Synced Account" : "Guest Mode");
     if (profileTelegramId) profileTelegramId.textContent = `ID: ${state.user.id}`;
+
+    // Refresh Sync UI status in Drawer & Mining Page
+    updateTelegramSyncUI();
+
+    // Attach real-time user listener if valid ID
+    if (state.user.id && state.user.id !== "000000000") {
+        setupUserProfileListener(state.user.id);
+    }
 }
 // User Profile Management & Loaders
 function loadUserProfile() {
@@ -1525,22 +1834,42 @@ function calculateUserRank() {
     return userIndex !== -1 ? userIndex + 1 : list.length;
 }
 
+// Permanent Immutable Loyalty Points Ledger Logger
+async function recordLoyaltyLedger(amount, type, reason, balanceAfter, metadata = {}) {
+    if (typeof firebase === "undefined" || !db || !state.user.id || state.user.id === "000000000") return;
+    try {
+        await db.collection("users").doc(state.user.id).collection("loyalty_ledger").add({
+            amount: Number(amount) || 0,
+            type: type || (amount >= 0 ? "earn" : "spend"),
+            reason: reason || "general",
+            balanceAfter: Number(balanceAfter) || 0,
+            metadata: metadata || {},
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch (err) {
+        console.warn("Error logging loyalty points transaction to ledger:", err);
+    }
+}
+
 function awardPoints(points, reason, silent = false) {
-    state.user.points = (state.user.points || 0) + points;
+    const pts = Number(points) || 0;
+    if (pts === 0) return;
+
+    state.user.points = Math.max(0, (state.user.points || 0) + pts);
     
     if (!state.user.pointsBreakdown) {
         state.user.pointsBreakdown = { downloads: 0, visits: 0, shares: 0, watched: 0 };
     }
-    if (reason === "download" && points > 0) {
+    if (reason === "download" && pts > 0) {
         state.user.pointsBreakdown.downloads = (state.user.pointsBreakdown.downloads || 0) + 1;
         updateMissionProgress("download", 1);
-    } else if (reason === "visit" && points > 0) {
+    } else if (reason === "visit" && pts > 0) {
         state.user.pointsBreakdown.visits = (state.user.pointsBreakdown.visits || 0) + 1;
-    } else if (reason === "share" && points > 0) {
+    } else if (reason === "share" && pts > 0) {
         state.user.pointsBreakdown.shares = (state.user.pointsBreakdown.shares || 0) + 1;
         updateMissionProgress("share", 1);
     } else if (reason === "watched") {
-        if (points > 0) {
+        if (pts > 0) {
             state.user.pointsBreakdown.watched = (state.user.pointsBreakdown.watched || 0) + 1;
             updateMissionProgress("ad", 1);
         } else {
@@ -1549,19 +1878,27 @@ function awardPoints(points, reason, silent = false) {
     }
     
     // Save to user profile in localStorage
-    const saved = localStorage.getItem("filmhouse_user_profile");
-    let profile = {};
-    if (saved) {
-        try {
-            profile = JSON.parse(saved);
-        } catch (e) {}
-    }
-    profile.points = state.user.points;
-    profile.pointsBreakdown = state.user.pointsBreakdown;
-    localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+    saveProfileToLocalStorage();
     
-    // Sync to Firebase Firestore
-    syncUserToFirestore();
+    // Atomic update to Firebase Firestore: FieldValue.increment
+    if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
+        const userRef = db.collection("users").doc(state.user.id);
+        userRef.update({
+            points: firebase.firestore.FieldValue.increment(pts),
+            pointsBreakdown: state.user.pointsBreakdown,
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(err => {
+            console.warn("Atomic awardPoints update failed, fallback to merge set:", err);
+            userRef.set({
+                points: state.user.points,
+                pointsBreakdown: state.user.pointsBreakdown,
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true }).catch(e => console.warn("Fallback failed:", e));
+        });
+
+        // Record in permanent loyalty ledger
+        recordLoyaltyLedger(pts, pts > 0 ? "earn" : "deduct", reason, state.user.points);
+    }
     
     // Update UI components
     updatePointsUI();
@@ -1580,12 +1917,12 @@ function awardPoints(points, reason, silent = false) {
         else if (reason === "visit") reasonText = "your daily visit";
         else if (reason === "share") reasonText = "sharing a movie";
         else if (reason === "mining") reasonText = "mining rewards";
-        else if (reason === "watched") reasonText = points > 0 ? "marking a movie as watched" : "removing a movie from watched list";
+        else if (reason === "watched") reasonText = pts > 0 ? "marking a movie as watched" : "removing a movie from watched list";
         
-        if (points > 0) {
-            showToast(`Earned +${points} Loyalty Points for ${reasonText}! 🏆`, "success");
-        } else if (points < 0) {
-            showToast(`Removed ${Math.abs(points)} Loyalty Points for ${reasonText}.`, "info");
+        if (pts > 0) {
+            showToast(`Earned +${pts} Loyalty Points for ${reasonText}! 🏆`, "success");
+        } else if (pts < 0) {
+            showToast(`Removed ${Math.abs(pts)} Loyalty Points for ${reasonText}.`, "info");
         }
     }
 }
@@ -10824,11 +11161,16 @@ function bindEvents() {
                 localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
                 
                 // Sync to Firestore
-                if (typeof firebase !== "undefined" && db && state.user.id) {
+                if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
                     db.collection("users").doc(state.user.id).update({
                         farmingStartedAt: now,
                         farmingReminded: false
-                    }).catch(err => console.warn("Error saving farming state:", err));
+                    }).catch(err => {
+                        db.collection("users").doc(state.user.id).set({
+                            farmingStartedAt: now,
+                            farmingReminded: false
+                        }, { merge: true }).catch(e => console.warn("Error saving farming state:", e));
+                    });
                 }
                 
                 updateFarmingUI();
@@ -10851,14 +11193,19 @@ function bindEvents() {
                     localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
                     
                     // Sync to Firestore
-                    if (typeof firebase !== "undefined" && db && state.user.id) {
+                    if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
                         db.collection("users").doc(state.user.id).update({
                             farmingStartedAt: 0,
                             farmingReminded: false
-                        }).catch(err => console.warn("Error updating farming state:", err));
+                        }).catch(err => {
+                            db.collection("users").doc(state.user.id).set({
+                                farmingStartedAt: 0,
+                                farmingReminded: false
+                            }, { merge: true }).catch(e => console.warn("Error updating farming state:", e));
+                        });
                     }
                     
-                    // Award the reward points!
+                    // Award the reward points atomically and log to ledger
                     awardPoints(FARMING_REWARD, "mining");
                     updateFarmingUI();
                 }
@@ -10878,35 +11225,16 @@ function bindEvents() {
                 return;
             }
 
-            // Deduct 100 Loyalty Points
-            state.user.points -= 100;
-            if (typeof updateUserUI === "function") updateUserUI();
-
-            // Persist points deduction to local storage
-            try {
-                const saved = localStorage.getItem("filmhouse_user_profile");
-                let profile = {};
-                if (saved) {
-                    try { profile = JSON.parse(saved); } catch (e) {}
-                }
-                profile.points = state.user.points;
-                localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
-            } catch (e) {}
-
-            // Persist points deduction to Firestore
-            if (typeof firebase !== "undefined" && db && state.user && state.user.id) {
-                try {
-                    db.collection("users").doc(state.user.id).update({
-                        points: firebase.firestore.FieldValue.increment(-100)
-                    }).catch(e => console.warn("Firestore points deduction error:", e));
-                } catch (e) {}
-            }
+            // Deduct 100 Loyalty Points atomically and log to ledger
+            deductPoints(100, "cinema_pass_4h");
 
             // Activate 4-Hour Ad-Free Pass (14400 seconds)
             const passDurationMs = 4 * 60 * 60 * 1000;
             const passExpiresAt = Date.now() + passDurationMs;
             localStorage.setItem("filmhouse_watch_pass_sec", "14400");
             localStorage.setItem("filmhouse_watch_pass_until", passExpiresAt.toString());
+            localStorage.setItem("cinema_fast_stream_until", passExpiresAt.toString());
+            localStorage.setItem("ad_free_until", passExpiresAt.toString());
 
             const passPill = document.getElementById("mining-pass-active-pill");
             if (passPill) {
@@ -11987,22 +12315,17 @@ function initManualRequestModal() {
 
 // Firebase Firestore Database Synchronization Helpers
 function syncUserToFirestore(forceFetch = false) {
-    if (typeof firebase === "undefined" || !db || !state.user.id) return;
+    if (typeof firebase === "undefined" || !db || !state.user.id || state.user.id === "000000000") return;
     const userRef = db.collection("users").doc(state.user.id);
 
-    const data = {
+    // Profile metadata payload (NEVER blindly overwrites points or farming timestamps during routine saves!)
+    const profilePayload = {
         id: state.user.id,
         username: state.user.username || "guest",
         fullName: state.user.fullName || "Guest User",
         avatar: state.user.avatar || "",
-        points: state.user.points || 0,
-        badge: state.user.badge || "",
-        badgeExpiresAt: state.user.badgeExpiresAt || 0,
-        farmingStartedAt: state.user.farmingStartedAt || 0,
-        checkInStreak: state.user.checkInStreak || 0,
-        lastCheckInDate: state.user.lastCheckInDate || "",
-        pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
-        dailyStats: state.user.dailyStats || {},
+        greetingFontStyle: state.user.greetingFontStyle || "default",
+        favoriteCategories: state.user.favoriteCategories || [],
         notificationsEnabled: state.user.notificationsEnabled !== undefined ? state.user.notificationsEnabled : true,
         subAnime: state.user.subAnime !== undefined ? state.user.subAnime : true,
         subHollywood: state.user.subHollywood !== undefined ? state.user.subHollywood : true,
@@ -12021,28 +12344,22 @@ function syncUserToFirestore(forceFetch = false) {
                         return;
                     }
                     if (docData.points !== undefined) {
-                        state.user.points = docData.points;
-                        data.points = docData.points;
+                        state.user.points = Number(docData.points) || 0;
                     }
                     if (docData.pointsBreakdown !== undefined) {
                         state.user.pointsBreakdown = docData.pointsBreakdown;
-                        data.pointsBreakdown = docData.pointsBreakdown;
                     }
                     if (docData.fullName !== undefined) {
                         state.user.fullName = docData.fullName;
-                        data.fullName = docData.fullName;
                     }
                     if (docData.avatar !== undefined) {
                         state.user.avatar = docData.avatar;
-                        data.avatar = docData.avatar;
                     }
                     if (docData.greetingFontStyle !== undefined) {
                         state.user.greetingFontStyle = docData.greetingFontStyle;
-                        data.greetingFontStyle = docData.greetingFontStyle;
                     }
                     if (docData.favoriteCategories !== undefined) {
                         state.user.favoriteCategories = docData.favoriteCategories;
-                        data.favoriteCategories = docData.favoriteCategories;
                     }
                     if (docData.notificationsEnabled !== undefined) state.user.notificationsEnabled = docData.notificationsEnabled;
                     if (docData.subAnime !== undefined) state.user.subAnime = docData.subAnime;
@@ -12051,27 +12368,21 @@ function syncUserToFirestore(forceFetch = false) {
                     if (docData.contactPreference !== undefined) state.user.contactPreference = docData.contactPreference;
                     if (docData.farmingStartedAt !== undefined) {
                         state.user.farmingStartedAt = docData.farmingStartedAt;
-                        data.farmingStartedAt = docData.farmingStartedAt;
                     }
                     if (docData.checkInStreak !== undefined) {
                         state.user.checkInStreak = docData.checkInStreak;
-                        data.checkInStreak = docData.checkInStreak;
                     }
                     if (docData.lastCheckInDate !== undefined) {
                         state.user.lastCheckInDate = docData.lastCheckInDate;
-                        data.lastCheckInDate = docData.lastCheckInDate;
                     }
                     if (docData.dailyStats !== undefined) {
                         state.user.dailyStats = docData.dailyStats;
-                        data.dailyStats = docData.dailyStats;
                     }
                     if (docData.badge !== undefined) {
                         state.user.badge = docData.badge;
-                        data.badge = docData.badge;
                     }
                     if (docData.badgeExpiresAt !== undefined) {
                         state.user.badgeExpiresAt = docData.badgeExpiresAt;
-                        data.badgeExpiresAt = docData.badgeExpiresAt;
                     }
 
                     // Save fully synchronized state to local storage
@@ -12082,17 +12393,34 @@ function syncUserToFirestore(forceFetch = false) {
                     updateUserGreeting();
                     renderStreakCalendar();
                     renderDailyMissions();
+                    updateFarmingUI();
                 }
+                // Update profile metadata only (preserves cloud points and farming timestamps)
+                userRef.set(profilePayload, { merge: true }).catch(err => console.warn("Firestore set error:", err));
+            } else {
+                // New user registration in Firestore
+                const newUserData = {
+                    ...profilePayload,
+                    points: state.user.points || 0,
+                    badge: state.user.badge || "",
+                    badgeExpiresAt: state.user.badgeExpiresAt || 0,
+                    farmingStartedAt: state.user.farmingStartedAt || 0,
+                    checkInStreak: state.user.checkInStreak || 0,
+                    lastCheckInDate: state.user.lastCheckInDate || "",
+                    pointsBreakdown: state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 },
+                    dailyStats: state.user.dailyStats || {},
+                    joinedDate: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                userRef.set(newUserData, { merge: true }).catch(err => console.warn("Firestore initial set error:", err));
             }
-            if (!doc.exists) {
-                data.joinedDate = firebase.firestore.FieldValue.serverTimestamp();
-            }
-            userRef.set(data, { merge: true }).catch(err => console.warn("Firestore set error:", err));
+            // Ensure real-time user listener is attached
+            setupUserProfileListener(state.user.id);
         }).catch(err => {
-            userRef.set(data, { merge: true }).catch(e => console.warn("Firestore fallback set error:", e));
+            userRef.set(profilePayload, { merge: true }).catch(e => console.warn("Firestore fallback set error:", e));
         });
     } else {
-        userRef.set(data, { merge: true }).catch(err => console.warn("Firestore set error:", err));
+        // Routine background sync: Only updates profile preferences, never points or farming timestamps!
+        userRef.set(profilePayload, { merge: true }).catch(err => console.warn("Firestore set error:", err));
     }
 }
 
@@ -12696,20 +13024,28 @@ function checkVipBadgeExpiry() {
     }
 }
 
-function deductPoints(points) {
-    state.user.points = Math.max(0, (state.user.points || 0) - points);
+function deductPoints(points, reason = "redeem", metadata = {}) {
+    const pts = Math.abs(Number(points) || 0);
+    if (pts === 0) return;
+
+    state.user.points = Math.max(0, (state.user.points || 0) - pts);
+    saveProfileToLocalStorage();
     
-    const saved = localStorage.getItem("filmhouse_user_profile");
-    let profile = {};
-    if (saved) {
-        try {
-            profile = JSON.parse(saved);
-        } catch (e) {}
+    // Atomic deduction in Firestore: FieldValue.increment(-pts)
+    if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
+        const userRef = db.collection("users").doc(state.user.id);
+        userRef.update({
+            points: firebase.firestore.FieldValue.increment(-pts),
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(err => {
+            console.warn("Atomic deductPoints update failed:", err);
+            userRef.set({ points: state.user.points }, { merge: true }).catch(e => {});
+        });
+
+        // Permanent immutable ledger entry
+        recordLoyaltyLedger(-pts, "spend", reason, state.user.points, metadata);
     }
-    profile.points = state.user.points;
-    localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
     
-    syncUserToFirestore();
     updatePointsUI();
     
     const leaderboardScreen = document.getElementById("screen-leaderboard");
@@ -13210,6 +13546,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const queryMovie = urlParams.get("movie") || urlParams.get("id");
     const queryStartApp = urlParams.get("startapp") || urlParams.get("tgWebAppStartParam");
+    const querySyncId = urlParams.get("sync_id") || urlParams.get("tg_id");
+    if (querySyncId && /^\d{5,15}$/.test(querySyncId.trim())) {
+        linkTelegramAccount(querySyncId.trim());
+    }
     if (!targetDeepLinkMovieId) {
         if (queryMovie) {
             targetDeepLinkMovieId = queryMovie.trim();
@@ -13217,9 +13557,54 @@ document.addEventListener("DOMContentLoaded", async () => {
             targetDeepLinkMovieId = queryStartApp.replace(/^(movie_|open_|watch_|dl_)/i, "").trim();
         }
     }
+
+    // PC Telegram Device Sync Modal Buttons
+    const btnSyncDrawer = document.getElementById("btn-sync-telegram");
+    if (btnSyncDrawer) {
+        btnSyncDrawer.addEventListener("click", () => {
+            openTelegramSyncModal();
+        });
+    }
+
+    const btnOpenSyncModal = document.getElementById("btn-open-sync-modal");
+    if (btnOpenSyncModal) {
+        btnOpenSyncModal.addEventListener("click", () => {
+            openTelegramSyncModal();
+        });
+    }
+
+    const btnCancelSync = document.getElementById("btn-cancel-sync-modal");
+    if (btnCancelSync) {
+        btnCancelSync.addEventListener("click", () => {
+            closeTelegramSyncModal();
+        });
+    }
+
+    const btnSubmitSync = document.getElementById("btn-submit-sync-modal");
+    const inputSyncId = document.getElementById("input-sync-telegram-id");
+    if (btnSubmitSync && inputSyncId) {
+        btnSubmitSync.addEventListener("click", () => {
+            linkTelegramAccount(inputSyncId.value);
+        });
+        inputSyncId.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                linkTelegramAccount(inputSyncId.value);
+            }
+        });
+    }
+
+    const btnUnlinkSync = document.getElementById("btn-unlink-sync-modal");
+    if (btnUnlinkSync) {
+        btnUnlinkSync.addEventListener("click", () => {
+            if (confirm("Are you sure you want to unlink this Telegram account from this browser?")) {
+                unlinkTelegramAccount();
+            }
+        });
+    }
     
     // Sync latest user points, check-in streak, and ban status from Firestore on startup
-    if (typeof firebase !== "undefined" && db && state.user.id) {
+    if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
         syncUserToFirestore(true);
     }
 
