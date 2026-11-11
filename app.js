@@ -1402,7 +1402,6 @@ async function linkTelegramAccount(idStr) {
                 closeTelegramSyncModal();
                 showToast(`🎉 Linked with Telegram account (${cleanId})! Points & mining timer synced.`, "success");
             } else {
-                // New document for this ID
                 state.user.id = cleanId;
                 state.isTelegramSynced = true;
                 localStorage.setItem("filmhouse_synced_telegram_id", cleanId);
@@ -1416,7 +1415,6 @@ async function linkTelegramAccount(idStr) {
                 showToast(`✅ Created synced profile for Telegram ID ${cleanId}!`, "success");
             }
         } else {
-            // Offline fallback
             state.user.id = cleanId;
             state.isTelegramSynced = true;
             localStorage.setItem("filmhouse_synced_telegram_id", cleanId);
@@ -2057,6 +2055,9 @@ function updatePointsUI() {
             const nextTier = getUserTier(tier.nextPts);
             progressText.textContent = `${ptsNeeded} points needed to unlock next rank (${nextTier.name} ${nextTier.icon})`;
         }
+    }
+    if (typeof updateTelegramSyncUI === "function") {
+        updateTelegramSyncUI();
     }
 }
 
@@ -8328,7 +8329,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const playerSrc = `${playerBase}?watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}`;
+        const cacheBuster = `v=135_${Date.now()}`;
+        const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}`;
         
         // Fast pre-buffering animation overlay for instant visual feedback
         const loader = document.createElement("div");
@@ -8904,6 +8906,9 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                                 showToast("⚡ Stream Reloaded (720p HD)", "success");
                             }
                         }
+                    } else if (e.data.action === "selectServer" || e.data.action === "switchServer") {
+                        const s2 = document.getElementById("cinema-server-2");
+                        if (s2) s2.click();
                     } else if (e.data.action === "playerEnteredFullscreen") {
                         try {
                             if (screen.orientation && screen.orientation.lock) {
