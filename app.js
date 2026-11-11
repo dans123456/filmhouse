@@ -8124,9 +8124,17 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     const isStreamLinkValid = (u) => u && typeof u === "string" && !u.includes("t.me/") && !u.includes("telegram.me/");
     let streamTarget = isStreamLinkValid(customStreamUrl) ? customStreamUrl : "";
     if (!streamTarget && movie.stream_links && Array.isArray(movie.stream_links)) {
-        const sl720 = movie.stream_links.find(s => s && isStreamLinkValid(s.stream_url || s.url) && /720/i.test(String(s.quality || s.name || s.seasonOrPart || "")));
-        const sl = sl720 || movie.stream_links.find(s => s && isStreamLinkValid(s.stream_url || s.url));
-        if (sl) streamTarget = sl.stream_url || sl.url;
+        if (isTVShow) {
+            const ep1Links = movie.stream_links.filter(s => s && (s.episode == 1 || s.episodeNum == 1 || s.episode_number == 1 || /e0?1\b/i.test(s.seasonOrPart || s.name || "")));
+            const ep1_720 = ep1Links.find(s => isStreamLinkValid(s.stream_url || s.url) && /720/i.test(String(s.quality || s.name || s.seasonOrPart || "")));
+            const ep1 = ep1_720 || ep1Links.find(s => isStreamLinkValid(s.stream_url || s.url));
+            if (ep1) streamTarget = ep1.stream_url || ep1.url;
+        }
+        if (!streamTarget) {
+            const sl720 = movie.stream_links.find(s => s && isStreamLinkValid(s.stream_url || s.url) && /720/i.test(String(s.quality || s.name || s.seasonOrPart || "")));
+            const sl = sl720 || movie.stream_links.find(s => s && isStreamLinkValid(s.stream_url || s.url));
+            if (sl) streamTarget = sl.stream_url || sl.url;
+        }
     }
     if (!streamTarget && movie.links && Array.isArray(movie.links)) {
         const l720 = movie.links.find(l => l && isStreamLinkValid(l.stream_url || l.url) && /720/i.test(String(l.quality || l.name || l.title || "")));
@@ -8554,9 +8562,9 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         if (typeof getMovieAvailableQualities === "function" && typeof selectQualityOption === "function") {
                             const qualities = getMovieAvailableQualities();
                             const q720 = qualities.find(q => /720/i.test(q.label || q.badge));
-                            if (q720 && q720.url !== currentSelectedQualityUrl) {
+                            if (q720) {
                                 selectQualityOption(q720);
-                                showToast("⚡ Switched to 720p HD (H.264)", "success");
+                                showToast("⚡ Stream Reloaded (720p HD)", "success");
                             }
                         }
                     } else if (e.data.action === "playerEnteredFullscreen") {

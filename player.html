@@ -527,12 +527,12 @@
         <span class='custom-sub-text' id='customSubtitleText'></span>
       </div>
 
-      <video controls='controls' id='mainVideo' playsinline='playsinline' preload='auto' crossorigin='anonymous'>
+      <video controls='controls' id='mainVideo' playsinline='playsinline' preload='metadata'>
         Your browser does not support HTML5 video streaming.
       </video>
-      <!-- Sleek Floating In-Player Error Toast -->
-      <div class='error-card' id='errorCard' style='display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(239,68,68,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.2);color:#ffffff;padding:10px 18px;border-radius:12px;font-size:12px;font-weight:600;z-index:56;box-shadow:0 8px 30px rgba(0,0,0,0.85);text-align:center;max-width:88%;pointer-events:auto;'>
-        ⚠️ <b>Stream server is warming up.</b> Reconnecting...
+      <!-- Sleek Floating In-Player Error Toast (Discreet, non-blocking) -->
+      <div class='error-card' id='errorCard' style='display:none;position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,188,0,0.35);color:#ffffff;padding:6px 14px;border-radius:24px;font-size:11px;font-weight:600;z-index:56;box-shadow:0 6px 25px rgba(0,0,0,0.8);text-align:center;max-width:92%;pointer-events:auto;align-items:center;justify-content:center;gap:8px;'>
+        <span>⚠️ Stream server is connecting...</span>
       </div>
     </div>
   </main>
@@ -1970,75 +1970,38 @@
           }
         }, 4500);
 
-        // Helper to notify parent Mini App to switch stream quality to 720p HD
-        window.trySwitchTo720p = function() {
+        // Helper to retry stream playback on demand
+        window.retryStreamPlayback = function() {
+          if (errorCard) errorCard.style.display = 'none';
+          if (loaderEl) {
+            loaderEl.style.display = 'flex';
+            loaderEl.style.opacity = '1';
+          }
           try {
-            if (window.parent && window.parent !== window) {
-              window.parent.postMessage({ action: 'switchTo720pQuality' }, '*');
-            }
+            videoEl.load();
+            if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
+            else videoEl.play().catch(() => {});
           } catch (_) {}
         };
 
-        // Black Screen Watchdog for HEVC/x265 incompatibility in Chrome/Android
-        videoEl.addEventListener('playing', function() {
-          setTimeout(function() {
-            // If playing for 3s but videoWidth is 0 (classic HEVC black screen where only audio plays)
-            if (videoEl && !videoEl.paused && videoEl.videoWidth === 0 && !videoEl.ended) {
-              console.warn("[CodecWatchdog] Audio playing but 0 video frames decoded (HEVC/H.265 in Chrome)");
-              if (errorCard) {
-                errorCard.style.display = 'block';
-                errorCard.innerHTML = `
-                  <div style="display:flex;flex-direction:column;gap:5px;align-items:center;">
-                    <span>⚠️ <b>Black Screen / HEVC Detected</b></span>
-                    <span style="font-size:11px;font-weight:400;opacity:0.95;">
-                      Your browser cannot decode H.265/HEVC video.
-                    </span>
-                    <button type="button" onclick="trySwitchTo720p()" style="background:#ffd700;color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;margin-top:2px;">⚡ Switch to 720p HD (H.264)</button>
-                  </div>
-                `;
-              }
-            }
-          }, 3500);
-        });
-
+        // Only show stream errors if the user has actually started the stream (never block the initial Tap to Watch overlay)
         videoEl.addEventListener('error', function(e) {
-          console.warn("Video load issue:", e, videoEl.error);
+          console.warn("Video stream load notice:", e, videoEl.error);
           if (loaderEl) loaderEl.style.display = 'none';
-          if (errorCard) {
-            errorCard.style.display = 'block';
-            const errCode = videoEl.error ? videoEl.error.code : 0;
-            if (errCode === 3 || errCode === 4) {
-              errorCard.innerHTML = `
-                <div style="display:flex;flex-direction:column;gap:6px;align-items:center;">
-                  <span>⚠️ <b>Codec / Format Incompatible</b></span>
-                  <span style="font-size:11px;font-weight:400;opacity:0.95;">
-                    This stream is encoded in HEVC/x265 or MKV, which is not supported by your browser.
-                  </span>
-                  <div style="display:flex;gap:8px;margin-top:4px;">
-                    <button type="button" onclick="trySwitchTo720p()" style="background:#ffd700;color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;">Switch to 720p HD</button>
-                    <a href="${finalStreamUrl}" target="_blank" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;">Download</a>
-                  </div>
-                </div>
-              `;
-            } else {
-              errorCard.innerHTML = `
-                <div style="display:flex;flex-direction:column;gap:6px;align-items:center;">
-                  <span>⚠️ <b>Stream Server Connection Notice</b></span>
-                  <span style="font-size:11px;font-weight:400;opacity:0.95;">
-                    Server is loading media or reconnecting. Tap <b>Switch to 720p HD</b> or use Direct Download.
-                  </span>
-                  <div style="display:flex;gap:8px;margin-top:4px;">
-                    <button type="button" onclick="trySwitchTo720p()" style="background:#ffd700;color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;">Switch to 720p HD</button>
-                    <a href="${finalStreamUrl}" target="_blank" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;">Download File</a>
-                  </div>
-                </div>
-              `;
-            }
+          if (errorCard && document.body.classList.contains('stream-started')) {
+            errorCard.style.display = 'flex';
+            errorCard.innerHTML = `
+              <span>⚠️ Stream is connecting...</span>
+              <button type="button" onclick="window.retryStreamPlayback()" style="background:#ffd700;color:#000;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Retry</button>
+              <a href="${finalStreamUrl}" target="_blank" style="color:#94a3b8;font-size:10.5px;text-decoration:underline;margin-left:4px;">Download</a>
+            `;
           }
         });
       } else {
         if (loaderEl) loaderEl.style.display = 'none';
-        if (errorCard) errorCard.style.display = 'block';
+        if (errorCard && document.body.classList.contains('stream-started')) {
+          errorCard.style.display = 'flex';
+        }
       }
     });
   
