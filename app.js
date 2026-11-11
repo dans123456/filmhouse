@@ -8741,6 +8741,16 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 if (matchCustom) currentSeason = matchCustom;
             }
             currentEpisodeNum = 1;
+            if (isTVShow && movie.stream_links && Array.isArray(movie.stream_links) && customStreamUrl) {
+                const matchedLink = movie.stream_links.find(s => (s.stream_url === customStreamUrl || s.url === customStreamUrl));
+                if (matchedLink) {
+                    if (matchedLink.season) {
+                        const foundSeason = detectedSeasons.find(s => s.seasonNumber === parseInt(matchedLink.season, 10));
+                        if (foundSeason) currentSeason = foundSeason;
+                    }
+                    currentEpisodeNum = parseInt(matchedLink.episode || matchedLink.episodeNum || 1, 10);
+                }
+            }
 
             // Header: Title + Episode Count Badge + Carousel Nav Arrows for PC
             const seriesHeader = document.createElement("div");
@@ -8992,7 +9002,53 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     }
                 }
 
-                // Fallback episode generation if TMDB returned empty
+                // 1. Merge all explicit episode stream links from movie.stream_links (Film House stream catalog)
+                const allStreamLinks = Array.isArray(movie.stream_links) ? movie.stream_links : [];
+                allStreamLinks.forEach((sl, sIdx) => {
+                    const slSeason = sl.season ? parseInt(sl.season, 10) : 1;
+                    if (slSeason === seasonObj.seasonNumber) {
+                        const slEp = parseInt(sl.episode || sl.episodeNum || sl.episode_number || (sIdx + 1), 10);
+                        const slStream = sl.stream_url || sl.url || "";
+                        const existing = episodes.find(e => e.episode_number === slEp);
+                        if (existing) {
+                            if (slStream && !slStream.includes("t.me")) existing.stream_url = slStream;
+                            if (sl.quality) existing.quality = sl.quality;
+                            if (sl.name && (!existing.name || existing.name.startsWith("Episode "))) existing.name = sl.name;
+                        } else {
+                            episodes.push({
+                                episode_number: slEp,
+                                name: sl.name || `Episode ${slEp}`,
+                                stream_url: (slStream && !slStream.includes("t.me")) ? slStream : "",
+                                quality: sl.quality || "720p",
+                                runtime: 45
+                            });
+                        }
+                    }
+                });
+
+                // 2. Merge explicit episode stream links if uploaded in seasonObj.links
+                if (seasonObj.links && Array.isArray(seasonObj.links) && seasonObj.links.length > 0) {
+                    const hasExplicitEps = seasonObj.links.some(l => l && (l.episode || l.ep || l.episode_number || (l.name && /ep/i.test(l.name))));
+                    if (hasExplicitEps) {
+                        seasonObj.links.forEach((l, idx) => {
+                            const epNum = parseInt(l.episode || l.ep || l.episode_number || (idx + 1), 10);
+                            const slStream = l.stream_url || l.url || "";
+                            const existing = episodes.find(e => (e.episode_number === epNum));
+                            if (existing) {
+                                if (slStream && !slStream.includes("t.me")) existing.stream_url = slStream;
+                                if (l.name) existing.name = l.name;
+                            } else {
+                                episodes.push({
+                                    episode_number: epNum,
+                                    name: l.name || `Episode ${epNum}`,
+                                    stream_url: (slStream && !slStream.includes("t.me")) ? slStream : ""
+                                });
+                            }
+                        });
+                    }
+                }
+
+                // 3. Fallback episode generation if both TMDB and stream_links returned empty
                 if (episodes.length === 0) {
                     const epCount = (seasonObj.links && seasonObj.links[0] && seasonObj.links[0].episode_count) || 12;
                     for (let i = 1; i <= epCount; i++) {
@@ -9003,32 +9059,26 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     }
                 }
 
-                // Merge explicit episode stream links if uploaded in movie.links
-                if (seasonObj.links && Array.isArray(seasonObj.links) && seasonObj.links.length > 0) {
-                    const hasExplicitEps = seasonObj.links.some(l => l && (l.episode || l.ep || l.episode_number || (l.name && /ep/i.test(l.name))));
-                    if (hasExplicitEps) {
-                        seasonObj.links.forEach((l, idx) => {
-                            const epNum = l.episode || l.ep || l.episode_number || (idx + 1);
-                            const existing = episodes.find(e => (e.episode_number == epNum));
-                            if (existing) {
-                                existing.stream_url = l.stream_url || l.url || "";
-                                if (l.name) existing.name = l.name;
-                            } else {
-                                episodes.push({
-                                    episode_number: parseInt(epNum, 10) || (idx + 1),
-                                    name: l.name || `Episode ${epNum}`,
-                                    stream_url: l.stream_url || l.url || ""
-                                });
-                            }
-                        });
-                        episodes.sort((a, b) => (a.episode_number || 0) - (b.episode_number || 0));
-                    }
-                }
+                // Guarantee episodes are always sorted numerically by episode number
+                episodes.sort((a, b) => (a.episode_number || 0) - (b.episode_number || 0));
 
                 currentCinemaEpisodes = episodes;
 
+                // Count streamable episodes
+                const streamableCount = episodes.filter(ep => {
+                    if (ep.stream_url && !ep.stream_url.includes("t.me")) return true;
+                    const epNum = ep.episode_number;
+                    return allStreamLinks.some(s => 
+                        (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) &&
+                        (s.season == seasonObj.seasonNumber || !s.season) &&
+                        (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")
+                    ) || (epNum === 1 && movie.stream_url && !movie.stream_url.includes("t.me"));
+                }).length;
+
                 if (badgeEl) {
-                    badgeEl.textContent = `${episodes.length} Episodes`;
+                    badgeEl.textContent = streamableCount > 0 
+                        ? `${streamableCount} Streamable • ${episodes.length} Episodes` 
+                        : `${episodes.length} Episodes`;
                 }
 
                 episodes.forEach((ep, idx) => {
@@ -9070,6 +9120,22 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         nowTag.textContent = "Playing";
                         thumbWrap.appendChild(nowTag);
                     }
+
+                    // Check if this episode is stream-ready
+                    const hasStream = !!(
+                        (ep.stream_url && !ep.stream_url.includes("t.me")) ||
+                        allStreamLinks.some(s => 
+                            (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) &&
+                            (s.season == seasonObj.seasonNumber || !s.season) &&
+                            (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")
+                        ) || (epNum === 1 && movie.stream_url && !movie.stream_url.includes("t.me"))
+                    );
+
+                    // Stream Ready / Download Badge
+                    const badgeTag = document.createElement("span");
+                    badgeTag.className = `cinema-ep-badge ${hasStream ? "ready" : "soon"}`;
+                    badgeTag.textContent = hasStream ? "⚡ Stream" : "📥 Download";
+                    thumbWrap.appendChild(badgeTag);
 
                     // Runtime Tag
                     const runtimeVal = ep.runtime ? `${ep.runtime}m` : "45m";
@@ -9201,16 +9267,16 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                                             }
                                         }
                                     }
-                                    showToast(`⚠️ Episode ${epNum} stream coming soon! Download is available in the Download tab.`, "info", 5000);
+                                    showToast(`⚠️ Episode ${epNum} stream is in preparation! Full series download is available in the Download tab.`, "info", 5000);
                                     if (typeof triggerHaptic === "function") triggerHaptic("warning");
                                 }).catch(() => {
-                                    showToast(`⚠️ Episode ${epNum} stream coming soon! Download is available in the Download tab.`, "info", 5000);
+                                    showToast(`⚠️ Episode ${epNum} stream is in preparation! Full series download is available in the Download tab.`, "info", 5000);
                                     if (typeof triggerHaptic === "function") triggerHaptic("warning");
                                 });
                                 return;
                             }
 
-                            showToast(`⚠️ Episode ${epNum} stream coming soon! Download is available in the Download tab.`, "info", 5000);
+                            showToast(`⚠️ Episode ${epNum} stream is in preparation! Full series download is available in the Download tab.`, "info", 5000);
                             if (typeof triggerHaptic === "function") triggerHaptic("warning");
                             return;
                         }
@@ -9225,6 +9291,14 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
                     episodesGrid.appendChild(epCard);
                 });
+
+                // Smoothly scroll active episode card into view
+                setTimeout(() => {
+                    const activeCard = episodesGrid.querySelector(`.cinema-episode-card.active`);
+                    if (activeCard) {
+                        activeCard.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                    }
+                }, 120);
             }
 
             // Populate Seasons Tabs

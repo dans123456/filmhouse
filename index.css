@@ -3470,42 +3470,48 @@ body.tg-back-visible #btn-close-cinema {
     }
 }
 
-/* Responsive Cinema Theater: Mobile Landscape Immersive Mode (Matches mobile phone screens rotated horizontally) */
+/* Responsive Cinema Theater: Mobile Landscape Mode (Phone turned sideways or compact landscape window) */
 @media (orientation: landscape) and (max-height: 850px) {
     #cinema-modal.active {
-        padding: 0 !important;
-        background: #000000 !important;
-    }
-    .cinema-theater-container {
-        width: 100vw !important;
-        max-width: 100vw !important;
-        height: 100vh !important;
-        height: 100dvh !important;
-        max-height: 100dvh !important;
-        border-radius: 0 !important;
-        border: none !important;
+        display: flex !important;
+        flex-direction: column !important;
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #06080d !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        z-index: 2500 !important;
+    }
+    .cinema-theater-container {
+        width: 100% !important;
+        max-width: 960px !important;
+        min-height: 100% !important;
+        height: auto !important;
+        margin: 0 auto !important;
+        border-radius: 0 !important;
+        border: none !important;
+        position: relative !important;
         display: flex !important;
         flex-direction: column !important;
-        background: #000000 !important;
-        z-index: 3000 !important;
+        background: #080a10 !important;
+        overflow: visible !important;
     }
     .cinema-header-wrapper {
-        position: absolute !important;
+        position: sticky !important;
         top: 0 !important;
-        left: 0 !important;
         width: 100% !important;
-        background: linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.3) 70%, transparent 100%) !important;
-        border-bottom: none !important;
+        background: rgba(6, 8, 13, 0.95) !important;
+        border-bottom: 1px solid rgba(255, 188, 0, 0.15) !important;
         z-index: 100 !important;
-        opacity: 1;
-        transform: translateY(0);
-        transition: opacity 0.35s ease, transform 0.35s ease;
-        pointer-events: none !important;
-    }
-    .cinema-header-wrapper * {
+        opacity: 1 !important;
         pointer-events: auto !important;
     }
     .cinema-top-bar {
@@ -3515,26 +3521,16 @@ body.tg-back-visible #btn-close-cinema {
         padding-right: max(14px, calc(var(--tg-safe-area-inset-right, 0px) + 14px)) !important;
         height: 38px !important;
     }
-    /* Hide second tier in landscape mode to prevent covering the video */
-    .cinema-sub-bar {
-        display: none !important;
-    }
-    .cinema-brand-group {
-        display: none !important;
-    }
     .cinema-top-actions {
         margin-right: max(14px, var(--tg-safe-area-inset-right, 14px)) !important;
     }
-    .cinema-theater-container.controls-hidden .cinema-header-wrapper {
-        opacity: 0 !important;
-        transform: translateY(-100%) !important;
-        pointer-events: none !important;
-    }
     .cinema-sticky-player {
-        width: 100vw !important;
-        height: 100vh !important;
-        height: 100dvh !important;
-        flex: 1 !important;
+        width: 100% !important;
+        max-width: 960px !important;
+        margin: 0 auto !important;
+        aspect-ratio: 16/9 !important;
+        max-height: 65vh !important;
+        height: auto !important;
         position: relative !important;
         display: flex !important;
         align-items: center !important;
@@ -3542,9 +3538,9 @@ body.tg-back-visible #btn-close-cinema {
         background: #000000 !important;
     }
     .cinema-iframe-wrapper {
-        width: 100vw !important;
-        height: 100vh !important;
-        height: 100dvh !important;
+        width: 100% !important;
+        height: 100% !important;
+        aspect-ratio: 16/9 !important;
         padding-top: 0 !important;
         display: flex !important;
         align-items: center !important;
@@ -3555,8 +3551,16 @@ body.tg-back-visible #btn-close-cinema {
         height: 100% !important;
         border: none !important;
     }
+    .cinema-player-controls-bar {
+        display: flex !important;
+    }
     .cinema-details-scroll-body {
-        display: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        flex: none !important;
+        overflow: visible !important;
+        height: auto !important;
+        padding: 14px 16px 80px !important;
     }
 }
 
@@ -8279,91 +8283,21 @@ body.desktop-wide-layout .mining-card-container {
     display: none !important;
 }
 
-/* Immersive Edge-to-Edge Mobile Landscape Mode (Phone turned sideways) */
+/* Responsive Cinema Theater: Compact Landscape Tweaks */
 @media (orientation: landscape) and (max-height: 550px) {
-    #cinema-modal.active {
-        padding: 0 !important;
-        background: #000000 !important;
-        overflow: hidden !important;
+    #cinema-modal.active:not(.has-fullscreen):not(:has(.is-fullscreen)) {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
     }
-
-    .cinema-theater-container {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        max-width: 100vw !important;
-        height: 100vh !important;
-        height: 100dvh !important;
-        max-height: 100dvh !important;
-        background: #000000 !important;
-        border-radius: 0 !important;
-        border: none !important;
-        z-index: 3500 !important;
-        margin: 0 !important;
-        padding: 0 !important;
+    .cinema-theater-container:not(.is-fullscreen) .cinema-details-scroll-body {
         display: flex !important;
         flex-direction: column !important;
+        overflow: visible !important;
     }
-
-    .cinema-sticky-player {
-        width: 100% !important;
-        height: 100% !important;
-        flex: 1 !important;
+    .cinema-theater-container:not(.is-fullscreen) .cinema-player-controls-bar {
         display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        background: #000000 !important;
-    }
-
-    .cinema-iframe-wrapper {
-        width: 100% !important;
-        height: 100% !important;
-        padding-top: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
-    .cinema-iframe-wrapper iframe {
-        width: 100% !important;
-        height: 100% !important;
-        border: none !important;
-    }
-
-    .cinema-details-scroll-body {
-        display: none !important;
-    }
-
-    /* Floating auto-hiding top bar in landscape */
-    .cinema-header-wrapper {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        background: linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 70%, transparent 100%) !important;
-        border-bottom: none !important;
-        z-index: 100 !important;
-        opacity: 1;
-        transition: opacity 0.35s ease;
-        pointer-events: none !important;
-    }
-
-    .cinema-header-wrapper * {
-        pointer-events: auto !important;
-    }
-
-    /* In landscape mode, hide redundant utility bar so video and Back button remain 100% clean */
-    .cinema-player-controls-bar {
-        display: none !important;
-    }
-
-    .cinema-theater-container.controls-hidden .cinema-header-wrapper {
-        opacity: 0 !important;
-        pointer-events: none !important;
     }
 }
-
 
 .cinema-server-cdn-badge {
     display: none !important;
@@ -8397,4 +8331,29 @@ body.desktop-wide-layout .mining-card-container {
     .cinema-theater-container.theater-pseudo-landscape .cinema-details-scroll-body {
         display: none !important;
     }
+}
+
+/* Episode Stream Ready / Download Status Badges */
+.cinema-ep-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    z-index: 2;
+    text-transform: uppercase;
+}
+.cinema-ep-badge.ready {
+    background: #ffbc00;
+    color: #0b0e14;
+    box-shadow: 0 0 10px rgba(255, 188, 0, 0.45);
+}
+.cinema-ep-badge.soon {
+    background: rgba(30, 41, 59, 0.85);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
