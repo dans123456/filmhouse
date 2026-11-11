@@ -74,7 +74,9 @@
       }
     ],
     "status": "Ongoing",
-    "is_ongoing": true
+    "is_ongoing": true,
+    "last_uploaded_episode": 4,
+    "current_season": 1
   },
   {
     "csv_id": "269161-bandi",
@@ -2136,7 +2138,10 @@
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADFRgAAhzcUEePaNizI7iXNhYE",
         "season": "Season 1"
       }
-    ]
+    ],
+    "last_uploaded_episode": 7,
+    "current_season": 1,
+    "status": "Ongoing"
   },
   {
     "csv_id": "559907-the-green-knight",
