@@ -4666,16 +4666,22 @@ function openMediaDetailPage(movie) {
 
     // 5. Live Streaming Controller (Option 2: Dedicated In-App Cinema Theater Modal)
     async function playMediaStream(customUrl, optTitle) {
-        let streamTarget = customUrl || movie.stream_url || "";
+        let streamTarget = customUrl || "";
+        // Prioritize 720p HD stream link by default for universal browser & mobile compatibility
         if (!streamTarget && movie.stream_links && Array.isArray(movie.stream_links)) {
-            const sl = movie.stream_links.find(s => s && (s.stream_url || s.url));
+            const sl720 = movie.stream_links.find(s => s && (s.stream_url || s.url) && /720/i.test(s.quality || s.name || s.seasonOrPart || ''));
+            const sl = sl720 || movie.stream_links.find(s => s && (s.stream_url || s.url));
             if (sl) streamTarget = sl.stream_url || sl.url;
         }
         if (!streamTarget && movie.links && Array.isArray(movie.links)) {
-            const streamLink = movie.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
+            const l720 = movie.links.find(l => l && (l.stream_url || l.url) && /720/i.test(l.quality || l.name || l.title || ''));
+            const streamLink = l720 || movie.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
             if (streamLink) {
                 streamTarget = streamLink.stream_url || streamLink.url;
             }
+        }
+        if (!streamTarget && movie.stream_url) {
+            streamTarget = movie.stream_url;
         }
 
         // Secondary catalog fallback: search state.movies
@@ -7036,8 +7042,8 @@ function resolveDirectStreamUrl(targetUrl) {
         if (clean.includes("/watch/")) {
             clean = clean.replace("/watch/", "/dl/");
         }
-        // If it points to an old trycloudflare tunnel or herokuapp with a token, upgrade domain to activeStreamingServerUrl
-        if (clean.includes(".trycloudflare.com/dl/") || clean.includes("herokuapp.com/dl/")) {
+        // If it points to an old trycloudflare tunnel, herokuapp, or duckdns when active server is synced, upgrade domain to activeStreamingServerUrl
+        if (clean.includes(".trycloudflare.com/dl/") || clean.includes("herokuapp.com/dl/") || (clean.includes("filmhouse-stream.duckdns.org/dl/") && activeStreamingServerUrl && !activeStreamingServerUrl.includes("filmhouse-stream.duckdns.org"))) {
             const tokenMatch = clean.match(/\/dl\/([a-zA-Z0-9_\-]+)/);
             if (tokenMatch && tokenMatch[1]) {
                 return `${activeStreamingServerUrl}/dl/${tokenMatch[1]}`;
@@ -7096,6 +7102,8 @@ function closeCinemaModal() {
     if (subQuickLabel) subQuickLabel.textContent = "CC Off";
     const audioQuickLabel = document.getElementById("cinema-audio-quick-label");
     if (audioQuickLabel) audioQuickLabel.textContent = "🔊 Auto";
+    const qLabelEl = document.getElementById("cinema-quality-label");
+    if (qLabelEl) qLabelEl.textContent = "720p HD";
     
     // Unlock screen orientation if locked
     try {
@@ -8044,14 +8052,13 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             window._nextEpCountdownTimer = null;
         }
 
-        // Update Quality Label in utility bar
+        // Update Quality Label in utility bar (Default: 720p HD)
         const qLabelEl = document.getElementById("cinema-quality-label");
         if (qLabelEl) {
             if (currentSelectedQualityLabel) {
                 qLabelEl.textContent = currentSelectedQualityLabel;
             } else {
-                const is4K = movie.links && movie.links.some(l => (l.quality || '').includes('4K') || (l.quality || '').includes('2160'));
-                qLabelEl.textContent = is4K ? '4K UHD' : '1080p FHD';
+                qLabelEl.textContent = '720p HD';
             }
         }
 
@@ -8113,21 +8120,23 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         }
     }
 
-    // Resolve initial stream parameter: custom URL -> stream_links -> movie.stream_url (Strictly non-Telegram)
+    // Resolve initial stream parameter: prioritize 720p HD as default streaming quality
     const isStreamLinkValid = (u) => u && typeof u === "string" && !u.includes("t.me/") && !u.includes("telegram.me/");
     let streamTarget = isStreamLinkValid(customStreamUrl) ? customStreamUrl : "";
     if (!streamTarget && movie.stream_links && Array.isArray(movie.stream_links)) {
-        const sl = movie.stream_links.find(s => s && isStreamLinkValid(s.stream_url || s.url));
+        const sl720 = movie.stream_links.find(s => s && isStreamLinkValid(s.stream_url || s.url) && /720/i.test(String(s.quality || s.name || s.seasonOrPart || "")));
+        const sl = sl720 || movie.stream_links.find(s => s && isStreamLinkValid(s.stream_url || s.url));
         if (sl) streamTarget = sl.stream_url || sl.url;
     }
-    if (!streamTarget && isStreamLinkValid(movie.stream_url)) {
-        streamTarget = movie.stream_url;
-    }
     if (!streamTarget && movie.links && Array.isArray(movie.links)) {
-        const streamLink = movie.links.find(l => l && isStreamLinkValid(l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
+        const l720 = movie.links.find(l => l && isStreamLinkValid(l.stream_url || l.url) && /720/i.test(String(l.quality || l.name || l.title || "")));
+        const streamLink = l720 || movie.links.find(l => l && isStreamLinkValid(l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
         if (streamLink) {
             streamTarget = streamLink.stream_url || streamLink.url;
         }
+    }
+    if (!streamTarget && isStreamLinkValid(movie.stream_url)) {
+        streamTarget = movie.stream_url;
     }
 
     if (!streamTarget && !isTVShow) {
@@ -8176,7 +8185,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     else if (/1080/i.test(text)) qName = "1080p FHD";
                     else if (/720/i.test(text)) qName = "720p HD";
                     else if (/480/i.test(text)) qName = "480p SD";
-                    else qName = idx === 0 ? "1080p FHD" : `Stream Quality ${idx + 1}`;
+                    else qName = idx === 0 ? "720p HD" : `Stream Quality ${idx + 1}`;
                 }
                 const cleanBadge = /4k|2160/i.test(qName) ? "4K" : (/720/i.test(qName) ? "720P" : (/480|360/i.test(qName) ? "SD" : "1080P"));
                 list.push({
@@ -8187,11 +8196,24 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 });
             });
 
-            // If no explicit qualities found in links, offer Master HD & Data Saver streams
+            // Sort qualities so 720p HD is always the first/default option, followed by 1080p, 4K, 480p
+            list.sort((a, b) => {
+                const rank = (q) => {
+                    const str = (q.label + ' ' + q.badge).toLowerCase();
+                    if (str.includes('720')) return 1;
+                    if (str.includes('1080')) return 2;
+                    if (str.includes('4k') || str.includes('2160')) return 3;
+                    if (str.includes('480') || str.includes('360')) return 4;
+                    return 5;
+                };
+                return rank(a) - rank(b);
+            });
+
+            // If no explicit qualities found in links, offer 720p HD first, then 1080p FHD
             if (list.length === 0) {
                 const activeTarget = customStreamUrl || movie.stream_url || streamTarget || "";
+                list.push({ label: "720p HD (Fast Stream)", badge: "720P", url: activeTarget, size: "Standard HD" });
                 list.push({ label: "1080p FHD (Master)", badge: "1080P", url: activeTarget, size: "High Definition" });
-                list.push({ label: "720p HD (Data Saver)", badge: "720P", url: activeTarget, size: "Fast Stream" });
             }
             return list;
         }
@@ -8528,6 +8550,15 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         if (typeof window.openCinemaSubtitlesHub === "function") {
                             window.openCinemaSubtitlesHub();
                         }
+                    } else if (e.data.action === "switchTo720pQuality") {
+                        if (typeof getMovieAvailableQualities === "function" && typeof selectQualityOption === "function") {
+                            const qualities = getMovieAvailableQualities();
+                            const q720 = qualities.find(q => /720/i.test(q.label || q.badge));
+                            if (q720 && q720.url !== currentSelectedQualityUrl) {
+                                selectQualityOption(q720);
+                                showToast("⚡ Switched to 720p HD (H.264)", "success");
+                            }
+                        }
                     } else if (e.data.action === "playerEnteredFullscreen") {
                         try {
                             if (screen.orientation && screen.orientation.lock) {
@@ -8771,10 +8802,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
                         let epTarget = "";
                         if (movie.stream_links && Array.isArray(movie.stream_links)) {
-                            const foundStream = movie.stream_links.find(s => 
+                            const matching = movie.stream_links.filter(s => 
                                 (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) && 
                                 (s.season == seasonObj.seasonNumber || !s.season)
                             );
+                            const found720 = matching.find(s => /720/i.test(s.quality || s.name || s.seasonOrPart || ''));
+                            const foundStream = found720 || matching[0];
                             if (foundStream) {
                                 const cand = foundStream.stream_url || foundStream.url;
                                 if (cand && !cand.includes("t.me")) epTarget = cand;

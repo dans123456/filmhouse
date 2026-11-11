@@ -398,7 +398,7 @@
           <svg viewBox='0 0 24 24'><polygon points='6 3 20 12 6 21 6 3'/></svg>
         </div>
         <div class='stream-play-title' id='streamPlayTitle'>▶ Tap to Watch Movie</div>
-        <div class='stream-play-sub' id='streamPlaySub'>Full 1080p HD • Online Cinema</div>
+        <div class='stream-play-sub' id='streamPlaySub'>720p HD • Fast Online Cinema</div>
       </div>
 
 
@@ -1810,8 +1810,8 @@
           } else if (clean.includes('/watch/')) {
             // Replace /watch/ with /dl/ for direct video stream
             finalStreamUrl = clean.replace('/watch/', '/dl/');
-          } else if (clean.includes('.trycloudflare.com/dl/') || clean.includes('herokuapp.com/dl/')) {
-            // Upgrade expired Cloudflare/Heroku tunnels directly to defaultStreamServer
+          } else if (clean.includes('.trycloudflare.com/dl/') || clean.includes('herokuapp.com/dl/') || (clean.includes('filmhouse-stream.duckdns.org/dl/') && defaultStreamServer && !defaultStreamServer.includes('filmhouse-stream.duckdns.org'))) {
+            // Upgrade expired Cloudflare/Heroku/DuckDNS tunnels directly to defaultStreamServer
             const tMatch = clean.match(/\/dl\/([a-zA-Z0-9_\-]+)/);
             if (tMatch && tMatch[1]) {
               finalStreamUrl = defaultStreamServer + "/dl/" + tMatch[1];
@@ -1970,12 +1970,70 @@
           }
         }, 4500);
 
+        // Helper to notify parent Mini App to switch stream quality to 720p HD
+        window.trySwitchTo720p = function() {
+          try {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({ action: 'switchTo720pQuality' }, '*');
+            }
+          } catch (_) {}
+        };
+
+        // Black Screen Watchdog for HEVC/x265 incompatibility in Chrome/Android
+        videoEl.addEventListener('playing', function() {
+          setTimeout(function() {
+            // If playing for 3s but videoWidth is 0 (classic HEVC black screen where only audio plays)
+            if (videoEl && !videoEl.paused && videoEl.videoWidth === 0 && !videoEl.ended) {
+              console.warn("[CodecWatchdog] Audio playing but 0 video frames decoded (HEVC/H.265 in Chrome)");
+              if (errorCard) {
+                errorCard.style.display = 'block';
+                errorCard.innerHTML = `
+                  <div style="display:flex;flex-direction:column;gap:5px;align-items:center;">
+                    <span>⚠️ <b>Black Screen / HEVC Detected</b></span>
+                    <span style="font-size:11px;font-weight:400;opacity:0.95;">
+                      Your browser cannot decode H.265/HEVC video.
+                    </span>
+                    <button type="button" onclick="trySwitchTo720p()" style="background:#ffd700;color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;margin-top:2px;">⚡ Switch to 720p HD (H.264)</button>
+                  </div>
+                `;
+              }
+            }
+          }, 3500);
+        });
+
         videoEl.addEventListener('error', function(e) {
-          console.warn("Video load issue:", e);
+          console.warn("Video load issue:", e, videoEl.error);
           if (loaderEl) loaderEl.style.display = 'none';
           if (errorCard) {
             errorCard.style.display = 'block';
-            errorCard.innerHTML = "⚠️ <b>Stream server is warming up.</b> Tap <b>Direct Download File</b> or reload in 10 seconds.";
+            const errCode = videoEl.error ? videoEl.error.code : 0;
+            if (errCode === 3 || errCode === 4) {
+              errorCard.innerHTML = `
+                <div style="display:flex;flex-direction:column;gap:6px;align-items:center;">
+                  <span>⚠️ <b>Codec / Format Incompatible</b></span>
+                  <span style="font-size:11px;font-weight:400;opacity:0.95;">
+                    This stream is encoded in HEVC/x265 or MKV, which is not supported by your browser.
+                  </span>
+                  <div style="display:flex;gap:8px;margin-top:4px;">
+                    <button type="button" onclick="trySwitchTo720p()" style="background:#ffd700;color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;">Switch to 720p HD</button>
+                    <a href="${finalStreamUrl}" target="_blank" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;">Download</a>
+                  </div>
+                </div>
+              `;
+            } else {
+              errorCard.innerHTML = `
+                <div style="display:flex;flex-direction:column;gap:6px;align-items:center;">
+                  <span>⚠️ <b>Stream Server Connection Notice</b></span>
+                  <span style="font-size:11px;font-weight:400;opacity:0.95;">
+                    Server is loading media or reconnecting. Tap <b>Switch to 720p HD</b> or use Direct Download.
+                  </span>
+                  <div style="display:flex;gap:8px;margin-top:4px;">
+                    <button type="button" onclick="trySwitchTo720p()" style="background:#ffd700;color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;">Switch to 720p HD</button>
+                    <a href="${finalStreamUrl}" target="_blank" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;">Download File</a>
+                  </div>
+                </div>
+              `;
+            }
           }
         });
       } else {
