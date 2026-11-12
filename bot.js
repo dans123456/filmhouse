@@ -162,6 +162,17 @@ function titlesMatch(titleA, titleB) {
     // Plural / singular tolerance: e.g. testament vs testaments
     if (normA.replace(/s$/, '') === normB.replace(/s$/, '')) return true;
 
+    // Word-by-word plural tolerance (e.g. "beast of no nation" vs "beasts of no nation")
+    const wordsA = normA.split(' ').map(w => w.replace(/s$/, ''));
+    const wordsB = normB.split(' ').map(w => w.replace(/s$/, ''));
+    if (wordsA.join(' ') === wordsB.join(' ')) return true;
+
+    // Beasts of No Nation alias
+    if ((normA.includes('beast of no nation') || normA.includes('beasts of no nation')) &&
+        (normB.includes('beast of no nation') || normB.includes('beasts of no nation'))) {
+        return true;
+    }
+
     // The Fixies alias
     if ((normA.includes('fixie') || normA === 'the fixies') && (normB.includes('fixie') || normB === 'the fixies')) return true;
     // VeggieTales alias
