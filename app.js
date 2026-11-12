@@ -7528,10 +7528,16 @@ function getMoreLikeThisMovies(currentMovie, limit = 8) {
     return scored.slice(0, limit).map(s => s.movie);
 }
 
-// Open In-App Cinema Streaming Player Modal directly with trailer cleanup
+// Open In-App Cinema Streaming Player Modal with Smart Pre-Roll Sponsor Flow & Trailer Cleanup
 function openCinemaModal(movie, customStreamUrl, customTitle) {
     stopAllBackgroundTrailers();
-    openCinemaModalCore(movie, customStreamUrl, customTitle);
+    if (typeof checkAndTriggerStreamAd === "function") {
+        checkAndTriggerStreamAd(movie, () => {
+            openCinemaModalCore(movie, customStreamUrl, customTitle);
+        });
+    } else {
+        openCinemaModalCore(movie, customStreamUrl, customTitle);
+    }
 }
 
 function openCinemaModalCore(movie, customStreamUrl, customTitle) {
@@ -8324,7 +8330,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=138_${Date.now()}`;
+        const cacheBuster = `v=139_${Date.now()}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}`;
         
         // Fast pre-buffering animation overlay for instant visual feedback
@@ -10341,9 +10347,10 @@ function checkAndTriggerStreamAd(movie, onReady) {
     const adFreeUntil = parseInt(localStorage.getItem("ad_free_until") || "0");
     const fastStreamUntil = parseInt(localStorage.getItem("cinema_fast_stream_until") || "0");
     const sessionUnlockedUntil = parseInt(localStorage.getItem("cinema_stream_unlocked_until") || "0");
+    const passSec = parseInt(localStorage.getItem("filmhouse_watch_pass_sec") || "0", 10);
 
     // 1. If active VIP Ad-Free, Fast-Stream Pass, or active 4h Binge Session:
-    if (adFreeUntil > now || fastStreamUntil > now || sessionUnlockedUntil > now) {
+    if (adFreeUntil > now || fastStreamUntil > now || sessionUnlockedUntil > now || passSec > 60) {
         if (typeof onReady === "function") onReady();
         return;
     }
@@ -10352,6 +10359,8 @@ function checkAndTriggerStreamAd(movie, onReady) {
     showCinemaPreRollModal(movie, () => {
         const unlockDuration = 4 * 60 * 60 * 1000; // 4 Hours
         localStorage.setItem("cinema_stream_unlocked_until", String(Date.now() + unlockDuration));
+        localStorage.setItem("cinema_fast_stream_until", String(Date.now() + unlockDuration));
+        localStorage.setItem("filmhouse_watch_pass_sec", String(4 * 3600));
         
         if (state.user && state.user.dailyStats) {
             state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
@@ -10395,6 +10404,7 @@ function showCinemaPreRollModal(movie, onUnlocked) {
             }
             deductPoints(500);
             localStorage.setItem("cinema_fast_stream_until", Date.now() + 4 * 60 * 60 * 1000);
+            localStorage.setItem("filmhouse_watch_pass_sec", String(4 * 3600));
             closeModal();
             if (typeof onUnlocked === "function") onUnlocked();
         };

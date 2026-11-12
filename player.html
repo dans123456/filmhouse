@@ -1854,11 +1854,6 @@
         }
       }
 
-      // iOS Safari Zero-Delay MP4 Transmuxing Hook for Matroska (.mkv) files
-      const isAppleDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      if (isAppleDevice && finalStreamUrl && !finalStreamUrl.includes('remux=')) {
-        finalStreamUrl += (finalStreamUrl.includes('?') ? '&' : '?') + 'remux=mp4';
-      }
       if (audioParam && finalStreamUrl && !finalStreamUrl.includes('audio=')) {
         finalStreamUrl += (finalStreamUrl.includes('?') ? '&' : '?') + 'audio=' + encodeURIComponent(audioParam);
       }
@@ -2036,16 +2031,10 @@
           if (loaderEl) loaderEl.style.display = 'none';
           if (errorCard) {
             errorCard.style.display = 'flex';
-            const errCode = videoEl.error ? videoEl.error.code : 0;
-            const isFormatIssue = (errCode === 4); // MEDIA_ERR_SRC_NOT_SUPPORTED
-            const errMsg = isFormatIssue 
-              ? "⚠️ Codec/Format requires external player or Safari MP4." 
-              : "⚠️ Stream is updating or reconnecting...";
             errorCard.innerHTML = `
-              <span>${errMsg}</span>
+              <span>⚠️ Stream is reconnecting...</span>
               <button type="button" onclick="window.retryStreamPlayback()" style="background:#ffd700;color:#000;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Retry</button>
               <button type="button" onclick="window.switchToServer2()" style="background:rgba(255,255,255,0.18);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:700;cursor:pointer;">Server 2</button>
-              <a href="${finalStreamUrl}" target="_blank" style="color:#ffbc00;font-size:10.5px;text-decoration:underline;margin-left:4px;font-weight:700;">Download / Play</a>
             `;
           }
         });
