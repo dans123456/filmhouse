@@ -8330,7 +8330,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=139_${Date.now()}`;
+        const cacheBuster = `v=140_${Date.now()}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}`;
         
         // Fast pre-buffering animation overlay for instant visual feedback
@@ -10412,19 +10412,18 @@ function showCinemaPreRollModal(movie, onUnlocked) {
 
     if (watchAdBtn) {
         watchAdBtn.onclick = () => {
-            watchAdBtn.disabled = true;
-            watchAdBtn.innerHTML = "<span>⏳ Loading Sponsor Clip...</span>";
-            showRewardedAd(() => {
-                watchAdBtn.disabled = false;
-                watchAdBtn.innerHTML = "<span>▶️ Watch Clip (Unlock 4h Binge)</span>";
-                closeModal();
-                if (typeof onUnlocked === "function") onUnlocked();
-            }, () => {
-                watchAdBtn.disabled = false;
-                watchAdBtn.innerHTML = "<span>▶️ Watch Clip (Unlock 4h Binge)</span>";
-                closeModal();
-                if (typeof onUnlocked === "function") onUnlocked();
-            });
+            triggerMonetagSmartLink();
+            const unlockDuration = 4 * 60 * 60 * 1000;
+            localStorage.setItem("cinema_stream_unlocked_until", String(Date.now() + unlockDuration));
+            localStorage.setItem("cinema_fast_stream_until", String(Date.now() + unlockDuration));
+            localStorage.setItem("filmhouse_watch_pass_sec", String(4 * 3600));
+            if (state.user && state.user.dailyStats) {
+                state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
+                saveDailyStats();
+            }
+            showToast("🍿 Cinema Session Unlocked! Enjoy 4 hours of ad-free streaming.", "success");
+            closeModal();
+            if (typeof onUnlocked === "function") onUnlocked();
         };
     }
 
