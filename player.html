@@ -1828,6 +1828,12 @@
         }
       }
 
+      // iOS Safari Zero-Delay MP4 Transmuxing Hook for Matroska (.mkv) files
+      const isAppleDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (isAppleDevice && finalStreamUrl && !finalStreamUrl.includes('remux=')) {
+        finalStreamUrl += (finalStreamUrl.includes('?') ? '&' : '?') + 'remux=mp4';
+      }
+
       // 1. Resume Playback Progress Logic (Strict Unique Key per Title/Episode)
       let uniqueMediaId = urlParams.get('media_id') || urlParams.get('mid') || urlParams.get('tmdb') || urlParams.get('imdb') || '';
       if (!uniqueMediaId && titleParam) {
