@@ -566,10 +566,25 @@
       const qualityParam = urlParams.get('quality') || '1080p HD';
       const backdropParam = urlParams.get('backdrop') || urlParams.get('poster') || '';
       const subParam = urlParams.get('sub') || '';
+      const audioParam = urlParams.get('audio') || '';
       const typeParam = (urlParams.get('type') || '').toLowerCase();
       const serverParam = urlParams.get('server') || '';
 
       const videoEl = document.getElementById('mainVideo');
+
+      if (audioParam !== '' && !isNaN(parseInt(audioParam, 10)) && videoEl) {
+        const initialAudioIdx = parseInt(audioParam, 10);
+        videoEl.addEventListener('loadedmetadata', function() {
+          if (window._currentHls && typeof window._currentHls.audioTrack !== 'undefined') {
+            window._currentHls.audioTrack = initialAudioIdx;
+          }
+          if (videoEl.audioTracks && videoEl.audioTracks[initialAudioIdx]) {
+            for (let i = 0; i < videoEl.audioTracks.length; i++) {
+              videoEl.audioTracks[i].enabled = (i === initialAudioIdx);
+            }
+          }
+        }, { once: true });
+      }
 
       // Set Backdrop immediately as video poster and background to prevent black screen!
       if (backdropParam && videoEl) {
@@ -1405,6 +1420,7 @@
               action: 'videoTracksDetected',
               subtitles: subTracks,
               audios: audioTracks,
+              audioTracks: audioTracks,
               subtitlesActive: anyShowing,
               activeSubtitleLabel: showingLabel
             }, '*');
@@ -1718,7 +1734,7 @@
             }
           } catch (_) {}
         } else if (ev.data.action === 'selectAudioTrack') {
-          const targetIndex = ev.data.index;
+          const targetIndex = parseInt(ev.data.index, 10);
           if (window._currentHls && typeof window._currentHls.audioTrack !== 'undefined') {
             window._currentHls.audioTrack = targetIndex;
           }
@@ -1727,10 +1743,20 @@
               videoEl.audioTracks[i].enabled = (i === targetIndex);
             }
           }
-        } else if (ev.data.action === 'purgeSubtitles') {
+          if (ev.data.reloadWithTrack) {
+            try {
+              let u = new URL(window.location.href);
+              u.searchParams.set('audio', targetIndex);
+              window.location.href = u.toString();
+              return;
+            } catch (_) {}
+          }
+          detectAndBroadcastTracks();
+        } else if (ev.data.action === 'purgeSubtitles' || ev.data.action === 'removeSubtitle' || ev.data.action === 'nukeSubtitles') {
           activeCues = [];
           window._subtitlesDisabled = true;
           window._subtitlesExplicitlyActive = false;
+          window._activeSubtitleTrack = null;
           const customSubEl = document.getElementById('customSubtitleText');
           if (customSubEl) {
             customSubEl.textContent = '';
@@ -1741,7 +1767,7 @@
               videoEl.textTracks[i].mode = 'disabled';
             }
           }
-          const dynamicSubs = videoEl ? videoEl.querySelectorAll('track.dynamic-sub') : [];
+          const dynamicSubs = videoEl ? videoEl.querySelectorAll('track') : [];
           dynamicSubs.forEach(t => t.remove());
           if (window.plyrInstance) {
             try { window.plyrInstance.toggleCaptions(false); } catch (_) {}
@@ -1832,6 +1858,9 @@
       const isAppleDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       if (isAppleDevice && finalStreamUrl && !finalStreamUrl.includes('remux=')) {
         finalStreamUrl += (finalStreamUrl.includes('?') ? '&' : '?') + 'remux=mp4';
+      }
+      if (audioParam && finalStreamUrl && !finalStreamUrl.includes('audio=')) {
+        finalStreamUrl += (finalStreamUrl.includes('?') ? '&' : '?') + 'audio=' + encodeURIComponent(audioParam);
       }
 
       // 1. Resume Playback Progress Logic (Strict Unique Key per Title/Episode)
