@@ -7528,16 +7528,10 @@ function getMoreLikeThisMovies(currentMovie, limit = 8) {
     return scored.slice(0, limit).map(s => s.movie);
 }
 
-// Open In-App Cinema Streaming Player Modal with Smart Pre-Roll Sponsor Flow & Trailer Cleanup
+// Open In-App Cinema Streaming Player Modal directly with trailer cleanup
 function openCinemaModal(movie, customStreamUrl, customTitle) {
     stopAllBackgroundTrailers();
-    if (typeof checkAndTriggerStreamAd === "function") {
-        checkAndTriggerStreamAd(movie, () => {
-            openCinemaModalCore(movie, customStreamUrl, customTitle);
-        });
-    } else {
-        openCinemaModalCore(movie, customStreamUrl, customTitle);
-    }
+    openCinemaModalCore(movie, customStreamUrl, customTitle);
 }
 
 function openCinemaModalCore(movie, customStreamUrl, customTitle) {
@@ -8330,7 +8324,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=140_${Date.now()}`;
+        const cacheBuster = `v=141_${Date.now()}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}`;
         
         // Fast pre-buffering animation overlay for instant visual feedback

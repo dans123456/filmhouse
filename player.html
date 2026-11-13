@@ -1287,7 +1287,10 @@
           return;
         }
 
-        // Note: SmartLink only opens when user voluntarily taps "⚡ 4h Pass"
+        // Open Monetag SmartLink sponsor
+        try {
+          window.open(MONETAG_SMARTLINK, '_blank');
+        } catch (e) {}
 
         preRoll.style.display = 'flex';
         let countdown = 8;
