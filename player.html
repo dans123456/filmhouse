@@ -1405,7 +1405,7 @@
               enabled: (idx === curIdx)
             });
           });
-        } else if (videoEl.audioTracks) {
+        } else if (videoEl.audioTracks && videoEl.audioTracks.length > 0) {
           for (let i = 0; i < videoEl.audioTracks.length; i++) {
             const a = videoEl.audioTracks[i];
             audioTracks.push({
@@ -1415,6 +1415,23 @@
               enabled: a.enabled
             });
           }
+        }
+
+        // Universal Fallback for mobile WebViews / Plyr where videoEl.audioTracks is disabled
+        if (audioTracks.length === 0) {
+          const activeAudioIdx = parseInt(urlParams.get('audio') || '0', 10);
+          audioTracks.push({
+            index: 0,
+            label: "Audio 1 (Original / Default)",
+            lang: "orig",
+            enabled: (activeAudioIdx === 0)
+          });
+          audioTracks.push({
+            index: 1,
+            label: "Audio 2 (English / Secondary)",
+            lang: "en",
+            enabled: (activeAudioIdx === 1)
+          });
         }
 
         try {
@@ -1741,15 +1758,21 @@
           if (window._currentHls && typeof window._currentHls.audioTrack !== 'undefined') {
             window._currentHls.audioTrack = targetIndex;
           }
-          if (videoEl && videoEl.audioTracks) {
+          let switchedClientSide = false;
+          if (videoEl && videoEl.audioTracks && videoEl.audioTracks.length > 1) {
             for (let i = 0; i < videoEl.audioTracks.length; i++) {
               videoEl.audioTracks[i].enabled = (i === targetIndex);
             }
+            switchedClientSide = true;
           }
-          if (ev.data.reloadWithTrack) {
+          if (!switchedClientSide || ev.data.reloadWithTrack) {
             try {
               let u = new URL(window.location.href);
               u.searchParams.set('audio', targetIndex);
+              const curTime = (videoEl && videoEl.currentTime > 5) ? Math.floor(videoEl.currentTime) : 0;
+              if (curTime > 0) {
+                u.searchParams.set('t', curTime);
+              }
               window.location.href = u.toString();
               return;
             } catch (_) {}
@@ -1885,6 +1908,18 @@
         return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
       }
 
+      const initialSeekTime = parseFloat(urlParams.get('t') || urlParams.get('time') || '0');
+      if (initialSeekTime > 0) {
+        const applySeek = function() {
+          try {
+            if (window.plyrInstance) window.plyrInstance.currentTime = initialSeekTime;
+            else videoEl.currentTime = initialSeekTime;
+          } catch (_) {}
+        };
+        videoEl.addEventListener('loadedmetadata', applySeek, { once: true });
+        videoEl.addEventListener('canplay', applySeek, { once: true });
+      }
+
       videoEl.addEventListener('loadedmetadata', function() {
         const saved = parseFloat(localStorage.getItem(resumeKey) || '0');
         if (saved > 15 && videoEl.duration && (videoEl.duration - saved) > 30) {
@@ -2013,6 +2048,14 @@
           } catch (e) {}
         };
 
+        let streamSilentRetryCount = 0;
+
+        // Reset error state whenever stream is actively playing
+        videoEl.addEventListener('playing', function() {
+          streamSilentRetryCount = 0;
+          if (errorCard) errorCard.style.display = 'none';
+        });
+
         // Helper to retry stream playback on demand
         window.retryStreamPlayback = function() {
           if (errorCard) errorCard.style.display = 'none';
@@ -2032,6 +2075,25 @@
           console.warn("Video stream load notice:", e, videoEl.error);
           hideStreamLoader();
           if (loaderEl) loaderEl.style.display = 'none';
+
+          // STRICT: NEVER show error notice if user hasn't pressed play or stream hasn't started!
+          if (!document.body.classList.contains('stream-started')) {
+            return;
+          }
+
+          // Attempt silent background recovery twice before surfacing reconnect UI
+          if (streamSilentRetryCount < 2) {
+            streamSilentRetryCount++;
+            setTimeout(() => {
+              try {
+                videoEl.load();
+                if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
+                else videoEl.play().catch(() => {});
+              } catch (_) {}
+            }, 1200);
+            return;
+          }
+
           if (errorCard) {
             errorCard.style.display = 'flex';
             errorCard.innerHTML = `

@@ -5031,10 +5031,17 @@ function openMediaDetailPage(movie) {
                 (m.title && movie.title && m.title.trim().toLowerCase() === movie.title.trim().toLowerCase())
             );
             if (localMatch) {
-                streamTarget = localMatch.stream_url || "";
+                streamTarget = isTVShow ? "" : (localMatch.stream_url || "");
                 if (!streamTarget && localMatch.stream_links && Array.isArray(localMatch.stream_links)) {
-                    const sl = localMatch.stream_links.find(s => s && (s.stream_url || s.url));
-                    if (sl) streamTarget = sl.stream_url || sl.url;
+                    if (isTVShow) {
+                        const s1e1 = localMatch.stream_links.find(s => s && (parseInt(s.season || s.season_number, 10) === 1) && (parseInt(s.episode || s.episode_number, 10) === 1) && (s.stream_url || s.url));
+                        const s1 = localMatch.stream_links.find(s => s && (parseInt(s.season || s.season_number, 10) === 1) && (s.stream_url || s.url));
+                        const sl = s1e1 || s1 || localMatch.stream_links.find(s => s && (s.stream_url || s.url));
+                        if (sl) streamTarget = sl.stream_url || sl.url;
+                    } else {
+                        const sl = localMatch.stream_links.find(s => s && (s.stream_url || s.url));
+                        if (sl) streamTarget = sl.stream_url || sl.url;
+                    }
                 }
                 if (!streamTarget && localMatch.links && Array.isArray(localMatch.links)) {
                     const sl = localMatch.links.find(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
@@ -5056,8 +5063,15 @@ function openMediaDetailPage(movie) {
                     const data = snap.data() || {};
                     if (data.stream_links && Array.isArray(data.stream_links) && data.stream_links.length > 0) {
                         movie.stream_links = data.stream_links;
-                        const validStream = data.stream_links.find(s => s && (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me"));
-                        if (validStream) streamTarget = validStream.stream_url || validStream.url;
+                        if (isTVShow) {
+                            const s1e1 = data.stream_links.find(s => s && (parseInt(s.season || s.season_number, 10) === 1) && (parseInt(s.episode || s.episode_number, 10) === 1) && (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me"));
+                            const s1 = data.stream_links.find(s => s && (parseInt(s.season || s.season_number, 10) === 1) && (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me"));
+                            const validStream = s1e1 || s1 || data.stream_links.find(s => s && (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me"));
+                            if (validStream) streamTarget = validStream.stream_url || validStream.url;
+                        } else {
+                            const validStream = data.stream_links.find(s => s && (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me"));
+                            if (validStream) streamTarget = validStream.stream_url || validStream.url;
+                        }
                     }
                     if (data.stream_url && !String(data.stream_url).includes("t.me")) {
                         movie.stream_url = data.stream_url;
@@ -8246,13 +8260,18 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             if (chk) chk.textContent = "✓";
 
             const trackIdx = parseInt(btn.getAttribute("data-audio-idx") ?? "0", 10);
+            try {
+                localStorage.setItem("fh_audio_pref", String(trackIdx));
+            } catch (_) {}
+
             const frame = container.querySelector("iframe");
             const trackName = btn.querySelector(".track-name")?.textContent || "Audio";
 
             if (frame && frame.contentWindow) {
                 frame.contentWindow.postMessage({
                     action: "selectAudioTrack",
-                    index: trackIdx
+                    index: trackIdx,
+                    reloadWithTrack: true
                 }, "*");
             }
 
@@ -8324,8 +8343,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=141_${Date.now()}`;
-        const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}`;
+        let savedAudioPref = "";
+        try { savedAudioPref = localStorage.getItem("fh_audio_pref") || ""; } catch (_) {}
+        const audioParam = (savedAudioPref && savedAudioPref !== "0") ? `&audio=${encodeURIComponent(savedAudioPref)}` : "";
+
+        const cacheBuster = `v=142_${Date.now()}`;
+        const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${audioParam}`;
         
         // Fast pre-buffering animation overlay for instant visual feedback
         const loader = document.createElement("div");
@@ -8728,9 +8751,13 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 });
             }
 
-            detectedSeasons.sort((a, b) => a.seasonNumber - b.seasonNumber);
+            detectedSeasons.sort((a, b) => (parseInt(a.seasonNumber, 10) || 1) - (parseInt(b.seasonNumber, 10) || 1));
 
-            currentSeason = detectedSeasons[0];
+            // Strictly default to Season 1
+            const season1 = detectedSeasons.find(s => (parseInt(s.seasonNumber, 10) || 1) === 1);
+            currentSeason = season1 || detectedSeasons[0];
+            currentEpisodeNum = 1;
+
             if (customStreamUrl) {
                 const matchCustom = detectedSeasons.find(s => s.streamUrl === customStreamUrl);
                 if (matchCustom) currentSeason = matchCustom;
