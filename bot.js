@@ -173,6 +173,12 @@ function titlesMatch(titleA, titleB) {
         return true;
     }
 
+    // Kdg <-> It's Okay to Not Be Okay alias
+    if ((normA === 'kdg' && (normB.includes('not be okay') || normB.includes('okay to not be'))) ||
+        (normB === 'kdg' && (normA.includes('not be okay') || normA.includes('okay to not be')))) {
+        return true;
+    }
+
     // The Fixies alias
     if ((normA.includes('fixie') || normA === 'the fixies') && (normB.includes('fixie') || normB === 'the fixies')) return true;
     // VeggieTales alias
