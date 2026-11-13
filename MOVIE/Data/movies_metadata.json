@@ -153,7 +153,7 @@
     "director": "",
     "trailer": "aScUjuKvHSo",
     "runtime": "",
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTI1MDpkOGUzMjI4OTk1YjViMmFk",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTI1NTphMjIzMDVlNTJhN2VjNGNl",
     "stream_links": [
       {
         "season": 1,
@@ -12626,7 +12626,7 @@
         "quality": "1080p"
       }
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTExMzowODMxYjhmOWY2MDk4OGEz",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTEyNjo4MTIxZWJiY2U2OWQ4ZTg4",
     "stream_links": [
       {
         "quality": "1080P",
@@ -74335,6 +74335,109 @@
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADpRAAAoFSOUdS3aTpvcmh1BYE",
         "season": "All Seasons"
       }
+    ],
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg2Nzo1NzZjYzJjNzdhNDViYTUx",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E01",
+        "episode": 1,
+        "episodeNum": 1,
+        "quality": "720P",
+        "name": "Episode 1",
+        "url": "https://filmhouse-stream.duckdns.org/dl/NTg1ODpiOTI5ZDlmYjUzZDEwOGE4",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg1ODpiOTI5ZDlmYjUzZDEwOGE4"
+      },
+      {
+        "season": 1,
+        "seasonOrPart": "S01E02",
+        "episode": 2,
+        "episodeNum": 2,
+        "quality": "720P",
+        "name": "Episode 2",
+        "url": "https://filmhouse-stream.duckdns.org/dl/NTg1OTo3N2E0NWFkNDM0ZjgwYTY2",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg1OTo3N2E0NWFkNDM0ZjgwYTY2"
+      },
+      {
+        "season": 1,
+        "seasonOrPart": "S01E03",
+        "episode": 3,
+        "episodeNum": 3,
+        "quality": "720P",
+        "name": "Episode 3",
+        "url": "https://filmhouse-stream.duckdns.org/dl/NTg2MDoxYzM1MTE5ZDgzZjk2Njk5",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg2MDoxYzM1MTE5ZDgzZjk2Njk5"
+      },
+      {
+        "season": 1,
+        "seasonOrPart": "S01E04",
+        "episode": 4,
+        "episodeNum": 4,
+        "quality": "720P",
+        "name": "Episode 4",
+        "url": "https://filmhouse-stream.duckdns.org/dl/NTg2MTo2MGJlNTUzYjkyNGI4M2E0",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg2MTo2MGJlNTUzYjkyNGI4M2E0"
+      },
+      {
+        "season": 1,
+        "seasonOrPart": "S01E05",
+        "episode": 5,
+        "episodeNum": 5,
+        "quality": "720P",
+        "name": "Episode 5",
+        "url": "https://filmhouse-stream.duckdns.org/dl/NTg2MjphMDU4ZjNhY2E1Njc1NGQ2",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg2MjphMDU4ZjNhY2E1Njc1NGQ2"
+      },
+      {
+        "season": 1,
+        "seasonOrPart": "S01E06",
+        "episode": 6,
+        "episodeNum": 6,
+        "quality": "720P",
+        "name": "Episode 6",
+        "url": "https://filmhouse-stream.duckdns.org/dl/NTg2MzplMmUwNmIxNzU4NmJhMTYy",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg2MzplMmUwNmIxNzU4NmJhMTYy"
+      },
+      {
+        "season": 1,
+        "seasonOrPart": "S01E07",
+        "episode": 7,
+        "episodeNum": 7,
+        "quality": "720P",
+        "name": "Episode 7",
+        "url": "https://filmhouse-stream.duckdns.org/dl/NTg2NDoxMGU2ZGYwZGVkOTZkY2Q4",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg2NDoxMGU2ZGYwZGVkOTZkY2Q4"
+      },
+      {
+        "season": 1,
+        "seasonOrPart": "S01E08",
+        "episode": 8,
+        "episodeNum": 8,
+        "quality": "720P",
+        "name": "Episode 8",
+        "url": "https://filmhouse-stream.duckdns.org/dl/NTg2NTowYzNhMDIwMjE4MGM4YWY1",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg2NTowYzNhMDIwMjE4MGM4YWY1"
+      },
+      {
+        "season": 1,
+        "seasonOrPart": "S01E09",
+        "episode": 9,
+        "episodeNum": 9,
+        "quality": "720P",
+        "name": "Episode 9",
+        "url": "https://filmhouse-stream.duckdns.org/dl/NTg2NjplYTZjNmE4NjQxZDkxMmFl",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg2NjplYTZjNmE4NjQxZDkxMmFl"
+      },
+      {
+        "season": 1,
+        "seasonOrPart": "S01E10",
+        "episode": 10,
+        "episodeNum": 10,
+        "quality": "720P",
+        "name": "Episode 10",
+        "url": "https://filmhouse-stream.duckdns.org/dl/NTg2Nzo1NzZjYzJjNzdhNDViYTUx",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg2Nzo1NzZjYzJjNzdhNDViYTUx"
+      }
     ]
   },
   {
@@ -79461,7 +79564,7 @@
         "stream_url": "https://filmhouse-stream.duckdns.org/dl/NjU1NjphYzk5MWYxMDQ2MTcyM2Ew"
       }
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODkxNjpiOWFkMzllNzkyZjYxOGQ4"
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODkyNTo1OGZmMGYxMTljNzVkMWNl"
   },
   {
     "csv_id": "74204-big-mouth",
@@ -82842,7 +82945,7 @@
         "quality": "720p"
       }
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIzMjoyYzBhZDBjYzc3MGE1Mzli",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIzNzo1NWE0NzhjODdhMjQxZDU1",
     "stream_links": [
       {
         "season": 1,
@@ -99775,7 +99878,7 @@
     "links": [
       "https://t.me/FilmHouseFilebot?start=BQADAQADXwgAAhoLoUZkGKaclHqsphYE"
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTE4Nzo4OTE2YzJjNDM5Njk4YWRl",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTE5NjozZDBjNjIxYjI2YjAzNTM4",
     "stream_links": [
       {
         "season": 1,
@@ -114581,7 +114684,7 @@
     "links": [
       "https://t.me/filmHouseFile1bot?start=BQADAQADlh4AAp4PgEZPj5hDZfzdYRYE"
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk4NzoxZTUwMDMyNWFmZWFhYjE4",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk5Mzo2OTE2MGVlOWY4NmQzMWZj",
     "stream_links": [
       {
         "quality": "1080P",
@@ -115033,7 +115136,7 @@
         "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk5NDozYzY2NmE3MDEzOTdiZGFj"
       }
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk5NDozYzY2NmE3MDEzOTdiZGFj"
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/Njg0OjJlZGNmZDZlMWI1MTE4ZmI"
   },
   {
     "title": "A Simple Lie",
@@ -115992,7 +116095,7 @@
         "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIyOTpmZWVjN2ZlYzIxYTc1ZWQ3"
       }
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIyOTpmZWVjN2ZlYzIxYTc1ZWQ3"
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIzMDo1ZWM4OTc3MmJmNDA3ZGEz"
   },
   {
     "title": "All American: Homecoming",
@@ -125054,7 +125157,7 @@
         "season": "Season 2"
       }
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTAwMzo0NWJlMmU1MWQ5MWM2ZDdh",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTAxNzpmNTdjZGQzYTdjNTFjMDMx",
     "stream_links": [
       {
         "quality": "1080P",
@@ -142827,7 +142930,7 @@
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADbwoAAhoLoUYmBTVw_3WKvxYE"
       }
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODg5NDozMDU5ZGMxNWQ4ODI0YTc4",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODkxNTpkOTY1NDM4Nzg5ZTZiOWNl",
     "stream_links": [
       {
         "season": 1,
@@ -144970,7 +145073,7 @@
       "https://t.me/filmHouseFile1bot?start=BQADAQADNRMAAp4PiEZxn5bbYQpUUxYE",
       "https://t.me/filmHouseFile1bot?start=BQADAQADqwoAAnavkUbeH25JO1gwahYE"
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODkyNjozZjdhMzg1MzQ3NDU0Zjlk",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODkzMzoyNmY4ZDVmZDcwNjgyMjM1",
     "stream_links": [
       {
         "season": 3,
@@ -153693,7 +153796,7 @@
     "director": "",
     "trailer": "",
     "runtime": "",
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc1NjpjYzRiZmY5NzA3ODc4Yjhi",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk0NDo1NGVhYjY3ZTQwMGFjNjVm",
     "stream_links": [
       {
         "season": 1,
@@ -153702,8 +153805,8 @@
         "episodeNum": 3,
         "quality": "1080P",
         "name": "Episode 3",
-        "url": "https://filmhouse-stream.duckdns.org/dl/ODc1NjpjYzRiZmY5NzA3ODc4Yjhi",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc1NjpjYzRiZmY5NzA3ODc4Yjhi"
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk0NDo1NGVhYjY3ZTQwMGFjNjVm",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk0NDo1NGVhYjY3ZTQwMGFjNjVm"
       }
     ],
     "links": []
@@ -155023,6 +155126,851 @@
         "quality": "720P",
         "url": "https://filmhouse-stream.duckdns.org/dl/OTIyMDo3ODY2MjI2ZTE3NzhiY2Jj",
         "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIyMDo3ODY2MjI2ZTE3NzhiY2Jj"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "60321-bellator-6",
+    "tmdb_id": 60321,
+    "imdb_id": "",
+    "title": "Bellator 6",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Thriller"
+    ],
+    "overview": "Bellator VI was an event of the mixed martial arts promotion, Bellator Fighting Championships. The event took place on Friday, May 8, 2009 in Robstown, Texas. It was broadcast nationally in the U.S. via tape-delay the following night on Saturday, May 9, 2009 through an exclusive television agreement with ESPN Deportes.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2009-05-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2MjpiZmJlMzIyYjRmNTBiMjMy",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E06",
+        "episode": 6,
+        "episodeNum": 6,
+        "quality": "1080P",
+        "name": "Episode 6",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc2MjpiZmJlMzIyYjRmNTBiMjMy",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2MjpiZmJlMzIyYjRmNTBiMjMy"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "60321-bellator-6",
+    "tmdb_id": 60321,
+    "imdb_id": "",
+    "title": "Bellator 6",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Thriller"
+    ],
+    "overview": "Bellator VI was an event of the mixed martial arts promotion, Bellator Fighting Championships. The event took place on Friday, May 8, 2009 in Robstown, Texas. It was broadcast nationally in the U.S. via tape-delay the following night on Saturday, May 9, 2009 through an exclusive television agreement with ESPN Deportes.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2009-05-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2MzplNmMxOTIxNzJhZWE5NTU2",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E06",
+        "episode": 6,
+        "episodeNum": 6,
+        "quality": "1080P",
+        "name": "Episode 6",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc2MzplNmMxOTIxNzJhZWE5NTU2",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2MzplNmMxOTIxNzJhZWE5NTU2"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "60322-bellator-7",
+    "tmdb_id": 60322,
+    "imdb_id": "",
+    "title": "Bellator 7",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Bellator VII was an event of the mixed martial arts promotion, Bellator Fighting Championships. The event took place on Friday, May 15, 2009 in Chicago, Illinois. It was broadcast nationally in the U.S. via tape-delay the following night on Saturday, May 16, 2009 through an exclusive television agreement with ESPN Deportes.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2009-05-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2NDo3NzMxYjUyODBkNTcxZjQ3",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E07",
+        "episode": 7,
+        "episodeNum": 7,
+        "quality": "1080P",
+        "name": "Episode 7",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc2NDo3NzMxYjUyODBkNTcxZjQ3",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2NDo3NzMxYjUyODBkNTcxZjQ3"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "60322-bellator-7",
+    "tmdb_id": 60322,
+    "imdb_id": "",
+    "title": "Bellator 7",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Bellator VII was an event of the mixed martial arts promotion, Bellator Fighting Championships. The event took place on Friday, May 15, 2009 in Chicago, Illinois. It was broadcast nationally in the U.S. via tape-delay the following night on Saturday, May 16, 2009 through an exclusive television agreement with ESPN Deportes.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2009-05-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2NTpjNWI5YjBmYTgyNjdlZDg2",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E07",
+        "episode": 7,
+        "episodeNum": 7,
+        "quality": "1080P",
+        "name": "Episode 7",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc2NTpjNWI5YjBmYTgyNjdlZDg2",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2NTpjNWI5YjBmYTgyNjdlZDg2"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "151713-bellator-85",
+    "tmdb_id": 151713,
+    "imdb_id": "",
+    "title": "Bellator 85",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Bellator LXXXV is currently scheduled to take place on January 17, 2013 at the Bren Events Center in Irvine, California.[1] The event will be distributed live in prime time by Spike TV. It marks the season debut of season eight.",
+    "poster": "https://image.tmdb.org/t/p/w1280/nq1ZZ32UXmPBWkkbb7mRG1DotpO.jpg",
+    "backdrop": "",
+    "rating": 7.2,
+    "release_date": "2013-01-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2NjpjNjVlN2U2NjQ2N2JiNjUy",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E08",
+        "episode": 8,
+        "episodeNum": 8,
+        "quality": "1080P",
+        "name": "Episode 8",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc2NjpjNjVlN2U2NjQ2N2JiNjUy",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2NjpjNjVlN2U2NjQ2N2JiNjUy"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "151713-bellator-85",
+    "tmdb_id": 151713,
+    "imdb_id": "",
+    "title": "Bellator 85",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Bellator LXXXV is currently scheduled to take place on January 17, 2013 at the Bren Events Center in Irvine, California.[1] The event will be distributed live in prime time by Spike TV. It marks the season debut of season eight.",
+    "poster": "https://image.tmdb.org/t/p/w1280/nq1ZZ32UXmPBWkkbb7mRG1DotpO.jpg",
+    "backdrop": "",
+    "rating": 7.2,
+    "release_date": "2013-01-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2NzowZGQ5YTg1NGU0MTk1ZWNh",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E08",
+        "episode": 8,
+        "episodeNum": 8,
+        "quality": "1080P",
+        "name": "Episode 8",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc2NzowZGQ5YTg1NGU0MTk1ZWNh",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2NzowZGQ5YTg1NGU0MTk1ZWNh"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "60323-bellator-9",
+    "tmdb_id": 60323,
+    "imdb_id": "",
+    "title": "Bellator 9",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Bellator IX was a mixed martial arts event promoted by Bellator Fighting Championships. The event took place on Friday, May 29, 2009 in Monroe, Louisiana. It was broadcasted nationally in the U.S. via tape-delay the following night on Saturday, May 30, 2009 through an exclusive television agreement with ESPN Deportes.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2009-05-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2ODplYmYxZGFiMmM3ZGE1NzUx",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E09",
+        "episode": 9,
+        "episodeNum": 9,
+        "quality": "1080P",
+        "name": "Episode 9",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc2ODplYmYxZGFiMmM3ZGE1NzUx",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2ODplYmYxZGFiMmM3ZGE1NzUx"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "60323-bellator-9",
+    "tmdb_id": 60323,
+    "imdb_id": "",
+    "title": "Bellator 9",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Bellator IX was a mixed martial arts event promoted by Bellator Fighting Championships. The event took place on Friday, May 29, 2009 in Monroe, Louisiana. It was broadcasted nationally in the U.S. via tape-delay the following night on Saturday, May 30, 2009 through an exclusive television agreement with ESPN Deportes.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2009-05-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2OTpmMjQyNGJhZTBjNWM0MmQ4",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E09",
+        "episode": 9,
+        "episodeNum": 9,
+        "quality": "1080P",
+        "name": "Episode 9",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc2OTpmMjQyNGJhZTBjNWM0MmQ4",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc2OTpmMjQyNGJhZTBjNWM0MmQ4"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "1490625-glory-s-hole-antiverse",
+    "tmdb_id": 1490625,
+    "imdb_id": "",
+    "title": "glory's hole antiverse",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "A celestial being probes gaping wormholes on quest toward carnal pleasure and cosmic annihilation",
+    "poster": "https://image.tmdb.org/t/p/w1280/pVN6Ersjo032T8yYc0IS6W5su8B.jpg",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2024-10-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc3MDoxNTcyNTAxMGE3ODEzNzg1",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E10",
+        "episode": 10,
+        "episodeNum": 10,
+        "quality": "1080P",
+        "name": "Episode 10",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc3MDoxNTcyNTAxMGE3ODEzNzg1",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc3MDoxNTcyNTAxMGE3ODEzNzg1"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "1490625-glory-s-hole-antiverse",
+    "tmdb_id": 1490625,
+    "imdb_id": "",
+    "title": "glory's hole antiverse",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "A celestial being probes gaping wormholes on quest toward carnal pleasure and cosmic annihilation",
+    "poster": "https://image.tmdb.org/t/p/w1280/pVN6Ersjo032T8yYc0IS6W5su8B.jpg",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2024-10-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc3MTplYTk3ZDA0ZDU4YjExZjcy",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E10",
+        "episode": 10,
+        "episodeNum": 10,
+        "quality": "1080P",
+        "name": "Episode 10",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc3MTplYTk3ZDA0ZDU4YjExZjcy",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc3MTplYTk3ZDA0ZDU4YjExZjcy"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "39323-dragon-ball-z-bardock-the-father-of-goku",
+    "tmdb_id": 39323,
+    "imdb_id": "",
+    "title": "Dragon Ball Z: Bardock - The Father of Goku",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action",
+      "Sci-Fi",
+      "Drama",
+      "Fantasy"
+    ],
+    "overview": "Bardock, Son Goku's father, is a low-ranking Saiyan soldier who was given the power to see into the future by the last remaining alien on a planet he just destroyed. He witnesses the destruction of his race and must now do his best to stop Frieza's impending massacre.",
+    "poster": "https://image.tmdb.org/t/p/w1280/docwOsWZuwJKQdwcYJtQPBcg6bm.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qZi0WpsdFRIc6sT2jTyWVvFPx0b.jpg",
+    "rating": 7.6,
+    "release_date": "1990-10-17",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc3NTphNjI5Y2UzNzIxZmJmNjhl",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E14",
+        "episode": 14,
+        "episodeNum": 14,
+        "quality": "1080P",
+        "name": "Episode 14",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODc3NTphNjI5Y2UzNzIxZmJmNjhl",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc3NTphNjI5Y2UzNzIxZmJmNjhl"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "246698-the-program-cons-cults-and-kidnapping",
+    "tmdb_id": 246698,
+    "imdb_id": "",
+    "title": "The Program: Cons, Cults, and Kidnapping",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Documentary"
+    ],
+    "overview": "Years after being sent to a disciplinary school, a woman still haunted by her experiences exposes the corruption and abuse of the troubled teen industry.",
+    "poster": "https://image.tmdb.org/t/p/w1280/g1NtXHq4qZcDvTTPCLgreV63ljB.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/7ryi68Lx0bDcuKwun2MqDtVFsl5.jpg",
+    "rating": 7.5,
+    "release_date": "2024-03-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk0MDo5ZGE1NDQzNmYxZjE3M2Mx",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E01",
+        "episode": 1,
+        "episodeNum": 1,
+        "quality": "1080P",
+        "name": "Episode 1",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk0MDo5ZGE1NDQzNmYxZjE3M2Mx",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk0MDo5ZGE1NDQzNmYxZjE3M2Mx"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "1611417-rose-s01e02-20220703-prisionera",
+    "tmdb_id": 1611417,
+    "imdb_id": "",
+    "title": "Rose肉阿生日会-S01E02-20220703-Prisionera",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "No overview available.",
+    "poster": "https://image.tmdb.org/t/p/w1280/w2A5WHPM1f5IQHF2vfd0AxhVPgD.jpg",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "",
+    "language": "zh",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk0MjoyNjFlNzYwNjk0YjY3YzYy",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E02",
+        "episode": 2,
+        "episodeNum": 2,
+        "quality": "1080P",
+        "name": "Episode 2",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk0MjoyNjFlNzYwNjk0YjY3YzYy",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk0MjoyNjFlNzYwNjk0YjY3YzYy"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "60318-bellator-3-4",
+    "tmdb_id": 60318,
+    "imdb_id": "",
+    "title": "Bellator 3 & 4",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Bellator III and Bellator IV were two episodes of the mixed martial arts promotion, Bellator Fighting Championships, created from a single event. The event took place on Friday, April 17, 2009 at the Lloyd Noble Center in Norman, Oklahoma. Each episode featured half of the bouts from the third Bellator event. Bellator III aired nationally in the U.S. via tape-delay the following night on Saturday, April 18, 2009 through an exclusive television agreement with ESPN Deportes. Bellator IV aired on on Saturday, April 25, 2009.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2009-04-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk0NjpjZjUxMGQ1NTQ3OTAxZGQ2",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E04",
+        "episode": 4,
+        "episodeNum": 4,
+        "quality": "1080P",
+        "name": "Episode 4",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk0NjpjZjUxMGQ1NTQ3OTAxZGQ2",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk0NjpjZjUxMGQ1NTQ3OTAxZGQ2"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "1635349-spine-chillers-2003-s01e05-goths",
+    "tmdb_id": 1635349,
+    "imdb_id": "",
+    "title": "Spine chillers 2003 S01E05 Goths",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Two Goths, Grish and Tim, looking for a flat, are overjoyed to find a landlord, Balfus, who is also a Goth but soon after they move in, they begin to suspect he murdered his previous tenant as a sacrifice to a dark god.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 7,
+    "release_date": "",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk0ODo5YjZiNDE5YWJkZjI4M2Jl",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E05",
+        "episode": 5,
+        "episodeNum": 5,
+        "quality": "1080P",
+        "name": "Episode 5",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk0ODo5YjZiNDE5YWJkZjI4M2Jl",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk0ODo5YjZiNDE5YWJkZjI4M2Jl"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "60321-bellator-6",
+    "tmdb_id": 60321,
+    "imdb_id": "",
+    "title": "Bellator 6",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Thriller"
+    ],
+    "overview": "Bellator VI was an event of the mixed martial arts promotion, Bellator Fighting Championships. The event took place on Friday, May 8, 2009 in Robstown, Texas. It was broadcast nationally in the U.S. via tape-delay the following night on Saturday, May 9, 2009 through an exclusive television agreement with ESPN Deportes.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2009-05-08",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk1MDo0YWRmNjk0OTgxMDNjOGIw",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E06",
+        "episode": 6,
+        "episodeNum": 6,
+        "quality": "1080P",
+        "name": "Episode 6",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk1MDo0YWRmNjk0OTgxMDNjOGIw",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk1MDo0YWRmNjk0OTgxMDNjOGIw"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "60322-bellator-7",
+    "tmdb_id": 60322,
+    "imdb_id": "",
+    "title": "Bellator 7",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Bellator VII was an event of the mixed martial arts promotion, Bellator Fighting Championships. The event took place on Friday, May 15, 2009 in Chicago, Illinois. It was broadcast nationally in the U.S. via tape-delay the following night on Saturday, May 16, 2009 through an exclusive television agreement with ESPN Deportes.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2009-05-15",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk1MjpmMmEyNGU0YTZhNmE5NDg2",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E07",
+        "episode": 7,
+        "episodeNum": 7,
+        "quality": "1080P",
+        "name": "Episode 7",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk1MjpmMmEyNGU0YTZhNmE5NDg2",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk1MjpmMmEyNGU0YTZhNmE5NDg2"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "151713-bellator-85",
+    "tmdb_id": 151713,
+    "imdb_id": "",
+    "title": "Bellator 85",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Bellator LXXXV is currently scheduled to take place on January 17, 2013 at the Bren Events Center in Irvine, California.[1] The event will be distributed live in prime time by Spike TV. It marks the season debut of season eight.",
+    "poster": "https://image.tmdb.org/t/p/w1280/nq1ZZ32UXmPBWkkbb7mRG1DotpO.jpg",
+    "backdrop": "",
+    "rating": 7.2,
+    "release_date": "2013-01-17",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk1NDplZjhjOTlkNThlMGFmZDBl",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E08",
+        "episode": 8,
+        "episodeNum": 8,
+        "quality": "1080P",
+        "name": "Episode 8",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk1NDplZjhjOTlkNThlMGFmZDBl",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk1NDplZjhjOTlkNThlMGFmZDBl"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "60323-bellator-9",
+    "tmdb_id": 60323,
+    "imdb_id": "",
+    "title": "Bellator 9",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "Bellator IX was a mixed martial arts event promoted by Bellator Fighting Championships. The event took place on Friday, May 29, 2009 in Monroe, Louisiana. It was broadcasted nationally in the U.S. via tape-delay the following night on Saturday, May 30, 2009 through an exclusive television agreement with ESPN Deportes.",
+    "poster": "",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2009-05-29",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk1Njo5NGVlMDdjNzU5ZjBhNDc1",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E09",
+        "episode": 9,
+        "episodeNum": 9,
+        "quality": "1080P",
+        "name": "Episode 9",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk1Njo5NGVlMDdjNzU5ZjBhNDc1",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk1Njo5NGVlMDdjNzU5ZjBhNDc1"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "1490625-glory-s-hole-antiverse",
+    "tmdb_id": 1490625,
+    "imdb_id": "",
+    "title": "glory's hole antiverse",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [],
+    "overview": "A celestial being probes gaping wormholes on quest toward carnal pleasure and cosmic annihilation",
+    "poster": "https://image.tmdb.org/t/p/w1280/pVN6Ersjo032T8yYc0IS6W5su8B.jpg",
+    "backdrop": "",
+    "rating": 0,
+    "release_date": "2024-10-03",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk1ODozZjVjZjliOWEyY2U1OGUx",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E10",
+        "episode": 10,
+        "episodeNum": 10,
+        "quality": "1080P",
+        "name": "Episode 10",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk1ODozZjVjZjliOWEyY2U1OGUx",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk1ODozZjVjZjliOWEyY2U1OGUx"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "39323-dragon-ball-z-bardock-the-father-of-goku",
+    "tmdb_id": 39323,
+    "imdb_id": "",
+    "title": "Dragon Ball Z: Bardock - The Father of Goku",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Animation",
+      "Action",
+      "Sci-Fi",
+      "Drama",
+      "Fantasy"
+    ],
+    "overview": "Bardock, Son Goku's father, is a low-ranking Saiyan soldier who was given the power to see into the future by the last remaining alien on a planet he just destroyed. He witnesses the destruction of his race and must now do his best to stop Frieza's impending massacre.",
+    "poster": "https://image.tmdb.org/t/p/w1280/docwOsWZuwJKQdwcYJtQPBcg6bm.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/qZi0WpsdFRIc6sT2jTyWVvFPx0b.jpg",
+    "rating": 7.6,
+    "release_date": "1990-10-17",
+    "language": "ja",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk2Njo1ODZmYWViY2M1ODVmMDFi",
+    "stream_links": [
+      {
+        "season": 1,
+        "seasonOrPart": "S01E14",
+        "episode": 14,
+        "episodeNum": 14,
+        "quality": "1080P",
+        "name": "Episode 14",
+        "url": "https://filmhouse-stream.duckdns.org/dl/ODk2Njo1ODZmYWViY2M1ODVmMDFi",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk2Njo1ODZmYWViY2M1ODVmMDFi"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "898704-desert-warrior",
+    "tmdb_id": 898704,
+    "imdb_id": "",
+    "title": "Desert Warrior",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "History",
+      "War",
+      "Action"
+    ],
+    "overview": "In 7th-century Arabia, Princess Hind becomes a warrior to defy the ruthless Emperor Kisra. Forged into a warrior and aided by legendary bandit Hanzala, Hind unites warring tribes for a last stand—the historic Battle of Dhi Qar—that will change history.",
+    "poster": "https://image.tmdb.org/t/p/w1280/waxnw1NpzTPY5JkqWvu0muSopRJ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ohlNSR8MsHk5e6fcAxqAJmcz4Sm.jpg",
+    "rating": 5.9,
+    "release_date": "2026-04-23",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIyMzpmZjYzODI0NzVlNDkxZDll",
+    "stream_links": [
+      {
+        "quality": "720P",
+        "url": "https://filmhouse-stream.duckdns.org/dl/OTIyMzpmZjYzODI0NzVlNDkxZDll",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIyMzpmZjYzODI0NzVlNDkxZDll"
+      }
+    ],
+    "links": []
+  },
+  {
+    "csv_id": "251783-pleasure-or-pain",
+    "tmdb_id": 251783,
+    "imdb_id": "",
+    "title": "Pleasure or Pain",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama",
+      "Thriller"
+    ],
+    "overview": "A young designer falls under a man's erotic spell and is drawn into a world of sexual abandon from which she may never return.",
+    "poster": "https://image.tmdb.org/t/p/w1280/hPsB2NZozctyxl9juWPZzdIpHxa.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/BjY9Sm4nAULcIchY6MTcX6oa72.jpg",
+    "rating": 4.8,
+    "release_date": "2013-09-05",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "",
+    "runtime": "",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTI1Njo5NGQ1MjJlODlkNGY2MjAx",
+    "stream_links": [
+      {
+        "quality": "720P",
+        "url": "https://filmhouse-stream.duckdns.org/dl/OTI1Njo5NGQ1MjJlODlkNGY2MjAx",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTI1Njo5NGQ1MjJlODlkNGY2MjAx"
       }
     ],
     "links": []
