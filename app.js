@@ -3887,6 +3887,34 @@ function renderCarouselBanner() {
             showSlide(next);
         }, 6000);
     }
+    // Add mobile swipe touch support for hero carousel
+    let touchStartX = 0;
+    let touchEndX = 0;
+    container.addEventListener("touchstart", (e) => {
+        if (e.touches && e.touches.length > 0) {
+            touchStartX = e.touches[0].clientX;
+        }
+    }, { passive: true });
+    container.addEventListener("touchend", (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+            touchEndX = e.changedTouches[0].clientX;
+            const diffX = touchStartX - touchEndX;
+            if (Math.abs(diffX) > 40) {
+                const slides2 = container.querySelectorAll(".carousel-slide");
+                if (diffX > 0) {
+                    // Swiped Left -> Next Slide
+                    let nxt = state.carouselIndex + 1;
+                    if (nxt >= slides2.length) nxt = 0;
+                    showSlide(nxt);
+                } else {
+                    // Swiped Right -> Previous Slide
+                    let prev = state.carouselIndex - 1;
+                    if (prev < 0) prev = slides2.length - 1;
+                    showSlide(prev);
+                }
+            }
+        }
+    }, { passive: true });
     startCarouselAuto();
     container.addEventListener("mouseenter", () => { if (state.carouselInterval) clearInterval(state.carouselInterval); });
     container.addEventListener("mouseleave", () => { startCarouselAuto(); });

@@ -29,37 +29,93 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=146">
+    <link rel="stylesheet" href="index.css?v=147">
 
     <style>
+      /* Desktop Arrow Buttons (Hidden on mobile/touch screens to not cover posters) */
       .carousel-arrow {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         z-index: 10;
-        background: rgba(0, 0, 0, 0.55);
+        background: rgba(0, 0, 0, 0.6);
         color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 50%;
-        width: 36px;
-        height: 36px;
-        display: flex;
+        width: 34px;
+        height: 34px;
+        display: none; /* Hidden by default on mobile (swipe gestures active!) */
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
         transition: background 0.2s, transform 0.2s;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.4);
       }
       .carousel-arrow:hover {
         background: var(--primary-color, #ffbc00);
         color: #000;
         transform: translateY(-50%) scale(1.1);
       }
-      .carousel-arrow-prev { left: 10px; }
-      .carousel-arrow-next { right: 10px; }
-      @media (max-width: 480px) {
-        .carousel-arrow { width: 30px; height: 30px; opacity: 0.8; }
+      .carousel-arrow-prev { left: 12px; }
+      .carousel-arrow-next { right: 12px; }
+
+      /* Show arrows ONLY on PC / Large screens where mouse hover is used */
+      @media (min-width: 769px) {
+        .carousel-arrow {
+          display: flex;
+        }
+      }
+
+      /* Compact, Elegant Indicator Dots (Smaller so all 10 fit beautifully without clutter) */
+      .carousel-dots {
+        position: absolute !important;
+        bottom: 12px !important;
+        right: 14px !important;
+        z-index: 4 !important;
+        display: flex !important;
+        gap: 4px !important;
+        background: rgba(0, 0, 0, 0.45);
+        padding: 3px 6px;
+        border-radius: 20px;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+      }
+      .carousel-dot {
+        width: 5px !important;
+        height: 5px !important;
+        border-radius: 50% !important;
+        background-color: rgba(255, 255, 255, 0.35) !important;
+        cursor: pointer !important;
+        transition: all 0.25s ease !important;
+      }
+      .carousel-dot.active {
+        background-color: var(--primary-color, #ffbc00) !important;
+        width: 12px !important;
+        border-radius: 3px !important;
+        transform: none !important;
+      }
+
+      /* Prevent Cinema Modal Controls horizontal shift/overflow on narrow mobile screens */
+      .cinema-player-controls-bar {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      .cinema-player-controls-bar::-webkit-scrollbar {
+        display: none !important;
+      }
+      .cinema-controls-single-row {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        min-width: 0 !important;
+      }
+      .cinema-controls-left, .cinema-controls-right {
+        flex-shrink: 0 !important;
       }
     </style>
   
@@ -1965,6 +2021,6 @@
     </div>
 
     <script src="seriesSchema.js?v=2"></script>
-    <script src="app.js?v=146"></script>
+    <script src="app.js?v=147"></script>
 </body>
 </html>

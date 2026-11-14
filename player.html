@@ -1415,24 +1415,34 @@
         }
       }
 
-      // Click-to-Play Overlay (Starts video if 4-Hour Pass is active, otherwise triggers Pre-Roll)
+      // Click & Touch-to-Play Overlay (Starts video if Pass is active, otherwise triggers Pre-Roll)
       if (playOverlay) {
-        playOverlay.addEventListener('click', function(e) {
+        let _playTriggered = false;
+        function triggerStreamPlay(e) {
           if (e) {
             e.preventDefault();
             e.stopPropagation();
           }
+          if (_playTriggered) return;
+          _playTriggered = true;
+
           playOverlay.style.pointerEvents = 'none';
           document.body.classList.add('stream-started');
+          playOverlay.style.transition = 'opacity 0.2s ease';
           playOverlay.style.opacity = '0';
-          setTimeout(() => { playOverlay.style.display = 'none'; }, 260);
+          setTimeout(() => { playOverlay.style.display = 'none'; }, 220);
+
+          if (videoEl && !videoEl.src && finalStreamUrl) {
+            videoEl.src = finalStreamUrl;
+          }
 
           if (passSec > 0) {
-            // 4-Hour Pass is active! 0 pre-roll ads, instant direct playback!
             try {
               const p = videoEl.play();
               if (p !== undefined) {
-                p.catch(err => {
+                p.then(() => {
+                  console.log("Stream video playback initiated successfully");
+                }).catch(err => {
                   console.log("Direct videoEl.play notice:", err);
                   if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
                 });
@@ -1441,9 +1451,13 @@
               if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
             }
           } else {
-            // No active pass: show 8s Pre-roll sponsor overlay with option to claim 4h pass
             showPreRollAd();
           }
+        }
+
+        playOverlay.addEventListener('click', triggerStreamPlay, { passive: false });
+        playOverlay.addEventListener('touchend', function(e) {
+          triggerStreamPlay(e);
         }, { passive: false });
       }
 
