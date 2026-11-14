@@ -68,33 +68,91 @@
         }
       }
 
-      /* Compact, Elegant Indicator Dots (Smaller so all 10 fit beautifully without clutter) */
+      /* Compact, Elegant Indicator Dots (7-Dot Dynamic Pill Navigation) */
       .carousel-dots {
         position: absolute !important;
         bottom: 12px !important;
         right: 14px !important;
-        z-index: 4 !important;
+        z-index: 5 !important;
         display: flex !important;
-        gap: 4px !important;
-        background: rgba(0, 0, 0, 0.45);
-        padding: 3px 6px;
-        border-radius: 20px;
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
+        align-items: center !important;
+        gap: 5px !important;
+        background: rgba(0, 0, 0, 0.55);
+        padding: 4px 8px;
+        border-radius: 999px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.5);
       }
       .carousel-dot {
-        width: 5px !important;
-        height: 5px !important;
+        width: 6px !important;
+        height: 6px !important;
         border-radius: 50% !important;
         background-color: rgba(255, 255, 255, 0.35) !important;
         cursor: pointer !important;
-        transition: all 0.25s ease !important;
+        transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
+      }
+      .carousel-dot:hover {
+        background-color: rgba(255, 255, 255, 0.7) !important;
+        transform: scale(1.15) !important;
       }
       .carousel-dot.active {
         background-color: var(--primary-color, #ffbc00) !important;
-        width: 12px !important;
-        border-radius: 3px !important;
+        width: 18px !important;
+        height: 6px !important;
+        border-radius: 999px !important;
+        box-shadow: 0 0 10px rgba(255, 188, 0, 0.55) !important;
         transform: none !important;
+      }
+
+      /* Hero Carousel Track & Touch/Mouse Drag Physics */
+      .hero-carousel-container {
+        position: relative !important;
+        overflow: hidden !important;
+        cursor: grab !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        touch-action: pan-y !important;
+      }
+      .hero-carousel-container.is-dragging {
+        cursor: grabbing !important;
+      }
+      .hero-carousel-track {
+        display: flex !important;
+        width: 100% !important;
+        height: 100% !important;
+        will-change: transform !important;
+        transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .carousel-slide {
+        position: relative !important;
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        height: 100% !important;
+        opacity: 1 !important;
+        overflow: hidden !important;
+      }
+      .carousel-slide .carousel-backdrop-img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center 20% !important;
+        transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1) !important;
+        transform: scale(1.05) !important;
+      }
+      .carousel-slide.active .carousel-backdrop-img {
+        transform: scale(1) !important;
+      }
+      .carousel-slide-title, .carousel-slide-desc, .carousel-actions {
+        transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+        transform: translateX(10px);
+        opacity: 0.85;
+      }
+      .carousel-slide.active .carousel-slide-title,
+      .carousel-slide.active .carousel-slide-desc,
+      .carousel-slide.active .carousel-actions {
+        transform: translateX(0);
+        opacity: 1;
       }
 
       /* Prevent Cinema Modal Controls horizontal shift/overflow on narrow mobile screens */
@@ -2025,6 +2083,6 @@
     </div>
 
     <script src="seriesSchema.js?v=2"></script>
-    <script src="app.js?v=150"></script>
+    <script src="app.js?v=151"></script>
 </body>
 </html>

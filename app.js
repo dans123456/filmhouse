@@ -3722,7 +3722,16 @@ function renderWatchlistGrid() {
     });
 }
 
-// Carousel Banner Slider populate
+// Global carousel drag & gesture state
+const carouselGestureState = {
+    isDragging: false,
+    hasDragged: false,
+    startX: 0,
+    currentX: 0,
+    startTime: 0
+};
+
+// Carousel Banner Slider populate (7 featured titles, physics touch/mouse drag, dynamic pill dots)
 function renderCarouselBanner() {
     const container = document.getElementById("hero-carousel");
     if (!container) return;
@@ -3733,10 +3742,15 @@ function renderCarouselBanner() {
     if (bestPool.length < 5) {
         bestPool = [...state.movies];
     }
-    // Shuffle the pool randomly and select top 5
-    let featuredList = bestPool.sort(() => 0.5 - Math.random()).slice(0, 10);
+    // Exactly 7 items for sleek 7-dot carousel
+    let featuredList = bestPool.sort(() => 0.5 - Math.random()).slice(0, 7);
 
     if (featuredList.length === 0) return;
+
+    // Create the sliding track
+    const track = document.createElement("div");
+    track.className = "hero-carousel-track";
+    track.id = "hero-carousel-track";
 
     // Create Slides
     featuredList.forEach((movie, idx) => {
@@ -3748,6 +3762,7 @@ function renderCarouselBanner() {
         backdropImg.className = "carousel-backdrop-img";
         backdropImg.src = movie.backdrop;
         backdropImg.alt = movie.title;
+        backdropImg.loading = idx === 0 ? "eager" : "lazy";
         slide.appendChild(backdropImg);
 
         const overlay = document.createElement("div");
@@ -3814,6 +3829,11 @@ function renderCarouselBanner() {
         infoBtn.className = "btn btn-primary";
         infoBtn.textContent = "More Info";
         infoBtn.addEventListener("click", (e) => {
+            if (carouselGestureState.hasDragged) {
+                e.stopPropagation();
+                e.preventDefault();
+                return;
+            }
             e.stopPropagation();
             openDetailModal(movie);
         });
@@ -3824,6 +3844,11 @@ function renderCarouselBanner() {
             trailerBtn.className = "btn btn-secondary";
             trailerBtn.textContent = "Watch Trailer";
             trailerBtn.addEventListener("click", (e) => {
+                if (carouselGestureState.hasDragged) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return;
+                }
                 e.stopPropagation();
                 openMediaDetailPage(movie);
             });
@@ -3832,32 +3857,37 @@ function renderCarouselBanner() {
 
         overlay.appendChild(actions);
         slide.appendChild(overlay);
-        container.appendChild(slide);
+        track.appendChild(slide);
     });
 
-    // Create Navigation Indicator Dots
+    container.appendChild(track);
+
+    // Create Navigation Indicator Dots (Sleek 7-Dot Dynamic Pill Navigation)
     const dotsContainer = document.createElement("div");
     dotsContainer.className = "carousel-dots";
     
     featuredList.forEach((_, idx) => {
         const dot = document.createElement("div");
         dot.className = `carousel-dot ${idx === 0 ? 'active' : ''}`;
-        dot.addEventListener("click", () => showSlide(idx));
+        dot.setAttribute("data-dot-index", idx);
+        dot.addEventListener("click", (e) => {
+            e.stopPropagation();
+            showSlide(idx);
+        });
         dotsContainer.appendChild(dot);
     });
     
     container.appendChild(dotsContainer);
 
-    // Add Prev / Next Arrow Buttons for manual navigation
+    // Add Prev / Next Arrow Buttons for PC manual navigation
     const prevArrow = document.createElement("button");
     prevArrow.className = "carousel-arrow carousel-arrow-prev";
     prevArrow.setAttribute("aria-label", "Previous slide");
     prevArrow.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>`;
     prevArrow.addEventListener("click", (e) => {
         e.stopPropagation();
-        const slides2 = container.querySelectorAll(".carousel-slide");
         let prev = state.carouselIndex - 1;
-        if (prev < 0) prev = slides2.length - 1;
+        if (prev < 0) prev = featuredList.length - 1;
         showSlide(prev);
     });
     container.appendChild(prevArrow);
@@ -3868,75 +3898,158 @@ function renderCarouselBanner() {
     nextArrow.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>`;
     nextArrow.addEventListener("click", (e) => {
         e.stopPropagation();
-        const slides2 = container.querySelectorAll(".carousel-slide");
         let nxt = state.carouselIndex + 1;
-        if (nxt >= slides2.length) nxt = 0;
+        if (nxt >= featuredList.length) nxt = 0;
         showSlide(nxt);
     });
     container.appendChild(nextArrow);
 
-    // Auto-scroll — pauses on hover, resumes on mouse leave
-    if (state.carouselInterval) clearInterval(state.carouselInterval);
-    function startCarouselAuto() {
-        if (state.carouselInterval) clearInterval(state.carouselInterval);
+    // Set initial slide state
+    state.carouselIndex = 0;
+    showSlide(0);
+
+    // Initialize unified swipe & mouse drag gestures with physics
+    setupCarouselGestures(container, track, featuredList.length);
+}
+
+function setupCarouselGestures(container, track, totalSlides) {
+    if (!container || !track) return;
+
+    function startAutoTimer() {
+        stopAutoTimer();
         state.carouselInterval = setInterval(() => {
-            const slides2 = container.querySelectorAll(".carousel-slide");
-            let next = state.carouselIndex + 1;
-            if (next >= slides2.length) next = 0;
-            showSlide(next);
-        }, 6000);
+            let nxt = state.carouselIndex + 1;
+            if (nxt >= totalSlides) nxt = 0;
+            showSlide(nxt);
+        }, 5000);
     }
-    // Add mobile swipe touch support for hero carousel
-    let touchStartX = 0;
-    let touchEndX = 0;
-    container.addEventListener("touchstart", (e) => {
-        if (e.touches && e.touches.length > 0) {
-            touchStartX = e.touches[0].clientX;
+
+    function stopAutoTimer() {
+        if (state.carouselInterval) {
+            clearInterval(state.carouselInterval);
+            state.carouselInterval = null;
         }
-    }, { passive: true });
-    container.addEventListener("touchend", (e) => {
-        if (e.changedTouches && e.changedTouches.length > 0) {
-            touchEndX = e.changedTouches[0].clientX;
-            const diffX = touchStartX - touchEndX;
-            if (Math.abs(diffX) > 40) {
-                const slides2 = container.querySelectorAll(".carousel-slide");
-                if (diffX > 0) {
-                    // Swiped Left -> Next Slide
-                    let nxt = state.carouselIndex + 1;
-                    if (nxt >= slides2.length) nxt = 0;
-                    showSlide(nxt);
-                } else {
-                    // Swiped Right -> Previous Slide
-                    let prev = state.carouselIndex - 1;
-                    if (prev < 0) prev = slides2.length - 1;
-                    showSlide(prev);
-                }
-            }
+    }
+
+    startAutoTimer();
+
+    function getPointerX(e) {
+        if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
+        if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientX;
+        return e.clientX;
+    }
+
+    function onPointerDown(e) {
+        if (e.type === "mousedown" && e.button !== 0) return;
+        stopAutoTimer();
+
+        carouselGestureState.isDragging = true;
+        carouselGestureState.hasDragged = false;
+        carouselGestureState.startX = getPointerX(e);
+        carouselGestureState.currentX = carouselGestureState.startX;
+        carouselGestureState.startTime = Date.now();
+
+        track.style.transition = "none";
+        container.classList.add("is-dragging");
+    }
+
+    function onPointerMove(e) {
+        if (!carouselGestureState.isDragging) return;
+
+        carouselGestureState.currentX = getPointerX(e);
+        const diffX = carouselGestureState.currentX - carouselGestureState.startX;
+
+        if (Math.abs(diffX) > 6) {
+            carouselGestureState.hasDragged = true;
         }
-    }, { passive: true });
-    startCarouselAuto();
-    container.addEventListener("mouseenter", () => { if (state.carouselInterval) clearInterval(state.carouselInterval); });
-    container.addEventListener("mouseleave", () => { startCarouselAuto(); });
+
+        const width = container.offsetWidth || 350;
+        const basePercent = -state.carouselIndex * 100;
+        const dragPercent = (diffX / width) * 100;
+
+        track.style.transform = `translate3d(${basePercent + dragPercent}%, 0, 0)`;
+    }
+
+    function onPointerUp() {
+        if (!carouselGestureState.isDragging) return;
+
+        carouselGestureState.isDragging = false;
+        container.classList.remove("is-dragging");
+
+        const diffX = carouselGestureState.currentX - carouselGestureState.startX;
+        const elapsed = Date.now() - carouselGestureState.startTime;
+        const velocity = Math.abs(diffX) / (elapsed || 1);
+        const width = container.offsetWidth || 350;
+        const threshold = Math.min(65, width * 0.16);
+
+        if (diffX < -threshold || (diffX < -20 && velocity > 0.35)) {
+            // Swiped left -> Next slide
+            let nxt = state.carouselIndex + 1;
+            if (nxt >= totalSlides) nxt = 0;
+            showSlide(nxt);
+        } else if (diffX > threshold || (diffX > 20 && velocity > 0.35)) {
+            // Swiped right -> Previous slide
+            let prev = state.carouselIndex - 1;
+            if (prev < 0) prev = totalSlides - 1;
+            showSlide(prev);
+        } else {
+            // Snap back
+            showSlide(state.carouselIndex);
+        }
+
+        setTimeout(() => {
+            carouselGestureState.hasDragged = false;
+        }, 120);
+
+        startAutoTimer();
+    }
+
+    // Touch events (Mobile)
+    container.addEventListener("touchstart", onPointerDown, { passive: true });
+    window.addEventListener("touchmove", onPointerMove, { passive: true });
+    window.addEventListener("touchend", onPointerUp, { passive: true });
+    window.addEventListener("touchcancel", onPointerUp, { passive: true });
+
+    // Mouse drag events (PC)
+    container.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("mousemove", onPointerMove);
+    window.addEventListener("mouseup", onPointerUp);
+
+    // Hover pause on PC
+    container.addEventListener("mouseenter", stopAutoTimer);
+    container.addEventListener("mouseleave", () => {
+        if (!carouselGestureState.isDragging) startAutoTimer();
+    });
 }
 
 function showSlide(index) {
     const container = document.getElementById("hero-carousel");
     if (!container) return;
 
+    const track = container.querySelector(".hero-carousel-track");
     const slides = container.querySelectorAll(".carousel-slide");
     const dots = container.querySelectorAll(".carousel-dot");
     
     if (slides.length === 0) return;
 
-    slides.forEach(s => s.classList.remove("active"));
-    dots.forEach(d => d.classList.remove("active"));
-
+    if (index < 0) index = slides.length - 1;
+    if (index >= slides.length) index = 0;
     state.carouselIndex = index;
-    
-    const activeSlide = Array.from(slides).find(s => parseInt(s.getAttribute("data-index")) === index);
-    if (activeSlide) activeSlide.classList.add("active");
-    
-    if (dots[index]) dots[index].classList.add("active");
+
+    if (track) {
+        track.style.transition = "transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)";
+        track.style.transform = `translate3d(-${index * 100}%, 0, 0)`;
+    }
+
+    slides.forEach((s, idx) => {
+        if (idx === index) s.classList.add("active");
+        else s.classList.remove("active");
+    });
+
+    dots.forEach((d, idx) => {
+        if (idx === index) d.classList.add("active");
+        else d.classList.remove("active");
+    });
 }
 
 // Advanced filters options loaders
@@ -14288,7 +14401,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 10c. Enable drag to scroll for horizontal sliders on PC
     enableDragToScroll(document.getElementById("categories-bar-slider"));
     enableDragToScroll(document.getElementById("editors-choice-scroll-container"));
-    enableDragToScroll(document.getElementById("hero-carousel"));
+    // hero-carousel uses dedicated physics swipe & mouse drag in setupCarouselGestures()
 
     // 10b. Handle startup startapp routing parameter redirection
     if (initialScreen === "mining") {
