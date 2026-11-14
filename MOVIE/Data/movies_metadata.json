@@ -1,5 +1,40 @@
 [
   {
+    "csv_id": "9603-clueless",
+    "tmdb_id": 9603,
+    "imdb_id": "",
+    "title": "Clueless",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Classic Movies",
+      "Teen/High-School",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Comedy",
+      "Romance"
+    ],
+    "overview": "Shallow, rich and socially successful Cher is at the top of her Beverly Hills high school's pecking scale. Seeing herself as a matchmaker, Cher first coaxes two teachers into dating each other. Emboldened by her success, she decides to give hopelessly klutzy new student Tai a makeover. When Tai becomes more popular than she is, Cher realizes that her disapproving ex-stepbrother was right about how misguided she was -- and falls for him.",
+    "poster": "https://image.tmdb.org/t/p/w500/8AwVTcgpTnmeOs4TdTWqcFDXEsA.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/65d0MccsiRSPTVicregKQL8owoo.jpg",
+    "rating": 7.2,
+    "release_date": "1995-07-19",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "KeGqX4GVBZE",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD5gkAAjzRwUeyJP9sAAFYxsIWBA",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "114479-the-acolyte",
     "tmdb_id": 114479,
     "imdb_id": "",
