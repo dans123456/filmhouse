@@ -115256,7 +115256,19 @@
     "trailer": "",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQADQwcAAh-4WEan9qWVtx5PHBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADQwcAAh-4WEan9qWVtx5PHBYE",
+        "quality": "720p",
+        "stream_url": "MTA1NTg6OWE3M2RiNzdjODNlNjhkNg"
+      }
+    ],
+    "stream_url": "MTA1NTg6OWE3M2RiNzdjODNlNjhkNg",
+    "stream_links": [
+      {
+        "quality": "720p",
+        "stream_url": "MTA1NTg6OWE3M2RiNzdjODNlNjhkNg",
+        "url": "MTA1NTg6OWE3M2RiNzdjODNlNjhkNg"
+      }
     ]
   },
   {
