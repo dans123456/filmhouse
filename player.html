@@ -793,24 +793,34 @@
             vttBlobUrl = URL.createObjectURL(blob);
           } else {
             const cleanUrl = decodeURIComponent(subUrlOrContent).trim();
-            const proxyCandidates = [
-              cleanUrl,
-              "https://corsproxy.io/?" + encodeURIComponent(cleanUrl),
-              "https://api.allorigins.win/raw?url=" + encodeURIComponent(cleanUrl),
-              "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(cleanUrl)
-            ];
-
-            for (const pUrl of proxyCandidates) {
-              try {
-                const res = await fetch(pUrl).catch(() => null);
-                if (res && res.ok) {
-                  const txt = await res.text();
-                  if (txt && txt.trim().length > 10) {
-                    srtTextContent = txt;
-                    break;
-                  }
+            try {
+              const directRes = await fetch(cleanUrl);
+              if (directRes && directRes.ok) {
+                const txt = await directRes.text();
+                if (txt && txt.trim().length > 10) {
+                  srtTextContent = txt;
                 }
-              } catch (_) {}
+              }
+            } catch (_) {}
+
+            if (!srtTextContent) {
+              const proxyCandidates = [
+                "https://api.allorigins.win/raw?url=" + encodeURIComponent(cleanUrl),
+                "https://corsproxy.io/?" + encodeURIComponent(cleanUrl)
+              ];
+
+              for (const pUrl of proxyCandidates) {
+                try {
+                  const res = await fetch(pUrl).catch(() => null);
+                  if (res && res.ok) {
+                    const txt = await res.text();
+                    if (txt && txt.trim().length > 10) {
+                      srtTextContent = txt;
+                      break;
+                    }
+                  }
+                } catch (_) {}
+              }
             }
 
             if (srtTextContent) {
@@ -825,6 +835,7 @@
           if (srtTextContent) {
             activeCues = parseVttCues(srtTextContent);
             window._subtitlesDisabled = false;
+            window._subtitlesExplicitlyActive = true;
           }
 
           const existing = videoEl.querySelectorAll('track.dynamic-sub');
@@ -1713,8 +1724,12 @@
           toggleFullscreenState();
         } else if (ev.data.action === 'toggleMute') {
           toggleMuteState();
-        } else if (ev.data.action === 'loadSubtitle' && ev.data.url) {
-          attachSubtitleTrack(ev.data.url, ev.data.lang || 'Captions');
+        } else if (ev.data.action === 'loadSubtitle') {
+          if (ev.data.text) {
+            attachSubtitleTrack(ev.data.text, ev.data.lang || 'Captions', true);
+          } else if (ev.data.url) {
+            attachSubtitleTrack(ev.data.url, ev.data.lang || 'Captions', false);
+          }
           detectAndBroadcastTracks();
         } else if (ev.data.action === 'toggleSubtitles') {
           const enable = !!ev.data.enable;
@@ -1785,14 +1800,31 @@
           }
           if (!switchedClientSide || ev.data.reloadWithTrack) {
             try {
-              let u = new URL(window.location.href);
-              u.searchParams.set('audio', targetIndex);
-              const curTime = (videoEl && videoEl.currentTime > 5) ? Math.floor(videoEl.currentTime) : 0;
-              if (curTime > 0) {
-                u.searchParams.set('t', curTime);
+              const curTime = (videoEl && videoEl.currentTime > 0) ? videoEl.currentTime : 0;
+              const wasPlaying = (videoEl && !videoEl.paused);
+              let newUrl = finalStreamUrl || (videoEl ? videoEl.src : '');
+              if (newUrl) {
+                newUrl = newUrl.replace(/([?&])audio=\d+/, '');
+                newUrl += (newUrl.includes('?') ? '&' : '?') + 'audio=' + targetIndex;
+                finalStreamUrl = newUrl;
+                videoEl.src = newUrl;
+
+                const resumeHandler = function() {
+                  try {
+                    if (curTime > 0) {
+                      videoEl.currentTime = curTime;
+                      if (window.plyrInstance) window.plyrInstance.currentTime = curTime;
+                    }
+                    if (wasPlaying) {
+                      videoEl.play().catch(() => {});
+                    }
+                  } catch (_) {}
+                };
+                videoEl.addEventListener('loadedmetadata', resumeHandler, { once: true });
+                videoEl.addEventListener('canplay', resumeHandler, { once: true });
+                detectAndBroadcastTracks();
+                return;
               }
-              window.location.href = u.toString();
-              return;
             } catch (_) {}
           }
           detectAndBroadcastTracks();

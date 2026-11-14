@@ -7841,7 +7841,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (activeHubSubFilter && activeHubSubFilter !== "all") {
             filtered = filtered.filter(s => {
                 const l = (s.lang || "").toLowerCase();
-                return l === activeHubSubFilter || l.startsWith(activeHubSubFilter.slice(0, 2));
+                return l === activeHubSubFilter || l.startsWith(activeHubSubFilter.slice(0, 2)) || (activeHubSubFilter === "en" && (l === "eng" || l === "en"));
             });
         }
         if (searchVal) {
@@ -7917,18 +7917,43 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             btn.onclick = () => {
                 const url = decodeURIComponent(btn.getAttribute("data-sub-url") || "");
                 const name = btn.getAttribute("data-sub-name") || "Captions";
-                executeWithCcUnlock(() => {
+                executeWithCcUnlock(async () => {
                     state.activeSubtitleUrl = url;
                     state.activeSubtitleLang = name;
                     state.activeSubtitleMovieId = getScopedMediaSubtitleKey(movie, currentSeason ? currentSeason.seasonNumber : 1, currentEpisodeNum);
                     const frame = container.querySelector("iframe");
                     if (frame && frame.contentWindow) {
-                        frame.contentWindow.postMessage({
-                            action: "loadSubtitle",
-                            url: url,
-                            lang: name
-                        }, "*");
+                        let srtContent = "";
+                        try {
+                            const res = await fetch(url);
+                            if (res.ok) srtContent = await res.text();
+                        } catch (_) {}
+
+                        if (srtContent && srtContent.length > 10) {
+                            frame.contentWindow.postMessage({
+                                action: "loadSubtitle",
+                                text: srtContent,
+                                lang: name
+                            }, "*");
+                        } else {
+                            frame.contentWindow.postMessage({
+                                action: "loadSubtitle",
+                                url: url,
+                                lang: name
+                            }, "*");
+                        }
                     }
+
+                    // Mark active in UI without removing list
+                    subTrackList.querySelectorAll(".cinema-sub-track-item").forEach(item => {
+                        item.classList.remove("active");
+                        const chk = item.querySelector(".sub-check");
+                        if (chk && !item.classList.contains("cinema-hub-dynamic-sub")) chk.textContent = "";
+                    });
+                    btn.classList.add("active");
+                    const myChk = btn.querySelector(".sub-check");
+                    if (myChk) myChk.textContent = "✓ Active";
+
                     const cleanName = name.length > 7 ? name.slice(0, 6) + "…" : name;
                     updateCcButtonVisual(true, cleanName);
                     showToast(`✅ Loaded ${name} Subtitles`, "success");
@@ -8113,8 +8138,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     window.updateCinemaDetectedTracks = function(data) {
         if (!data) return;
 
-        // 1. Inbuilt Subtitles from Video Stream
-        if (data.subtitles && Array.isArray(data.subtitles) && subTrackList) {
+        // NEVER wipe out subTrackList if OpenSubtitles list (loadedHubSubtitles) is already loaded!
+        if (loadedHubSubtitles && loadedHubSubtitles.length > 0) {
+            if (data.subtitlesActive || (data.subtitles && data.subtitles.some(s => s.mode === "showing"))) {
+                updateCcButtonVisual(true, data.activeSubtitleLabel || "On");
+            }
+        } else if (data.subtitles && Array.isArray(data.subtitles) && subTrackList) {
             subTrackList.replaceChildren();
 
             // Default 'Off' Track
