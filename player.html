@@ -523,10 +523,10 @@
         <div style='font-size:32px;margin-bottom:8px;'>⏱️</div>
         <h3 style='margin:0 0 8px 0;font-size:18px;font-weight:700;color:#fff;'>Your 4-Hour Pass Has Ended</h3>
         <p style='margin:0 0 18px 0;font-size:12px;color:#94a3b8;max-width:320px;line-height:1.4;'>
-          You've streamed for 4 hours! Tap below to visit our sponsor and unlock another 4 hours of uninterrupted cinema.
+          Your ad-free stream time has expired. Watch 2 sponsor ads to unlock another 4 real hours of uninterrupted streaming!
         </p>
         <button id='btnRenewPassModal' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,188,0,0.4);' type='button'>
-          ⚡ Unlock Another 4 Hours
+          ⚡ Watch Ad to Unlock 4h (0/2)
         </button>
       </div>
 
@@ -1305,9 +1305,19 @@
         const dot = document.getElementById('passDot');
         const timerText = document.getElementById('passTimerText');
         const btnGet = document.getElementById('btnGetPassPill');
+        const btnRenew = document.getElementById('btnRenewPassModal');
+        const btnClaimPre = document.getElementById('btnClaimPassInPreRoll');
         if (!pill || !timerText) return;
 
         const state = getActivePassState();
+        const adsWatched4h = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
+
+        if (btnRenew) {
+          btnRenew.textContent = adsWatched4h > 0 ? `⚡ Watch Ad to Unlock 4h (${adsWatched4h}/2)` : '⚡ Watch Ad to Unlock 4h (0/2)';
+        }
+        if (btnClaimPre) {
+          btnClaimPre.textContent = adsWatched4h > 0 ? `⚡ Get 4-Hour Pass (${adsWatched4h}/2)` : '⚡ Get 4-Hour Ad-Free Pass (2 Ads)';
+        }
 
         if (state.hasAccess) {
           pill.style.display = 'flex';
@@ -1341,7 +1351,9 @@
           }
           timerText.textContent = 'No Pass';
           timerText.style.color = '#94a3b8';
-          if (btnGet) btnGet.textContent = '⚡ Get 4h';
+          if (btnGet) {
+            btnGet.textContent = adsWatched4h > 0 ? `⚡ ${adsWatched4h}/2` : '⚡ Get 4h';
+          }
         }
       }
 
@@ -1353,6 +1365,7 @@
           newExpires = currentExpires + FOUR_HOURS_MS;
         }
         localStorage.setItem('filmhouse_watch_pass_until', String(newExpires));
+        localStorage.setItem('fh_ads_4h', '0');
         updatePassUI();
 
         const expiredModal = document.getElementById('passExpiredModal');
@@ -1366,23 +1379,36 @@
         }
       }
 
-      function triggerMonetagPassUnlock() {
+      function triggerPassAdWatch() {
+        // 1. Open the Monetag Smart Money Link
+        openTelegramLink(MONETAG_SMARTLINK);
+
+        // 2. Notify parent app so Mining tab bars and iPhone toast are triggered
         try {
-          openTelegramLink(MONETAG_SMARTLINK);
-        } catch (e) {
-          try { window.open(MONETAG_SMARTLINK, '_blank'); } catch (_) {}
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ action: "watchAdForPass", tierId: "4h" }, "*");
+          }
+        } catch (_) {}
+
+        // 3. Track progress strictly: 1/2, 2/2
+        const watched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10) + 1;
+        localStorage.setItem('fh_ads_4h', String(watched));
+
+        if (watched >= 2) {
+          activateWatchPass();
+        } else {
+          updatePassUI();
         }
-        activateWatchPass();
       }
 
       const btnGetPill = document.getElementById('btnGetPassPill');
-      if (btnGetPill) btnGetPill.addEventListener('click', triggerMonetagPassUnlock);
+      if (btnGetPill) btnGetPill.addEventListener('click', triggerPassAdWatch);
 
       const btnClaimPreRoll = document.getElementById('btnClaimPassInPreRoll');
-      if (btnClaimPreRoll) btnClaimPreRoll.addEventListener('click', triggerMonetagPassUnlock);
+      if (btnClaimPreRoll) btnClaimPreRoll.addEventListener('click', triggerPassAdWatch);
 
       const btnRenewModal = document.getElementById('btnRenewPassModal');
-      if (btnRenewModal) btnRenewModal.addEventListener('click', triggerMonetagPassUnlock);
+      if (btnRenewModal) btnRenewModal.addEventListener('click', triggerPassAdWatch);
 
       // Decrement logic:
       // Real-time pass counts down continuously; Banked streaming time only decrements while video is playing!

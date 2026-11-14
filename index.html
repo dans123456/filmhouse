@@ -508,16 +508,20 @@
 
                     <!-- 4h Pass Row -->
                     <div style="background: rgba(255, 188, 0, 0.07); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
                             <span style="font-size: 12px; font-weight: 700; color: #fff;">⚡ 4-Hour Pass</span>
                             <span style="font-size: 11px; color: #ffbc00; font-weight: 700;">300 Pts</span>
+                        </div>
+                        <span id="ad-count-4h" style="font-size: 10px; color: #94a3b8; display:block; margin-bottom: 5px;">0/3 ads watched</span>
+                        <div style="height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 999px; margin-bottom: 8px; overflow:hidden;">
+                            <div id="ad-bar-4h" style="height:100%; width:0%; background: linear-gradient(90deg, #ffbc00, #f59e0b); border-radius: 999px; transition: width 0.4s ease;"></div>
                         </div>
                         <div style="display:flex; gap: 8px; flex-wrap: wrap;">
                             <button type="button" id="btn-redeem-cinema-pass-mining" style="flex: 1; min-width: 130px; padding: 8px 12px; border-radius: 8px; background: linear-gradient(135deg, #ffbc00, #f59e0b); color: #000; font-weight: 800; font-size: 11px; border: none; cursor: pointer;">
                                 ⚡ Redeem (300 Pts)
                             </button>
-                            <button type="button" id="btn-mining-goto-cinema" style="padding: 8px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.08); color: #fff; font-weight: 700; font-size: 11px; border: 1px solid rgba(255, 255, 255, 0.15); cursor: pointer;">
-                                Watch Now ❯
+                            <button type="button" id="btn-watch-ad-4h" style="padding: 8px 12px; border-radius: 8px; background: rgba(255, 188, 0, 0.15); color: #ffbc00; font-weight: 700; font-size: 11px; border: 1px solid rgba(255, 188, 0, 0.3); cursor: pointer;">
+                                📺 Watch Ad (3 ads)
                             </button>
                         </div>
                     </div>
@@ -528,7 +532,7 @@
                             <span style="font-size: 12px; font-weight: 700; color: #fff;">🌙 6-Hour Pass</span>
                             <span style="font-size: 11px; color: #818cf8; font-weight: 700;">650 Pts</span>
                         </div>
-                        <span id="ad-count-6h" style="font-size: 10px; color: #94a3b8; display:block; margin-bottom: 5px;">0/3 ads watched</span>
+                        <span id="ad-count-6h" style="font-size: 10px; color: #94a3b8; display:block; margin-bottom: 5px;">0/7 ads watched</span>
                         <div style="height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 999px; margin-bottom: 8px; overflow:hidden;">
                             <div id="ad-bar-6h" style="height:100%; width:0%; background: linear-gradient(90deg, #818cf8, #6366f1); border-radius: 999px; transition: width 0.4s ease;"></div>
                         </div>
@@ -537,7 +541,7 @@
                                 🌙 Redeem (650 Pts)
                             </button>
                             <button type="button" id="btn-watch-ad-6h" style="padding: 8px 12px; border-radius: 8px; background: rgba(99, 102, 241, 0.15); color: #818cf8; font-weight: 700; font-size: 11px; border: 1px solid rgba(99, 102, 241, 0.3); cursor: pointer;">
-                                📺 Watch Ad (3 ads)
+                                📺 Watch Ads (7 ads)
                             </button>
                         </div>
                     </div>
@@ -548,7 +552,7 @@
                             <span style="font-size: 12px; font-weight: 700; color: #fff;">🔥 10-Hour Pass</span>
                             <span style="font-size: 11px; color: #f87171; font-weight: 700;">1,200 Pts</span>
                         </div>
-                        <span id="ad-count-10h" style="font-size: 10px; color: #94a3b8; display:block; margin-bottom: 5px;">0/7 ads watched</span>
+                        <span id="ad-count-10h" style="font-size: 10px; color: #94a3b8; display:block; margin-bottom: 5px;">0/12 ads watched</span>
                         <div style="height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 999px; margin-bottom: 8px; overflow:hidden;">
                             <div id="ad-bar-10h" style="height:100%; width:0%; background: linear-gradient(90deg, #f87171, #ef4444); border-radius: 999px; transition: width 0.4s ease;"></div>
                         </div>
@@ -557,7 +561,7 @@
                                 🔥 Redeem (1,200 Pts)
                             </button>
                             <button type="button" id="btn-watch-ad-10h" style="padding: 8px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.12); color: #f87171; font-weight: 700; font-size: 11px; border: 1px solid rgba(239, 68, 68, 0.25); cursor: pointer;">
-                                📺 Watch Ads (7 ads)
+                                📺 Watch Ads (12 ads)
                             </button>
                         </div>
                     </div>
@@ -2021,6 +2025,6 @@
     </div>
 
     <script src="seriesSchema.js?v=2"></script>
-    <script src="app.js?v=149"></script>
+    <script src="app.js?v=150"></script>
 </body>
 </html>

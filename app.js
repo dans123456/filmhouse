@@ -8423,7 +8423,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=149_${Date.now()}`;
+        const cacheBuster = `v=150_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
@@ -9026,6 +9026,9 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         } catch (_) {
                             window.open(e.data.url, "_blank");
                         }
+                    } else if (e.data.action === "watchAdForPass") {
+                        triggerMonetagSmartLink();
+                        showToast("👉 On iPhone: Tap \"Open\" to visit sponsor and claim your pass!", "info");
                     } else if (e.data.action === "selectServer" || e.data.action === "switchServer") {
                         const s2 = document.getElementById("cinema-server-2");
                         if (s2) s2.click();
@@ -11404,34 +11407,47 @@ function bindEvents() {
 
     // =====================================================================
     // Cinema Pass Redemption — Multi-Tier (4h/6h/10h) Points + Ad Watching
+    // Mining Tab = Banked Streaming Time (only decrements while watching)
+    // Media Player = 4h Real-Time Ad-Free Pass (clock time, 2 ads to unlock)
     // =====================================================================
     const PASS_TIERS = [
-        { id: "4h", label: "4h Pass", sec: 4 * 3600, pts: 300, adsRequired: 0, adKey: null, btnId: "btn-redeem-cinema-pass-mining", barId: null, countId: null, kind: "cinema_pass_4h" },
-        { id: "6h", label: "6h Pass", sec: 6 * 3600, pts: 650, adsRequired: 3, adKey: "fh_ads_6h", btnId: "btn-redeem-6h-pass", barId: "ad-bar-6h", countId: "ad-count-6h", kind: "cinema_pass_6h" },
-        { id: "10h", label: "10h Pass", sec: 10 * 3600, pts: 1200, adsRequired: 7, adKey: "fh_ads_10h", btnId: "btn-redeem-10h-pass", barId: "ad-bar-10h", countId: "ad-count-10h", kind: "cinema_pass_10h" }
+        { id: "4h", label: "4-Hour Pass", sec: 4 * 3600, pts: 300, adsRequired: 3, adKey: "fh_mining_ads_4h", btnId: "btn-redeem-cinema-pass-mining", adBtnId: "btn-watch-ad-4h", barId: "ad-bar-4h", countId: "ad-count-4h", kind: "cinema_pass_4h" },
+        { id: "6h", label: "6-Hour Pass", sec: 6 * 3600, pts: 650, adsRequired: 7, adKey: "fh_mining_ads_6h", btnId: "btn-redeem-6h-pass", adBtnId: "btn-watch-ad-6h", barId: "ad-bar-6h", countId: "ad-count-6h", kind: "cinema_pass_6h" },
+        { id: "10h", label: "10-Hour Pass", sec: 10 * 3600, pts: 1200, adsRequired: 12, adKey: "fh_mining_ads_10h", btnId: "btn-redeem-10h-pass", adBtnId: "btn-watch-ad-10h", barId: "ad-bar-10h", countId: "ad-count-10h", kind: "cinema_pass_10h" }
     ];
 
     function activateCinemaPassTier(tier) {
-        const durationMs = tier.sec * 1000;
-        const passExpiresAt = Date.now() + durationMs;
-        localStorage.setItem("filmhouse_watch_pass_sec", String(tier.sec));
-        localStorage.setItem("filmhouse_watch_pass_until", passExpiresAt.toString());
-        localStorage.setItem("cinema_fast_stream_until", passExpiresAt.toString());
-        localStorage.setItem("ad_free_until", passExpiresAt.toString());
+        // Mining Tab passes add directly to Banked Streaming Time (only counts down while streaming video!)
+        const currentBank = parseInt(localStorage.getItem("filmhouse_stream_bank_sec") || "0", 10);
+        const newBank = currentBank + tier.sec;
+        localStorage.setItem("filmhouse_stream_bank_sec", String(newBank));
+        localStorage.setItem("cinema_fast_stream_until", String(Date.now() + 86400000));
+        localStorage.setItem("ad_free_until", String(Date.now() + 86400000));
         if (tier.adKey) localStorage.setItem(tier.adKey, "0");
 
         const passPill = document.getElementById("mining-pass-active-pill");
         if (passPill) {
-            passPill.textContent = `⚡ Pass Active (${tier.id})`;
+            const h = Math.floor(newBank / 3600);
+            passPill.textContent = `⚡ Banked: ${h}h Stream Time`;
             passPill.style.background = "rgba(16, 185, 129, 0.25)";
             passPill.style.color = "#34d399";
         }
         updatePassTierBars();
-        showToast(`🎉 ${tier.label} Ad-Free Cinema Pass Activated! Enjoy streaming!`, "success");
+        showToast(`🎉 +${tier.label} added to your Banked Streaming Time! Enjoy uninterrupted movies!`, "success");
         if (typeof triggerHaptic === "function") triggerHaptic("success");
     }
 
     function updatePassTierBars() {
+        const bankSec = parseInt(localStorage.getItem("filmhouse_stream_bank_sec") || "0", 10);
+        const passPill = document.getElementById("mining-pass-active-pill");
+        if (passPill && bankSec > 0) {
+            const h = Math.floor(bankSec / 3600);
+            const m = Math.floor((bankSec % 3600) / 60);
+            passPill.textContent = `⚡ Banked: ${h}h ${m}m`;
+            passPill.style.background = "rgba(16, 185, 129, 0.25)";
+            passPill.style.color = "#34d399";
+        }
+
         PASS_TIERS.forEach(tier => {
             if (!tier.adKey || !tier.barId) return;
             const watched = parseInt(localStorage.getItem(tier.adKey) || "0", 10);
@@ -11448,15 +11464,21 @@ function bindEvents() {
     }
 
     function watchAdForTier(tier) {
-        try { window.open("https://uplcm.com/4/12129096", "_blank"); } catch(e) {}
+        if (!tier) return;
+        triggerMonetagSmartLink();
+        showToast("👉 On iPhone: Tap \"Open\" to visit sponsor and claim your pass!", "info");
+
         const watched = parseInt(localStorage.getItem(tier.adKey) || "0", 10) + 1;
         localStorage.setItem(tier.adKey, String(watched));
         updatePassTierBars();
+
         if (watched >= tier.adsRequired) {
+            localStorage.setItem(tier.adKey, "0");
             showToast(`✅ All ads watched! ${tier.label} unlocked!`, "success");
-            setTimeout(() => activateCinemaPassTier(tier), 800);
+            setTimeout(() => activateCinemaPassTier(tier), 700);
         } else {
-            showToast(`📺 ${watched}/${tier.adsRequired} ads watched for ${tier.label}`, "info");
+            const remaining = tier.adsRequired - watched;
+            showToast(`📺 ${watched}/${tier.adsRequired} ads watched for ${tier.label}! Watch ${remaining} more to unlock.`, "info");
         }
         if (typeof triggerHaptic === "function") triggerHaptic("medium");
     }
@@ -11470,22 +11492,18 @@ function bindEvents() {
                 if (currentPoints >= tier.pts) {
                     deductPoints(tier.pts, tier.kind);
                     activateCinemaPassTier(tier);
-                } else if (tier.adsRequired > 0) {
-                    watchAdForTier(tier);
                 } else {
-                    showToast(`⚠️ You need ${tier.pts} Loyalty Points for a ${tier.label}! Current: ${currentPoints} pts`, "error");
+                    showToast(`⚠️ You need ${tier.pts} Loyalty Points for a ${tier.label}! Or watch ${tier.adsRequired} ads to unlock.`, "error");
                     if (typeof triggerHaptic === "function") triggerHaptic("error");
                 }
             });
         }
-    });
-
-    ["btn-watch-ad-6h", "btn-watch-ad-10h"].forEach((btnId, idx) => {
-        const tier = PASS_TIERS[idx + 1];
-        const btn = document.getElementById(btnId);
-        if (btn && !btn._bound) {
-            btn._bound = true;
-            btn.addEventListener("click", () => watchAdForTier(tier));
+        if (tier.adBtnId) {
+            const adBtn = document.getElementById(tier.adBtnId);
+            if (adBtn && !adBtn._bound) {
+                adBtn._bound = true;
+                adBtn.addEventListener("click", () => watchAdForTier(tier));
+            }
         }
     });
 
