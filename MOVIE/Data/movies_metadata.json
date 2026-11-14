@@ -1,5 +1,40 @@
 [
   {
+    "csv_id": "114479-the-acolyte",
+    "tmdb_id": 114479,
+    "imdb_id": "",
+    "title": "The Acolyte",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Mystery",
+      "Sci-Fi & Fantasy",
+      "Action & Adventure",
+      "War & Politics"
+    ],
+    "overview": "A hundred years before the rise of the Empire, the Jedi Order and the Galactic Republic have prospered for centuries without war. During this time, an investigation into a shocking crime spree pits a Jedi Master against a dangerous warrior from his past.",
+    "poster": "https://image.tmdb.org/t/p/w500/mztdt3y6GBsJR69zHtszFezTCLT.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/kwronSXO1ogMqHHFvY2eBxfFLdn.jpg",
+    "rating": 5.3,
+    "release_date": "2024-06-04",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "6tzur6JrUEA",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADzAkAAjzRwUcj1of6MyyinxYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "669392-pardoned-by-grace",
     "tmdb_id": 669392,
     "imdb_id": "",
