@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "303044-campus-drivers",
+    "tmdb_id": 303044,
+    "imdb_id": "",
+    "title": "Campus Drivers",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "Lois arrives in Belrose with Max, the love of her life. Lane, the creator of Campus Drivers, the hottest app on campus, is known for never getting attached. Their paths were never meant to cross. But some encounters change everything, reopening old wounds. And when love appears unexpectedly, nothing is certain anymore.",
+    "poster": "https://image.tmdb.org/t/p/w500/aa1mDCaRtGNEIHVpZrh2xil03Tq.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/oaWJm4brEMSWBmQIB73DFxsU683.jpg",
+    "rating": 7.9,
+    "release_date": "2026-11-06",
+    "language": "fr",
+    "cast": [],
+    "director": "",
+    "trailer": "xybsbjGt1KA",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD6gkAAjzRwUf6DSqwpht_PhYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "9603-clueless",
     "tmdb_id": 9603,
     "imdb_id": "",
