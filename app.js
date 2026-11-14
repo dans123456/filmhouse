@@ -2657,10 +2657,9 @@ function getStreamBadgeElement(movie) {
 
 function getRequestedBadgeElement(movie) {
     if (!movie || typeof currentUserRequests === 'undefined' || !currentUserRequests || currentUserRequests.length === 0) return null;
-    if (movie.links && movie.links.length > 0) return null;
     const userReq = currentUserRequests.find(r => 
         r.title && titlesMatch(r.title, movie.title) &&
-        r.status !== "fulfilled"
+        typeof isUserRequestFulfilled === 'function' && !isUserRequestFulfilled(r, movie)
     );
     if (!userReq) return null;
     
@@ -8424,7 +8423,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=145_${Date.now()}`;
+        const cacheBuster = `v=149_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
@@ -12878,47 +12877,121 @@ function startUserRequestsListener() {
         });
 }
 
+// Helper: Identifies if a request is specifically for Online Streaming
+function isStreamRequest(r) {
+    if (!r) return false;
+    const t = String(r.type || "").toLowerCase();
+    const rt = String(r.requestType || "").toLowerCase();
+    const target = String(r.target || "").toLowerCase();
+    const q = String(r.quality || "").toLowerCase();
+    const sop = String(r.seasonOrPart || "").toLowerCase();
+    const title = String(r.title || "").toLowerCase();
+
+    return t === "stream" || rt === "stream" || target === "stream_url" ||
+           q.includes("stream") || sop.includes("stream") || title.includes("(stream") || title.includes(" stream");
+}
+
 // Helper: Checks if requested season/quality exists with working links in matching catalog movie
 function isMovieSpecAvailableInCatalog(movie, r) {
-    if (!movie || !Array.isArray(movie.links) || movie.links.length === 0) return false;
-    const hasValidLinks = movie.links.some(l => {
-        const url = typeof l === 'object' && l !== null ? (l.url || l.link) : l;
-        return url && String(url).trim() !== "";
-    });
-    if (!hasValidLinks) return false;
+    if (!movie) return false;
 
-    const reqSpec = (r && r.seasonOrPart ? String(r.seasonOrPart) : "").toLowerCase().trim();
-    if (!reqSpec) return true; // General request with no specific season or quality requirement
-
-    const isReqSeries = (r.type || "").toLowerCase() === 'series' || (r.type || "").toLowerCase() === 'tv' || (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
-    const isSeasonReq = reqSpec.includes("season") || !!reqSpec.match(/\bs\d+\b/i);
-    const isQualityReq = reqSpec.includes("quality") || reqSpec.includes("1080") || reqSpec.includes("720") || reqSpec.includes("2160") || reqSpec.includes("4k") || reqSpec.includes("480");
-
-    if (isReqSeries && isSeasonReq) {
-        const sMatch = reqSpec.match(/season\s*(\d+)/i) || reqSpec.match(/\bs(\d+)\b/i);
-        const sNum = sMatch ? sMatch[1] : null;
-        return movie.links.some(link => {
-            const sLabel = (typeof link === 'object' && link !== null ? (link.season || link.quality || "") : "").toLowerCase();
-            const lUrl = typeof link === 'object' && link !== null ? (link.url || link.link) : link;
-            if (!lUrl || String(lUrl).trim() === "") return false;
-            if (sNum) {
-                return sLabel.includes(`season ${sNum}`) || sLabel.includes(`s${sNum}`);
-            }
-            return sLabel.includes(reqSpec);
+    const isStream = isStreamRequest(r);
+    if (isStream) {
+        // Stream requests MUST have active streaming source in catalog!
+        const hasStream = typeof hasMovieStream === "function" ? hasMovieStream(movie) : !!(
+            (movie.stream_url && !movie.stream_url.includes("t.me")) ||
+            (Array.isArray(movie.stream_links) && movie.stream_links.some(s => s && (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")))
+        );
+        if (!hasStream) return false;
+    } else {
+        // Download/catalog requests MUST have valid download links
+        if (!Array.isArray(movie.links) || movie.links.length === 0) return false;
+        const hasValidLinks = movie.links.some(l => {
+            const url = typeof l === 'object' && l !== null ? (l.url || l.link || l.download_url) : l;
+            return url && String(url).trim() !== "";
         });
+        if (!hasValidLinks) return false;
     }
 
-    if (!isReqSeries && isQualityReq) {
-        const qMatch = reqSpec.match(/(2160p|4k|1080p|720p|480p)/i);
-        const targetQ = qMatch ? qMatch[1].toLowerCase() : reqSpec;
-        return movie.links.some(link => {
-            const lQuality = (typeof link === 'object' && link !== null ? (link.quality || link.season || "") : "").toLowerCase();
-            const lUrl = typeof link === 'object' && link !== null ? (link.url || link.link) : link;
-            return lQuality.includes(targetQ) && lUrl && String(lUrl).trim() !== "";
-        });
+    const reqSpec = String(r && (r.seasonOrPart || r.specs || r.quality || "")).toLowerCase().trim();
+    const reqTitle = String(r && r.title ? r.title : "").toLowerCase().trim();
+    const fullSpec = `${reqSpec} ${reqTitle}`;
+
+    const isReqSeries = (r.type || "").toLowerCase() === 'series' || (r.type || "").toLowerCase() === 'tv' || 
+                        (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
+
+    // Season Check: e.g. "Season 4", "S04", "Season 2"
+    const sMatch = fullSpec.match(/(?:season\s*|s)(\d+)\b/i);
+    if (sMatch) {
+        const sNum = parseInt(sMatch[1], 10);
+        let seasonFound = false;
+
+        if (isStream) {
+            if (Array.isArray(movie.stream_links) && movie.stream_links.length > 0) {
+                seasonFound = movie.stream_links.some(sl => {
+                    const sVal = sl.season || sl.seasonNumber || sl.season_number;
+                    return sVal && parseInt(String(sVal).replace(/\D/g, ''), 10) === sNum;
+                });
+            } else if (Array.isArray(movie.seasons) && movie.seasons.length > 0) {
+                seasonFound = movie.seasons.some(s => {
+                    const sVal = s.seasonNumber || s.season || s.season_number;
+                    return sVal && parseInt(String(sVal).replace(/\D/g, ''), 10) === sNum;
+                });
+            }
+            if (!seasonFound && isReqSeries) return false;
+        }
+
+        if (Array.isArray(movie.links) && movie.links.length > 0) {
+            const hasSeasonLink = movie.links.some(link => {
+                const sLabel = typeof link === 'object' && link !== null ? (link.season || link.quality || link.name || "") : String(link);
+                const match = String(sLabel).match(/(?:season\s*|s)(\d+)\b/i);
+                return match && parseInt(match[1], 10) === sNum;
+            });
+            if (!hasSeasonLink && !isStream) return false;
+        }
+    }
+
+    // Quality Check: e.g. 1080p, 4k, 2160p
+    const qMatch = fullSpec.match(/(2160p|4k|1080p|720p|480p)/i);
+    if (qMatch) {
+        const targetQ = qMatch[1].toLowerCase();
+        const linksToCheck = isStream 
+            ? (Array.isArray(movie.stream_links) ? movie.stream_links : []) 
+            : (Array.isArray(movie.links) ? movie.links : []);
+
+        if (linksToCheck.length > 0) {
+            const hasTargetQuality = linksToCheck.some(link => {
+                const lQuality = (typeof link === 'object' && link !== null ? (link.quality || link.season || "") : String(link)).toLowerCase();
+                if (targetQ === '4k' || targetQ === '2160p') {
+                    return lQuality.includes('2160') || lQuality.includes('4k');
+                }
+                return lQuality.includes(targetQ);
+            });
+            if (!hasTargetQuality && (targetQ === '1080p' || targetQ === '4k' || targetQ === '2160p')) {
+                return false;
+            }
+        }
     }
 
     return true;
+}
+
+// Unified helper: Determines whether a user request is truly fulfilled
+function isUserRequestFulfilled(r, matchingMovie) {
+    if (!r) return false;
+    // 1. Explicit fulfillment by admin in Firestore / Bot
+    if ((r.status === "fulfilled" || r.status === "claimed") && r.downloadLink) {
+        return true;
+    }
+    // 2. Catalog spec fulfillment (Stream must exist for stream request, Season X must exist for Season X, etc.)
+    if (matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r)) {
+        return true;
+    }
+    // 3. Status marked fulfilled or claimed by admin
+    if (r.status === "fulfilled" || r.status === "claimed") {
+        return true;
+    }
+    return false;
 }
 
 function renderUserRequests(requests) {
@@ -12962,15 +13035,15 @@ function renderUserRequests(requests) {
                    (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
         });
         const isExplicit = (r.status === "fulfilled" || r.status === "claimed") && r.downloadLink;
-        const isMatched = (r.status === "fulfilled" || r.status === "claimed") && matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r) && matchingMovie.links && matchingMovie.links.length > 0;
-        const isFulfilled = isExplicit || isMatched;
+        const isMatched = matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r);
+        const isFulfilled = isUserRequestFulfilled(r, matchingMovie);
         const isClaimed = isFulfilled && (r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId));
         
         if (isClaimed) {
-            historyRequests.push({ ...r, _matchingMovie: matchingMovie, _isExplicit: isExplicit, _isMatched: isMatched });
+            historyRequests.push({ ...r, _matchingMovie: matchingMovie, _isExplicit: isExplicit, _isMatched: isMatched, _isFulfilled: isFulfilled });
         } else {
             activeRequests.push({ ...r, _matchingMovie: matchingMovie, _isMatched: isMatched, _isExplicit: isExplicit, _isFulfilled: isFulfilled });
-            if (isFulfilled && !(r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId))) {
+            if (isFulfilled && !isClaimed) {
                 hasNewFulfillment = true;
             }
         }
@@ -13010,11 +13083,22 @@ function renderUserRequests(requests) {
                 reviewingColor = "var(--primary-color)";
                 readyColor = "#4caf50";
                 activeLineColor = "#4caf50";
-                const rawLink = r._isExplicit ? r.downloadLink : (r._matchingMovie && r._matchingMovie.links ? r._matchingMovie.links[0] : "");
-                const dlLink = typeof rawLink === 'object' && rawLink !== null ? (rawLink.url || rawLink.download_url || "") : rawLink;
+                const isStream = isStreamRequest(r);
+                let dlLink = "";
+                if (r._isExplicit) {
+                    dlLink = r.downloadLink;
+                } else if (r._matchingMovie) {
+                    if (isStream) {
+                        dlLink = r._matchingMovie.stream_url || (r._matchingMovie.stream_links && r._matchingMovie.stream_links[0] ? (r._matchingMovie.stream_links[0].stream_url || r._matchingMovie.stream_links[0].url) : "");
+                    }
+                    if (!dlLink && r._matchingMovie.links && r._matchingMovie.links.length > 0) {
+                        const rawLink = r._matchingMovie.links[0];
+                        dlLink = typeof rawLink === 'object' && rawLink !== null ? (rawLink.url || rawLink.download_url || "") : rawLink;
+                    }
+                }
                 actionBtn = `
-                    <button class="btn btn-primary btn-sm user-request-dl-btn" data-link="${escapeHTML(dlLink)}" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">
-                        Claim 🎁
+                    <button class="btn btn-primary btn-sm user-request-dl-btn" data-link="${escapeHTML(dlLink)}" data-is-stream="${isStream ? 'true' : 'false'}" data-doc-id="${escapeHTML(r.docId)}" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; font-weight: 700; flex-shrink: 0;">
+                        ${isStream ? 'Stream 🎬' : 'Claim 🎁'}
                     </button>
                 `;
             } else if (r.status === "priority") {
@@ -13119,7 +13203,29 @@ function renderUserRequests(requests) {
                         }).catch(err => console.error("Error updating claim in Firestore:", err));
                     }
 
-                    showToast("Claimed! The download links have been sent to your Telegram DMs. 🍿", "success");
+                    const isStream = isStreamRequest(r);
+                    if (isStream && r._matchingMovie) {
+                        const rewardsDrawer = document.getElementById("rewards-drawer");
+                        if (rewardsDrawer) rewardsDrawer.classList.remove("active");
+                        if (typeof openMovieDetail === "function") {
+                            openMovieDetail(r._matchingMovie);
+                        }
+                        showToast(`Opening "${r._matchingMovie.title}" in Cinema Player 🍿`, "success");
+                    } else {
+                        const link = dlBtn.getAttribute("data-link");
+                        if (link && (link.includes("t.me") || link.startsWith("http"))) {
+                            try {
+                                if (window.Telegram?.WebApp?.openLink) {
+                                    window.Telegram.WebApp.openLink(link);
+                                } else {
+                                    window.open(link, "_blank");
+                                }
+                            } catch (_) {
+                                window.open(link, "_blank");
+                            }
+                        }
+                        showToast("Claimed! The download links have been sent to your Telegram DMs. 🍿", "success");
+                    }
                     
                     // Re-render so claimed request moves to history immediately
                     renderUserRequests(currentUserRequests);
@@ -13193,21 +13299,27 @@ function updateHomeFulfillmentBanner() {
     const acknowledgedFulfillments = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
     
     const unacknowledgedFulfilled = currentUserRequests.filter(r => {
-        const matchingMovie = state.movies.find(m => 
-            (m.title && titlesMatch(m.title, r.title)) || 
-            (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
-        );
-        const isMatched = matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r);
-        const isExplicit = (r.status === "fulfilled" || r.status === "claimed") && r.downloadLink;
-        const isClaimed = (isMatched || isExplicit) && (r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId));
-        return (isMatched || isExplicit) && !isClaimed;
+        const matchingMovie = state.movies.find(m => {
+            const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
+            const mId = String(m.tmdb_id || m.csv_id || '').split('-')[0].trim();
+            if (rId && mId) {
+                return rId === mId;
+            }
+            return (m.title && titlesMatch(m.title, r.title)) || 
+                   (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
+        });
+        const isFulfilled = isUserRequestFulfilled(r, matchingMovie);
+        const isClaimed = isFulfilled && (r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId));
+        return isFulfilled && !isClaimed;
     });
     
     if (unacknowledgedFulfilled.length > 0) {
         banner.style.display = "flex";
         if (bannerText) {
             const titles = unacknowledgedFulfilled.map(r => `"${r.title}"`).join(", ");
-            bannerText.textContent = `${titles} ${unacknowledgedFulfilled.length === 1 ? 'is' : 'are'} ready to download! 🍿`;
+            const hasStreamReq = unacknowledgedFulfilled.some(r => isStreamRequest(r));
+            const verb = hasStreamReq ? "stream" : "download";
+            bannerText.textContent = `${titles} ${unacknowledgedFulfilled.length === 1 ? 'is' : 'are'} ready to ${verb}! 🍿`;
         }
         if (bannerBtn) {
             bannerBtn.onclick = () => {

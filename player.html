@@ -10,12 +10,31 @@
     <script src='https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js'></script>
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
   <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <title>Film House Cinema Player</title>
   <link href='https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap' rel='stylesheet'/>
   
   <!-- Monetag SmartLink Integration (Zone: 12129096) -->
   <script type='text/javascript'>
-    
+    function openTelegramLink(url) {
+      if (!url) return;
+      try {
+        if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === 'function') {
+          window.Telegram.WebApp.openLink(url);
+          return;
+        }
+      } catch (_) {}
+      try {
+        if (window.parent && window.parent.Telegram && window.parent.Telegram.WebApp && typeof window.parent.Telegram.WebApp.openLink === 'function') {
+          window.parent.Telegram.WebApp.openLink(url);
+          return;
+        }
+      } catch (_) {}
+      try {
+        window.open(url, '_blank');
+      } catch (_) {}
+    }
+
     var MONETAG_SMARTLINK = 'https://uplcm.com/4/12129096';
     
   </script>
@@ -158,6 +177,12 @@
       display: flex;
       justify-content: center;
       transition: bottom 0.2s ease;
+    }
+    :fullscreen .custom-sub-overlay,
+    :-webkit-full-screen .custom-sub-overlay,
+    .plyr--fullscreen-active .custom-sub-overlay,
+    body.is-fullscreen .custom-sub-overlay {
+      bottom: 26px !important;
     }
     .custom-sub-text {
       display: none;
@@ -1337,11 +1362,7 @@
 
       function triggerMonetagPassUnlock() {
         try {
-          if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === 'function') {
-            window.Telegram.WebApp.openLink(MONETAG_SMARTLINK);
-          } else {
-            window.open(MONETAG_SMARTLINK, '_blank');
-          }
+          openTelegramLink(MONETAG_SMARTLINK);
         } catch (e) {
           try { window.open(MONETAG_SMARTLINK, '_blank'); } catch (_) {}
         }
@@ -1397,10 +1418,8 @@
           return;
         }
 
-        // Open Monetag SmartLink sponsor
-        try {
-          window.open(MONETAG_SMARTLINK, '_blank');
-        } catch (e) {}
+        // Open Monetag SmartLink sponsor natively in Telegram
+        openTelegramLink(MONETAG_SMARTLINK);
 
         preRoll.style.display = 'flex';
         let countdown = 8;
@@ -1464,6 +1483,14 @@
           playOverlay.style.opacity = '0';
           setTimeout(() => { playOverlay.style.display = 'none'; }, 220);
 
+          // Fast loading state: show connecting pulse immediately over backdrop
+          if (loaderEl) {
+            loaderEl.style.display = 'flex';
+            loaderEl.style.opacity = '1';
+            const lt = loaderEl.querySelector('.loader-text');
+            if (lt) lt.textContent = '⚡ Connecting High-Speed Stream...';
+          }
+
           if (videoEl && !videoEl.src && finalStreamUrl) {
             videoEl.src = finalStreamUrl;
           }
@@ -1496,9 +1523,7 @@
       // Monetag SmartLink on Direct Download button
       if (downloadBtn) {
         downloadBtn.addEventListener('click', function(e) {
-          try {
-            window.open(MONETAG_SMARTLINK, '_blank');
-          } catch (err) {}
+          openTelegramLink(MONETAG_SMARTLINK);
         });
       }
 
@@ -1561,7 +1586,9 @@
 
         // Universal Fallback for mobile WebViews / Plyr where videoEl.audioTracks is disabled
         if (audioTracks.length === 0) {
-          const activeAudioIdx = parseInt(urlParams.get('audio') || '0', 10);
+          const activeAudioIdx = (typeof window._selectedAudioTrackIndex !== 'undefined')
+            ? window._selectedAudioTrackIndex
+            : parseInt(urlParams.get('audio') || '0', 10);
           audioTracks.push({
             index: 0,
             label: "Audio 1 (Original / Default)",
@@ -1901,6 +1928,7 @@
           } catch (_) {}
         } else if (ev.data.action === 'selectAudioTrack') {
           const targetIndex = parseInt(ev.data.index, 10);
+          window._selectedAudioTrackIndex = targetIndex;
           if (window._currentHls && typeof window._currentHls.audioTrack !== 'undefined') {
             window._currentHls.audioTrack = targetIndex;
           }
@@ -1913,21 +1941,31 @@
           }
           if (!switchedClientSide || ev.data.reloadWithTrack) {
             try {
-              const curTime = (videoEl && videoEl.currentTime > 0) ? videoEl.currentTime : 0;
+              const curTime = (videoEl && videoEl.currentTime > 0) ? Math.floor(videoEl.currentTime) : 0;
               const wasPlaying = (videoEl && !videoEl.paused);
               let newUrl = finalStreamUrl || (videoEl ? videoEl.src : '');
               if (newUrl) {
-                newUrl = newUrl.replace(/([?&])audio=\d+/, '');
-                newUrl += (newUrl.includes('?') ? '&' : '?') + 'audio=' + targetIndex;
+                // Strip existing audio and seek parameters
+                newUrl = newUrl.replace(/([?&])audio=\d+/g, '').replace(/([?&])ss=\d+/g, '').replace(/([?&])t=\d+/g, '');
+                const sep = newUrl.includes('?') ? '&' : '?';
+                newUrl = `${newUrl}${sep}audio=${targetIndex}`;
+                // Pass seeking parameter directly to backend ffmpeg transmuxer so stream resumes mid-stream!
+                if (curTime > 0) {
+                  newUrl += `&ss=${curTime}`;
+                }
                 finalStreamUrl = newUrl;
+
+                if (loaderEl) {
+                  loaderEl.style.display = 'flex';
+                  loaderEl.style.opacity = '1';
+                  const lt = loaderEl.querySelector('.loader-text');
+                  if (lt) lt.textContent = '🔊 Switching Audio Track...';
+                }
+
                 videoEl.src = newUrl;
 
                 const resumeHandler = function() {
                   try {
-                    if (curTime > 0) {
-                      videoEl.currentTime = curTime;
-                      if (window.plyrInstance) window.plyrInstance.currentTime = curTime;
-                    }
                     if (wasPlaying) {
                       videoEl.play().catch(() => {});
                     }
