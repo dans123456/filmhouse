@@ -1309,8 +1309,14 @@
             clearInterval(timer);
             preRoll.style.display = 'none';
             document.body.classList.add('stream-started');
-            if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
-            else if (videoEl) videoEl.play().catch(() => {});
+            try {
+              const p = videoEl.play();
+              if (p !== undefined) {
+                p.catch(() => { if (window.plyrInstance) window.plyrInstance.play().catch(() => {}); });
+              }
+            } catch (_) {
+              if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
+            }
           }
         }, 1000);
 
@@ -1319,8 +1325,14 @@
             clearInterval(timer);
             preRoll.style.display = 'none';
             document.body.classList.add('stream-started');
-            if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
-            else if (videoEl) videoEl.play().catch(() => {});
+            try {
+              const p = videoEl.play();
+              if (p !== undefined) {
+                p.catch(() => { if (window.plyrInstance) window.plyrInstance.play().catch(() => {}); });
+              }
+            } catch (_) {
+              if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
+            }
           };
         }
       }
@@ -1338,11 +1350,17 @@
           setTimeout(() => { playOverlay.style.display = 'none'; }, 260);
 
           if (passSec > 0) {
-            // 4-Hour Pass is active! 0 pre-roll ads, instant playback!
-            if (window.plyrInstance) {
-              window.plyrInstance.play().catch(err => console.log("Play error handled:", err));
-            } else if (videoEl) {
-              videoEl.play().catch(err => console.log("Play error handled:", err));
+            // 4-Hour Pass is active! 0 pre-roll ads, instant direct playback!
+            try {
+              const p = videoEl.play();
+              if (p !== undefined) {
+                p.catch(err => {
+                  console.log("Direct videoEl.play notice:", err);
+                  if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
+                });
+              }
+            } catch (_) {
+              if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
             }
           } else {
             // No active pass: show 8s Pre-roll sponsor overlay with option to claim 4h pass

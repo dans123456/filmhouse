@@ -1,4 +1,7 @@
 
+// Reset any stale audio track overrides on startup so high-speed direct stream is always default
+try { localStorage.removeItem("fh_audio_pref"); } catch (_) {}
+
 function isDesktopEnvironment() {
     const ua = (navigator.userAgent || "").toLowerCase();
     const isMobileUA = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
@@ -6786,24 +6789,15 @@ function openDetailModal(movie) {
             infoColumn.appendChild(reqBanner);
         }
     } else {
-        // Admin Streaming Beta Tester Whitelist Button
-        const currentTelegramUserId = String(state.user?.id || window.Telegram?.WebApp?.initDataUnsafe?.user?.id || localStorage.getItem("filmhouse_user_id") || "");
-        const isStreamingTester = typeof STREAMING_ADMIN_IDS !== "undefined" && STREAMING_ADMIN_IDS.includes(currentTelegramUserId);
-
         let hasStreamLink = !!(movie.stream_url);
         if (!hasStreamLink && movie.links && Array.isArray(movie.links)) {
             hasStreamLink = movie.links.some(l => l && (l.stream_url || (l.url && (l.url.includes("watch=") || l.url.includes("dl/")))));
         }
 
-        if (isStreamingTester) {
+        if (hasStreamLink) {
             const watchOnlineBtn = document.createElement("button");
             watchOnlineBtn.className = "btn btn-primary btn-stream-hero";
-            watchOnlineBtn.innerHTML = `<svg style="width:16px;height:16px;fill:currentColor;"><use href="#icon-play"></use></svg><span>Watch Online</span><span class="beta-pill">BETA</span>`;
-            
-            if (!hasStreamLink) {
-                watchOnlineBtn.style.opacity = "0.75";
-                watchOnlineBtn.title = "No streaming link added yet (Admin)";
-            }
+            watchOnlineBtn.innerHTML = `<svg style="width:16px;height:16px;fill:currentColor;"><use href="#icon-play"></use></svg><span>Watch Online</span>`;
 
             let _watchOnlineThrottle = 0;
             watchOnlineBtn.addEventListener("click", (e) => {
@@ -6812,10 +6806,6 @@ function openDetailModal(movie) {
                 if (now - _watchOnlineThrottle < 800) return;
                 _watchOnlineThrottle = now;
 
-                if (!hasStreamLink) {
-                    showToast(`⚠️ No streaming link added for "${movie.title}" yet. Add it via Admin Panel!`, "warning");
-                    return;
-                }
                 addWatchHistory(movie.csv_id || movie.id);
                 openCinemaModal(movie);
             });
@@ -8343,12 +8333,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        let savedAudioPref = "";
-        try { savedAudioPref = localStorage.getItem("fh_audio_pref") || ""; } catch (_) {}
-        const audioParam = (savedAudioPref && savedAudioPref !== "0") ? `&audio=${encodeURIComponent(savedAudioPref)}` : "";
-
-        const cacheBuster = `v=142_${Date.now()}`;
-        const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${audioParam}`;
+        const cacheBuster = `v=143_${Date.now()}`;
+        const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}`;
         
         // Fast pre-buffering animation overlay for instant visual feedback
         const loader = document.createElement("div");
@@ -9938,12 +9924,10 @@ function openDownloadModal(movie) {
             const actionsGroup = document.createElement("div");
             actionsGroup.className = "download-link-actions-group";
 
-            const currentTelegramUserId = String(state.user?.id || window.Telegram?.WebApp?.initDataUnsafe?.user?.id || localStorage.getItem("filmhouse_user_id") || "");
-            const isStreamingTester = typeof STREAMING_ADMIN_IDS !== "undefined" && STREAMING_ADMIN_IDS.includes(currentTelegramUserId);
             const isObj = typeof link === 'object' && link !== null;
             const streamTarget = (isObj && link.stream_url) ? link.stream_url : (movie.stream_url || "");
 
-            if (isStreamingTester && streamTarget) {
+            if (streamTarget) {
                 const streamBtn = document.createElement("button");
                 streamBtn.type = "button";
                 streamBtn.className = "download-link-stream-btn";
