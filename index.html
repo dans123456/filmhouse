@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -29,8 +29,40 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=95">
-</head>
+    <link rel="stylesheet" href="index.css?v=145">
+
+    <style>
+      .carousel-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        transition: background 0.2s, transform 0.2s;
+      }
+      .carousel-arrow:hover {
+        background: var(--primary-color, #ffbc00);
+        color: #000;
+        transform: translateY(-50%) scale(1.1);
+      }
+      .carousel-arrow-prev { left: 10px; }
+      .carousel-arrow-next { right: 10px; }
+      @media (max-width: 480px) {
+        .carousel-arrow { width: 30px; height: 30px; opacity: 0.8; }
+      }
+    </style>
+  </head>
 <body>
 
     <!-- SVG Definitions for Reusable Icons -->
@@ -374,25 +406,71 @@
                 </div>
 
                 <!-- Loyalty Points Cinema Perks Card (Option 1) -->
-                <div class="mining-cinema-perks-card" style="background: linear-gradient(135deg, rgba(255, 188, 0, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%); border: 1px solid rgba(255, 188, 0, 0.3); border-radius: var(--border-radius-md); padding: 14px 16px; margin-bottom: 20px; text-align: left; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+                <div class="mining-cinema-perks-card" style="background: linear-gradient(135deg, rgba(255, 188, 0, 0.1) 0%, rgba(15, 23, 42, 0.85) 100%); border: 1px solid rgba(255, 188, 0, 0.3); border-radius: var(--border-radius-md); padding: 14px 16px; margin-bottom: 20px; text-align: left; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
                         <span style="font-size: 11px; font-weight: 800; color: #ffbc00; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
                             🍿 Cinema Loyalty Perks
                         </span>
                         <span id="mining-pass-active-pill" style="font-size: 10px; padding: 2px 8px; border-radius: 999px; background: rgba(255, 188, 0, 0.2); color: #ffbc00; font-weight: 700;">
-                            100 Pts = 4h Pass
+                            Pass Tiers
                         </span>
                     </div>
-                    <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.4; margin-bottom: 12px;">
-                        Redeem <strong>100 Loyalty Points</strong> for an <strong>Ad-Free 4-Hour Cinema Pass</strong> to enjoy uninterrupted movie streaming &amp; instant quality switches!
+                    <p style="font-size: 11px; color: #94a3b8; margin: 0 0 12px 0; line-height: 1.5;">Redeem Loyalty Points or watch ads to unlock an Ad-Free Cinema Pass. Time is <strong style="color:#fff;">real-time</strong> — counts down even when you are away!</p>
+
+                    <!-- 4h Pass Row -->
+                    <div style="background: rgba(255, 188, 0, 0.07); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+                            <span style="font-size: 12px; font-weight: 700; color: #fff;">⚡ 4-Hour Pass</span>
+                            <span style="font-size: 11px; color: #ffbc00; font-weight: 700;">300 Pts</span>
+                        </div>
+                        <div style="display:flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" id="btn-redeem-cinema-pass-mining" style="flex: 1; min-width: 130px; padding: 8px 12px; border-radius: 8px; background: linear-gradient(135deg, #ffbc00, #f59e0b); color: #000; font-weight: 800; font-size: 11px; border: none; cursor: pointer;">
+                                ⚡ Redeem (300 Pts)
+                            </button>
+                            <button type="button" id="btn-mining-goto-cinema" style="padding: 8px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.08); color: #fff; font-weight: 700; font-size: 11px; border: 1px solid rgba(255, 255, 255, 0.15); cursor: pointer;">
+                                Watch Now ❯
+                            </button>
+                        </div>
                     </div>
-                    <div style="display:flex; gap: 8px; flex-wrap: wrap;">
-                        <button type="button" id="btn-redeem-cinema-pass-mining" style="flex: 1; min-width: 150px; padding: 10px 14px; border-radius: 10px; background: linear-gradient(135deg, #ffbc00, #f59e0b); color: #000; font-weight: 800; font-size: 11.5px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 10px rgba(255,188,0,0.35);">
-                            <span>⚡ Redeem 4h Pass (100 Pts)</span>
-                        </button>
-                        <button type="button" id="btn-mining-goto-cinema" style="padding: 10px 14px; border-radius: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; font-weight: 700; font-size: 11.5px; border: 1px solid rgba(255, 255, 255, 0.18); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                            <span>Watch Now ❯</span>
-                        </button>
+
+                    <!-- 6h Pass Row -->
+                    <div style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+                            <span style="font-size: 12px; font-weight: 700; color: #fff;">🌙 6-Hour Pass</span>
+                            <span style="font-size: 11px; color: #818cf8; font-weight: 700;">650 Pts</span>
+                        </div>
+                        <span id="ad-count-6h" style="font-size: 10px; color: #94a3b8; display:block; margin-bottom: 5px;">0/3 ads watched</span>
+                        <div style="height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 999px; margin-bottom: 8px; overflow:hidden;">
+                            <div id="ad-bar-6h" style="height:100%; width:0%; background: linear-gradient(90deg, #818cf8, #6366f1); border-radius: 999px; transition: width 0.4s ease;"></div>
+                        </div>
+                        <div style="display:flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" id="btn-redeem-6h-pass" style="flex: 1; min-width: 130px; padding: 8px 12px; border-radius: 8px; background: linear-gradient(135deg, #818cf8, #6366f1); color: #fff; font-weight: 800; font-size: 11px; border: none; cursor: pointer;">
+                                🌙 Redeem (650 Pts)
+                            </button>
+                            <button type="button" id="btn-watch-ad-6h" style="padding: 8px 12px; border-radius: 8px; background: rgba(99, 102, 241, 0.15); color: #818cf8; font-weight: 700; font-size: 11px; border: 1px solid rgba(99, 102, 241, 0.3); cursor: pointer;">
+                                📺 Watch Ad (3 ads)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 10h Pass Row -->
+                    <div style="background: rgba(239, 68, 68, 0.07); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; padding: 10px 12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+                            <span style="font-size: 12px; font-weight: 700; color: #fff;">🔥 10-Hour Pass</span>
+                            <span style="font-size: 11px; color: #f87171; font-weight: 700;">1,200 Pts</span>
+                        </div>
+                        <span id="ad-count-10h" style="font-size: 10px; color: #94a3b8; display:block; margin-bottom: 5px;">0/7 ads watched</span>
+                        <div style="height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 999px; margin-bottom: 8px; overflow:hidden;">
+                            <div id="ad-bar-10h" style="height:100%; width:0%; background: linear-gradient(90deg, #f87171, #ef4444); border-radius: 999px; transition: width 0.4s ease;"></div>
+                        </div>
+                        <div style="display:flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" id="btn-redeem-10h-pass" style="flex: 1; min-width: 130px; padding: 8px 12px; border-radius: 8px; background: linear-gradient(135deg, #f87171, #ef4444); color: #fff; font-weight: 800; font-size: 11px; border: none; cursor: pointer;">
+                                🔥 Redeem (1,200 Pts)
+                            </button>
+                            <button type="button" id="btn-watch-ad-10h" style="padding: 8px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.12); color: #f87171; font-weight: 700; font-size: 11px; border: 1px solid rgba(239, 68, 68, 0.25); cursor: pointer;">
+                                📺 Watch Ads (7 ads)
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -1854,6 +1932,6 @@
     </div>
 
     <script src="seriesSchema.js?v=2"></script>
-    <script src="app.js?v=144"></script>
+    <script src="app.js?v=145"></script>
 </body>
 </html>

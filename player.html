@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset='utf-8'/>
@@ -1194,7 +1194,32 @@
       // =======================================================================
       // 4-Hour Watch-Time Ad Pass (Option B) & Pre-Roll Engine
       // =======================================================================
-      const FOUR_HOURS_SEC = 4 * 3600; // 14,400 seconds
+      // Apply user theme accent from URL param
+      (function applyUrlTheme() {
+        const _urlParams = new URLSearchParams(window.location.search);
+        const _theme = _urlParams.get("theme") || "gold";
+        const _themes = {
+          gold:     { color:"#ffbc00", glow:"rgba(255,188,0,0.4)",     gradient:"linear-gradient(135deg,#ffbc00 0%,#ff7b00 100%)",    border:"rgba(255,188,0,0.3)" },
+          crimson:  { color:"#e50914", glow:"rgba(229,9,20,0.4)",      gradient:"linear-gradient(135deg,#e50914 0%,#b81d24 100%)",   border:"rgba(229,9,20,0.3)" },
+          azure:    { color:"#1a9cff", glow:"rgba(26,156,255,0.4)",    gradient:"linear-gradient(135deg,#1a9cff 0%,#0056b3 100%)",   border:"rgba(26,156,255,0.3)" },
+          amethyst: { color:"#a855f7", glow:"rgba(168,85,247,0.4)",    gradient:"linear-gradient(135deg,#a855f7 0%,#7e22ce 100%)",   border:"rgba(168,85,247,0.3)" },
+          blossom:  { color:"#ff8da1", glow:"rgba(255,141,161,0.4)",   gradient:"linear-gradient(135deg,#ff8da1 0%,#ff527b 100%)",   border:"rgba(255,141,161,0.3)" },
+          barbie:   { color:"#ec4899", glow:"rgba(236,72,153,0.4)",    gradient:"linear-gradient(135deg,#ec4899 0%,#db2777 100%)",   border:"rgba(236,72,153,0.3)" },
+          emerald:  { color:"#10b981", glow:"rgba(16,185,129,0.4)",    gradient:"linear-gradient(135deg,#10b981 0%,#047857 100%)",   border:"rgba(16,185,129,0.3)" }
+        };
+        const _t = _themes[_theme] || _themes.gold;
+        const _r = document.documentElement;
+        _r.style.setProperty("--primary-color", _t.color);
+        _r.style.setProperty("--primary-glow", _t.glow);
+        _r.style.setProperty("--primary-gradient", _t.gradient);
+        _r.style.setProperty("--border-color-glow", _t.border);
+        // Also update Plyr accent (the gold highlight on controls)
+        const _style = document.createElement("style");
+        _style.textContent = `:root { --plyr-color-main: ${_t.color} !important; } .plyr__progress__buffer, .plyr__volume__track { --plyr-range-fill-background: ${_t.color} !important; }`;
+        document.head.appendChild(_style);
+      })();
+
+      const FOUR_HOURS_SEC = 4 * 3600; // 14,400 seconds (kept for reference — actual pass sec read from localStorage)
       let passSec = parseInt(localStorage.getItem('filmhouse_watch_pass_sec') || '0', 10);
       if (isNaN(passSec) || passSec < 0) passSec = 0;
 
@@ -1274,9 +1299,22 @@
 
       // Decrement watch-time ONLY while video is actively playing (Option B: Actual Watch-Time!)
       setInterval(function() {
-        if (videoEl && !videoEl.paused && !videoEl.ended && passSec > 0) {
+        const _expiresAt = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
+        if (_expiresAt > 0) {
+          const _rem = Math.floor((_expiresAt - Date.now()) / 1000);
+          passSec = Math.max(0, _rem);
+          localStorage.setItem('filmhouse_watch_pass_sec', String(passSec));
+          updatePassUI();
+
+          if (passSec <= 0) {
+            localStorage.removeItem('filmhouse_watch_pass_until');
+            if (videoEl && !videoEl.paused) videoEl.pause();
+            const expiredModal = document.getElementById('passExpiredModal');
+            if (expiredModal) expiredModal.style.display = 'flex';
+          }
+        } else if (videoEl && !videoEl.paused && !videoEl.ended && passSec > 0) {
           passSec--;
-          localStorage.setItem('filmhouse_watch_pass_sec', passSec);
+          localStorage.setItem('filmhouse_watch_pass_sec', String(passSec));
           updatePassUI();
 
           if (passSec <= 0) {
