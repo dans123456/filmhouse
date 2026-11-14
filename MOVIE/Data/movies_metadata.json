@@ -106240,8 +106240,14 @@
     "trailer": "14o38xfHlXc",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQAD6QwAAnavkUZa_63dHWRcnxYE"
-    ]
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQAD6QwAAnavkUZa_63dHWRcnxYE",
+        "quality": "720p",
+        "stream_url": ""
+      }
+    ],
+    "stream_url": "",
+    "stream_links": []
   },
   {
     "csv_id": "1019836-christmas-bloody-christmas",
