@@ -148,30 +148,33 @@
     /* Universal In-Player Subtitle Overlay (Guaranteed 100% Render) */
     .custom-sub-overlay {
       position: absolute;
-      bottom: 64px;
+      bottom: 12px;
       left: 50%;
       transform: translateX(-50%);
       text-align: center;
       pointer-events: none;
       z-index: 25;
-      max-width: 90%;
+      max-width: 86%;
       display: flex;
       justify-content: center;
+      transition: bottom 0.2s ease;
     }
     .custom-sub-text {
       display: none;
-      background: rgba(0, 0, 0, 0.82);
+      background: rgba(0, 0, 0, 0.75);
       color: #ffffff;
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 1.4;
-      letter-spacing: 0.3px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: clamp(11px, 2.6vw, 15px);
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: 0.2px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       max-width: 100%;
       word-break: break-word;
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
     }
     /* Reset & Base: Dedicated 100% Edge-to-Edge Cinema Player */
     *, *::before, *::after {
@@ -1241,8 +1244,30 @@
       })();
 
       const FOUR_HOURS_SEC = 4 * 3600; // 14,400 seconds (kept for reference — actual pass sec read from localStorage)
-      let passSec = parseInt(localStorage.getItem('filmhouse_watch_pass_sec') || '0', 10);
-      if (isNaN(passSec) || passSec < 0) passSec = 0;
+      // =======================================================================
+      // Streaming Time Engine:
+      // 1. Real-Time Ad Pass (filmhouse_watch_pass_until): 4h ad-pass from sponsor ads (clock time)
+      // 2. Banked Streaming Time (filmhouse_stream_bank_sec): Purchased/Mined time (only ticks while playing)
+      // =======================================================================
+      function getActivePassState() {
+        const expiresAt = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
+        let realTimeRemaining = 0;
+        if (expiresAt > Date.now()) {
+          realTimeRemaining = Math.floor((expiresAt - Date.now()) / 1000);
+        } else if (expiresAt > 0) {
+          localStorage.removeItem('filmhouse_watch_pass_until');
+        }
+
+        let bankRemaining = parseInt(localStorage.getItem('filmhouse_stream_bank_sec') || '0', 10);
+        if (isNaN(bankRemaining) || bankRemaining < 0) bankRemaining = 0;
+
+        return {
+          realTimeSec: realTimeRemaining,
+          bankSec: bankRemaining,
+          totalSec: realTimeRemaining + bankRemaining,
+          hasAccess: (realTimeRemaining > 0 || bankRemaining > 0)
+        };
+      }
 
       function updatePassUI() {
         const pill = document.getElementById('watchPassPill');
@@ -1251,16 +1276,19 @@
         const btnGet = document.getElementById('btnGetPassPill');
         if (!pill || !timerText) return;
 
-        if (passSec > 0) {
-          pill.style.display = 'flex';
-          const h = Math.floor(passSec / 3600);
-          const m = Math.floor((passSec % 3600) / 60);
-          const s = passSec % 60;
-          const pad = n => (n < 10 ? '0' : '') + n;
-          timerText.textContent = `Pass: ${pad(h)}:${pad(m)}:${pad(s)}`;
+        const state = getActivePassState();
 
-          if (passSec <= 600) {
-            // Warning: <= 10m left
+        if (state.hasAccess) {
+          pill.style.display = 'flex';
+          const displaySec = state.realTimeSec > 0 ? state.realTimeSec : state.bankSec;
+          const h = Math.floor(displaySec / 3600);
+          const m = Math.floor((displaySec % 3600) / 60);
+          const s = displaySec % 60;
+          const pad = n => (n < 10 ? '0' : '') + n;
+          const modeLabel = state.realTimeSec > 0 ? 'Pass' : 'Bank';
+          timerText.textContent = `${modeLabel}: ${pad(h)}:${pad(m)}:${pad(s)}`;
+
+          if (displaySec <= 600) {
             if (dot) {
               dot.style.background = '#f59e0b';
               dot.style.boxShadow = '0 0 6px #f59e0b';
@@ -1291,12 +1319,9 @@
         const currentExpires = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
         let newExpires = Date.now() + FOUR_HOURS_MS;
         if (currentExpires > Date.now()) {
-          // Extend active pass by another 4 hours!
           newExpires = currentExpires + FOUR_HOURS_MS;
         }
         localStorage.setItem('filmhouse_watch_pass_until', String(newExpires));
-        passSec = Math.max(0, Math.floor((newExpires - Date.now()) / 1000));
-        localStorage.setItem('filmhouse_watch_pass_sec', String(passSec));
         updatePassUI();
 
         const expiredModal = document.getElementById('passExpiredModal');
@@ -1312,8 +1337,14 @@
 
       function triggerMonetagPassUnlock() {
         try {
-          window.open(MONETAG_SMARTLINK, '_blank');
-        } catch (e) {}
+          if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === 'function') {
+            window.Telegram.WebApp.openLink(MONETAG_SMARTLINK);
+          } else {
+            window.open(MONETAG_SMARTLINK, '_blank');
+          }
+        } catch (e) {
+          try { window.open(MONETAG_SMARTLINK, '_blank'); } catch (_) {}
+        }
         activateWatchPass();
       }
 
@@ -1326,27 +1357,28 @@
       const btnRenewModal = document.getElementById('btnRenewPassModal');
       if (btnRenewModal) btnRenewModal.addEventListener('click', triggerMonetagPassUnlock);
 
-      // Decrement watch-time ONLY while video is actively playing (Option B: Actual Watch-Time!)
+      // Decrement logic:
+      // Real-time pass counts down continuously; Banked streaming time only decrements while video is playing!
       setInterval(function() {
-        const _expiresAt = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
-        if (_expiresAt > 0) {
-          const _rem = Math.floor((_expiresAt - Date.now()) / 1000);
-          passSec = Math.max(0, _rem);
-          localStorage.setItem('filmhouse_watch_pass_sec', String(passSec));
-          updatePassUI();
+        const state = getActivePassState();
 
-          if (passSec <= 0) {
-            localStorage.removeItem('filmhouse_watch_pass_until');
-            if (videoEl && !videoEl.paused) videoEl.pause();
+        if (state.realTimeSec > 0) {
+          // Real-time pass active: counts down automatically
+          updatePassUI();
+        } else if (state.bankSec > 0 && videoEl && !videoEl.paused && !videoEl.ended) {
+          // Banked streaming time: only ticks down while video is playing!
+          const newBank = state.bankSec - 1;
+          localStorage.setItem('filmhouse_stream_bank_sec', String(newBank));
+          updatePassUI();
+          if (newBank <= 0) {
+            videoEl.pause();
             const expiredModal = document.getElementById('passExpiredModal');
             if (expiredModal) expiredModal.style.display = 'flex';
           }
-        } else if (videoEl && !videoEl.paused && !videoEl.ended && passSec > 0) {
-          passSec--;
-          localStorage.setItem('filmhouse_watch_pass_sec', String(passSec));
+        } else {
           updatePassUI();
-
-          if (passSec <= 0) {
+          if (!state.hasAccess && videoEl && !videoEl.paused && !videoEl.ended && videoEl.currentTime > 300) {
+            // Mid-stream expiry after grace period
             videoEl.pause();
             const expiredModal = document.getElementById('passExpiredModal');
             if (expiredModal) expiredModal.style.display = 'flex';
