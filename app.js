@@ -9016,6 +9016,16 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                                 showToast("⚡ Stream Reloaded (720p HD)", "success");
                             }
                         }
+                    } else if (e.data.action === "openLink" && e.data.url) {
+                        try {
+                            if (window.Telegram?.WebApp?.openLink) {
+                                window.Telegram.WebApp.openLink(e.data.url);
+                            } else {
+                                window.open(e.data.url, "_blank");
+                            }
+                        } catch (_) {
+                            window.open(e.data.url, "_blank");
+                        }
                     } else if (e.data.action === "selectServer" || e.data.action === "switchServer") {
                         const s2 = document.getElementById("cinema-server-2");
                         if (s2) s2.click();
@@ -10935,6 +10945,7 @@ async function fetchTmdbCategoryMovies(category) {
             urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=35,18&sort_by=popularity.desc&page=1`];
         } else {
             urls = [`${TMDB_BASE_URL}/trending/all/week?api_key=${apiKey}&page=1`];
+  
         }
 
         const responses = await Promise.all(urls.map(u => fetch(u).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] }))));

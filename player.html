@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset='utf-8'/>
@@ -27,6 +27,12 @@
       try {
         if (window.parent && window.parent.Telegram && window.parent.Telegram.WebApp && typeof window.parent.Telegram.WebApp.openLink === 'function') {
           window.parent.Telegram.WebApp.openLink(url);
+          return;
+        }
+      } catch (_) {}
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ action: "openLink", url: url }, "*");
           return;
         }
       } catch (_) {}
@@ -1398,8 +1404,8 @@
           }
         } else {
           updatePassUI();
-          if (!state.hasAccess && videoEl && !videoEl.paused && !videoEl.ended && videoEl.currentTime > 300) {
-            // Mid-stream expiry after grace period
+          if (!state.hasAccess && videoEl && !videoEl.paused && !videoEl.ended) {
+            // Mid-stream expiry: pause playback and prompt user to renew pass
             videoEl.pause();
             const expiredModal = document.getElementById('passExpiredModal');
             if (expiredModal) expiredModal.style.display = 'flex';
@@ -1438,6 +1444,12 @@
             clearInterval(timer);
             preRoll.style.display = 'none';
             document.body.classList.add('stream-started');
+            if (loaderEl) {
+              loaderEl.style.display = 'flex';
+              loaderEl.style.opacity = '1';
+              const lt = loaderEl.querySelector('.loader-text');
+              if (lt) lt.textContent = '⚡ Connecting High-Speed Stream...';
+            }
             try {
               const p = videoEl.play();
               if (p !== undefined) {
@@ -1454,6 +1466,12 @@
             clearInterval(timer);
             preRoll.style.display = 'none';
             document.body.classList.add('stream-started');
+            if (loaderEl) {
+              loaderEl.style.display = 'flex';
+              loaderEl.style.opacity = '1';
+              const lt = loaderEl.querySelector('.loader-text');
+              if (lt) lt.textContent = '⚡ Connecting High-Speed Stream...';
+            }
             try {
               const p = videoEl.play();
               if (p !== undefined) {
@@ -1477,25 +1495,28 @@
           if (_playTriggered) return;
           _playTriggered = true;
 
-          playOverlay.style.pointerEvents = 'none';
-          document.body.classList.add('stream-started');
-          playOverlay.style.transition = 'opacity 0.2s ease';
-          playOverlay.style.opacity = '0';
-          setTimeout(() => { playOverlay.style.display = 'none'; }, 220);
-
-          // Fast loading state: show connecting pulse immediately over backdrop
-          if (loaderEl) {
-            loaderEl.style.display = 'flex';
-            loaderEl.style.opacity = '1';
-            const lt = loaderEl.querySelector('.loader-text');
-            if (lt) lt.textContent = '⚡ Connecting High-Speed Stream...';
-          }
+          const passState = getActivePassState();
 
           if (videoEl && !videoEl.src && finalStreamUrl) {
             videoEl.src = finalStreamUrl;
           }
 
-          if (passSec > 0) {
+          if (passState.hasAccess) {
+            // User has an active Ad-Free pass or banked stream time -> Play immediately!
+            playOverlay.style.pointerEvents = 'none';
+            document.body.classList.add('stream-started');
+            playOverlay.style.transition = 'opacity 0.2s ease';
+            playOverlay.style.opacity = '0';
+            setTimeout(() => { playOverlay.style.display = 'none'; }, 220);
+
+            // Fast loading state: show connecting pulse immediately over backdrop
+            if (loaderEl) {
+              loaderEl.style.display = 'flex';
+              loaderEl.style.opacity = '1';
+              const lt = loaderEl.querySelector('.loader-text');
+              if (lt) lt.textContent = '⚡ Connecting High-Speed Stream...';
+            }
+
             try {
               const p = videoEl.play();
               if (p !== undefined) {
@@ -1510,6 +1531,12 @@
               if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
             }
           } else {
+            // User has NO active pass -> Trigger Pre-Roll Sponsor Presentation!
+            playOverlay.style.pointerEvents = 'none';
+            playOverlay.style.transition = 'opacity 0.2s ease';
+            playOverlay.style.opacity = '0';
+            setTimeout(() => { playOverlay.style.display = 'none'; }, 220);
+
             showPreRollAd();
           }
         }
