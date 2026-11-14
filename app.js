@@ -14458,7 +14458,7 @@ function showBannedScreen() {
 
 // Passive Points Farming (Mining) System
 const FARMING_DURATION = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
-const FARMING_REWARD = 80; // points awarded (10 pts per hour)
+const FARMING_REWARD = 90; // points awarded (for full 8h session)
 const FARMING_RATE = FARMING_REWARD / FARMING_DURATION; // points per millisecond
 let farmingInterval = null;
 
@@ -14859,8 +14859,8 @@ function loadMiningTaskAd() {
 
     // Event handlers
     const handleReward = () => {
-        showToast("Bonus task completed! +50 Points awarded! 🏆", "success");
-        awardPoints(50, "task");
+        showToast("Bonus task completed! +80 Points awarded! 🏆", "success");
+        awardPoints(80, "task");
         syncUserToFirestore();
         box.style.display = "none";
     };

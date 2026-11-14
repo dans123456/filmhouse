@@ -29,7 +29,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <link rel="stylesheet" href="index.css?v=145">
+    <link rel="stylesheet" href="index.css?v=146">
 
     <style>
       .carousel-arrow {
@@ -60,6 +60,39 @@
       .carousel-arrow-next { right: 10px; }
       @media (max-width: 480px) {
         .carousel-arrow { width: 30px; height: 30px; opacity: 0.8; }
+      }
+    </style>
+  
+    <!-- Global Dynamic Theme Overrides for Cinema -->
+    <style>
+      /* Dynamic Theme Styling for Cinema Modal */
+      .cinema-brand-cinema-pill {
+        background: var(--primary-gradient, linear-gradient(135deg, #ffbc00, #ff9800)) !important;
+        color: #0b0d14 !important;
+      }
+      .brand-text-house {
+        background: var(--primary-gradient, linear-gradient(135deg, #ffbc00, #ff9800)) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+      }
+      .cinema-server-pill.active {
+        background: var(--primary-gradient, linear-gradient(135deg, #e11d48, #be123c)) !important;
+        border-color: rgba(255, 255, 255, 0.4) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), var(--primary-glow, 0 0 12px rgba(225, 29, 72, 0.4)) !important;
+      }
+      .cinema-season-tab.active {
+        background: var(--primary-gradient, linear-gradient(135deg, #ffbc00, #f59e0b)) !important;
+        border-color: var(--primary-color, #ffbc00) !important;
+        color: #06080d !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.3), var(--primary-glow, 0 0 10px rgba(255,188,0,0.35)) !important;
+      }
+      .cinema-episode-card.active {
+        border-color: var(--primary-color, #ffbc00) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), var(--primary-glow, 0 0 12px rgba(255,188,0,0.3)) !important;
+      }
+      .cinema-episode-card.active .cinema-ep-badge-playing {
+        background: var(--primary-gradient, linear-gradient(135deg, #ffbc00, #f59e0b)) !important;
+        color: #000 !important;
       }
     </style>
   </head>
@@ -1932,6 +1965,6 @@
     </div>
 
     <script src="seriesSchema.js?v=2"></script>
-    <script src="app.js?v=145"></script>
+    <script src="app.js?v=146"></script>
 </body>
 </html>

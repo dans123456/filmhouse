@@ -1213,9 +1213,30 @@
         _r.style.setProperty("--primary-glow", _t.glow);
         _r.style.setProperty("--primary-gradient", _t.gradient);
         _r.style.setProperty("--border-color-glow", _t.border);
-        // Also update Plyr accent (the gold highlight on controls)
+        // Dynamic theme styling for Play Circle, Pass Pill Button, and Plyr controls
         const _style = document.createElement("style");
-        _style.textContent = `:root { --plyr-color-main: ${_t.color} !important; } .plyr__progress__buffer, .plyr__volume__track { --plyr-range-fill-background: ${_t.color} !important; }`;
+        _style.textContent = `
+          :root {
+            --plyr-color-main: ${_t.color} !important;
+            --primary-color: ${_t.color} !important;
+            --primary-gradient: ${_t.gradient} !important;
+          }
+          .stream-play-circle {
+            background: ${_t.gradient} !important;
+            box-shadow: 0 0 35px ${_t.glow}, 0 4px 15px rgba(0,0,0,0.5) !important;
+          }
+          .stream-play-overlay:hover .stream-play-circle,
+          .stream-play-overlay:active .stream-play-circle {
+            box-shadow: 0 0 55px ${_t.glow}, 0 6px 20px rgba(0,0,0,0.7) !important;
+          }
+          #btnGetPassPill {
+            background: ${_t.gradient} !important;
+            color: #0b0d14 !important;
+          }
+          .plyr__progress__buffer, .plyr__volume__track {
+            --plyr-range-fill-background: ${_t.color} !important;
+          }
+        `;
         document.head.appendChild(_style);
       })();
 
@@ -1266,8 +1287,16 @@
       }
 
       function activateWatchPass() {
-        passSec = FOUR_HOURS_SEC;
-        localStorage.setItem('filmhouse_watch_pass_sec', passSec);
+        const FOUR_HOURS_MS = 4 * 3600 * 1000;
+        const currentExpires = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
+        let newExpires = Date.now() + FOUR_HOURS_MS;
+        if (currentExpires > Date.now()) {
+          // Extend active pass by another 4 hours!
+          newExpires = currentExpires + FOUR_HOURS_MS;
+        }
+        localStorage.setItem('filmhouse_watch_pass_until', String(newExpires));
+        passSec = Math.max(0, Math.floor((newExpires - Date.now()) / 1000));
+        localStorage.setItem('filmhouse_watch_pass_sec', String(passSec));
         updatePassUI();
 
         const expiredModal = document.getElementById('passExpiredModal');
