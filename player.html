@@ -436,6 +436,137 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
+
+    /* Modern Mobile-Responsive Bottom Sponsor HUD Ribbon (Concept C) */
+    .stream-pass-hud {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 52;
+      background: rgba(13, 16, 26, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 188, 0, 0.4);
+      border-radius: 12px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 188, 0, 0.15);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+      box-sizing: border-box;
+      pointer-events: auto;
+    }
+    .stream-pass-hud.pulse-alert {
+      border-color: #ffd700;
+      box-shadow: 0 0 30px rgba(255, 188, 0, 0.7), 0 10px 30px rgba(0, 0, 0, 0.9);
+      animation: hudWiggle 0.45s ease-in-out;
+    }
+    @keyframes hudWiggle {
+      0%, 100% { transform: translateY(0); }
+      20% { transform: translateY(-4px) scale(1.02); }
+      40% { transform: translateY(2px) scale(0.99); }
+      60% { transform: translateY(-2px) scale(1.01); }
+      80% { transform: translateY(1px); }
+    }
+    .hud-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+    .hud-icon {
+      font-size: 22px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+      flex-shrink: 0;
+    }
+    .hud-info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+      flex: 1;
+    }
+    .hud-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      line-height: 1;
+    }
+    .hud-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #f1f5f9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: 0.2px;
+    }
+    .hud-count {
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffd700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .hud-bar-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .hud-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffd700 0%, #ff8800 100%);
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+    .hud-btn {
+      background: linear-gradient(135deg, #ffd700 0%, #ff9800 100%);
+      color: #0b0d14;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 2px 10px rgba(255, 188, 0, 0.4);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .hud-btn:active {
+      transform: scale(0.96);
+    }
+    @media (max-width: 420px) {
+      .stream-pass-hud {
+        bottom: 8px;
+        left: 8px;
+        right: 8px;
+        padding: 6px 10px;
+        gap: 8px;
+      }
+      .hud-icon {
+        font-size: 18px;
+      }
+      .hud-title {
+        font-size: 10.5px;
+      }
+      .hud-btn {
+        padding: 6px 10px;
+        font-size: 10.5px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -525,36 +656,29 @@
         <span id='subToastText'>Subtitles Active</span>
       </div>
 
-      <!-- In-Player Sponsor Pre-Roll & Pass Presentation Overlay -->
-      <div id='preRollOverlay' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:56;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;box-sizing:border-box;text-align:center;'>
-        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(255, 188, 0, 0.12); border: 2px solid rgba(255, 188, 0, 0.35); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; box-shadow: 0 0 20px rgba(255, 188, 0, 0.25);">
-          <span style="font-size: 24px;">🍿</span>
-        </div>
-        <div id='preRollBadge' style='background:rgba(255,188,0,0.12);border:1px solid rgba(255,188,0,0.35);color:#ffd700;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;display:inline-flex;align-items:center;gap:4px;'>
-          <span>✨</span><span id='preRollBadgeText'>Sponsor Presentation</span>
-        </div>
-        <h3 id='preRollTitle' style='margin:0 0 6px 0;font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.2px;'>4-Hour Cinema Pass Required</h3>
-        <p id='preRollDesc' style='margin:0 0 14px 0;font-size:11.5px;color:#94a3b8;max-width:300px;line-height:1.45;'>
-          Watch 2 quick sponsor ads to unlock 4 real-time hours of unlimited cinema streaming!
-        </p>
-
-        <!-- 2-Ad Progress Bar Indicator -->
-        <div style="width: 100%; max-width: 270px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 7px 12px; margin-bottom: 14px; text-align: left; box-sizing: border-box;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-size: 11px; font-weight: 700;">
-            <span style="color: #cbd5e1;">Pass Progress:</span>
-            <span id="playerAdProgress" style="color: #ffd700;">0/2 Ads Watched</span>
-          </div>
-          <div style="height: 5px; background: rgba(255, 255, 255, 0.1); border-radius: 999px; overflow: hidden;">
-            <div id="playerAdBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #ffbc00, #ff8800); border-radius: 999px; transition: width 0.3s ease;"></div>
+      <!-- Modern Mobile-Responsive Bottom Sponsor HUD Ribbon (Concept C) -->
+      <div class='stream-pass-hud' id='streamPassHud' style='display:none;'>
+        <div class='hud-left'>
+          <span class='hud-icon'>🍿</span>
+          <div class='hud-info'>
+            <div class='hud-title-row'>
+              <span class='hud-title' id='hudPassTitle'>4-Hour Cinema Pass</span>
+              <span class='hud-count' id='hudPassCount'>0/2 Ads</span>
+            </div>
+            <div class='hud-bar-track'>
+              <div class='hud-bar-fill' id='hudPassBar'></div>
+            </div>
           </div>
         </div>
-
-        <button id='btnClaimPassInPreRoll' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,188,0,0.4);display:inline-flex;align-items:center;gap:6px;transition:transform 0.15s ease;' type='button'>
-          <span>⚡</span><span id='preRollBtnText'>Watch Sponsor Ad (0/2)</span>
+        <button class='hud-btn' id='btnHudWatchAd' type='button'>
+          <span class='hud-btn-bolt'>⚡</span>
+          <span id='hudBtnText'>Watch Ad (0/2)</span>
         </button>
-        <div id='playerIPhoneTip' style='display:none;font-size:10.5px;color:#94a3b8;margin-top:10px;max-width:280px;line-height:1.4;'>
-          💡 iPhone: When prompted by Telegram, tap <b style="color:#ffd700;">"Open"</b> to count your ad.
-        </div>
+      </div>
+
+      <!-- Subtle Floating Pass Alert Toast -->
+      <div id='passAlertToast' style='display:none;position:absolute;bottom:64px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,188,0,0.5);color:#ffd700;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;z-index:53;box-shadow:0 6px 20px rgba(0,0,0,0.8);white-space:nowrap;pointer-events:none;text-align:center;'>
+        <span>⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!</span>
       </div>
 
       <!-- Sleek Floating Glassmorphic Resume Pill -->
@@ -1431,46 +1555,39 @@
         const dot = document.getElementById('passDot');
         const timerText = document.getElementById('passTimerText');
         const btnGet = document.getElementById('btnGetPassPill');
-        const preRollBadgeText = document.getElementById('preRollBadgeText');
-        const preRollTitle = document.getElementById('preRollTitle');
-        const preRollDesc = document.getElementById('preRollDesc');
-        const preRollBtnText = document.getElementById('preRollBtnText');
+        const hud = document.getElementById('streamPassHud');
+        const hudTitle = document.getElementById('hudPassTitle');
+        const hudCount = document.getElementById('hudPassCount');
+        const hudBar = document.getElementById('hudPassBar');
+        const hudBtn = document.getElementById('hudBtnText');
+
         if (!pill || !timerText) return;
 
         const state = getActivePassState();
         const adsWatched4h = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
         const hadPass = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10) > 0;
 
-        if (preRollBadgeText) {
-          preRollBadgeText.textContent = hadPass ? 'Pass Expired' : 'Sponsor Presentation';
+        if (hudTitle) {
+          hudTitle.textContent = hadPass ? 'Pass Expired • 4h' : '4-Hour Cinema Pass';
         }
-        if (preRollTitle) {
-          preRollTitle.textContent = hadPass ? 'Your 4-Hour Pass Has Ended' : '4-Hour Cinema Pass Required';
+        if (hudCount) {
+          hudCount.textContent = `${adsWatched4h}/2 Ads`;
         }
-        if (preRollDesc) {
-          preRollDesc.textContent = hadPass
-            ? 'Your ad-free stream time has expired. Watch 2 sponsor ads to unlock another 4 real hours of uninterrupted streaming!'
-            : 'Watch 2 quick sponsor ads to unlock 4 full hours of continuous, zero-ad cinema streaming!';
+        if (hudBar) {
+          hudBar.style.width = adsWatched4h >= 2 ? '100%' : (adsWatched4h === 1 ? '50%' : '0%');
         }
-        const playerAdProgress = document.getElementById('playerAdProgress');
-        const playerAdBar = document.getElementById('playerAdBar');
-        if (playerAdProgress) {
-          playerAdProgress.textContent = `${adsWatched4h}/2 Ads Watched`;
-        }
-        if (playerAdBar) {
-          playerAdBar.style.width = adsWatched4h >= 2 ? '100%' : (adsWatched4h === 1 ? '50%' : '0%');
-        }
-        if (preRollBtnText) {
+        if (hudBtn) {
           if (adsWatched4h === 0) {
-            preRollBtnText.textContent = '⚡ Watch Sponsor Ad (0/2)';
+            hudBtn.textContent = 'Watch Ad (0/2)';
           } else if (adsWatched4h === 1) {
-            preRollBtnText.textContent = '🚀 Watch Final Ad (1/2)';
+            hudBtn.textContent = 'Final Ad (1/2)';
           } else {
-            preRollBtnText.textContent = '✓ 4h Pass Ready!';
+            hudBtn.textContent = '✓ Ready!';
           }
         }
 
         if (state.hasAccess) {
+          if (hud) hud.style.display = 'none';
           pill.style.display = 'flex';
           const displaySec = state.realTimeSec > 0 ? state.realTimeSec : state.bankSec;
           const h = Math.floor(displaySec / 3600);
@@ -1495,6 +1612,8 @@
           }
           if (btnGet) btnGet.textContent = '⚡ +4h';
         } else {
+          // No active pass -> Display sleek bottom HUD bar!
+          if (hud) hud.style.display = 'flex';
           pill.style.display = 'flex';
           if (dot) {
             dot.style.background = '#64748b';
@@ -1519,8 +1638,8 @@
         localStorage.setItem('fh_ads_4h', '0');
         updatePassUI();
 
-        const preRoll = document.getElementById('preRollOverlay');
-        if (preRoll) preRoll.style.display = 'none';
+        const hud = document.getElementById('streamPassHud');
+        if (hud) hud.style.display = 'none';
 
         if (playOverlay) {
           playOverlay.style.display = 'flex';
@@ -1561,8 +1680,6 @@
           clearTimeout(_playerCancelTimer);
           _playerCancelTimer = null;
         }
-        const tip = document.getElementById('playerIPhoneTip');
-        if (tip) tip.style.display = 'none';
       }
 
       function onPlayerFocusReturn() {
@@ -1581,6 +1698,14 @@
         }
       }
 
+      function showPassAlert(msg) {
+        const toast = document.getElementById('passAlertToast');
+        if (!toast) return;
+        toast.innerHTML = `<span>${msg}</span>`;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 3500);
+      }
+
       function verifyAndCompletePlayerAd() {
         const elapsed = Date.now() - _playerAdStartTime;
         _playerAdPending = false;
@@ -1591,16 +1716,15 @@
           const watched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10) + 1;
           localStorage.setItem('fh_ads_4h', String(watched));
           if (watched >= 2) {
+            showPassAlert("🎉 4-Hour Cinema Pass Activated!");
             activateWatchPass();
           } else {
             updatePassUI();
+            showPassAlert("✅ Ad 1 of 2 Verified! Tap to watch final ad.");
           }
         } else {
           updatePassUI();
-          const preRollDesc = document.getElementById('preRollDesc');
-          if (preRollDesc) {
-            preRollDesc.innerHTML = '<span style="color:#f59e0b;">⚠️ Sponsor page closed too quickly. Please visit the sponsor to earn your pass!</span>';
-          }
+          showPassAlert("⚠️ Sponsor page closed too quickly. Please visit sponsor!");
         }
       }
 
@@ -1610,14 +1734,13 @@
         _playerAdStartTime = Date.now();
         _playerAdLeftApp = false;
 
-        const preRollBtn = document.getElementById('preRollBtnText');
-        if (preRollBtn) preRollBtn.textContent = '⏳ Waiting for sponsor visit...';
+        const hudBtn = document.getElementById('hudBtnText');
+        if (hudBtn) hudBtn.textContent = '⏳ Visiting...';
 
         const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || 
                       (window.Telegram?.WebApp?.platform === 'ios');
-        const tipEl = document.getElementById('playerIPhoneTip');
-        if (isIOS && tipEl) {
-          tipEl.style.display = 'block';
+        if (isIOS) {
+          showPassAlert("👉 On iPhone: Tap \"Open\" in Telegram to count your ad!");
         }
 
         document.addEventListener('visibilitychange', onPlayerVisibilityChange);
@@ -1642,10 +1765,7 @@
             _playerAdPending = false;
             cleanupPlayerAdListeners();
             updatePassUI();
-            const preRollDesc = document.getElementById('preRollDesc');
-            if (preRollDesc) {
-              preRollDesc.innerHTML = '<span style="color:#f87171;">⚠️ Sponsor visit not detected. On iPhone, remember to tap <b>"Open"</b> when Telegram asks!</span>';
-            }
+            showPassAlert("⚠️ Sponsor visit not detected. Tap \"Open\" when Telegram asks!");
           }
         }, 6500);
       }
@@ -1653,8 +1773,8 @@
       const btnGetPill = document.getElementById('btnGetPassPill');
       if (btnGetPill) btnGetPill.addEventListener('click', triggerPassAdWatch);
 
-      const btnClaimPreRoll = document.getElementById('btnClaimPassInPreRoll');
-      if (btnClaimPreRoll) btnClaimPreRoll.addEventListener('click', triggerPassAdWatch);
+      const btnHudWatchAd = document.getElementById('btnHudWatchAd');
+      if (btnHudWatchAd) btnHudWatchAd.addEventListener('click', triggerPassAdWatch);
 
       // Decrement logic:
       // Real-time pass counts down continuously; Banked streaming time only decrements while video is playing!
@@ -1671,17 +1791,25 @@
           updatePassUI();
           if (newBank <= 0) {
             videoEl.pause();
-            const preRoll = document.getElementById('preRollOverlay');
-            if (preRoll) preRoll.style.display = 'flex';
+            const hud = document.getElementById('streamPassHud');
+            if (hud) {
+              hud.style.display = 'flex';
+              hud.classList.add('pulse-alert');
+            }
+            showPassAlert("⚠️ Stream time expired. Watch 2 sponsor ads to resume!");
             updatePassUI();
           }
         } else {
           updatePassUI();
           if (!state.hasAccess && videoEl && !videoEl.paused && !videoEl.ended) {
-            // Mid-stream expiry: pause playback and prompt user to renew pass
+            // Mid-stream expiry: pause playback and prompt user on bottom HUD
             videoEl.pause();
-            const preRoll = document.getElementById('preRollOverlay');
-            if (preRoll) preRoll.style.display = 'flex';
+            const hud = document.getElementById('streamPassHud');
+            if (hud) {
+              hud.style.display = 'flex';
+              hud.classList.add('pulse-alert');
+            }
+            showPassAlert("⚠️ 4-Hour Pass Expired. Watch 2 sponsor ads to resume!");
             updatePassUI();
           }
         }
@@ -1695,8 +1823,12 @@
           const passState = getActivePassState();
           if (!passState.hasAccess) {
             videoEl.pause();
-            const preRoll = document.getElementById('preRollOverlay');
-            if (preRoll) preRoll.style.display = 'flex';
+            const hud = document.getElementById('streamPassHud');
+            if (hud) {
+              hud.style.display = 'flex';
+              hud.classList.add('pulse-alert');
+            }
+            showPassAlert("⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!");
             updatePassUI();
           }
         });
@@ -1756,13 +1888,17 @@
               if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
             }
           } else {
-            // User has NO active pass -> Open Sponsor Pre-Roll Overlay to watch 2 ads!
+            // User has NO active pass -> Pulse the bottom HUD bar!
             _playTriggered = false;
             try { videoEl.pause(); } catch(_) {}
-            const preRoll = document.getElementById('preRollOverlay');
-            if (preRoll) {
-              preRoll.style.display = 'flex';
+            const hud = document.getElementById('streamPassHud');
+            if (hud) {
+              hud.style.display = 'flex';
+              hud.classList.remove('pulse-alert');
+              void hud.offsetWidth; // force reflow for CSS animation restart
+              hud.classList.add('pulse-alert');
             }
+            showPassAlert("⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!");
             updatePassUI();
           }
         }
@@ -2394,8 +2530,7 @@
         const passState = getActivePassState();
         if (!passState.hasAccess) {
           try { videoEl.pause(); } catch(_) {}
-          const preRoll = document.getElementById('preRollOverlay');
-          if (preRoll) preRoll.style.display = 'flex';
+          updatePassUI();
           return;
         }
         document.body.classList.add('stream-started');
@@ -2417,8 +2552,7 @@
         const passState = getActivePassState();
         if (!passState.hasAccess) {
           try { videoEl.pause(); } catch(_) {}
-          const preRoll = document.getElementById('preRollOverlay');
-          if (preRoll) preRoll.style.display = 'flex';
+          updatePassUI();
           return;
         }
         if (videoEl.currentTime > 0.05) {
@@ -2454,8 +2588,6 @@
         if (initialPass.hasAccess) {
           attachStreamSource();
         } else {
-          const preRoll = document.getElementById('preRollOverlay');
-          if (preRoll) preRoll.style.display = 'flex';
           updatePassUI();
         }
 
