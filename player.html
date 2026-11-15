@@ -493,34 +493,17 @@
         <span id='subToastText'>Subtitles Active</span>
       </div>
 
-      <!-- In-Player Pre-Roll Sponsor Overlay -->
-      <div id='preRollOverlay' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.92);backdrop-filter:blur(14px);z-index:52;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;text-align:center;'>
-        <div style='background:rgba(255,188,0,0.1);border:1px solid rgba(255,188,0,0.3);color:#ffbc00;font-size:11px;font-weight:800;padding:3px 10px;border-radius:12px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;'>
-          Sponsor Presentation
+      <!-- In-Player Sponsor Pre-Roll & Pass Presentation Overlay -->
+      <div id='preRollOverlay' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:56;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;box-sizing:border-box;text-align:center;'>
+        <div id='preRollBadge' style='background:rgba(255,188,0,0.12);border:1px solid rgba(255,188,0,0.35);color:#ffd700;font-size:10.5px;font-weight:800;padding:4px 12px;border-radius:14px;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:inline-flex;align-items:center;gap:5px;'>
+          <span>✨</span><span id='preRollBadgeText'>Sponsor Presentation</span>
         </div>
-        <h3 style='margin:0 0 8px 0;font-size:17px;font-weight:700;color:#fff;'>Your Stream Starts In <span id='preRollCount' style='color:#ffd700;font-size:20px;font-weight:800;'>8</span>s</h3>
-        <p style='margin:0 0 16px 0;font-size:12px;color:#94a3b8;max-width:320px;line-height:1.4;'>
-          Enjoying Film House? Unlock 4 full hours of continuous, zero-ad streaming right now!
+        <h3 id='preRollTitle' style='margin:0 0 8px 0;font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.2px;'>4-Hour Cinema Pass Required</h3>
+        <p id='preRollDesc' style='margin:0 0 20px 0;font-size:12px;color:#94a3b8;max-width:320px;line-height:1.45;'>
+          Watch 2 sponsor ads to unlock 4 full hours of uninterrupted, zero-ad cinema streaming!
         </p>
-        <div style='display:flex;gap:10px;flex-wrap:wrap;justify-content:center;'>
-          <button id='btnClaimPassInPreRoll' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 4px 15px rgba(255,188,0,0.3);' type='button'>
-            ⚡ Get 4-Hour Ad-Free Pass
-          </button>
-          <button id='btnSkipPreRoll' style='display:none;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;' type='button'>
-            Skip Ad ❯
-          </button>
-        </div>
-      </div>
-
-      <!-- Pass Expired Modal -->
-      <div id='passExpiredModal' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.94);backdrop-filter:blur(16px);z-index:58;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;text-align:center;'>
-        <div style='font-size:32px;margin-bottom:8px;'>⏱️</div>
-        <h3 id='passExpiredModalTitle' style='margin:0 0 8px 0;font-size:18px;font-weight:700;color:#fff;'>Your 4-Hour Pass Has Ended</h3>
-        <p id='passExpiredModalDesc' style='margin:0 0 18px 0;font-size:12px;color:#94a3b8;max-width:320px;line-height:1.4;'>
-          Your ad-free stream time has expired. Watch 2 sponsor ads to unlock another 4 real hours of uninterrupted streaming!
-        </p>
-        <button id='btnRenewPassModal' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,188,0,0.4);' type='button'>
-          ⚡ Watch Ad to Unlock 4h (0/2)
+        <button id='btnClaimPassInPreRoll' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,188,0,0.4);display:inline-flex;align-items:center;gap:6px;transition:transform 0.15s ease;' type='button'>
+          <span>⚡</span><span id='preRollBtnText'>Watch Ad to Unlock 4h (0/2)</span>
         </button>
       </div>
 
@@ -1299,30 +1282,29 @@
         const dot = document.getElementById('passDot');
         const timerText = document.getElementById('passTimerText');
         const btnGet = document.getElementById('btnGetPassPill');
-        const btnRenew = document.getElementById('btnRenewPassModal');
-        const btnClaimPre = document.getElementById('btnClaimPassInPreRoll');
+        const preRollBadgeText = document.getElementById('preRollBadgeText');
+        const preRollTitle = document.getElementById('preRollTitle');
+        const preRollDesc = document.getElementById('preRollDesc');
+        const preRollBtnText = document.getElementById('preRollBtnText');
         if (!pill || !timerText) return;
 
         const state = getActivePassState();
         const adsWatched4h = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
-
-        const modalTitle = document.getElementById('passExpiredModalTitle');
-        const modalDesc = document.getElementById('passExpiredModalDesc');
         const hadPass = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10) > 0;
-        if (modalTitle) {
-          modalTitle.textContent = hadPass ? 'Your 4-Hour Pass Has Ended' : '4-Hour Cinema Pass Required';
-        }
-        if (modalDesc) {
-          modalDesc.textContent = hadPass
-            ? 'Your ad-free stream time has expired. Watch 2 sponsor ads to unlock another 4 real hours of uninterrupted streaming!'
-            : 'Watch 2 sponsor ads to unlock 4 full hours of uninterrupted, zero-ad cinema streaming!';
-        }
 
-        if (btnRenew) {
-          btnRenew.textContent = adsWatched4h > 0 ? `⚡ Watch Ad to Unlock 4h (${adsWatched4h}/2)` : '⚡ Watch Ad to Unlock 4h (0/2)';
+        if (preRollBadgeText) {
+          preRollBadgeText.textContent = hadPass ? 'Pass Expired' : 'Sponsor Presentation';
         }
-        if (btnClaimPre) {
-          btnClaimPre.textContent = adsWatched4h > 0 ? `⚡ Get 4-Hour Pass (${adsWatched4h}/2)` : '⚡ Get 4-Hour Ad-Free Pass (2 Ads)';
+        if (preRollTitle) {
+          preRollTitle.textContent = hadPass ? 'Your 4-Hour Pass Has Ended' : '4-Hour Cinema Pass Required';
+        }
+        if (preRollDesc) {
+          preRollDesc.textContent = hadPass
+            ? 'Your ad-free stream time has expired. Watch 2 sponsor ads to unlock another 4 real hours of uninterrupted streaming!'
+            : 'Watch 2 quick sponsor ads to unlock 4 full hours of continuous, zero-ad cinema streaming!';
+        }
+        if (preRollBtnText) {
+          preRollBtnText.textContent = adsWatched4h > 0 ? `Watch Ad to Unlock 4h (${adsWatched4h}/2)` : 'Watch Ad to Unlock 4h (0/2)';
         }
 
         if (state.hasAccess) {
@@ -1373,9 +1355,6 @@
         localStorage.setItem('filmhouse_watch_pass_until', String(newExpires));
         localStorage.setItem('fh_ads_4h', '0');
         updatePassUI();
-
-        const expiredModal = document.getElementById('passExpiredModal');
-        if (expiredModal) expiredModal.style.display = 'none';
 
         const preRoll = document.getElementById('preRollOverlay');
         if (preRoll) preRoll.style.display = 'none';
@@ -1432,9 +1411,6 @@
       const btnClaimPreRoll = document.getElementById('btnClaimPassInPreRoll');
       if (btnClaimPreRoll) btnClaimPreRoll.addEventListener('click', triggerPassAdWatch);
 
-      const btnRenewModal = document.getElementById('btnRenewPassModal');
-      if (btnRenewModal) btnRenewModal.addEventListener('click', triggerPassAdWatch);
-
       // Decrement logic:
       // Real-time pass counts down continuously; Banked streaming time only decrements while video is playing!
       setInterval(function() {
@@ -1450,8 +1426,8 @@
           updatePassUI();
           if (newBank <= 0) {
             videoEl.pause();
-            const expiredModal = document.getElementById('passExpiredModal');
-            if (expiredModal) expiredModal.style.display = 'flex';
+            const preRoll = document.getElementById('preRollOverlay');
+            if (preRoll) preRoll.style.display = 'flex';
             updatePassUI();
           }
         } else {
@@ -1459,8 +1435,8 @@
           if (!state.hasAccess && videoEl && !videoEl.paused && !videoEl.ended) {
             // Mid-stream expiry: pause playback and prompt user to renew pass
             videoEl.pause();
-            const expiredModal = document.getElementById('passExpiredModal');
-            if (expiredModal) expiredModal.style.display = 'flex';
+            const preRoll = document.getElementById('preRollOverlay');
+            if (preRoll) preRoll.style.display = 'flex';
             updatePassUI();
           }
         }
@@ -1474,8 +1450,8 @@
           const passState = getActivePassState();
           if (!passState.hasAccess) {
             videoEl.pause();
-            const expiredModal = document.getElementById('passExpiredModal');
-            if (expiredModal) expiredModal.style.display = 'flex';
+            const preRoll = document.getElementById('preRollOverlay');
+            if (preRoll) preRoll.style.display = 'flex';
             updatePassUI();
           }
         });
@@ -1484,13 +1460,13 @@
       function showPreRollAd() {
         const passState = getActivePassState();
         if (!passState.hasAccess) {
-          const expiredModal = document.getElementById('passExpiredModal');
-          if (expiredModal) expiredModal.style.display = 'flex';
+          const preRoll = document.getElementById('preRollOverlay');
+          if (preRoll) preRoll.style.display = 'flex';
           updatePassUI();
         }
       }
 
-      // Click & Touch-to-Play Overlay (Requires active pass; otherwise triggers 2-Ad Pass Unlock Modal)
+      // Click & Touch-to-Play Overlay (Requires active pass; otherwise triggers 2-Ad Sponsor Pre-Roll Overlay)
       if (playOverlay) {
         let _playTriggered = false;
         function triggerStreamPlay(e) {
@@ -1537,11 +1513,11 @@
               if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
             }
           } else {
-            // User has NO active pass -> Strictly enforce 2-Ad Unlock Modal! Zero free playback!
+            // User has NO active pass -> Open Sponsor Pre-Roll Overlay to watch 2 ads!
             _playTriggered = false;
-            const expiredModal = document.getElementById('passExpiredModal');
-            if (expiredModal) {
-              expiredModal.style.display = 'flex';
+            const preRoll = document.getElementById('preRollOverlay');
+            if (preRoll) {
+              preRoll.style.display = 'flex';
             }
             updatePassUI();
           }
