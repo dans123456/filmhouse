@@ -1,5 +1,37 @@
 [
   {
+    "csv_id": "95212-love-with-flaws",
+    "tmdb_id": 95212,
+    "imdb_id": "",
+    "title": "Love with Flaws",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Asian Drama"
+    ],
+    "genres": [
+      "Comedy"
+    ],
+    "overview": "An unlikely love begins to blossom between a narcissistic attention-seeker and a PE teacher who hates handsome men.",
+    "poster": "https://image.tmdb.org/t/p/w500/2YrxoA6HhRaFwtwbrdNMOx1fvh1.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/iUY4h66wZc4voK7svVTEYarq3XL.jpg",
+    "rating": 7.9,
+    "release_date": "2019-11-27",
+    "language": "ko",
+    "cast": [],
+    "director": "",
+    "trailer": "KW2ZmMAAKjI",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADCBMAAtkY0Eer-ZA_SE6YuRYE",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "195339-pantheon",
     "tmdb_id": 195339,
     "imdb_id": "",
