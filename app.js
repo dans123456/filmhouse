@@ -8186,7 +8186,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         subBackdrop.onclick = closeSubHub;
     }
 
-    // Live Subtitle Sync Tuner Controls
+    // Live Subtitle Sync Tuner Controls & 1-Tap Voice Alignment
+    const btnSyncVoice = document.getElementById("btn-cinema-sub-voice");
+    const btnSyncIntro = document.getElementById("btn-cinema-sub-intro");
+    const btnSyncM15 = document.getElementById("btn-cinema-sub-m15");
     const btnSyncMinus = document.getElementById("btn-cinema-sub-minus");
     const btnSyncReset = document.getElementById("btn-cinema-sub-reset");
     const btnSyncPlus = document.getElementById("btn-cinema-sub-plus");
@@ -8204,6 +8207,18 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (typeof triggerHaptic === "function") triggerHaptic("light");
     }
 
+    if (btnSyncVoice) {
+        btnSyncVoice.onclick = () => {
+            const frame = container.querySelector("iframe");
+            if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage({ action: "syncToVoice" }, "*");
+            }
+            if (typeof triggerHaptic === "function") triggerHaptic("medium");
+            showToast("🎯 Snapping subtitles to voice...", "info");
+        };
+    }
+    if (btnSyncIntro) btnSyncIntro.onclick = () => sendSubtitleOffsetDelta(15);
+    if (btnSyncM15) btnSyncM15.onclick = () => sendSubtitleOffsetDelta(-15);
     if (btnSyncMinus) btnSyncMinus.onclick = () => sendSubtitleOffsetDelta(-0.5);
     if (btnSyncReset) btnSyncReset.onclick = () => sendSubtitleOffsetDelta(0);
     if (btnSyncPlus) btnSyncPlus.onclick = () => sendSubtitleOffsetDelta(0.5);
@@ -8536,7 +8551,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=153_${Date.now()}`;
+        const cacheBuster = `v=155_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;

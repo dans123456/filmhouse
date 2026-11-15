@@ -465,16 +465,23 @@
         </div>
 
         <!-- Live Subtitle Sync Offset Tuner -->
-        <div id='subSyncBar' style='display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:4px 8px;margin-bottom:6px;flex-shrink:0;'>
-          <div style='display:flex;align-items:center;gap:5px;'>
-            <span style='font-size:11px;'>⏱️</span>
-            <span style='font-size:10.5px;font-weight:700;color:#cbd5e1;'>Sync:</span>
-            <span id='subOffsetDisplay' style='color:#ffd700;font-family:monospace;font-size:11px;font-weight:800;'>0.0s</span>
+        <div id='subSyncBar' style='display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 8px;margin-bottom:6px;flex-shrink:0;'>
+          <div style='display:flex;align-items:center;justify-content:space-between;'>
+            <div style='display:flex;align-items:center;gap:5px;'>
+              <span style='font-size:11px;'>⏱️</span>
+              <span style='font-size:10.5px;font-weight:700;color:#cbd5e1;'>Sync:</span>
+              <span id='subOffsetDisplay' style='color:#ffd700;font-family:monospace;font-size:11px;font-weight:800;'>0.0s</span>
+            </div>
+            <button id='btnSubVoice' type='button' style='background:linear-gradient(135deg,#ffbc00 0%,#ff8800 100%);color:#000;border:none;border-radius:5px;padding:3px 8px;font-size:10.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:3px;' title='Align subtitles to spoken voice immediately'>🎯 Sync to Voice</button>
           </div>
-          <div style='display:flex;align-items:center;gap:4px;'>
-            <button id='btnSubOffsetMinus' type='button' style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;' title='Delay subtitles 0.5s'>-0.5s</button>
-            <button id='btnSubOffsetReset' type='button' style='background:rgba(255,255,255,0.06);color:#94a3b8;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600;cursor:pointer;' title='Reset sync to 0s'>Reset</button>
-            <button id='btnSubOffsetPlus' type='button' style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;' title='Speed up subtitles 0.5s'>+0.5s</button>
+          <div style='display:flex;align-items:center;justify-content:space-between;gap:4px;'>
+            <button id='btnSubIntro15' type='button' style='background:rgba(255,188,0,0.15);border:1px solid rgba(255,188,0,0.3);color:#ffbc00;border-radius:4px;padding:2px 6px;font-size:9.5px;font-weight:700;cursor:pointer;' title='Skip 15s studio intro credits'>+15s Intro</button>
+            <div style='display:flex;align-items:center;gap:3px;'>
+              <button id='btnSubOffsetM15' type='button' style='background:rgba(255,255,255,0.08);color:#fff;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'>-15s</button>
+              <button id='btnSubOffsetMinus' type='button' style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;' title='Advance subtitles 0.5s'>-0.5s</button>
+              <button id='btnSubOffsetReset' type='button' style='background:rgba(255,255,255,0.06);color:#94a3b8;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;' title='Reset sync to 0s'>Reset</button>
+              <button id='btnSubOffsetPlus' type='button' style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;' title='Delay subtitles 0.5s'>+0.5s</button>
+            </div>
           </div>
         </div>
 
@@ -708,7 +715,15 @@
       let loadedSubtitlesList = [];
       let activeSubLangFilter = 'all';
       let activeCues = [];
-      let currentSubOffset = 0; // seconds
+      let currentSubOffset = 0; // seconds (positive = delay/shift later, negative = advance/shift earlier)
+
+      const subStorageKey = 'fh_sub_offset_' + (watchParam ? watchParam.slice(0, 32) : (titleParam || 'default')).replace(/[^a-zA-Z0-9_-]/g, '_');
+      try {
+        const savedOff = localStorage.getItem(subStorageKey);
+        if (savedOff !== null && !isNaN(parseFloat(savedOff))) {
+          currentSubOffset = parseFloat(savedOff);
+        }
+      } catch (_) {}
 
       function convertSrtToVtt(srtText) {
         if (!srtText) return "";
@@ -765,8 +780,11 @@
           customSubEl.style.display = 'none';
           return;
         }
-        const t = (videoEl ? videoEl.currentTime : 0) + currentSubOffset;
-        const currentCue = activeCues.find(c => t >= c.start && t <= c.end);
+        // Subtitle timing math:
+        // Positive offset = Delay subtitles (cue appears later in video time)
+        // Negative offset = Advance subtitles (cue appears earlier in video time)
+        const subFileTime = (videoEl ? videoEl.currentTime : 0) - currentSubOffset;
+        const currentCue = activeCues.find(c => subFileTime >= c.start && subFileTime <= c.end);
         if (currentCue && currentCue.text) {
           customSubEl.textContent = currentCue.text;
           customSubEl.style.display = 'inline-block';
@@ -1134,16 +1152,8 @@
         };
       }
 
-      // Real-Time Subtitle Sync Offset Engine
-      function adjustSubtitleOffset(deltaSec) {
-        if (deltaSec === 0) {
-          currentSubOffset = 0;
-        } else {
-          currentSubOffset = Math.round((currentSubOffset + deltaSec) * 10) / 10;
-        }
-
-        updateSubtitleDisplay();
-
+      // Real-Time Subtitle Sync Offset Engine & 1-Tap Voice Alignment
+      function applyOffsetToTextTracks() {
         if (videoEl && videoEl.textTracks) {
           for (let i = 0; i < videoEl.textTracks.length; i++) {
             const track = videoEl.textTracks[i];
@@ -1154,21 +1164,17 @@
                   cue._origStart = cue.startTime;
                   cue._origEnd = cue.endTime;
                 }
-                if (deltaSec === 0) {
-                  cue.startTime = cue._origStart;
-                  cue.endTime = cue._origEnd;
-                } else {
-                  cue.startTime = Math.max(0, cue.startTime + deltaSec);
-                  cue.endTime = Math.max(0.1, cue.endTime + deltaSec);
-                }
+                cue.startTime = Math.max(0, cue._origStart + currentSubOffset);
+                cue.endTime = Math.max(0.1, cue._origEnd + currentSubOffset);
               }
             }
           }
         }
+      }
+
+      function broadcastSubtitleOffset() {
         const disp = document.getElementById('subOffsetDisplay');
         if (disp) disp.textContent = (currentSubOffset >= 0 ? '+' : '') + currentSubOffset.toFixed(1) + 's';
-        showSubToast(`Subtitles ${currentSubOffset >= 0 ? '+' : ''}${currentSubOffset.toFixed(1)}s`, '⏱️');
-
         try {
           if (window.parent && window.parent !== window) {
             window.parent.postMessage({
@@ -1179,12 +1185,81 @@
         } catch (_) {}
       }
 
+      function adjustSubtitleOffset(deltaSec, isAbsolute) {
+        if (isAbsolute) {
+          currentSubOffset = Math.round(deltaSec * 10) / 10;
+        } else if (deltaSec === 0) {
+          currentSubOffset = 0;
+        } else {
+          currentSubOffset = Math.round((currentSubOffset + deltaSec) * 10) / 10;
+        }
+
+        try {
+          localStorage.setItem(subStorageKey, String(currentSubOffset));
+        } catch (_) {}
+
+        updateSubtitleDisplay();
+        applyOffsetToTextTracks();
+
+        const sign = currentSubOffset >= 0 ? '+' : '';
+        showSubToast(`Subtitles ${sign}${currentSubOffset.toFixed(1)}s`, '⏱️');
+        broadcastSubtitleOffset();
+      }
+
+      function syncToVoice() {
+        if (!videoEl || !activeCues || activeCues.length === 0) {
+          showSubToast('No active subtitles to sync', '⚠️');
+          return;
+        }
+        const curTime = (videoEl && videoEl.currentTime > 0) ? videoEl.currentTime : 0;
+        let targetCue = null;
+        if (curTime < 90) {
+          // If in opening credits/intro, snap to first spoken line
+          targetCue = activeCues[0];
+        } else {
+          const currentFileTime = curTime - currentSubOffset;
+          let minDiff = Infinity;
+          for (const cue of activeCues) {
+            const diff = Math.abs(cue.start - currentFileTime);
+            if (diff < minDiff) {
+              minDiff = diff;
+              targetCue = cue;
+            }
+          }
+        }
+
+        if (targetCue) {
+          // curTime - offset = targetCue.start => offset = curTime - targetCue.start
+          currentSubOffset = Math.round((curTime - targetCue.start) * 10) / 10;
+          try {
+            localStorage.setItem(subStorageKey, String(currentSubOffset));
+          } catch (_) {}
+          updateSubtitleDisplay();
+          applyOffsetToTextTracks();
+          const sign = currentSubOffset >= 0 ? '+' : '';
+          showSubToast(`🎯 Synced to Voice (${sign}${currentSubOffset.toFixed(1)}s)`, '🎯');
+          broadcastSubtitleOffset();
+        }
+      }
+
+      const btnSubVoice = document.getElementById('btnSubVoice');
+      const btnSubIntro15 = document.getElementById('btnSubIntro15');
+      const btnSubOffsetM15 = document.getElementById('btnSubOffsetM15');
       const btnSubMinus = document.getElementById('btnSubOffsetMinus');
       const btnSubReset = document.getElementById('btnSubOffsetReset');
       const btnSubPlus = document.getElementById('btnSubOffsetPlus');
-      if (btnSubMinus) btnSubMinus.onclick = () => adjustSubtitleOffset(-0.5);
-      if (btnSubReset) btnSubReset.onclick = () => adjustSubtitleOffset(0);
-      if (btnSubPlus) btnSubPlus.onclick = () => adjustSubtitleOffset(0.5);
+
+      if (btnSubVoice) btnSubVoice.onclick = syncToVoice;
+      if (btnSubIntro15) btnSubIntro15.onclick = () => adjustSubtitleOffset(15, false);
+      if (btnSubOffsetM15) btnSubOffsetM15.onclick = () => adjustSubtitleOffset(-15, false);
+      if (btnSubMinus) btnSubMinus.onclick = () => adjustSubtitleOffset(-0.5, false);
+      if (btnSubReset) btnSubReset.onclick = () => adjustSubtitleOffset(0, true);
+      if (btnSubPlus) btnSubPlus.onclick = () => adjustSubtitleOffset(0.5, false);
+
+      // Restore saved subtitle offset if existing
+      if (currentSubOffset !== 0) {
+        broadcastSubtitleOffset();
+      }
 
       if (subParam) {
         attachSubtitleTrack(subParam, 'Active Subtitle', false);
@@ -1593,22 +1668,13 @@
           }
         }
 
-        // Universal Fallback for mobile WebViews / Plyr where videoEl.audioTracks is disabled
+        // Universal Fallback for mobile WebViews / Plyr where videoEl.audioTracks is not exposed
         if (audioTracks.length === 0) {
-          const activeAudioIdx = (typeof window._selectedAudioTrackIndex !== 'undefined')
-            ? window._selectedAudioTrackIndex
-            : parseInt(urlParams.get('audio') || '0', 10);
           audioTracks.push({
             index: 0,
             label: "Audio 1 (Original / Default)",
             lang: "orig",
-            enabled: (activeAudioIdx === 0)
-          });
-          audioTracks.push({
-            index: 1,
-            label: "Audio 2 (English / Secondary)",
-            lang: "en",
-            enabled: (activeAudioIdx === 1)
+            enabled: true
           });
         }
 
@@ -1948,20 +2014,17 @@
             }
             switchedClientSide = true;
           }
-          if (!switchedClientSide || ev.data.reloadWithTrack) {
+          // Only attempt stream reload if there are multiple tracks and not switched client-side
+          if (!switchedClientSide && targetIndex > 0 && ev.data.reloadWithTrack) {
             try {
               const curTime = (videoEl && videoEl.currentTime > 0) ? Math.floor(videoEl.currentTime) : 0;
               const wasPlaying = (videoEl && !videoEl.paused);
               let newUrl = finalStreamUrl || (videoEl ? videoEl.src : '');
               if (newUrl) {
-                // Strip existing audio and seek parameters
+                // Strip existing audio and seek parameters - NEVER inject destructive &ss=
                 newUrl = newUrl.replace(/([?&])audio=\d+/g, '').replace(/([?&])ss=\d+/g, '').replace(/([?&])t=\d+/g, '');
                 const sep = newUrl.includes('?') ? '&' : '?';
                 newUrl = `${newUrl}${sep}audio=${targetIndex}`;
-                // Pass seeking parameter directly to backend ffmpeg transmuxer so stream resumes mid-stream!
-                if (curTime > 0) {
-                  newUrl += `&ss=${curTime}`;
-                }
                 finalStreamUrl = newUrl;
 
                 if (loaderEl) {
@@ -1975,6 +2038,9 @@
 
                 const resumeHandler = function() {
                   try {
+                    if (curTime > 0) {
+                      videoEl.currentTime = curTime;
+                    }
                     if (wasPlaying) {
                       videoEl.play().catch(() => {});
                     }
@@ -2022,7 +2088,11 @@
         } else if (ev.data.action === 'requestTracks') {
           detectAndBroadcastTracks();
         } else if (ev.data.action === 'adjustSubtitleOffset') {
-          adjustSubtitleOffset(parseFloat(ev.data.delta || 0));
+          adjustSubtitleOffset(parseFloat(ev.data.delta || 0), false);
+        } else if (ev.data.action === 'setSubtitleOffset') {
+          adjustSubtitleOffset(parseFloat(ev.data.offset || 0), true);
+        } else if (ev.data.action === 'syncToVoice') {
+          syncToVoice();
         }
       });
 
