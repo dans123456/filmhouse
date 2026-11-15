@@ -7653,8 +7653,12 @@ function triggerMonetagSmartLink() {
         showToast("👉 On iPhone: Tap \"Open\" in Telegram to count your sponsor ad!", "info", 5000);
     }
     try {
-        if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === "function") {
-            window.Telegram.WebApp.openLink(smartLinkUrl);
+        const tg = (window.Telegram && window.Telegram.WebApp && 
+                   ((window.Telegram.WebApp.initData && window.Telegram.WebApp.initData.length > 0) || 
+                    (window.Telegram.WebApp.platform && window.Telegram.WebApp.platform !== "unknown")))
+                   ? window.Telegram.WebApp : null;
+        if (tg && typeof tg.openLink === "function") {
+            tg.openLink(smartLinkUrl);
             return;
         }
     } catch (_) {}
@@ -8562,7 +8566,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=161_${Date.now()}`;
+        const cacheBuster = `v=163_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
@@ -9157,8 +9161,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         }
                     } else if (e.data.action === "openLink" && e.data.url) {
                         try {
-                            if (window.Telegram?.WebApp?.openLink) {
-                                window.Telegram.WebApp.openLink(e.data.url);
+                            const tg = (window.Telegram && window.Telegram.WebApp && 
+                                       ((window.Telegram.WebApp.initData && window.Telegram.WebApp.initData.length > 0) || 
+                                        (window.Telegram.WebApp.platform && window.Telegram.WebApp.platform !== "unknown")))
+                                       ? window.Telegram.WebApp : null;
+                            if (tg && typeof tg.openLink === "function") {
+                                tg.openLink(e.data.url);
                             } else {
                                 window.open(e.data.url, "_blank");
                             }
@@ -9166,7 +9174,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                             window.open(e.data.url, "_blank");
                         }
                     } else if (e.data.action === "watchAdForPass") {
-                        triggerMonetagSmartLink();
+                        if (state.user && state.user.dailyStats) {
+                            state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
+                            if (typeof saveDailyStats === "function") saveDailyStats();
+                        }
                     } else if (e.data.action === "selectServer" || e.data.action === "switchServer") {
                         const s2 = document.getElementById("cinema-server-2");
                         if (s2) s2.click();

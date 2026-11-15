@@ -16,27 +16,47 @@
   
   <!-- Monetag SmartLink Integration (Zone: 12129103) -->
   <script type='text/javascript'>
+    function getActiveTelegramWebApp() {
+      try {
+        const tg = (window.Telegram && window.Telegram.WebApp) || 
+                   (window.parent && window.parent.Telegram && window.parent.Telegram.WebApp);
+        if (tg && typeof tg.openLink === 'function') {
+          if ((tg.initData && tg.initData.length > 0) || (tg.platform && tg.platform !== 'unknown')) {
+            return tg;
+          }
+        }
+      } catch (_) {}
+      return null;
+    }
+
     function openTelegramLink(url) {
       if (!url) return;
+      const tg = getActiveTelegramWebApp();
+      if (tg) {
+        try {
+          tg.openLink(url);
+          return;
+        } catch (_) {}
+      }
       try {
+        const w = window.open(url, '_blank');
+        if (!w || w.closed || typeof w.closed === 'undefined') {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ action: "openLink", url: url }, "*");
+          } else {
+            window.location.href = url;
+          }
+        }
+      } catch (_) {
         if (window.parent && window.parent !== window) {
           window.parent.postMessage({ action: "openLink", url: url }, "*");
-          return;
+        } else {
+          window.location.href = url;
         }
-      } catch (_) {}
-      try {
-        if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === 'function') {
-          window.Telegram.WebApp.openLink(url);
-          return;
-        }
-      } catch (_) {}
-      try {
-        window.open(url, '_blank');
-      } catch (_) {}
+      }
     }
 
     var MONETAG_SMARTLINK = 'https://uplcm.com/4/12129103';
-    
   </script>
 
   <style>
@@ -594,7 +614,7 @@
       <div class='watch-pass-pill' id='watchPassPill' style='display:flex;position:absolute;top:12px;right:12px;z-index:55;align-items:center;gap:6px;background:rgba(12,15,24,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;font-size:11px;color:#cbd5e1;box-shadow:0 4px 15px rgba(0,0,0,0.5);'>
         <span id='passDot' style='width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;display:inline-block;'></span>
         <span id='passTimerText' style='font-weight:600;color:#fff;'>Pass: 04:00:00</span>
-        <button id='btnGetPassPill' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:800;cursor:pointer;margin-left:2px;' type='button'>⚡ 4h Pass</button>
+        <a id='btnGetPassPill' href='https://uplcm.com/4/12129103' target='_blank' rel='noopener noreferrer' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:800;cursor:pointer;margin-left:2px;text-decoration:none;display:inline-flex;align-items:center;'>⚡ 4h Pass</a>
       </div>
 
       <!-- Multi-Language Subtitles Modal (60+ Languages) -->
@@ -670,10 +690,10 @@
             </div>
           </div>
         </div>
-        <button class='hud-btn' id='btnHudWatchAd' type='button'>
+        <a class='hud-btn' id='btnHudWatchAd' href='https://uplcm.com/4/12129103' target='_blank' rel='noopener noreferrer' style='text-decoration:none;'>
           <span class='hud-btn-bolt'>⚡</span>
           <span id='hudBtnText'>Watch Ad (0/2)</span>
-        </button>
+        </a>
       </div>
 
       <!-- Subtle Floating Pass Alert Toast -->
@@ -1728,7 +1748,7 @@
         }
       }
 
-      function triggerPassAdWatch() {
+      function triggerPassAdWatch(e) {
         if (_playerAdPending) return;
         _playerAdPending = true;
         _playerAdStartTime = Date.now();
@@ -1747,18 +1767,39 @@
         window.addEventListener('focus', onPlayerFocusReturn);
         window.addEventListener('blur', function() { if (_playerAdPending) _playerAdLeftApp = true; }, { once: true });
 
-        // 1. Tell parent app to trigger Monetag SmartLink natively in Telegram
+        // 1. If in genuine Telegram client, use Telegram SDK openLink
+        const tg = getActiveTelegramWebApp();
+        if (tg) {
+          if (e && typeof e.preventDefault === 'function') e.preventDefault();
+          try {
+            tg.openLink(MONETAG_SMARTLINK);
+          } catch (_) {
+            window.open(MONETAG_SMARTLINK, '_blank');
+          }
+        } else {
+          // In standard browser / desktop / mobile browser outside Telegram:
+          // If called from native <a> click, DO NOT preventDefault! Let the browser open the tab natively!
+          // If called programmatically (no href or e is synthetic), open directly:
+          if (!e || !e.target || !e.target.closest || !e.target.closest('a')) {
+            try {
+              const w = window.open(MONETAG_SMARTLINK, '_blank');
+              if (!w || w.closed || typeof w.closed === 'undefined') {
+                window.location.href = MONETAG_SMARTLINK;
+              }
+            } catch (_) {
+              window.location.href = MONETAG_SMARTLINK;
+            }
+          }
+        }
+
+        // Inform parent app in case parent maintains daily stats
         try {
           if (window.parent && window.parent !== window) {
             window.parent.postMessage({ action: "watchAdForPass", tierId: "4h" }, "*");
-          } else {
-            openTelegramLink(MONETAG_SMARTLINK);
           }
-        } catch (_) {
-          openTelegramLink(MONETAG_SMARTLINK);
-        }
+        } catch (_) {}
 
-        // Safety timeout if user clicked Cancel on Telegram prompt
+        // Safety timeout if user clicked Cancel on Telegram prompt or never left
         if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
         _playerCancelTimer = setTimeout(function() {
           if (_playerAdPending && !_playerAdLeftApp) {
@@ -1767,7 +1808,7 @@
             updatePassUI();
             showPassAlert("⚠️ Sponsor visit not detected. Tap \"Open\" when Telegram asks!");
           }
-        }, 6500);
+        }, 12000);
       }
 
       const btnGetPill = document.getElementById('btnGetPassPill');
