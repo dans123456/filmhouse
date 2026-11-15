@@ -1,6 +1,6 @@
 /*!
  * Film House – Guided Tour (Standalone Drop-In)
- * Interactive Walkthrough with Dynamic Theme Detection, Spotlight Cutout & Safe Navigation
+ * Interactive Walkthrough with Dynamic Theme Detection, Spotlight Cutout, Shrink Mode & Animated Welcome
  */
 (function () {
   'use strict';
@@ -43,11 +43,44 @@
     } catch (_) {}
   }
 
+  /* ============ USER NAME RESOLVER ============ */
+  function getUserName() {
+    try {
+      var c = window.FilmHouseTourConfig;
+      if (c && typeof c.getUserName === 'function') {
+        var n = c.getUserName();
+        if (n) return n;
+      }
+    } catch (_) {}
+    try {
+      var u = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
+      if (u && u.first_name) return u.first_name;
+    } catch (_) {}
+    try {
+      if (window.state && window.state.user && (window.state.user.displayName || window.state.user.name)) {
+        return window.state.user.displayName || window.state.user.name;
+      }
+    } catch (_) {}
+    try {
+      var keys = ['fh_username', 'fh_name', 'username', 'userName', 'first_name', 'filmhouse_user_name'];
+      for (var i = 0; i < keys.length; i++) {
+        var v = localStorage.getItem(keys[i]);
+        if (v) return v;
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  function cleanName(n) {
+    return String(n || '').replace(/[\u0000-\u001f<>]/g, '').trim().split(/\s+/)[0].slice(0, 18);
+  }
+
   /* ============ TOUR STEPS ============ */
   var STEPS = [
     {
       icon: '🍿',
       title: 'Welcome to Film House!',
+      welcome: true,
       text: 'Your premium cinema portal for movies & series, right inside Telegram. Let\'s take a quick 30-second tour to show you how everything works.',
       tab: 'home'
     },
@@ -213,7 +246,7 @@
       '@keyframes fhPulse{0%,100%{box-shadow:0 0 0 9999px rgba(5,6,10,.82),0 0 14px 1px var(--primary-glow,rgba(255,188,0,.35))}50%{box-shadow:0 0 0 9999px rgba(5,6,10,.82),0 0 28px 5px var(--primary-glow,rgba(255,188,0,.75))}}' +
       '.fh-card{position:absolute;width:min(92vw,350px);background:rgba(21,24,33,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:#fff;border:1px solid var(--primary-color,#ffbc00);border-radius:18px;padding:20px 20px 16px;box-shadow:0 0 34px var(--primary-glow,rgba(255,188,0,.25)),0 18px 40px rgba(0,0,0,.7);transition:top .35s cubic-bezier(.2,.8,.2,1),left .35s cubic-bezier(.2,.8,.2,1),opacity .25s,transform .25s;opacity:0;transform:scale(.96)}' +
       '.fh-card.on{opacity:1;transform:scale(1)}' +
-      '.fh-skip{position:absolute;top:14px;right:16px;background:none;border:0;color:#8b90a0;font-size:11.5px;font-weight:700;letter-spacing:.06em;cursor:pointer;padding:4px}' +
+      '.fh-skip{position:absolute;top:14px;right:16px;background:none;border:0;color:#8b90a0;font-size:11.5px;font-weight:700;letter-spacing:.06em;cursor:pointer;padding:4px;transition:color .2s}' +
       '.fh-skip:hover{color:#fff}' +
       '.fh-ico{font-size:34px;line-height:1;text-align:center;margin:4px 0 10px}' +
       '.fh-title{font-size:17px;font-weight:800;text-align:center;margin:0 0 8px;font-family:inherit}' +
@@ -228,6 +261,26 @@
       '.fh-next{background:linear-gradient(135deg,var(--primary-color,#ffbc00),#ff8a00);color:#000;box-shadow:0 2px 14px var(--primary-glow,rgba(255,188,0,.45))}' +
       '.fh-btn:active{transform:scale(.96)}' +
       '.fh-btn:focus-visible,.fh-skip:focus-visible{outline:2px solid #fff;outline-offset:2px}' +
+      '.fh-min{position:absolute;top:12px;left:14px;background:none;border:0;color:#8b90a0;font-size:15px;line-height:1;cursor:pointer;padding:4px 6px;transition:color .2s}' +
+      '.fh-min:hover{color:#fff}' +
+      '.fh-card.min .fh-ico,.fh-card.min .fh-text,.fh-card.min .fh-dots{display:none}' +
+      '.fh-card.min .fh-title{font-size:14px;margin:0 34px 10px;text-align:left}' +
+      '.fh-card.min .fh-foot{border-top:0;padding-top:0;justify-content:flex-end}' +
+      '.fh-card.min{padding:14px 16px}' +
+      '.fh-title.typing::after{content:"";display:inline-block;width:2px;height:1em;background:var(--primary-color,#ffbc00);margin-left:3px;vertical-align:-2px;animation:fhBlink .7s steps(1) infinite}' +
+      '@keyframes fhBlink{50%{opacity:0}}' +
+      '.fh-title.done{animation:fhGlow 1.3s ease-out}' +
+      '@keyframes fhGlow{0%{text-shadow:0 0 0 rgba(255,188,0,0)}40%{text-shadow:0 0 16px var(--primary-glow,rgba(255,188,0,.95))}100%{text-shadow:0 0 0 rgba(255,188,0,0)}}' +
+      '@media (max-width:480px),(max-height:640px){' +
+        '.fh-card{width:min(88vw,300px);padding:14px 14px 12px;border-radius:16px}' +
+        '.fh-ico{font-size:24px;margin:2px 0 6px}' +
+        '.fh-title{font-size:15px;margin:0 0 5px}' +
+        '.fh-text{font-size:12px;line-height:1.45;margin:0 0 10px}' +
+        '.fh-foot{padding-top:10px}' +
+        '.fh-btn{font-size:12.5px;padding:8px 14px}' +
+        '.fh-dot{width:5px;height:5px}.fh-dot.on{width:14px}' +
+        '.fh-dots{gap:4px}' +
+      '}' +
       '@media (prefers-reduced-motion:reduce){.fh-spot.on{animation:none}.fh-card,.fh-spot{transition:none}}';
     var s = document.createElement('style');
     s.id = 'fh-tour-css';
@@ -245,6 +298,7 @@
       '<div class="fh-ov"></div>' +
       '<div class="fh-spot"></div>' +
       '<div class="fh-card">' +
+        '<button class="fh-min" type="button" aria-label="Shrink">&#9662;</button>' +
         '<button class="fh-skip" type="button">SKIP</button>' +
         '<div class="fh-ico"></div>' +
         '<h3 class="fh-title"></h3>' +
@@ -265,6 +319,15 @@
     root.querySelector('.fh-skip').onclick = function () {
       triggerHapticFeedback('light');
       end();
+    };
+    root.querySelector('.fh-min').onclick = function () {
+      var m = card.classList.toggle('min');
+      this.innerHTML = m ? '&#9652;' : '&#9662;';
+      this.setAttribute('aria-label', m ? 'Expand' : 'Shrink');
+      triggerHapticFeedback('light');
+      requestAnimationFrame(function () {
+        place(locate(STEPS[idx].target));
+      });
     };
     root.querySelector('.fh-back').onclick = function () {
       triggerHapticFeedback('light');
@@ -351,12 +414,50 @@
     card.style.left = left + 'px';
   }
 
+  /* ============ ANIMATED WELCOME ============ */
+  var typeToken = 0;
+  function setTitle(s) {
+    var el = card.querySelector('.fh-title');
+    var my = ++typeToken;
+    el.classList.remove('typing', 'done');
+    if (!s.welcome) {
+      el.textContent = s.title;
+      return;
+    }
+    var name = cleanName(getUserName());
+    var full = name ? 'Welcome, ' + name + '!' : s.title;
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!name || reduced) {
+      el.textContent = full;
+      return;
+    }
+    var chars = Array.from(full), i = 0;
+    el.textContent = '';
+    el.classList.add('typing');
+    (function tick() {
+      if (my !== typeToken) return;
+      el.textContent = chars.slice(0, ++i).join('');
+      if (i < chars.length) return setTimeout(tick, 70);
+      setTimeout(function () {
+        if (my !== typeToken) return;
+        el.classList.remove('typing');
+        el.classList.add('done');
+      }, 500);
+    })();
+  }
+
   /* ============ FLOW ============ */
   function render() {
     var s = STEPS[idx];
     card.classList.remove('on');
     card.querySelector('.fh-ico').textContent = s.icon;
-    card.querySelector('.fh-title').textContent = s.title;
+    card.classList.remove('min');
+    var mb = root.querySelector('.fh-min');
+    if (mb) {
+      mb.innerHTML = '&#9662;';
+      mb.setAttribute('aria-label', 'Shrink');
+    }
+    setTitle(s);
     card.querySelector('.fh-text').textContent = s.text;
     var dots = '';
     for (var i = 0; i < STEPS.length; i++) {
@@ -391,6 +492,8 @@
           });
         } catch (_) {}
       }
+      var mb = root.querySelector('.fh-min');
+      if (mb) mb.style.display = t ? '' : 'none';
       setTimeout(function () {
         place(t);
         card.classList.add('on');
@@ -436,7 +539,7 @@
     if (!AUTO_START || seen()) return;
     var waited = 0;
     (function wait() {
-      var loader = document.getElementById('initial-app-loader') || document.querySelector('.app-loader');
+      var loader = document.getElementById('initial-app-loader') || document.querySelector('.app-loader') || document.getElementById('preloader');
       var loaderGone = !loader || loader.style.display === 'none' || loader.classList.contains('fade-out');
       var ready = loaderGone && document.getElementById('screen-home');
       if (ready || waited > 10000) {
