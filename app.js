@@ -8536,7 +8536,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=150_${Date.now()}`;
+        const cacheBuster = `v=152_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;

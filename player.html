@@ -19,20 +19,14 @@
     function openTelegramLink(url) {
       if (!url) return;
       try {
-        if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === 'function') {
-          window.Telegram.WebApp.openLink(url);
-          return;
-        }
-      } catch (_) {}
-      try {
-        if (window.parent && window.parent.Telegram && window.parent.Telegram.WebApp && typeof window.parent.Telegram.WebApp.openLink === 'function') {
-          window.parent.Telegram.WebApp.openLink(url);
-          return;
-        }
-      } catch (_) {}
-      try {
         if (window.parent && window.parent !== window) {
           window.parent.postMessage({ action: "openLink", url: url }, "*");
+          return;
+        }
+      } catch (_) {}
+      try {
+        if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === 'function') {
+          window.Telegram.WebApp.openLink(url);
           return;
         }
       } catch (_) {}
@@ -521,8 +515,8 @@
       <!-- Pass Expired Modal -->
       <div id='passExpiredModal' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.94);backdrop-filter:blur(16px);z-index:58;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;text-align:center;'>
         <div style='font-size:32px;margin-bottom:8px;'>⏱️</div>
-        <h3 style='margin:0 0 8px 0;font-size:18px;font-weight:700;color:#fff;'>Your 4-Hour Pass Has Ended</h3>
-        <p style='margin:0 0 18px 0;font-size:12px;color:#94a3b8;max-width:320px;line-height:1.4;'>
+        <h3 id='passExpiredModalTitle' style='margin:0 0 8px 0;font-size:18px;font-weight:700;color:#fff;'>Your 4-Hour Pass Has Ended</h3>
+        <p id='passExpiredModalDesc' style='margin:0 0 18px 0;font-size:12px;color:#94a3b8;max-width:320px;line-height:1.4;'>
           Your ad-free stream time has expired. Watch 2 sponsor ads to unlock another 4 real hours of uninterrupted streaming!
         </p>
         <button id='btnRenewPassModal' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,188,0,0.4);' type='button'>
@@ -1312,6 +1306,18 @@
         const state = getActivePassState();
         const adsWatched4h = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
 
+        const modalTitle = document.getElementById('passExpiredModalTitle');
+        const modalDesc = document.getElementById('passExpiredModalDesc');
+        const hadPass = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10) > 0;
+        if (modalTitle) {
+          modalTitle.textContent = hadPass ? 'Your 4-Hour Pass Has Ended' : '4-Hour Cinema Pass Required';
+        }
+        if (modalDesc) {
+          modalDesc.textContent = hadPass
+            ? 'Your ad-free stream time has expired. Watch 2 sponsor ads to unlock another 4 real hours of uninterrupted streaming!'
+            : 'Watch 2 sponsor ads to unlock 4 full hours of uninterrupted, zero-ad cinema streaming!';
+        }
+
         if (btnRenew) {
           btnRenew.textContent = adsWatched4h > 0 ? `⚡ Watch Ad to Unlock 4h (${adsWatched4h}/2)` : '⚡ Watch Ad to Unlock 4h (0/2)';
         }
@@ -1374,23 +1380,42 @@
         const preRoll = document.getElementById('preRollOverlay');
         if (preRoll) preRoll.style.display = 'none';
 
-        if (videoEl && videoEl.paused) {
-          videoEl.play().catch(() => {});
+        if (playOverlay) {
+          playOverlay.style.display = 'none';
+          document.body.classList.add('stream-started');
+        }
+
+        if (videoEl && !videoEl.src && finalStreamUrl) {
+          videoEl.src = finalStreamUrl;
+        }
+
+        if (videoEl) {
+          try {
+            const p = videoEl.play();
+            if (p !== undefined) {
+              p.catch(() => {
+                if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
+              });
+            }
+          } catch (_) {
+            if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
+          }
         }
       }
 
       function triggerPassAdWatch() {
-        // 1. Open the Monetag Smart Money Link
-        openTelegramLink(MONETAG_SMARTLINK);
-
-        // 2. Notify parent app so Mining tab bars and iPhone toast are triggered
+        // 1. Tell parent app to trigger Monetag SmartLink natively in Telegram
         try {
           if (window.parent && window.parent !== window) {
             window.parent.postMessage({ action: "watchAdForPass", tierId: "4h" }, "*");
+          } else {
+            openTelegramLink(MONETAG_SMARTLINK);
           }
-        } catch (_) {}
+        } catch (_) {
+          openTelegramLink(MONETAG_SMARTLINK);
+        }
 
-        // 3. Track progress strictly: 1/2, 2/2
+        // 2. Track progress strictly: 1/2, 2/2
         const watched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10) + 1;
         localStorage.setItem('fh_ads_4h', String(watched));
 
@@ -1427,6 +1452,7 @@
             videoEl.pause();
             const expiredModal = document.getElementById('passExpiredModal');
             if (expiredModal) expiredModal.style.display = 'flex';
+            updatePassUI();
           }
         } else {
           updatePassUI();
@@ -1435,82 +1461,36 @@
             videoEl.pause();
             const expiredModal = document.getElementById('passExpiredModal');
             if (expiredModal) expiredModal.style.display = 'flex';
+            updatePassUI();
           }
         }
       }, 1000);
 
       updatePassUI();
 
+      // Strict Playback Gate: Video is NEVER permitted to play without an active Pass or Banked Streaming Time!
+      if (videoEl) {
+        videoEl.addEventListener('play', function() {
+          const passState = getActivePassState();
+          if (!passState.hasAccess) {
+            videoEl.pause();
+            const expiredModal = document.getElementById('passExpiredModal');
+            if (expiredModal) expiredModal.style.display = 'flex';
+            updatePassUI();
+          }
+        });
+      }
+
       function showPreRollAd() {
-        const preRoll = document.getElementById('preRollOverlay');
-        const countSpan = document.getElementById('preRollCount');
-        const skipBtn = document.getElementById('btnSkipPreRoll');
-        if (!preRoll) {
-          if (videoEl) videoEl.play().catch(() => {});
-          return;
-        }
-
-        // Open Monetag SmartLink sponsor natively in Telegram
-        openTelegramLink(MONETAG_SMARTLINK);
-
-        preRoll.style.display = 'flex';
-        let countdown = 8;
-        if (countSpan) countSpan.textContent = countdown;
-        if (skipBtn) skipBtn.style.display = 'none';
-
-        const timer = setInterval(function() {
-          countdown--;
-          if (countSpan) countSpan.textContent = countdown;
-
-          if (countdown <= 4 && skipBtn) {
-            skipBtn.style.display = 'inline-flex';
-          }
-
-          if (countdown <= 0) {
-            clearInterval(timer);
-            preRoll.style.display = 'none';
-            document.body.classList.add('stream-started');
-            if (loaderEl) {
-              loaderEl.style.display = 'flex';
-              loaderEl.style.opacity = '1';
-              const lt = loaderEl.querySelector('.loader-text');
-              if (lt) lt.textContent = '⚡ Connecting High-Speed Stream...';
-            }
-            try {
-              const p = videoEl.play();
-              if (p !== undefined) {
-                p.catch(() => { if (window.plyrInstance) window.plyrInstance.play().catch(() => {}); });
-              }
-            } catch (_) {
-              if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
-            }
-          }
-        }, 1000);
-
-        if (skipBtn) {
-          skipBtn.onclick = function() {
-            clearInterval(timer);
-            preRoll.style.display = 'none';
-            document.body.classList.add('stream-started');
-            if (loaderEl) {
-              loaderEl.style.display = 'flex';
-              loaderEl.style.opacity = '1';
-              const lt = loaderEl.querySelector('.loader-text');
-              if (lt) lt.textContent = '⚡ Connecting High-Speed Stream...';
-            }
-            try {
-              const p = videoEl.play();
-              if (p !== undefined) {
-                p.catch(() => { if (window.plyrInstance) window.plyrInstance.play().catch(() => {}); });
-              }
-            } catch (_) {
-              if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
-            }
-          };
+        const passState = getActivePassState();
+        if (!passState.hasAccess) {
+          const expiredModal = document.getElementById('passExpiredModal');
+          if (expiredModal) expiredModal.style.display = 'flex';
+          updatePassUI();
         }
       }
 
-      // Click & Touch-to-Play Overlay (Starts video if Pass is active, otherwise triggers Pre-Roll)
+      // Click & Touch-to-Play Overlay (Requires active pass; otherwise triggers 2-Ad Pass Unlock Modal)
       if (playOverlay) {
         let _playTriggered = false;
         function triggerStreamPlay(e) {
@@ -1518,8 +1498,6 @@
             e.preventDefault();
             e.stopPropagation();
           }
-          if (_playTriggered) return;
-          _playTriggered = true;
 
           const passState = getActivePassState();
 
@@ -1528,7 +1506,9 @@
           }
 
           if (passState.hasAccess) {
-            // User has an active Ad-Free pass or banked stream time -> Play immediately!
+            if (_playTriggered) return;
+            _playTriggered = true;
+
             playOverlay.style.pointerEvents = 'none';
             document.body.classList.add('stream-started');
             playOverlay.style.transition = 'opacity 0.2s ease';
@@ -1557,13 +1537,13 @@
               if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
             }
           } else {
-            // User has NO active pass -> Trigger Pre-Roll Sponsor Presentation!
-            playOverlay.style.pointerEvents = 'none';
-            playOverlay.style.transition = 'opacity 0.2s ease';
-            playOverlay.style.opacity = '0';
-            setTimeout(() => { playOverlay.style.display = 'none'; }, 220);
-
-            showPreRollAd();
+            // User has NO active pass -> Strictly enforce 2-Ad Unlock Modal! Zero free playback!
+            _playTriggered = false;
+            const expiredModal = document.getElementById('passExpiredModal');
+            if (expiredModal) {
+              expiredModal.style.display = 'flex';
+            }
+            updatePassUI();
           }
         }
 
