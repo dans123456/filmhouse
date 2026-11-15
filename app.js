@@ -15453,64 +15453,14 @@ function closeWelcomeTour() {
 }
 
 function initWelcomeTourHandlers() {
-    const nextBtn = document.getElementById("btn-tour-next");
-    const prevBtn = document.getElementById("btn-tour-prev");
-    const skipBtn = document.getElementById("btn-tour-skip");
     const tourBtn = document.getElementById("btn-profile-tutorial");
-    const tourOverlay = document.getElementById("app-tour-overlay");
-    
-    if (nextBtn) {
-        nextBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (currentTourStep < 6) {
-                showTourStep(currentTourStep + 1);
-            } else {
-                closeWelcomeTour();
-            }
-        });
-    }
-    
-    if (prevBtn) {
-        prevBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (currentTourStep > 1) {
-                showTourStep(currentTourStep - 1);
-            }
-        });
-    }
-    
-    if (skipBtn) {
-        skipBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            closeWelcomeTour();
-        });
-    }
-
-    // Dismiss tour when clicking outside card on the dark scrim
-    if (tourOverlay) {
-        tourOverlay.addEventListener("click", (e) => {
-            if (e.target === tourOverlay) {
-                closeWelcomeTour();
-            }
-        });
-    }
-    
     if (tourBtn) {
         tourBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            startWelcomeTour();
+            if (window.FilmHouseTour) {
+                window.FilmHouseTour.start(true);
+            }
         });
-    }
-
-    // Auto-start for new visitors
-    const completed = localStorage.getItem("filmhouse_tour_completed");
-    if (completed !== "true") {
-        setTimeout(() => {
-            startWelcomeTour();
-        }, 1200);
     }
 }
 

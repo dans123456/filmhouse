@@ -795,7 +795,7 @@
                         </button>
 
                         <!-- Tutorial Guide Button -->
-                        <button type="button" class="btn btn-block btn-secondary" id="btn-profile-tutorial" style="font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: var(--border-radius-sm); width: 100%; margin-bottom: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);">
+                        <button type="button" class="btn btn-block btn-secondary" id="btn-profile-tutorial" onclick="if (window.FilmHouseTour) { window.FilmHouseTour.start(true); }" style="font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: var(--border-radius-sm); width: 100%; margin-bottom: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);">
                             <span>Tutorial Guide 📖</span>
                         </button>
 
@@ -1869,8 +1869,8 @@
     <!-- TOAST NOTIFICATION CONTAINER -->
     <div class="toast-container" id="toast-container"></div>
 
-    <!-- APP WELCOME WALKTHROUGH TOUR OVERLAY -->
-    <div id="app-tour-overlay" class="tour-overlay">
+    <!-- RETIRED OLD TOUR OVERLAY (SUPERSEDED BY filmhouse-tour.js) -->
+    <div id="app-tour-overlay" class="tour-overlay" style="display: none !important;">
         <div class="tour-card">
             <button class="tour-skip-btn" id="btn-tour-skip">Skip</button>
             <div class="tour-content">
@@ -2092,6 +2092,7 @@
     </div>
 
     <script src="seriesSchema.js?v=2"></script>
-    <script src="app.js?v=155"></script>
+    <script src="app.js?v=156"></script>
+    <script src="filmhouse-tour.js?v=1"></script>
 </body>
 </html>
