@@ -7717,22 +7717,10 @@ function getMoreLikeThisMovies(currentMovie, limit = 8) {
     return scored.slice(0, limit).map(s => s.movie);
 }
 
-// Open In-App Cinema Streaming Player Modal with Door 1 Ad Pass Gate
+// Open In-App Cinema Streaming Player Modal (Direct to Cinema Player)
 function openCinemaModal(movie, customStreamUrl, customTitle) {
     stopAllBackgroundTrailers();
-
-    const passUntil = parseInt(localStorage.getItem("filmhouse_watch_pass_until") || "0", 10);
-    const bankSec = parseInt(localStorage.getItem("filmhouse_stream_bank_sec") || "0", 10);
-    const hasAccess = (passUntil > Date.now()) || (bankSec > 0);
-
-    if (hasAccess) {
-        openCinemaModalCore(movie, customStreamUrl, customTitle);
-    } else {
-        // DOOR 1: User has NO active pass -> Pop up 4-Hour Pass Sponsor Modal!
-        showCinemaPreRollModal(movie, () => {
-            openCinemaModalCore(movie, customStreamUrl, customTitle);
-        });
-    }
+    openCinemaModalCore(movie, customStreamUrl, customTitle);
 }
 
 function openCinemaModalCore(movie, customStreamUrl, customTitle) {
@@ -8574,7 +8562,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=158_${Date.now()}`;
+        const cacheBuster = `v=159_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
@@ -9179,7 +9167,6 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         }
                     } else if (e.data.action === "watchAdForPass") {
                         triggerMonetagSmartLink();
-                        showToast("👉 On iPhone: Tap \"Open\" to visit sponsor and claim your pass!", "info");
                     } else if (e.data.action === "selectServer" || e.data.action === "switchServer") {
                         const s2 = document.getElementById("cinema-server-2");
                         if (s2) s2.click();

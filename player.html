@@ -501,18 +501,33 @@
       </div>
 
       <!-- In-Player Sponsor Pre-Roll & Pass Presentation Overlay -->
-      <div id='preRollOverlay' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:56;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;box-sizing:border-box;text-align:center;'>
-        <div id='preRollBadge' style='background:rgba(255,188,0,0.12);border:1px solid rgba(255,188,0,0.35);color:#ffd700;font-size:10.5px;font-weight:800;padding:4px 12px;border-radius:14px;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;display:inline-flex;align-items:center;gap:5px;'>
+      <div id='preRollOverlay' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:56;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;box-sizing:border-box;text-align:center;'>
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(255, 188, 0, 0.12); border: 2px solid rgba(255, 188, 0, 0.35); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; box-shadow: 0 0 20px rgba(255, 188, 0, 0.25);">
+          <span style="font-size: 24px;">🍿</span>
+        </div>
+        <div id='preRollBadge' style='background:rgba(255,188,0,0.12);border:1px solid rgba(255,188,0,0.35);color:#ffd700;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;display:inline-flex;align-items:center;gap:4px;'>
           <span>✨</span><span id='preRollBadgeText'>Sponsor Presentation</span>
         </div>
-        <h3 id='preRollTitle' style='margin:0 0 8px 0;font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.2px;'>4-Hour Cinema Pass Required</h3>
-        <p id='preRollDesc' style='margin:0 0 20px 0;font-size:12px;color:#94a3b8;max-width:320px;line-height:1.45;'>
-          Watch 2 sponsor ads to unlock 4 full hours of uninterrupted, zero-ad cinema streaming!
+        <h3 id='preRollTitle' style='margin:0 0 6px 0;font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.2px;'>4-Hour Cinema Pass Required</h3>
+        <p id='preRollDesc' style='margin:0 0 14px 0;font-size:11.5px;color:#94a3b8;max-width:300px;line-height:1.45;'>
+          Watch 2 quick sponsor ads to unlock 4 real-time hours of unlimited cinema streaming!
         </p>
+
+        <!-- 2-Ad Progress Bar Indicator -->
+        <div style="width: 100%; max-width: 270px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 7px 12px; margin-bottom: 14px; text-align: left; box-sizing: border-box;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-size: 11px; font-weight: 700;">
+            <span style="color: #cbd5e1;">Pass Progress:</span>
+            <span id="playerAdProgress" style="color: #ffd700;">0/2 Ads Watched</span>
+          </div>
+          <div style="height: 5px; background: rgba(255, 255, 255, 0.1); border-radius: 999px; overflow: hidden;">
+            <div id="playerAdBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #ffbc00, #ff8800); border-radius: 999px; transition: width 0.3s ease;"></div>
+          </div>
+        </div>
+
         <button id='btnClaimPassInPreRoll' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,188,0,0.4);display:inline-flex;align-items:center;gap:6px;transition:transform 0.15s ease;' type='button'>
-          <span>⚡</span><span id='preRollBtnText'>Watch Ad to Unlock 4h (0/2)</span>
+          <span>⚡</span><span id='preRollBtnText'>Watch Sponsor Ad (0/2)</span>
         </button>
-        <div style='font-size:11px;color:#94a3b8;margin-top:10px;line-height:1.4;'>
+        <div id='playerIPhoneTip' style='display:none;font-size:10.5px;color:#94a3b8;margin-top:10px;max-width:280px;line-height:1.4;'>
           💡 iPhone: When prompted by Telegram, tap <b style="color:#ffd700;">"Open"</b> to count your ad.
         </div>
       </div>
@@ -1412,8 +1427,22 @@
             ? 'Your ad-free stream time has expired. Watch 2 sponsor ads to unlock another 4 real hours of uninterrupted streaming!'
             : 'Watch 2 quick sponsor ads to unlock 4 full hours of continuous, zero-ad cinema streaming!';
         }
+        const playerAdProgress = document.getElementById('playerAdProgress');
+        const playerAdBar = document.getElementById('playerAdBar');
+        if (playerAdProgress) {
+          playerAdProgress.textContent = `${adsWatched4h}/2 Ads Watched`;
+        }
+        if (playerAdBar) {
+          playerAdBar.style.width = adsWatched4h >= 2 ? '100%' : (adsWatched4h === 1 ? '50%' : '0%');
+        }
         if (preRollBtnText) {
-          preRollBtnText.textContent = adsWatched4h > 0 ? `Watch Ad to Unlock 4h (${adsWatched4h}/2)` : 'Watch Ad to Unlock 4h (0/2)';
+          if (adsWatched4h === 0) {
+            preRollBtnText.textContent = '⚡ Watch Sponsor Ad (0/2)';
+          } else if (adsWatched4h === 1) {
+            preRollBtnText.textContent = '🚀 Watch Final Ad (1/2)';
+          } else {
+            preRollBtnText.textContent = '✓ 4h Pass Ready!';
+          }
         }
 
         if (state.hasAccess) {
@@ -1501,6 +1530,8 @@
           clearTimeout(_playerCancelTimer);
           _playerCancelTimer = null;
         }
+        const tip = document.getElementById('playerIPhoneTip');
+        if (tip) tip.style.display = 'none';
       }
 
       function onPlayerFocusReturn() {
@@ -1550,6 +1581,13 @@
 
         const preRollBtn = document.getElementById('preRollBtnText');
         if (preRollBtn) preRollBtn.textContent = '⏳ Waiting for sponsor visit...';
+
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || 
+                      (window.Telegram?.WebApp?.platform === 'ios');
+        const tipEl = document.getElementById('playerIPhoneTip');
+        if (isIOS && tipEl) {
+          tipEl.style.display = 'block';
+        }
 
         document.addEventListener('visibilitychange', onPlayerVisibilityChange);
         window.addEventListener('focus', onPlayerFocusReturn);
