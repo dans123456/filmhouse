@@ -7644,9 +7644,14 @@ function closeCinemaModal() {
     }
 }
 
-// Trigger Monetag SmartLink (Zone 12129103)
+// Trigger Monetag SmartLink (Zone 12129103) with iPhone / iOS guidance
 function triggerMonetagSmartLink() {
     const smartLinkUrl = "https://uplcm.com/4/12129103";
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || 
+                  (window.Telegram?.WebApp?.platform === "ios");
+    if (isIOS && typeof showToast === "function") {
+        showToast("👉 On iPhone: Tap \"Open\" in Telegram to count your sponsor ad!", "info", 5000);
+    }
     try {
         if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === "function") {
             window.Telegram.WebApp.openLink(smartLinkUrl);
@@ -8569,7 +8574,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=157_${Date.now()}`;
+        const cacheBuster = `v=158_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
@@ -10696,31 +10701,104 @@ function showCinemaPreRollModal(movie, onUnlocked) {
     }
 
     if (watchAdBtn) {
-        watchAdBtn.onclick = () => {
-            triggerMonetagSmartLink();
-            const currentWatched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
-            const newWatched = currentWatched + 1;
-            localStorage.setItem('fh_ads_4h', String(newWatched));
+        let _adPending = false;
+        let _adStartTime = 0;
+        let _adLeftApp = false;
+        let _cancelCheckTimer = null;
 
-            if (state.user && state.user.dailyStats) {
-                state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
-                if (typeof saveDailyStats === "function") saveDailyStats();
+        function cleanupAdListeners() {
+            document.removeEventListener("visibilitychange", onAppVisibilityChange);
+            window.removeEventListener("focus", onAppFocusReturn);
+            if (_cancelCheckTimer) {
+                clearTimeout(_cancelCheckTimer);
+                _cancelCheckTimer = null;
             }
+        }
 
-            refreshPrerollUI();
+        function onAppFocusReturn() {
+            if (_adPending && _adLeftApp) {
+                verifyAndCompleteAd();
+            }
+        }
 
-            if (newWatched >= 2) {
-                const FOUR_HOURS_MS = 4 * 3600 * 1000;
-                const currentPass = parseInt(localStorage.getItem("filmhouse_watch_pass_until") || "0", 10);
-                const newExpiry = (currentPass > Date.now()) ? currentPass + FOUR_HOURS_MS : Date.now() + FOUR_HOURS_MS;
-                localStorage.setItem("filmhouse_watch_pass_until", String(newExpiry));
-                localStorage.setItem("fh_ads_4h", "0");
-                showToast("🎉 4-Hour Cinema Pass Activated! Enjoy your movie.", "success");
-                closeModal();
-                if (typeof onUnlocked === "function") onUnlocked();
+        function onAppVisibilityChange() {
+            if (!_adPending) return;
+            if (document.hidden) {
+                // User actually tapped "Open" in Telegram prompt; Safari/browser opened!
+                _adLeftApp = true;
+                if (_cancelCheckTimer) clearTimeout(_cancelCheckTimer);
+            } else if (_adLeftApp) {
+                // User returned from Safari/browser back into Film House!
+                verifyAndCompleteAd();
+            }
+        }
+
+        function verifyAndCompleteAd() {
+            const elapsed = Date.now() - _adStartTime;
+            _adPending = false;
+            _adLeftApp = false;
+            cleanupAdListeners();
+            watchAdBtn.style.opacity = "1";
+
+            // Require at least 2.5 seconds on sponsor page
+            if (elapsed >= 2500) {
+                const currentWatched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
+                const newWatched = currentWatched + 1;
+                localStorage.setItem('fh_ads_4h', String(newWatched));
+
+                if (state.user && state.user.dailyStats) {
+                    state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
+                    if (typeof saveDailyStats === "function") saveDailyStats();
+                }
+
+                refreshPrerollUI();
+
+                if (newWatched >= 2) {
+                    const FOUR_HOURS_MS = 4 * 3600 * 1000;
+                    const currentPass = parseInt(localStorage.getItem("filmhouse_watch_pass_until") || "0", 10);
+                    const newExpiry = (currentPass > Date.now()) ? currentPass + FOUR_HOURS_MS : Date.now() + FOUR_HOURS_MS;
+                    localStorage.setItem("filmhouse_watch_pass_until", String(newExpiry));
+                    localStorage.setItem("fh_ads_4h", "0");
+                    showToast("🎉 4-Hour Cinema Pass Activated! Enjoy your movie.", "success");
+                    closeModal();
+                    if (typeof onUnlocked === "function") onUnlocked();
+                } else {
+                    showToast("✅ Ad 1 of 2 Verified! Tap to watch the final ad and unlock your 4h Pass.", "success", 5000);
+                }
             } else {
-                showToast("👉 Ad 1 of 2 visited! Tap to watch the final ad and unlock your 4h Pass.", "info", 5000);
+                refreshPrerollUI();
+                showToast("⚠️ Sponsor page closed too quickly. Please visit the sponsor to earn your pass.", "warning", 5000);
             }
+        }
+
+        watchAdBtn.onclick = () => {
+            if (_adPending) return;
+            _adPending = true;
+            _adStartTime = Date.now();
+            _adLeftApp = false;
+
+            if (btnText) {
+                btnText.textContent = "⏳ Waiting for sponsor visit...";
+            }
+            watchAdBtn.style.opacity = "0.75";
+
+            document.addEventListener("visibilitychange", onAppVisibilityChange);
+            window.addEventListener("focus", onAppFocusReturn);
+            window.addEventListener("blur", () => { if (_adPending) _adLeftApp = true; }, { once: true });
+
+            triggerMonetagSmartLink();
+
+            // Safety timeout: If user never left app within 6.5s (e.g. tapped "Cancel" on iPhone dialog)
+            if (_cancelCheckTimer) clearTimeout(_cancelCheckTimer);
+            _cancelCheckTimer = setTimeout(() => {
+                if (_adPending && !_adLeftApp) {
+                    _adPending = false;
+                    cleanupAdListeners();
+                    refreshPrerollUI();
+                    watchAdBtn.style.opacity = "1";
+                    showToast("⚠️ Sponsor visit not detected. On iPhone, remember to tap \"Open\" when Telegram asks!", "warning", 6000);
+                }
+            }, 6500);
         };
     }
 

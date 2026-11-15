@@ -512,6 +512,9 @@
         <button id='btnClaimPassInPreRoll' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,188,0,0.4);display:inline-flex;align-items:center;gap:6px;transition:transform 0.15s ease;' type='button'>
           <span>⚡</span><span id='preRollBtnText'>Watch Ad to Unlock 4h (0/2)</span>
         </button>
+        <div style='font-size:11px;color:#94a3b8;margin-top:10px;line-height:1.4;'>
+          💡 iPhone: When prompted by Telegram, tap <b style="color:#ffd700;">"Open"</b> to count your ad.
+        </div>
       </div>
 
       <!-- Sleek Floating Glassmorphic Resume Pill -->
@@ -548,7 +551,7 @@
         <span class='custom-sub-text' id='customSubtitleText'></span>
       </div>
 
-      <video controls='controls' id='mainVideo' playsinline='playsinline' preload='metadata'>
+      <video controls='controls' id='mainVideo' playsinline='playsinline' webkit-playsinline='webkit-playsinline' preload='metadata'>
         Your browser does not support HTML5 video streaming.
       </video>
       <!-- Sleek Floating In-Player Error Toast (Discreet, non-blocking) -->
@@ -1486,7 +1489,72 @@
         }
       }
 
+      let _playerAdPending = false;
+      let _playerAdStartTime = 0;
+      let _playerAdLeftApp = false;
+      let _playerCancelTimer = null;
+
+      function cleanupPlayerAdListeners() {
+        document.removeEventListener('visibilitychange', onPlayerVisibilityChange);
+        window.removeEventListener('focus', onPlayerFocusReturn);
+        if (_playerCancelTimer) {
+          clearTimeout(_playerCancelTimer);
+          _playerCancelTimer = null;
+        }
+      }
+
+      function onPlayerFocusReturn() {
+        if (_playerAdPending && _playerAdLeftApp) {
+          verifyAndCompletePlayerAd();
+        }
+      }
+
+      function onPlayerVisibilityChange() {
+        if (!_playerAdPending) return;
+        if (document.hidden) {
+          _playerAdLeftApp = true;
+          if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
+        } else if (_playerAdLeftApp) {
+          verifyAndCompletePlayerAd();
+        }
+      }
+
+      function verifyAndCompletePlayerAd() {
+        const elapsed = Date.now() - _playerAdStartTime;
+        _playerAdPending = false;
+        _playerAdLeftApp = false;
+        cleanupPlayerAdListeners();
+
+        if (elapsed >= 2500) {
+          const watched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10) + 1;
+          localStorage.setItem('fh_ads_4h', String(watched));
+          if (watched >= 2) {
+            activateWatchPass();
+          } else {
+            updatePassUI();
+          }
+        } else {
+          updatePassUI();
+          const preRollDesc = document.getElementById('preRollDesc');
+          if (preRollDesc) {
+            preRollDesc.innerHTML = '<span style="color:#f59e0b;">⚠️ Sponsor page closed too quickly. Please visit the sponsor to earn your pass!</span>';
+          }
+        }
+      }
+
       function triggerPassAdWatch() {
+        if (_playerAdPending) return;
+        _playerAdPending = true;
+        _playerAdStartTime = Date.now();
+        _playerAdLeftApp = false;
+
+        const preRollBtn = document.getElementById('preRollBtnText');
+        if (preRollBtn) preRollBtn.textContent = '⏳ Waiting for sponsor visit...';
+
+        document.addEventListener('visibilitychange', onPlayerVisibilityChange);
+        window.addEventListener('focus', onPlayerFocusReturn);
+        window.addEventListener('blur', function() { if (_playerAdPending) _playerAdLeftApp = true; }, { once: true });
+
         // 1. Tell parent app to trigger Monetag SmartLink natively in Telegram
         try {
           if (window.parent && window.parent !== window) {
@@ -1498,15 +1566,19 @@
           openTelegramLink(MONETAG_SMARTLINK);
         }
 
-        // 2. Track progress strictly: 1/2, 2/2
-        const watched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10) + 1;
-        localStorage.setItem('fh_ads_4h', String(watched));
-
-        if (watched >= 2) {
-          activateWatchPass();
-        } else {
-          updatePassUI();
-        }
+        // Safety timeout if user clicked Cancel on Telegram prompt
+        if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
+        _playerCancelTimer = setTimeout(function() {
+          if (_playerAdPending && !_playerAdLeftApp) {
+            _playerAdPending = false;
+            cleanupPlayerAdListeners();
+            updatePassUI();
+            const preRollDesc = document.getElementById('preRollDesc');
+            if (preRollDesc) {
+              preRollDesc.innerHTML = '<span style="color:#f87171;">⚠️ Sponsor visit not detected. On iPhone, remember to tap <b>"Open"</b> when Telegram asks!</span>';
+            }
+          }
+        }, 6500);
       }
 
       const btnGetPill = document.getElementById('btnGetPassPill');
