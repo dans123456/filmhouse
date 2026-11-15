@@ -390,7 +390,8 @@ function performServerGitUpdate(onProgress) {
     return new Promise((resolve) => {
         const projectDir = path.resolve(__dirname);
         // Discard local metadata cache changes and stash untracked files before pulling so dirty files never block git pull
-        const pullCmd = "git checkout -- MOVIE/Data/movies_metadata.json 2>/dev/null || true; git stash -u 2>/dev/null || true; git pull origin main";
+        // Use pull --no-rebase with auto-recovery to origin/main so divergent branches never cause fatal halts
+        const pullCmd = "git checkout -- MOVIE/Data/movies_metadata.json 2>/dev/null || true; git stash -u 2>/dev/null || true; git config pull.rebase false 2>/dev/null || true; git pull --no-rebase origin main || (git fetch origin main && git reset --hard origin/main)";
         exec(pullCmd, { cwd: projectDir, timeout: 25000 }, (pullErr, pullOut, pullErrOut) => {
             if (pullErr) {
                 console.error("[ServerUpdater] git pull failed:", pullErr);

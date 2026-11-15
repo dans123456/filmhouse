@@ -9,7 +9,8 @@ echo "----------------------------------------------------"
 
 echo "[1/4] Pulling latest code from GitHub main branch..."
 git stash push -u -m 'auto-stash-updater' || true
-git pull origin main
+git config pull.rebase false 2>/dev/null || true
+git pull --no-rebase origin main || (git fetch origin main && git reset --hard origin/main)
 
 echo "[2/4] Verifying node dependencies..."
 npm install --omit=dev
