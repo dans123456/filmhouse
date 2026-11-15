@@ -7644,17 +7644,23 @@ function closeCinemaModal() {
     }
 }
 
-// Trigger Monetag SmartLink (Zone 12129096)
+// Trigger Monetag SmartLink (Zone 12129103)
 function triggerMonetagSmartLink() {
-    const smartLinkUrl = "https://uplcm.com/4/12129096";
+    const smartLinkUrl = "https://uplcm.com/4/12129103";
     try {
-        if (window.Telegram?.WebApp?.openLink) {
+        if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === "function") {
             window.Telegram.WebApp.openLink(smartLinkUrl);
-        } else {
-            window.open(smartLinkUrl, "_blank");
+            return;
+        }
+    } catch (_) {}
+    try {
+        const w = window.open(smartLinkUrl, "_blank");
+        if (!w || w.closed || typeof w.closed === "undefined") {
+            window.location.href = smartLinkUrl;
         }
     } catch (err) {
         console.warn("SmartLink trigger error:", err);
+        window.location.href = smartLinkUrl;
     }
 }
 
@@ -7706,10 +7712,22 @@ function getMoreLikeThisMovies(currentMovie, limit = 8) {
     return scored.slice(0, limit).map(s => s.movie);
 }
 
-// Open In-App Cinema Streaming Player Modal directly with trailer cleanup
+// Open In-App Cinema Streaming Player Modal with Door 1 Ad Pass Gate
 function openCinemaModal(movie, customStreamUrl, customTitle) {
     stopAllBackgroundTrailers();
-    openCinemaModalCore(movie, customStreamUrl, customTitle);
+
+    const passUntil = parseInt(localStorage.getItem("filmhouse_watch_pass_until") || "0", 10);
+    const bankSec = parseInt(localStorage.getItem("filmhouse_stream_bank_sec") || "0", 10);
+    const hasAccess = (passUntil > Date.now()) || (bankSec > 0);
+
+    if (hasAccess) {
+        openCinemaModalCore(movie, customStreamUrl, customTitle);
+    } else {
+        // DOOR 1: User has NO active pass -> Pop up 4-Hour Pass Sponsor Modal!
+        showCinemaPreRollModal(movie, () => {
+            openCinemaModalCore(movie, customStreamUrl, customTitle);
+        });
+    }
 }
 
 function openCinemaModalCore(movie, customStreamUrl, customTitle) {
@@ -8551,7 +8569,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=155_${Date.now()}`;
+        const cacheBuster = `v=157_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
@@ -10614,6 +10632,9 @@ function showCinemaPreRollModal(movie, onUnlocked) {
     const modal = document.getElementById("cinema-preroll-modal");
     const titleEl = document.getElementById("preroll-movie-title");
     const watchAdBtn = document.getElementById("btn-preroll-watch-ad");
+    const btnText = document.getElementById("preroll-btn-ad-text");
+    const progressText = document.getElementById("preroll-ad-progress");
+    const progressBar = document.getElementById("preroll-ad-bar");
     const redeemBtn = document.getElementById("btn-preroll-redeem-pass");
     const closeBtn = document.getElementById("btn-close-preroll");
     if (!modal) {
@@ -10624,6 +10645,27 @@ function showCinemaPreRollModal(movie, onUnlocked) {
     if (titleEl) {
         titleEl.textContent = (movie && movie.title) ? movie.title : "Film House Cinema";
     }
+
+    function refreshPrerollUI() {
+        const adsWatched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
+        if (progressText) {
+            progressText.textContent = `${adsWatched}/2 Ads Watched`;
+        }
+        if (progressBar) {
+            progressBar.style.width = adsWatched >= 2 ? "100%" : (adsWatched === 1 ? "50%" : "0%");
+        }
+        if (btnText) {
+            if (adsWatched === 0) {
+                btnText.textContent = "⚡ Watch Sponsor Ad (0/2)";
+            } else if (adsWatched === 1) {
+                btnText.textContent = "🚀 Watch Final Ad (1/2)";
+            } else {
+                btnText.textContent = "✓ 4h Pass Ready!";
+            }
+        }
+    }
+
+    refreshPrerollUI();
 
     const closeModal = () => {
         modal.classList.remove("active");
@@ -10636,13 +10678,18 @@ function showCinemaPreRollModal(movie, onUnlocked) {
 
     if (redeemBtn) {
         redeemBtn.onclick = () => {
-            if (state.user.points < 500) {
-                showToast("Not enough points! You have " + state.user.points + " pts. Need 500 pts.", "error");
+            const userPts = parseInt(state.user.points || 0, 10);
+            if (userPts < 300) {
+                showToast(`Not enough points! You have ${userPts} pts. Need 300 pts.`, "error");
                 return;
             }
-            deductPoints(500);
-            localStorage.setItem("cinema_fast_stream_until", Date.now() + 4 * 60 * 60 * 1000);
-            localStorage.setItem("filmhouse_watch_pass_sec", String(4 * 3600));
+            deductPoints(300);
+            const FOUR_HOURS_MS = 4 * 3600 * 1000;
+            const currentPass = parseInt(localStorage.getItem("filmhouse_watch_pass_until") || "0", 10);
+            const newExpiry = (currentPass > Date.now()) ? currentPass + FOUR_HOURS_MS : Date.now() + FOUR_HOURS_MS;
+            localStorage.setItem("filmhouse_watch_pass_until", String(newExpiry));
+            localStorage.setItem("fh_ads_4h", "0");
+            showToast("🍿 4-Hour Pass Unlocked via Points! Enjoy your movie.", "success");
             closeModal();
             if (typeof onUnlocked === "function") onUnlocked();
         };
@@ -10651,17 +10698,29 @@ function showCinemaPreRollModal(movie, onUnlocked) {
     if (watchAdBtn) {
         watchAdBtn.onclick = () => {
             triggerMonetagSmartLink();
-            const unlockDuration = 4 * 60 * 60 * 1000;
-            localStorage.setItem("cinema_stream_unlocked_until", String(Date.now() + unlockDuration));
-            localStorage.setItem("cinema_fast_stream_until", String(Date.now() + unlockDuration));
-            localStorage.setItem("filmhouse_watch_pass_sec", String(4 * 3600));
+            const currentWatched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
+            const newWatched = currentWatched + 1;
+            localStorage.setItem('fh_ads_4h', String(newWatched));
+
             if (state.user && state.user.dailyStats) {
                 state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
-                saveDailyStats();
+                if (typeof saveDailyStats === "function") saveDailyStats();
             }
-            showToast("🍿 Cinema Session Unlocked! Enjoy 4 hours of ad-free streaming.", "success");
-            closeModal();
-            if (typeof onUnlocked === "function") onUnlocked();
+
+            refreshPrerollUI();
+
+            if (newWatched >= 2) {
+                const FOUR_HOURS_MS = 4 * 3600 * 1000;
+                const currentPass = parseInt(localStorage.getItem("filmhouse_watch_pass_until") || "0", 10);
+                const newExpiry = (currentPass > Date.now()) ? currentPass + FOUR_HOURS_MS : Date.now() + FOUR_HOURS_MS;
+                localStorage.setItem("filmhouse_watch_pass_until", String(newExpiry));
+                localStorage.setItem("fh_ads_4h", "0");
+                showToast("🎉 4-Hour Cinema Pass Activated! Enjoy your movie.", "success");
+                closeModal();
+                if (typeof onUnlocked === "function") onUnlocked();
+            } else {
+                showToast("👉 Ad 1 of 2 visited! Tap to watch the final ad and unlock your 4h Pass.", "info", 5000);
+            }
         };
     }
 

@@ -14,7 +14,7 @@
   <title>Film House Cinema Player</title>
   <link href='https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap' rel='stylesheet'/>
   
-  <!-- Monetag SmartLink Integration (Zone: 12129096) -->
+  <!-- Monetag SmartLink Integration (Zone: 12129103) -->
   <script type='text/javascript'>
     function openTelegramLink(url) {
       if (!url) return;
@@ -35,7 +35,7 @@
       } catch (_) {}
     }
 
-    var MONETAG_SMARTLINK = 'https://uplcm.com/4/12129096';
+    var MONETAG_SMARTLINK = 'https://uplcm.com/4/12129103';
     
   </script>
 
@@ -589,6 +589,37 @@
       const serverParam = urlParams.get('server') || '';
 
       const videoEl = document.getElementById('mainVideo');
+      let finalStreamUrl = "";
+
+      function attachStreamSource() {
+        if (!finalStreamUrl || !videoEl) return;
+        if (videoEl.src || (window._currentHls && window._currentHls.url)) return;
+        if (finalStreamUrl.includes('.m3u8') && typeof Hls !== 'undefined' && Hls.isSupported()) {
+          try {
+            if (window._currentHls) {
+              window._currentHls.destroy();
+            }
+            const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+            window._currentHls = hls;
+            hls.loadSource(finalStreamUrl);
+            hls.attachMedia(videoEl);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+              if (loaderEl) loaderEl.style.opacity = '0';
+              setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 400);
+            });
+            hls.on(Hls.Events.ERROR, function(evt, data) {
+              if (data.fatal) {
+                console.warn("HLS streaming error, falling back to direct video.src:", data);
+                videoEl.src = finalStreamUrl;
+              }
+            });
+          } catch (hErr) {
+            videoEl.src = finalStreamUrl;
+          }
+        } else {
+          videoEl.src = finalStreamUrl;
+        }
+      }
 
       if (audioParam !== '' && !isNaN(parseInt(audioParam, 10)) && videoEl) {
         const initialAudioIdx = parseInt(audioParam, 10);
@@ -1439,9 +1470,7 @@
           document.body.classList.add('stream-started');
         }
 
-        if (videoEl && !videoEl.src && finalStreamUrl) {
-          videoEl.src = finalStreamUrl;
-        }
+        attachStreamSource();
 
         if (videoEl) {
           try {
@@ -1552,11 +1581,8 @@
 
           const passState = getActivePassState();
 
-          if (videoEl && !videoEl.src && finalStreamUrl) {
-            videoEl.src = finalStreamUrl;
-          }
-
           if (passState.hasAccess) {
+            attachStreamSource();
             if (_playTriggered) return;
             _playTriggered = true;
 
@@ -1590,6 +1616,7 @@
           } else {
             // User has NO active pass -> Open Sponsor Pre-Roll Overlay to watch 2 ads!
             _playTriggered = false;
+            try { videoEl.pause(); } catch(_) {}
             const preRoll = document.getElementById('preRollOverlay');
             if (preRoll) {
               preRoll.style.display = 'flex';
@@ -2123,7 +2150,7 @@
         qualityEl.textContent = qualityParam;
       }
 
-      let finalStreamUrl = "";
+      finalStreamUrl = "";
 
       if (watchParam) {
         let clean = decodeURIComponent(watchParam).trim();
@@ -2222,6 +2249,13 @@
 
       // Auto-hide playOverlay the moment video frames output (eliminates pitch black playback on start)
       function autoHidePlayOverlay() {
+        const passState = getActivePassState();
+        if (!passState.hasAccess) {
+          try { videoEl.pause(); } catch(_) {}
+          const preRoll = document.getElementById('preRollOverlay');
+          if (preRoll) preRoll.style.display = 'flex';
+          return;
+        }
         document.body.classList.add('stream-started');
         if (playOverlay && playOverlay.style.display !== 'none') {
           playOverlay.style.pointerEvents = 'none';
@@ -2234,6 +2268,13 @@
       videoEl.addEventListener('playing', autoHidePlayOverlay);
 
       videoEl.addEventListener('timeupdate', function() {
+        const passState = getActivePassState();
+        if (!passState.hasAccess) {
+          try { videoEl.pause(); } catch(_) {}
+          const preRoll = document.getElementById('preRollOverlay');
+          if (preRoll) preRoll.style.display = 'flex';
+          return;
+        }
         if (videoEl.currentTime > 0.05) {
           autoHidePlayOverlay();
         }
@@ -2261,33 +2302,16 @@
       });
 
       if (finalStreamUrl) {
-        // Multi-engine stream resolver with native HLS fallback
-        if (finalStreamUrl.includes('.m3u8') && typeof Hls !== 'undefined' && Hls.isSupported()) {
-          try {
-            if (window._currentHls) {
-              window._currentHls.destroy();
-            }
-            const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
-            window._currentHls = hls;
-            hls.loadSource(finalStreamUrl);
-            hls.attachMedia(videoEl);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-              if (loaderEl) loaderEl.style.opacity = '0';
-              setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 400);
-            });
-            hls.on(Hls.Events.ERROR, function(evt, data) {
-              if (data.fatal) {
-                console.warn("HLS streaming error, falling back to direct video.src:", data);
-                videoEl.src = finalStreamUrl;
-              }
-            });
-          } catch (hErr) {
-            videoEl.src = finalStreamUrl;
-          }
-        } else {
-          videoEl.src = finalStreamUrl;
-        }
         if (downloadBtn) downloadBtn.href = finalStreamUrl;
+
+        const initialPass = getActivePassState();
+        if (initialPass.hasAccess) {
+          attachStreamSource();
+        } else {
+          const preRoll = document.getElementById('preRollOverlay');
+          if (preRoll) preRoll.style.display = 'flex';
+          updatePassUI();
+        }
 
         function hideStreamLoader() {
           if (!loaderEl) return;
@@ -2301,9 +2325,9 @@
           videoEl.addEventListener(evt, hideStreamLoader);
         });
 
-        // Explicitly trigger browser video load
+        // Explicitly trigger browser video load if pass is already active
         try {
-          videoEl.load();
+          if (initialPass.hasAccess) videoEl.load();
         } catch (_) {}
 
         // Fallback: If video already buffered enough data, hide immediately
