@@ -1,6 +1,27 @@
 
 // Reset any stale audio track overrides on startup so high-speed direct stream is always default
-try { localStorage.removeItem("fh_audio_pref"); } catch (_) {}
+try { localStorage.removeItem("fh_audio_pref"); } catch (_) { }
+
+function safeJsonParse(raw, fallback) {
+    try {
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return (parsed === null || parsed === undefined) ? fallback : parsed;
+    } catch (_) {
+        return fallback;
+    }
+}
+
+function getActiveTelegramWebApp() {
+    try {
+        const tg = window.Telegram && window.Telegram.WebApp;
+        if (!tg) return null;
+        const isActive = (tg.initData && tg.initData.length > 0) || (tg.platform && tg.platform !== "unknown");
+        return isActive ? tg : null;
+    } catch (_) {
+        return null;
+    }
+}
 
 function isDesktopEnvironment() {
     const ua = (navigator.userAgent || "").toLowerCase();
@@ -34,7 +55,7 @@ function initDesktopExpandToggle() {
             toggleBtn.style.color = "#ffbc00";
             toggleBtn.style.borderColor = "rgba(255, 188, 0, 0.4)";
             if (typeof window.Telegram?.WebApp?.requestFullscreen === "function") {
-                try { window.Telegram.WebApp.requestFullscreen(); } catch (e) {}
+                try { window.Telegram.WebApp.requestFullscreen(); } catch (e) { }
             }
             if (notify && typeof showToast === "function") {
                 showToast("Expanded to Fullscreen Layout 🖥️", "info");
@@ -46,7 +67,7 @@ function initDesktopExpandToggle() {
             toggleBtn.style.color = "var(--text-secondary)";
             toggleBtn.style.borderColor = "rgba(255, 255, 255, 0.15)";
             if (typeof window.Telegram?.WebApp?.exitFullscreen === "function") {
-                try { window.Telegram.WebApp.exitFullscreen(); } catch (e) {}
+                try { window.Telegram.WebApp.exitFullscreen(); } catch (e) { }
             }
             if (notify && typeof showToast === "function") {
                 showToast("Restored Compact Window 🪟", "info");
@@ -70,29 +91,29 @@ function ensureTelegramFullscreen() {
             document.body.classList.add("telegram-app-ready");
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
-            
+
             const tgPlatform = (window.Telegram.WebApp.platform || "").toLowerCase();
             const isDesktopPlatform = tgPlatform === "tdesktop" || tgPlatform === "macos" || tgPlatform === "web" || tgPlatform === "weba" || tgPlatform === "webk";
-            
+
             if (isDesktopPlatform) {
                 document.body.classList.add("telegram-desktop-mode");
                 const savedWide = localStorage.getItem("filmhouse_desktop_wide_mode") === "true";
                 if (savedWide) {
                     if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
-                        try { window.Telegram.WebApp.requestFullscreen(); } catch (e) {}
+                        try { window.Telegram.WebApp.requestFullscreen(); } catch (e) { }
                     }
                 } else {
                     if (typeof window.Telegram.WebApp.exitFullscreen === "function") {
-                        try { window.Telegram.WebApp.exitFullscreen(); } catch (e) {}
+                        try { window.Telegram.WebApp.exitFullscreen(); } catch (e) { }
                     }
                 }
             } else {
                 // On Mobile (Android/iOS), request fullscreen for optimal immersive view
                 if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
-                    try { window.Telegram.WebApp.requestFullscreen(); } catch (e) {}
+                    try { window.Telegram.WebApp.requestFullscreen(); } catch (e) { }
                 }
             }
-        } catch (e) {}
+        } catch (e) { }
     }
 }
 ensureTelegramFullscreen();
@@ -113,16 +134,16 @@ if (window.Telegram && window.Telegram.WebApp) {
             const savedWide = localStorage.getItem("filmhouse_desktop_wide_mode") === "true";
             if (savedWide) {
                 if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
-                    try { window.Telegram.WebApp.requestFullscreen(); } catch (fsErr) {}
+                    try { window.Telegram.WebApp.requestFullscreen(); } catch (fsErr) { }
                 }
             } else {
                 if (typeof window.Telegram.WebApp.exitFullscreen === "function") {
-                    try { window.Telegram.WebApp.exitFullscreen(); } catch (fsErr) {}
+                    try { window.Telegram.WebApp.exitFullscreen(); } catch (fsErr) { }
                 }
             }
         } else {
             if (typeof window.Telegram.WebApp.requestFullscreen === "function") {
-                try { window.Telegram.WebApp.requestFullscreen(); } catch (fsErr) {}
+                try { window.Telegram.WebApp.requestFullscreen(); } catch (fsErr) { }
             }
         }
     } catch (e) {
@@ -310,13 +331,13 @@ function getAsianOriginBadgeElement(movie) {
 }
 
 // Load Eruda In-App Mobile Console if ?debug=true is passed in URL
-(function() {
+(function () {
     try {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('debug') === 'true') {
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/eruda';
-            script.onload = function() {
+            script.onload = function () {
                 if (typeof window.eruda !== 'undefined' && window.eruda.init) {
                     window.eruda.init();
                     console.log("Eruda Mobile Debugger successfully initialized!");
@@ -345,19 +366,19 @@ const safeStorage = (() => {
     return {
         getItem(key) {
             if (available) {
-                try { return window.localStorage.getItem(key); } catch (e) {}
+                try { return window.localStorage.getItem(key); } catch (e) { }
             }
             return inMemoryStorage.hasOwnProperty(key) ? inMemoryStorage[key] : null;
         },
         setItem(key, value) {
             if (available) {
-                try { window.localStorage.setItem(key, value); return; } catch (e) {}
+                try { window.localStorage.setItem(key, value); return; } catch (e) { }
             }
             inMemoryStorage[key] = String(value);
         },
         removeItem(key) {
             if (available) {
-                try { window.localStorage.removeItem(key); return; } catch (e) {}
+                try { window.localStorage.removeItem(key); return; } catch (e) { }
             }
             delete inMemoryStorage[key];
         }
@@ -384,7 +405,7 @@ if (typeof firebase !== "undefined") {
     try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
-        
+
         // Load TMDB API Key from Firestore settings
         db.collection("settings").doc("tmdb").get().then(doc => {
             if (doc.exists && doc.data().apiKey) {
@@ -440,32 +461,32 @@ const SEARCH_STOP_WORDS = new Set(['the', 'a', 'an', 'of', 'and', 'or', 'in', 'o
 // Universal search query normalizer: strips symbols, extracts year, strips video tags, isolates keywords
 function sanitizeSearchQuery(query) {
     if (!query) return { cleanTokens: [], significantTokens: [], titleOnlyTokens: [], searchTitleStr: "", targetYear: null, cleanFullStr: "", collapsedQuery: "", rawCollapsedQuery: "" };
-    
+
     let raw = String(query).toLowerCase();
     raw = convertRomanNumerals(raw);
     raw = raw.replace(/&/g, " and ");
-    
+
     const yearMatch = raw.match(/\b(19\d\d|20\d\d)\b/);
     const targetYear = yearMatch ? yearMatch[1] : null;
-    
+
     // Strip common copy-pasted video quality & release tags
     raw = raw.replace(/\b(1080p|720p|480p|360p|4k|2160p|web-dl|webrip|bluray|brrip|dvdrip|hdrip|hdcam|camrip|cam|x264|x265|hevc|aac|sub|dub|multi|dual\s*audio|season|episode|s\d{1,2}|e\d{1,2}|complete)\b/gi, " ");
-    
+
     // Replace all symbols and punctuation with spaces
     raw = raw.replace(/[^\p{L}\p{N}\s]/gu, " ");
-    
+
     const cleanTokens = raw.split(/\s+/).filter(tok => tok.length > 0);
     const titleOnlyTokens = cleanTokens.filter(t => t !== targetYear);
     const searchTitleStr = titleOnlyTokens.join(" ").trim();
     const cleanFullStr = cleanTokens.join(" ").trim();
-    
+
     // Normalized collapsed representation aligns with normalizeTitleForComparison (removes internal "the" and articles)
     const normCleanStr = normalizeTitleForComparison(searchTitleStr || cleanFullStr);
     const collapsedQuery = normCleanStr.replace(/[^a-z0-9]/gi, "");
-    
+
     // Raw collapsed preserves all characters for exact full-string comparison
     const rawCollapsedQuery = cleanTokens.join("").replace(/[^a-z0-9]/gi, "");
-    
+
     // Filter significant keyword tokens (excluding stop words and target year)
     let significantTokens = cleanTokens.filter(t => t !== targetYear && !SEARCH_STOP_WORDS.has(t));
     // If all tokens were stop words (e.g. "IT", "Us", "Up", "Her"), preserve them so they are never lost!
@@ -473,7 +494,7 @@ function sanitizeSearchQuery(query) {
         significantTokens = cleanTokens.filter(t => t !== targetYear);
         if (significantTokens.length === 0) significantTokens = cleanTokens;
     }
-    
+
     return { cleanTokens, significantTokens, titleOnlyTokens, searchTitleStr, targetYear, cleanFullStr, collapsedQuery, rawCollapsedQuery };
 }
 
@@ -530,12 +551,12 @@ function calculateSearchScore(movie, queryInfo) {
     }
     // 2. TITLE STARTS WITH QUERY (8,500 pts)
     else if ((colTitle && collapsedQuery && (colTitle.startsWith(collapsedQuery) || numColTitle.startsWith(collapsedQuery))) ||
-             (rawColTitle && rawCollapsedQuery && rawColTitle.startsWith(rawCollapsedQuery))) {
+        (rawColTitle && rawCollapsedQuery && rawColTitle.startsWith(rawCollapsedQuery))) {
         score = 8500;
     }
     // 3. COLLAPSED TITLE CONTAINS QUERY (7,500 pts)
     else if ((colTitle && collapsedQuery && collapsedQuery.length >= 2 && (colTitle.includes(collapsedQuery) || numColTitle.includes(collapsedQuery))) ||
-             (rawColTitle && rawCollapsedQuery && rawCollapsedQuery.length >= 2 && rawColTitle.includes(rawCollapsedQuery))) {
+        (rawColTitle && rawCollapsedQuery && rawCollapsedQuery.length >= 2 && rawColTitle.includes(rawCollapsedQuery))) {
         score = 7500;
     }
     else {
@@ -712,7 +733,7 @@ const state = {
 function escapeHTML(str) {
     if (str === null || str === undefined) return "";
     if (typeof str !== "string") str = String(str);
-    return str.replace(/[&<>"']/g, function(match) {
+    return str.replace(/[&<>"']/g, function (match) {
         const escapeMap = {
             '&': '&amp;',
             '<': '&lt;',
@@ -763,7 +784,7 @@ function showToast(message, type = "success", action = null) {
 
     const toast = document.createElement("div");
     toast.className = `toast toast-${type}`;
-    
+
     const textNode = document.createElement("span");
     textNode.textContent = message;
     toast.appendChild(textNode);
@@ -784,14 +805,14 @@ function showToast(message, type = "success", action = null) {
     const closeBtn = document.createElement("button");
     closeBtn.className = "toast-close-btn";
     closeBtn.ariaLabel = "Close notification";
-    
+
     const closeIcon = createSvgIcon("icon-close", "toast-close-icon");
     closeBtn.appendChild(closeIcon);
     closeBtn.addEventListener("click", () => {
         toast.classList.add("fade-out");
         setTimeout(() => toast.remove(), 300);
     });
-    
+
     toast.appendChild(closeBtn);
     container.appendChild(toast);
 
@@ -823,7 +844,7 @@ function shuffleAndPinNewMovies(movies) {
 async function initializeDatabase() {
     const statusEl = document.getElementById("preloader-status");
     let loadedFromServer = false;
-    
+
     // 1. Try to load pre-enriched JSON
     try {
         statusEl.textContent = "Loading catalog metadata...";
@@ -840,7 +861,7 @@ async function initializeDatabase() {
                     if (m.backdrop && m.backdrop.startsWith("img/")) {
                         m.backdrop = "MOVIE/" + m.backdrop;
                     }
-                    
+
                     if (!m.categories || !Array.isArray(m.categories) || m.categories.length === 0) {
                         m.categories = ["Main"];
                         const isTV = (m.type || "").toLowerCase() === "series" || (m.type || "").toLowerCase() === "tv";
@@ -853,7 +874,7 @@ async function initializeDatabase() {
                     if (!m.poster) {
                         m.poster = "MOVIE/img/FilmHouse3_nobg.png";
                     }
-                    
+
                     // Precompute search string for highly responsive filtering including year
                     m._searchStr = buildMovieSearchStr(m);
                 });
@@ -861,7 +882,7 @@ async function initializeDatabase() {
                 state.movies = shuffleAndPinNewMovies(data);
                 statusEl.textContent = "Starting Film House...";
                 loadedFromServer = true;
-                
+
                 // Clear old client-side cache so it doesn't build up or conflict
                 localStorage.removeItem("filmhouse_enriched_db_v5");
             }
@@ -884,7 +905,7 @@ async function initializeDatabase() {
                     if (m.backdrop && m.backdrop.startsWith("img/")) {
                         m.backdrop = "MOVIE/" + m.backdrop;
                     }
-                    
+
                     // Precompute search string for highly responsive filtering including year
                     m._searchStr = buildMovieSearchStr(m);
                 });
@@ -896,7 +917,7 @@ async function initializeDatabase() {
             }
         }
     }
-    
+
 
 
     if (state.movies && state.movies.length > 0) {
@@ -909,7 +930,7 @@ async function initializeDatabase() {
     try {
         const response = await fetch(`${CSV_FILE_PATH}?t=${Date.now()}`);
         const text = await response.text();
-        
+
         // Use PapaParse if loaded
         if (window.Papa) {
             const parsed = window.Papa.parse(text, { header: false });
@@ -927,11 +948,11 @@ async function initializeDatabase() {
     // Filter valid rows (skip header)
     const rows = csvData.filter((row, idx) => idx > 0 && row.length > 0 && row[0].trim());
     const enrichedList = [];
-    
+
     // Setup client-side API progress screen
     const total = rows.length;
     statusEl.textContent = `Synchronizing with TMDB API (first-time setup: 0/${total})...`;
-    
+
     // Fetch details in batches to stay within safe client-side rate limits
     for (let i = 0; i < total; i++) {
         const row = rows[i];
@@ -942,14 +963,14 @@ async function initializeDatabase() {
         const movie_id_str = raw_id.split("-")[0] || raw_id;
         const row_type = row[2] ? row[2].trim() : "movie";
         const links = row.slice(3).map(lnk => lnk.trim()).filter(lnk => lnk);
-        
+
         statusEl.textContent = `Synchronizing with TMDB API (first-time setup: ${i + 1}/${total})...`;
-        
+
         let details = null;
         if (movie_id_str && !isNaN(movie_id_str)) {
             const tmdb_id = parseInt(movie_id_str);
             const isTV = row_type.toLowerCase() === "tv" || row_type.toLowerCase().includes("series") || row_type.toLowerCase().includes("cartoon");
-            
+
             // Try matching media endpoint
             const endpoint = isTV ? "tv" : "movie";
             try {
@@ -1015,7 +1036,7 @@ async function initializeDatabase() {
             releaseDate = details.release_date || details.first_air_date || "";
             mType = details.media_type || 'movie';
             imdbId = details.imdb_id || (details.external_ids ? details.external_ids.imdb_id : "") || "";
-            
+
             // Runtime
             if (details.runtime) {
                 runtime = `${details.runtime} min`;
@@ -1054,7 +1075,7 @@ async function initializeDatabase() {
         // Evaluate Categories
         const categories = ["Main"];
         const titleLower = title.toLowerCase();
-        
+
         // Classify Category Rules
         const eroticTitles = ["365 days", "fifty shades", "fatal seduction", "sex education", "erotic"];
         if (anyMatch(titleLower, eroticTitles)) categories.push("Erotic Movies");
@@ -1092,9 +1113,9 @@ async function initializeDatabase() {
         }
 
         const kidsKeywords = [
-            "drake and josh", "henry danger", "sam and cat", "thundermans", 
-            "victorious", "zoey 101", "nicky ricky", "gravity falls", 
-            "baymax", "casagrandes", "carrossel", "loud house", 
+            "drake and josh", "henry danger", "sam and cat", "thundermans",
+            "victorious", "zoey 101", "nicky ricky", "gravity falls",
+            "baymax", "casagrandes", "carrossel", "loud house",
             "phineas and ferb", "nickelodeon", "disney", "icarly", "matilda", "jessie"
         ];
         if (genres.includes("Family") || genres.includes("Kids") || anyMatch(titleLower, kidsKeywords)) {
@@ -1106,8 +1127,8 @@ async function initializeDatabase() {
             releaseYear = parseInt(releaseDate.substring(0, 4)) || 0;
         }
         const classicKeywords = [
-            "chucky", "child's play", "bride of chucky", "seed of chucky", "curse of chucky", 
-            "cult of chucky", "american pie", "american wedding", "american reunion", 
+            "chucky", "child's play", "bride of chucky", "seed of chucky", "curse of chucky",
+            "cult of chucky", "american pie", "american wedding", "american reunion",
             "naked mile", "beta house", "girls' rules", "band camp", "hole in one"
         ];
         if ((releaseYear > 0 && releaseYear < 2000) || anyMatch(titleLower, classicKeywords)) {
@@ -1115,12 +1136,12 @@ async function initializeDatabase() {
         }
 
         const comicKeywords = [
-            "marvel", "avengers", "spider-man", "spidey", "iron man", "captain america", "thor", 
-            "guardians of the galaxy", "loki", "wandavision", "hulk", "deadpool", "wolverine", 
-            "venom", "shang-chi", "eternals", "black widow", "hawkeye", "ms. marvel", "moon knight", 
-            "she-hulk", "werewolf by night", "black panther", "echo", "madame web", "x-men", "kraven", 
-            "daredevil", "born again", "ironheart", "fantastic 4", "wonder man", "gen v", "the boys", 
-            "invincible", "punisher", "batman", "superman", "shazam", "black adam", "dc comics", 
+            "marvel", "avengers", "spider-man", "spidey", "iron man", "captain america", "thor",
+            "guardians of the galaxy", "loki", "wandavision", "hulk", "deadpool", "wolverine",
+            "venom", "shang-chi", "eternals", "black widow", "hawkeye", "ms. marvel", "moon knight",
+            "she-hulk", "werewolf by night", "black panther", "echo", "madame web", "x-men", "kraven",
+            "daredevil", "born again", "ironheart", "fantastic 4", "wonder man", "gen v", "the boys",
+            "invincible", "punisher", "batman", "superman", "shazam", "black adam", "dc comics",
             "blue beetle", "kakegurui", "hit-monkey", "m.o.d.o.k.", "what if...?"
         ];
         const isToAllTheBoys = titleLower.includes("to all the boys");
@@ -1182,54 +1203,54 @@ let userProfileUnsubscribe = null;
 
 function setupUserProfileListener(userId) {
     if (typeof firebase === "undefined" || !db || !userId || userId === "000000000") return;
-    
+
     if (userProfileUnsubscribe) {
-        try { userProfileUnsubscribe(); } catch (e) {}
+        try { userProfileUnsubscribe(); } catch (e) { }
         userProfileUnsubscribe = null;
     }
-    
+
     try {
         userProfileUnsubscribe = db.collection("users").doc(userId).onSnapshot(doc => {
             if (!doc.exists) return;
             const docData = doc.data();
             if (!docData) return;
-            
+
             if (docData.banned === true) {
                 showBannedScreen();
                 return;
             }
-            
+
             let shouldUpdateUI = false;
             let shouldUpdateFarming = false;
-            
+
             // Sync points balance in real-time across devices
             if (docData.points !== undefined && Number(docData.points) !== state.user.points) {
                 state.user.points = Number(docData.points) || 0;
                 shouldUpdateUI = true;
             }
-            
+
             // Sync mining timer in real-time across devices
             if (docData.farmingStartedAt !== undefined && docData.farmingStartedAt !== state.user.farmingStartedAt) {
                 state.user.farmingStartedAt = docData.farmingStartedAt;
                 shouldUpdateFarming = true;
             }
-            
+
             // Sync badges & passes in real-time
             if (docData.badge !== undefined && docData.badge !== state.user.badge) {
                 state.user.badge = docData.badge;
                 state.user.badgeExpiresAt = docData.badgeExpiresAt || 0;
                 shouldUpdateUI = true;
             }
-            
+
             if (docData.pointsBreakdown !== undefined) {
                 state.user.pointsBreakdown = docData.pointsBreakdown;
             }
             if (docData.checkInStreak !== undefined) state.user.checkInStreak = docData.checkInStreak;
             if (docData.lastCheckInDate) state.user.lastCheckInDate = docData.lastCheckInDate;
             if (docData.dailyStats) state.user.dailyStats = docData.dailyStats;
-            
+
             saveProfileToLocalStorage();
-            
+
             if (shouldUpdateUI) {
                 updatePointsUI();
                 updateUserGreeting();
@@ -1240,7 +1261,7 @@ function setupUserProfileListener(userId) {
                     renderLeaderboard();
                 }
             }
-            
+
             if (shouldUpdateFarming) {
                 updateFarmingUI();
             }
@@ -1450,7 +1471,7 @@ function unlinkTelegramAccount() {
     state.isTelegramSynced = false;
 
     if (userProfileUnsubscribe) {
-        try { userProfileUnsubscribe(); } catch (e) {}
+        try { userProfileUnsubscribe(); } catch (e) { }
         userProfileUnsubscribe = null;
     }
 
@@ -1546,7 +1567,7 @@ function loadUserProfile() {
         contactPreference: "telegram",
         points: 0
     };
-    
+
     let profile = defaultProfile;
     const saved = localStorage.getItem("filmhouse_user_profile");
     if (saved) {
@@ -1584,7 +1605,7 @@ function loadUserProfile() {
         inviteShared: false
     };
     checkAndResetDailyMissions();
-    
+
     if (profile.avatar) {
         const isCustomUploaded = profile.avatar.startsWith("data:");
         const hasTelegramPhoto = state.user.avatar && state.user.avatar.startsWith("http");
@@ -1593,7 +1614,7 @@ function loadUserProfile() {
             state.user.avatar = profile.avatar;
         }
     }
-    
+
     // Resolve relative default avatar paths dynamically to prevent 404s between root & subfolder
     if (state.user.avatar && !state.user.avatar.startsWith("data:") && !state.user.avatar.startsWith("http")) {
         const isSubfolder = window.location.pathname.includes("/MOVIE/");
@@ -1603,7 +1624,7 @@ function loadUserProfile() {
             state.user.avatar = "MOVIE/img/FilmHouse3_nobg.png";
         }
     }
-    
+
     state.user.favoriteCategories = profile.favoriteCategories || [];
     state.user.notificationsEnabled = profile.notificationsEnabled !== undefined ? profile.notificationsEnabled : true;
     state.user.subAnime = profile.subAnime !== undefined ? profile.subAnime : true;
@@ -1645,7 +1666,7 @@ function loadUserProfile() {
 
     const displayFullName = document.getElementById("profile-display-name");
     if (displayFullName) displayFullName.textContent = state.user.fullName || "Guest User";
-    
+
     const displayUsername = document.getElementById("profile-display-username");
     if (displayUsername) displayUsername.textContent = state.user.username ? `@${state.user.username}` : "No handle";
 
@@ -1676,10 +1697,10 @@ function loadUserProfile() {
 
     // Build favorite genres checklist dynamically
     renderFavoriteCategoriesChecklist();
-    
+
     // Check if VIP Custom Badge has expired before syncing UI
     checkVipBadgeExpiry();
-    
+
     // Sync points UI elements
     updatePointsUI();
 
@@ -1721,7 +1742,7 @@ function loadUserProfile() {
     } catch (e) {
         console.warn("Could not merge healed movie details cache:", e);
     }
-    
+
     // Sync top-left personalized name greeting
     updateUserGreeting();
 }
@@ -1730,15 +1751,15 @@ function loadUserProfile() {
 function renderProfileMovieSummaries() {
     const watchlistScroll = document.getElementById("profile-watchlist-scroll-container");
     const watchedScroll = document.getElementById("profile-watched-scroll-container");
-    
+
     // 1. Populate Watchlist summaries
     if (watchlistScroll) {
         watchlistScroll.replaceChildren();
         const watchlistMovies = state.movies.filter(m => state.watchlist.includes(m.csv_id));
-        
+
         const countLabel = document.getElementById("profile-watchlist-count-label");
         if (countLabel) countLabel.textContent = watchlistMovies.length;
-        
+
         if (watchlistMovies.length === 0) {
             const empty = document.createElement("div");
             empty.className = "profile-movies-empty";
@@ -1756,15 +1777,15 @@ function renderProfileMovieSummaries() {
             });
         }
     }
-    
+
     // 2. Populate Watched history summaries
     if (watchedScroll) {
         watchedScroll.replaceChildren();
         const watchedMovies = state.movies.filter(m => state.history.includes(m.csv_id));
-        
+
         const countLabel = document.getElementById("profile-watched-count-label");
         if (countLabel) countLabel.textContent = watchedMovies.length;
-        
+
         if (watchedMovies.length === 0) {
             const empty = document.createElement("div");
             empty.className = "profile-movies-empty";
@@ -1798,13 +1819,13 @@ const LEADERBOARD_COMPETITORS = [
 function getDynamicLeaderboard() {
     const isSubfolder = window.location.pathname.includes("/MOVIE/");
     const prefix = isSubfolder ? "" : "MOVIE/";
-    
+
     // Build list of competitors with dynamic paths
     const list = LEADERBOARD_COMPETITORS.map(c => ({
         ...c,
         avatar: c.avatar ? prefix + c.avatar : ""
     }));
-    
+
     // Add current user
     list.push({
         username: state.user.username || "guest",
@@ -1814,7 +1835,7 @@ function getDynamicLeaderboard() {
         badge: getAchievementBadge(state.user.points || 0, state.user.badge),
         isCurrentUser: true
     });
-    
+
     // Sort descending
     list.sort((a, b) => b.points - a.points);
     return list;
@@ -1857,7 +1878,7 @@ function awardPoints(points, reason, silent = false) {
     if (pts === 0) return;
 
     state.user.points = Math.max(0, (state.user.points || 0) + pts);
-    
+
     if (!state.user.pointsBreakdown) {
         state.user.pointsBreakdown = { downloads: 0, visits: 0, shares: 0, watched: 0 };
     }
@@ -1877,10 +1898,10 @@ function awardPoints(points, reason, silent = false) {
             state.user.pointsBreakdown.watched = Math.max(0, (state.user.pointsBreakdown.watched || 0) - 1);
         }
     }
-    
+
     // Save to user profile in localStorage
     saveProfileToLocalStorage();
-    
+
     // Atomic update to Firebase Firestore: FieldValue.increment
     if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
         const userRef = db.collection("users").doc(state.user.id);
@@ -1900,16 +1921,16 @@ function awardPoints(points, reason, silent = false) {
         // Record in permanent loyalty ledger
         recordLoyaltyLedger(pts, pts > 0 ? "earn" : "deduct", reason, state.user.points);
     }
-    
+
     // Update UI components
     updatePointsUI();
-    
+
     // Render Leaderboard dynamically if active
     const leaderboardScreen = document.getElementById("screen-leaderboard");
     if (leaderboardScreen && leaderboardScreen.classList.contains("active")) {
         renderLeaderboard();
     }
-    
+
     // Notify the user via toast (if not silent)
     if (!silent) {
         let reasonText = "";
@@ -1919,7 +1940,7 @@ function awardPoints(points, reason, silent = false) {
         else if (reason === "share") reasonText = "sharing a movie";
         else if (reason === "mining") reasonText = "mining rewards";
         else if (reason === "watched") reasonText = pts > 0 ? "marking a movie as watched" : "removing a movie from watched list";
-        
+
         if (pts > 0) {
             showToast(`Earned +${pts} Loyalty Points for ${reasonText}! 🏆`, "success");
         } else if (pts < 0) {
@@ -1936,11 +1957,11 @@ function updatePointsUI() {
     // 1b. Rewards Drawer points display
     const rewardsPoints = document.getElementById("rewards-points-display");
     if (rewardsPoints) rewardsPoints.textContent = state.user.points || 0;
-    
+
     // 2. Profile screen points counts
     const profilePoints = document.getElementById("profile-loyalty-points");
     if (profilePoints) profilePoints.textContent = state.user.points || 0;
-    
+
     // 3. Profile screen rank label (Calculated locally from state - zero Firestore reads)
     const profileRankLabel = document.getElementById("profile-loyalty-rank-label");
     if (profileRankLabel) {
@@ -1958,9 +1979,9 @@ function updatePointsUI() {
     const bkV = document.getElementById("breakdown-visits");
     const bkS = document.getElementById("breakdown-shares");
     const bkW = document.getElementById("breakdown-watched");
-    
+
     const breakdown = state.user.pointsBreakdown || { downloads: 0, visits: 0, shares: 0, watched: 0 };
-    
+
     if (bkD) bkD.textContent = `${breakdown.downloads * 10} pts (${breakdown.downloads} downloads)`;
     if (bkV) bkV.textContent = `${breakdown.visits * 5} pts (${breakdown.visits} visits)`;
     if (bkS) bkS.textContent = `${breakdown.shares * 2} pts (${breakdown.shares} shares)`;
@@ -2030,10 +2051,10 @@ function updatePointsUI() {
     const progressFill = document.getElementById("profile-tier-progress-fill");
     const progressPercent = document.getElementById("profile-tier-progress-percent");
     const progressText = document.getElementById("profile-tier-progress-text");
-    
+
     const pts = state.user.points || 0;
     const tier = getUserTier(pts);
-    
+
     if (tierIcon) tierIcon.textContent = tier.icon;
     if (tierName) tierName.textContent = tier.name;
     if (tierBadge) {
@@ -2041,7 +2062,7 @@ function updatePointsUI() {
         tierBadge.style.borderColor = tier.borderColor;
         tierBadge.style.background = tier.bgColor;
     }
-    
+
     if (tier.nextPts === null) {
         if (progressFill) progressFill.style.width = "100%";
         if (progressPercent) progressPercent.textContent = "100%";
@@ -2051,7 +2072,7 @@ function updatePointsUI() {
         const currentProgress = pts - tier.prevPts;
         const percentage = Math.min(100, Math.max(0, Math.round((currentProgress / range) * 100)));
         const ptsNeeded = tier.nextPts - pts;
-        
+
         if (progressFill) progressFill.style.width = `${percentage}%`;
         if (progressPercent) progressPercent.textContent = `${percentage}%`;
         if (progressText) {
@@ -2130,7 +2151,7 @@ function renderLeaderboard() {
     const userRankCard = document.getElementById("leaderboard-user-rank-card");
     const rowsContainer = document.getElementById("leaderboard-rows-container");
     if (!userRankCard || !rowsContainer) return;
-    
+
     // Clear previous listener if any
     if (typeof leaderboardUnsubscribe === "function") {
         try {
@@ -2144,9 +2165,9 @@ function renderLeaderboard() {
     // Clear containers and show loading state
     userRankCard.innerHTML = `<div style="padding: 10px; text-align: center; color: var(--text-secondary); width: 100%;">Loading ranking...</div>`;
     rowsContainer.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--text-secondary);">Loading global leaderboard...</div>`;
-    
+
     const badgePrefix = window.location.pathname.includes("/MOVIE/") ? "" : "MOVIE/";
-    
+
     // If Firebase is available, load live leaderboard
     if (typeof firebase !== "undefined" && db) {
         db.collection("settings").doc("admins").get().then(adminDoc => {
@@ -2161,11 +2182,11 @@ function renderLeaderboard() {
                 const seenIds = new Set();
                 const seenUsernames = new Set();
                 const seenFullNames = new Set();
-                
+
                 snapshot.forEach(doc => {
                     const u = doc.data();
                     const userIdStr = u.id ? String(u.id) : "";
-                    
+
                     // Skip if duplicate ID
                     if (u.id && seenIds.has(u.id)) return;
                     // Skip if duplicate username (unless it is "guest" or empty)
@@ -2173,11 +2194,11 @@ function renderLeaderboard() {
                     // Skip if duplicate display name (unless it is a generic guest/demo name)
                     const isGuestName = !u.fullName || u.fullName.includes("Guest") || u.fullName.includes("Demo User");
                     if (u.fullName && !isGuestName && u.fullName !== "" && seenFullNames.has(u.fullName)) return;
-                    
+
                     if (u.id) seenIds.add(u.id);
                     if (u.username && u.username !== "guest" && u.username !== "") seenUsernames.add(u.username);
                     if (u.fullName && !isGuestName && u.fullName !== "") seenFullNames.add(u.fullName);
-                    
+
                     const isMe = u.id === state.user.id;
                     const avatarVal = u.avatar || (badgePrefix + "img/FilmHouse3_nobg.png");
                     const badgeVal = getAchievementBadge(u.points || 0, u.badge);
@@ -2205,11 +2226,11 @@ function renderLeaderboard() {
                         });
                     }
                 });
-                
+
                 // If current user is in top 25, get their rank; otherwise display 25+ (zero additional reads)
                 const index = list.findIndex(item => item.isCurrentUser);
                 const userRank = index !== -1 ? index + 1 : (list.length >= 25 ? "25+" : list.length + 1);
-                
+
                 const isCurrentUserStaff = allAdminIds.includes(String(state.user.id));
                 displayLeaderboardData(list, userRank, staffList, isCurrentUserStaff);
             }, (err) => {
@@ -2223,20 +2244,20 @@ function renderLeaderboard() {
     } else {
         renderStaticLeaderboard();
     }
-    
+
     function renderStaticLeaderboard() {
         const list = getDynamicLeaderboard();
         const userRank = calculateUserRank();
         const isCurrentUserStaff = typeof globalAdminIds !== "undefined" && globalAdminIds.includes(String(state.user.id));
         displayLeaderboardData(list, userRank, [], isCurrentUserStaff);
     }
-    
+
     function displayLeaderboardData(list, userRank, staffList = [], isCurrentUserStaff = false) {
         userRankCard.replaceChildren();
         rowsContainer.replaceChildren();
-        
+
         const userAvatarPath = state.user.avatar || (badgePrefix + "img/FilmHouse3_nobg.png");
-        
+
         let rankHTML = `
             <span style="font-size: 16px; font-weight: 800; color: #f5c518; display: block; line-height: 1;">#${userRank}</span>
             <span style="font-size: 10px; color: var(--text-secondary); font-weight: 500;">Rank | ${state.user.points || 0} pts</span>
@@ -2247,7 +2268,7 @@ function renderLeaderboard() {
                 <span style="font-size: 9px; color: var(--text-secondary); font-weight: 500;">Curator | ${state.user.points || 0} pts</span>
             `;
         }
-        
+
         const userCardHTML = `
             <div style="display: flex; align-items: center; gap: 12px;">
                 <img src="${escapeHTML(userAvatarPath)}" alt="Your Avatar" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #f5c518;" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
@@ -2261,7 +2282,7 @@ function renderLeaderboard() {
             </div>
         `;
         userRankCard.innerHTML = userCardHTML;
-        
+
         // Render Pinned Staff / Curators if present
         if (staffList && staffList.length > 0) {
             const staffContainer = document.createElement("div");
@@ -2284,12 +2305,12 @@ function renderLeaderboard() {
             `;
             rowsContainer.appendChild(staffContainer);
         }
-        
+
         list.forEach((item, index) => {
             const rank = index + 1;
             const row = document.createElement("div");
             row.className = `leaderboard-row ${item.isCurrentUser ? "current-user" : ""}`;
-            
+
             let rankBadgeClass = "leaderboard-rank-default";
             let rankBadgeContent = rank;
             if (rank === 1) {
@@ -2302,7 +2323,7 @@ function renderLeaderboard() {
                 rankBadgeClass = "leaderboard-rank-3";
                 rankBadgeContent = "🥉";
             }
-            
+
             row.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div class="leaderboard-rank-badge ${rankBadgeClass}">${rankBadgeContent}</div>
@@ -2329,9 +2350,9 @@ function renderFavoriteCategoriesChecklist() {
     ];
 
     const categoryList = [
-        "Hollywood/British Movies", "Hollywood/British Series", 
-        "Bollywood", "Asian Drama", "Asian Movies", "African", "Anime", "Comic", 
-        "Animated Movies", "Kids Shows and Movies (Nickelodeon and Disney)", 
+        "Hollywood/British Movies", "Hollywood/British Series",
+        "Bollywood", "Asian Drama", "Asian Movies", "African", "Anime", "Comic",
+        "Animated Movies", "Kids Shows and Movies (Nickelodeon and Disney)",
         "Classic Movies", "Erotic Movies", "Teen/High-School", "Christian Movies"
     ];
 
@@ -2476,7 +2497,7 @@ function generateNotificationAlerts() {
     }
 
     const notifications = [];
-    
+
     // Find Anime movie
     if (state.user.subAnime) {
         const animeMovie = state.movies.find(m => m.categories.includes("Anime"));
@@ -2529,7 +2550,7 @@ function generateNotificationAlerts() {
         const watchlistMovies = state.movies.filter(m => state.watchlist.includes(m.csv_id));
         const categories = new Set();
         watchlistMovies.forEach(m => m.categories.forEach(c => categories.add(c)));
-        
+
         const recMovie = state.movies.find(m => !state.watchlist.includes(m.csv_id) && m.categories.some(c => categories.has(c)));
         if (recMovie) {
             notifications.push({
@@ -2543,8 +2564,8 @@ function generateNotificationAlerts() {
         }
     }
 
-    const storedStatus = JSON.parse(localStorage.getItem("filmhouse_notifications_status") || "{}");
-    
+    const storedStatus = safeJsonParse(localStorage.getItem("filmhouse_notifications_status"), {});
+
     notifications.forEach(n => {
         if (storedStatus[n.id] !== undefined) {
             n.unread = storedStatus[n.id];
@@ -2584,27 +2605,27 @@ function renderNotificationsList() {
     }
 
     emptyState.style.display = "none";
-    
+
     const unreadCount = state.notifications.filter(n => n.unread).length;
     clearBtn.style.display = unreadCount > 0 ? "block" : "none";
 
     state.notifications.forEach(n => {
         const card = document.createElement("div");
         card.className = `notification-card ${n.unread ? 'unread' : ''}`;
-        
+
         const header = document.createElement("div");
         header.className = "notification-header";
-        
+
         const title = document.createElement("span");
         title.className = "notification-title";
         title.textContent = n.title;
         header.appendChild(title);
-        
+
         const time = document.createElement("span");
         time.className = "notification-time";
         time.textContent = n.time;
         header.appendChild(time);
-        
+
         card.appendChild(header);
 
         const body = document.createElement("div");
@@ -2614,13 +2635,13 @@ function renderNotificationsList() {
 
         card.addEventListener("click", () => {
             n.unread = false;
-            const storedStatus = JSON.parse(localStorage.getItem("filmhouse_notifications_status") || "{}");
+            const storedStatus = safeJsonParse(localStorage.getItem("filmhouse_notifications_status"), {});
             storedStatus[n.id] = false;
             localStorage.setItem("filmhouse_notifications_status", JSON.stringify(storedStatus));
-            
+
             const notifModal = document.getElementById("notifications-modal");
             if (notifModal) notifModal.classList.remove("active");
-            
+
             const profileDrawer = document.getElementById("profile-drawer");
             if (profileDrawer) profileDrawer.classList.remove("active");
 
@@ -2628,7 +2649,7 @@ function renderNotificationsList() {
             if (movie) {
                 openDetailModal(movie);
             }
-            
+
             updateNotificationsBadge();
             renderNotificationsList();
         });
@@ -2657,12 +2678,12 @@ function getStreamBadgeElement(movie) {
 
 function getRequestedBadgeElement(movie) {
     if (!movie || typeof currentUserRequests === 'undefined' || !currentUserRequests || currentUserRequests.length === 0) return null;
-    const userReq = currentUserRequests.find(r => 
+    const userReq = currentUserRequests.find(r =>
         r.title && titlesMatch(r.title, movie.title) &&
         typeof isUserRequestFulfilled === 'function' && !isUserRequestFulfilled(r, movie)
     );
     if (!userReq) return null;
-    
+
     const reqBadge = document.createElement("div");
     reqBadge.className = "movie-card-req-badge";
     reqBadge.style.cssText = "position: absolute; top: 6px; left: 6px; background: linear-gradient(135deg, #ffbc00, #ff8c00); color: #000; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; z-index: 4; box-shadow: 0 2px 8px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 3px;";
@@ -2784,7 +2805,7 @@ function renderHistoryGrid() {
 function clearWatchHistory() {
     state.history = [];
     localStorage.setItem("filmhouse_history", JSON.stringify(state.history));
-    
+
     const countLabel = document.getElementById("stat-history-count");
     if (countLabel) countLabel.textContent = 0;
 
@@ -2852,7 +2873,7 @@ function navigateToScreen(targetScreenId) {
             state.filters.rating = 0;
             state.filters.selectedGenres = ["All"];
         }
-        
+
         const filterGenre = document.getElementById("filter-genre");
         if (filterGenre) filterGenre.value = "All";
         const filterGenre2 = document.getElementById("filter-genre-2");
@@ -2897,10 +2918,10 @@ function renderCategoriesBar() {
     bar.replaceChildren();
 
     const categoryList = [
-        "Main", "Hollywood/British Movies", "Hollywood/British Series", 
-        "Asian Drama", "Asian Movies", "Anime Series", "Anime Movies", 
-        "Bollywood", "African", "Comic", "Animated Movies", 
-        "Kids Shows and Movies (Nickelodeon and Disney)", 
+        "Main", "Hollywood/British Movies", "Hollywood/British Series",
+        "Asian Drama", "Asian Movies", "Anime Series", "Anime Movies",
+        "Bollywood", "African", "Comic", "Animated Movies",
+        "Kids Shows and Movies (Nickelodeon and Disney)",
         "Classic Movies", "Erotic Movies", "Teen/High-School", "Christian Movies"
     ];
 
@@ -2964,11 +2985,11 @@ function renderCategoriesBar() {
         button.addEventListener("click", () => {
             const activeEl = bar.querySelector(".category-pill.active");
             if (activeEl) activeEl.classList.remove("active");
-            
+
             button.classList.add("active");
             state.activeCategory = cat;
             state.visibleCount = 24;
-            
+
             const heading = document.getElementById("grid-title");
             if (heading) heading.textContent = categoryLabels[cat] || cat;
 
@@ -2992,40 +3013,40 @@ function renderGenreChips() {
     wrapper.replaceChildren();
 
     const genres = ["All", "Action", "Adventure", "Action & Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", "Kids", "Music", "Mystery", "News", "Reality", "Romance", "Sci-Fi", "Science Fiction", "Sci-Fi & Fantasy", "Soap", "Talk", "Thriller", "TV Movie", "War", "War & Politics", "Western"];
-    
+
     genres.forEach(genre => {
         const chip = document.createElement("div");
         const isActive = state.filters.selectedGenres.includes(genre);
         chip.className = `genre-chip ${isActive ? "active" : ""}`;
         chip.textContent = genre;
-        
+
         chip.addEventListener("click", () => {
             if (genre === "All") {
                 state.filters.selectedGenres = ["All"];
             } else {
                 // Remove "All" if it was active
                 state.filters.selectedGenres = state.filters.selectedGenres.filter(g => g !== "All");
-                
+
                 // Toggle clicked genre
                 if (state.filters.selectedGenres.includes(genre)) {
                     state.filters.selectedGenres = state.filters.selectedGenres.filter(g => g !== genre);
                 } else {
                     state.filters.selectedGenres.push(genre);
                 }
-                
+
                 // If empty, set back to "All"
                 if (state.filters.selectedGenres.length === 0) {
                     state.filters.selectedGenres = ["All"];
                 }
             }
-            
+
             state.visibleCount = 24;
-            
+
             // Re-render chips to update active styling
             renderGenreChips();
             renderFeaturedGrid();
         });
-        
+
         wrapper.appendChild(chip);
     });
 }
@@ -3035,10 +3056,10 @@ function renderGenreChips() {
 function matchesMovieCategory(m, category) {
     if (!m) return false;
     if (category === "Main") return true;
-    
+
     const cats = (m.categories || []).map(c => String(c).toLowerCase());
     const targetCat = String(category).toLowerCase();
-    
+
     const isSeries = (m.type || "").toLowerCase() === "series" || (m.type || "").toLowerCase() === "tv";
     const genres = (m.genres || []).map(g => (typeof g === 'string' ? g : (g.name || "")).toLowerCase());
     const lang = (m.language || "").toLowerCase();
@@ -3370,14 +3391,14 @@ function renderFeaturedGrid(preservePagination = false) {
         if (movie.rating > 0) {
             const rating = document.createElement("div");
             rating.className = "movie-card-rating";
-            
+
             const star = createSvgIcon("icon-star", "star-card-icon");
             rating.appendChild(star);
-            
+
             const score = document.createElement("span");
             score.textContent = movie.rating;
             rating.appendChild(score);
-            
+
             imgWrapper.appendChild(rating);
         }
 
@@ -3432,7 +3453,7 @@ function renderFeaturedGrid(preservePagination = false) {
         loadMoreBtn.className = "btn btn-secondary";
         loadMoreBtn.style.cssText = "grid-column: 1 / -1; margin: 16px auto 24px auto; padding: 10px 24px; font-weight: 700; border-radius: 24px; font-size: 12px; display: block; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: #fff; cursor: pointer; transition: all 0.2s; font-family: var(--font-primary);";
         loadMoreBtn.textContent = `Show More (+${totalCount - state.visibleCount} titles) 🎬`;
-        
+
         loadMoreBtn.addEventListener("mouseenter", () => {
             loadMoreBtn.style.background = "var(--primary-gradient)";
             loadMoreBtn.style.color = "#000";
@@ -3443,7 +3464,7 @@ function renderFeaturedGrid(preservePagination = false) {
             loadMoreBtn.style.color = "#fff";
             loadMoreBtn.style.borderColor = "var(--border-color)";
         });
-        
+
         loadMoreBtn.addEventListener("click", () => {
             state.visibleCount += 24;
             renderFeaturedGrid();
@@ -3488,7 +3509,7 @@ function renderEditorsChoice() {
     }
 
     wrapper.style.display = "block";
-    
+
     const titleHeader = wrapper.querySelector(".section-title");
     if (titleHeader) {
         titleHeader.textContent = state.editorsChoiceTitle || "Editor's Choice 🎬";
@@ -3518,14 +3539,14 @@ function renderEditorsChoice() {
         if (movie.rating > 0) {
             const rating = document.createElement("div");
             rating.className = "movie-card-rating";
-            
+
             const star = createSvgIcon("icon-star", "star-card-icon");
             rating.appendChild(star);
-            
+
             const score = document.createElement("span");
             score.textContent = movie.rating;
             rating.appendChild(score);
-            
+
             imgWrapper.appendChild(rating);
         }
 
@@ -3552,7 +3573,7 @@ function renderEditorsChoice() {
         const yearLabel = document.createElement("span");
         yearLabel.textContent = movie.release_date ? movie.release_date.substring(0, 4) : "N/A";
         metaRow.appendChild(yearLabel);
-        
+
         info.appendChild(metaRow);
         card.appendChild(info);
 
@@ -3574,7 +3595,7 @@ function renderWatchlistGrid() {
 
     const isWatchedTab = state.activeWatchlistTab === "watched";
     const list = state.movies.filter(m => {
-        return isWatchedTab 
+        return isWatchedTab
             ? state.history.includes(m.csv_id)
             : state.watchlist.includes(m.csv_id);
     });
@@ -3582,7 +3603,7 @@ function renderWatchlistGrid() {
     if (list.length === 0) {
         grid.style.display = "none";
         emptyState.style.display = "flex";
-        
+
         // Update empty state text based on active tab
         const emptyIcon = emptyState.querySelector(".empty-icon use");
         const emptyTitle = emptyState.querySelector("h3");
@@ -3624,7 +3645,7 @@ function renderWatchlistGrid() {
             const rating = document.createElement("div");
             rating.className = "watchlist-rating-badge";
             rating.appendChild(createSvgIcon("icon-star", "star-card-icon"));
-            
+
             const score = document.createElement("span");
             score.textContent = movie.rating;
             rating.appendChild(score);
@@ -3652,7 +3673,7 @@ function renderWatchlistGrid() {
         const yearLabel = document.createElement("span");
         yearLabel.textContent = movie.release_date ? movie.release_date.substring(0, 4) : "N/A";
         metaRow.appendChild(yearLabel);
-        
+
         if (movie.rating > 0) {
             const ratingLabel = document.createElement("span");
             ratingLabel.textContent = `IMDb ${movie.rating}`;
@@ -3689,10 +3710,10 @@ function renderWatchlistGrid() {
 
         const removeBtn = document.createElement("button");
         removeBtn.className = "btn btn-secondary btn-sm btn-block-sm btn-danger-sm";
-        
+
         const trashIcon = createSvgIcon("icon-close", "remove-icon");
         removeBtn.appendChild(trashIcon);
-        
+
         const removeText = document.createElement("span");
         removeText.textContent = isWatchedTab ? "Unwatch" : "Remove";
         removeBtn.appendChild(removeText);
@@ -3703,10 +3724,10 @@ function renderWatchlistGrid() {
                 // Remove from watched list
                 state.history = state.history.filter(id => id !== movie.csv_id);
                 localStorage.setItem("filmhouse_history", JSON.stringify(state.history));
-                
+
                 // Deduct points
                 awardPoints(-5, "watched");
-                
+
                 const countLabel = document.getElementById("stat-history-count");
                 if (countLabel) countLabel.textContent = state.history.length;
             } else {
@@ -3799,11 +3820,11 @@ function renderCarouselBanner() {
             const rating = document.createElement("span");
             rating.className = "rating";
             rating.appendChild(createSvgIcon("icon-star"));
-            
+
             const ratingScore = document.createElement("span");
             ratingScore.textContent = `${movie.rating}/10`;
             rating.appendChild(ratingScore);
-            
+
             metaRow.appendChild(rating);
         }
 
@@ -3865,7 +3886,7 @@ function renderCarouselBanner() {
     // Create Navigation Indicator Dots (Sleek 7-Dot Dynamic Pill Navigation)
     const dotsContainer = document.createElement("div");
     dotsContainer.className = "carousel-dots";
-    
+
     featuredList.forEach((_, idx) => {
         const dot = document.createElement("div");
         dot.className = `carousel-dot ${idx === 0 ? 'active' : ''}`;
@@ -3876,7 +3897,7 @@ function renderCarouselBanner() {
         });
         dotsContainer.appendChild(dot);
     });
-    
+
     container.appendChild(dotsContainer);
 
     // Add Prev / Next Arrow Buttons for PC manual navigation
@@ -4029,7 +4050,7 @@ function showSlide(index) {
     const track = container.querySelector(".hero-carousel-track");
     const slides = container.querySelectorAll(".carousel-slide");
     const dots = container.querySelectorAll(".carousel-dot");
-    
+
     if (slides.length === 0) return;
 
     if (index < 0) index = slides.length - 1;
@@ -4090,7 +4111,7 @@ function initializeFilterDropdowns() {
     });
 
     // Populate years
-    Array.from(yearSet).sort((a,b) => b-a).forEach(y => {
+    Array.from(yearSet).sort((a, b) => b - a).forEach(y => {
         const opt = document.createElement("option");
         opt.value = y;
         opt.textContent = y;
@@ -4223,12 +4244,12 @@ function closeMediaDetailPage() {
     }
     if (document.fullscreenElement || document.webkitFullscreenElement) {
         try {
-            if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            if (document.exitFullscreen) document.exitFullscreen().catch(() => { });
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        } catch (e) {}
+        } catch (e) { }
     }
     if (window.Telegram?.WebApp?.unlockOrientation) {
-        try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
+        try { window.Telegram.WebApp.unlockOrientation(); } catch (e) { }
     }
 
     if (typeof currentHeroTrailerCleanup === "function") {
@@ -4271,7 +4292,7 @@ function closeMediaDetailPage() {
     document.body.classList.remove("media-detail-active");
 
     if (window.Telegram?.WebApp?.BackButton) {
-        try { window.Telegram.WebApp.BackButton.offClick(closeMediaDetailPage); } catch (e) {}
+        try { window.Telegram.WebApp.BackButton.offClick(closeMediaDetailPage); } catch (e) { }
         window.Telegram.WebApp.BackButton.hide();
     }
 
@@ -4287,13 +4308,13 @@ function stopAllBackgroundTrailers() {
     if (typeof currentHeroTrailerCleanup === "function") {
         const cleanup = currentHeroTrailerCleanup;
         currentHeroTrailerCleanup = null;
-        try { cleanup(); } catch (e) {}
+        try { cleanup(); } catch (e) { }
     }
     const heroTrailerIframe = document.getElementById("media-stream-iframe-container");
     if (heroTrailerIframe) {
         heroTrailerIframe.querySelectorAll("iframe").forEach(f => {
-            try { f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "pauseVideo", args: [] }), "*"); } catch (_) {}
-            try { f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "stopVideo", args: [] }), "*"); } catch (_) {}
+            try { f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "pauseVideo", args: [] }), "*"); } catch (_) { }
+            try { f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "stopVideo", args: [] }), "*"); } catch (_) { }
             f.src = "about:blank";
             f.remove();
         });
@@ -4316,7 +4337,7 @@ function stopAllBackgroundTrailers() {
     const trailerContainer = document.getElementById("trailer-iframe-container");
     if (trailerContainer) {
         trailerContainer.querySelectorAll("iframe").forEach(f => {
-            try { f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "stopVideo", args: [] }), "*"); } catch (_) {}
+            try { f.contentWindow?.postMessage(JSON.stringify({ event: "command", func: "stopVideo", args: [] }), "*"); } catch (_) { }
             f.src = "about:blank";
             f.remove();
         });
@@ -4355,8 +4376,8 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
         ytKey = trailerKeyOrUrl;
     }
 
-    const embedUrl = ytKey.startsWith("http") 
-        ? ytKey 
+    const embedUrl = ytKey.startsWith("http")
+        ? ytKey
         : `https://www.youtube.com/embed/${ytKey}?autoplay=1&mute=0&playsinline=0&fs=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
 
     iframeContainer.replaceChildren();
@@ -4365,7 +4386,7 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
     if (detailScreen) detailScreen.classList.add("video-playing");
 
     if (window.Telegram?.WebApp?.unlockOrientation) {
-        try { window.Telegram.WebApp.unlockOrientation(); } catch (e) {}
+        try { window.Telegram.WebApp.unlockOrientation(); } catch (e) { }
     }
 
     const iframe = document.createElement("iframe");
@@ -4380,7 +4401,7 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
     const postCmd = (func, args = []) => {
         try {
             iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), "*");
-        } catch (e) {}
+        } catch (e) { }
     };
 
     const stopAndRestoreBackdrop = () => {
@@ -4406,7 +4427,7 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
         clearTimeout(crossfadeTimeout);
         try {
             iframe.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: 1 }), "*");
-        } catch (e) {}
+        } catch (e) { }
         postCmd("addEventListener", ["onStateChange"]);
         postCmd("setVolume", [25]);
         postCmd("unMute");
@@ -4414,7 +4435,7 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
         setTimeout(() => {
             try {
                 iframe.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: 1 }), "*");
-            } catch (e) {}
+            } catch (e) { }
             postCmd("setVolume", [25]);
             postCmd("unMute");
             if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
@@ -4469,7 +4490,7 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
                     if (backdropContainer) backdropContainer.classList.remove("hidden-for-playback");
                 }
             }
-        } catch (err) {}
+        } catch (err) { }
     };
 
     window.addEventListener("message", onYtMessage);
@@ -4478,8 +4499,8 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
         clearTimeout(crossfadeTimeout);
         if (progressPollInterval) clearInterval(progressPollInterval);
         window.removeEventListener("message", onYtMessage);
-        try { postCmd("pauseVideo"); } catch (e) {}
-        try { postCmd("stopVideo"); } catch (e) {}
+        try { postCmd("pauseVideo"); } catch (e) { }
+        try { postCmd("stopVideo"); } catch (e) { }
         stopAndRestoreBackdrop();
     };
 
@@ -4521,7 +4542,7 @@ function setLocalSeriesSubscription(tmdbId, isSubscribed) {
             subs.splice(idx, 1);
         }
         localStorage.setItem("filmhouse_series_subs", JSON.stringify(subs));
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function updateMediaSeriesTracker(movie, isTVShow) {
@@ -4540,7 +4561,7 @@ function updateMediaSeriesTracker(movie, isTVShow) {
     if (!isExplicitOngoing && !hasUpcomingAirDate) {
         // Untracked series, finished classic show (e.g. 1990 series), or ended series: hide tracker banner!
         banner.style.display = "none";
-        
+
         // Background check: did admin mark it Ongoing in Firestore?
         if (typeof db !== "undefined" && db && movie.csv_id) {
             db.collection("movies").doc(String(movie.csv_id)).get()
@@ -4556,7 +4577,7 @@ function updateMediaSeriesTracker(movie, isTVShow) {
                             updateMediaSeriesTracker(movie, true);
                         }
                     }
-                }).catch(() => {});
+                }).catch(() => { });
         }
         return;
     }
@@ -4586,8 +4607,8 @@ function updateMediaSeriesTracker(movie, isTVShow) {
     }
 
     // 1. Compute dynamic countdown badge via seriesSchema.js helper
-    const badge = typeof getSeriesCountdownBadge === "function" 
-        ? getSeriesCountdownBadge(movie) 
+    const badge = typeof getSeriesCountdownBadge === "function"
+        ? getSeriesCountdownBadge(movie)
         : null;
 
     if (statusPill && statusText) {
@@ -4649,8 +4670,8 @@ function updateMediaSeriesTracker(movie, isTVShow) {
 
     // Asynchronous Firestore background check (sync multi-device state)
     if (userId && tmdbId && typeof db !== "undefined" && db) {
-        const docId = typeof buildSubscriptionDocId === "function" 
-            ? buildSubscriptionDocId(userId, tmdbId) 
+        const docId = typeof buildSubscriptionDocId === "function"
+            ? buildSubscriptionDocId(userId, tmdbId)
             : `${userId}_${tmdbId}`;
 
         db.collection("subscriptions").doc(docId).get()
@@ -4711,8 +4732,8 @@ function updateMediaSeriesTracker(movie, isTVShow) {
 
             // Remote Firestore persistence for logged-in Telegram users (graceful background sync)
             if (typeof db !== "undefined" && db && userId) {
-                const docId = typeof buildSubscriptionDocId === "function" 
-                    ? buildSubscriptionDocId(userId, tmdbId) 
+                const docId = typeof buildSubscriptionDocId === "function"
+                    ? buildSubscriptionDocId(userId, tmdbId)
                     : `${userId}_${tmdbId}`;
                 const docRef = db.collection("subscriptions").doc(docId);
                 const userDocRef = db.collection("users").doc(String(userId));
@@ -4728,14 +4749,14 @@ function updateMediaSeriesTracker(movie, isTVShow) {
                         if (userDocRef) {
                             userDocRef.set({
                                 series_subscriptions: firebase.firestore.FieldValue.arrayUnion(Number(tmdbId))
-                            }, { merge: true }).catch(() => {});
+                            }, { merge: true }).catch(() => { });
                         }
                     } else {
-                        await docRef.delete().catch(() => {});
+                        await docRef.delete().catch(() => { });
                         if (userDocRef) {
                             userDocRef.set({
                                 series_subscriptions: firebase.firestore.FieldValue.arrayRemove(Number(tmdbId))
-                            }, { merge: true }).catch(() => {});
+                            }, { merge: true }).catch(() => { });
                         }
                     }
                 } catch (err) {
@@ -4753,7 +4774,7 @@ function updateMediaSeriesTracker(movie, isTVShow) {
 
 function isMovieUnreleased(movie) {
     if (!movie) return false;
-    
+
     // If the movie has streaming or uploaded download links, it is already released
     const hasUploadedLinks = movie.links && Array.isArray(movie.links) && movie.links.some(l => {
         const u = typeof l === 'object' && l !== null ? (l.url || l.stream_url) : l;
@@ -4815,7 +4836,7 @@ function setLocalMovieReleaseReminder(tmdbId, isSubscribed) {
             subs = subs.filter(id => id !== numId);
         }
         localStorage.setItem("filmhouse_movie_reminders", JSON.stringify(subs));
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function updateMovieReleaseTracker(movie, isTVShow) {
@@ -4882,7 +4903,7 @@ function updateMovieReleaseTracker(movie, isTVShow) {
                     setLocalMovieReleaseReminder(tmdbId, false);
                 }
             })
-            .catch(() => {});
+            .catch(() => { });
     }
 
     if (notifyBtn) {
@@ -4945,7 +4966,7 @@ function openMediaDetailPage(movie) {
 
     // Auto-enrich movie from state.movies if available (preserves stream_url, links, quality, backdrop, trailers)
     if (state.movies && Array.isArray(state.movies)) {
-        const localMatch = state.movies.find(m => 
+        const localMatch = state.movies.find(m =>
             (m.id && (m.id === movie.id || m.id === movie.csv_id)) ||
             (m.csv_id && (m.csv_id === movie.id || m.csv_id === movie.csv_id)) ||
             (m.tmdb_id && movie.tmdb_id && String(m.tmdb_id) === String(movie.tmdb_id)) ||
@@ -4991,14 +5012,14 @@ function openMediaDetailPage(movie) {
         return lc === "hollywood/british series" || lc === "anime series" || lc === "asian drama" || lc === "korean drama";
     });
     const hasSeasonLinks = movie.links && Array.isArray(movie.links) && movie.links.some(l => l && (l.season || l.episode));
-    
+
     // An item is a TV series only if explicitly marked as Series/TV/Show, or has season links,
     // or has a dedicated series category while NOT explicitly marked as Movie.
-    const isTVShow = explicitType === "series" || 
-                     explicitType === "tv" || 
-                     explicitType === "show" || 
-                     hasSeasonLinks || 
-                     (hasExplicitSeriesCategory && explicitType !== "movie");
+    const isTVShow = explicitType === "series" ||
+        explicitType === "tv" ||
+        explicitType === "show" ||
+        hasSeasonLinks ||
+        (hasExplicitSeriesCategory && explicitType !== "movie");
     movie.type = isTVShow ? "Series" : "Movie";
 
     navigateToScreen("media-detail");
@@ -5016,7 +5037,7 @@ function openMediaDetailPage(movie) {
         try {
             window.Telegram.WebApp.BackButton.show();
             window.Telegram.WebApp.BackButton.onClick(closeMediaDetailPage);
-        } catch (e) {}
+        } catch (e) { }
     }
 
     // 1. Immediately terminate previous trailer and clean previous video from DOM
@@ -5046,7 +5067,7 @@ function openMediaDetailPage(movie) {
 
     const backdropContainer = document.getElementById("media-backdrop-container");
     const previewFab = document.getElementById("btn-hero-play-preview");
-    
+
     if (backdropContainer) {
         backdropContainer.style.display = "block";
         backdropContainer.classList.remove("hidden-for-playback");
@@ -5201,7 +5222,7 @@ function openMediaDetailPage(movie) {
 
         // Secondary catalog fallback: search state.movies
         if (!streamTarget && state.movies && Array.isArray(state.movies)) {
-            const localMatch = state.movies.find(m => 
+            const localMatch = state.movies.find(m =>
                 (m.id && (m.id === movie.id || m.id === movie.csv_id)) ||
                 (m.csv_id && (m.csv_id === movie.id || m.csv_id === movie.csv_id)) ||
                 (m.tmdb_id && movie.tmdb_id && String(m.tmdb_id) === String(movie.tmdb_id)) ||
@@ -5266,7 +5287,7 @@ function openMediaDetailPage(movie) {
         // Only stop/clean up the trailer if we actually have a valid stream or TV Show to play
         if (isTVShow || streamTarget) {
             if (typeof currentHeroTrailerCleanup === "function") {
-                try { currentHeroTrailerCleanup(); } catch (e) {}
+                try { currentHeroTrailerCleanup(); } catch (e) { }
                 currentHeroTrailerCleanup = null;
             }
             const heroTrailerIframe = document.getElementById("media-stream-iframe-container");
@@ -5411,7 +5432,7 @@ function renderMediaDownloadRows(movie, container) {
         return u && String(u).trim().length > 0;
     }) : [];
 
-    const matchingRequest = currentUserRequests && currentUserRequests.find(r => 
+    const matchingRequest = currentUserRequests && currentUserRequests.find(r =>
         r.title && titlesMatch(r.title, movie.title) &&
         r.status === "fulfilled"
     );
@@ -5721,7 +5742,7 @@ function updateMediaQuickActions(movie) {
     const btnLike = document.getElementById("btn-media-like");
     if (btnLike) {
         const targetMovieId = String(movie.csv_id || movie.tmdb_id || movie.id || "").trim();
-        const likedIds = JSON.parse(localStorage.getItem("filmhouse_liked_movies") || "[]");
+        const likedIds = safeJsonParse(localStorage.getItem("filmhouse_liked_movies"), []);
         let isLiked = likedIds.includes(movie.csv_id) || (targetMovieId && likedIds.includes(targetMovieId));
 
         // Realistic organic baseline based on rating & ID (e.g. 24, 78, 142)
@@ -5759,7 +5780,7 @@ function updateMediaQuickActions(movie) {
         }
 
         btnLike.onclick = () => {
-            let currentLikes = JSON.parse(localStorage.getItem("filmhouse_liked_movies") || "[]");
+            let currentLikes = safeJsonParse(localStorage.getItem("filmhouse_liked_movies"), []);
             isLiked = !isLiked;
 
             if (isLiked) {
@@ -5807,7 +5828,7 @@ async function submitDedicatedStreamRequest(movie) {
 
     // Check if user already submitted a stream request for this movie
     if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
-        const alreadyStreamReq = currentUserRequests.some(r => 
+        const alreadyStreamReq = currentUserRequests.some(r =>
             (r.type === "stream" || r.requestType === "stream" || r.target === "stream_url") &&
             r.title && titlesMatch(r.title, movie.title) &&
             r.status !== "fulfilled"
@@ -5957,9 +5978,9 @@ async function openSubtitlesPicker(movie) {
     `;
 
     try {
-        const isTV = (movie.type || "").toLowerCase() === "series" || 
-                     (movie.type || "").toLowerCase() === "tv" || 
-                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+        const isTV = (movie.type || "").toLowerCase() === "series" ||
+            (movie.type || "").toLowerCase() === "tv" ||
+            (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
 
         let tmdbId = movie.tmdb_id;
         let imdbId = movie.imdb_id;
@@ -6347,25 +6368,25 @@ function renderMediaSeriesSection(movie, container, streamCallback) {
                 const epDisplayTitle = `${movie.title} • S${seasonObj.seasonNumber}:E${epNum}`;
                 streamCallback(epTarget, epDisplayTitle);
                 showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
-                    // Update Next Episode Quick Jump button
-                    let nextEpBtn = seriesHeader.querySelector(".cinema-next-ep-btn");
-                    const nextEpObj = episodes.find(e => (e.episode_number || 1) === (epNum + 1));
-                    if (nextEpObj) {
-                        if (!nextEpBtn) {
-                            nextEpBtn = document.createElement("button");
-                            nextEpBtn.type = "button";
-                            nextEpBtn.className = "cinema-next-ep-btn";
-                            seriesHeader.appendChild(nextEpBtn);
-                        }
-                        nextEpBtn.innerHTML = `<span>Next Ep ${epNum + 1}</span><span>▶️</span>`;
-                        nextEpBtn.onclick = () => {
-                            const nextCard = episodesGrid.children[epNum];
-                            if (nextCard) nextCard.click();
-                        };
-                        nextEpBtn.style.display = "inline-flex";
-                    } else if (nextEpBtn) {
-                        nextEpBtn.style.display = "none";
+                // Update Next Episode Quick Jump button
+                let nextEpBtn = seriesHeader.querySelector(".cinema-next-ep-btn");
+                const nextEpObj = episodes.find(e => (e.episode_number || 1) === (epNum + 1));
+                if (nextEpObj) {
+                    if (!nextEpBtn) {
+                        nextEpBtn = document.createElement("button");
+                        nextEpBtn.type = "button";
+                        nextEpBtn.className = "cinema-next-ep-btn";
+                        seriesHeader.appendChild(nextEpBtn);
                     }
+                    nextEpBtn.innerHTML = `<span>Next Ep ${epNum + 1}</span><span>▶️</span>`;
+                    nextEpBtn.onclick = () => {
+                        const nextCard = episodesGrid.children[epNum];
+                        if (nextCard) nextCard.click();
+                    };
+                    nextEpBtn.style.display = "inline-flex";
+                } else if (nextEpBtn) {
+                    nextEpBtn.style.display = "none";
+                }
 
             });
 
@@ -6456,10 +6477,10 @@ function renderMediaRelated(movie) {
     const relatedScroll = document.getElementById("media-related-scroll");
     if (!relatedSection || !relatedScroll) return;
 
-    const relatedList = state.movies.filter(m => 
-        m.csv_id !== movie.csv_id && 
-        m.categories && 
-        movie.categories && 
+    const relatedList = state.movies.filter(m =>
+        m.csv_id !== movie.csv_id &&
+        m.categories &&
+        movie.categories &&
         m.categories.some(c => movie.categories.includes(c))
     ).slice(0, 10);
 
@@ -6500,11 +6521,11 @@ function fetchTmdbDetailsForMedia(movie) {
     if (!numericId || !/^\d+$/.test(numericId)) return;
 
     const isTVShow = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
-    const needsHeal = !movie.overview || movie.overview === "No synopsis available." || 
-                      !movie.release_date || !movie.poster || movie.poster.includes("FilmHouse3_nobg.png") ||
-                      !movie.backdrop || movie.backdrop.includes("FilmHouse.png") ||
-                      !movie.cast || movie.cast.length === 0 || !movie.trailer ||
-                      (isTVShow && !movie.next_air_date && movie.status !== "Completed");
+    const needsHeal = !movie.overview || movie.overview === "No synopsis available." ||
+        !movie.release_date || !movie.poster || movie.poster.includes("FilmHouse3_nobg.png") ||
+        !movie.backdrop || movie.backdrop.includes("FilmHouse.png") ||
+        !movie.cast || movie.cast.length === 0 || !movie.trailer ||
+        (isTVShow && !movie.next_air_date && movie.status !== "Completed");
 
     if (!needsHeal) return;
 
@@ -6638,11 +6659,11 @@ function openDetailModal(movie) {
     // Poster Column
     const posterColumn = document.createElement("div");
     posterColumn.className = "detail-poster-column";
-    
+
     const posterCard = document.createElement("div");
     posterCard.className = "detail-poster-card";
     posterCard.style.position = "relative";
-    
+
     const posterImg = document.createElement("img");
     posterImg.src = movie.poster;
     posterImg.alt = movie.title;
@@ -6671,11 +6692,11 @@ function openDetailModal(movie) {
         const rating = document.createElement("span");
         rating.className = "rating";
         rating.appendChild(createSvgIcon("icon-star"));
-        
+
         const ratingScore = document.createElement("span");
         ratingScore.textContent = `IMDb ${movie.rating}/10`;
         rating.appendChild(ratingScore);
-        
+
         metaList.appendChild(rating);
         metaList.appendChild(createMetaDivider());
     }
@@ -6735,19 +6756,19 @@ function openDetailModal(movie) {
     const inWatchlist = state.watchlist.includes(movie.csv_id);
     const watchlistBtn = document.createElement("button");
     watchlistBtn.className = `btn ${inWatchlist ? 'btn-secondary' : 'btn-primary'}`;
-    
+
     const wIcon = createSvgIcon(inWatchlist ? "icon-bookmark-fill" : "icon-bookmark");
     watchlistBtn.appendChild(wIcon);
-    
+
     const wText = document.createElement("span");
     wText.textContent = inWatchlist ? "Saved" : "Watchlist";
     watchlistBtn.appendChild(wText);
-    
+
     watchlistBtn.addEventListener("click", () => {
         toggleWatchlist(movie);
         const active = state.watchlist.includes(movie.csv_id);
         watchlistBtn.className = `btn ${active ? 'btn-secondary' : 'btn-primary'}`;
-        
+
         const newIcon = createSvgIcon(active ? "icon-bookmark-fill" : "icon-bookmark");
         wText.textContent = active ? "Saved" : "Watchlist";
         watchlistBtn.replaceChild(newIcon, watchlistBtn.querySelector("svg"));
@@ -6759,34 +6780,34 @@ function openDetailModal(movie) {
     const watchedBtn = document.createElement("button");
     watchedBtn.id = "btn-watched-toggle";
     watchedBtn.className = `btn ${inHistory ? 'btn-secondary' : 'btn-primary'}`;
-    
+
     const watchedIcon = createSvgIcon("icon-check");
     watchedBtn.appendChild(watchedIcon);
-    
+
     const watchedText = document.createElement("span");
     watchedText.textContent = inHistory ? "Watched" : "Mark Watched";
     watchedBtn.appendChild(watchedText);
-    
+
     watchedBtn.addEventListener("click", () => {
         const active = state.history.includes(movie.csv_id);
         if (active) {
             // Remove from history
             state.history = state.history.filter(id => id !== movie.csv_id);
             localStorage.setItem("filmhouse_history", JSON.stringify(state.history));
-            
+
             // Deduct points
             awardPoints(-5, "watched");
-            
+
             // Update UI
             watchedBtn.className = "btn btn-primary";
             watchedText.textContent = "Mark Watched";
         } else {
             // Add to history (automatically removes from watchlist)
             addWatchHistory(movie);
-            
+
             // Award points (+5)
             awardPoints(5, "watched");
-            
+
             // Update UI
             watchedBtn.className = "btn btn-secondary";
             watchedText.textContent = "Watched";
@@ -6800,11 +6821,11 @@ function openDetailModal(movie) {
 
             showToast("Moved to Watched list! 🍿", "success");
         }
-        
+
         // Update stats Viewed count
         const countLabel = document.getElementById("stat-history-count");
         if (countLabel) countLabel.textContent = state.history.length;
-        
+
         // Refresh grids if visible
         const watchHistoryScreen = document.getElementById("screen-watchlist");
         if (watchHistoryScreen && watchHistoryScreen.classList.contains("active")) {
@@ -6818,7 +6839,7 @@ function openDetailModal(movie) {
         const trailerBtn = document.createElement("button");
         trailerBtn.className = "btn btn-secondary";
         trailerBtn.appendChild(createSvgIcon("icon-play"));
-        
+
         const tText = document.createElement("span");
         tText.textContent = "Trailer";
         trailerBtn.appendChild(tText);
@@ -6830,7 +6851,7 @@ function openDetailModal(movie) {
                 window.open(`https://www.imdb.com/title/${movie.imdb_id}/videogallery`, '_blank');
             }
         });
-        
+
         actionsRow.appendChild(trailerBtn);
     }
 
@@ -6845,7 +6866,7 @@ function openDetailModal(movie) {
         imdbBtn.style.alignItems = "center";
         imdbBtn.style.gap = "6px";
         imdbBtn.style.textDecoration = "none";
-        
+
         const imdbLabel = document.createElement("span");
         imdbLabel.textContent = "IMDb";
         imdbLabel.style.fontWeight = "800";
@@ -6855,18 +6876,18 @@ function openDetailModal(movie) {
         imdbLabel.style.borderRadius = "4px";
         imdbLabel.style.fontSize = "11px";
         imdbLabel.style.lineHeight = "1";
-        
+
         imdbBtn.appendChild(imdbLabel);
-        
+
         const viewText = document.createElement("span");
         viewText.textContent = "View";
         imdbBtn.appendChild(viewText);
-        
+
         actionsRow.appendChild(imdbBtn);
     }
 
     // Download or Request Button
-    const recentFulfilledReq = currentUserRequests && currentUserRequests.find(r => 
+    const recentFulfilledReq = currentUserRequests && currentUserRequests.find(r =>
         r.title && titlesMatch(r.title, movie.title) &&
         (r.status === "fulfilled" || r.status === "claimed" || r.claimed === true)
     );
@@ -6901,7 +6922,7 @@ function openDetailModal(movie) {
         const detailInfoCol = modal.querySelector(".detail-info-column");
         if (detailInfoCol) detailInfoCol.appendChild(fulfilledBanner);
     } else if (!movie.links || movie.links.length === 0) {
-        const existingReq = currentUserRequests && currentUserRequests.find(r => 
+        const existingReq = currentUserRequests && currentUserRequests.find(r =>
             r.title && titlesMatch(r.title, movie.title) &&
             r.status !== "fulfilled" && r.status !== "claimed"
         );
@@ -6912,15 +6933,15 @@ function openDetailModal(movie) {
         requestBtn.target = "_blank";
         requestBtn.rel = "noopener noreferrer";
         requestBtn.style.textDecoration = "none";
-        
+
         if (existingReq) {
             const isPriority = existingReq.status === "priority";
             requestBtn.appendChild(createSvgIcon("icon-check"));
             const rText = document.createElement("span");
             rText.textContent = isPriority ? "Priority Request ⚡" : "Requested ⏳";
             requestBtn.appendChild(rText);
-            requestBtn.style.background = isPriority 
-                ? "linear-gradient(135deg, rgba(255, 188, 0, 0.25), rgba(255, 120, 0, 0.3))" 
+            requestBtn.style.background = isPriority
+                ? "linear-gradient(135deg, rgba(255, 188, 0, 0.25), rgba(255, 120, 0, 0.3))"
                 : "rgba(255, 188, 0, 0.15)";
             requestBtn.style.borderColor = "var(--primary-color)";
         } else if (recentFulfilledReq) {
@@ -6945,7 +6966,7 @@ function openDetailModal(movie) {
             }
             showRequestSpecsDrawer(movie);
         });
-        
+
         actionsRow.appendChild(requestBtn);
 
         if (existingReq) {
@@ -6989,7 +7010,7 @@ function openDetailModal(movie) {
         const downloadBtn = document.createElement("button");
         downloadBtn.className = "btn btn-secondary btn-download-hero";
         downloadBtn.appendChild(createSvgIcon("icon-download"));
-        
+
         const dText = document.createElement("span");
         dText.textContent = "Download";
         downloadBtn.appendChild(dText);
@@ -7007,7 +7028,7 @@ function openDetailModal(movie) {
     const shareBtn = document.createElement("button");
     shareBtn.className = "btn btn-secondary";
     shareBtn.appendChild(createSvgIcon("icon-share"));
-    
+
     const sText = document.createElement("span");
     sText.textContent = "Share";
     shareBtn.appendChild(sText);
@@ -7041,7 +7062,7 @@ function openDetailModal(movie) {
     if ((movie.cast && movie.cast.length > 0) || movie.director) {
         const castBox = document.createElement("div");
         castBox.className = "detail-cast-box";
-        
+
         const castTitle = document.createElement("h3");
         castTitle.textContent = "Cast & Crew";
         castBox.appendChild(castTitle);
@@ -7138,7 +7159,7 @@ function openDetailModal(movie) {
                     if (data.backdrop_path && (!movie.backdrop || movie.backdrop.includes("FilmHouse.png"))) {
                         movie.backdrop = `https://image.tmdb.org/t/p/w1280${data.backdrop_path}`;
                     }
-                    
+
                     // Save to local self-healing cache
                     try {
                         const cacheStr = localStorage.getItem("filmhouse_healed_movies") || "{}";
@@ -7157,7 +7178,7 @@ function openDetailModal(movie) {
 
                     // Update DOM cards on the fly
                     updateMovieCardDOM(movie);
-                    
+
                     // Update DOM elements on the fly if user is still viewing this card
                     const openModal = document.getElementById("detail-modal");
                     if (openModal && openModal.classList.contains("active")) {
@@ -7165,13 +7186,13 @@ function openDetailModal(movie) {
                         if (currentTitle && currentTitle.textContent === movie.title) {
                             const backdropEl = document.querySelector(".detail-backdrop");
                             if (backdropEl && movie.backdrop) backdropEl.src = movie.backdrop;
-                            
+
                             const posterEl = document.querySelector(".detail-poster-card img");
                             if (posterEl && movie.poster) posterEl.src = movie.poster;
-                            
+
                             const synopsisEl = document.querySelector(".detail-synopsis-desc");
                             if (synopsisEl && movie.overview) synopsisEl.textContent = movie.overview;
-                            
+
                             const yearLabelEl = document.querySelector(".detail-year-label");
                             if (yearLabelEl && movie.release_date) {
                                 yearLabelEl.textContent = movie.release_date.substring(0, 4);
@@ -7187,7 +7208,7 @@ function openDetailModal(movie) {
 // Dynamically patch any matching movie card in the UI grids
 function updateMovieCardDOM(movie) {
     if (!movie || !movie.csv_id) return;
-    
+
     // 1. Update standard movie-cards
     const cards = document.querySelectorAll(`.movie-card[data-id="${movie.csv_id}"]`);
     cards.forEach(card => {
@@ -7286,7 +7307,7 @@ function toggleWatchlist(movie) {
         showToast("Removed from watchlist.", "success");
     }
     localStorage.setItem("filmhouse_watchlist", JSON.stringify(state.watchlist));
-    
+
     // Update Stats counters in UI profile panel
     const countLabel = document.getElementById("stat-watchlist-count");
     if (countLabel) countLabel.textContent = state.watchlist.length;
@@ -7334,7 +7355,7 @@ function loadWatchlist() {
             state.watchlist = [];
         }
     }
-    
+
     const countLabel = document.getElementById("stat-watchlist-count");
     if (countLabel) countLabel.textContent = state.watchlist.length;
 }
@@ -7398,7 +7419,7 @@ function openTrailerModal(videoKey) {
     iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
     iframe.setAttribute("allowfullscreen", "true");
     iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-presentation");
-    
+
     container.appendChild(iframe);
     modal.classList.add("active");
 }
@@ -7410,7 +7431,7 @@ let activeStreamHeartbeatInterval = null;
 // Start or update live streaming presence in Firestore (Dual-synced to settings/active_streamers & users)
 function startStreamingPresence(movie, title) {
     if (typeof firebase === "undefined" || !db) return;
-    
+
     if (activeStreamHeartbeatInterval) {
         clearInterval(activeStreamHeartbeatInterval);
         activeStreamHeartbeatInterval = null;
@@ -7420,8 +7441,8 @@ function startStreamingPresence(movie, title) {
     currentStreamSessionId = userId;
     const sessionKey = `streamer_${userId}`;
 
-    const displayName = (state.user && [state.user.first_name, state.user.last_name].filter(Boolean).join(" ")) 
-        || (state.user && state.user.username ? "@" + state.user.username : "") 
+    const displayName = (state.user && [state.user.first_name, state.user.last_name].filter(Boolean).join(" "))
+        || (state.user && state.user.username ? "@" + state.user.username : "")
         || "Guest Viewer";
     const username = (state.user && state.user.username) ? state.user.username : "";
 
@@ -7450,7 +7471,7 @@ function startStreamingPresence(movie, title) {
     if (state.user && state.user.id) {
         db.collection("users").doc(String(state.user.id)).set({
             current_stream: streamData
-        }, { merge: true }).catch(() => {});
+        }, { merge: true }).catch(() => { });
     }
 
     // 3. Fallback sync to active_streams collection
@@ -7458,7 +7479,7 @@ function startStreamingPresence(movie, title) {
         ...streamData,
         startedAt: firebase.firestore.FieldValue.serverTimestamp(),
         lastHeartbeat: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(() => {});
+    }).catch(() => { });
 
     // Auto-track daily streaming mission
     if (state.user) {
@@ -7473,7 +7494,7 @@ function startStreamingPresence(movie, title) {
     db.collection("settings").doc("stream_metrics").set({
         totalStreamPlays: firebase.firestore.FieldValue.increment(1),
         lastStreamedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true }).catch(() => {});
+    }, { merge: true }).catch(() => { });
 
     activeStreamHeartbeatInterval = setInterval(() => {
         if (!currentStreamSessionId || typeof firebase === "undefined" || !db) return;
@@ -7486,19 +7507,19 @@ function startStreamingPresence(movie, title) {
                 lastHeartbeatMs: hbNow,
                 status: "streaming"
             }
-        }, { merge: true }).catch(() => {});
+        }, { merge: true }).catch(() => { });
 
         // Update user profile stream heartbeat
         if (state.user && state.user.id) {
             db.collection("users").doc(String(state.user.id)).set({
                 "current_stream.lastHeartbeatMs": hbNow
-            }, { merge: true }).catch(() => {});
+            }, { merge: true }).catch(() => { });
         }
 
         db.collection("active_streams").doc(currentStreamSessionId).update({
             lastHeartbeat: firebase.firestore.FieldValue.serverTimestamp(),
             lastHeartbeatMs: hbNow
-        }).catch(() => {});
+        }).catch(() => { });
     }, 20000);
 }
 
@@ -7516,16 +7537,16 @@ function stopStreamingPresence() {
         // Clean up settings/active_streamers
         db.collection("settings").doc("active_streamers").set({
             [sessionKey]: firebase.firestore.FieldValue.delete()
-        }, { merge: true }).catch(() => {});
+        }, { merge: true }).catch(() => { });
 
         // Clean up user profile current_stream
         if (state.user && state.user.id) {
             db.collection("users").doc(String(state.user.id)).set({
                 current_stream: null
-            }, { merge: true }).catch(() => {});
+            }, { merge: true }).catch(() => { });
         }
 
-        db.collection("active_streams").doc(idToDelete).delete().catch(() => {});
+        db.collection("active_streams").doc(idToDelete).delete().catch(() => { });
     }
 }
 
@@ -7547,7 +7568,7 @@ if (typeof db !== "undefined" && db) {
                 }
             }
         }, err => console.warn("[StreamEngine] streaming_config sync notice:", err.message));
-    } catch (e) {}
+    } catch (e) { }
 }
 
 // Convert any stream target (raw token, expired tunnel link, /watch/ link) into a robust direct stream URL
@@ -7591,12 +7612,12 @@ function closeCinemaModal() {
         if (screen.orientation && screen.orientation.unlock) {
             screen.orientation.unlock();
         }
-    } catch (_) {}
+    } catch (_) { }
     try {
         if (window.Telegram?.WebApp?.unlockOrientation) {
             window.Telegram.WebApp.unlockOrientation();
         }
-    } catch (_) {}
+    } catch (_) { }
     if (container) container.replaceChildren();
 
     // Reset Next Episode Card & Subtitle / Quality Hub Modals
@@ -7621,16 +7642,16 @@ function closeCinemaModal() {
     if (audioQuickLabel) audioQuickLabel.textContent = "🔊 Auto";
     const qLabelEl = document.getElementById("cinema-quality-label");
     if (qLabelEl) qLabelEl.textContent = "720p HD";
-    
+
     // Unlock screen orientation if locked
     try {
         if (screen.orientation && screen.orientation.unlock) {
             screen.orientation.unlock();
         }
-    } catch (e) {}
+    } catch (e) { }
 
     if (document.fullscreenElement && document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
+        document.exitFullscreen().catch(() => { });
     }
 
     document.body.classList.remove("tg-back-visible");
@@ -7647,21 +7668,21 @@ function closeCinemaModal() {
 // Trigger Monetag SmartLink (Zone 12129103) with iPhone / iOS guidance
 function triggerMonetagSmartLink() {
     const smartLinkUrl = "https://uplcm.com/4/12129103";
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || 
-                  (window.Telegram?.WebApp?.platform === "ios");
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+        (window.Telegram?.WebApp?.platform === "ios");
     if (isIOS && typeof showToast === "function") {
         showToast("👉 On iPhone: Tap \"Open\" in Telegram to count your sponsor ad!", "info", 5000);
     }
     try {
-        const tg = (window.Telegram && window.Telegram.WebApp && 
-                   ((window.Telegram.WebApp.initData && window.Telegram.WebApp.initData.length > 0) || 
-                    (window.Telegram.WebApp.platform && window.Telegram.WebApp.platform !== "unknown")))
-                   ? window.Telegram.WebApp : null;
+        const tg = (window.Telegram && window.Telegram.WebApp &&
+            ((window.Telegram.WebApp.initData && window.Telegram.WebApp.initData.length > 0) ||
+                (window.Telegram.WebApp.platform && window.Telegram.WebApp.platform !== "unknown")))
+            ? window.Telegram.WebApp : null;
         if (tg && typeof tg.openLink === "function") {
             tg.openLink(smartLinkUrl);
             return;
         }
-    } catch (_) {}
+    } catch (_) { }
     try {
         const w = window.open(smartLinkUrl, "_blank");
         if (!w || w.closed || typeof w.closed === "undefined") {
@@ -7684,9 +7705,9 @@ function getMoreLikeThisMovies(currentMovie, limit = 8) {
         curGenres = currentMovie.genre.split(/[,/]/).map(g => g.trim().toLowerCase()).filter(Boolean);
     }
 
-    const isCurrentSeries = (currentMovie.type || "").toLowerCase() === "series" || 
-                           (currentMovie.type || "").toLowerCase() === "tv" || 
-                           (currentMovie.categories && currentMovie.categories.some(c => c.toLowerCase().includes("series")));
+    const isCurrentSeries = (currentMovie.type || "").toLowerCase() === "series" ||
+        (currentMovie.type || "").toLowerCase() === "tv" ||
+        (currentMovie.categories && currentMovie.categories.some(c => c.toLowerCase().includes("series")));
 
     const candidates = state.movies.filter(m => {
         const mId = m.csv_id || m.id;
@@ -7737,9 +7758,9 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
     const baseTitle = movie.title || "Film House Cinema";
     const initialTitle = customTitle || baseTitle;
-    const isTVShow = (movie.type || "").toLowerCase() === "series" || 
-                     (movie.type || "").toLowerCase() === "tv" || 
-                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+    const isTVShow = (movie.type || "").toLowerCase() === "series" ||
+        (movie.type || "").toLowerCase() === "tv" ||
+        (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
 
     let currentSeason = isTVShow ? { seasonNumber: 1, name: "Season 1" } : null;
     let currentEpisodeNum = 1;
@@ -7861,7 +7882,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     function markCcUnlocked() {
         try {
             sessionStorage.setItem(getCurrentCcMediaKey(), "1");
-        } catch (_) {}
+        } catch (_) { }
     }
 
     let isCcActive = false;
@@ -7884,7 +7905,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         }
     }
 
-    window.updateCinemaSubtitleState = function(enabled, label) {
+    window.updateCinemaSubtitleState = function (enabled, label) {
         updateCcButtonVisual(enabled, label);
     };
 
@@ -7972,7 +7993,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
         if (!imdbId && tmdbId) {
             try {
-                const endpoint = isTVShow 
+                const endpoint = isTVShow
                     ? `https://api.themoviedb.org/3/tv/${tmdbId}/external_ids?api_key=${apiKey}`
                     : `https://api.themoviedb.org/3/movie/${tmdbId}?append_to_response=external_ids&api_key=${apiKey}`;
                 const res = await fetch(endpoint);
@@ -7980,7 +8001,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     const data = await res.json();
                     imdbId = data.imdb_id || data.external_ids?.imdb_id || "";
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
 
         if (!imdbId && movie.title) {
@@ -7998,7 +8019,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         }
                     }
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
 
         if (imdbId) {
@@ -8116,7 +8137,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         try {
                             const res = await fetch(url);
                             if (res.ok) srtContent = await res.text();
-                        } catch (_) {}
+                        } catch (_) { }
 
                         if (srtContent && srtContent.length > 10) {
                             frame.contentWindow.postMessage({
@@ -8253,8 +8274,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         if (!qModal || !qList) return;
         const passSec = parseInt(localStorage.getItem('filmhouse_watch_pass_sec') || "0", 10);
         if (qPassStatus) {
-            qPassStatus.textContent = passSec > 0 
-                ? "⚡ 4-Hour Ad-Free Pass Active (Instant 0-Ad Switch)" 
+            qPassStatus.textContent = passSec > 0
+                ? "⚡ 4-Hour Ad-Free Pass Active (Instant 0-Ad Switch)"
                 : "Switching quality will open sponsor link (or get 4-Hour Pass)";
         }
 
@@ -8264,8 +8285,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         qualities.forEach((q, idx) => {
             const btn = document.createElement("button");
             btn.type = "button";
-            const isActive = currentSelectedQualityUrl 
-                ? (currentSelectedQualityUrl === q.url) 
+            const isActive = currentSelectedQualityUrl
+                ? (currentSelectedQualityUrl === q.url)
                 : (idx === 0);
             btn.className = `cinema-quality-item ${isActive ? 'active' : ''}`;
             btn.innerHTML = `
@@ -8339,7 +8360,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     }
 
     // Dynamic Track Population & Switching from Inbuilt Video Tracks
-    window.updateCinemaDetectedTracks = function(data) {
+    window.updateCinemaDetectedTracks = function (data) {
         if (!data) return;
 
         // NEVER wipe out subTrackList if OpenSubtitles list (loadedHubSubtitles) is already loaded!
@@ -8485,7 +8506,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             const trackIdx = parseInt(btn.getAttribute("data-audio-idx") ?? "0", 10);
             try {
                 localStorage.setItem("fh_audio_pref", String(trackIdx));
-            } catch (_) {}
+            } catch (_) { }
 
             const frame = container.querySelector("iframe");
             const trackName = btn.querySelector(".track-name")?.textContent || "Audio";
@@ -8553,24 +8574,24 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const directUrl = resolveDirectStreamUrl(targetUrl);
         const currentMediaTitle = currentTitle || initialTitle;
         const currentMovieKey = getScopedMediaSubtitleKey(movie, currentSeason ? currentSeason.seasonNumber : 1, currentEpisodeNum);
-        const subParam = (state.activeSubtitleUrl && state.activeSubtitleMovieId === currentMovieKey) 
-            ? `&sub=${encodeURIComponent(state.activeSubtitleUrl)}` 
+        const subParam = (state.activeSubtitleUrl && state.activeSubtitleMovieId === currentMovieKey)
+            ? `&sub=${encodeURIComponent(state.activeSubtitleUrl)}`
             : "";
         const movieBackdrop = movie.backdrop || movie.poster || "";
         const imdbParam = movie.imdb_id ? `&imdb=${encodeURIComponent(movie.imdb_id)}` : "";
         const tmdbParam = movie.tmdb_id ? `&tmdb=${encodeURIComponent(movie.tmdb_id)}` : "";
         const mediaIdParam = `&media_id=${encodeURIComponent(movie.csv_id || movie.id || '')}`;
-        const seriesEpParam = isTVShow 
-            ? `&s=${encodeURIComponent(currentSeason ? currentSeason.seasonNumber : 1)}&ep=${encodeURIComponent(currentEpisodeNum || 1)}` 
+        const seriesEpParam = isTVShow
+            ? `&s=${encodeURIComponent(currentSeason ? currentSeason.seasonNumber : 1)}&ep=${encodeURIComponent(currentEpisodeNum || 1)}`
             : "";
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=165_${Date.now()}`;
+        const cacheBuster = `v=166_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
-        
+
         // Fast pre-buffering animation overlay for instant visual feedback
         const loader = document.createElement("div");
         loader.className = "cinema-stream-loader";
@@ -8586,7 +8607,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         iframe.src = playerSrc;
         iframe.setAttribute("allow", "autoplay; fullscreen; encrypted-media; picture-in-picture; orientation-lock; screen-wake-lock");
         iframe.setAttribute("allowfullscreen", "true");
-        
+
         let loaderDismissed = false;
         const dismissLoader = () => {
             if (loaderDismissed) return;
@@ -8615,7 +8636,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                             event: evtType
                         }, "*");
                     }
-                } catch (_) {}
+                } catch (_) { }
             };
             document.addEventListener("visibilitychange", () => relayToPlayer("visibilitychange"));
             window.addEventListener("focus", () => relayToPlayer("focus"));
@@ -9060,7 +9081,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             let currentCinemaEpIndex = 0;
 
             // Trigger autoplay binge prompt
-            window.triggerNextEpisodeAutoplay = function() {
+            window.triggerNextEpisodeAutoplay = function () {
                 if (!isTVShow || currentCinemaEpisodes.length === 0) return;
                 const nextIndex = currentCinemaEpIndex + 1;
                 if (nextIndex >= currentCinemaEpisodes.length) return; // End of season
@@ -9182,10 +9203,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         }
                     } else if (e.data.action === "openLink" && e.data.url) {
                         try {
-                            const tg = (window.Telegram && window.Telegram.WebApp && 
-                                       ((window.Telegram.WebApp.initData && window.Telegram.WebApp.initData.length > 0) || 
-                                        (window.Telegram.WebApp.platform && window.Telegram.WebApp.platform !== "unknown")))
-                                       ? window.Telegram.WebApp : null;
+                            const tg = (window.Telegram && window.Telegram.WebApp &&
+                                ((window.Telegram.WebApp.initData && window.Telegram.WebApp.initData.length > 0) ||
+                                    (window.Telegram.WebApp.platform && window.Telegram.WebApp.platform !== "unknown")))
+                                ? window.Telegram.WebApp : null;
                             if (tg && typeof tg.openLink === "function") {
                                 tg.openLink(e.data.url);
                             } else {
@@ -9205,19 +9226,19 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     } else if (e.data.action === "playerEnteredFullscreen") {
                         try {
                             if (screen.orientation && screen.orientation.lock) {
-                                screen.orientation.lock("landscape").catch(() => {});
+                                screen.orientation.lock("landscape").catch(() => { });
                             }
-                        } catch (_) {}
+                        } catch (_) { }
                         try {
                             if (window.Telegram?.WebApp?.requestFullscreen) {
                                 window.Telegram.WebApp.requestFullscreen();
                             }
-                        } catch (_) {}
+                        } catch (_) { }
                         try {
                             if (window.Telegram?.WebApp?.lockOrientation) {
                                 window.Telegram.WebApp.lockOrientation("landscape");
                             }
-                        } catch (_) {}
+                        } catch (_) { }
                         const theater = document.querySelector(".cinema-theater-container");
                         if (theater) {
                             theater.classList.add("is-fullscreen");
@@ -9231,12 +9252,12 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                             if (screen.orientation && screen.orientation.unlock) {
                                 screen.orientation.unlock();
                             }
-                        } catch (_) {}
+                        } catch (_) { }
                         try {
                             if (window.Telegram?.WebApp?.unlockOrientation) {
                                 window.Telegram.WebApp.unlockOrientation();
                             }
-                        } catch (_) {}
+                        } catch (_) { }
                         const theater = document.querySelector(".cinema-theater-container");
                         if (theater) {
                             theater.classList.remove("is-fullscreen");
@@ -9351,7 +9372,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 const streamableCount = episodes.filter(ep => {
                     if (ep.stream_url && !ep.stream_url.includes("t.me")) return true;
                     const epNum = ep.episode_number;
-                    return allStreamLinks.some(s => 
+                    return allStreamLinks.some(s =>
                         (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) &&
                         (s.season == seasonObj.seasonNumber || !s.season) &&
                         (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")
@@ -9359,8 +9380,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 }).length;
 
                 if (badgeEl) {
-                    badgeEl.textContent = streamableCount > 0 
-                        ? `${streamableCount} Streamable • ${episodes.length} Episodes` 
+                    badgeEl.textContent = streamableCount > 0
+                        ? `${streamableCount} Streamable • ${episodes.length} Episodes`
                         : `${episodes.length} Episodes`;
                 }
 
@@ -9374,8 +9395,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     epCard.setAttribute("data-ep", epNum);
 
                     // Episode thumbnail with fallback
-                    const thumbUrl = ep.still_path 
-                        ? `https://image.tmdb.org/t/p/w500${ep.still_path}` 
+                    const thumbUrl = ep.still_path
+                        ? `https://image.tmdb.org/t/p/w500${ep.still_path}`
                         : (movie.backdrop || movie.poster || "");
 
                     const thumbWrap = document.createElement("div");
@@ -9407,7 +9428,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     // Check if this episode is stream-ready
                     const hasStream = !!(
                         (ep.stream_url && !ep.stream_url.includes("t.me")) ||
-                        allStreamLinks.some(s => 
+                        allStreamLinks.some(s =>
                             (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) &&
                             (s.season == seasonObj.seasonNumber || !s.season) &&
                             (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")
@@ -9500,8 +9521,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
                         let epTarget = "";
                         if (movie.stream_links && Array.isArray(movie.stream_links)) {
-                            const matching = movie.stream_links.filter(s => 
-                                (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) && 
+                            const matching = movie.stream_links.filter(s =>
+                                (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) &&
                                 (s.season == seasonObj.seasonNumber || !s.season)
                             );
                             const found720 = matching.find(s => /720/i.test(s.quality || s.name || s.seasonOrPart || ''));
@@ -9531,8 +9552,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                                         const d = snap.data() || {};
                                         if (Array.isArray(d.stream_links) && d.stream_links.length > 0) {
                                             movie.stream_links = d.stream_links;
-                                            const liveFound = d.stream_links.find(s => 
-                                                (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) && 
+                                            const liveFound = d.stream_links.find(s =>
+                                                (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) &&
                                                 (s.season == seasonObj.seasonNumber || !s.season)
                                             );
                                             if (liveFound) {
@@ -9746,18 +9767,18 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         if (window.Telegram?.WebApp?.requestFullscreen) {
                             window.Telegram.WebApp.requestFullscreen();
                         }
-                    } catch (e) {}
+                    } catch (e) { }
                     // Automatically lock to landscape orientation for true edge-to-edge mobile viewing
                     try {
                         if (screen.orientation && screen.orientation.lock) {
-                            screen.orientation.lock("landscape").catch(() => {});
+                            screen.orientation.lock("landscape").catch(() => { });
                         }
-                    } catch (e) {}
+                    } catch (e) { }
                     // PC / Desktop browser HTML5 Fullscreen API
                     if (theater.requestFullscreen) {
-                        theater.requestFullscreen().catch(() => {});
+                        theater.requestFullscreen().catch(() => { });
                     } else if (document.documentElement.requestFullscreen) {
-                        document.documentElement.requestFullscreen().catch(() => {});
+                        document.documentElement.requestFullscreen().catch(() => { });
                     }
                     if (frame && frame.contentWindow) {
                         frame.contentWindow.postMessage({ action: "enterFullscreen" }, "*");
@@ -9769,14 +9790,14 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         if (window.Telegram?.WebApp?.exitFullscreen) {
                             window.Telegram.WebApp.exitFullscreen();
                         }
-                    } catch (e) {}
+                    } catch (e) { }
                     try {
                         if (screen.orientation && screen.orientation.unlock) {
                             screen.orientation.unlock();
                         }
-                    } catch (e) {}
+                    } catch (e) { }
                     if (document.fullscreenElement && document.exitFullscreen) {
-                        document.exitFullscreen().catch(() => {});
+                        document.exitFullscreen().catch(() => { });
                     }
                     if (frame && frame.contentWindow) {
                         frame.contentWindow.postMessage({ action: "exitFullscreen" }, "*");
@@ -9835,7 +9856,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         try {
             document.body.classList.add("tg-back-visible");
             window.Telegram.WebApp.BackButton.show();
-        } catch (e) {}
+        } catch (e) { }
     }
 
     modal.classList.add("active");
@@ -9850,7 +9871,7 @@ async function fetchTvSeriesTotalSeasons(movie) {
     }
     const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
     const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
-    
+
     if (tmdbId) {
         try {
             const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}`);
@@ -9861,9 +9882,9 @@ async function fetchTvSeriesTotalSeasons(movie) {
                     return data.number_of_seasons;
                 }
             }
-        } catch (e) {}
+        } catch (e) { }
     }
-    
+
     const searchTitle = typeof getCleanRequestTitle === "function" ? getCleanRequestTitle(movie.title || "") : (movie.title || "");
     if (searchTitle) {
         try {
@@ -9882,7 +9903,7 @@ async function fetchTvSeriesTotalSeasons(movie) {
                     }
                 }
             }
-        } catch (e) {}
+        } catch (e) { }
     }
     return 0;
 }
@@ -9892,15 +9913,15 @@ async function fetchTvSeriesAiredSeasons(movie) {
     if (!movie) return [];
     const apiKey = typeof getTmdbApiKey === "function" ? getTmdbApiKey() : "d638f7775bfa1b8d456dfd028ccbef19";
     const tmdbId = movie.tmdb_id || (movie.id && !isNaN(parseInt(movie.id, 10)) ? parseInt(movie.id, 10) : null);
-    
+
     let tvData = null;
     if (tmdbId) {
         try {
             const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}`);
             if (res.ok) tvData = await res.json();
-        } catch (e) {}
+        } catch (e) { }
     }
-    
+
     const searchTitle = typeof getCleanRequestTitle === "function" ? getCleanRequestTitle(movie.title || "") : (movie.title || "");
     if (!tvData && searchTitle) {
         try {
@@ -9913,7 +9934,7 @@ async function fetchTvSeriesAiredSeasons(movie) {
                     if (detailRes.ok) tvData = await detailRes.json();
                 }
             }
-        } catch (e) {}
+        } catch (e) { }
     }
 
     if (!tvData || !tvData.seasons || !Array.isArray(tvData.seasons)) return [];
@@ -9923,13 +9944,13 @@ async function fetchTvSeriesAiredSeasons(movie) {
 
     tvData.seasons.forEach(s => {
         if (!s || s.season_number <= 0) return; // Skip specials
-        
+
         let hasAired = false;
         if (s.air_date) {
             const airDate = new Date(s.air_date);
             if (airDate <= now) hasAired = true;
         }
-        
+
         const epCount = typeof s.episode_count === 'number' ? s.episode_count : 0;
         if (hasAired && epCount > 0) {
             releasedSeasons.push({
@@ -9951,12 +9972,12 @@ function openDownloadModal(movie) {
     const grid = document.getElementById("download-links-grid");
     const modalHeading = modal ? modal.querySelector(".download-modal-content > h2") : null;
     const sectionHeading = modal ? modal.querySelector(".download-options-section h3") : null;
-    
+
     if (!modal || !title || !grid) return;
 
-    const isTVShow = (movie.type || "").toLowerCase() === "series" || 
-                     (movie.type || "").toLowerCase() === "tv" || 
-                     (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
+    const isTVShow = (movie.type || "").toLowerCase() === "series" ||
+        (movie.type || "").toLowerCase() === "tv" ||
+        (movie.categories && movie.categories.some(c => c.toLowerCase().includes("series")));
 
     title.textContent = movie.title;
     grid.replaceChildren();
@@ -10047,8 +10068,8 @@ function openDownloadModal(movie) {
 
             const anchor = document.createElement("div");
             anchor.className = "download-link-item";
-            
-            const matchingRequest = currentUserRequests && currentUserRequests.find(r => 
+
+            const matchingRequest = currentUserRequests && currentUserRequests.find(r =>
                 r.title && titlesMatch(r.title, movie.title) &&
                 r.status === "fulfilled"
             );
@@ -10107,7 +10128,7 @@ function openDownloadModal(movie) {
                 const isObj = typeof link === 'object' && link !== null;
                 const qLabel = isObj && link.quality ? link.quality : (qualityLabels[idx] || `Link ${idx + 1}`);
                 const isCinemaCutLink = qLabel.toLowerCase().includes("cinema cut") || qLabel.toLowerCase().includes("hdcam") || qLabel.toLowerCase().includes("cam");
-                
+
                 let qIcon = "📥";
                 let qCat = "all";
                 let resBadgeClass = "badge-res-720p";
@@ -10171,10 +10192,10 @@ function openDownloadModal(movie) {
                     anchor.style.borderColor = "rgba(255, 152, 0, 0.4)";
                     anchor.style.background = "linear-gradient(135deg, rgba(255, 152, 0, 0.08), rgba(22, 24, 35, 0.4))";
                 }
-                
+
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
-                
+
                 let qualityText = "Direct Download";
                 if (isCinemaCutLink) {
                     qualityText = "⚠️ Theater Recording (Not Real HD Quality)";
@@ -10184,7 +10205,7 @@ function openDownloadModal(movie) {
                 else if (qLabel.includes("720p")) qualityText = "Standard Quality (720p)";
                 else if (qLabel.includes("4K")) qualityText = "Ultra HD Quality (4K)";
                 else if (qLabel.includes("480p")) qualityText = "Mobile Quality (480p)";
-                
+
                 if (matchingRequest) {
                     sublabel.textContent = isCinemaCutLink ? `⚠️ Cinema Cut • Free Fulfillment` : `${qualityText} • ${estimatedSize} • Free Fulfillment`;
                 } else {
@@ -10292,12 +10313,12 @@ function openDownloadModal(movie) {
                     const labelWrap = document.createElement("div");
                     labelWrap.className = "download-link-label-wrap";
                     labelWrap.style.cssText = "flex: 1; margin-left: 10px; display: flex; flex-direction: column; gap: 1px;";
-                    
+
                     const label = document.createElement("span");
                     label.className = "download-link-label";
                     label.style.cssText = "font-weight: 600; color: rgba(255, 255, 255, 0.85); font-size: 12px;";
                     label.textContent = qItem.label;
-                    
+
                     const sublabel = document.createElement("span");
                     sublabel.className = "download-link-sublabel";
                     sublabel.style.cssText = "font-size: 9px; color: var(--text-muted); opacity: 0.75;";
@@ -10309,10 +10330,10 @@ function openDownloadModal(movie) {
 
                     const reqActionBtn = document.createElement("button");
                     reqActionBtn.className = "btn-request-quality-action";
-                    
+
                     const reqQualityStr = `${qItem.code} Quality`;
                     const cleanMovieTitle = getCleanRequestTitle(movie.title).toLowerCase();
-                    
+
                     const isAlreadyReq = currentUserRequests && currentUserRequests.some(r => {
                         const matchesTitle = titlesMatch(r.title, movie.title);
                         const matchesQuality = r.title && r.title.toLowerCase().includes(qItem.code.toLowerCase());
@@ -10326,7 +10347,7 @@ function openDownloadModal(movie) {
                     } else {
                         reqActionBtn.textContent = `Request ${qItem.code}`;
                         reqActionBtn.style.cssText = "background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.75); border: 1px solid rgba(255, 255, 255, 0.12); font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;";
-                        
+
                         reqActionBtn.addEventListener("mouseenter", () => {
                             reqActionBtn.style.background = "rgba(255, 255, 255, 0.14)";
                             reqActionBtn.style.color = "#ffffff";
@@ -10388,12 +10409,12 @@ function openDownloadModal(movie) {
                 const labelWrap = document.createElement("div");
                 labelWrap.className = "download-link-label-wrap";
                 labelWrap.style.cssText = "flex: 1; margin-left: 10px; display: flex; flex-direction: column; gap: 1px;";
-                
+
                 const label = document.createElement("span");
                 label.className = "download-link-label";
                 label.style.cssText = "font-weight: 600; color: rgba(255, 255, 255, 0.85); font-size: 12px;";
                 label.textContent = `Season ${seasonNum}`;
-                
+
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
                 sublabel.style.cssText = "font-size: 9px; color: var(--text-muted); opacity: 0.75;";
@@ -10405,14 +10426,14 @@ function openDownloadModal(movie) {
 
                 const reqActionBtn = document.createElement("button");
                 reqActionBtn.className = "btn-request-season-action";
-                
+
                 const reqSeasonStr = `Season ${seasonNum}`;
                 const cleanMovieTitle = getCleanRequestTitle(movie.title).toLowerCase();
-                
+
                 const isAlreadyReq = currentUserRequests && currentUserRequests.some(r => {
                     const matchesTitle = titlesMatch(r.title, movie.title);
-                    const matchesSeason = (r.seasonOrPart && r.seasonOrPart.toLowerCase() === reqSeasonStr.toLowerCase()) || 
-                                          (r.title && r.title.toLowerCase().includes(`season ${seasonNum}`));
+                    const matchesSeason = (r.seasonOrPart && r.seasonOrPart.toLowerCase() === reqSeasonStr.toLowerCase()) ||
+                        (r.title && r.title.toLowerCase().includes(`season ${seasonNum}`));
                     return matchesTitle && matchesSeason && r.status !== "fulfilled";
                 });
 
@@ -10423,7 +10444,7 @@ function openDownloadModal(movie) {
                 } else {
                     reqActionBtn.textContent = `Request S${seasonNum}`;
                     reqActionBtn.style.cssText = "background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.75); border: 1px solid rgba(255, 255, 255, 0.12); font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;";
-                    
+
                     reqActionBtn.addEventListener("mouseenter", () => {
                         reqActionBtn.style.background = "rgba(255, 255, 255, 0.14)";
                         reqActionBtn.style.color = "#ffffff";
@@ -10457,7 +10478,7 @@ function openDownloadModal(movie) {
 // Universal External URL opener (safe for Telegram Mini App on mobile, desktop browser, iOS & Android)
 function openExternalUrl(url) {
     if (!url) return;
-    const tg = window.Telegram?.WebApp;
+    const tg = getActiveTelegramWebApp();
     if (tg && typeof tg.openLink === "function") {
         try {
             tg.openLink(url);
@@ -10466,13 +10487,16 @@ function openExternalUrl(url) {
             console.warn("tg.openLink failed, falling back to window.open", e);
         }
     }
-    window.open(url, "_blank");
+    const win = window.open(url, "_blank");
+    if (!win) {
+        window.location.href = url;
+    }
 }
 
 // Universal Telegram Link opener (in-app chat chooser for WebApp, web fallback on desktop)
 function openTelegramUrl(url) {
     if (!url) return;
-    const tg = window.Telegram?.WebApp;
+    const tg = getActiveTelegramWebApp();
     if (tg && typeof tg.openTelegramLink === "function") {
         try {
             tg.openTelegramLink(url);
@@ -10520,7 +10544,7 @@ function openUniversalShareModal(options) {
 
     // Auto-clipboard copy as convenience so user can paste immediately anywhere
     if (navigator.clipboard?.writeText && (currentSharePayload.text || currentSharePayload.url)) {
-        navigator.clipboard.writeText(currentSharePayload.text || currentSharePayload.url).catch(() => {});
+        navigator.clipboard.writeText(currentSharePayload.text || currentSharePayload.url).catch(() => { });
     }
 
     if (typeof triggerHaptic === "function") triggerHaptic("selection");
@@ -10579,7 +10603,7 @@ function copyToClipboard(text) {
 // Universal Rewarded Ad Engine (Smart Waterfall: Adsgram Primary -> Monetag Fallback)
 function showRewardedAd(onSuccess, onError) {
     const isTelegramEnv = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== "";
-    
+
     let fallbackTriggered = false;
     const triggerMonetagFallback = () => {
         if (fallbackTriggered) return;
@@ -10641,12 +10665,12 @@ function checkAndTriggerStreamAd(movie, onReady) {
         localStorage.setItem("cinema_stream_unlocked_until", String(Date.now() + unlockDuration));
         localStorage.setItem("cinema_fast_stream_until", String(Date.now() + unlockDuration));
         localStorage.setItem("filmhouse_watch_pass_sec", String(4 * 3600));
-        
+
         if (state.user && state.user.dailyStats) {
             state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
             saveDailyStats();
         }
-        
+
         showToast("🍿 Cinema Session Unlocked! Enjoy 4 hours of ad-free streaming.", "success");
         if (typeof onReady === "function") onReady();
     });
@@ -10832,12 +10856,12 @@ function initializeAdsgram(blockId) {
         console.warn("Adsgram SDK not loaded yet.");
         return null;
     }
-    
+
     const id = blockId || ADSGRAM_DOWNLOAD_BLOCK_ID;
     if (!state.adsgramControllers) {
         state.adsgramControllers = {};
     }
-    
+
     if (!state.adsgramControllers[id]) {
         state.adsgramControllers[id] = window.Adsgram.init({ blockId: id });
     }
@@ -10865,7 +10889,7 @@ function showAdRewardFlow(onStatusUpdate, blockId) {
         let originalShowAlert = null;
         if (tg && tg.showAlert) {
             originalShowAlert = tg.showAlert;
-            tg.showAlert = function(options, callback) {
+            tg.showAlert = function (options, callback) {
                 console.log("Mocked WebApp.showAlert invoked:", options);
                 const msg = typeof options === "string" ? options : (options?.message || "");
                 if (msg.toLowerCase().includes("ad") || msg.toLowerCase().includes("oops") || msg.toLowerCase().includes("moment") || msg.toLowerCase().includes("later")) {
@@ -10965,11 +10989,11 @@ function renderFAQAccordion() {
 
         const qRow = document.createElement("div");
         qRow.className = "faq-question";
-        
+
         const qText = document.createElement("span");
         qText.textContent = faq.q;
         qRow.appendChild(qText);
-        
+
         const arrow = createSvgIcon("icon-chevron-right");
         qRow.appendChild(arrow);
         item.appendChild(qRow);
@@ -10983,7 +11007,7 @@ function renderFAQAccordion() {
 
         qRow.addEventListener("click", () => {
             const active = item.classList.contains("active");
-            
+
             // Close active open rows
             const openRows = accordion.querySelectorAll(".faq-item.active");
             openRows.forEach(r => r.classList.remove("active"));
@@ -11042,18 +11066,18 @@ let currentDiscoverAbortController = null;
 async function performGlobalTmdbDiscover() {
     // If there is a text query, we don't run discover search (we run text search instead)
     if (state.searchQuery) return;
-    
+
     // Check if filters are active (if all are default/empty, clear external discover results)
     const genre1 = state.filters.genre;
     const genre2 = state.filters.genre2;
     const rating = state.filters.rating;
     const year = state.filters.year;
-    
+
     if (genre1 === "All" && genre2 === "All" && rating === 0 && year === "All") {
         state.externalSearchResults = [];
         return;
     }
-    
+
     // Set up active loading state indicator
     const grid = document.getElementById("movies-grid-container");
     if (grid) {
@@ -11067,51 +11091,51 @@ async function performGlobalTmdbDiscover() {
         `;
         grid.appendChild(loader);
     }
-    
+
     // Abort previous discover request if still pending
     if (currentDiscoverAbortController) {
         currentDiscoverAbortController.abort();
     }
     currentDiscoverAbortController = new AbortController();
     const signal = currentDiscoverAbortController.signal;
-    
+
     console.log("[Discover Debug] Querying TMDB discover with filters:", { genre1, genre2, rating, year });
-    
+
     try {
         const apiKey = getTmdbApiKey();
-        
+
         // Build genre ID strings
         const movieGenreIds = [getTmdbGenreId(genre1, false), getTmdbGenreId(genre2, false)].filter(id => id !== null).join(",");
         const tvGenreIds = [getTmdbGenreId(genre1, true), getTmdbGenreId(genre2, true)].filter(id => id !== null).join(",");
-        
+
         // Build base discover queries
         let movieUrl = `${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&vote_average.gte=${rating}&sort_by=popularity.desc`;
         let tvUrl = `${TMDB_BASE_URL}/discover/tv?api_key=${apiKey}&vote_average.gte=${rating}&sort_by=popularity.desc`;
-        
+
         if (movieGenreIds) movieUrl += `&with_genres=${movieGenreIds}`;
         if (tvGenreIds) tvUrl += `&with_genres=${tvGenreIds}`;
-        
+
         if (year !== "All") {
             movieUrl += `&primary_release_year=${year}`;
             tvUrl += `&first_air_date_year=${year}`;
         }
-        
+
         // Fetch concurrently
         const [movieRes, tvRes] = await Promise.all([
             fetch(movieUrl, { signal }).catch(e => null),
             fetch(tvUrl, { signal }).catch(e => null)
         ]);
-        
+
         if (signal.aborted) return;
-        
+
         let movieData = { results: [] };
         let tvData = { results: [] };
-        
+
         if (movieRes && movieRes.ok) movieData = await movieRes.json();
         if (tvRes && tvRes.ok) tvData = await tvRes.json();
-        
+
         const combinedResults = [];
-        
+
         // Format movies
         movieData.results.forEach(item => {
             combinedResults.push({
@@ -11135,7 +11159,7 @@ async function performGlobalTmdbDiscover() {
                 links: []
             });
         });
-        
+
         // Format TV shows
         tvData.results.forEach(item => {
             combinedResults.push({
@@ -11159,13 +11183,13 @@ async function performGlobalTmdbDiscover() {
                 links: []
             });
         });
-        
+
         // Deduplicate discover results against local database items
         const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
         state.externalSearchResults = combinedResults.filter(ext => !localTmdbIds.has(ext.tmdb_id));
-        
+
         console.log("[Discover Debug] Fetched and filtered external discover results count:", state.externalSearchResults.length);
-        
+
         // Re-trigger grid rendering to show the merged list
         renderFeaturedGrid(true);
     } catch (err) {
@@ -11231,11 +11255,11 @@ async function fetchTmdbCategoryMovies(category) {
             urls = [`${TMDB_BASE_URL}/discover/movie?api_key=${apiKey}&with_genres=35,18&sort_by=popularity.desc&page=1`];
         } else {
             urls = [`${TMDB_BASE_URL}/trending/all/week?api_key=${apiKey}&page=1`];
-  
+
         }
 
         const responses = await Promise.all(urls.map(u => fetch(u).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] }))));
-        
+
         let allResults = [];
         const seenIds = new Set();
 
@@ -11271,7 +11295,7 @@ async function fetchTmdbCategoryMovies(category) {
                 .map(item => {
                     const isTV = item.first_air_date || item.name || item.media_type === "tv";
                     const origLang = item.original_language || "";
-                    
+
                     const genresList = [category];
                     if (origLang === "ja") genresList.push("Anime");
                     if (origLang === "ko") genresList.push("Korean", "Korean Drama");
@@ -11304,7 +11328,7 @@ async function fetchTmdbCategoryMovies(category) {
             if (!state.categoryTmdbMovies) state.categoryTmdbMovies = {};
             const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
             const filteredTmdb = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
-            
+
             state.categoryTmdbMovies[category] = filteredTmdb;
             if (category === "Korean Movies") state.categoryTmdbMovies["Asian Movies"] = filteredTmdb;
             if (category === "Asian Movies") state.categoryTmdbMovies["Korean Movies"] = filteredTmdb;
@@ -11444,25 +11468,25 @@ async function fetchTmdbSearchResults(query, apiKey) {
 // Global TMDB Multi-Search for global search support
 async function performGlobalTmdbSearch(query) {
     if (!query || query.trim().length < 3 || state.searchQuery !== query) return;
-    
+
     logAppEvent("search", query.trim(), query.trim());
     console.log("[Search Debug] Starting global search for query:", query);
     try {
         const apiKey = getTmdbApiKey();
         const results = await fetchTmdbSearchResults(query, apiKey);
-        
+
         if (state.searchQuery !== query) {
             console.warn("[Search Debug] Search query changed while fetching. Aborting render.");
             return;
         }
-        
+
         console.log("[Search Debug] Filtered movie/tv results count:", results.length);
-        
+
         const formatted = results.map(item => {
             const title = item.title || item.name || "";
             const releaseDate = item.release_date || item.first_air_date || "";
             const mType = item.media_type === 'tv' ? 'Series' : 'Movie';
-            
+
             return {
                 csv_id: String(item.id),
                 tmdb_id: item.id,
@@ -11484,11 +11508,11 @@ async function performGlobalTmdbSearch(query) {
                 links: []
             };
         });
-        
+
         const localTmdbIds = new Set(state.movies.map(m => m.tmdb_id).filter(id => id));
         state.externalSearchResults = formatted.filter(ext => !localTmdbIds.has(ext.tmdb_id));
         console.log("[Search Debug] Final external search results to display:", state.externalSearchResults.length);
-        
+
         renderFeaturedGrid();
     } catch (err) {
         console.error("[Search Debug] Error doing global search: ", err);
@@ -11519,7 +11543,7 @@ function bindEvents() {
             profileDrawer.classList.remove("active");
         });
     }
-    
+
     // Close profile drawer if clicked outside card area
     if (profileDrawer) {
         profileDrawer.addEventListener("click", (e) => {
@@ -11558,7 +11582,7 @@ function bindEvents() {
             });
         }
     };
-    
+
     setupModalClose("detail-modal", "btn-close-detail");
     setupModalClose("trailer-modal", "btn-close-trailer");
     setupModalClose("cinema-modal", "btn-close-cinema");
@@ -11625,16 +11649,16 @@ function bindEvents() {
                 // Start mining session
                 const now = Date.now();
                 state.user.farmingStartedAt = now;
-                
+
                 // Save local profile cache
                 const saved = localStorage.getItem("filmhouse_user_profile");
                 let profile = {};
                 if (saved) {
-                    try { profile = JSON.parse(saved); } catch (e) {}
+                    try { profile = JSON.parse(saved); } catch (e) { }
                 }
                 profile.farmingStartedAt = now;
                 localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
-                
+
                 // Sync to Firestore
                 if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
                     db.collection("users").doc(state.user.id).update({
@@ -11647,7 +11671,7 @@ function bindEvents() {
                         }, { merge: true }).catch(e => console.warn("Error saving farming state:", e));
                     });
                 }
-                
+
                 updateFarmingUI();
                 triggerHaptic("medium");
                 showToast("Mining session started! Check back in 8 hours.", "success");
@@ -11657,16 +11681,16 @@ function bindEvents() {
                     // Claim farming rewards
                     state.user.farmingStartedAt = 0;
                     triggerHaptic("success");
-                    
+
                     // Save local profile cache
                     const saved = localStorage.getItem("filmhouse_user_profile");
                     let profile = {};
                     if (saved) {
-                        try { profile = JSON.parse(saved); } catch (e) {}
+                        try { profile = JSON.parse(saved); } catch (e) { }
                     }
                     profile.farmingStartedAt = 0;
                     localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
-                    
+
                     // Sync to Firestore
                     if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
                         db.collection("users").doc(state.user.id).update({
@@ -11679,7 +11703,7 @@ function bindEvents() {
                             }, { merge: true }).catch(e => console.warn("Error updating farming state:", e));
                         });
                     }
-                    
+
                     // Award the reward points atomically and log to ledger
                     awardPoints(FARMING_REWARD, "mining");
                     updateFarmingUI();
@@ -11883,18 +11907,18 @@ function bindEvents() {
     if (searchInput) {
         const clearBtn = document.getElementById("search-clear-btn");
         const dropdown = document.getElementById("search-autocomplete-dropdown");
-        
+
         const renderAutocomplete = (query) => {
             if (!dropdown) return;
             const q = (query || "").toLowerCase().trim();
             const badgePrefix = window.location.pathname.includes("/MOVIE/") ? "" : "MOVIE/";
-            
+
             if (q.length < 2) {
                 dropdown.style.display = "none";
                 dropdown.innerHTML = "";
                 return;
             }
-            
+
             // Filter and score local library movies with precision ranking
             const matches = getPrecisionSearchResults(state.movies, q);
 
@@ -11905,18 +11929,18 @@ function bindEvents() {
                 dropdown.innerHTML = "";
                 return;
             }
-            
+
             dropdown.innerHTML = "";
             topMatches.forEach(m => {
                 const item = document.createElement("div");
                 item.className = "autocomplete-item";
-                
+
                 const posterUrl = m.poster || (badgePrefix + "img/FilmHouse3_nobg.png");
                 const genreStr = Array.isArray(m.genres) ? m.genres.join(", ") : (m.genre || "Media");
                 const ratingStr = m.rating ? `⭐ ${m.rating}` : "N/A";
                 const releaseYear = m.release_date ? String(m.release_date).substring(0, 4) : (m.year ? String(m.year) : "");
                 const yearLabel = releaseYear ? ` (${releaseYear})` : "";
-                
+
                 item.innerHTML = `
                     <img src="${escapeHTML(posterUrl)}" alt="Poster" class="autocomplete-poster" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
                     <div class="autocomplete-details">
@@ -11924,14 +11948,14 @@ function bindEvents() {
                         <div class="autocomplete-meta">${escapeHTML(genreStr)} | ${ratingStr}</div>
                     </div>
                 `;
-                
+
                 item.addEventListener("click", (e) => {
                     e.stopPropagation();
                     openDetailModal(m);
                     dropdown.style.display = "none";
                     dropdown.innerHTML = "";
                 });
-                
+
                 dropdown.appendChild(item);
             });
             dropdown.style.display = "flex";
@@ -11945,13 +11969,13 @@ function bindEvents() {
             if (clearBtn) {
                 clearBtn.style.display = query ? "flex" : "none";
             }
-            
+
             if (query.trim().length > 0) {
                 document.body.classList.add("search-active");
             } else {
                 document.body.classList.remove("search-active");
             }
-            
+
             renderAutocomplete(query);
 
             // Debounce local grid rendering to prevent keystroke input stuttering/lag
@@ -12011,7 +12035,7 @@ function bindEvents() {
                 }
             }
         });
-        
+
         document.addEventListener("click", (e) => {
             if (window.innerWidth < 600) {
                 if (searchWrapper.classList.contains("expanded") && !searchWrapper.contains(e.target)) {
@@ -12052,17 +12076,17 @@ function bindEvents() {
             catLeftBtn.style.display = scrollLeft > 5 ? "flex" : "none";
             catRightBtn.style.display = scrollLeft < maxScroll - 5 ? "flex" : "none";
         };
-        
+
         catSlider.addEventListener("scroll", updateScrollArrows);
         window.addEventListener("resize", updateScrollArrows);
-        
+
         catLeftBtn.addEventListener("click", () => {
             catSlider.scrollBy({ left: -200, behavior: "smooth" });
         });
         catRightBtn.addEventListener("click", () => {
             catSlider.scrollBy({ left: 200, behavior: "smooth" });
         });
-        
+
         // Initial execution check
         setTimeout(updateScrollArrows, 500);
     }
@@ -12084,7 +12108,7 @@ function bindEvents() {
 
             renderFeaturedGrid();
             renderGenreChips();
-            
+
             // Close filters panel
             if (filterToggle && filterPanel) {
                 filterToggle.classList.remove("active");
@@ -12120,13 +12144,13 @@ function bindEvents() {
     if (feedbackForm) {
         feedbackForm.addEventListener("submit", (e) => {
             e.preventDefault();
-            
+
             const category = document.getElementById("feedback-type").value;
             const subject = document.getElementById("feedback-subject").value;
             const message = document.getElementById("feedback-message").value;
 
             // Save feedback locally in mock database
-            const feedbackList = JSON.parse(localStorage.getItem("filmhouse_user_feedbacks") || "[]");
+            const feedbackList = safeJsonParse(localStorage.getItem("filmhouse_user_feedbacks"), []);
             feedbackList.push({
                 user: state.user.username,
                 category,
@@ -12159,12 +12183,12 @@ function bindEvents() {
     if (supportForm) {
         supportForm.addEventListener("submit", (e) => {
             e.preventDefault();
-            
+
             const email = document.getElementById("contact-email").value;
             const msg = document.getElementById("contact-message").value;
 
             // Mock submit support ticket
-            const tickets = JSON.parse(localStorage.getItem("filmhouse_support_tickets") || "[]");
+            const tickets = safeJsonParse(localStorage.getItem("filmhouse_support_tickets"), []);
             tickets.push({
                 user: state.user.username,
                 email,
@@ -12185,7 +12209,7 @@ function bindEvents() {
     if (btnSaveTmdbKey && inputTmdbKey) {
         // Populate current key if exists
         inputTmdbKey.value = localStorage.getItem("filmhouse_tmdb_key") || "";
-        
+
         btnSaveTmdbKey.addEventListener("click", () => {
             const key = inputTmdbKey.value.trim();
             if (key) {
@@ -12357,14 +12381,14 @@ function bindEvents() {
                 }).catch(err => {
                     if (err.name !== "AbortError") {
                         if (navigator.clipboard?.writeText) {
-                            navigator.clipboard.writeText(shareText || shareUrl).catch(() => {});
+                            navigator.clipboard.writeText(shareText || shareUrl).catch(() => { });
                         }
                         showToast("Link copied to clipboard! Share anywhere 🍿", "success");
                     }
                 });
             } else {
                 if (navigator.clipboard?.writeText) {
-                    navigator.clipboard.writeText(shareText || shareUrl).catch(() => {});
+                    navigator.clipboard.writeText(shareText || shareUrl).catch(() => { });
                 }
                 showToast("Link copied to clipboard! Share anywhere 🍿", "success");
                 handleShareReward();
@@ -12424,20 +12448,20 @@ function bindEvents() {
     const btnViewNotifications = document.getElementById("btn-view-notifications");
     const notificationsModal = document.getElementById("notifications-modal");
     const btnCloseNotifications = document.getElementById("btn-close-notifications");
-    
+
     if (btnViewNotifications && notificationsModal) {
         btnViewNotifications.addEventListener("click", () => {
             renderNotificationsList();
             notificationsModal.classList.add("active");
         });
     }
-    
+
     if (btnCloseNotifications && notificationsModal) {
         btnCloseNotifications.addEventListener("click", () => {
             notificationsModal.classList.remove("active");
         });
     }
-    
+
     if (notificationsModal) {
         notificationsModal.addEventListener("click", (e) => {
             if (e.target === notificationsModal) {
@@ -12468,20 +12492,20 @@ function bindEvents() {
     const btnViewHistory = document.getElementById("btn-view-watch-history");
     const historyModal = document.getElementById("history-modal");
     const btnCloseHistory = document.getElementById("btn-close-history");
-    
+
     if (btnViewHistory && historyModal) {
         btnViewHistory.addEventListener("click", () => {
             renderHistoryGrid();
             historyModal.classList.add("active");
         });
     }
-    
+
     if (btnCloseHistory && historyModal) {
         btnCloseHistory.addEventListener("click", () => {
             historyModal.classList.remove("active");
         });
     }
-    
+
     if (historyModal) {
         historyModal.addEventListener("click", (e) => {
             if (e.target === historyModal) {
@@ -12505,14 +12529,14 @@ function bindEvents() {
         imageWrapper.addEventListener("click", () => {
             fileInput.click();
         });
-        
+
         fileInput.addEventListener("change", (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(evt) {
+                reader.onload = function (evt) {
                     state.user.avatar = evt.target.result;
-                    
+
                     const profileObj = {
                         fullName: state.user.fullName,
                         avatar: state.user.avatar,
@@ -12524,7 +12548,7 @@ function bindEvents() {
                         contactPreference: state.user.contactPreference
                     };
                     localStorage.setItem("filmhouse_user_profile", JSON.stringify(profileObj));
-                    
+
                     loadUserProfile();
                     showToast("Profile picture updated!");
                 };
@@ -12548,11 +12572,11 @@ function bindEvents() {
             const confirmed = confirm("⚠️ Are you sure you want to RESET your account? This will DELETE your profile from the database and clear all points, so you can test as a completely fresh new user. Proceed?");
             if (confirmed) {
                 triggerHaptic("warning");
-                
+
                 // Show loading state on button
                 btnResetAccount.disabled = true;
                 btnResetAccount.textContent = "Deleting Profile... ⏳";
-                
+
                 // Clear local storage profile keys
                 localStorage.removeItem("filmhouse_user_profile");
                 localStorage.removeItem("filmhouse_tour_completed");
@@ -12592,21 +12616,21 @@ function bindEvents() {
     const formStep = document.getElementById("login-step-form");
     const cancelOAuthBtn = document.getElementById("btn-cancel-oauth");
     const oauthForm = document.getElementById("oauth-simulation-form");
-    
+
     if (btnOAuth && choiceStep && formStep) {
         btnOAuth.addEventListener("click", () => {
             choiceStep.style.display = "none";
             formStep.style.display = "block";
         });
     }
-    
+
     if (cancelOAuthBtn && choiceStep && formStep) {
         cancelOAuthBtn.addEventListener("click", () => {
             formStep.style.display = "none";
             choiceStep.style.display = "block";
         });
     }
-    
+
     if (btnGuest && loginModal) {
         btnGuest.addEventListener("click", () => {
             const defaultProfile = {
@@ -12628,13 +12652,13 @@ function bindEvents() {
         });
     }
 
-    
+
     if (oauthForm && loginModal) {
         oauthForm.addEventListener("submit", (e) => {
             e.preventDefault();
             const fullNameInput = document.getElementById("oauth-fullname");
             const usernameInput = document.getElementById("oauth-username");
-            
+
             if (fullNameInput && usernameInput) {
                 state.user.fullName = fullNameInput.value.trim();
                 state.user.username = usernameInput.value.trim().replace(/^@/, "");
@@ -12653,7 +12677,7 @@ function bindEvents() {
                     points: 0
                 };
                 localStorage.setItem("filmhouse_user_profile", JSON.stringify(profileObj));
-                
+
                 loadUserProfile();
                 loginModal.classList.remove("active");
                 navigateToScreen("home");
@@ -12667,17 +12691,17 @@ function bindEvents() {
     tabButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             const targetTab = btn.getAttribute("data-tab");
-            
+
             // Toggle active class on buttons
             tabButtons.forEach(b => {
                 if (b === btn) b.classList.add("active");
                 else b.classList.remove("active");
             });
-            
+
             // Toggle active content panel
             const dashboardContent = document.getElementById("profile-tab-content-dashboard");
             const settingsContent = document.getElementById("profile-tab-content-settings");
-            
+
             if (targetTab === "dashboard") {
                 if (dashboardContent) dashboardContent.style.display = "block";
                 if (settingsContent) settingsContent.style.display = "none";
@@ -12795,7 +12819,7 @@ function initManualRequestModal() {
                         release_date: `${yrNum}-01-01`,
                         status: "pending",
                         subscribed_at: firebase.firestore.FieldValue.serverTimestamp()
-                    }).catch(() => {});
+                    }).catch(() => { });
                 }
                 closeManualRequestModal();
                 if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Submit Request 📩"; }
@@ -12842,7 +12866,7 @@ function initManualRequestModal() {
 
             try {
                 localStorage.setItem("filmhouse_my_requests", JSON.stringify(currentUserRequests));
-            } catch (_) {}
+            } catch (_) { }
 
             if (typeof renderUserRequests === "function") {
                 renderUserRequests(currentUserRequests);
@@ -13049,7 +13073,7 @@ function applyThemeAccent(themeName) {
     root.style.setProperty('--primary-glow', active.glow);
     root.style.setProperty('--primary-gradient', active.gradient);
     root.style.setProperty('--border-color-glow', active.glowBorder);
-    
+
     // Update active state in UI dots
     const dots = document.querySelectorAll(".accent-option-dot");
     dots.forEach(dot => {
@@ -13068,7 +13092,7 @@ function applyThemeAccent(themeName) {
 function parseRequestDate(val) {
     if (!val) return null;
     if (typeof val.toDate === 'function') {
-        try { return val.toDate(); } catch(e) {}
+        try { return val.toDate(); } catch (e) { }
     }
     if (val && typeof val.seconds === 'number') {
         return new Date(val.seconds * 1000);
@@ -13085,19 +13109,19 @@ function formatRequestDateTime(date, includeYear = true) {
     if (!date) return "";
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
+
     const dayName = days[date.getDay()];
     const monthName = months[date.getMonth()];
     const dayNum = date.getDate();
     const year = date.getFullYear();
-    
+
     let hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
     hours = hours ? hours : 12;
     const hoursStr = String(hours).padStart(2, '0');
-    
+
     const timeStr = `${hoursStr}:${minutes} ${ampm}`;
     const yearStr = includeYear ? `, ${year}` : '';
     return `${dayName}, ${monthName} ${dayNum}${yearStr} • ${timeStr}`;
@@ -13109,12 +13133,12 @@ function getRelativeTimeAgo(date) {
     const now = Date.now();
     const diffMs = now - date.getTime();
     if (diffMs < 0) return "Just now";
-    
+
     const diffSecs = Math.floor(diffMs / 1000);
     const diffMins = Math.floor(diffSecs / 60);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
-    
+
     if (diffSecs < 60) return "Just now";
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
@@ -13135,14 +13159,14 @@ function startUserRequestsListener() {
             currentUserRequests = JSON.parse(savedReqs);
             renderUserRequests(currentUserRequests);
         }
-    } catch (e) {}
+    } catch (e) { }
 
     if (typeof firebase === "undefined" || !db || !state.user.id) return;
-    
+
     if (userRequestsUnsubscribe) {
         userRequestsUnsubscribe();
     }
-    
+
     userRequestsUnsubscribe = db.collection("requests")
         .where("requestedById", "==", state.user.id)
         .onSnapshot(snapshot => {
@@ -13179,7 +13203,7 @@ function startUserRequestsListener() {
             currentUserRequests = requests;
             try {
                 localStorage.setItem("filmhouse_my_requests", JSON.stringify(currentUserRequests));
-            } catch (e) {}
+            } catch (e) { }
             renderUserRequests(requests);
             if (typeof renderFeaturedGrid === "function") {
                 renderFeaturedGrid(true);
@@ -13200,7 +13224,7 @@ function isStreamRequest(r) {
     const title = String(r.title || "").toLowerCase();
 
     return t === "stream" || rt === "stream" || target === "stream_url" ||
-           q.includes("stream") || sop.includes("stream") || title.includes("(stream") || title.includes(" stream");
+        q.includes("stream") || sop.includes("stream") || title.includes("(stream") || title.includes(" stream");
 }
 
 // Helper: Checks if requested season/quality exists with working links in matching catalog movie
@@ -13229,8 +13253,8 @@ function isMovieSpecAvailableInCatalog(movie, r) {
     const reqTitle = String(r && r.title ? r.title : "").toLowerCase().trim();
     const fullSpec = `${reqSpec} ${reqTitle}`;
 
-    const isReqSeries = (r.type || "").toLowerCase() === 'series' || (r.type || "").toLowerCase() === 'tv' || 
-                        (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
+    const isReqSeries = (r.type || "").toLowerCase() === 'series' || (r.type || "").toLowerCase() === 'tv' ||
+        (movie.type || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'tv';
 
     // Season Check: e.g. "Season 4", "S04", "Season 2"
     const sMatch = fullSpec.match(/(?:season\s*|s)(\d+)\b/i);
@@ -13267,8 +13291,8 @@ function isMovieSpecAvailableInCatalog(movie, r) {
     const qMatch = fullSpec.match(/(2160p|4k|1080p|720p|480p)/i);
     if (qMatch) {
         const targetQ = qMatch[1].toLowerCase();
-        const linksToCheck = isStream 
-            ? (Array.isArray(movie.stream_links) ? movie.stream_links : []) 
+        const linksToCheck = isStream
+            ? (Array.isArray(movie.stream_links) ? movie.stream_links : [])
             : (Array.isArray(movie.links) ? movie.links : []);
 
         if (linksToCheck.length > 0) {
@@ -13315,9 +13339,9 @@ function renderUserRequests(requests) {
     const historyCountBadge = document.getElementById("history-count-badge");
     const historyToggle = document.getElementById("user-requests-history-toggle");
     const historyChevron = document.getElementById("history-chevron");
-    
+
     if (!list) return;
-    
+
     if (requests.length === 0) {
         if (countBadge) countBadge.textContent = "0";
         list.innerHTML = `
@@ -13328,14 +13352,14 @@ function renderUserRequests(requests) {
         if (historyWrapper) historyWrapper.style.display = "none";
         return;
     }
-    
-    const acknowledgedFulfillments = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
-    
+
+    const acknowledgedFulfillments = safeJsonParse(localStorage.getItem("acknowledged_fulfillments"), []);
+
     // Split into active vs history
     const activeRequests = [];
     const historyRequests = [];
     let hasNewFulfillment = false;
-    
+
     requests.forEach(r => {
         const matchingMovie = state.movies.find(m => {
             const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
@@ -13343,14 +13367,14 @@ function renderUserRequests(requests) {
             if (rId && mId) {
                 return rId === mId;
             }
-            return (m.title && titlesMatch(m.title, r.title)) || 
-                   (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
+            return (m.title && titlesMatch(m.title, r.title)) ||
+                (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
         });
         const isExplicit = (r.status === "fulfilled" || r.status === "claimed") && r.downloadLink;
         const isMatched = matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r);
         const isFulfilled = isUserRequestFulfilled(r, matchingMovie);
         const isClaimed = isFulfilled && (r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId));
-        
+
         if (isClaimed) {
             historyRequests.push({ ...r, _matchingMovie: matchingMovie, _isExplicit: isExplicit, _isMatched: isMatched, _isFulfilled: isFulfilled });
         } else {
@@ -13360,10 +13384,10 @@ function renderUserRequests(requests) {
             }
         }
     });
-    
+
     // Update badge with active count only
     if (countBadge) countBadge.textContent = activeRequests.length;
-    
+
     // Render active requests
     list.innerHTML = "";
     if (activeRequests.length === 0) {
@@ -13377,7 +13401,7 @@ function renderUserRequests(requests) {
             const item = document.createElement("div");
             item.className = "user-request-item";
             item.style.cssText = "background: rgba(255,255,255,0.025); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; display: flex; flex-direction: column; gap: 12px;";
-            
+
             const reqDate = parseRequestDate(r.requestedAt || r._localTime || r.createdAt || r.timestamp);
             const reqDateFormatted = reqDate ? formatRequestDateTime(reqDate, false) : "";
             const reqTimeAgo = reqDate ? getRelativeTimeAgo(reqDate) : "";
@@ -13388,7 +13412,7 @@ function renderUserRequests(requests) {
             let reviewingColor = "rgba(255,255,255,0.1)";
             let readyColor = "rgba(255,255,255,0.1)";
             let activeLineColor = "var(--primary-color)";
-            
+
             if (r._isFulfilled || r._isMatched || r._isExplicit) {
                 step = 3;
                 progressPct = 100;
@@ -13428,7 +13452,7 @@ function renderUserRequests(requests) {
                     </button>
                 `;
             }
-            
+
             const stepperLineWidth = progressPct === 100 ? 'calc(100% - 48px)' : (progressPct === 50 ? 'calc(50% - 24px)' : '0px');
             const stepperHTML = `
                 <div class="request-stepper" style="display: flex; align-items: center; justify-content: space-between; padding: 4px 14px 0 14px; position: relative; width: 100%; box-sizing: border-box; margin-top: 2px;">
@@ -13462,7 +13486,7 @@ function renderUserRequests(requests) {
                     </div>
                 </div>
             `;
-            
+
             const dateBadgeHTML = reqDateFormatted ? `
                 <div style="font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; margin-top: 4px; flex-wrap: wrap;">
                     <span>📅</span>
@@ -13486,7 +13510,7 @@ function renderUserRequests(requests) {
                 </div>
                 ${stepperHTML}
             `;
-            
+
             // Event listeners
             const boostBtn = item.querySelector(".user-request-boost-btn");
             if (boostBtn) {
@@ -13494,18 +13518,18 @@ function renderUserRequests(requests) {
                     boostRequestToPriority(r.docId);
                 });
             }
-            
+
             const dlBtn = item.querySelector(".user-request-dl-btn");
             if (dlBtn) {
                 dlBtn.addEventListener("click", () => {
-                    const ack = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
+                    const ack = safeJsonParse(localStorage.getItem("acknowledged_fulfillments"), []);
                     if (!ack.includes(r.docId)) {
                         ack.push(r.docId);
                         localStorage.setItem("acknowledged_fulfillments", JSON.stringify(ack));
                     }
                     updateHeaderNotificationDot();
                     updateHomeFulfillmentBanner();
-                    
+
                     // Mark as claimed in Firestore in the background
                     if (db) {
                         db.collection("requests").doc(r.docId).update({
@@ -13526,34 +13550,26 @@ function renderUserRequests(requests) {
                     } else {
                         const link = dlBtn.getAttribute("data-link");
                         if (link && (link.includes("t.me") || link.startsWith("http"))) {
-                            try {
-                                if (window.Telegram?.WebApp?.openLink) {
-                                    window.Telegram.WebApp.openLink(link);
-                                } else {
-                                    window.open(link, "_blank");
-                                }
-                            } catch (_) {
-                                window.open(link, "_blank");
-                            }
+                            openExternalUrl(link);
                         }
                         showToast("Claimed! The download links have been sent to your Telegram DMs. 🍿", "success");
                     }
-                    
+
                     // Re-render so claimed request moves to history immediately
                     renderUserRequests(currentUserRequests);
                 });
             }
-            
+
             list.appendChild(item);
         });
     }
-    
+
     // Render history section
     if (historyWrapper && historyList) {
         if (historyRequests.length > 0) {
             historyWrapper.style.display = "block";
             if (historyCountBadge) historyCountBadge.textContent = historyRequests.length;
-            
+
             historyList.innerHTML = "";
             historyRequests.forEach(r => {
                 const reqDate = parseRequestDate(r.requestedAt || r._localTime || r.createdAt || r.timestamp);
@@ -13572,7 +13588,7 @@ function renderUserRequests(requests) {
                 `;
                 historyList.appendChild(item);
             });
-            
+
             // Bind toggle (only if not already bound)
             if (historyToggle && !historyToggle._bound) {
                 historyToggle._bound = true;
@@ -13588,13 +13604,13 @@ function renderUserRequests(requests) {
             historyWrapper.style.display = "none";
         }
     }
-    
+
     if (headerNotificationDot) {
         headerNotificationDot.style.display = hasNewFulfillment ? "block" : "none";
     }
-    
+
     updateHomeFulfillmentBanner();
-    
+
     // Notify user once per session if a request is ready
     if (hasNewFulfillment && !state.notifiedOfFulfillment) {
         state.notifiedOfFulfillment = true;
@@ -13608,8 +13624,8 @@ function updateHomeFulfillmentBanner() {
     const bannerBtn = document.getElementById("btn-banner-view-requests");
     if (!banner) return;
 
-    const acknowledgedFulfillments = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
-    
+    const acknowledgedFulfillments = safeJsonParse(localStorage.getItem("acknowledged_fulfillments"), []);
+
     const unacknowledgedFulfilled = currentUserRequests.filter(r => {
         const matchingMovie = state.movies.find(m => {
             const rId = String(r.tmdb_id || r.csv_id || '').split('-')[0].trim();
@@ -13617,14 +13633,14 @@ function updateHomeFulfillmentBanner() {
             if (rId && mId) {
                 return rId === mId;
             }
-            return (m.title && titlesMatch(m.title, r.title)) || 
-                   (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
+            return (m.title && titlesMatch(m.title, r.title)) ||
+                (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase());
         });
         const isFulfilled = isUserRequestFulfilled(r, matchingMovie);
         const isClaimed = isFulfilled && (r.claimed === true || r.status === "claimed" || acknowledgedFulfillments.includes(r.docId));
         return isFulfilled && !isClaimed;
     });
-    
+
     if (unacknowledgedFulfilled.length > 0) {
         banner.style.display = "flex";
         if (bannerText) {
@@ -13649,12 +13665,12 @@ function updateHomeFulfillmentBanner() {
 
 function boostRequestToPriority(docId) {
     if (typeof firebase === "undefined" || !db) return;
-    
+
     if (state.user.points < 1000) {
         showToast("Not enough points! You need 1,000 points to boost requests.", "error");
         return;
     }
-    
+
     const boosterName = state.user.username ? `@${state.user.username.replace(/^@/, '')}` : (state.user.fullName || state.user.firstName || `User ${state.user.id || 'Guest'}`);
     const boosterId = String(state.user.id || '');
 
@@ -13669,7 +13685,7 @@ function boostRequestToPriority(docId) {
         claimedAt: firebase.firestore.FieldValue.delete()
     }).then(() => {
         deductPoints(1000);
-        const ack = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
+        const ack = safeJsonParse(localStorage.getItem("acknowledged_fulfillments"), []);
         const newAck = ack.filter(id => id !== docId);
         localStorage.setItem("acknowledged_fulfillments", JSON.stringify(newAck));
         const localReq = currentUserRequests.find(r => r.docId === docId);
@@ -13693,7 +13709,7 @@ function checkVipBadgeExpiry() {
         if (expiry > 0 && Date.now() > expiry) {
             state.user.badge = "";
             state.user.badgeExpiresAt = 0;
-            
+
             const saved = localStorage.getItem("filmhouse_user_profile");
             if (saved) {
                 try {
@@ -13701,9 +13717,9 @@ function checkVipBadgeExpiry() {
                     profile.badge = "";
                     profile.badgeExpiresAt = 0;
                     localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
-                } catch (e) {}
+                } catch (e) { }
             }
-            
+
             syncUserToFirestore();
             showToast("Your VIP Custom Badge has expired! Earn more points to reclaim it. 🏆", "info");
         }
@@ -13716,7 +13732,7 @@ function deductPoints(points, reason = "redeem", metadata = {}) {
 
     state.user.points = Math.max(0, (state.user.points || 0) - pts);
     saveProfileToLocalStorage();
-    
+
     // Atomic deduction in Firestore: FieldValue.increment(-pts)
     if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
         const userRef = db.collection("users").doc(state.user.id);
@@ -13725,15 +13741,15 @@ function deductPoints(points, reason = "redeem", metadata = {}) {
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
         }).catch(err => {
             console.warn("Atomic deductPoints update failed:", err);
-            userRef.set({ points: state.user.points }, { merge: true }).catch(e => {});
+            userRef.set({ points: state.user.points }, { merge: true }).catch(e => { });
         });
 
         // Permanent immutable ledger entry
         recordLoyaltyLedger(-pts, "spend", reason, state.user.points, metadata);
     }
-    
+
     updatePointsUI();
-    
+
     const leaderboardScreen = document.getElementById("screen-leaderboard");
     if (leaderboardScreen && leaderboardScreen.classList.contains("active")) {
         renderLeaderboard();
@@ -13742,31 +13758,31 @@ function deductPoints(points, reason = "redeem", metadata = {}) {
 
 function updateHeaderNotificationDot() {
     if (typeof firebase === "undefined" || !db || !state.user.id) return;
-    
+
     db.collection("requests")
         .where("requestedById", "==", state.user.id)
         .get()
         .then(snapshot => {
-            const acknowledgedFulfillments = JSON.parse(localStorage.getItem("acknowledged_fulfillments") || "[]");
+            const acknowledgedFulfillments = safeJsonParse(localStorage.getItem("acknowledged_fulfillments"), []);
             let hasNew = false;
-            
+
             snapshot.forEach(doc => {
                 const r = doc.data();
                 const docId = doc.id;
-                
-                const matchingMovie = state.movies.find(m => 
-                    (m.title && titlesMatch(m.title, r.title)) || 
+
+                const matchingMovie = state.movies.find(m =>
+                    (m.title && titlesMatch(m.title, r.title)) ||
                     (m.csv_id && r.csv_id && m.csv_id.toLowerCase() === r.csv_id.toLowerCase())
                 );
-                
+
                 const isMatched = matchingMovie && isMovieSpecAvailableInCatalog(matchingMovie, r);
                 const isExplicit = r.status === "fulfilled" && r.downloadLink;
-                
+
                 if ((isMatched || isExplicit) && !acknowledgedFulfillments.includes(docId)) {
                     hasNew = true;
                 }
             });
-            
+
             const dot = document.getElementById("rewards-notification-dot");
             if (dot) dot.style.display = hasNew ? "block" : "none";
         }).catch(err => console.warn("Error checking header notifications:", err));
@@ -13815,7 +13831,7 @@ function logMovieRequestToFirestore(movie, specs = "") {
     }
 
     const isTVShow = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
-    
+
     // Determine release year reliably
     let movieReleaseYear = 0;
     if (movie.release_date && String(movie.release_date).length >= 4) {
@@ -13843,7 +13859,7 @@ function logMovieRequestToFirestore(movie, specs = "") {
 
     const requestTitle = specs ? `${movie.title || "Unknown Title"} (${specs})` : (movie.title || "Unknown Title");
     const yearStr = movieReleaseYear > 0 ? String(movieReleaseYear) : (movie.release_date ? movie.release_date.substring(0, 4) : (movie.year ? String(movie.year) : ""));
-    
+
     // 1. Immediately store in local currentUserRequests array and persist to localStorage
     const reqObj = {
         title: requestTitle,
@@ -13863,10 +13879,10 @@ function logMovieRequestToFirestore(movie, specs = "") {
     if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
         currentUserRequests.unshift(reqObj);
     }
-    
+
     try {
         localStorage.setItem("filmhouse_my_requests", JSON.stringify(currentUserRequests));
-    } catch (e) {}
+    } catch (e) { }
 
     // 2. Instantly update active detail modal UI if open on screen for this movie
     const modal = document.getElementById("detail-modal");
@@ -13881,7 +13897,7 @@ function logMovieRequestToFirestore(movie, specs = "") {
             reqBtn.style.background = "rgba(255, 188, 0, 0.15)";
             reqBtn.style.borderColor = "var(--primary-color)";
         }
-        
+
         const infoColumn = modal.querySelector(".detail-info-column");
         if (infoColumn && !infoColumn.querySelector(".requested-status-banner")) {
             const reqBanner = document.createElement("div");
@@ -13966,11 +13982,11 @@ function saveDailyStats() {
     if (saved) {
         try {
             profile = JSON.parse(saved);
-        } catch (e) {}
+        } catch (e) { }
     }
     profile.dailyStats = state.user.dailyStats;
     localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
-    
+
     // Sync immediately to Firestore to prevent data resets
     syncUserToFirestore();
 }
@@ -13978,11 +13994,11 @@ function saveDailyStats() {
 function renderDailyMissions() {
     const list = document.getElementById("daily-missions-list");
     if (!list) return;
-    
+
     checkAndResetDailyMissions();
     renderStreakCalendar();
     const stats = state.user.dailyStats;
-    
+
     const missions = [
         {
             id: "stream",
@@ -14026,7 +14042,7 @@ function renderDailyMissions() {
     missions.forEach(m => {
         const pct = Math.min(100, (m.current / m.target) * 100);
         let btnHTML = "";
-        
+
         if (m.claimed) {
             btnHTML = `<button class="btn btn-secondary btn-sm" disabled style="padding: 6px 12px; font-size: 11px; border-radius: 6px; opacity: 0.6; pointer-events: none;">Claimed ✓</button>`;
         } else if (m.current >= m.target) {
@@ -14052,7 +14068,7 @@ function renderDailyMissions() {
                 </div>
             ` : ''}
         `;
-        
+
         list.appendChild(item);
     });
 
@@ -14068,7 +14084,7 @@ function renderDailyMissions() {
 function claimMissionReward(missionId) {
     const stats = state.user.dailyStats;
     let pointsToAward = 0;
-    
+
     if (missionId === "login" && !stats.checkInClaimed) {
         stats.checkInClaimed = true;
         pointsToAward = 5;
@@ -14085,12 +14101,12 @@ function claimMissionReward(missionId) {
         stats.downloadsClaimed = true;
         pointsToAward = 15;
     }
-    
+
     if (pointsToAward > 0) {
         // Award points
         state.user.points = (state.user.points || 0) + pointsToAward;
         saveDailyStats();
-        
+
         // Save overall profile points
         const saved = localStorage.getItem("filmhouse_user_profile");
         if (saved) {
@@ -14099,9 +14115,9 @@ function claimMissionReward(missionId) {
                 profile.points = state.user.points;
                 profile.dailyStats = state.user.dailyStats;
                 localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
-            } catch (e) {}
+            } catch (e) { }
         }
-        
+
         syncUserToFirestore();
         updatePointsUI();
         renderDailyMissions();
@@ -14112,12 +14128,12 @@ function claimMissionReward(missionId) {
 function updateMissionProgress(actionType, count = 1) {
     checkAndResetDailyMissions();
     const stats = state.user.dailyStats;
-    
+
     let oldVal = 0;
     let target = 0;
     let title = "";
     let reward = 0;
-    
+
     if (actionType === "share") {
         oldVal = stats.sharesCount || 0;
         stats.sharesCount = oldVal + count;
@@ -14137,7 +14153,7 @@ function updateMissionProgress(actionType, count = 1) {
         title = "Movie Collector 📥";
         reward = 15;
     }
-    
+
     saveDailyStats();
     renderDailyMissions();
 
@@ -14146,7 +14162,7 @@ function updateMissionProgress(actionType, count = 1) {
         // Send a visual reminder / alert that the mission is completed
         showToast(`🎉 Daily Mission Completed: ${title}! Claim +${reward} points in Reward Center! 🪙`, "success");
         triggerHaptic("success");
-        
+
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.showAlert(`🎉 Daily Mission Completed: ${title}!\n\nOpen the Reward Center to claim your +${reward} points! 🪙`);
         }
@@ -14156,18 +14172,18 @@ function updateMissionProgress(actionType, count = 1) {
 function startMissionsResetTimer() {
     const timerEl = document.getElementById("missions-reset-timer");
     if (!timerEl) return;
-    
+
     function updateTimer() {
         const now = new Date();
         const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
         const diffMs = tomorrow - now;
-        
+
         const hours = Math.floor(diffMs / (1000 * 60 * 60));
         const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        
+
         timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     }
-    
+
     updateTimer();
     setInterval(updateTimer, 60000); // update every minute
 }
@@ -14175,458 +14191,458 @@ function startMissionsResetTimer() {
 // App Kickoff Initializer
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-    // Force clear old corrupted database & healed caches once
-    if (localStorage.getItem("filmhouse_reset_v7") !== "true") {
-        localStorage.removeItem("filmhouse_healed_movies");
-        localStorage.removeItem("filmhouse_enriched_db_v5");
-        localStorage.removeItem("filmhouse_enriched_db_v4");
-        localStorage.setItem("filmhouse_reset_v7", "true");
-    }
-
-    // 0. Load Theme Accent configuration immediately
-    const savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
-    applyThemeAccent(savedTheme);
-
-    // Bind Theme dots listeners
-    const themeDots = document.querySelectorAll(".accent-option-dot");
-    themeDots.forEach(dot => {
-        dot.addEventListener("click", () => {
-            const selectedTheme = dot.getAttribute("data-theme");
-            applyThemeAccent(selectedTheme);
-            showToast("Theme accent updated! 🎨", "success");
-        });
-    });
-
-    // 1. Initial login credentials grab
-    handleTelegramAuth();
-    updateUserGreeting();
-    initMediaDetailPage();
-
-    // Register single global Telegram Native BackButton listener
-    if (window.Telegram?.WebApp?.BackButton) {
-        try {
-            window.Telegram.WebApp.BackButton.onClick(handleAppBack);
-        } catch (e) {
-            console.warn("BackButton.onClick register error:", e);
+        // Force clear old corrupted database & healed caches once
+        if (localStorage.getItem("filmhouse_reset_v7") !== "true") {
+            localStorage.removeItem("filmhouse_healed_movies");
+            localStorage.removeItem("filmhouse_enriched_db_v5");
+            localStorage.removeItem("filmhouse_enriched_db_v4");
+            localStorage.setItem("filmhouse_reset_v7", "true");
         }
-    }
 
-    // Parse Telegram startapp parameter (e.g. startapp=mining or boost_docId or movie_id)
-    let initialScreen = "home";
-    let boostRequestDocId = null;
-    let targetDeepLinkMovieId = null;
-    if (state.isTelegram && window.Telegram && window.Telegram.WebApp) {
-        const initData = window.Telegram.WebApp.initDataUnsafe;
-        if (initData && initData.start_param) {
-            const rawParam = initData.start_param.trim();
-            const param = rawParam.toLowerCase();
-            if (param === "mining") {
-                initialScreen = "mining";
-            } else if (param === "tour") {
-                if (window.FilmHouseTour) {
-                    window.FilmHouseTour.reset();
-                    setTimeout(() => { window.FilmHouseTour.start(true); }, 800);
-                }
-            } else if (param.startsWith("boost_")) {
-                boostRequestDocId = rawParam.substring(6);
-            } else if (param.startsWith("movie_") || param.startsWith("open_") || param.startsWith("watch_") || param.startsWith("dl_")) {
-                targetDeepLinkMovieId = rawParam.replace(/^(movie_|open_|watch_|dl_)/i, "").trim();
+        // 0. Load Theme Accent configuration immediately
+        const savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
+        applyThemeAccent(savedTheme);
+
+        // Bind Theme dots listeners
+        const themeDots = document.querySelectorAll(".accent-option-dot");
+        themeDots.forEach(dot => {
+            dot.addEventListener("click", () => {
+                const selectedTheme = dot.getAttribute("data-theme");
+                applyThemeAccent(selectedTheme);
+                showToast("Theme accent updated! 🎨", "success");
+            });
+        });
+
+        // 1. Initial login credentials grab
+        handleTelegramAuth();
+        updateUserGreeting();
+        initMediaDetailPage();
+
+        // Register single global Telegram Native BackButton listener
+        if (window.Telegram?.WebApp?.BackButton) {
+            try {
+                window.Telegram.WebApp.BackButton.onClick(handleAppBack);
+            } catch (e) {
+                console.warn("BackButton.onClick register error:", e);
             }
         }
-    }
-    const urlParams = new URLSearchParams(window.location.search);
-    const queryMovie = urlParams.get("movie") || urlParams.get("id");
-    const queryStartApp = urlParams.get("startapp") || urlParams.get("tgWebAppStartParam");
-    const querySyncId = urlParams.get("sync_id") || urlParams.get("tg_id");
-    if (querySyncId && /^\d{5,15}$/.test(querySyncId.trim())) {
-        linkTelegramAccount(querySyncId.trim());
-    }
-    if (!targetDeepLinkMovieId) {
-        if (queryMovie) {
-            targetDeepLinkMovieId = queryMovie.trim();
-        } else if (queryStartApp && (queryStartApp.startsWith("movie_") || queryStartApp.startsWith("open_") || queryStartApp.startsWith("watch_") || queryStartApp.startsWith("dl_"))) {
-            targetDeepLinkMovieId = queryStartApp.replace(/^(movie_|open_|watch_|dl_)/i, "").trim();
-        }
-    }
 
-    if (queryStartApp === "tour" || urlParams.get("tour") === "1" || urlParams.get("tour") === "true") {
-        if (window.FilmHouseTour) {
-            window.FilmHouseTour.reset();
-            setTimeout(() => { window.FilmHouseTour.start(true); }, 800);
-        }
-    }
-
-    // PC Telegram Device Sync Modal Buttons
-    const btnSyncDrawer = document.getElementById("btn-sync-telegram");
-    if (btnSyncDrawer) {
-        btnSyncDrawer.addEventListener("click", () => {
-            openTelegramSyncModal();
-        });
-    }
-
-    const btnOpenSyncModal = document.getElementById("btn-open-sync-modal");
-    if (btnOpenSyncModal) {
-        btnOpenSyncModal.addEventListener("click", () => {
-            openTelegramSyncModal();
-        });
-    }
-
-    const btnCancelSync = document.getElementById("btn-cancel-sync-modal");
-    if (btnCancelSync) {
-        btnCancelSync.addEventListener("click", () => {
-            closeTelegramSyncModal();
-        });
-    }
-
-    const btnSubmitSync = document.getElementById("btn-submit-sync-modal");
-    const inputSyncId = document.getElementById("input-sync-telegram-id");
-    if (btnSubmitSync && inputSyncId) {
-        btnSubmitSync.addEventListener("click", () => {
-            linkTelegramAccount(inputSyncId.value);
-        });
-        inputSyncId.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                linkTelegramAccount(inputSyncId.value);
-            }
-        });
-    }
-
-    const btnUnlinkSync = document.getElementById("btn-unlink-sync-modal");
-    if (btnUnlinkSync) {
-        btnUnlinkSync.addEventListener("click", () => {
-            if (confirm("Are you sure you want to unlink this Telegram account from this browser?")) {
-                unlinkTelegramAccount();
-            }
-        });
-    }
-    
-    // Sync latest user points, check-in streak, and ban status from Firestore on startup
-    if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
-        syncUserToFirestore(true);
-    }
-
-    // Fetch live list of admins to cache globally on startup
-    if (typeof firebase !== "undefined" && db) {
-        db.collection("settings").doc("admins").get().then(adminDoc => {
-            if (adminDoc.exists && adminDoc.data().ids) {
-                const defaultAdmins = ["1329840839", "1175336733"];
-                globalAdminIds = Array.from(new Set([...defaultAdmins, ...adminDoc.data().ids]));
-            }
-            updatePointsUI(); // Refresh UI once admin IDs are loaded
-        }).catch(err => console.warn("Error loading admins settings:", err));
-    }
-    const profileExists = !!localStorage.getItem("filmhouse_user_profile");
-    
-    // Auto-create profile if inside Telegram
-    if (state.isTelegram && !profileExists) {
-        const defaultProfile = {
-            fullName: state.user.fullName,
-            avatar: state.user.avatar,
-            favoriteCategories: [],
-            notificationsEnabled: true,
-            subAnime: true,
-            subHollywood: true,
-            subRecs: true,
-            contactPreference: "telegram",
-            points: 0
-        };
-        localStorage.setItem("filmhouse_user_profile", JSON.stringify(defaultProfile));
-        setTimeout(() => {
-            showToast("Welcome to Film House! Your Telegram account has been connected.", "success");
-        }, 1000);
-    }
-
-    // Global Leaderboard renderer
-    function fetchAndRenderLeaderboard() {
-        const list = document.getElementById("points-leaderboard-list");
-        if (!list || typeof firebase === "undefined" || !db) return;
-        
-        db.collection("users")
-            .orderBy("points", "desc")
-            .limit(30)
-            .get()
-            .then(snapshot => {
-                list.innerHTML = "";
-                let rank = 1;
-                
-                snapshot.forEach(doc => {
-                    const u = doc.data();
-                    const userIdStr = u.id ? String(u.id) : "";
-                    
-                    // Skip admins/staff members in homepage rankings list
-                    if (typeof globalAdminIds !== "undefined" && globalAdminIds.includes(userIdStr)) return;
-                    if (rank > 10) return; // Limit to top 10
-                    
-                    const points = parseInt(u.points || 0);
-                    const name = escapeHTML(u.fullName || u.username || `User ${doc.id.substring(0, 4)}`);
-                    
-                    let badge = "";
-                    let rankStyle = "color: var(--text-secondary); font-weight: 700;";
-                    if (rank === 1) {
-                        badge = "🥇";
-                        rankStyle = "color: #ffbc00; font-size: 14px; font-weight: 900;";
-                    } else if (rank === 2) {
-                        badge = "🥈";
-                        rankStyle = "color: #e0e0e0; font-size: 14px; font-weight: 900;";
-                    } else if (rank === 3) {
-                        badge = "🥉";
-                        rankStyle = "color: #cd7f32; font-size: 14px; font-weight: 900;";
-                    } else {
-                        badge = `#${rank}`;
+        // Parse Telegram startapp parameter (e.g. startapp=mining or boost_docId or movie_id)
+        let initialScreen = "home";
+        let boostRequestDocId = null;
+        let targetDeepLinkMovieId = null;
+        if (state.isTelegram && window.Telegram && window.Telegram.WebApp) {
+            const initData = window.Telegram.WebApp.initDataUnsafe;
+            if (initData && initData.start_param) {
+                const rawParam = initData.start_param.trim();
+                const param = rawParam.toLowerCase();
+                if (param === "mining") {
+                    initialScreen = "mining";
+                } else if (param === "tour") {
+                    if (window.FilmHouseTour) {
+                        window.FilmHouseTour.reset();
+                        setTimeout(() => { window.FilmHouseTour.start(true); }, 800);
                     }
-                    
-                    const isMe = state.user && (String(state.user.id) === String(u.id));
-                    const itemBg = isMe ? "background: rgba(255, 188, 0, 0.06); border-color: rgba(255, 188, 0, 0.25);" : "background: rgba(255,255,255,0.01); border-color: transparent;";
-                    
-                    const item = document.createElement("div");
-                    item.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); margin-bottom: 4px; ${itemBg}`;
-                    item.innerHTML = `
+                } else if (param.startsWith("boost_")) {
+                    boostRequestDocId = rawParam.substring(6);
+                } else if (param.startsWith("movie_") || param.startsWith("open_") || param.startsWith("watch_") || param.startsWith("dl_")) {
+                    targetDeepLinkMovieId = rawParam.replace(/^(movie_|open_|watch_|dl_)/i, "").trim();
+                }
+            }
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryMovie = urlParams.get("movie") || urlParams.get("id");
+        const queryStartApp = urlParams.get("startapp") || urlParams.get("tgWebAppStartParam");
+        const querySyncId = urlParams.get("sync_id") || urlParams.get("tg_id");
+        if (querySyncId && /^\d{5,15}$/.test(querySyncId.trim())) {
+            linkTelegramAccount(querySyncId.trim());
+        }
+        if (!targetDeepLinkMovieId) {
+            if (queryMovie) {
+                targetDeepLinkMovieId = queryMovie.trim();
+            } else if (queryStartApp && (queryStartApp.startsWith("movie_") || queryStartApp.startsWith("open_") || queryStartApp.startsWith("watch_") || queryStartApp.startsWith("dl_"))) {
+                targetDeepLinkMovieId = queryStartApp.replace(/^(movie_|open_|watch_|dl_)/i, "").trim();
+            }
+        }
+
+        if (queryStartApp === "tour" || urlParams.get("tour") === "1" || urlParams.get("tour") === "true") {
+            if (window.FilmHouseTour) {
+                window.FilmHouseTour.reset();
+                setTimeout(() => { window.FilmHouseTour.start(true); }, 800);
+            }
+        }
+
+        // PC Telegram Device Sync Modal Buttons
+        const btnSyncDrawer = document.getElementById("btn-sync-telegram");
+        if (btnSyncDrawer) {
+            btnSyncDrawer.addEventListener("click", () => {
+                openTelegramSyncModal();
+            });
+        }
+
+        const btnOpenSyncModal = document.getElementById("btn-open-sync-modal");
+        if (btnOpenSyncModal) {
+            btnOpenSyncModal.addEventListener("click", () => {
+                openTelegramSyncModal();
+            });
+        }
+
+        const btnCancelSync = document.getElementById("btn-cancel-sync-modal");
+        if (btnCancelSync) {
+            btnCancelSync.addEventListener("click", () => {
+                closeTelegramSyncModal();
+            });
+        }
+
+        const btnSubmitSync = document.getElementById("btn-submit-sync-modal");
+        const inputSyncId = document.getElementById("input-sync-telegram-id");
+        if (btnSubmitSync && inputSyncId) {
+            btnSubmitSync.addEventListener("click", () => {
+                linkTelegramAccount(inputSyncId.value);
+            });
+            inputSyncId.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    linkTelegramAccount(inputSyncId.value);
+                }
+            });
+        }
+
+        const btnUnlinkSync = document.getElementById("btn-unlink-sync-modal");
+        if (btnUnlinkSync) {
+            btnUnlinkSync.addEventListener("click", () => {
+                if (confirm("Are you sure you want to unlink this Telegram account from this browser?")) {
+                    unlinkTelegramAccount();
+                }
+            });
+        }
+
+        // Sync latest user points, check-in streak, and ban status from Firestore on startup
+        if (typeof firebase !== "undefined" && db && state.user.id && state.user.id !== "000000000") {
+            syncUserToFirestore(true);
+        }
+
+        // Fetch live list of admins to cache globally on startup
+        if (typeof firebase !== "undefined" && db) {
+            db.collection("settings").doc("admins").get().then(adminDoc => {
+                if (adminDoc.exists && adminDoc.data().ids) {
+                    const defaultAdmins = ["1329840839", "1175336733"];
+                    globalAdminIds = Array.from(new Set([...defaultAdmins, ...adminDoc.data().ids]));
+                }
+                updatePointsUI(); // Refresh UI once admin IDs are loaded
+            }).catch(err => console.warn("Error loading admins settings:", err));
+        }
+        const profileExists = !!localStorage.getItem("filmhouse_user_profile");
+
+        // Auto-create profile if inside Telegram
+        if (state.isTelegram && !profileExists) {
+            const defaultProfile = {
+                fullName: state.user.fullName,
+                avatar: state.user.avatar,
+                favoriteCategories: [],
+                notificationsEnabled: true,
+                subAnime: true,
+                subHollywood: true,
+                subRecs: true,
+                contactPreference: "telegram",
+                points: 0
+            };
+            localStorage.setItem("filmhouse_user_profile", JSON.stringify(defaultProfile));
+            setTimeout(() => {
+                showToast("Welcome to Film House! Your Telegram account has been connected.", "success");
+            }, 1000);
+        }
+
+        // Global Leaderboard renderer
+        function fetchAndRenderLeaderboard() {
+            const list = document.getElementById("points-leaderboard-list");
+            if (!list || typeof firebase === "undefined" || !db) return;
+
+            db.collection("users")
+                .orderBy("points", "desc")
+                .limit(30)
+                .get()
+                .then(snapshot => {
+                    list.innerHTML = "";
+                    let rank = 1;
+
+                    snapshot.forEach(doc => {
+                        const u = doc.data();
+                        const userIdStr = u.id ? String(u.id) : "";
+
+                        // Skip admins/staff members in homepage rankings list
+                        if (typeof globalAdminIds !== "undefined" && globalAdminIds.includes(userIdStr)) return;
+                        if (rank > 10) return; // Limit to top 10
+
+                        const points = parseInt(u.points || 0);
+                        const name = escapeHTML(u.fullName || u.username || `User ${doc.id.substring(0, 4)}`);
+
+                        let badge = "";
+                        let rankStyle = "color: var(--text-secondary); font-weight: 700;";
+                        if (rank === 1) {
+                            badge = "🥇";
+                            rankStyle = "color: #ffbc00; font-size: 14px; font-weight: 900;";
+                        } else if (rank === 2) {
+                            badge = "🥈";
+                            rankStyle = "color: #e0e0e0; font-size: 14px; font-weight: 900;";
+                        } else if (rank === 3) {
+                            badge = "🥉";
+                            rankStyle = "color: #cd7f32; font-size: 14px; font-weight: 900;";
+                        } else {
+                            badge = `#${rank}`;
+                        }
+
+                        const isMe = state.user && (String(state.user.id) === String(u.id));
+                        const itemBg = isMe ? "background: rgba(255, 188, 0, 0.06); border-color: rgba(255, 188, 0, 0.25);" : "background: rgba(255,255,255,0.01); border-color: transparent;";
+
+                        const item = document.createElement("div");
+                        item.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); margin-bottom: 4px; ${itemBg}`;
+                        item.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span style="width: 24px; text-align: center; ${rankStyle}">${badge}</span>
                             <span style="font-size: 12px; font-weight: ${isMe ? '700' : '500'}; color: ${isMe ? 'var(--primary-color)' : '#fff'};">${name} ${isMe ? ' (You)' : ''}</span>
                         </div>
                         <span style="font-size: 11px; font-weight: 700; color: #ffbc00;">${points.toLocaleString()} pts</span>
                     `;
-                    list.appendChild(item);
-                    rank++;
-                });
-                
-                if (list.children.length === 0) {
-                    list.innerHTML = `<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 11px;">Join the game! Claim points to rank here. 🚀</div>`;
-                }
-            }).catch(err => {
-                console.warn("Error rendering leaderboard:", err);
-                list.innerHTML = `<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 11px;">Leaderboard offline.</div>`;
-            });
-    }
+                        list.appendChild(item);
+                        rank++;
+                    });
 
-    // Reward Center Drawer triggers & listeners
-    const btnRewards = document.getElementById("btn-header-rewards");
-    const rewardsDrawer = document.getElementById("rewards-drawer");
-    const rewardsClose = document.getElementById("rewards-drawer-close");
-    
-    if (btnRewards && rewardsDrawer) {
-        btnRewards.addEventListener("click", () => {
-            rewardsDrawer.classList.add("active");
-            updatePointsUI();
-            renderDailyMissions();
-            updateHeaderNotificationDot();
-        });
-    }
-    if (rewardsClose && rewardsDrawer) {
-        rewardsClose.addEventListener("click", () => {
-            rewardsDrawer.classList.remove("active");
-        });
-        rewardsDrawer.addEventListener("click", (e) => {
-            if (e.target === rewardsDrawer) {
-                rewardsDrawer.classList.remove("active");
-            }
-        });
-    }
-    
-    // Reward redemption actions
-    // Reward Center Sponsor Ad Bonus Listener
-    const btnWatchAdPoints = document.getElementById("btn-watch-ad-for-points");
-    if (btnWatchAdPoints) {
-        btnWatchAdPoints.addEventListener("click", () => {
-            const stats = state.user.dailyStats || {};
-            const adCount = stats.adWatchesCount || 0;
-            if (adCount >= 10) {
-                showToast("Daily ad bonus limit reached (10/10)! Check back tomorrow.", "info");
-                return;
-            }
-
-            btnWatchAdPoints.disabled = true;
-            btnWatchAdPoints.innerHTML = "<span>⏳ Loading Sponsor Clip...</span>";
-
-            // Trigger monetag / adsgram rewarded ad
-            showRewardedAd(() => {
-                btnWatchAdPoints.disabled = false;
-                btnWatchAdPoints.innerHTML = "<span>📺 Watch Sponsor Ad (+25 pts)</span>";
-                
-                if (state.user && state.user.dailyStats) {
-                    state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
-                    saveDailyStats();
-                }
-                awardPoints(25, "ad");
-                triggerHaptic("success");
-                showToast("🎉 Sponsor Ad Completed! +25 Loyalty Points added to balance.", "success");
-                if (typeof renderDailyMissions === "function") renderDailyMissions();
-            }, () => {
-                btnWatchAdPoints.disabled = false;
-                btnWatchAdPoints.innerHTML = "<span>📺 Watch Sponsor Ad (+25 pts)</span>";
-                showToast("Ad could not be loaded at this moment. Please try again in a few seconds.", "warning");
-            });
-        });
-    }
-
-    const redeemButtons = document.querySelectorAll("#rewards-drawer .redeem-btn");
-    redeemButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-            const rewardId = btn.getAttribute("data-reward-id");
-            if (rewardId === "stream-pass") {
-                if (state.user.points < 500) {
-                    showToast("Not enough points! You need 500 points for 4h Fast-Stream Pass.", "error");
-                    return;
-                }
-                deductPoints(500);
-                localStorage.setItem("cinema_fast_stream_until", Date.now() + 4 * 60 * 60 * 1000);
-                localStorage.setItem("ad_free_until", Date.now() + 4 * 60 * 60 * 1000);
-                showToast("⚡ 4-Hour Cinema Fast-Stream Pass activated! Enjoy ad-free streaming & instant buffering.", "success");
-            } else if (rewardId === "ad-free") {
-                if (state.user.points < 1500) {
-                    showToast("Not enough points! You need 1,500 points for Ad-Free pass.", "error");
-                    return;
-                }
-                deductPoints(1500);
-                localStorage.setItem("ad_free_until", Date.now() + 24 * 60 * 60 * 1000);
-                showToast("24h Ad-Free VIP Pass activated! 🎫 Enjoy ad-free downloads.", "success");
-            } else if (rewardId === "vip-badge") {
-                if (state.user.points < 2500) {
-                    showToast("Not enough points! You need 2,500 points for VIP Badge.", "error");
-                    return;
-                }
-                
-                const customBadge = prompt("Enter your custom VIP Badge text (max 15 characters):");
-                if (customBadge === null) return;
-                
-                const cleanBadge = customBadge.trim().substring(0, 15);
-                if (!cleanBadge) {
-                    showToast("Badge text cannot be empty!", "error");
-                    return;
-                }
-                
-                deductPoints(2500);
-                
-                const expiryTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days
-                state.user.badge = cleanBadge;
-                state.user.badgeExpiresAt = expiryTime;
-                
-                const saved = localStorage.getItem("filmhouse_user_profile");
-                let profile = {};
-                if (saved) {
-                    try {
-                        profile = JSON.parse(saved);
-                    } catch (e) {}
-                }
-                profile.badge = cleanBadge;
-                profile.badgeExpiresAt = expiryTime;
-                localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
-                
-                syncUserToFirestore();
-                showToast(`VIP Badge unlocked: "${cleanBadge}"! Check leaderboard.`, "success");
-            }
-        });
-    });
-
-    loadUserProfile();
-    checkDailyVisitPoints();
-    renderDailyMissions();
-    startMissionsResetTimer();
-
-    // Check if browser visitor needs Telegram login prompt overlay
-    if (!state.isTelegram && !profileExists) {
-        const loginModal = document.getElementById("telegram-login-modal");
-        if (loginModal) {
-            loginModal.classList.add("active");
-        }
-    }
-
-
-    // 2. Fetch data (JSON files or Client dynamic parser fallback)
-    await initializeDatabase();
-    generateNotificationAlerts();
-
-    // 3. Populate state lists (Watchlist, History)
-    loadWatchlist();
-    loadWatchHistory();
-
-    // 4. Fill categories options inside filters
-    initializeFilterDropdowns();
-
-    // 5. Populate Carousel Banner
-    renderCarouselBanner();
-
-    // 6. Draw Category Filters
-    renderCategoriesBar();
-    renderGenreChips();
-
-    // 7. Load Editor Picks from Firestore
-    if (typeof firebase !== "undefined" && db) {
-        try {
-            const doc = await db.collection("settings").doc("admin_picks").get();
-            if (doc.exists) {
-                state.editorPicks = doc.data().ids || [];
-                state.editorsChoiceTitle = doc.data().title || "Editor's Choice 🎬";
-            }
-        } catch (err) {
-            console.warn("Error loading editor picks:", err);
-        }
-    }
-
-    // 7. Load grid results list
-    renderFeaturedGrid();
-
-    // 7b. Render Editor's Choice carousel
-    renderEditorsChoice();
-
-    // 8. Load FAQs panel answers
-    renderFAQAccordion();
-
-    // 9. Initialize Adsgram SDK
-    initializeAdsgram();
-
-    // 10. Bind triggers & event click listeners
-    bindEvents();
-
-    // 10c. Enable drag to scroll for horizontal sliders on PC
-    enableDragToScroll(document.getElementById("categories-bar-slider"));
-    enableDragToScroll(document.getElementById("editors-choice-scroll-container"));
-    // hero-carousel uses dedicated physics swipe & mouse drag in setupCarouselGestures()
-
-    // 10b. Handle startup startapp routing parameter redirection
-    if (initialScreen === "mining") {
-        navigateToScreen("mining");
-    }
-
-    if (boostRequestDocId) {
-        setTimeout(() => {
-            if (typeof firebase !== "undefined" && db) {
-                db.collection("requests").doc(boostRequestDocId).get().then(doc => {
-                    if (doc.exists) {
-                        const req = doc.data();
-                        if (req.status === "priority") {
-                            showToast(`Request for "${req.title}" is already boosted!`, "info");
-                            return;
-                        }
-                        if (confirm(`Would you like to spend 1,000 points to boost your request for "${req.title}" to High Priority?`)) {
-                            boostRequestToPriority(boostRequestDocId);
-                        }
-                    } else {
-                        showToast("Request not found or has been completed.", "error");
+                    if (list.children.length === 0) {
+                        list.innerHTML = `<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 11px;">Join the game! Claim points to rank here. 🚀</div>`;
                     }
-                }).catch(err => console.warn("Error loading boost request details:", err));
+                }).catch(err => {
+                    console.warn("Error rendering leaderboard:", err);
+                    list.innerHTML = `<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 11px;">Leaderboard offline.</div>`;
+                });
+        }
+
+        // Reward Center Drawer triggers & listeners
+        const btnRewards = document.getElementById("btn-header-rewards");
+        const rewardsDrawer = document.getElementById("rewards-drawer");
+        const rewardsClose = document.getElementById("rewards-drawer-close");
+
+        if (btnRewards && rewardsDrawer) {
+            btnRewards.addEventListener("click", () => {
+                rewardsDrawer.classList.add("active");
+                updatePointsUI();
+                renderDailyMissions();
+                updateHeaderNotificationDot();
+            });
+        }
+        if (rewardsClose && rewardsDrawer) {
+            rewardsClose.addEventListener("click", () => {
+                rewardsDrawer.classList.remove("active");
+            });
+            rewardsDrawer.addEventListener("click", (e) => {
+                if (e.target === rewardsDrawer) {
+                    rewardsDrawer.classList.remove("active");
+                }
+            });
+        }
+
+        // Reward redemption actions
+        // Reward Center Sponsor Ad Bonus Listener
+        const btnWatchAdPoints = document.getElementById("btn-watch-ad-for-points");
+        if (btnWatchAdPoints) {
+            btnWatchAdPoints.addEventListener("click", () => {
+                const stats = state.user.dailyStats || {};
+                const adCount = stats.adWatchesCount || 0;
+                if (adCount >= 10) {
+                    showToast("Daily ad bonus limit reached (10/10)! Check back tomorrow.", "info");
+                    return;
+                }
+
+                btnWatchAdPoints.disabled = true;
+                btnWatchAdPoints.innerHTML = "<span>⏳ Loading Sponsor Clip...</span>";
+
+                // Trigger monetag / adsgram rewarded ad
+                showRewardedAd(() => {
+                    btnWatchAdPoints.disabled = false;
+                    btnWatchAdPoints.innerHTML = "<span>📺 Watch Sponsor Ad (+25 pts)</span>";
+
+                    if (state.user && state.user.dailyStats) {
+                        state.user.dailyStats.adWatchesCount = (state.user.dailyStats.adWatchesCount || 0) + 1;
+                        saveDailyStats();
+                    }
+                    awardPoints(25, "ad");
+                    triggerHaptic("success");
+                    showToast("🎉 Sponsor Ad Completed! +25 Loyalty Points added to balance.", "success");
+                    if (typeof renderDailyMissions === "function") renderDailyMissions();
+                }, () => {
+                    btnWatchAdPoints.disabled = false;
+                    btnWatchAdPoints.innerHTML = "<span>📺 Watch Sponsor Ad (+25 pts)</span>";
+                    showToast("Ad could not be loaded at this moment. Please try again in a few seconds.", "warning");
+                });
+            });
+        }
+
+        const redeemButtons = document.querySelectorAll("#rewards-drawer .redeem-btn");
+        redeemButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const rewardId = btn.getAttribute("data-reward-id");
+                if (rewardId === "stream-pass") {
+                    if (state.user.points < 500) {
+                        showToast("Not enough points! You need 500 points for 4h Fast-Stream Pass.", "error");
+                        return;
+                    }
+                    deductPoints(500);
+                    localStorage.setItem("cinema_fast_stream_until", Date.now() + 4 * 60 * 60 * 1000);
+                    localStorage.setItem("ad_free_until", Date.now() + 4 * 60 * 60 * 1000);
+                    showToast("⚡ 4-Hour Cinema Fast-Stream Pass activated! Enjoy ad-free streaming & instant buffering.", "success");
+                } else if (rewardId === "ad-free") {
+                    if (state.user.points < 1500) {
+                        showToast("Not enough points! You need 1,500 points for Ad-Free pass.", "error");
+                        return;
+                    }
+                    deductPoints(1500);
+                    localStorage.setItem("ad_free_until", Date.now() + 24 * 60 * 60 * 1000);
+                    showToast("24h Ad-Free VIP Pass activated! 🎫 Enjoy ad-free downloads.", "success");
+                } else if (rewardId === "vip-badge") {
+                    if (state.user.points < 2500) {
+                        showToast("Not enough points! You need 2,500 points for VIP Badge.", "error");
+                        return;
+                    }
+
+                    const customBadge = prompt("Enter your custom VIP Badge text (max 15 characters):");
+                    if (customBadge === null) return;
+
+                    const cleanBadge = customBadge.trim().substring(0, 15);
+                    if (!cleanBadge) {
+                        showToast("Badge text cannot be empty!", "error");
+                        return;
+                    }
+
+                    deductPoints(2500);
+
+                    const expiryTime = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days
+                    state.user.badge = cleanBadge;
+                    state.user.badgeExpiresAt = expiryTime;
+
+                    const saved = localStorage.getItem("filmhouse_user_profile");
+                    let profile = {};
+                    if (saved) {
+                        try {
+                            profile = JSON.parse(saved);
+                        } catch (e) { }
+                    }
+                    profile.badge = cleanBadge;
+                    profile.badgeExpiresAt = expiryTime;
+                    localStorage.setItem("filmhouse_user_profile", JSON.stringify(profile));
+
+                    syncUserToFirestore();
+                    showToast(`VIP Badge unlocked: "${cleanBadge}"! Check leaderboard.`, "success");
+                }
+            });
+        });
+
+        loadUserProfile();
+        checkDailyVisitPoints();
+        renderDailyMissions();
+        startMissionsResetTimer();
+
+        // Check if browser visitor needs Telegram login prompt overlay
+        if (!state.isTelegram && !profileExists) {
+            const loginModal = document.getElementById("telegram-login-modal");
+            if (loginModal) {
+                loginModal.classList.add("active");
             }
-        }, 3000);
-    }
+        }
 
-    if (targetDeepLinkMovieId) {
-        setTimeout(() => {
-            resolveAndOpenDeepLinkMovie(targetDeepLinkMovieId);
-        }, 1200);
-    }
 
-    // 11. Clear loader splash page with a cinematic 1.5s delay presentation
-    const loader = document.getElementById("preloader");
-    if (loader) {
-        setTimeout(() => {
-            loader.classList.add("fade-out");
-            // Initialize tour guide overlay
-            initWelcomeTourHandlers();
-            initPremiumSearchOverlay();
-        }, 2500);
-    }
+        // 2. Fetch data (JSON files or Client dynamic parser fallback)
+        await initializeDatabase();
+        generateNotificationAlerts();
+
+        // 3. Populate state lists (Watchlist, History)
+        loadWatchlist();
+        loadWatchHistory();
+
+        // 4. Fill categories options inside filters
+        initializeFilterDropdowns();
+
+        // 5. Populate Carousel Banner
+        renderCarouselBanner();
+
+        // 6. Draw Category Filters
+        renderCategoriesBar();
+        renderGenreChips();
+
+        // 7. Load Editor Picks from Firestore
+        if (typeof firebase !== "undefined" && db) {
+            try {
+                const doc = await db.collection("settings").doc("admin_picks").get();
+                if (doc.exists) {
+                    state.editorPicks = doc.data().ids || [];
+                    state.editorsChoiceTitle = doc.data().title || "Editor's Choice 🎬";
+                }
+            } catch (err) {
+                console.warn("Error loading editor picks:", err);
+            }
+        }
+
+        // 7. Load grid results list
+        renderFeaturedGrid();
+
+        // 7b. Render Editor's Choice carousel
+        renderEditorsChoice();
+
+        // 8. Load FAQs panel answers
+        renderFAQAccordion();
+
+        // 9. Initialize Adsgram SDK
+        initializeAdsgram();
+
+        // 10. Bind triggers & event click listeners
+        bindEvents();
+
+        // 10c. Enable drag to scroll for horizontal sliders on PC
+        enableDragToScroll(document.getElementById("categories-bar-slider"));
+        enableDragToScroll(document.getElementById("editors-choice-scroll-container"));
+        // hero-carousel uses dedicated physics swipe & mouse drag in setupCarouselGestures()
+
+        // 10b. Handle startup startapp routing parameter redirection
+        if (initialScreen === "mining") {
+            navigateToScreen("mining");
+        }
+
+        if (boostRequestDocId) {
+            setTimeout(() => {
+                if (typeof firebase !== "undefined" && db) {
+                    db.collection("requests").doc(boostRequestDocId).get().then(doc => {
+                        if (doc.exists) {
+                            const req = doc.data();
+                            if (req.status === "priority") {
+                                showToast(`Request for "${req.title}" is already boosted!`, "info");
+                                return;
+                            }
+                            if (confirm(`Would you like to spend 1,000 points to boost your request for "${req.title}" to High Priority?`)) {
+                                boostRequestToPriority(boostRequestDocId);
+                            }
+                        } else {
+                            showToast("Request not found or has been completed.", "error");
+                        }
+                    }).catch(err => console.warn("Error loading boost request details:", err));
+                }
+            }, 3000);
+        }
+
+        if (targetDeepLinkMovieId) {
+            setTimeout(() => {
+                resolveAndOpenDeepLinkMovie(targetDeepLinkMovieId);
+            }, 1200);
+        }
+
+        // 11. Clear loader splash page with a cinematic 1.5s delay presentation
+        const loader = document.getElementById("preloader");
+        if (loader) {
+            setTimeout(() => {
+                loader.classList.add("fade-out");
+                // Initialize tour guide overlay
+                initWelcomeTourHandlers();
+                initPremiumSearchOverlay();
+            }, 2500);
+        }
     } catch (err) {
         console.error("Initialization error:", err);
         const loader = document.getElementById("preloader");
@@ -14639,7 +14655,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 // Helper to convert standard t.me links into native tg:// schemes for external redirection
 function convertToTelegramScheme(url) {
     if (!url || typeof url !== "string") return url;
-    
+
     // Check if it's a telegram link
     if (url.includes("t.me/")) {
         try {
@@ -14647,7 +14663,7 @@ function convertToTelegramScheme(url) {
             const parts = url.split("t.me/");
             if (parts.length > 1) {
                 const path = parts[1];
-                
+
                 // Case 1: Private invite link e.g., t.me/+09ahNmGdB1U2MzFk or t.me/joinchat/09ahNmGdB1U2MzFk
                 if (path.startsWith("+")) {
                     const code = path.substring(1);
@@ -14657,7 +14673,7 @@ function convertToTelegramScheme(url) {
                     const code = path.substring(9);
                     return `tg://join?invite=${code}`;
                 }
-                
+
                 // Case 2: Channel post link, e.g., t.me/filmhousedirect/280
                 if (path.includes("/")) {
                     const subParts = path.split("/");
@@ -14667,7 +14683,7 @@ function convertToTelegramScheme(url) {
                         return `tg://resolve?domain=${domain}&post=${postId}`;
                     }
                 }
-                
+
                 // Case 3: Bot link with start parameters, e.g., t.me/FilmHouseFilebot?start=xxx or startapp=xxx
                 if (path.includes("?")) {
                     const subParts = path.split("?");
@@ -14679,7 +14695,7 @@ function convertToTelegramScheme(url) {
                         return `tg://resolve?domain=${domain}&start=${startParam}`;
                     }
                 }
-                
+
                 // Case 4: Standard user/bot/channel domain name, e.g., t.me/FilmHouseFilebot
                 return `tg://resolve?domain=${path}`;
             }
@@ -14704,8 +14720,8 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
     const closeDrawer = () => {
         if (drawer) {
             drawer.classList.remove("active");
-            setTimeout(() => { 
-                drawer.style.display = "none"; 
+            setTimeout(() => {
+                drawer.style.display = "none";
                 // Restore spinner and remove dynamic buttons/tasks for next requests
                 const spinnerWrapper = drawer.querySelector(".connection-spinner-wrapper");
                 if (spinnerWrapper) spinnerWrapper.style.display = "flex";
@@ -14733,7 +14749,7 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
 
         // Use Telegram's native link opener for t.me links (avoids popup blocking inside webapp view)
         const tg = window.Telegram?.WebApp;
-        
+
         if (targetLink.includes("t.me")) {
             if (tg && tg.openTelegramLink) {
                 try {
@@ -14744,7 +14760,7 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
                     console.warn("tg.openTelegramLink failed:", e);
                 }
             }
-            
+
             // Extract bot name and start parameter for tg:// protocol deep link
             const match = targetLink.match(/t\.me\/([^\/?#]+)(?:\?start=(.*))?/);
             if (match) {
@@ -14754,14 +14770,15 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
                 try {
                     window.location.href = tgProtocolUrl;
                     return;
-                } catch (e) {}
+                } catch (e) { }
             }
         }
-        
+
         // Fallback for non-Telegram links or if openTelegramLink fails/is skipped inside Telegram WebApp
-        if (tg && tg.openLink) {
+        const activeTg = getActiveTelegramWebApp();
+        if (activeTg && activeTg.openLink) {
             try {
-                tg.openLink(targetLink);
+                activeTg.openLink(targetLink);
                 return;
             } catch (e) {
                 console.warn("tg.openLink failed:", e);
@@ -14826,7 +14843,7 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
         if (titleEl) {
             titleEl.textContent = blockId === ADSGRAM_REQUEST_BLOCK_ID ? "Request Link Ready ✓" : "Connection Secured ✓";
         }
-        
+
         // Show helpful message instructing user what to do in the bot chat
         if (targetLink.includes("start=")) {
             setStatus("Ready! Tap the button below to open Telegram. Make sure to tap 'START' at the bottom of the bot chat to receive your movie!");
@@ -14844,7 +14861,7 @@ function showConnectionDrawer(targetLink, blockId, skipAd = false) {
         const actionBtn = document.createElement("button");
         actionBtn.className = "btn btn-primary btn-block connection-action-btn";
         actionBtn.style.marginTop = "16px";
-        
+
         if (targetLink.includes("start=")) {
             actionBtn.textContent = "Start Bot & Get Movie 📥";
         } else if (blockId === ADSGRAM_REQUEST_BLOCK_ID) {
@@ -14874,10 +14891,10 @@ function showBannedScreen() {
     // Stop any splash screen timers
     const preloader = document.getElementById("preloader");
     if (preloader) preloader.style.display = "none";
-    
+
     // Check if banned screen already exists
     if (document.getElementById("banned-screen-overlay")) return;
-    
+
     const overlay = document.createElement("div");
     overlay.id = "banned-screen-overlay";
     overlay.style.cssText = `
@@ -14898,7 +14915,7 @@ function showBannedScreen() {
         padding: 24px;
         box-sizing: border-box;
     `;
-    
+
     overlay.innerHTML = `
         <div style="background: rgba(255, 59, 48, 0.05); border: 1px solid rgba(255, 59, 48, 0.2); border-radius: 16px; padding: 32px; max-width: 400px; box-shadow: 0 10px 30px rgba(255, 59, 48, 0.05);">
             <div style="font-size: 64px; margin-bottom: 20px;">🚫</div>
@@ -14911,9 +14928,9 @@ function showBannedScreen() {
             </p>
         </div>
     `;
-    
+
     document.body.prepend(overlay);
-    
+
     // Disable any scrolls or inputs
     document.body.style.overflow = "hidden";
     document.body.style.pointerEvents = "none";
@@ -15029,7 +15046,7 @@ function updateFarmingUI() {
                     if (progressPercent) {
                         progressPercent.textContent = `${Math.floor(pct)}%`;
                     }
-                    
+
                     const timeLeftMs = FARMING_DURATION - curElapsed;
                     const hrs = Math.floor(timeLeftMs / (3600 * 1000));
                     const mins = Math.floor((timeLeftMs % (3600 * 1000)) / (60 * 1000));
@@ -15062,16 +15079,16 @@ function startFarmingParticles() {
         }
 
         const isAvatarParticle = Math.random() < 0.25 && state.user.avatar;
-        
+
         if (isAvatarParticle) {
             const img = document.createElement("img");
             img.src = state.user.avatar;
             img.className = "mining-particle";
-            
+
             const left = Math.random() * 70 + 15;
             const size = Math.random() * 6 + 14; // 14px to 20px
             const duration = Math.random() * 1.5 + 2;
-            
+
             img.style.cssText = `
                 position: absolute;
                 bottom: 10px;
@@ -15092,14 +15109,14 @@ function startFarmingParticles() {
         } else {
             const particle = document.createElement("div");
             particle.className = "mining-particle";
-            
+
             const icons = ["🍿", "🎬", "⭐", "🪙", "🎞️"];
             particle.textContent = icons[Math.floor(Math.random() * icons.length)];
-            
+
             const left = Math.random() * 70 + 15;
             const size = Math.random() * 6 + 10; // 10px to 16px
             const duration = Math.random() * 1.5 + 2;
-            
+
             particle.style.cssText = `
                 position: absolute;
                 bottom: 10px;
@@ -15186,7 +15203,7 @@ function renderStreakCalendar() {
                 <span style="font-size: 11px; font-weight: 900; line-height: 1.1; margin: 1px 0;">+${reward}</span>
                 <span style="font-size: 7.5px; font-weight: 800; line-height: 1.1; white-space: nowrap;">Claim 🪙</span>
             `;
-            
+
             dayBox.addEventListener("click", (e) => {
                 claimStreakReward(d, reward, e.currentTarget);
             });
@@ -15208,31 +15225,31 @@ function renderStreakCalendar() {
 
 function claimStreakReward(dayNum, rewardAmount, sourceElement) {
     const today = new Date().toISOString().split("T")[0];
-    
+
     let newStreak = state.user.checkInStreak || 0;
     if (newStreak === 7) {
         newStreak = 1;
     } else {
         newStreak += 1;
     }
-    
+
     state.user.checkInStreak = newStreak;
     state.user.lastCheckInDate = today;
-    
+
     triggerHaptic("success");
-    
+
     // Trigger floating coins visual effect
     if (sourceElement) {
         triggerFloatingCoinsAnimation(sourceElement);
     }
-    
+
     awardPoints(rewardAmount, "visit");
     saveProfileToLocalStorage();
     syncUserToFirestore();
-    
+
     renderStreakCalendar();
     renderDailyMissions();
-    
+
     showToast(`Day ${dayNum} check-in claimed! +${rewardAmount} points awarded! 🗓️`, "success");
 }
 
@@ -15293,11 +15310,11 @@ function loadMiningTaskAd() {
     const rewardEl = document.createElement("div");
     rewardEl.setAttribute("slot", "reward");
     rewardEl.style.cssText = "display: flex; flex-direction: column; align-items: flex-start; gap: 2px; margin-top: 6px; width: 100%; text-align: left;";
-    
+
     const rewardTitle = document.createElement("span");
     rewardTitle.textContent = "TASK REWARD";
     rewardTitle.style.cssText = "font-size: 9px; font-weight: 700; color: rgba(255, 255, 255, 0.35); letter-spacing: 1px;";
-    
+
     const rewardValue = document.createElement("span");
     rewardValue.textContent = "+50 Points 🪙";
     rewardValue.style.cssText = "font-size: 13px; font-weight: 700; color: #ffbc00;";
@@ -15407,7 +15424,7 @@ let currentTourStep = 1;
 function startWelcomeTour() {
     const tourOverlay = document.getElementById("app-tour-overlay");
     if (!tourOverlay) return;
-    
+
     tourOverlay.style.display = "";
     tourOverlay.style.visibility = "";
     currentTourStep = 1;
@@ -15417,27 +15434,27 @@ function startWelcomeTour() {
 
 function showTourStep(stepNum) {
     currentTourStep = stepNum;
-    
+
     // Hide all steps
     const steps = document.querySelectorAll(".tour-step");
     steps.forEach(s => s.classList.remove("active"));
-    
+
     // Show active step
     const activeStep = document.querySelector(`.tour-step[data-step="${stepNum}"]`);
     if (activeStep) activeStep.classList.add("active");
-    
+
     // Update navigation dots
     const dots = document.querySelectorAll(".tour-dot");
     dots.forEach(d => {
         d.classList.toggle("active", parseInt(d.getAttribute("data-step")) === stepNum);
     });
-    
+
     // Handle back button visibility
     const backBtn = document.getElementById("btn-tour-prev");
     if (backBtn) {
         backBtn.style.visibility = stepNum === 1 ? "hidden" : "visible";
     }
-    
+
     // Handle next button label
     const nextBtn = document.getElementById("btn-tour-next");
     if (nextBtn) {
@@ -15481,7 +15498,7 @@ function showTourStep(stepNum) {
             let letterIdx = 0;
             searchInput.value = "";
             state.searchQuery = "";
-            
+
             function typeLetter() {
                 if (currentTourStep !== 2) return; // cancel if user navigated away
                 if (letterIdx < term.length) {
@@ -15524,13 +15541,13 @@ function showTourStep(stepNum) {
             if (typeof updatePointsUI === "function") updatePointsUI();
             if (typeof renderDailyMissions === "function") renderDailyMissions();
             if (typeof updateHeaderNotificationDot === "function") updateHeaderNotificationDot();
-            
+
             // Highlight the drawer content container
             const drawerContainer = rewardsDrawer.querySelector(".connection-drawer-container");
             if (drawerContainer) {
                 drawerContainer.classList.add("tour-highlight-target");
             }
-            
+
             // Animate points display count-up logic
             const pointsDisplay = document.getElementById("rewards-points-display");
             if (pointsDisplay) {
@@ -15567,15 +15584,15 @@ function closeWelcomeTour() {
             tourOverlay.style.display = "none";
         }
         localStorage.setItem("filmhouse_tour_completed", "true");
-        
+
         // Clean up highlights
         const highlighted = document.querySelectorAll(".tour-highlight-target");
         highlighted.forEach(el => el.classList.remove("tour-highlight-target"));
-        
+
         // Close any drawers that were opened during the tour
         const rewardsDrawer = document.getElementById("rewards-drawer");
         if (rewardsDrawer) rewardsDrawer.classList.remove("active");
-        
+
         const filterToggle = document.getElementById("search-filter-toggle");
         const filterPanel = document.getElementById("search-filters-panel");
         if (filterToggle && filterPanel) {
@@ -15669,14 +15686,14 @@ function saveSearchQueryToHistory(query) {
         if (history.length > 10) history = history.slice(0, 10);
         localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
         renderSearchHistoryChips();
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function clearDailySearchHistory() {
     try {
         localStorage.removeItem(SEARCH_HISTORY_KEY);
         renderSearchHistoryChips();
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function renderSearchHistoryChips() {
@@ -15851,7 +15868,7 @@ function triggerOverlaySearch(query) {
     const countText = document.getElementById("search-overlay-results-count");
     const clearBtn = document.getElementById("overlay-search-clear");
     const scope = document.getElementById("search-scope-select")?.value || "all";
-    
+
     if (clearBtn) {
         clearBtn.style.display = query ? "flex" : "none";
     }
@@ -15899,7 +15916,7 @@ function triggerOverlaySearch(query) {
             <div id="search-local-container"></div>
             <div id="search-global-container"></div>
         `;
-        
+
         const localContainer = document.getElementById("search-local-container");
         if (filtered.length > 0) {
             filtered.forEach(m => {
@@ -15908,7 +15925,7 @@ function triggerOverlaySearch(query) {
             });
         }
     }
-    
+
     if (countText) {
         countText.textContent = `Found ${filtered.length} library titles`;
     }
@@ -15929,10 +15946,10 @@ function triggerOverlaySearch(query) {
         overlaySearchDebounceTimer = setTimeout(async () => {
             const localContainer = document.getElementById("search-local-container");
             const globalContainer = document.getElementById("search-global-container");
-            
+
             try {
                 const extResults = await fetchGlobalTmdbSearchResults(query);
-                
+
                 // Exclude any TMDB IDs already in our local filtered results
                 const localTmdbIds = new Set(filtered.map(m => m.tmdb_id).filter(id => id));
                 let uniqueExt = extResults.filter(ext => !localTmdbIds.has(ext.tmdb_id));
@@ -15949,12 +15966,12 @@ function triggerOverlaySearch(query) {
                         return hasAnimeCat || hasAnimeGen;
                     });
                 }
-                
+
                 if (globalContainer) {
                     if (uniqueExt.length === 0) {
                         globalContainer.innerHTML = "";
                         globalContainer.style.display = "none";
-                        
+
                         // Show "no matches" warning only if both are empty
                         if (filtered.length === 0 && localContainer) {
                             localContainer.innerHTML = `
@@ -15985,8 +16002,8 @@ function triggerOverlaySearch(query) {
                         `;
                         const listDiv = globalContainer.querySelector(".external-results-list");
                         uniqueExt.forEach(m => {
-                            const localMatch = state.movies.find(lm => 
-                                (lm.tmdb_id && String(lm.tmdb_id) === String(m.tmdb_id)) || 
+                            const localMatch = state.movies.find(lm =>
+                                (lm.tmdb_id && String(lm.tmdb_id) === String(m.tmdb_id)) ||
                                 (lm.csv_id && String(lm.csv_id) === String(m.tmdb_id)) ||
                                 (lm.title && typeof titlesMatch === "function" && titlesMatch(lm.title, m.title))
                             );
@@ -16000,13 +16017,13 @@ function triggerOverlaySearch(query) {
                             listDiv?.appendChild(card);
                         });
                         globalContainer.style.display = "block";
-                        
+
                         // Clear the local "no matches" placeholder if we have cloud results
                         if (filtered.length === 0 && localContainer) {
                             localContainer.innerHTML = "";
                         }
                     }
-                    
+
                     if (countText) {
                         countText.textContent = `Found ${filtered.length} library & ${uniqueExt.length} cloud titles`;
                     }
@@ -16065,7 +16082,7 @@ const searchCache = new Map();
 async function fetchGlobalTmdbSearchResults(query) {
     const qKey = (query || "").toLowerCase().trim();
     if (!qKey) return [];
-    
+
     if (searchCache.has(qKey)) {
         return searchCache.get(qKey);
     }
@@ -16077,7 +16094,7 @@ async function fetchGlobalTmdbSearchResults(query) {
             const title = item.title || item.name || "";
             const releaseDate = item.release_date || item.first_air_date || "";
             const mType = item.media_type === 'tv' ? 'Series' : 'Movie';
-            
+
             return {
                 csv_id: String(item.id),
                 tmdb_id: item.id,
@@ -16099,7 +16116,7 @@ async function fetchGlobalTmdbSearchResults(query) {
                 links: []
             };
         });
-        
+
         // Set cache and limit size to 50 items
         searchCache.set(qKey, mapped);
         if (searchCache.size > 50) {
@@ -16116,12 +16133,12 @@ async function fetchGlobalTmdbSearchResults(query) {
 function createSearchOverlayCard(m) {
     const badgePrefix = window.location.pathname.includes("/MOVIE/") ? "" : "MOVIE/";
     let posterUrl = m.poster || (badgePrefix + "img/FilmHouse3_nobg.png");
-    
+
     // Optimize TMDB poster size for small search results cards (uses small w92 thumbnail instead of w500)
     if (posterUrl.includes("image.tmdb.org/t/p/w500")) {
         posterUrl = posterUrl.replace("/t/p/w500", "/t/p/w92");
     }
-    
+
     const genreStr = Array.isArray(m.genres) ? m.genres.join(", ") : (m.genre || "Media");
     const hasStream = typeof hasMovieStream === "function" && hasMovieStream(m);
     const hasDownload = Array.isArray(m.links) && m.links.some(l => {
@@ -16129,10 +16146,10 @@ function createSearchOverlayCard(m) {
         const u = typeof l === 'string' ? l : (l.url || '');
         return u && (u.includes('t.me') || u.includes('telegram'));
     });
-    
+
     const card = document.createElement("div");
     card.className = "search-result-card";
-    
+
     card.innerHTML = `
         <div class="result-card-main">
             <img src="${posterUrl}" alt="Poster" class="result-card-poster" onerror="this.src='${badgePrefix}img/FilmHouse3_nobg.png'">
@@ -16157,11 +16174,11 @@ function createSearchOverlayCard(m) {
             ${escapeHTML(m.overview || "No synopsis available.")}
         </div>
     `;
-    
+
     const expandBtn = card.querySelector(".result-card-expand-btn");
     const desc = card.querySelector(".result-card-description");
     const chevron = card.querySelector(".result-card-chevron");
-    
+
     expandBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         const isExpanded = card.classList.contains("expanded");
@@ -16174,7 +16191,7 @@ function createSearchOverlayCard(m) {
             chevron.style.transform = "rotate(180deg)";
         }
     });
-    
+
     card.addEventListener("click", () => {
         const overlayInput = document.getElementById("overlay-search-input");
         if (overlayInput && overlayInput.value.trim().length >= 2 && typeof saveSearchQueryToHistory === "function") {
@@ -16193,7 +16210,7 @@ function createSearchOverlayCard(m) {
 
 function triggerFloatingCoinsAnimation(sourceElement) {
     if (!sourceElement) return;
-    
+
     // Find target points display element
     let target = document.getElementById("rewards-points-display");
     if (!target || target.getBoundingClientRect().width === 0) {
@@ -16202,9 +16219,9 @@ function triggerFloatingCoinsAnimation(sourceElement) {
     if (!target || target.getBoundingClientRect().width === 0) {
         target = document.getElementById("profile-loyalty-points");
     }
-    
+
     const sourceRect = sourceElement.getBoundingClientRect();
-    
+
     let targetX, targetY;
     if (target && target.getBoundingClientRect().width > 0) {
         const targetRect = target.getBoundingClientRect();
@@ -16215,30 +16232,30 @@ function triggerFloatingCoinsAnimation(sourceElement) {
         targetX = window.innerWidth - 60;
         targetY = 40;
     }
-    
+
     const startX = sourceRect.left + sourceRect.width / 2 - 8;
     const startY = sourceRect.top + sourceRect.height / 2 - 8;
-    
+
     const coinCount = 10;
-    
+
     for (let i = 0; i < coinCount; i++) {
         setTimeout(() => {
             const coin = document.createElement("div");
             coin.className = "floating-coin";
-            
+
             // Random arching paths
             const midX = (startX + targetX) / 2 + (Math.random() - 0.5) * 160;
             const midY = Math.min(startY, targetY) - 80 - Math.random() * 80;
-            
+
             coin.style.setProperty("--start-x", `${startX}px`);
             coin.style.setProperty("--start-y", `${startY}px`);
             coin.style.setProperty("--mid-x", `${midX}px`);
             coin.style.setProperty("--mid-y", `${midY}px`);
             coin.style.setProperty("--end-x", `${targetX}px`);
             coin.style.setProperty("--end-y", `${targetY}px`);
-            
+
             document.body.appendChild(coin);
-            
+
             setTimeout(() => {
                 if (target) {
                     target.classList.remove("pulse-bounce");
@@ -16250,4 +16267,3 @@ function triggerFloatingCoinsAnimation(sourceElement) {
         }, i * 75);
     }
 }
-

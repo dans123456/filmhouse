@@ -7304,7 +7304,10 @@ async function init() {
                                 ]
                             };
 
-                            const posterImg = movie.backdrop || movie.poster || "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png";
+                            let posterImg = movie.backdrop || movie.poster || "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png";
+                            if (posterImg && !String(posterImg).startsWith("http")) {
+                                posterImg = "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png";
+                            }
 
                             let postRes;
                             try {
@@ -7380,6 +7383,17 @@ async function init() {
                                     await callTelegramWithRetry('sendMessage', u.id, messageText, sendOptions);
                                     sent++;
                                 } catch (e) {
+                                    if (e.message && e.message.includes("can't parse entities")) {
+                                        try {
+                                            const plainOptions = replyMarkup ? { reply_markup: replyMarkup } : {};
+                                            await callTelegramWithRetry('sendMessage', u.id, messageText, plainOptions);
+                                            sent++;
+                                            await new Promise(r => setTimeout(r, 40));
+                                            continue;
+                                        } catch (plainErr) {
+                                            e = plainErr;
+                                        }
+                                    }
                                     failed++;
                                     if (e.message && (e.message.includes("blocked") || e.message.includes("deactivated"))) {
                                         localStore.setBlocked(u.id, true);
