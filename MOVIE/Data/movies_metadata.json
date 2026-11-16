@@ -1,5 +1,42 @@
 [
   {
+    "csv_id": "65334-miraculous-tales-of-ladybug-cat-noir",
+    "tmdb_id": 65334,
+    "imdb_id": "",
+    "title": "Miraculous: Tales of Ladybug & Cat Noir",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Animated Movies",
+      "Kids Shows and Movies (Nickelodeon and Disney)",
+      "Teen/High-School",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Action & Adventure",
+      "Animation",
+      "Kids"
+    ],
+    "overview": "Marinette and Adrien, two Parisian teenagers, are entrusted with powerful jewels in order to transform into superheroes Ladybug and Cat Noir. But neither hero knows the other's true identity — or that they're classmates!",
+    "poster": "https://image.tmdb.org/t/p/w500/acrtAy8gmxcsEvrDP09MpMSCeDZ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/lH22EnM0ofC7GsVGU8dAA2RXV1c.jpg",
+    "rating": 8.1,
+    "release_date": "2015-10-19",
+    "language": "fr",
+    "cast": [],
+    "director": "",
+    "trailer": "Eo73DkyXywE",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFREAAtkY4EcAAc-ZRG_-BjMWBA",
+        "season": "Season 1"
+      }
+    ]
+  },
+  {
     "csv_id": "1559980-the-gospel-of-christmas",
     "tmdb_id": 1559980,
     "imdb_id": "",
