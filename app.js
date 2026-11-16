@@ -8566,7 +8566,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=163_${Date.now()}`;
+        const cacheBuster = `v=165_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
@@ -8601,6 +8601,27 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         setTimeout(dismissLoader, 2500);
 
         container.appendChild(iframe);
+
+        // Relay parent window visibility/focus lifecycle to player iframe (critical for iPhone SFSafariViewController return)
+        if (!window._fhPlayerLifecycleRelayBound) {
+            window._fhPlayerLifecycleRelayBound = true;
+            const relayToPlayer = (evtType) => {
+                try {
+                    const activeIframe = document.querySelector("#cinema-video-wrapper iframe");
+                    if (activeIframe && activeIframe.contentWindow) {
+                        activeIframe.contentWindow.postMessage({
+                            action: "parentAdLifecycle",
+                            state: document.hidden ? "hidden" : "visible",
+                            event: evtType
+                        }, "*");
+                    }
+                } catch (_) {}
+            };
+            document.addEventListener("visibilitychange", () => relayToPlayer("visibilitychange"));
+            window.addEventListener("focus", () => relayToPlayer("focus"));
+            window.addEventListener("blur", () => relayToPlayer("blur"));
+            window.addEventListener("pageshow", () => relayToPlayer("pageshow"));
+        }
         if (titleEl) titleEl.textContent = currentMediaTitle;
         startStreamingPresence(movie, currentTitle || initialTitle);
 

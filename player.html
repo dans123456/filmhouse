@@ -374,24 +374,24 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.65) 0%, rgba(5, 7, 12, 0.94) 100%);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      background: radial-gradient(circle at 50% 45%, rgba(10, 14, 24, 0.25) 0%, rgba(5, 7, 12, 0.70) 100%);
+      backdrop-filter: blur(1.5px);
+      -webkit-backdrop-filter: blur(1.5px);
       z-index: 1;
       pointer-events: none;
       transition: backdrop-filter 0.4s ease, background 0.4s ease;
     }
     .stream-play-overlay.connecting::before {
-      background: radial-gradient(circle at 50% 50%, rgba(8, 10, 16, 0.72) 0%, rgba(5, 7, 12, 0.96) 100%);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: radial-gradient(circle at 50% 45%, rgba(10, 14, 24, 0.38) 0%, rgba(5, 7, 12, 0.78) 100%);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
     }
     .stream-play-overlay.connecting .stream-play-circle {
-      background: rgba(15, 23, 42, 0.85);
-      border: 3.5px solid rgba(255, 188, 0, 0.25);
-      border-top-color: #ffd700;
-      animation: spin 0.9s linear infinite;
-      box-shadow: 0 0 35px rgba(255, 188, 0, 0.5);
+      background: rgba(12, 16, 28, 0.78) !important;
+      border: 4px solid rgba(255, 188, 0, 0.22) !important;
+      border-top-color: #ffd700 !important;
+      animation: spin 0.85s linear infinite !important;
+      box-shadow: 0 0 30px rgba(255, 188, 0, 0.45) !important;
     }
     .stream-play-overlay.connecting .stream-play-circle svg {
       display: none;
@@ -1525,12 +1525,18 @@
             --primary-color: ${_t.color} !important;
             --primary-gradient: ${_t.gradient} !important;
           }
-          .stream-play-circle {
+          .stream-play-overlay:not(.connecting) .stream-play-circle {
             background: ${_t.gradient} !important;
             box-shadow: 0 0 35px ${_t.glow}, 0 4px 15px rgba(0,0,0,0.5) !important;
           }
-          .stream-play-overlay:hover .stream-play-circle,
-          .stream-play-overlay:active .stream-play-circle {
+          .stream-play-overlay.connecting .stream-play-circle {
+            background: rgba(12, 16, 28, 0.78) !important;
+            border: 4px solid rgba(255, 255, 255, 0.18) !important;
+            border-top-color: ${_t.color} !important;
+            box-shadow: 0 0 30px ${_t.glow} !important;
+          }
+          .stream-play-overlay:not(.connecting):hover .stream-play-circle,
+          .stream-play-overlay:not(.connecting):active .stream-play-circle {
             box-shadow: 0 0 55px ${_t.glow}, 0 6px 20px rgba(0,0,0,0.7) !important;
           }
           #btnGetPassPill {
@@ -1647,7 +1653,22 @@
         }
       }
 
-      function activateWatchPass() {
+      let _connectTimeoutTimer = null;
+
+      function restoreInteractivePlayOverlay(titleMsg, subMsg) {
+        if (!playOverlay) return;
+        if (document.body.classList.contains('stream-started') && videoEl && !videoEl.paused && videoEl.currentTime > 0) return;
+        playOverlay.style.display = 'flex';
+        playOverlay.style.opacity = '1';
+        playOverlay.style.pointerEvents = 'auto';
+        playOverlay.classList.remove('connecting');
+        const playTitle = document.getElementById('streamPlayTitle');
+        const playSub = document.getElementById('streamPlaySub');
+        if (playTitle && titleMsg) playTitle.textContent = titleMsg;
+        if (playSub && subMsg) playSub.textContent = subMsg;
+      }
+
+      function activateWatchPass(fromUserGesture) {
         const FOUR_HOURS_MS = 4 * 3600 * 1000;
         const currentExpires = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
         let newExpires = Date.now() + FOUR_HOURS_MS;
@@ -1661,29 +1682,51 @@
         const hud = document.getElementById('streamPassHud');
         if (hud) hud.style.display = 'none';
 
+        attachStreamSource();
+
         if (playOverlay) {
           playOverlay.style.display = 'flex';
           playOverlay.style.opacity = '1';
-          playOverlay.style.pointerEvents = 'none';
+          playOverlay.style.pointerEvents = 'auto';
           playOverlay.classList.add('connecting');
           const playTitle = document.getElementById('streamPlayTitle');
           const playSub = document.getElementById('streamPlaySub');
-          if (playTitle) playTitle.textContent = '⚡ Connecting High-Speed Stream...';
-          if (playSub) playSub.textContent = 'Buffering 1080p Cinema • Starting Movie';
+          if (playTitle) playTitle.textContent = '⚡ Starting High-Speed Stream...';
+          if (playSub) playSub.textContent = '4-Hour Cinema Pass Active • Loading Movie';
         }
 
-        attachStreamSource();
-
         if (videoEl) {
+          const onAutoplayBlocked = function() {
+            restoreInteractivePlayOverlay(
+              '🎉 Pass Unlocked! ▶ Tap to Play',
+              '4-Hour Ad-Free Cinema Ready • Instant Start'
+            );
+          };
+
           try {
             const p = videoEl.play();
             if (p !== undefined) {
-              p.catch(() => {
-                if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
+              p.then(() => {
+                // Started playing; if still at 0 after 2.5s and paused, restore button
+                setTimeout(() => {
+                  if (videoEl.paused) onAutoplayBlocked();
+                }, 2500);
+              }).catch(() => {
+                // iOS blocked non-gesture autoplay after returning from Safari: show instant 1-tap play button!
+                onAutoplayBlocked();
               });
             }
           } catch (_) {
-            if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
+            onAutoplayBlocked();
+          }
+
+          // Safety check for iOS: if not playing within 1.6s when triggered without a direct tap, prompt user to tap Play
+          if (!fromUserGesture) {
+            setTimeout(() => {
+              if (videoEl && videoEl.paused && !document.body.classList.contains('stream-started')) {
+                onAutoplayBlocked();
+              }
+            }, 1600);
           }
         }
       }
@@ -1692,19 +1735,25 @@
       let _playerAdStartTime = 0;
       let _playerAdLeftApp = false;
       let _playerCancelTimer = null;
+      let _playerAdPollTimer = null;
 
       function cleanupPlayerAdListeners() {
         document.removeEventListener('visibilitychange', onPlayerVisibilityChange);
         window.removeEventListener('focus', onPlayerFocusReturn);
+        window.removeEventListener('pageshow', onPlayerFocusReturn);
         if (_playerCancelTimer) {
           clearTimeout(_playerCancelTimer);
           _playerCancelTimer = null;
         }
+        if (_playerAdPollTimer) {
+          clearInterval(_playerAdPollTimer);
+          _playerAdPollTimer = null;
+        }
       }
 
       function onPlayerFocusReturn() {
-        if (_playerAdPending && _playerAdLeftApp) {
-          verifyAndCompletePlayerAd();
+        if (_playerAdPending && (_playerAdLeftApp || (Date.now() - _playerAdStartTime >= 2500))) {
+          verifyAndCompletePlayerAd(false);
         }
       }
 
@@ -1713,43 +1762,78 @@
         if (document.hidden) {
           _playerAdLeftApp = true;
           if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
-        } else if (_playerAdLeftApp) {
-          verifyAndCompletePlayerAd();
+        } else if (_playerAdLeftApp || (Date.now() - _playerAdStartTime >= 2500)) {
+          verifyAndCompletePlayerAd(false);
         }
       }
+
+      // Listen for parent window visibility/focus relay (critical for iPhone iframe inside Telegram Mini App)
+      window.addEventListener('message', function(ev) {
+        if (!ev || !ev.data) return;
+        if (ev.data.action === 'parentAdLifecycle' && _playerAdPending) {
+          if (ev.data.state === 'hidden' || ev.data.event === 'blur') {
+            _playerAdLeftApp = true;
+            if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
+          } else if (ev.data.state === 'visible' || ev.data.event === 'focus' || ev.data.event === 'pageshow') {
+            if (_playerAdLeftApp || (Date.now() - _playerAdStartTime >= 2500)) {
+              verifyAndCompletePlayerAd(false);
+            }
+          }
+        }
+      });
 
       function showPassAlert(msg) {
         const toast = document.getElementById('passAlertToast');
         if (!toast) return;
         toast.innerHTML = `<span>${msg}</span>`;
         toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, 3500);
+        setTimeout(() => { toast.style.display = 'none'; }, 4000);
       }
 
-      function verifyAndCompletePlayerAd() {
+      function verifyAndCompletePlayerAd(fromUserGesture) {
+        if (!_playerAdPending) return false;
         const elapsed = Date.now() - _playerAdStartTime;
         _playerAdPending = false;
         _playerAdLeftApp = false;
         cleanupPlayerAdListeners();
 
-        if (elapsed >= 2500) {
+        if (elapsed >= 2200) {
           const watched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10) + 1;
           localStorage.setItem('fh_ads_4h', String(watched));
           if (watched >= 2) {
             showPassAlert("🎉 4-Hour Cinema Pass Activated!");
-            activateWatchPass();
+            activateWatchPass(!!fromUserGesture);
+            return 'unlocked';
           } else {
             updatePassUI();
-            showPassAlert("✅ Ad 1 of 2 Verified! Tap to watch final ad.");
+            showPassAlert("✅ Ad 1 of 2 Verified! Tap 'Final Ad (1/2)' now.");
+            return 'step1';
           }
         } else {
           updatePassUI();
           showPassAlert("⚠️ Sponsor page closed too quickly. Please visit sponsor!");
+          return false;
         }
       }
 
       function triggerPassAdWatch(e) {
-        if (_playerAdPending) return;
+        // Self-healing check for iPhone: if previous ad was already visited >= 2.2s ago
+        // and iOS didn't fire iframe focus until the user tapped this button again:
+        if (_playerAdPending) {
+          const elapsed = Date.now() - _playerAdStartTime;
+          if (elapsed >= 2200) {
+            const res = verifyAndCompletePlayerAd(true);
+            if (res === 'unlocked') {
+              if (e && typeof e.preventDefault === 'function') e.preventDefault();
+              return;
+            }
+            // If res === 'step1', Ad 1 was just verified! Continue immediately into opening Ad 2 on this tap!
+          } else {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            return;
+          }
+        }
+
         _playerAdPending = true;
         _playerAdStartTime = Date.now();
         _playerAdLeftApp = false;
@@ -1765,21 +1849,22 @@
 
         document.addEventListener('visibilitychange', onPlayerVisibilityChange);
         window.addEventListener('focus', onPlayerFocusReturn);
+        window.addEventListener('pageshow', onPlayerFocusReturn);
         window.addEventListener('blur', function() { if (_playerAdPending) _playerAdLeftApp = true; }, { once: true });
 
         // 1. If in genuine Telegram client, use Telegram SDK openLink
         const tg = getActiveTelegramWebApp();
         if (tg) {
           if (e && typeof e.preventDefault === 'function') e.preventDefault();
+          // On iOS Telegram, SFSafariViewController opens over the webview without always firing iframe blur
+          setTimeout(function() { if (_playerAdPending) _playerAdLeftApp = true; }, 1200);
           try {
             tg.openLink(MONETAG_SMARTLINK);
           } catch (_) {
             window.open(MONETAG_SMARTLINK, '_blank');
           }
         } else {
-          // In standard browser / desktop / mobile browser outside Telegram:
-          // If called from native <a> click, DO NOT preventDefault! Let the browser open the tab natively!
-          // If called programmatically (no href or e is synthetic), open directly:
+          setTimeout(function() { if (_playerAdPending) _playerAdLeftApp = true; }, 1200);
           if (!e || !e.target || !e.target.closest || !e.target.closest('a')) {
             try {
               const w = window.open(MONETAG_SMARTLINK, '_blank');
@@ -1792,6 +1877,21 @@
           }
         }
 
+        // Poll for focus/visibility return (ensures iPhone SFSafariViewController close is detected even without iframe focus event)
+        if (_playerAdPollTimer) clearInterval(_playerAdPollTimer);
+        _playerAdPollTimer = setInterval(function() {
+          if (!_playerAdPending) {
+            clearInterval(_playerAdPollTimer);
+            _playerAdPollTimer = null;
+            return;
+          }
+          if (document.hidden || !document.hasFocus()) {
+            _playerAdLeftApp = true;
+          } else if (_playerAdLeftApp && (Date.now() - _playerAdStartTime >= 3500)) {
+            verifyAndCompletePlayerAd(false);
+          }
+        }, 600);
+
         // Inform parent app in case parent maintains daily stats
         try {
           if (window.parent && window.parent !== window) {
@@ -1802,11 +1902,15 @@
         // Safety timeout if user clicked Cancel on Telegram prompt or never left
         if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
         _playerCancelTimer = setTimeout(function() {
-          if (_playerAdPending && !_playerAdLeftApp) {
-            _playerAdPending = false;
-            cleanupPlayerAdListeners();
-            updatePassUI();
-            showPassAlert("⚠️ Sponsor visit not detected. Tap \"Open\" when Telegram asks!");
+          if (_playerAdPending) {
+            if (_playerAdLeftApp && !document.hidden) {
+              verifyAndCompletePlayerAd(false);
+            } else if (!_playerAdLeftApp) {
+              _playerAdPending = false;
+              cleanupPlayerAdListeners();
+              updatePassUI();
+              showPassAlert("⚠️ Sponsor visit not detected. Tap \"Open\" when Telegram asks!");
+            }
           }
         }, 12000);
       }
@@ -1884,36 +1988,41 @@
         }
       }
 
-      // Click & Touch-to-Play Overlay (Requires active pass; otherwise triggers 2-Ad Sponsor Pre-Roll Overlay)
+      // Click & Touch-to-Play Overlay (Requires active pass; otherwise triggers 2-Ad Sponsor HUD)
       if (playOverlay) {
-        let _playTriggered = false;
         function triggerStreamPlay(e) {
           if (e) {
             e.preventDefault();
             e.stopPropagation();
           }
 
+          // If an ad was pending and >= 2.2s elapsed, complete it right on this tap!
+          if (_playerAdPending && (Date.now() - _playerAdStartTime >= 2200)) {
+            verifyAndCompletePlayerAd(true);
+          }
+
           const passState = getActivePassState();
 
           if (passState.hasAccess) {
             attachStreamSource();
-            if (_playTriggered) return;
-            _playTriggered = true;
 
-            playOverlay.style.pointerEvents = 'none';
+            // Keep pointerEvents = 'auto' until frames actually render so iOS never opens a black 00:00 native player!
+            playOverlay.style.pointerEvents = 'auto';
             playOverlay.classList.add('connecting');
             const playTitle = document.getElementById('streamPlayTitle');
             const playSub = document.getElementById('streamPlaySub');
             if (playTitle) playTitle.textContent = '⚡ Connecting High-Speed Stream...';
             if (playSub) playSub.textContent = 'Buffering 1080p Cinema • Starting Movie';
 
-            // Fast loading state: show connecting pulse immediately over backdrop
-            if (loaderEl) {
-              loaderEl.style.display = 'flex';
-              loaderEl.style.opacity = '1';
-              const lt = loaderEl.querySelector('.loader-text');
-              if (lt) lt.textContent = '⚡ Connecting High-Speed Stream...';
-            }
+            if (_connectTimeoutTimer) clearTimeout(_connectTimeoutTimer);
+            _connectTimeoutTimer = setTimeout(function() {
+              if (!document.body.classList.contains('stream-started') && (!videoEl || videoEl.paused || videoEl.currentTime === 0)) {
+                restoreInteractivePlayOverlay(
+                  '▶ Tap to Retry Stream',
+                  '⚡ Slow network response • Tap here or try Server 2 below'
+                );
+              }
+            }, 8000);
 
             try {
               const p = videoEl.play();
@@ -1922,7 +2031,13 @@
                   console.log("Stream video playback initiated successfully");
                 }).catch(err => {
                   console.log("Direct videoEl.play notice:", err);
-                  if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
+                  if (window.plyrInstance) {
+                    window.plyrInstance.play().catch(() => {
+                      restoreInteractivePlayOverlay('▶ Tap to Start Movie', '1080p FHD Cinema Ready');
+                    });
+                  } else {
+                    restoreInteractivePlayOverlay('▶ Tap to Start Movie', '1080p FHD Cinema Ready');
+                  }
                 });
               }
             } catch (_) {
@@ -1930,7 +2045,6 @@
             }
           } else {
             // User has NO active pass -> Pulse the bottom HUD bar!
-            _playTriggered = false;
             try { videoEl.pause(); } catch(_) {}
             const hud = document.getElementById('streamPassHud');
             if (hud) {
@@ -2574,6 +2688,10 @@
           updatePassUI();
           return;
         }
+        if (_connectTimeoutTimer) {
+          clearTimeout(_connectTimeoutTimer);
+          _connectTimeoutTimer = null;
+        }
         document.body.classList.add('stream-started');
         if (playOverlay && playOverlay.style.display !== 'none') {
           playOverlay.style.pointerEvents = 'none';
@@ -2588,6 +2706,12 @@
       }
 
       videoEl.addEventListener('playing', autoHidePlayOverlay);
+      videoEl.addEventListener('canplay', function() {
+        if (!videoEl.paused) autoHidePlayOverlay();
+      });
+      videoEl.addEventListener('loadeddata', function() {
+        if (!videoEl.paused) autoHidePlayOverlay();
+      });
 
       videoEl.addEventListener('timeupdate', function() {
         const passState = getActivePassState();
@@ -2625,12 +2749,9 @@
       if (finalStreamUrl) {
         if (downloadBtn) downloadBtn.href = finalStreamUrl;
 
-        const initialPass = getActivePassState();
-        if (initialPass.hasAccess) {
-          attachStreamSource();
-        } else {
-          updatePassUI();
-        }
+        // Always attach stream source with preload="metadata" so DNS/TLS and headers warm up immediately
+        attachStreamSource();
+        updatePassUI();
 
         function hideStreamLoader() {
           if (!loaderEl) return;
@@ -2644,9 +2765,9 @@
           videoEl.addEventListener(evt, hideStreamLoader);
         });
 
-        // Explicitly trigger browser video load if pass is already active
+        // Pre-warm metadata connection in background
         try {
-          if (initialPass.hasAccess) videoEl.load();
+          videoEl.load();
         } catch (_) {}
 
         // Fallback: If video already buffered enough data, hide immediately

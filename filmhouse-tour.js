@@ -15,7 +15,7 @@
       var docStyle = getComputedStyle(document.documentElement);
       var primary = docStyle.getPropertyValue('--primary-color').trim();
       if (primary && primary.length > 2) return primary;
-    } catch (_) {}
+    } catch (_) { }
     var saved = localStorage.getItem('filmhouse_theme_accent') || 'gold';
     var map = {
       gold: '#ffbc00',
@@ -40,7 +40,7 @@
           window.Telegram.WebApp.HapticFeedback.impactOccurred(type === 'medium' ? 'medium' : 'light');
         }
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   /* ============ USER NAME RESOLVER ============ */
@@ -51,23 +51,23 @@
         var n = c.getUserName();
         if (n) return n;
       }
-    } catch (_) {}
+    } catch (_) { }
     try {
       var u = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
       if (u && u.first_name) return u.first_name;
-    } catch (_) {}
+    } catch (_) { }
     try {
       if (window.state && window.state.user && (window.state.user.displayName || window.state.user.name)) {
         return window.state.user.displayName || window.state.user.name;
       }
-    } catch (_) {}
+    } catch (_) { }
     try {
       var keys = ['fh_username', 'fh_name', 'username', 'userName', 'first_name', 'filmhouse_user_name'];
       for (var i = 0; i < keys.length; i++) {
         var v = localStorage.getItem(keys[i]);
         if (v) return v;
       }
-    } catch (_) {}
+    } catch (_) { }
     return '';
   }
 
@@ -180,7 +180,7 @@
     try {
       localStorage.setItem(STORAGE_KEY, '1');
       localStorage.setItem('filmhouse_tour_completed', 'true');
-    } catch (_) {}
+    } catch (_) { }
   }
 
   function visible(el) {
@@ -205,7 +205,7 @@
             return list[j];
           }
         }
-      } catch (_) {}
+      } catch (_) { }
     }
     return null;
   }
@@ -220,7 +220,7 @@
         var navBtn = document.querySelector('.bottom-nav-item[data-target="' + screen + '"]');
         if (navBtn) navBtn.click();
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   function closeOldPopups() {
@@ -272,14 +272,14 @@
       '.fh-title.done{animation:fhGlow 1.3s ease-out}' +
       '@keyframes fhGlow{0%{text-shadow:0 0 0 rgba(255,188,0,0)}40%{text-shadow:0 0 16px var(--primary-glow,rgba(255,188,0,.95))}100%{text-shadow:0 0 0 rgba(255,188,0,0)}}' +
       '@media (max-width:480px),(max-height:640px){' +
-        '.fh-card{width:min(88vw,300px);padding:14px 14px 12px;border-radius:16px}' +
-        '.fh-ico{font-size:24px;margin:2px 0 6px}' +
-        '.fh-title{font-size:15px;margin:0 0 5px}' +
-        '.fh-text{font-size:12px;line-height:1.45;margin:0 0 10px}' +
-        '.fh-foot{padding-top:10px}' +
-        '.fh-btn{font-size:12.5px;padding:8px 14px}' +
-        '.fh-dot{width:5px;height:5px}.fh-dot.on{width:14px}' +
-        '.fh-dots{gap:4px}' +
+      '.fh-card{width:min(88vw,300px);padding:14px 14px 12px;border-radius:16px}' +
+      '.fh-ico{font-size:24px;margin:2px 0 6px}' +
+      '.fh-title{font-size:15px;margin:0 0 5px}' +
+      '.fh-text{font-size:12px;line-height:1.45;margin:0 0 10px}' +
+      '.fh-foot{padding-top:10px}' +
+      '.fh-btn{font-size:12.5px;padding:8px 14px}' +
+      '.fh-dot{width:5px;height:5px}.fh-dot.on{width:14px}' +
+      '.fh-dots{gap:4px}' +
       '}' +
       '@media (prefers-reduced-motion:reduce){.fh-spot.on{animation:none}.fh-card,.fh-spot{transition:none}}';
     var s = document.createElement('style');
@@ -298,18 +298,18 @@
       '<div class="fh-ov"></div>' +
       '<div class="fh-spot"></div>' +
       '<div class="fh-card">' +
-        '<button class="fh-min" type="button" aria-label="Shrink">&#9662;</button>' +
-        '<button class="fh-skip" type="button">SKIP</button>' +
-        '<div class="fh-ico"></div>' +
-        '<h3 class="fh-title"></h3>' +
-        '<p class="fh-text"></p>' +
-        '<div class="fh-foot">' +
-          '<div class="fh-dots"></div>' +
-          '<div class="fh-btns">' +
-            '<button class="fh-btn fh-back" type="button">Back</button>' +
-            '<button class="fh-btn fh-next" type="button">Next</button>' +
-          '</div>' +
-        '</div>' +
+      '<button class="fh-min" type="button" aria-label="Shrink">&#9662;</button>' +
+      '<button class="fh-skip" type="button">SKIP</button>' +
+      '<div class="fh-ico"></div>' +
+      '<h3 class="fh-title"></h3>' +
+      '<p class="fh-text"></p>' +
+      '<div class="fh-foot">' +
+      '<div class="fh-dots"></div>' +
+      '<div class="fh-btns">' +
+      '<button class="fh-btn fh-back" type="button">Back</button>' +
+      '<button class="fh-btn fh-next" type="button">Next</button>' +
+      '</div>' +
+      '</div>' +
       '</div>';
     document.body.appendChild(root);
     overlay = root.querySelector('.fh-ov');
@@ -490,7 +490,7 @@
             block: 'center',
             behavior: 'instant' in document.documentElement.style ? 'instant' : 'auto'
           });
-        } catch (_) {}
+        } catch (_) { }
       }
       var mb = root.querySelector('.fh-min');
       if (mb) mb.style.display = t ? '' : 'none';
@@ -530,7 +530,7 @@
       try {
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem('filmhouse_tour_completed');
-      } catch (_) {}
+      } catch (_) { }
     }
   };
 
@@ -542,7 +542,7 @@
       if (s.includes('tour=1') || s.includes('tour=true') || s.includes('startapp=tour') || h.includes('tour')) return true;
       var tgParam = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.start_param;
       if (tgParam && String(tgParam).toLowerCase() === 'tour') return true;
-    } catch (_) {}
+    } catch (_) { }
     return false;
   }
 
@@ -553,7 +553,7 @@
       try {
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem('filmhouse_tour_completed');
-      } catch (_) {}
+      } catch (_) { }
     }
     var waited = 0;
     (function wait() {
