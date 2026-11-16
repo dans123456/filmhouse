@@ -1115,7 +1115,10 @@ function setupBot(bot, adminBot) {
             const isExplicitRelease = bMode === "released" || bMode === "release" || bMode === "new";
             const isExplicitUpdate = bMode === "updated" || bMode === "update";
 
-            if (isSeries) {
+            if (bMode.includes("stream") || movieInfo.broadcastMode === "stream_available" || movieInfo.isStreamRequest) {
+                headerBadge = "🟣 <b>ONLINE STREAM PLAYER ACTIVE!</b> ⚡";
+                updateCallout = `📌 <b>Stream Update:</b> <b>High-Speed 1080p Cinema Player Ready!</b> 🍿\n`;
+            } else if (isSeries) {
                 if (specLower.includes("season") || specLower.match(/\bs\d+\b/i)) {
                     const sMatch = specLower.match(/season\s*(\d+)/i) || specLower.match(/\bs(\d+)\b/i);
                     const sNum = sMatch ? sMatch[1] : rawSpec;
@@ -1213,11 +1216,15 @@ function setupBot(bot, adminBot) {
             const shareText = encodeURIComponent(`🍿 Watch "${cleanTitle}" on Film House!\nStream and download in HD:`);
             const shareUrl = encodeURIComponent(miniAppUrl);
 
+            const mainBtnLabel = (movieInfo.broadcastMode === "stream_available" || movieInfo.isStreamRequest || bMode.includes("stream"))
+                ? "▶️ Stream Now in 1080p FHD 🍿"
+                : "🎬 Watch / Download in App 🍿";
+
             const channelReplyMarkup = {
                 inline_keyboard: [
                     [
                         {
-                            text: "🎬 Watch / Download in App 🍿",
+                            text: mainBtnLabel,
                             url: miniAppUrl
                         }
                     ],
@@ -7457,24 +7464,90 @@ async function init() {
                             let sent = 0;
                             let failed = 0;
 
-                            for (const sub of subscribers) {
-                                const targetId = String(sub.user_telegram_id);
-                                try {
-                                    await callTelegramWithRetry('sendMessage', targetId, messageText, {
-                                        parse_mode: 'HTML',
-                                        reply_markup: replyMarkup
-                                    });
-                                    sent++;
-                                } catch (sendErr) {
-                                    failed++;
-                                    if (sendErr.message && (sendErr.message.includes("blocked") || sendErr.message.includes("deactivated"))) {
-                                        localStore.setBlocked(targetId, true);
+                            if (data.notify_subscribers !== false) {
+                                for (const sub of subscribers) {
+                                    const targetId = String(sub.user_telegram_id);
+                                    try {
+                                        await callTelegramWithRetry('sendMessage', targetId, messageText, {
+                                            parse_mode: 'HTML',
+                                            reply_markup: replyMarkup
+                                        });
+                                        sent++;
+                                    } catch (sendErr) {
+                                        failed++;
+                                        if (sendErr.message && (sendErr.message.includes("blocked") || sendErr.message.includes("deactivated"))) {
+                                            localStore.setBlocked(targetId, true);
+                                        }
                                     }
+                                    await new Promise(r => setTimeout(r, 40));
                                 }
-                                await new Promise(r => setTimeout(r, 40));
+                                console.log(`[SeriesBroadcast] Subscriber notifications delivered: ${sent}, failed: ${failed}`);
                             }
 
-                            console.log(`[SeriesBroadcast] Broadcast finished. Delivered: ${sent}, Failed: ${failed}`);
+                            // Post Episode Announcement to Updates Channel (@filmhouse_main)
+                            let channelPosted = false;
+                            if (data.post_to_channel !== false) {
+                                try {
+                                    const targetChannel = data.channelId || process.env.UPDATES_CHANNEL_ID || process.env.CHANNEL_TARGET || "-1004272961286";
+                                    console.log(`[SeriesBroadcast] Publishing S${season}E${episode} announcement for "${seriesTitle}" to Updates Channel ${targetChannel}...`);
+
+                                    let posterImg = data.backdrop || data.poster || null;
+                                    if (!posterImg && cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
+                                        const found = cachedMoviesMetadata.find(m => {
+                                            if (csvId && String(m.csv_id).toLowerCase() === String(csvId).toLowerCase()) return true;
+                                            if (tmdbId && String(m.tmdb_id) === String(tmdbId)) return true;
+                                            return false;
+                                        });
+                                        if (found) {
+                                            posterImg = found.backdrop || found.poster || null;
+                                        }
+                                    }
+
+                                    const channelCaption = 
+                                        `📺 <b>NEW EPISODE RELEASED!</b> 🍿\n` +
+                                        `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                                        `🎬 <b>${cleanSafe(seriesTitle)}</b>\n` +
+                                        `📌 <b>Season ${season}, Episode ${episode}</b>${epTitleLine}\n\n` +
+                                        `⚡ <i>Now ready for instant 1080p streaming & high-speed Telegram download!</i>`;
+
+                                    const channelMarkup = {
+                                        inline_keyboard: [
+                                            actionRow,
+                                            [
+                                                { text: "🍿 Open Film House Mini App", url: "https://t.me/Filmhouseappbot/filmhouseapp" },
+                                                { text: "📢 Join Channel", url: "https://t.me/filmhouse_main" }
+                                            ]
+                                        ]
+                                    };
+
+                                    if (posterImg && String(posterImg).startsWith("http")) {
+                                        try {
+                                            await callTelegramWithRetry('sendPhoto', targetChannel, posterImg, {
+                                                caption: channelCaption,
+                                                parse_mode: 'HTML',
+                                                reply_markup: channelMarkup
+                                            });
+                                            channelPosted = true;
+                                        } catch (pErr) {
+                                            console.warn(`[SeriesBroadcast] Photo post to channel failed (${pErr.message}), falling back to text:`);
+                                            await callTelegramWithRetry('sendMessage', targetChannel, channelCaption, {
+                                                parse_mode: 'HTML',
+                                                reply_markup: channelMarkup
+                                            });
+                                            channelPosted = true;
+                                        }
+                                    } else {
+                                        await callTelegramWithRetry('sendMessage', targetChannel, channelCaption, {
+                                            parse_mode: 'HTML',
+                                            reply_markup: channelMarkup
+                                        });
+                                        channelPosted = true;
+                                    }
+                                    console.log(`[SeriesBroadcast] Successfully published episode announcement to Updates Channel!`);
+                                } catch (chErr) {
+                                    console.error(`[SeriesBroadcast] Failed to post episode announcement to channel:`, chErr.message);
+                                }
+                            }
 
                             // If this was marked to purge subscriptions (season completed)
                             if (data.purge_subscriptions === true) {
@@ -7889,12 +7962,15 @@ async function init() {
                     if (data.status === "fulfilled" && data.publishToChannel !== false && !data.channelMessageId) {
                         const rawClean = String(title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
                         const movieKey = String(data.csv_id || data.tmdb_id || rawClean || docId).toLowerCase().trim();
-                        const specKey = String(data.seasonOrPart || "").toLowerCase().trim();
+                        const isStreamFulfill = (data.type === "stream" || data.requestType === "stream" || data.target === "stream_url" || !!data.streamUrl || !!data.stream_url);
+                        const specKey = String(data.seasonOrPart || (isStreamFulfill ? "stream_available" : "")).toLowerCase().trim();
                         const fullKey = specKey ? `${movieKey}_${specKey}` : movieKey;
 
-                        const isAlreadyBroadcasted = specKey 
-                            ? (broadcastedCatalogIds.has(fullKey) || _channelPostingLocks.has(fullKey))
-                            : (broadcastedCatalogIds.has(movieKey) || broadcastedCatalogIds.has(rawClean) || _channelPostingLocks.has(movieKey) || _channelPostingLocks.has(rawClean));
+                        const isAlreadyBroadcasted = isStreamFulfill
+                            ? _channelPostingLocks.has(fullKey)
+                            : (specKey 
+                                ? (broadcastedCatalogIds.has(fullKey) || _channelPostingLocks.has(fullKey))
+                                : (broadcastedCatalogIds.has(movieKey) || broadcastedCatalogIds.has(rawClean) || _channelPostingLocks.has(movieKey) || _channelPostingLocks.has(rawClean)));
 
                         if (!isAlreadyBroadcasted) {
                             _channelPostingLocks.add(fullKey);
@@ -7949,6 +8025,15 @@ async function init() {
                                         };
                                     }
 
+                                    movieDataForChannel.forceBroadcast = true;
+                                    if (isStreamFulfill) {
+                                        movieDataForChannel.broadcastMode = "stream_available";
+                                        movieDataForChannel.isStreamRequest = true;
+                                        if (data.streamUrl || data.stream_url) {
+                                            movieDataForChannel.stream_url = data.streamUrl || data.stream_url;
+                                        }
+                                    }
+
                                     const pubResult = await publishMovieToChannel(movieDataForChannel);
                                     if (pubResult && pubResult.message_id) {
                                         console.log(`[CHANNEL PUBLISH] Successfully published announcement for "${title}" to Updates Channel (msg_id: ${pubResult.message_id})`);
@@ -7996,7 +8081,7 @@ async function init() {
                         const isSeries = (data.type || "").toLowerCase() === "series" || (data.type || "").toLowerCase() === "tv";
                         let detailText = "";
                         let buttonText = "Download/Watch Now 🎬";
-                            if (isSeries) {
+                        if (isSeries) {
                                 let requestedSeason = data.seasonOrPart || "";
                                 if (!requestedSeason && title) {
                                     const sMatch = title.match(/Season\s*\d+/i) || title.match(/\(Season\s*\d+\)/i) || title.match(/S\d+/i);

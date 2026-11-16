@@ -5638,6 +5638,23 @@ if (publishBtn) {
                 }
             }
 
+            // Auto-broadcast newly added series & movies to Updates Channel (@filmhouse_main)
+            if (newlyAddedIds && newlyAddedIds.length > 0) {
+                const itemsToBroadcast = allCatalogMovies.filter(m => newlyAddedIds.includes(m.csv_id) && !m.channelBroadcasted);
+                if (itemsToBroadcast.length > 0) {
+                    console.log(`[PublishChanges] Auto-broadcasting ${itemsToBroadcast.length} new title(s) to Updates Channel...`);
+                    for (const item of itemsToBroadcast) {
+                        try {
+                            if (typeof window.broadcastMovieToMainChannel === 'function') {
+                                window.broadcastMovieToMainChannel(item);
+                            }
+                        } catch (bErr) {
+                            console.warn(`[PublishChanges] Failed to queue channel broadcast for ${item.title}:`, bErr);
+                        }
+                    }
+                }
+            }
+
             // Credit publication duty activity for the admin performing the publish
             if (newlyAddedIds && newlyAddedIds.length > 0) {
                 const pubTitles = allCatalogMovies.filter(m => newlyAddedIds.includes(m.csv_id)).map(m => m.title).filter(Boolean);
@@ -8117,6 +8134,38 @@ document.addEventListener("DOMContentLoaded", () => {
             btnOptionsContainer.style.display = includeBtnCheckbox.checked ? "block" : "none";
         });
     }
+
+    // Load Tour Guide Broadcast Template Preset
+    const btnLoadTourPreset = document.getElementById("btn-load-tour-preset");
+    if (btnLoadTourPreset) {
+        btnLoadTourPreset.addEventListener("click", () => {
+            if (broadcastMessage) {
+                broadcastMessage.value = 
+`🍿 <b>Welcome to the New Film House Cinema!</b> 🎬\n\n` +
+`We've upgraded Film House with powerful new features:\n` +
+`⚡ <b>Ultra-Fast 1080p Cinema Streaming</b>\n` +
+`⏱️ <b>60+ Subtitle Languages with 1-Tap Voice Sync</b>\n` +
+`🍿 <b>4-Hour Cinema Streaming Pass</b>\n` +
+`📥 <b>Direct High-Speed Telegram Downloads</b>\n\n` +
+`Tap the button below for a quick 30-second guided tour of everything new! 👇`;
+                if (broadcastCharCounter) broadcastCharCounter.textContent = `${broadcastMessage.value.length} chars`;
+            }
+            if (broadcastTarget) {
+                broadcastTarget.value = "all";
+                if (broadcastUserIdGroup) broadcastUserIdGroup.style.display = "none";
+                updateTargetCountLabel();
+            }
+            if (includeBtnCheckbox) {
+                includeBtnCheckbox.checked = true;
+                if (btnOptionsContainer) btnOptionsContainer.style.display = "block";
+            }
+            const btnTextInput = document.getElementById("broadcast-button-text");
+            if (btnTextInput) btnTextInput.value = "🚀 Start Interactive Tour 🎬";
+            const btnUrlInput = document.getElementById("broadcast-button-url");
+            if (btnUrlInput) btnUrlInput.value = "https://dans123456.github.io/filmhouse/?tour=1";
+            showToast("✨ Tour Guide broadcast template loaded! Tap 'Send Broadcast Message' when ready.", "info");
+        });
+    }
     
     // UI elements update on user profile list sync to show target count
     const updateTargetCountLabel = () => {
@@ -8229,6 +8278,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
                     const includeBtn = document.getElementById("broadcast-include-button")?.checked || false;
                     const customBtnText = (document.getElementById("broadcast-button-text")?.value.trim()) || "🍿 Open Film House";
+                    const customBtnUrl = (document.getElementById("broadcast-button-url")?.value.trim()) || "https://dans123456.github.io/filmhouse/";
                     queuePayload = {
                         type: "user_broadcast",
                         adminId: String(currentAdminId),
@@ -8236,6 +8286,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         targetUserIds: parsedIds,
                         includeButton: includeBtn,
                         buttonText: customBtnText,
+                        buttonUrl: customBtnUrl,
                         status: "pending",
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     };
@@ -10227,6 +10278,7 @@ window.submitEpisodeUpload = async function() {
     const rawStream = document.getElementById("upload-ep-stream")?.value.trim() || "";
     const downloadUrl = document.getElementById("upload-ep-download")?.value.trim() || "";
     const notifySubscribers = document.getElementById("upload-ep-notify-checkbox")?.checked !== false;
+    const postToChannel = document.getElementById("upload-ep-channel-checkbox")?.checked !== false;
     const isFinale = document.getElementById("upload-ep-finale-checkbox")?.checked === true;
 
     if (!rawStream && !downloadUrl) {
@@ -10299,8 +10351,8 @@ window.submitEpisodeUpload = async function() {
 
             console.log(`[SeriesTracker] Updated series ${csvId} in Firestore: Season ${seasonNum} Ep ${epNum}`);
 
-            // 2. Queue Telegram Push Notification to Subscribed Users
-            if (notifySubscribers && tmdbId) {
+            // 2. Queue Telegram Push Notification to Subscribed Users & Updates Channel
+            if ((notifySubscribers || postToChannel) && (tmdbId || csvId)) {
                 const currentAdminId = sessionStorage.getItem("admin_auth_id") || "1175336733";
                 const streamMiniAppUrl = `https://dans123456.github.io/filmhouse/?stream_id=${encodeURIComponent(csvId)}&season=${seasonNum}&ep=${epNum}`;
 
@@ -10314,12 +10366,18 @@ window.submitEpisodeUpload = async function() {
                     episode_title: epTitle,
                     stream_url: streamMiniAppUrl,
                     download_url: downloadUrl,
+                    poster: series.poster || null,
+                    backdrop: series.backdrop || null,
+                    genres: series.genres || series.categories || [],
+                    overview: series.overview || "",
+                    notify_subscribers: notifySubscribers,
+                    post_to_channel: postToChannel,
                     purge_subscriptions: isFinale,
                     status: "pending",
                     adminId: String(currentAdminId),
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                console.log(`[SeriesTracker] Queued episode broadcast in admin_broadcast_queue for TMDB ${tmdbId}`);
+                console.log(`[SeriesTracker] Queued episode broadcast (Subscribers: ${notifySubscribers}, Channel: ${postToChannel}) for TMDB ${tmdbId}`);
             }
 
             // 3. If finale, purge subscriptions directly from client as well

@@ -14201,6 +14201,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             const param = rawParam.toLowerCase();
             if (param === "mining") {
                 initialScreen = "mining";
+            } else if (param === "tour") {
+                if (window.FilmHouseTour) {
+                    window.FilmHouseTour.reset();
+                    setTimeout(() => { window.FilmHouseTour.start(true); }, 800);
+                }
             } else if (param.startsWith("boost_")) {
                 boostRequestDocId = rawParam.substring(6);
             } else if (param.startsWith("movie_") || param.startsWith("open_") || param.startsWith("watch_") || param.startsWith("dl_")) {
@@ -14220,6 +14225,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             targetDeepLinkMovieId = queryMovie.trim();
         } else if (queryStartApp && (queryStartApp.startsWith("movie_") || queryStartApp.startsWith("open_") || queryStartApp.startsWith("watch_") || queryStartApp.startsWith("dl_"))) {
             targetDeepLinkMovieId = queryStartApp.replace(/^(movie_|open_|watch_|dl_)/i, "").trim();
+        }
+    }
+
+    if (queryStartApp === "tour" || urlParams.get("tour") === "1" || urlParams.get("tour") === "true") {
+        if (window.FilmHouseTour) {
+            window.FilmHouseTour.reset();
+            setTimeout(() => { window.FilmHouseTour.start(true); }, 800);
         }
     }
 

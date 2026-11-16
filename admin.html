@@ -1042,6 +1042,12 @@
                 </div>
             </div>
 
+            <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                <button type="button" id="btn-load-tour-preset" style="background: rgba(255, 188, 0, 0.12); border: 1px solid rgba(255, 188, 0, 0.35); color: #ffbc00; border-radius: 20px; padding: 5px 14px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                    <span>✨ Load Tour Guide Broadcast Template</span>
+                </button>
+            </div>
+
             <div class="form-group" style="margin-bottom: 15px;">
                 <label for="broadcast-message">Message Content (Markdown Supported)</label>
                 <textarea id="broadcast-message" rows="5" placeholder="Type your message here... Use *bold*, _italic_, or [link text](url) for formatting." style="padding: 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: #fff; font-size: 13px; outline: none; resize: vertical; width: 100%; box-sizing: border-box; font-family: inherit;"></textarea>
@@ -1055,13 +1061,15 @@
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <label for="broadcast-include-button" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 13px; font-weight: 600; color: #fff; cursor: pointer; user-select: none;">
                         <input type="checkbox" id="broadcast-include-button" style="width: 16px; height: 16px; accent-color: #0088cc; cursor: pointer;">
-                        Attach "Open Film House" Button
+                        Attach Action Button
                     </label>
                     <span style="font-size: 11px; color: var(--text-secondary);">Optional action button</span>
                 </div>
                 <div id="broadcast-button-options" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08);">
                     <label for="broadcast-button-text" style="display: block; font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">Button Label (Optional)</label>
-                    <input type="text" id="broadcast-button-text" placeholder="🍿 Open Film House" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%; box-sizing: border-box;">
+                    <input type="text" id="broadcast-button-text" placeholder="🍿 Open Film House" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%; box-sizing: border-box; margin-bottom: 8px;">
+                    <label for="broadcast-button-url" style="display: block; font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">Button Destination URL (Optional)</label>
+                    <input type="text" id="broadcast-button-url" placeholder="https://dans123456.github.io/filmhouse/" style="padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 13px; width: 100%; box-sizing: border-box;">
                 </div>
             </div>
 
@@ -1660,6 +1668,13 @@
                     </label>
                 </div>
 
+                <div style="background: rgba(255, 188, 0, 0.08); border: 1px solid rgba(255, 188, 0, 0.25); border-radius: 6px; padding: 10px 12px; margin-bottom: 12px;">
+                    <label for="upload-ep-channel-checkbox" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 12px; font-weight: 600; color: #ffbc00; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="upload-ep-channel-checkbox" checked style="width: 16px; height: 16px; accent-color: #ffbc00; cursor: pointer;">
+                        <span>📢 Post Episode Announcement to Updates Channel (@filmhouse_main)</span>
+                    </label>
+                </div>
+
                 <div style="background: rgba(255, 188, 0, 0.06); border: 1px solid rgba(255, 188, 0, 0.2); border-radius: 6px; padding: 10px 12px; margin-bottom: 18px;">
                     <label for="upload-ep-finale-checkbox" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 12px; font-weight: 600; color: #ffbc00; cursor: pointer; user-select: none;">
                         <input type="checkbox" id="upload-ep-finale-checkbox" style="width: 16px; height: 16px; accent-color: #ffbc00; cursor: pointer;">
@@ -1717,6 +1732,6 @@
     </div>
 
     <script src="seriesSchema.js?v=2"></script>
-    <script src="admin.js?v=119"></script>
+    <script src="admin.js?v=120"></script>
 </body>
 </html>

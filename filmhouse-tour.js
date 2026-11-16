@@ -535,8 +535,26 @@
   };
 
   /* ============ AUTO-BOOT ============ */
+  function isTourRequested() {
+    try {
+      var s = window.location.search || '';
+      var h = window.location.hash || '';
+      if (s.includes('tour=1') || s.includes('tour=true') || s.includes('startapp=tour') || h.includes('tour')) return true;
+      var tgParam = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.start_param;
+      if (tgParam && String(tgParam).toLowerCase() === 'tour') return true;
+    } catch (_) {}
+    return false;
+  }
+
   function boot() {
-    if (!AUTO_START || seen()) return;
+    var requested = isTourRequested();
+    if (!requested && (!AUTO_START || seen())) return;
+    if (requested) {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem('filmhouse_tour_completed');
+      } catch (_) {}
+    }
     var waited = 0;
     (function wait() {
       var loader = document.getElementById('initial-app-loader') || document.querySelector('.app-loader') || document.getElementById('preloader');
@@ -544,8 +562,8 @@
       var ready = loaderGone && document.getElementById('screen-home');
       if (ready || waited > 10000) {
         return setTimeout(function () {
-          start(false);
-        }, START_DELAY);
+          start(true);
+        }, requested ? 800 : START_DELAY);
       }
       waited += 300;
       setTimeout(wait, 300);
