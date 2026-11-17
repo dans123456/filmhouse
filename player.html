@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset='utf-8'/>
-  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' name='viewport'/>
+  <meta charset='utf-8' />
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' name='viewport' />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta content='d5a6c39f06bb1c4f60a134f72a9315db' name='monetag'/>
-    <script src='https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js'></script>
+  <meta content='d5a6c39f06bb1c4f60a134f72a9315db' name='monetag' />
+  <script src='https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js'></script>
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
   <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <title>Film House Cinema Player</title>
-  <link href='https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap' rel='stylesheet'/>
-  
+  <link href='https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&amp;display=swap'
+    rel='stylesheet' />
+
   <!-- Monetag SmartLink Integration (Zone: 12129103) -->
   <script type='text/javascript'>
     function getActiveTelegramWebApp() {
       try {
-        const tg = (window.Telegram && window.Telegram.WebApp) || 
-                   (window.parent && window.parent.Telegram && window.parent.Telegram.WebApp);
+        const tg = (window.Telegram && window.Telegram.WebApp) ||
+          (window.parent && window.parent.Telegram && window.parent.Telegram.WebApp);
         if (tg && typeof tg.openLink === 'function') {
           if ((tg.initData && tg.initData.length > 0) || (tg.platform && tg.platform !== 'unknown')) {
             return tg;
           }
         }
-      } catch (_) {}
+      } catch (_) { }
       return null;
     }
 
@@ -36,7 +38,7 @@
         try {
           tg.openLink(url);
           return;
-        } catch (_) {}
+        } catch (_) { }
       }
       try {
         const w = window.open(url, '_blank');
@@ -60,7 +62,6 @@
   </script>
 
   <style>
-
     /* Film House Custom Gold Plyr Theme */
     :root {
       --plyr-color-main: #ffbc00;
@@ -78,12 +79,14 @@
       --plyr-control-radius: 6px;
       --plyr-focus-ring-color: #ffbc00;
     }
+
     .plyr--video {
       width: 100% !important;
       height: 100% !important;
       background: #000 !important;
       font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
+
     .plyr__control--overlaid {
       background: linear-gradient(135deg, #ffd700, #ff9900) !important;
       color: #0b0d14 !important;
@@ -92,13 +95,16 @@
       padding: 18px !important;
       transition: transform 0.2s ease, box-shadow 0.2s ease !important;
     }
+
     .plyr__control--overlaid svg {
       fill: #0b0d14 !important;
     }
+
     .plyr__control--overlaid:hover {
       transform: scale(1.08) !important;
       box-shadow: 0 6px 28px rgba(255, 188, 0, 0.7) !important;
     }
+
     .plyr__menu__container {
       background: rgba(15, 23, 42, 0.96) !important;
       backdrop-filter: blur(14px) !important;
@@ -107,9 +113,11 @@
       border-radius: 10px !important;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
     }
+
     .plyr__menu__container button[role="menuitemradio"][aria-checked="true"]::before {
       background: #ffbc00 !important;
     }
+
     .plyr__captions .plyr__caption {
       background: rgba(0, 0, 0, 0.8) !important;
       border-radius: 4px !important;
@@ -132,17 +140,20 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: calc(100% - 56px); /* Leave bottom control bar accessible */
+      height: calc(100% - 56px);
+      /* Leave bottom control bar accessible */
       display: flex;
       z-index: 12;
       pointer-events: auto;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
+
     body:not(.stream-started) .video-tap-gestures {
       display: none !important;
       pointer-events: none !important;
     }
+
     .tap-zone {
       height: 100%;
       position: relative;
@@ -151,9 +162,19 @@
       justify-content: center;
       cursor: pointer;
     }
-    .tap-left { width: 35%; }
-    .tap-center { width: 30%; }
-    .tap-right { width: 35%; }
+
+    .tap-left {
+      width: 35%;
+    }
+
+    .tap-center {
+      width: 30%;
+    }
+
+    .tap-right {
+      width: 35%;
+    }
+
     .ripple-indicator {
       position: absolute;
       display: none;
@@ -174,14 +195,27 @@
       pointer-events: none;
       z-index: 15;
     }
+
     .ripple-indicator.animate {
       display: flex !important;
       animation: rippleAnim 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+
     @keyframes rippleAnim {
-      0% { transform: scale(0.65); opacity: 0; }
-      35% { transform: scale(1.12); opacity: 1; }
-      100% { transform: scale(1); opacity: 0; }
+      0% {
+        transform: scale(0.65);
+        opacity: 0;
+      }
+
+      35% {
+        transform: scale(1.12);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 0;
+      }
     }
 
     /* Universal In-Player Subtitle Overlay (Guaranteed 100% Render) */
@@ -198,12 +232,14 @@
       justify-content: center;
       transition: bottom 0.2s ease;
     }
+
     :fullscreen .custom-sub-overlay,
     :-webkit-full-screen .custom-sub-overlay,
     .plyr--fullscreen-active .custom-sub-overlay,
     body.is-fullscreen .custom-sub-overlay {
       bottom: 26px !important;
     }
+
     .custom-sub-text {
       display: none;
       background: rgba(0, 0, 0, 0.75);
@@ -221,13 +257,18 @@
       backdrop-filter: blur(3px);
       -webkit-backdrop-filter: blur(3px);
     }
+
     /* Reset & Base: Dedicated 100% Edge-to-Edge Cinema Player */
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    html, body {
+
+    html,
+    body {
       width: 100% !important;
       height: 100% !important;
       max-width: 100vw !important;
@@ -284,6 +325,7 @@
       align-items: center !important;
       justify-content: center !important;
     }
+
     .video-viewport::before {
       content: '';
       position: absolute;
@@ -292,6 +334,7 @@
       pointer-events: none;
       z-index: 1;
     }
+
     .video-viewport video {
       width: 100% !important;
       height: 100% !important;
@@ -300,6 +343,7 @@
       position: relative;
       z-index: 2;
     }
+
     .plyr--video {
       width: 100% !important;
       height: 100% !important;
@@ -308,11 +352,13 @@
       position: relative;
       z-index: 2;
     }
+
     .plyr__video-wrapper {
       width: 100% !important;
       height: 100% !important;
       background: transparent !important;
     }
+
     .plyr__video-wrapper video {
       width: 100% !important;
       height: 100% !important;
@@ -339,6 +385,7 @@
       pointer-events: none;
       transition: opacity 0.35s ease;
     }
+
     .spinner {
       width: 44px;
       height: 44px;
@@ -347,9 +394,13 @@
       border-radius: 50%;
       animation: spin 0.85s linear infinite;
     }
+
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
+
     .loader-text {
       font-size: 13px;
       color: #94a3b8;
@@ -382,6 +433,7 @@
       padding: 24px 16px;
       pointer-events: auto !important;
     }
+
     .stream-play-overlay::before {
       content: '';
       position: absolute;
@@ -393,11 +445,13 @@
       pointer-events: none;
       transition: backdrop-filter 0.4s ease, background 0.4s ease;
     }
+
     .stream-play-overlay.connecting::before {
       background: radial-gradient(circle at 50% 45%, rgba(10, 14, 24, 0.38) 0%, rgba(5, 7, 12, 0.78) 100%);
       backdrop-filter: blur(7px);
       -webkit-backdrop-filter: blur(7px);
     }
+
     .stream-play-overlay.connecting .stream-play-circle {
       background: rgba(12, 16, 28, 0.78) !important;
       border: 4px solid rgba(255, 188, 0, 0.22) !important;
@@ -405,24 +459,29 @@
       animation: spin 0.85s linear infinite !important;
       box-shadow: 0 0 30px rgba(255, 188, 0, 0.45) !important;
     }
+
     .stream-play-overlay.connecting .stream-play-circle svg {
       display: none;
     }
+
     .stream-play-overlay.connecting .stream-play-title {
       color: #ffd700;
       text-shadow: 0 0 15px rgba(255, 188, 0, 0.6);
     }
+
     .stream-play-overlay.connecting .stream-play-sub {
       background: rgba(15, 23, 42, 0.75);
       border-color: rgba(255, 188, 0, 0.3);
       color: #f1f5f9;
     }
+
     .stream-play-circle,
     .stream-play-title,
     .stream-play-sub {
       position: relative;
       z-index: 2;
     }
+
     .stream-play-circle {
       width: 72px;
       height: 72px;
@@ -434,17 +493,20 @@
       box-shadow: 0 0 35px rgba(255, 188, 0, 0.65), 0 4px 15px rgba(0, 0, 0, 0.5);
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
     }
+
     .stream-play-overlay:hover .stream-play-circle,
     .stream-play-overlay:active .stream-play-circle {
       transform: scale(1.12);
       box-shadow: 0 0 55px rgba(255, 188, 0, 0.95), 0 6px 20px rgba(0, 0, 0, 0.7);
     }
+
     .stream-play-circle svg {
       width: 30px;
       height: 30px;
       fill: #000;
       margin-left: 4px;
     }
+
     .stream-play-title {
       font-size: 16.5px;
       font-weight: 800;
@@ -455,6 +517,7 @@
       max-width: 90%;
       line-height: 1.35;
     }
+
     .stream-play-sub {
       font-size: 12px;
       color: #cbd5e1;
@@ -491,18 +554,37 @@
       box-sizing: border-box;
       pointer-events: auto;
     }
+
     .stream-pass-hud.pulse-alert {
       border-color: #ffd700;
       box-shadow: 0 0 30px rgba(255, 188, 0, 0.7), 0 10px 30px rgba(0, 0, 0, 0.9);
       animation: hudWiggle 0.45s ease-in-out;
     }
+
     @keyframes hudWiggle {
-      0%, 100% { transform: translateY(0); }
-      20% { transform: translateY(-4px) scale(1.02); }
-      40% { transform: translateY(2px) scale(0.99); }
-      60% { transform: translateY(-2px) scale(1.01); }
-      80% { transform: translateY(1px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      20% {
+        transform: translateY(-4px) scale(1.02);
+      }
+
+      40% {
+        transform: translateY(2px) scale(0.99);
+      }
+
+      60% {
+        transform: translateY(-2px) scale(1.01);
+      }
+
+      80% {
+        transform: translateY(1px);
+      }
     }
+
     .hud-left {
       display: flex;
       align-items: center;
@@ -510,12 +592,14 @@
       min-width: 0;
       flex: 1;
     }
+
     .hud-icon {
       font-size: 22px;
       line-height: 1;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
       flex-shrink: 0;
     }
+
     .hud-info {
       display: flex;
       flex-direction: column;
@@ -523,6 +607,7 @@
       min-width: 0;
       flex: 1;
     }
+
     .hud-title-row {
       display: flex;
       align-items: center;
@@ -530,6 +615,7 @@
       gap: 6px;
       line-height: 1;
     }
+
     .hud-title {
       font-size: 11.5px;
       font-weight: 700;
@@ -539,6 +625,7 @@
       text-overflow: ellipsis;
       letter-spacing: 0.2px;
     }
+
     .hud-count {
       font-size: 11px;
       font-weight: 800;
@@ -546,6 +633,7 @@
       white-space: nowrap;
       flex-shrink: 0;
     }
+
     .hud-bar-track {
       width: 100%;
       height: 4px;
@@ -553,6 +641,7 @@
       border-radius: 999px;
       overflow: hidden;
     }
+
     .hud-bar-fill {
       height: 100%;
       width: 0%;
@@ -560,6 +649,7 @@
       border-radius: 999px;
       transition: width 0.35s ease;
     }
+
     .hud-btn {
       background: linear-gradient(135deg, #ffd700 0%, #ff9800 100%);
       color: #0b0d14;
@@ -577,9 +667,11 @@
       box-shadow: 0 2px 10px rgba(255, 188, 0, 0.4);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
+
     .hud-btn:active {
       transform: scale(0.96);
     }
+
     @media (max-width: 420px) {
       .stream-pass-hud {
         bottom: 8px;
@@ -588,12 +680,15 @@
         padding: 6px 10px;
         gap: 8px;
       }
+
       .hud-icon {
         font-size: 18px;
       }
+
       .hud-title {
         font-size: 10.5px;
       }
+
       .hud-btn {
         padding: 6px 10px;
         font-size: 10.5px;
@@ -601,6 +696,7 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Pure Cinema Player Card -->
   <main class='player-card'>
@@ -614,7 +710,9 @@
       <!-- Stream Play & Backdrop Poster Overlay -->
       <div class='stream-play-overlay' id='playOverlay'>
         <div class='stream-play-circle'>
-          <svg viewBox='0 0 24 24'><polygon points='6 3 20 12 6 21 6 3'/></svg>
+          <svg viewBox='0 0 24 24'>
+            <polygon points='6 3 20 12 6 21 6 3' />
+          </svg>
         </div>
         <div class='stream-play-title' id='streamPlayTitle'>▶ Tap to Watch Movie</div>
         <div class='stream-play-sub' id='streamPlaySub'>720p HD • Fast Online Cinema</div>
@@ -623,58 +721,87 @@
 
 
       <!-- 4-Hour Ad Pass Live Meter Pill -->
-      <div class='watch-pass-pill' id='watchPassPill' style='display:flex;position:absolute;top:12px;right:12px;z-index:55;align-items:center;gap:6px;background:rgba(12,15,24,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;font-size:11px;color:#cbd5e1;box-shadow:0 4px 15px rgba(0,0,0,0.5);'>
-        <span id='passDot' style='width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;display:inline-block;'></span>
+      <div class='watch-pass-pill' id='watchPassPill'
+        style='display:flex;position:absolute;top:12px;right:12px;z-index:55;align-items:center;gap:6px;background:rgba(12,15,24,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;font-size:11px;color:#cbd5e1;box-shadow:0 4px 15px rgba(0,0,0,0.5);'>
+        <span id='passDot'
+          style='width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;display:inline-block;'></span>
         <span id='passTimerText' style='font-weight:600;color:#fff;'>Pass: 04:00:00</span>
-        <a id='btnGetPassPill' href='https://uplcm.com/4/12129103' target='_blank' rel='noopener noreferrer' style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:800;cursor:pointer;margin-left:2px;text-decoration:none;display:inline-flex;align-items:center;'>⚡ 4h Pass</a>
+        <a id='btnGetPassPill' href='https://uplcm.com/4/12129103' target='_blank' rel='noopener noreferrer'
+          style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:800;cursor:pointer;margin-left:2px;text-decoration:none;display:inline-flex;align-items:center;'>⚡
+          4h Pass</a>
       </div>
 
       <!-- Multi-Language Subtitles Modal (60+ Languages) -->
-      <div id='subtitlesModal' style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.96);backdrop-filter:blur(18px);z-index:60;flex-direction:column;padding:8px 12px;box-sizing:border-box;overflow:hidden;'>
+      <div id='subtitlesModal'
+        style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.96);backdrop-filter:blur(18px);z-index:60;flex-direction:column;padding:8px 12px;box-sizing:border-box;overflow:hidden;'>
         <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-shrink:0;'>
           <div style='display:flex;align-items:center;gap:6px;'>
-            <span style='background:#ffbc00;color:#000;font-weight:900;font-size:9.5px;padding:1px 5px;border-radius:4px;'>CC</span>
+            <span
+              style='background:#ffbc00;color:#000;font-weight:900;font-size:9.5px;padding:1px 5px;border-radius:4px;'>CC</span>
             <span style='font-size:12.5px;font-weight:800;color:#fff;'>Subtitles (60+ Languages)</span>
           </div>
           <div style='display:flex;align-items:center;gap:6px;'>
-            <button id='btnDisableSubs' style='background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;' type='button'>Off</button>
-            <button id='btnCloseSubtitlesModal' style='background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;' type='button'>✕</button>
+            <button id='btnDisableSubs'
+              style='background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;'
+              type='button'>Off</button>
+            <button id='btnCloseSubtitlesModal'
+              style='background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;'
+              type='button'>✕</button>
           </div>
         </div>
 
         <!-- Search Bar -->
         <div style='margin-bottom:5px;flex-shrink:0;'>
-          <input id='subSearchInput' placeholder='🔍 Search language...' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);padding:5px 10px;border-radius:6px;color:#fff;font-size:11px;outline:none;' type='text'/>
+          <input id='subSearchInput' placeholder='🔍 Search language...'
+            style='width:100%;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);padding:5px 10px;border-radius:6px;color:#fff;font-size:11px;outline:none;'
+            type='text' />
         </div>
 
         <!-- Quick Language Filter Pills -->
-        <div id='subLangPills' style='display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-bottom:5px;scrollbar-width:none;flex-shrink:0;'>
-          <button class='sub-pill active' data-lang='all' style='white-space:nowrap;background:#ffbc00;color:#000;border:1px solid #ffbc00;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800;cursor:pointer;' type='button'>All</button>
+        <div id='subLangPills'
+          style='display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-bottom:5px;scrollbar-width:none;flex-shrink:0;'>
+          <button class='sub-pill active' data-lang='all'
+            style='white-space:nowrap;background:#ffbc00;color:#000;border:1px solid #ffbc00;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800;cursor:pointer;'
+            type='button'>All</button>
         </div>
 
         <!-- Live Subtitle Sync Offset Tuner -->
-        <div id='subSyncBar' style='display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 8px;margin-bottom:6px;flex-shrink:0;'>
+        <div id='subSyncBar'
+          style='display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 8px;margin-bottom:6px;flex-shrink:0;'>
           <div style='display:flex;align-items:center;justify-content:space-between;'>
             <div style='display:flex;align-items:center;gap:5px;'>
               <span style='font-size:11px;'>⏱️</span>
               <span style='font-size:10.5px;font-weight:700;color:#cbd5e1;'>Sync:</span>
-              <span id='subOffsetDisplay' style='color:#ffd700;font-family:monospace;font-size:11px;font-weight:800;'>0.0s</span>
+              <span id='subOffsetDisplay'
+                style='color:#ffd700;font-family:monospace;font-size:11px;font-weight:800;'>0.0s</span>
             </div>
-            <button id='btnSubVoice' type='button' style='background:linear-gradient(135deg,#ffbc00 0%,#ff8800 100%);color:#000;border:none;border-radius:5px;padding:3px 8px;font-size:10.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:3px;' title='Align subtitles to spoken voice immediately'>🎯 Sync to Voice</button>
+            <button id='btnSubVoice' type='button'
+              style='background:linear-gradient(135deg,#ffbc00 0%,#ff8800 100%);color:#000;border:none;border-radius:5px;padding:3px 8px;font-size:10.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:3px;'
+              title='Align subtitles to spoken voice immediately'>🎯 Sync to Voice</button>
           </div>
           <div style='display:flex;align-items:center;justify-content:space-between;gap:4px;'>
-            <button id='btnSubIntro15' type='button' style='background:rgba(255,188,0,0.15);border:1px solid rgba(255,188,0,0.3);color:#ffbc00;border-radius:4px;padding:2px 6px;font-size:9.5px;font-weight:700;cursor:pointer;' title='Skip 15s studio intro credits'>+15s Intro</button>
+            <button id='btnSubIntro15' type='button'
+              style='background:rgba(255,188,0,0.15);border:1px solid rgba(255,188,0,0.3);color:#ffbc00;border-radius:4px;padding:2px 6px;font-size:9.5px;font-weight:700;cursor:pointer;'
+              title='Skip 15s studio intro credits'>+15s Intro</button>
             <div style='display:flex;align-items:center;gap:3px;'>
-              <button id='btnSubOffsetM15' type='button' style='background:rgba(255,255,255,0.08);color:#fff;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'>-15s</button>
-              <button id='btnSubOffsetMinus' type='button' style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;' title='Advance subtitles 0.5s'>-0.5s</button>
-              <button id='btnSubOffsetReset' type='button' style='background:rgba(255,255,255,0.06);color:#94a3b8;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;' title='Reset sync to 0s'>Reset</button>
-              <button id='btnSubOffsetPlus' type='button' style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;' title='Delay subtitles 0.5s'>+0.5s</button>
+              <button id='btnSubOffsetM15' type='button'
+                style='background:rgba(255,255,255,0.08);color:#fff;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'>-15s</button>
+              <button id='btnSubOffsetMinus' type='button'
+                style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;'
+                title='Advance subtitles 0.5s'>-0.5s</button>
+              <button id='btnSubOffsetReset' type='button'
+                style='background:rgba(255,255,255,0.06);color:#94a3b8;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'
+                title='Reset sync to 0s'>Reset</button>
+              <button id='btnSubOffsetPlus' type='button'
+                style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;'
+                title='Delay subtitles 0.5s'>+0.5s</button>
             </div>
           </div>
         </div>
 
         <!-- Subtitles List -->
-        <div id='subtitlesList' style='flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding-right:2px;-webkit-overflow-scrolling:touch;'>
+        <div id='subtitlesList'
+          style='flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding-right:2px;-webkit-overflow-scrolling:touch;'>
           <div id='subListLoading' style='text-align:center;padding:20px 10px;color:#94a3b8;font-size:11.5px;'>
             <div class='spinner' style='margin:0 auto 8px;width:20px;height:20px;'></div>
             Connecting to OpenSubtitles (60+ languages)...
@@ -683,7 +810,8 @@
       </div>
 
       <!-- In-Player Subtitle Notification Toast -->
-      <div id='subNotificationToast' style='display:none;position:absolute;top:50px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);border:1px solid rgba(255,188,0,0.4);border-radius:20px;padding:6px 14px;font-size:11.5px;color:#fff;z-index:65;box-shadow:0 6px 20px rgba(0,0,0,0.6);align-items:center;gap:6px;'>
+      <div id='subNotificationToast'
+        style='display:none;position:absolute;top:50px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);border:1px solid rgba(255,188,0,0.4);border-radius:20px;padding:6px 14px;font-size:11.5px;color:#fff;z-index:65;box-shadow:0 6px 20px rgba(0,0,0,0.6);align-items:center;gap:6px;'>
         <span id='subToastIcon'>🟢</span>
         <span id='subToastText'>Subtitles Active</span>
       </div>
@@ -702,27 +830,34 @@
             </div>
           </div>
         </div>
-        <a class='hud-btn' id='btnHudWatchAd' href='https://uplcm.com/4/12129103' target='_blank' rel='noopener noreferrer' style='text-decoration:none;'>
+        <a class='hud-btn' id='btnHudWatchAd' href='https://uplcm.com/4/12129103' target='_blank'
+          rel='noopener noreferrer' style='text-decoration:none;'>
           <span class='hud-btn-bolt'>⚡</span>
           <span id='hudBtnText'>Watch Ad (0/2)</span>
         </a>
       </div>
 
       <!-- Subtle Floating Pass Alert Toast -->
-      <div id='passAlertToast' style='display:none;position:absolute;bottom:64px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,188,0,0.5);color:#ffd700;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;z-index:53;box-shadow:0 6px 20px rgba(0,0,0,0.8);white-space:nowrap;pointer-events:none;text-align:center;'>
+      <div id='passAlertToast'
+        style='display:none;position:absolute;bottom:64px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,188,0,0.5);color:#ffd700;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;z-index:53;box-shadow:0 6px 20px rgba(0,0,0,0.8);white-space:nowrap;pointer-events:none;text-align:center;'>
         <span>⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!</span>
       </div>
 
       <!-- Sleek Floating Glassmorphic Resume Pill -->
-      <div id='resumeToast' style='display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,188,0,0.4);padding:5px 10px 5px 14px;border-radius:30px;box-shadow:0 8px 25px rgba(0,0,0,0.75);z-index:54;align-items:center;gap:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:11.5px;color:#f1f5f9;pointer-events:auto;'>
+      <div id='resumeToast'
+        style='display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,188,0,0.4);padding:5px 10px 5px 14px;border-radius:30px;box-shadow:0 8px 25px rgba(0,0,0,0.75);z-index:54;align-items:center;gap:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:11.5px;color:#f1f5f9;pointer-events:auto;'>
         <div style='display:flex;align-items:center;gap:5px;'>
           <span style='font-size:12px;'>⏱️</span>
           <span>Resume at <b id='resumeTimeText' style='color:#ffd700;font-weight:700;'>00:00</b>?</span>
         </div>
-        <button id='btnResume' style='background:linear-gradient(135deg,#ffd700,#ff9900);color:#0a0d14;font-size:11px;font-weight:800;border:none;padding:4px 12px;border-radius:18px;cursor:pointer;box-shadow:0 2px 8px rgba(255,188,0,0.35);display:flex;align-items:center;gap:3px;' type='button'>
+        <button id='btnResume'
+          style='background:linear-gradient(135deg,#ffd700,#ff9900);color:#0a0d14;font-size:11px;font-weight:800;border:none;padding:4px 12px;border-radius:18px;cursor:pointer;box-shadow:0 2px 8px rgba(255,188,0,0.35);display:flex;align-items:center;gap:3px;'
+          type='button'>
           <span>▶</span> Resume
         </button>
-        <button id='btnDismissResume' style='background:rgba(255,255,255,0.08);border:none;color:#94a3b8;cursor:pointer;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;' title='Start from beginning' type='button'>✕</button>
+        <button id='btnDismissResume'
+          style='background:rgba(255,255,255,0.08);border:none;color:#94a3b8;cursor:pointer;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;'
+          title='Start from beginning' type='button'>✕</button>
       </div>
 
       <!-- Interactive Double-Tap Gestures (YouTube Style) -->
@@ -747,11 +882,13 @@
         <span class='custom-sub-text' id='customSubtitleText'></span>
       </div>
 
-      <video controls='controls' id='mainVideo' playsinline='playsinline' webkit-playsinline='webkit-playsinline' preload='metadata'>
+      <video controls='controls' id='mainVideo' playsinline='playsinline' webkit-playsinline='webkit-playsinline'
+        preload='metadata'>
         Your browser does not support HTML5 video streaming.
       </video>
       <!-- Sleek Floating In-Player Error Toast (Discreet, non-blocking) -->
-      <div class='error-card' id='errorCard' style='display:none;position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,188,0,0.35);color:#ffffff;padding:6px 14px;border-radius:24px;font-size:11px;font-weight:600;z-index:56;box-shadow:0 6px 25px rgba(0,0,0,0.8);text-align:center;max-width:92%;pointer-events:auto;align-items:center;justify-content:center;gap:8px;'>
+      <div class='error-card' id='errorCard'
+        style='display:none;position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,188,0,0.35);color:#ffffff;padding:6px 14px;border-radius:24px;font-size:11px;font-weight:600;z-index:56;box-shadow:0 6px 25px rgba(0,0,0,0.8);text-align:center;max-width:92%;pointer-events:auto;align-items:center;justify-content:center;gap:8px;'>
         <span>⚠️ Stream server is connecting...</span>
       </div>
     </div>
@@ -759,8 +896,8 @@
 
   <!-- Script: Universal Smart Stream Resolver -->
   <script type='text/javascript'>
-  
-    document.addEventListener("DOMContentLoaded", function() {
+
+    document.addEventListener("DOMContentLoaded", function () {
       try {
         if (window.self !== window.top) {
           document.documentElement.classList.add('in-iframe');
@@ -776,7 +913,7 @@
       } catch (e) {
         document.documentElement.classList.add('in-iframe');
       }
-      
+
       const urlParams = new URLSearchParams(window.location.search);
       const watchParam = urlParams.get('watch') || urlParams.get('stream') || urlParams.get('id') || urlParams.get('dl') || '';
       const titleParam = urlParams.get('title') || urlParams.get('name') || '';
@@ -802,11 +939,11 @@
             window._currentHls = hls;
             hls.loadSource(finalStreamUrl);
             hls.attachMedia(videoEl);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
               if (loaderEl) loaderEl.style.opacity = '0';
               setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 400);
             });
-            hls.on(Hls.Events.ERROR, function(evt, data) {
+            hls.on(Hls.Events.ERROR, function (evt, data) {
               if (data.fatal) {
                 console.warn("HLS streaming error, falling back to direct video.src:", data);
                 videoEl.src = finalStreamUrl;
@@ -822,7 +959,7 @@
 
       if (audioParam !== '' && !isNaN(parseInt(audioParam, 10)) && videoEl) {
         const initialAudioIdx = parseInt(audioParam, 10);
-        videoEl.addEventListener('loadedmetadata', function() {
+        videoEl.addEventListener('loadedmetadata', function () {
           if (window._currentHls && typeof window._currentHls.audioTrack !== 'undefined') {
             window._currentHls.audioTrack = initialAudioIdx;
           }
@@ -855,13 +992,13 @@
             }
             // Preload image; if it errors, ensure fallback styling remains vibrant
             const imgTest = new Image();
-            imgTest.onerror = function() {
+            imgTest.onerror = function () {
               if (vp) vp.style.background = defaultBackdropGradient;
               if (playOverlayEl) playOverlayEl.style.background = defaultBackdropGradient;
             };
             imgTest.src = cleanBackdrop;
           }
-        } catch (_) {}
+        } catch (_) { }
       } else {
         const vp = document.getElementById("viewport");
         if (vp) vp.style.background = defaultBackdropGradient;
@@ -968,7 +1105,7 @@
         if (savedOff !== null && !isNaN(parseFloat(savedOff))) {
           currentSubOffset = parseFloat(savedOff);
         }
-      } catch (_) {}
+      } catch (_) { }
 
       function convertSrtToVtt(srtText) {
         if (!srtText) return "";
@@ -982,332 +1119,332 @@
         if (!vttOrSrtText) return [];
         const cues = [];
         const clean = String(vttOrSrtText).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        const timeRegex = /(?:(\d{1,2}):)?(\d{2}):(\d{2})[,.](\d{3})\s*-->\s*(?:(\d{1,2}):)?(\d{2}):(\d{2})[,.](\d{3})/;
-        const blocks = clean.split(/\n\s*\n/);
-        for (const block of blocks) {
-          const lines = block.trim().split('\n');
-          let timeIndex = -1;
-          for (let i = 0; i < lines.length; i++) {
-            if (timeRegex.test(lines[i])) {
-              timeIndex = i;
-              break;
-            }
-          }
-          if (timeIndex !== -1) {
-            const match = lines[timeIndex].match(timeRegex);
-            if (match) {
-              const h1 = parseInt(match[1] || '0', 10);
-              const m1 = parseInt(match[2], 10);
-              const s1 = parseInt(match[3], 10);
-              const ms1 = parseInt(match[4], 10);
-              const start = h1 * 3600 + m1 * 60 + s1 + ms1 / 1000;
+        const timeRegex = /(?:(\d{1,2}):)?(\d{2}):(\d{2})[,.](\d{3})\s*-->\s* (?: (\d{ 1, 2 }):)?(\d{ 2 }): (\d{ 2 })[,.](\d{ 3}) /;
+    const blocks = clean.split(/\n\s*\n/);
+    for (const block of blocks) {
+      const lines = block.trim().split('\n');
+      let timeIndex = -1;
+      for (let i = 0; i < lines.length; i++) {
+        if (timeRegex.test(lines[i])) {
+          timeIndex = i;
+          break;
+        }
+      }
+      if (timeIndex !== -1) {
+        const match = lines[timeIndex].match(timeRegex);
+        if (match) {
+          const h1 = parseInt(match[1] || '0', 10);
+          const m1 = parseInt(match[2], 10);
+          const s1 = parseInt(match[3], 10);
+          const ms1 = parseInt(match[4], 10);
+          const start = h1 * 3600 + m1 * 60 + s1 + ms1 / 1000;
 
-              const h2 = parseInt(match[5] || '0', 10);
-              const m2 = parseInt(match[6], 10);
-              const s2 = parseInt(match[7], 10);
-              const ms2 = parseInt(match[8], 10);
-              const end = h2 * 3600 + m2 * 60 + s2 + ms2 / 1000;
+          const h2 = parseInt(match[5] || '0', 10);
+          const m2 = parseInt(match[6], 10);
+          const s2 = parseInt(match[7], 10);
+          const ms2 = parseInt(match[8], 10);
+          const end = h2 * 3600 + m2 * 60 + s2 + ms2 / 1000;
 
-              const text = lines.slice(timeIndex + 1).join(' ').replace(/<[^>]+>/g, '').trim();
-              if (text) {
-                cues.push({ start, end, text });
-              }
-            }
+          const text = lines.slice(timeIndex + 1).join(' ').replace(/<[^>]+>/g, '').trim();
+          if (text) {
+            cues.push({ start, end, text });
           }
         }
-        return cues;
+      }
+    }
+    return cues;
       }
 
-      function updateSubtitleDisplay() {
-        const customSubEl = document.getElementById('customSubtitleText');
-        if (!customSubEl) return;
-        if (!activeCues || activeCues.length === 0 || window._subtitlesDisabled) {
-          customSubEl.style.display = 'none';
-          return;
-        }
-        // Subtitle timing math:
-        // Positive offset = Delay subtitles (cue appears later in video time)
-        // Negative offset = Advance subtitles (cue appears earlier in video time)
-        const subFileTime = (videoEl ? videoEl.currentTime : 0) - currentSubOffset;
-        const currentCue = activeCues.find(c => subFileTime >= c.start && subFileTime <= c.end);
-        if (currentCue && currentCue.text) {
-          customSubEl.textContent = currentCue.text;
-          customSubEl.style.display = 'inline-block';
+    function updateSubtitleDisplay() {
+      const customSubEl = document.getElementById('customSubtitleText');
+      if (!customSubEl) return;
+      if (!activeCues || activeCues.length === 0 || window._subtitlesDisabled) {
+        customSubEl.style.display = 'none';
+        return;
+      }
+      // Subtitle timing math:
+      // Positive offset = Delay subtitles (cue appears later in video time)
+      // Negative offset = Advance subtitles (cue appears earlier in video time)
+      const subFileTime = (videoEl ? videoEl.currentTime : 0) - currentSubOffset;
+      const currentCue = activeCues.find(c => subFileTime >= c.start && subFileTime <= c.end);
+      if (currentCue && currentCue.text) {
+        customSubEl.textContent = currentCue.text;
+        customSubEl.style.display = 'inline-block';
+      } else {
+        customSubEl.style.display = 'none';
+      }
+    }
+
+    if (videoEl) {
+      videoEl.addEventListener('timeupdate', updateSubtitleDisplay);
+    }
+
+    function showSubToast(text, icon) {
+      const toast = document.getElementById('subNotificationToast');
+      const tText = document.getElementById('subToastText');
+      const tIcon = document.getElementById('subToastIcon');
+      if (!toast) return;
+      if (tText) tText.textContent = text;
+      if (tIcon) tIcon.textContent = icon || '🟢';
+      toast.style.display = 'flex';
+      clearTimeout(window._subToastTimer);
+      window._subToastTimer = setTimeout(() => { toast.style.display = 'none'; }, 3200);
+    }
+
+    async function attachSubtitleTrack(subUrlOrContent, labelName, isRawContent) {
+      if (!videoEl || !subUrlOrContent) return;
+      try {
+        let srtTextContent = "";
+        let vttBlobUrl = null;
+
+        if (isRawContent) {
+          srtTextContent = subUrlOrContent;
+          const vttText = convertSrtToVtt(subUrlOrContent);
+          const blob = new Blob([vttText], { type: 'text/vtt' });
+          vttBlobUrl = URL.createObjectURL(blob);
         } else {
-          customSubEl.style.display = 'none';
-        }
-      }
-
-      if (videoEl) {
-        videoEl.addEventListener('timeupdate', updateSubtitleDisplay);
-      }
-
-      function showSubToast(text, icon) {
-        const toast = document.getElementById('subNotificationToast');
-        const tText = document.getElementById('subToastText');
-        const tIcon = document.getElementById('subToastIcon');
-        if (!toast) return;
-        if (tText) tText.textContent = text;
-        if (tIcon) tIcon.textContent = icon || '🟢';
-        toast.style.display = 'flex';
-        clearTimeout(window._subToastTimer);
-        window._subToastTimer = setTimeout(() => { toast.style.display = 'none'; }, 3200);
-      }
-
-      async function attachSubtitleTrack(subUrlOrContent, labelName, isRawContent) {
-        if (!videoEl || !subUrlOrContent) return;
-        try {
-          let srtTextContent = "";
-          let vttBlobUrl = null;
-
-          if (isRawContent) {
-            srtTextContent = subUrlOrContent;
-            const vttText = convertSrtToVtt(subUrlOrContent);
-            const blob = new Blob([vttText], { type: 'text/vtt' });
-            vttBlobUrl = URL.createObjectURL(blob);
-          } else {
-            const cleanUrl = decodeURIComponent(subUrlOrContent).trim();
-            try {
-              const directRes = await fetch(cleanUrl);
-              if (directRes && directRes.ok) {
-                const txt = await directRes.text();
-                if (txt && txt.trim().length > 10) {
-                  srtTextContent = txt;
-                }
-              }
-            } catch (_) {}
-
-            if (!srtTextContent) {
-              const proxyCandidates = [
-                "https://api.allorigins.win/raw?url=" + encodeURIComponent(cleanUrl),
-                "https://corsproxy.io/?" + encodeURIComponent(cleanUrl)
-              ];
-
-              for (const pUrl of proxyCandidates) {
-                try {
-                  const res = await fetch(pUrl).catch(() => null);
-                  if (res && res.ok) {
-                    const txt = await res.text();
-                    if (txt && txt.trim().length > 10) {
-                      srtTextContent = txt;
-                      break;
-                    }
-                  }
-                } catch (_) {}
+          const cleanUrl = decodeURIComponent(subUrlOrContent).trim();
+          try {
+            const directRes = await fetch(cleanUrl);
+            if (directRes && directRes.ok) {
+              const txt = await directRes.text();
+              if (txt && txt.trim().length > 10) {
+                srtTextContent = txt;
               }
             }
+          } catch (_) { }
 
-            if (srtTextContent) {
-              const vttText = convertSrtToVtt(srtTextContent);
-              const blob = new Blob([vttText], { type: 'text/vtt' });
-              vttBlobUrl = URL.createObjectURL(blob);
-            } else {
-              vttBlobUrl = cleanUrl;
+          if (!srtTextContent) {
+            const proxyCandidates = [
+              "https://api.allorigins.win/raw?url=" + encodeURIComponent(cleanUrl),
+              "https://corsproxy.io/?" + encodeURIComponent(cleanUrl)
+            ];
+
+            for (const pUrl of proxyCandidates) {
+              try {
+                const res = await fetch(pUrl).catch(() => null);
+                if (res && res.ok) {
+                  const txt = await res.text();
+                  if (txt && txt.trim().length > 10) {
+                    srtTextContent = txt;
+                    break;
+                  }
+                }
+              } catch (_) { }
             }
           }
 
           if (srtTextContent) {
-            activeCues = parseVttCues(srtTextContent);
-            window._subtitlesDisabled = false;
-            window._subtitlesExplicitlyActive = true;
+            const vttText = convertSrtToVtt(srtTextContent);
+            const blob = new Blob([vttText], { type: 'text/vtt' });
+            vttBlobUrl = URL.createObjectURL(blob);
+          } else {
+            vttBlobUrl = cleanUrl;
           }
+        }
 
-          const existing = videoEl.querySelectorAll('track.dynamic-sub');
-          existing.forEach(t => t.remove());
+        if (srtTextContent) {
+          activeCues = parseVttCues(srtTextContent);
+          window._subtitlesDisabled = false;
+          window._subtitlesExplicitlyActive = true;
+        }
 
-          const track = document.createElement('track');
-          track.className = 'dynamic-sub';
-          track.kind = 'subtitles';
-          track.label = labelName || 'Captions';
-          track.srclang = 'en';
-          track.src = vttBlobUrl;
-          track.default = true;
-          videoEl.appendChild(track);
+        const existing = videoEl.querySelectorAll('track.dynamic-sub');
+        existing.forEach(t => t.remove());
 
-          setTimeout(() => {
-            if (videoEl.textTracks && videoEl.textTracks.length > 0) {
-              for (let i = 0; i < videoEl.textTracks.length; i++) {
-                const tt = videoEl.textTracks[i];
-                if (tt.label === (labelName || 'Captions') || i === videoEl.textTracks.length - 1) {
-                  tt.mode = 'showing';
+        const track = document.createElement('track');
+        track.className = 'dynamic-sub';
+        track.kind = 'subtitles';
+        track.label = labelName || 'Captions';
+        track.srclang = 'en';
+        track.src = vttBlobUrl;
+        track.default = true;
+        videoEl.appendChild(track);
+
+        setTimeout(() => {
+          if (videoEl.textTracks && videoEl.textTracks.length > 0) {
+            for (let i = 0; i < videoEl.textTracks.length; i++) {
+              const tt = videoEl.textTracks[i];
+              if (tt.label === (labelName || 'Captions') || i === videoEl.textTracks.length - 1) {
+                tt.mode = 'showing';
+              }
+            }
+          }
+          if (window.plyrInstance) {
+            try {
+              window.plyrInstance.toggleCaptions(true);
+            } catch (_) { }
+          }
+        }, 150);
+
+        const activeLabel = document.getElementById('activeSubLabel');
+        if (activeLabel) activeLabel.textContent = labelName || 'Active';
+        showSubToast(`${labelName || 'Subtitles'} Loaded`, '🟢');
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+              action: 'subtitleStateChanged',
+              enabled: true,
+              label: labelName || 'Active'
+            }, '*');
+          }
+        } catch (_) { }
+      } catch (e) {
+        console.warn('Subtitle attach error:', e);
+      }
+    }
+
+    async function fetchMovieSubtitles() {
+      const subListContainer = document.getElementById('subtitlesList');
+      if (!subListContainer) return;
+
+      let imdbId = urlParams.get('imdb') || '';
+      const tmdbId = urlParams.get('tmdb') || '';
+      const rawTitle = titleParam ? decodeURIComponent(titleParam).trim() : '';
+      const isSeriesMode = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
+
+      if (!imdbId && (tmdbId || rawTitle)) {
+        try {
+          const tmdbKey = 'd638f7775bfa1b8d456dfd028ccbef19';
+          if (tmdbId) {
+            const extEndpoint = isSeriesMode ? `https://api.themoviedb.org/3/tv/${tmdbId}/external_ids` : `https://api.themoviedb.org/3/movie/${tmdbId}?append_to_response=external_ids`;
+            const res = await fetch(`${extEndpoint}${extEndpoint.includes('?') ? '&' : '?'}api_key=${tmdbKey}`);
+            if (res.ok) {
+              const data = await res.json();
+              imdbId = data.imdb_id || data.external_ids?.imdb_id || '';
+            }
+          }
+          if (!imdbId && rawTitle) {
+            const sEndpoint = isSeriesMode ? `https://api.themoviedb.org/3/search/tv` : `https://api.themoviedb.org/3/search/movie`;
+            const res = await fetch(`${sEndpoint}?api_key=${tmdbKey}&query=${encodeURIComponent(rawTitle)}`);
+            if (res.ok) {
+              const sData = await res.json();
+              if (sData.results && sData.results[0] && sData.results[0].id) {
+                const fId = sData.results[0].id;
+                const extRes = await fetch(`https://api.themoviedb.org/3/${isSeriesMode ? 'tv' : 'movie'}/${fId}?append_to_response=external_ids&api_key=${tmdbKey}`);
+                if (extRes.ok) {
+                  const extData = await extRes.json();
+                  imdbId = extData.imdb_id || extData.external_ids?.imdb_id || '';
                 }
               }
             }
-            if (window.plyrInstance) {
-              try {
-                window.plyrInstance.toggleCaptions(true);
-              } catch (_) {}
-            }
-          }, 150);
-
-          const activeLabel = document.getElementById('activeSubLabel');
-          if (activeLabel) activeLabel.textContent = labelName || 'Active';
-          showSubToast(`${labelName || 'Subtitles'} Loaded`, '🟢');
-          try {
-            if (window.parent && window.parent !== window) {
-              window.parent.postMessage({
-                action: 'subtitleStateChanged',
-                enabled: true,
-                label: labelName || 'Active'
-              }, '*');
-            }
-          } catch (_) {}
+          }
         } catch (e) {
-          console.warn('Subtitle attach error:', e);
+          console.warn('IMDb ID resolve error:', e.message);
         }
       }
 
-      async function fetchMovieSubtitles() {
-        const subListContainer = document.getElementById('subtitlesList');
-        if (!subListContainer) return;
-
-        let imdbId = urlParams.get('imdb') || '';
-        const tmdbId = urlParams.get('tmdb') || '';
-        const rawTitle = titleParam ? decodeURIComponent(titleParam).trim() : '';
-        const isSeriesMode = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
-
-        if (!imdbId && (tmdbId || rawTitle)) {
-          try {
-            const tmdbKey = 'd638f7775bfa1b8d456dfd028ccbef19';
-            if (tmdbId) {
-              const extEndpoint = isSeriesMode ? `https://api.themoviedb.org/3/tv/${tmdbId}/external_ids` : `https://api.themoviedb.org/3/movie/${tmdbId}?append_to_response=external_ids`;
-              const res = await fetch(`${extEndpoint}${extEndpoint.includes('?') ? '&' : '?'}api_key=${tmdbKey}`);
-              if (res.ok) {
-                const data = await res.json();
-                imdbId = data.imdb_id || data.external_ids?.imdb_id || '';
-              }
-            }
-            if (!imdbId && rawTitle) {
-              const sEndpoint = isSeriesMode ? `https://api.themoviedb.org/3/search/tv` : `https://api.themoviedb.org/3/search/movie`;
-              const res = await fetch(`${sEndpoint}?api_key=${tmdbKey}&query=${encodeURIComponent(rawTitle)}`);
-              if (res.ok) {
-                const sData = await res.json();
-                if (sData.results && sData.results[0] && sData.results[0].id) {
-                  const fId = sData.results[0].id;
-                  const extRes = await fetch(`https://api.themoviedb.org/3/${isSeriesMode ? 'tv' : 'movie'}/${fId}?append_to_response=external_ids&api_key=${tmdbKey}`);
-                  if (extRes.ok) {
-                    const extData = await extRes.json();
-                    imdbId = extData.imdb_id || extData.external_ids?.imdb_id || '';
-                  }
-                }
-              }
-            }
-          } catch (e) {
-            console.warn('IMDb ID resolve error:', e.message);
-          }
-        }
-
-        if (!imdbId) {
-          subListContainer.innerHTML = `
+      if (!imdbId) {
+        subListContainer.innerHTML = `
             <div style="text-align:center;padding:24px 10px;color:#94a3b8;font-size:12px;">
               <p style="margin:0 0 8px 0;font-weight:700;color:#fff;">ℹ️ No IMDb ID found for "${escapeHtml ? escapeHtml(rawTitle) : rawTitle}".</p>
               <p style="margin:0;">You can upload your own <b>.srt</b> or <b>.vtt</b> file below.</p>
             </div>
           `;
-          return;
-        }
+        return;
+      }
 
-        try {
-          const sParam = urlParams.get('s') || '1';
-          const epParam = urlParams.get('ep') || '1';
-          const typeSlug = isSeriesMode ? 'series' : 'movie';
-          const epSuffix = isSeriesMode ? `:${sParam}:${epParam}` : '';
-          const subUrl = `https://opensubtitles-v3.strem.io/subtitles/${typeSlug}/${imdbId}${epSuffix}.json`;
-          const subRes = await fetch(subUrl);
-          if (subRes.ok) {
-            const data = await subRes.json();
-            loadedSubtitlesList = data.subtitles || [];
-            renderSubtitlesPills();
-            renderSubtitlesList();
-          } else {
-            throw new Error(`HTTP ${subRes.status}`);
-          }
-        } catch (subErr) {
-          console.warn('OpenSubtitles fetch error:', subErr.message);
-          subListContainer.innerHTML = `
+      try {
+        const sParam = urlParams.get('s') || '1';
+        const epParam = urlParams.get('ep') || '1';
+        const typeSlug = isSeriesMode ? 'series' : 'movie';
+        const epSuffix = isSeriesMode ? `:${sParam}:${epParam}` : '';
+        const subUrl = `https://opensubtitles-v3.strem.io/subtitles/${typeSlug}/${imdbId}${epSuffix}.json`;
+        const subRes = await fetch(subUrl);
+        if (subRes.ok) {
+          const data = await subRes.json();
+          loadedSubtitlesList = data.subtitles || [];
+          renderSubtitlesPills();
+          renderSubtitlesList();
+        } else {
+          throw new Error(`HTTP ${subRes.status}`);
+        }
+      } catch (subErr) {
+        console.warn('OpenSubtitles fetch error:', subErr.message);
+        subListContainer.innerHTML = `
             <div style="text-align:center;padding:24px 10px;color:#fca5a5;font-size:12px;">
               ⚠️ Could not connect to OpenSubtitles server. Please upload a local .srt/.vtt file or try again later.
             </div>
           `;
-        }
       }
+    }
 
-      function renderSubtitlesPills() {
-        const pillsContainer = document.getElementById('subLangPills');
-        if (!pillsContainer) return;
+    function renderSubtitlesPills() {
+      const pillsContainer = document.getElementById('subLangPills');
+      if (!pillsContainer) return;
 
-        const availableLangs = new Set();
-        loadedSubtitlesList.forEach(s => {
-          if (s.lang) availableLangs.add(s.lang.toLowerCase());
-        });
+      const availableLangs = new Set();
+      loadedSubtitlesList.forEach(s => {
+        if (s.lang) availableLangs.add(s.lang.toLowerCase());
+      });
 
-        const popularCodes = ['all', 'eng', 'kor', 'jpn', 'spa', 'fre', 'ara', 'hin', 'por', 'pob', 'ger', 'zho', 'rus', 'ind', 'tur', 'vie', 'tha'];
-        const renderedCodes = ['all'];
+      const popularCodes = ['all', 'eng', 'kor', 'jpn', 'spa', 'fre', 'ara', 'hin', 'por', 'pob', 'ger', 'zho', 'rus', 'ind', 'tur', 'vie', 'tha'];
+      const renderedCodes = ['all'];
 
-        popularCodes.forEach(c => {
-          if (c !== 'all' && (availableLangs.has(c) || availableLangs.has(c.substring(0, 2)))) {
-            renderedCodes.push(c);
-          }
-        });
+      popularCodes.forEach(c => {
+        if (c !== 'all' && (availableLangs.has(c) || availableLangs.has(c.substring(0, 2)))) {
+          renderedCodes.push(c);
+        }
+      });
 
-        pillsContainer.innerHTML = renderedCodes.map(code => {
-          const meta = SUB_LANG_MAP[code] || { flag: "🌐", name: code.toUpperCase() };
-          const label = code === 'all' ? `All (${loadedSubtitlesList.length})` : `${meta.flag} ${meta.name.split(' ')[0]}`;
-          const isActive = activeSubLangFilter === code;
-          return `
+      pillsContainer.innerHTML = renderedCodes.map(code => {
+        const meta = SUB_LANG_MAP[code] || { flag: "🌐", name: code.toUpperCase() };
+        const label = code === 'all' ? `All (${loadedSubtitlesList.length})` : `${meta.flag} ${meta.name.split(' ')[0]}`;
+        const isActive = activeSubLangFilter === code;
+        return `
             <button class="sub-pill ${isActive ? 'active' : ''}" data-lang="${code}" style="white-space:nowrap;background:${isActive ? '#ffbc00' : 'rgba(255,255,255,0.08)'};color:${isActive ? '#000' : '#cbd5e1'};border:1px solid ${isActive ? '#ffbc00' : 'rgba(255,255,255,0.12)'};padding:4px 10px;border-radius:14px;font-size:11px;font-weight:${isActive ? '800' : '600'};cursor:pointer;" type="button">
               ${label}
             </button>
           `;
-        }).join('');
+      }).join('');
 
-        pillsContainer.querySelectorAll('.sub-pill').forEach(btn => {
-          btn.onclick = () => {
-            activeSubLangFilter = btn.getAttribute('data-lang');
-            renderSubtitlesPills();
-            renderSubtitlesList();
-          };
+      pillsContainer.querySelectorAll('.sub-pill').forEach(btn => {
+        btn.onclick = () => {
+          activeSubLangFilter = btn.getAttribute('data-lang');
+          renderSubtitlesPills();
+          renderSubtitlesList();
+        };
+      });
+    }
+
+    function renderSubtitlesList() {
+      const subListContainer = document.getElementById('subtitlesList');
+      const searchVal = (document.getElementById('subSearchInput')?.value || '').toLowerCase().trim();
+      if (!subListContainer) return;
+
+      let filtered = loadedSubtitlesList;
+
+      if (activeSubLangFilter && activeSubLangFilter !== 'all') {
+        filtered = filtered.filter(s => {
+          const l = (s.lang || '').toLowerCase();
+          return l === activeSubLangFilter || l.startsWith(activeSubLangFilter.substring(0, 2));
         });
       }
 
-      function renderSubtitlesList() {
-        const subListContainer = document.getElementById('subtitlesList');
-        const searchVal = (document.getElementById('subSearchInput')?.value || '').toLowerCase().trim();
-        if (!subListContainer) return;
+      if (searchVal) {
+        filtered = filtered.filter(s => {
+          const l = (s.lang || '').toLowerCase();
+          const meta = SUB_LANG_MAP[l] || { name: l };
+          const fName = (s.subtitleFileName || '').toLowerCase();
+          const relName = (s.movieReleaseName || '').toLowerCase();
+          return meta.name.toLowerCase().includes(searchVal) || fName.includes(searchVal) || relName.includes(searchVal) || l.includes(searchVal);
+        });
+      }
 
-        let filtered = loadedSubtitlesList;
-
-        if (activeSubLangFilter && activeSubLangFilter !== 'all') {
-          filtered = filtered.filter(s => {
-            const l = (s.lang || '').toLowerCase();
-            return l === activeSubLangFilter || l.startsWith(activeSubLangFilter.substring(0, 2));
-          });
-        }
-
-        if (searchVal) {
-          filtered = filtered.filter(s => {
-            const l = (s.lang || '').toLowerCase();
-            const meta = SUB_LANG_MAP[l] || { name: l };
-            const fName = (s.subtitleFileName || '').toLowerCase();
-            const relName = (s.movieReleaseName || '').toLowerCase();
-            return meta.name.toLowerCase().includes(searchVal) || fName.includes(searchVal) || relName.includes(searchVal) || l.includes(searchVal);
-          });
-        }
-
-        if (filtered.length === 0) {
-          subListContainer.innerHTML = `
+      if (filtered.length === 0) {
+        subListContainer.innerHTML = `
             <div style="text-align:center;padding:24px 10px;color:#94a3b8;font-size:12px;">
               No subtitles found matching "${searchVal || activeSubLangFilter}".
             </div>
           `;
-          return;
-        }
+        return;
+      }
 
-        subListContainer.innerHTML = filtered.map((sub, idx) => {
-          const l = (sub.lang || 'en').toLowerCase();
-          const meta = SUB_LANG_MAP[l] || { flag: "🌐", name: l.toUpperCase() };
-          const releaseText = sub.movieReleaseName || sub.subtitleFileName || "Standard Release";
-          return `
+      subListContainer.innerHTML = filtered.map((sub, idx) => {
+        const l = (sub.lang || 'en').toLowerCase();
+        const meta = SUB_LANG_MAP[l] || { flag: "🌐", name: l.toUpperCase() };
+        const releaseText = sub.movieReleaseName || sub.subtitleFileName || "Standard Release";
+        return `
             <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;gap:10px;">
               <div style="display:flex;align-items:center;gap:10px;overflow:hidden;flex:1;">
                 <span style="font-size:18px;">${meta.flag}</span>
@@ -1323,230 +1460,230 @@
               </button>
             </div>
           `;
-        }).join('');
+      }).join('');
 
-        subListContainer.querySelectorAll('.btn-load-sub').forEach(btn => {
-          btn.onclick = async () => {
-            const idx = parseInt(btn.getAttribute('data-idx'), 10);
-            const sub = filtered[idx];
-            if (!sub) return;
+      subListContainer.querySelectorAll('.btn-load-sub').forEach(btn => {
+        btn.onclick = async () => {
+          const idx = parseInt(btn.getAttribute('data-idx'), 10);
+          const sub = filtered[idx];
+          if (!sub) return;
 
-            btn.textContent = 'Loading...';
-            btn.style.opacity = '0.7';
+          btn.textContent = 'Loading...';
+          btn.style.opacity = '0.7';
 
-            const l = (sub.lang || 'en').toLowerCase();
-            const meta = SUB_LANG_MAP[l] || { flag: "🌐", name: l.toUpperCase() };
-            const label = `${meta.flag} ${meta.name.split(' ')[0]}`;
+          const l = (sub.lang || 'en').toLowerCase();
+          const meta = SUB_LANG_MAP[l] || { flag: "🌐", name: l.toUpperCase() };
+          const label = `${meta.flag} ${meta.name.split(' ')[0]}`;
 
-            await attachSubtitleTrack(sub.url, label, false);
+          await attachSubtitleTrack(sub.url, label, false);
 
-            const modal = document.getElementById('subtitlesModal');
-            if (modal) modal.style.display = 'none';
-          };
-        });
-      }
-
-      // Wire Subtitle Modal Controls
-      const modalSubs = document.getElementById('subtitlesModal');
-      const openSubBtn1 = document.getElementById('btnOpenSubtitlesModal');
-      const openSubBtn2 = document.getElementById('btnOpenSubtitlesModal2');
-      const closeSubBtn = document.getElementById('btnCloseSubtitlesModal');
-      const subSearchInput = document.getElementById('subSearchInput');
-      const btnDisableSubs = document.getElementById('btnDisableSubs');
-
-      function openSubtitlesModalView() {
-        if (window.parent && window.parent !== window) {
-          try {
-            window.parent.postMessage({ action: 'openSubtitlesHub' }, '*');
-            return;
-          } catch (e) {}
-        }
-        if (!modalSubs) return;
-        modalSubs.style.display = 'flex';
-        if (loadedSubtitlesList.length === 0) {
-          fetchMovieSubtitles();
-        }
-      }
-
-      if (openSubBtn1) openSubBtn1.onclick = openSubtitlesModalView;
-      if (openSubBtn2) openSubBtn2.onclick = openSubtitlesModalView;
-      if (closeSubBtn) closeSubBtn.onclick = () => { modalSubs.style.display = 'none'; };
-
-      if (subSearchInput) {
-        subSearchInput.addEventListener('input', () => {
-          renderSubtitlesList();
-        });
-      }
-
-      if (btnDisableSubs) {
-        btnDisableSubs.onclick = () => {
-          window._subtitlesDisabled = true;
-          const customSubEl = document.getElementById('customSubtitleText');
-          if (customSubEl) customSubEl.style.display = 'none';
-          if (videoEl && videoEl.textTracks) {
-            for (let i = 0; i < videoEl.textTracks.length; i++) {
-              videoEl.textTracks[i].mode = 'disabled';
-            }
-          }
-          const dynamicSubs = videoEl.querySelectorAll('track.dynamic-sub');
-          dynamicSubs.forEach(t => t.remove());
-          const activeLabel = document.getElementById('activeSubLabel');
-          if (activeLabel) activeLabel.textContent = 'Subtitles';
-          showSubToast('Subtitles Disabled', 'ℹ️');
-          if (modalSubs) modalSubs.style.display = 'none';
+          const modal = document.getElementById('subtitlesModal');
+          if (modal) modal.style.display = 'none';
         };
-      }
+      });
+    }
 
-      // Real-Time Subtitle Sync Offset Engine & 1-Tap Voice Alignment
-      function applyOffsetToTextTracks() {
+    // Wire Subtitle Modal Controls
+    const modalSubs = document.getElementById('subtitlesModal');
+    const openSubBtn1 = document.getElementById('btnOpenSubtitlesModal');
+    const openSubBtn2 = document.getElementById('btnOpenSubtitlesModal2');
+    const closeSubBtn = document.getElementById('btnCloseSubtitlesModal');
+    const subSearchInput = document.getElementById('subSearchInput');
+    const btnDisableSubs = document.getElementById('btnDisableSubs');
+
+    function openSubtitlesModalView() {
+      if (window.parent && window.parent !== window) {
+        try {
+          window.parent.postMessage({ action: 'openSubtitlesHub' }, '*');
+          return;
+        } catch (e) { }
+      }
+      if (!modalSubs) return;
+      modalSubs.style.display = 'flex';
+      if (loadedSubtitlesList.length === 0) {
+        fetchMovieSubtitles();
+      }
+    }
+
+    if (openSubBtn1) openSubBtn1.onclick = openSubtitlesModalView;
+    if (openSubBtn2) openSubBtn2.onclick = openSubtitlesModalView;
+    if (closeSubBtn) closeSubBtn.onclick = () => { modalSubs.style.display = 'none'; };
+
+    if (subSearchInput) {
+      subSearchInput.addEventListener('input', () => {
+        renderSubtitlesList();
+      });
+    }
+
+    if (btnDisableSubs) {
+      btnDisableSubs.onclick = () => {
+        window._subtitlesDisabled = true;
+        const customSubEl = document.getElementById('customSubtitleText');
+        if (customSubEl) customSubEl.style.display = 'none';
         if (videoEl && videoEl.textTracks) {
           for (let i = 0; i < videoEl.textTracks.length; i++) {
-            const track = videoEl.textTracks[i];
-            if (track.cues && track.cues.length > 0) {
-              for (let j = 0; j < track.cues.length; j++) {
-                const cue = track.cues[j];
-                if (typeof cue._origStart === 'undefined') {
-                  cue._origStart = cue.startTime;
-                  cue._origEnd = cue.endTime;
-                }
-                cue.startTime = Math.max(0, cue._origStart + currentSubOffset);
-                cue.endTime = Math.max(0.1, cue._origEnd + currentSubOffset);
+            videoEl.textTracks[i].mode = 'disabled';
+          }
+        }
+        const dynamicSubs = videoEl.querySelectorAll('track.dynamic-sub');
+        dynamicSubs.forEach(t => t.remove());
+        const activeLabel = document.getElementById('activeSubLabel');
+        if (activeLabel) activeLabel.textContent = 'Subtitles';
+        showSubToast('Subtitles Disabled', 'ℹ️');
+        if (modalSubs) modalSubs.style.display = 'none';
+      };
+    }
+
+    // Real-Time Subtitle Sync Offset Engine & 1-Tap Voice Alignment
+    function applyOffsetToTextTracks() {
+      if (videoEl && videoEl.textTracks) {
+        for (let i = 0; i < videoEl.textTracks.length; i++) {
+          const track = videoEl.textTracks[i];
+          if (track.cues && track.cues.length > 0) {
+            for (let j = 0; j < track.cues.length; j++) {
+              const cue = track.cues[j];
+              if (typeof cue._origStart === 'undefined') {
+                cue._origStart = cue.startTime;
+                cue._origEnd = cue.endTime;
               }
+              cue.startTime = Math.max(0, cue._origStart + currentSubOffset);
+              cue.endTime = Math.max(0.1, cue._origEnd + currentSubOffset);
             }
           }
         }
       }
+    }
 
-      function broadcastSubtitleOffset() {
-        const disp = document.getElementById('subOffsetDisplay');
-        if (disp) disp.textContent = (currentSubOffset >= 0 ? '+' : '') + currentSubOffset.toFixed(1) + 's';
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage({
-              action: 'subtitleOffsetChanged',
-              offset: currentSubOffset
-            }, '*');
-          }
-        } catch (_) {}
+    function broadcastSubtitleOffset() {
+      const disp = document.getElementById('subOffsetDisplay');
+      if (disp) disp.textContent = (currentSubOffset >= 0 ? '+' : '') + currentSubOffset.toFixed(1) + 's';
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            action: 'subtitleOffsetChanged',
+            offset: currentSubOffset
+          }, '*');
+        }
+      } catch (_) { }
+    }
+
+    function adjustSubtitleOffset(deltaSec, isAbsolute) {
+      if (isAbsolute) {
+        currentSubOffset = Math.round(deltaSec * 10) / 10;
+      } else if (deltaSec === 0) {
+        currentSubOffset = 0;
+      } else {
+        currentSubOffset = Math.round((currentSubOffset + deltaSec) * 10) / 10;
       }
 
-      function adjustSubtitleOffset(deltaSec, isAbsolute) {
-        if (isAbsolute) {
-          currentSubOffset = Math.round(deltaSec * 10) / 10;
-        } else if (deltaSec === 0) {
-          currentSubOffset = 0;
-        } else {
-          currentSubOffset = Math.round((currentSubOffset + deltaSec) * 10) / 10;
-        }
+      try {
+        localStorage.setItem(subStorageKey, String(currentSubOffset));
+      } catch (_) { }
 
+      updateSubtitleDisplay();
+      applyOffsetToTextTracks();
+
+      const sign = currentSubOffset >= 0 ? '+' : '';
+      showSubToast(`Subtitles ${sign}${currentSubOffset.toFixed(1)}s`, '⏱️');
+      broadcastSubtitleOffset();
+    }
+
+    function syncToVoice() {
+      if (!videoEl || !activeCues || activeCues.length === 0) {
+        showSubToast('No active subtitles to sync', '⚠️');
+        return;
+      }
+      const curTime = (videoEl && videoEl.currentTime > 0) ? videoEl.currentTime : 0;
+      let targetCue = null;
+      if (curTime < 90) {
+        // If in opening credits/intro, snap to first spoken line
+        targetCue = activeCues[0];
+      } else {
+        const currentFileTime = curTime - currentSubOffset;
+        let minDiff = Infinity;
+        for (const cue of activeCues) {
+          const diff = Math.abs(cue.start - currentFileTime);
+          if (diff < minDiff) {
+            minDiff = diff;
+            targetCue = cue;
+          }
+        }
+      }
+
+      if (targetCue) {
+        // curTime - offset = targetCue.start => offset = curTime - targetCue.start
+        currentSubOffset = Math.round((curTime - targetCue.start) * 10) / 10;
         try {
           localStorage.setItem(subStorageKey, String(currentSubOffset));
-        } catch (_) {}
-
+        } catch (_) { }
         updateSubtitleDisplay();
         applyOffsetToTextTracks();
-
         const sign = currentSubOffset >= 0 ? '+' : '';
-        showSubToast(`Subtitles ${sign}${currentSubOffset.toFixed(1)}s`, '⏱️');
+        showSubToast(`🎯 Synced to Voice (${sign}${currentSubOffset.toFixed(1)}s)`, '🎯');
         broadcastSubtitleOffset();
       }
+    }
 
-      function syncToVoice() {
-        if (!videoEl || !activeCues || activeCues.length === 0) {
-          showSubToast('No active subtitles to sync', '⚠️');
-          return;
+    const btnSubVoice = document.getElementById('btnSubVoice');
+    const btnSubIntro15 = document.getElementById('btnSubIntro15');
+    const btnSubOffsetM15 = document.getElementById('btnSubOffsetM15');
+    const btnSubMinus = document.getElementById('btnSubOffsetMinus');
+    const btnSubReset = document.getElementById('btnSubOffsetReset');
+    const btnSubPlus = document.getElementById('btnSubOffsetPlus');
+
+    if (btnSubVoice) btnSubVoice.onclick = syncToVoice;
+    if (btnSubIntro15) btnSubIntro15.onclick = () => adjustSubtitleOffset(15, false);
+    if (btnSubOffsetM15) btnSubOffsetM15.onclick = () => adjustSubtitleOffset(-15, false);
+    if (btnSubMinus) btnSubMinus.onclick = () => adjustSubtitleOffset(-0.5, false);
+    if (btnSubReset) btnSubReset.onclick = () => adjustSubtitleOffset(0, true);
+    if (btnSubPlus) btnSubPlus.onclick = () => adjustSubtitleOffset(0.5, false);
+
+    // Restore saved subtitle offset if existing
+    if (currentSubOffset !== 0) {
+      broadcastSubtitleOffset();
+    }
+
+    if (subParam) {
+      attachSubtitleTrack(subParam, 'Active Subtitle', false);
+    }
+
+    // Set Backdrop Background on Overlay if provided
+    if (backdropParam && playOverlay) {
+      try {
+        const cleanBackdrop = decodeURIComponent(backdropParam).trim();
+        if (cleanBackdrop) {
+          playOverlay.style.backgroundImage = "url('" + cleanBackdrop + "')";
         }
-        const curTime = (videoEl && videoEl.currentTime > 0) ? videoEl.currentTime : 0;
-        let targetCue = null;
-        if (curTime < 90) {
-          // If in opening credits/intro, snap to first spoken line
-          targetCue = activeCues[0];
-        } else {
-          const currentFileTime = curTime - currentSubOffset;
-          let minDiff = Infinity;
-          for (const cue of activeCues) {
-            const diff = Math.abs(cue.start - currentFileTime);
-            if (diff < minDiff) {
-              minDiff = diff;
-              targetCue = cue;
-            }
-          }
-        }
-
-        if (targetCue) {
-          // curTime - offset = targetCue.start => offset = curTime - targetCue.start
-          currentSubOffset = Math.round((curTime - targetCue.start) * 10) / 10;
-          try {
-            localStorage.setItem(subStorageKey, String(currentSubOffset));
-          } catch (_) {}
-          updateSubtitleDisplay();
-          applyOffsetToTextTracks();
-          const sign = currentSubOffset >= 0 ? '+' : '';
-          showSubToast(`🎯 Synced to Voice (${sign}${currentSubOffset.toFixed(1)}s)`, '🎯');
-          broadcastSubtitleOffset();
-        }
+      } catch (e) {
+        playOverlay.style.backgroundImage = "url('" + backdropParam + "')";
       }
+    }
 
-      const btnSubVoice = document.getElementById('btnSubVoice');
-      const btnSubIntro15 = document.getElementById('btnSubIntro15');
-      const btnSubOffsetM15 = document.getElementById('btnSubOffsetM15');
-      const btnSubMinus = document.getElementById('btnSubOffsetMinus');
-      const btnSubReset = document.getElementById('btnSubOffsetReset');
-      const btnSubPlus = document.getElementById('btnSubOffsetPlus');
-
-      if (btnSubVoice) btnSubVoice.onclick = syncToVoice;
-      if (btnSubIntro15) btnSubIntro15.onclick = () => adjustSubtitleOffset(15, false);
-      if (btnSubOffsetM15) btnSubOffsetM15.onclick = () => adjustSubtitleOffset(-15, false);
-      if (btnSubMinus) btnSubMinus.onclick = () => adjustSubtitleOffset(-0.5, false);
-      if (btnSubReset) btnSubReset.onclick = () => adjustSubtitleOffset(0, true);
-      if (btnSubPlus) btnSubPlus.onclick = () => adjustSubtitleOffset(0.5, false);
-
-      // Restore saved subtitle offset if existing
-      if (currentSubOffset !== 0) {
-        broadcastSubtitleOffset();
-      }
-
-      if (subParam) {
-        attachSubtitleTrack(subParam, 'Active Subtitle', false);
-      }
-
-      // Set Backdrop Background on Overlay if provided
-      if (backdropParam && playOverlay) {
-        try {
-          const cleanBackdrop = decodeURIComponent(backdropParam).trim();
-          if (cleanBackdrop) {
-            playOverlay.style.backgroundImage = "url('" + cleanBackdrop + "')";
-          }
-        } catch (e) {
-          playOverlay.style.backgroundImage = "url('" + backdropParam + "')";
-        }
-      }
-
-      // =======================================================================
-      // 4-Hour Watch-Time Ad Pass (Option B) & Pre-Roll Engine
-      // =======================================================================
-      // Apply user theme accent from URL param
-      (function applyUrlTheme() {
-        const _urlParams = new URLSearchParams(window.location.search);
-        const _theme = _urlParams.get("theme") || "gold";
-        const _themes = {
-          gold:     { color:"#ffbc00", glow:"rgba(255,188,0,0.4)",     gradient:"linear-gradient(135deg,#ffbc00 0%,#ff7b00 100%)",    border:"rgba(255,188,0,0.3)" },
-          crimson:  { color:"#e50914", glow:"rgba(229,9,20,0.4)",      gradient:"linear-gradient(135deg,#e50914 0%,#b81d24 100%)",   border:"rgba(229,9,20,0.3)" },
-          azure:    { color:"#1a9cff", glow:"rgba(26,156,255,0.4)",    gradient:"linear-gradient(135deg,#1a9cff 0%,#0056b3 100%)",   border:"rgba(26,156,255,0.3)" },
-          amethyst: { color:"#a855f7", glow:"rgba(168,85,247,0.4)",    gradient:"linear-gradient(135deg,#a855f7 0%,#7e22ce 100%)",   border:"rgba(168,85,247,0.3)" },
-          blossom:  { color:"#ff8da1", glow:"rgba(255,141,161,0.4)",   gradient:"linear-gradient(135deg,#ff8da1 0%,#ff527b 100%)",   border:"rgba(255,141,161,0.3)" },
-          barbie:   { color:"#ec4899", glow:"rgba(236,72,153,0.4)",    gradient:"linear-gradient(135deg,#ec4899 0%,#db2777 100%)",   border:"rgba(236,72,153,0.3)" },
-          emerald:  { color:"#10b981", glow:"rgba(16,185,129,0.4)",    gradient:"linear-gradient(135deg,#10b981 0%,#047857 100%)",   border:"rgba(16,185,129,0.3)" }
-        };
-        const _t = _themes[_theme] || _themes.gold;
-        const _r = document.documentElement;
-        _r.style.setProperty("--primary-color", _t.color);
-        _r.style.setProperty("--primary-glow", _t.glow);
-        _r.style.setProperty("--primary-gradient", _t.gradient);
-        _r.style.setProperty("--border-color-glow", _t.border);
-        // Dynamic theme styling for Play Circle, Pass Pill Button, and Plyr controls
-        const _style = document.createElement("style");
-        _style.textContent = `
+    // =======================================================================
+    // 4-Hour Watch-Time Ad Pass (Option B) & Pre-Roll Engine
+    // =======================================================================
+    // Apply user theme accent from URL param
+    (function applyUrlTheme() {
+      const _urlParams = new URLSearchParams(window.location.search);
+      const _theme = _urlParams.get("theme") || "gold";
+      const _themes = {
+        gold: { color: "#ffbc00", glow: "rgba(255,188,0,0.4)", gradient: "linear-gradient(135deg,#ffbc00 0%,#ff7b00 100%)", border: "rgba(255,188,0,0.3)" },
+        crimson: { color: "#e50914", glow: "rgba(229,9,20,0.4)", gradient: "linear-gradient(135deg,#e50914 0%,#b81d24 100%)", border: "rgba(229,9,20,0.3)" },
+        azure: { color: "#1a9cff", glow: "rgba(26,156,255,0.4)", gradient: "linear-gradient(135deg,#1a9cff 0%,#0056b3 100%)", border: "rgba(26,156,255,0.3)" },
+        amethyst: { color: "#a855f7", glow: "rgba(168,85,247,0.4)", gradient: "linear-gradient(135deg,#a855f7 0%,#7e22ce 100%)", border: "rgba(168,85,247,0.3)" },
+        blossom: { color: "#ff8da1", glow: "rgba(255,141,161,0.4)", gradient: "linear-gradient(135deg,#ff8da1 0%,#ff527b 100%)", border: "rgba(255,141,161,0.3)" },
+        barbie: { color: "#ec4899", glow: "rgba(236,72,153,0.4)", gradient: "linear-gradient(135deg,#ec4899 0%,#db2777 100%)", border: "rgba(236,72,153,0.3)" },
+        emerald: { color: "#10b981", glow: "rgba(16,185,129,0.4)", gradient: "linear-gradient(135deg,#10b981 0%,#047857 100%)", border: "rgba(16,185,129,0.3)" }
+      };
+      const _t = _themes[_theme] || _themes.gold;
+      const _r = document.documentElement;
+      _r.style.setProperty("--primary-color", _t.color);
+      _r.style.setProperty("--primary-glow", _t.glow);
+      _r.style.setProperty("--primary-gradient", _t.gradient);
+      _r.style.setProperty("--border-color-glow", _t.border);
+      // Dynamic theme styling for Play Circle, Pass Pill Button, and Plyr controls
+      const _style = document.createElement("style");
+      _style.textContent = `
           :root {
             --plyr-color-main: ${_t.color} !important;
             --primary-color: ${_t.color} !important;
@@ -1574,1427 +1711,1428 @@
             --plyr-range-fill-background: ${_t.color} !important;
           }
         `;
-        document.head.appendChild(_style);
-      })();
+      document.head.appendChild(_style);
+    })();
 
-      const FOUR_HOURS_SEC = 4 * 3600; // 14,400 seconds (kept for reference — actual pass sec read from localStorage)
-      // =======================================================================
-      // Streaming Time Engine:
-      // 1. Real-Time Ad Pass (filmhouse_watch_pass_until): 4h ad-pass from sponsor ads (clock time)
-      // 2. Banked Streaming Time (filmhouse_stream_bank_sec): Purchased/Mined time (only ticks while playing)
-      // =======================================================================
-      function getActivePassState() {
-        const expiresAt = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
-        let realTimeRemaining = 0;
-        if (expiresAt > Date.now()) {
-          realTimeRemaining = Math.floor((expiresAt - Date.now()) / 1000);
-        } else if (expiresAt > 0) {
-          localStorage.removeItem('filmhouse_watch_pass_until');
-        }
-
-        let bankRemaining = parseInt(localStorage.getItem('filmhouse_stream_bank_sec') || '0', 10);
-        if (isNaN(bankRemaining) || bankRemaining < 0) bankRemaining = 0;
-
-        return {
-          realTimeSec: realTimeRemaining,
-          bankSec: bankRemaining,
-          totalSec: realTimeRemaining + bankRemaining,
-          hasAccess: (realTimeRemaining > 0 || bankRemaining > 0)
-        };
+    const FOUR_HOURS_SEC = 4 * 3600; // 14,400 seconds (kept for reference — actual pass sec read from localStorage)
+    // =======================================================================
+    // Streaming Time Engine:
+    // 1. Real-Time Ad Pass (filmhouse_watch_pass_until): 4h ad-pass from sponsor ads (clock time)
+    // 2. Banked Streaming Time (filmhouse_stream_bank_sec): Purchased/Mined time (only ticks while playing)
+    // =======================================================================
+    function getActivePassState() {
+      const expiresAt = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
+      let realTimeRemaining = 0;
+      if (expiresAt > Date.now()) {
+        realTimeRemaining = Math.floor((expiresAt - Date.now()) / 1000);
+      } else if (expiresAt > 0) {
+        localStorage.removeItem('filmhouse_watch_pass_until');
       }
 
-      function updatePassUI() {
-        const pill = document.getElementById('watchPassPill');
-        const dot = document.getElementById('passDot');
-        const timerText = document.getElementById('passTimerText');
-        const btnGet = document.getElementById('btnGetPassPill');
-        const hud = document.getElementById('streamPassHud');
-        const hudTitle = document.getElementById('hudPassTitle');
-        const hudCount = document.getElementById('hudPassCount');
-        const hudBar = document.getElementById('hudPassBar');
-        const hudBtn = document.getElementById('hudBtnText');
+      let bankRemaining = parseInt(localStorage.getItem('filmhouse_stream_bank_sec') || '0', 10);
+      if (isNaN(bankRemaining) || bankRemaining < 0) bankRemaining = 0;
 
-        if (!pill || !timerText) return;
+      return {
+        realTimeSec: realTimeRemaining,
+        bankSec: bankRemaining,
+        totalSec: realTimeRemaining + bankRemaining,
+        hasAccess: (realTimeRemaining > 0 || bankRemaining > 0)
+      };
+    }
 
-        const state = getActivePassState();
-        const adsWatched4h = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
-        const hadPass = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10) > 0;
+    function updatePassUI() {
+      const pill = document.getElementById('watchPassPill');
+      const dot = document.getElementById('passDot');
+      const timerText = document.getElementById('passTimerText');
+      const btnGet = document.getElementById('btnGetPassPill');
+      const hud = document.getElementById('streamPassHud');
+      const hudTitle = document.getElementById('hudPassTitle');
+      const hudCount = document.getElementById('hudPassCount');
+      const hudBar = document.getElementById('hudPassBar');
+      const hudBtn = document.getElementById('hudBtnText');
 
-        if (hudTitle) {
-          hudTitle.textContent = hadPass ? 'Pass Expired • 4h' : '4-Hour Cinema Pass';
-        }
-        if (hudCount) {
-          hudCount.textContent = `${adsWatched4h}/2 Ads`;
-        }
-        if (hudBar) {
-          hudBar.style.width = adsWatched4h >= 2 ? '100%' : (adsWatched4h === 1 ? '50%' : '0%');
-        }
-        if (hudBtn) {
-          if (adsWatched4h === 0) {
-            hudBtn.textContent = 'Watch Ad (0/2)';
-          } else if (adsWatched4h === 1) {
-            hudBtn.textContent = 'Final Ad (1/2)';
-          } else {
-            hudBtn.textContent = '✓ Ready!';
-          }
-        }
+      if (!pill || !timerText) return;
 
-        if (state.hasAccess) {
-          if (hud) hud.style.display = 'none';
-          pill.style.display = 'flex';
-          const displaySec = state.realTimeSec > 0 ? state.realTimeSec : state.bankSec;
-          const h = Math.floor(displaySec / 3600);
-          const m = Math.floor((displaySec % 3600) / 60);
-          const s = displaySec % 60;
-          const pad = n => (n < 10 ? '0' : '') + n;
-          const modeLabel = state.realTimeSec > 0 ? 'Pass' : 'Bank';
-          timerText.textContent = `${modeLabel}: ${pad(h)}:${pad(m)}:${pad(s)}`;
+      const state = getActivePassState();
+      const adsWatched4h = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
+      const hadPass = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10) > 0;
 
-          if (displaySec <= 600) {
-            if (dot) {
-              dot.style.background = '#f59e0b';
-              dot.style.boxShadow = '0 0 6px #f59e0b';
-            }
-            timerText.style.color = '#f59e0b';
-          } else {
-            if (dot) {
-              dot.style.background = '#10b981';
-              dot.style.boxShadow = '0 0 6px #10b981';
-            }
-            timerText.style.color = '#fff';
-          }
-          if (btnGet) btnGet.textContent = '⚡ +4h';
+      if (hudTitle) {
+        hudTitle.textContent = hadPass ? 'Pass Expired • 4h' : '4-Hour Cinema Pass';
+      }
+      if (hudCount) {
+        hudCount.textContent = `${adsWatched4h}/2 Ads`;
+      }
+      if (hudBar) {
+        hudBar.style.width = adsWatched4h >= 2 ? '100%' : (adsWatched4h === 1 ? '50%' : '0%');
+      }
+      if (hudBtn) {
+        if (adsWatched4h === 0) {
+          hudBtn.textContent = 'Watch Ad (0/2)';
+        } else if (adsWatched4h === 1) {
+          hudBtn.textContent = 'Final Ad (1/2)';
         } else {
-          // No active pass -> Display sleek bottom HUD bar!
-          if (hud) hud.style.display = 'flex';
-          pill.style.display = 'flex';
-          if (dot) {
-            dot.style.background = '#64748b';
-            dot.style.boxShadow = 'none';
-          }
-          timerText.textContent = 'No Pass';
-          timerText.style.color = '#94a3b8';
-          if (btnGet) {
-            btnGet.textContent = adsWatched4h > 0 ? `⚡ ${adsWatched4h}/2` : '⚡ Get 4h';
-          }
+          hudBtn.textContent = '✓ Ready!';
         }
       }
 
-      let _connectTimeoutTimer = null;
+      if (state.hasAccess) {
+        if (hud) hud.style.display = 'none';
+        pill.style.display = 'flex';
+        const displaySec = state.realTimeSec > 0 ? state.realTimeSec : state.bankSec;
+        const h = Math.floor(displaySec / 3600);
+        const m = Math.floor((displaySec % 3600) / 60);
+        const s = displaySec % 60;
+        const pad = n => (n < 10 ? '0' : '') + n;
+        const modeLabel = state.realTimeSec > 0 ? 'Pass' : 'Bank';
+        timerText.textContent = `${modeLabel}: ${pad(h)}:${pad(m)}:${pad(s)}`;
 
-      function restoreInteractivePlayOverlay(titleMsg, subMsg) {
-        if (!playOverlay) return;
-        if (document.body.classList.contains('stream-started') && videoEl && !videoEl.paused && videoEl.currentTime > 0) return;
+        if (displaySec <= 600) {
+          if (dot) {
+            dot.style.background = '#f59e0b';
+            dot.style.boxShadow = '0 0 6px #f59e0b';
+          }
+          timerText.style.color = '#f59e0b';
+        } else {
+          if (dot) {
+            dot.style.background = '#10b981';
+            dot.style.boxShadow = '0 0 6px #10b981';
+          }
+          timerText.style.color = '#fff';
+        }
+        if (btnGet) btnGet.textContent = '⚡ +4h';
+      } else {
+        // No active pass -> Display sleek bottom HUD bar!
+        if (hud) hud.style.display = 'flex';
+        pill.style.display = 'flex';
+        if (dot) {
+          dot.style.background = '#64748b';
+          dot.style.boxShadow = 'none';
+        }
+        timerText.textContent = 'No Pass';
+        timerText.style.color = '#94a3b8';
+        if (btnGet) {
+          btnGet.textContent = adsWatched4h > 0 ? `⚡ ${adsWatched4h}/2` : '⚡ Get 4h';
+        }
+      }
+    }
+
+    let _connectTimeoutTimer = null;
+
+    function restoreInteractivePlayOverlay(titleMsg, subMsg) {
+      if (!playOverlay) return;
+      if (document.body.classList.contains('stream-started') && videoEl && !videoEl.paused && videoEl.currentTime > 0) return;
+      playOverlay.style.display = 'flex';
+      playOverlay.style.opacity = '1';
+      playOverlay.style.pointerEvents = 'auto';
+      playOverlay.classList.remove('connecting');
+      const playTitle = document.getElementById('streamPlayTitle');
+      const playSub = document.getElementById('streamPlaySub');
+      if (playTitle && titleMsg) playTitle.textContent = titleMsg;
+      if (playSub && subMsg) playSub.textContent = subMsg;
+    }
+
+    function activateWatchPass(fromUserGesture) {
+      const FOUR_HOURS_MS = 4 * 3600 * 1000;
+      const currentExpires = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
+      let newExpires = Date.now() + FOUR_HOURS_MS;
+      if (currentExpires > Date.now()) {
+        newExpires = currentExpires + FOUR_HOURS_MS;
+      }
+      localStorage.setItem('filmhouse_watch_pass_until', String(newExpires));
+      localStorage.setItem('fh_ads_4h', '0');
+      updatePassUI();
+
+      const hud = document.getElementById('streamPassHud');
+      if (hud) hud.style.display = 'none';
+
+      attachStreamSource();
+
+      if (playOverlay) {
         playOverlay.style.display = 'flex';
         playOverlay.style.opacity = '1';
         playOverlay.style.pointerEvents = 'auto';
-        playOverlay.classList.remove('connecting');
+        playOverlay.classList.add('connecting');
         const playTitle = document.getElementById('streamPlayTitle');
         const playSub = document.getElementById('streamPlaySub');
-        if (playTitle && titleMsg) playTitle.textContent = titleMsg;
-        if (playSub && subMsg) playSub.textContent = subMsg;
+        if (playTitle) playTitle.textContent = '⚡ Starting High-Speed Stream...';
+        if (playSub) playSub.textContent = '4-Hour Cinema Pass Active • Loading Movie';
       }
 
-      function activateWatchPass(fromUserGesture) {
-        const FOUR_HOURS_MS = 4 * 3600 * 1000;
-        const currentExpires = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
-        let newExpires = Date.now() + FOUR_HOURS_MS;
-        if (currentExpires > Date.now()) {
-          newExpires = currentExpires + FOUR_HOURS_MS;
+      if (videoEl) {
+        const onAutoplayBlocked = function () {
+          restoreInteractivePlayOverlay(
+            '🎉 Pass Unlocked! ▶ Tap to Play',
+            '4-Hour Ad-Free Cinema Ready • Instant Start'
+          );
+        };
+
+        try {
+          const p = videoEl.play();
+          if (p !== undefined) {
+            p.then(() => {
+              // Started playing; if still at 0 after 2.5s and paused, restore button
+              setTimeout(() => {
+                if (videoEl.paused) onAutoplayBlocked();
+              }, 2500);
+            }).catch(() => {
+              // iOS blocked non-gesture autoplay after returning from Safari: show instant 1-tap play button!
+              onAutoplayBlocked();
+            });
+          }
+        } catch (_) {
+          onAutoplayBlocked();
         }
-        localStorage.setItem('filmhouse_watch_pass_until', String(newExpires));
-        localStorage.setItem('fh_ads_4h', '0');
+
+        // Safety check for iOS: if not playing within 1.6s when triggered without a direct tap, prompt user to tap Play
+        if (!fromUserGesture) {
+          setTimeout(() => {
+            if (videoEl && videoEl.paused && !document.body.classList.contains('stream-started')) {
+              onAutoplayBlocked();
+            }
+          }, 1600);
+        }
+      }
+    }
+
+    let _playerAdPending = false;
+    let _playerAdStartTime = 0;
+    let _playerAdLeftApp = false;
+    let _playerCancelTimer = null;
+    let _playerAdPollTimer = null;
+
+    function cleanupPlayerAdListeners() {
+      document.removeEventListener('visibilitychange', onPlayerVisibilityChange);
+      window.removeEventListener('focus', onPlayerFocusReturn);
+      window.removeEventListener('pageshow', onPlayerFocusReturn);
+      if (_playerCancelTimer) {
+        clearTimeout(_playerCancelTimer);
+        _playerCancelTimer = null;
+      }
+      if (_playerAdPollTimer) {
+        clearInterval(_playerAdPollTimer);
+        _playerAdPollTimer = null;
+      }
+    }
+
+    function onPlayerFocusReturn() {
+      if (_playerAdPending && (_playerAdLeftApp || (Date.now() - _playerAdStartTime >= 2500))) {
+        verifyAndCompletePlayerAd(false);
+      }
+    }
+
+    function onPlayerVisibilityChange() {
+      if (!_playerAdPending) return;
+      if (document.hidden) {
+        _playerAdLeftApp = true;
+        if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
+      } else if (_playerAdLeftApp || (Date.now() - _playerAdStartTime >= 2500)) {
+        verifyAndCompletePlayerAd(false);
+      }
+    }
+
+    // Listen for parent window visibility/focus relay (critical for iPhone iframe inside Telegram Mini App)
+    window.addEventListener('message', function (ev) {
+      if (!ev || !ev.data) return;
+      if (ev.data.action === 'parentAdLifecycle' && _playerAdPending) {
+        if (ev.data.state === 'hidden' || ev.data.event === 'blur') {
+          _playerAdLeftApp = true;
+          if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
+        } else if (ev.data.state === 'visible' || ev.data.event === 'focus' || ev.data.event === 'pageshow') {
+          if (_playerAdLeftApp || (Date.now() - _playerAdStartTime >= 2500)) {
+            verifyAndCompletePlayerAd(false);
+          }
+        }
+      }
+    });
+
+    function showPassAlert(msg) {
+      const toast = document.getElementById('passAlertToast');
+      if (!toast) return;
+      toast.innerHTML = `<span>${msg}</span>`;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    }
+
+    function verifyAndCompletePlayerAd(fromUserGesture) {
+      if (!_playerAdPending) return false;
+      const elapsed = Date.now() - _playerAdStartTime;
+      _playerAdPending = false;
+      _playerAdLeftApp = false;
+      cleanupPlayerAdListeners();
+
+      if (elapsed >= 2200) {
+        const watched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10) + 1;
+        localStorage.setItem('fh_ads_4h', String(watched));
+        if (watched >= 2) {
+          showPassAlert("🎉 4-Hour Cinema Pass Activated!");
+          activateWatchPass(!!fromUserGesture);
+          return 'unlocked';
+        } else {
+          updatePassUI();
+          showPassAlert("✅ Ad 1 of 2 Verified! Tap 'Final Ad (1/2)' now.");
+          return 'step1';
+        }
+      } else {
         updatePassUI();
+        showPassAlert("⚠️ Sponsor page closed too quickly. Please visit sponsor!");
+        return false;
+      }
+    }
 
-        const hud = document.getElementById('streamPassHud');
-        if (hud) hud.style.display = 'none';
+    function triggerPassAdWatch(e) {
+      // Self-healing check for iPhone: if previous ad was already visited >= 2.2s ago
+      // and iOS didn't fire iframe focus until the user tapped this button again:
+      if (_playerAdPending) {
+        const elapsed = Date.now() - _playerAdStartTime;
+        if (elapsed >= 2200) {
+          const res = verifyAndCompletePlayerAd(true);
+          if (res === 'unlocked') {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            return;
+          }
+          // If res === 'step1', Ad 1 was just verified! Continue immediately into opening Ad 2 on this tap!
+        } else {
+          if (e && typeof e.preventDefault === 'function') e.preventDefault();
+          return;
+        }
+      }
 
-        attachStreamSource();
+      _playerAdPending = true;
+      _playerAdStartTime = Date.now();
+      _playerAdLeftApp = false;
 
-        if (playOverlay) {
-          playOverlay.style.display = 'flex';
-          playOverlay.style.opacity = '1';
+      const hudBtn = document.getElementById('hudBtnText');
+      if (hudBtn) hudBtn.textContent = '⏳ Visiting...';
+
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+        (window.Telegram?.WebApp?.platform === 'ios');
+      if (isIOS) {
+        showPassAlert("👉 On iPhone: Tap \"Open\" in Telegram to count your ad!");
+      }
+
+      document.addEventListener('visibilitychange', onPlayerVisibilityChange);
+      window.addEventListener('focus', onPlayerFocusReturn);
+      window.addEventListener('pageshow', onPlayerFocusReturn);
+      window.addEventListener('blur', function () { if (_playerAdPending) _playerAdLeftApp = true; }, { once: true });
+
+      // 1. If in genuine Telegram client, use Telegram SDK openLink
+      const tg = getActiveTelegramWebApp();
+      if (tg) {
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        // On iOS Telegram, SFSafariViewController opens over the webview without always firing iframe blur
+        setTimeout(function () { if (_playerAdPending) _playerAdLeftApp = true; }, 1200);
+        try {
+          tg.openLink(MONETAG_SMARTLINK);
+        } catch (_) {
+          window.open(MONETAG_SMARTLINK, '_blank');
+        }
+      } else {
+        setTimeout(function () { if (_playerAdPending) _playerAdLeftApp = true; }, 1200);
+        if (!e || !e.target || !e.target.closest || !e.target.closest('a')) {
+          try {
+            const w = window.open(MONETAG_SMARTLINK, '_blank');
+            if (!w || w.closed || typeof w.closed === 'undefined') {
+              window.location.href = MONETAG_SMARTLINK;
+            }
+          } catch (_) {
+            window.location.href = MONETAG_SMARTLINK;
+          }
+        }
+      }
+
+      // Poll for focus/visibility return (ensures iPhone SFSafariViewController close is detected even without iframe focus event)
+      if (_playerAdPollTimer) clearInterval(_playerAdPollTimer);
+      _playerAdPollTimer = setInterval(function () {
+        if (!_playerAdPending) {
+          clearInterval(_playerAdPollTimer);
+          _playerAdPollTimer = null;
+          return;
+        }
+        if (document.hidden || !document.hasFocus()) {
+          _playerAdLeftApp = true;
+        } else if (_playerAdLeftApp && (Date.now() - _playerAdStartTime >= 3500)) {
+          verifyAndCompletePlayerAd(false);
+        }
+      }, 600);
+
+      // Inform parent app in case parent maintains daily stats
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ action: "watchAdForPass", tierId: "4h" }, "*");
+        }
+      } catch (_) { }
+
+      // Safety timeout if user clicked Cancel on Telegram prompt or never left
+      if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
+      _playerCancelTimer = setTimeout(function () {
+        if (_playerAdPending) {
+          if (_playerAdLeftApp && !document.hidden) {
+            verifyAndCompletePlayerAd(false);
+          } else if (!_playerAdLeftApp) {
+            _playerAdPending = false;
+            cleanupPlayerAdListeners();
+            updatePassUI();
+            showPassAlert("⚠️ Sponsor visit not detected. Tap \"Open\" when Telegram asks!");
+          }
+        }
+      }, 12000);
+    }
+
+    const btnGetPill = document.getElementById('btnGetPassPill');
+    if (btnGetPill) btnGetPill.addEventListener('click', triggerPassAdWatch);
+
+    const btnHudWatchAd = document.getElementById('btnHudWatchAd');
+    if (btnHudWatchAd) btnHudWatchAd.addEventListener('click', triggerPassAdWatch);
+
+    // Decrement logic:
+    // Real-time pass counts down continuously; Banked streaming time only decrements while video is playing!
+    setInterval(function () {
+      const state = getActivePassState();
+
+      if (state.realTimeSec > 0) {
+        // Real-time pass active: counts down automatically
+        updatePassUI();
+      } else if (state.bankSec > 0 && videoEl && !videoEl.paused && !videoEl.ended) {
+        // Banked streaming time: only ticks down while video is playing!
+        const newBank = state.bankSec - 1;
+        localStorage.setItem('filmhouse_stream_bank_sec', String(newBank));
+        updatePassUI();
+        if (newBank <= 0) {
+          videoEl.pause();
+          const hud = document.getElementById('streamPassHud');
+          if (hud) {
+            hud.style.display = 'flex';
+            hud.classList.add('pulse-alert');
+          }
+          showPassAlert("⚠️ Stream time expired. Watch 2 sponsor ads to resume!");
+          updatePassUI();
+        }
+      } else {
+        updatePassUI();
+        if (!state.hasAccess && videoEl && !videoEl.paused && !videoEl.ended) {
+          // Mid-stream expiry: pause playback and prompt user on bottom HUD
+          videoEl.pause();
+          const hud = document.getElementById('streamPassHud');
+          if (hud) {
+            hud.style.display = 'flex';
+            hud.classList.add('pulse-alert');
+          }
+          showPassAlert("⚠️ 4-Hour Pass Expired. Watch 2 sponsor ads to resume!");
+          updatePassUI();
+        }
+      }
+    }, 1000);
+
+    updatePassUI();
+
+    // Strict Playback Gate: Video is NEVER permitted to play without an active Pass or Banked Streaming Time!
+    if (videoEl) {
+      videoEl.addEventListener('play', function () {
+        const passState = getActivePassState();
+        if (!passState.hasAccess) {
+          videoEl.pause();
+          const hud = document.getElementById('streamPassHud');
+          if (hud) {
+            hud.style.display = 'flex';
+            hud.classList.add('pulse-alert');
+          }
+          showPassAlert("⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!");
+          updatePassUI();
+        }
+      });
+    }
+
+    function showPreRollAd() {
+      const passState = getActivePassState();
+      if (!passState.hasAccess) {
+        const preRoll = document.getElementById('preRollOverlay');
+        if (preRoll) preRoll.style.display = 'flex';
+        updatePassUI();
+      }
+    }
+
+    // Click & Touch-to-Play Overlay (Requires active pass; otherwise triggers 2-Ad Sponsor HUD)
+    if (playOverlay) {
+      function triggerStreamPlay(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        // If an ad was pending and >= 2.2s elapsed, complete it right on this tap!
+        if (_playerAdPending && (Date.now() - _playerAdStartTime >= 2200)) {
+          verifyAndCompletePlayerAd(true);
+        }
+
+        const passState = getActivePassState();
+
+        if (passState.hasAccess) {
+          attachStreamSource();
+
+          // Keep pointerEvents = 'auto' until frames actually render so iOS never opens a black 00:00 native player!
           playOverlay.style.pointerEvents = 'auto';
           playOverlay.classList.add('connecting');
           const playTitle = document.getElementById('streamPlayTitle');
           const playSub = document.getElementById('streamPlaySub');
-          if (playTitle) playTitle.textContent = '⚡ Starting High-Speed Stream...';
-          if (playSub) playSub.textContent = '4-Hour Cinema Pass Active • Loading Movie';
-        }
+          if (playTitle) playTitle.textContent = '⚡ Connecting High-Speed Stream...';
+          if (playSub) playSub.textContent = 'Buffering 1080p Cinema • Starting Movie';
 
-        if (videoEl) {
-          const onAutoplayBlocked = function() {
-            restoreInteractivePlayOverlay(
-              '🎉 Pass Unlocked! ▶ Tap to Play',
-              '4-Hour Ad-Free Cinema Ready • Instant Start'
-            );
-          };
+          if (_connectTimeoutTimer) clearTimeout(_connectTimeoutTimer);
+          _connectTimeoutTimer = setTimeout(function () {
+            if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
+              console.warn("[Player] Stream connection timeout (>6s) on primary server");
+              if (errorCard) {
+                errorCard.style.display = 'flex';
+                errorCard.innerHTML = `
+                    <span>⚡ Server 1 connection is slow...</span>
+                    <button type="button" onclick="window.retryStreamPlayback()" style="background:#ffd700;color:#000;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Retry</button>
+                    <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Server 2 (VIP)</button>
+                  `;
+              }
+              restoreInteractivePlayOverlay(
+                '▶ Tap to Retry Stream',
+                '⚡ Slow response from Server 1 • Tap here or switch to Server 2 below'
+              );
+            }
+          }, 6000);
 
           try {
             const p = videoEl.play();
             if (p !== undefined) {
               p.then(() => {
-                // Started playing; if still at 0 after 2.5s and paused, restore button
-                setTimeout(() => {
-                  if (videoEl.paused) onAutoplayBlocked();
-                }, 2500);
-              }).catch(() => {
-                // iOS blocked non-gesture autoplay after returning from Safari: show instant 1-tap play button!
-                onAutoplayBlocked();
+                console.log("Stream video playback initiated successfully");
+              }).catch(err => {
+                console.log("Direct videoEl.play notice:", err);
+                if (window.plyrInstance) {
+                  window.plyrInstance.play().catch(() => {
+                    restoreInteractivePlayOverlay('▶ Tap to Start Movie', '1080p FHD Cinema Ready');
+                  });
+                } else {
+                  restoreInteractivePlayOverlay('▶ Tap to Start Movie', '1080p FHD Cinema Ready');
+                }
               });
             }
           } catch (_) {
-            onAutoplayBlocked();
-          }
-
-          // Safety check for iOS: if not playing within 1.6s when triggered without a direct tap, prompt user to tap Play
-          if (!fromUserGesture) {
-            setTimeout(() => {
-              if (videoEl && videoEl.paused && !document.body.classList.contains('stream-started')) {
-                onAutoplayBlocked();
-              }
-            }, 1600);
-          }
-        }
-      }
-
-      let _playerAdPending = false;
-      let _playerAdStartTime = 0;
-      let _playerAdLeftApp = false;
-      let _playerCancelTimer = null;
-      let _playerAdPollTimer = null;
-
-      function cleanupPlayerAdListeners() {
-        document.removeEventListener('visibilitychange', onPlayerVisibilityChange);
-        window.removeEventListener('focus', onPlayerFocusReturn);
-        window.removeEventListener('pageshow', onPlayerFocusReturn);
-        if (_playerCancelTimer) {
-          clearTimeout(_playerCancelTimer);
-          _playerCancelTimer = null;
-        }
-        if (_playerAdPollTimer) {
-          clearInterval(_playerAdPollTimer);
-          _playerAdPollTimer = null;
-        }
-      }
-
-      function onPlayerFocusReturn() {
-        if (_playerAdPending && (_playerAdLeftApp || (Date.now() - _playerAdStartTime >= 2500))) {
-          verifyAndCompletePlayerAd(false);
-        }
-      }
-
-      function onPlayerVisibilityChange() {
-        if (!_playerAdPending) return;
-        if (document.hidden) {
-          _playerAdLeftApp = true;
-          if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
-        } else if (_playerAdLeftApp || (Date.now() - _playerAdStartTime >= 2500)) {
-          verifyAndCompletePlayerAd(false);
-        }
-      }
-
-      // Listen for parent window visibility/focus relay (critical for iPhone iframe inside Telegram Mini App)
-      window.addEventListener('message', function(ev) {
-        if (!ev || !ev.data) return;
-        if (ev.data.action === 'parentAdLifecycle' && _playerAdPending) {
-          if (ev.data.state === 'hidden' || ev.data.event === 'blur') {
-            _playerAdLeftApp = true;
-            if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
-          } else if (ev.data.state === 'visible' || ev.data.event === 'focus' || ev.data.event === 'pageshow') {
-            if (_playerAdLeftApp || (Date.now() - _playerAdStartTime >= 2500)) {
-              verifyAndCompletePlayerAd(false);
-            }
-          }
-        }
-      });
-
-      function showPassAlert(msg) {
-        const toast = document.getElementById('passAlertToast');
-        if (!toast) return;
-        toast.innerHTML = `<span>${msg}</span>`;
-        toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, 4000);
-      }
-
-      function verifyAndCompletePlayerAd(fromUserGesture) {
-        if (!_playerAdPending) return false;
-        const elapsed = Date.now() - _playerAdStartTime;
-        _playerAdPending = false;
-        _playerAdLeftApp = false;
-        cleanupPlayerAdListeners();
-
-        if (elapsed >= 2200) {
-          const watched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10) + 1;
-          localStorage.setItem('fh_ads_4h', String(watched));
-          if (watched >= 2) {
-            showPassAlert("🎉 4-Hour Cinema Pass Activated!");
-            activateWatchPass(!!fromUserGesture);
-            return 'unlocked';
-          } else {
-            updatePassUI();
-            showPassAlert("✅ Ad 1 of 2 Verified! Tap 'Final Ad (1/2)' now.");
-            return 'step1';
+            if (window.plyrInstance) window.plyrInstance.play().catch(() => { });
           }
         } else {
+          // User has NO active pass -> Pulse the bottom HUD bar!
+          try { videoEl.pause(); } catch (_) { }
+          const hud = document.getElementById('streamPassHud');
+          if (hud) {
+            hud.style.display = 'flex';
+            hud.classList.remove('pulse-alert');
+            void hud.offsetWidth; // force reflow for CSS animation restart
+            hud.classList.add('pulse-alert');
+          }
+          showPassAlert("⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!");
           updatePassUI();
-          showPassAlert("⚠️ Sponsor page closed too quickly. Please visit sponsor!");
-          return false;
         }
       }
 
-      function triggerPassAdWatch(e) {
-        // Self-healing check for iPhone: if previous ad was already visited >= 2.2s ago
-        // and iOS didn't fire iframe focus until the user tapped this button again:
-        if (_playerAdPending) {
-          const elapsed = Date.now() - _playerAdStartTime;
-          if (elapsed >= 2200) {
-            const res = verifyAndCompletePlayerAd(true);
-            if (res === 'unlocked') {
-              if (e && typeof e.preventDefault === 'function') e.preventDefault();
-              return;
-            }
-            // If res === 'step1', Ad 1 was just verified! Continue immediately into opening Ad 2 on this tap!
+      playOverlay.addEventListener('click', triggerStreamPlay, { passive: false });
+      playOverlay.addEventListener('touchend', function (e) {
+        triggerStreamPlay(e);
+      }, { passive: false });
+    }
+
+    // Monetag SmartLink on Direct Download button
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', function (e) {
+        openTelegramLink(MONETAG_SMARTLINK);
+      });
+    }
+
+    // Listen for parent Mini App fullscreen requests
+    // Detect and broadcast embedded subtitles and audio tracks to parent app
+    function detectAndBroadcastTracks() {
+      if (!videoEl) return;
+      // Ensure soft subtitles default to disabled unless explicitly activated
+      if (!window._subtitlesExplicitlyActive && videoEl.textTracks) {
+        for (let i = 0; i < videoEl.textTracks.length; i++) {
+          if (videoEl.textTracks[i].mode !== 'disabled') {
+            videoEl.textTracks[i].mode = 'disabled';
+          }
+        }
+      }
+      const subTracks = [];
+      let anyShowing = false;
+      let showingLabel = '';
+
+      if (videoEl.textTracks) {
+        for (let i = 0; i < videoEl.textTracks.length; i++) {
+          const t = videoEl.textTracks[i];
+          const isShowing = (t.mode === 'showing');
+          if (isShowing) {
+            anyShowing = true;
+            showingLabel = t.label || t.language || 'ON';
+          }
+          subTracks.push({
+            index: i,
+            label: t.label || t.language || `Track ${i + 1}`,
+            lang: t.language || 'en',
+            kind: t.kind || 'subtitles',
+            mode: t.mode
+          });
+        }
+      }
+
+      const audioTracks = [];
+      if (window._currentHls && window._currentHls.audioTracks && window._currentHls.audioTracks.length > 0) {
+        const curIdx = window._currentHls.audioTrack;
+        window._currentHls.audioTracks.forEach((at, idx) => {
+          audioTracks.push({
+            index: idx,
+            label: at.name || at.lang || `Audio ${idx + 1}`,
+            lang: at.lang || '',
+            enabled: (idx === curIdx)
+          });
+        });
+      } else if (videoEl.audioTracks && videoEl.audioTracks.length > 0) {
+        for (let i = 0; i < videoEl.audioTracks.length; i++) {
+          const a = videoEl.audioTracks[i];
+          audioTracks.push({
+            index: i,
+            label: a.label || a.language || `Audio ${i + 1}`,
+            lang: a.language || '',
+            enabled: a.enabled
+          });
+        }
+      }
+
+      // Universal Fallback for mobile WebViews / Plyr where videoEl.audioTracks is not exposed
+      if (audioTracks.length === 0) {
+        audioTracks.push({
+          index: 0,
+          label: "Audio 1 (Original / Default)",
+          lang: "orig",
+          enabled: true
+        });
+      }
+
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            action: 'videoTracksDetected',
+            subtitles: subTracks,
+            audios: audioTracks,
+            audioTracks: audioTracks,
+            subtitlesActive: anyShowing,
+            activeSubtitleLabel: showingLabel
+          }, '*');
+        }
+      } catch (e) { }
+    }
+
+    videoEl.addEventListener('loadedmetadata', detectAndBroadcastTracks);
+    videoEl.addEventListener('canplay', detectAndBroadcastTracks);
+
+    async function lockToLandscape() {
+      try {
+        // 1. Native iOS / Safari / WebKit fullscreen rotation
+        if (videoEl && typeof videoEl.webkitEnterFullscreen === 'function' && !document.fullscreenElement) {
+          videoEl.webkitEnterFullscreen();
+        }
+      } catch (_) { }
+      try {
+        // 2. Telegram WebApp SDK orientation lock
+        if (window.Telegram?.WebApp?.lockOrientation) {
+          window.Telegram.WebApp.lockOrientation('landscape');
+        }
+      } catch (_) { }
+      try {
+        // 3. HTML5 Screen Orientation API
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape').catch(() => { });
+        } else if (screen.lockOrientation) {
+          screen.lockOrientation('landscape');
+        } else if (screen.mozLockOrientation) {
+          screen.mozLockOrientation('landscape');
+        } else if (screen.msLockOrientation) {
+          screen.msLockOrientation('landscape');
+        }
+      } catch (_) { }
+    }
+
+    function unlockFromLandscape() {
+      try {
+        if (window.Telegram?.WebApp?.unlockOrientation) {
+          window.Telegram.WebApp.unlockOrientation();
+        }
+      } catch (_) { }
+      try {
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
+        } else if (screen.unlockOrientation) {
+          screen.unlockOrientation();
+        }
+      } catch (_) { }
+    }
+
+    function togglePlayState() {
+      if (window.plyrInstance) {
+        window.plyrInstance.togglePlay();
+      } else if (videoEl) {
+        if (videoEl.paused) videoEl.play().catch(() => { });
+        else videoEl.pause();
+      }
+    }
+
+    function seekDelta(seconds) {
+      if (window.plyrInstance) {
+        const cur = window.plyrInstance.currentTime || 0;
+        const dur = window.plyrInstance.duration || 0;
+        window.plyrInstance.currentTime = Math.max(0, Math.min(dur ? dur - 1 : 999999, cur + seconds));
+      } else if (videoEl) {
+        const cur = videoEl.currentTime || 0;
+        const dur = videoEl.duration || 0;
+        videoEl.currentTime = Math.max(0, Math.min(dur ? dur - 1 : 999999, cur + seconds));
+      }
+    }
+
+    function toggleFullscreenState() {
+      if (window.plyrInstance && window.plyrInstance.fullscreen) {
+        window.plyrInstance.fullscreen.toggle();
+      } else if (document.fullscreenElement) {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => { });
+      } else if (videoEl && videoEl.requestFullscreen) {
+        videoEl.requestFullscreen().catch(() => { });
+      } else if (videoEl && typeof videoEl.webkitEnterFullscreen === 'function') {
+        videoEl.webkitEnterFullscreen();
+      }
+    }
+
+    function toggleControlsVisibility() {
+      if (window.plyrInstance && typeof window.plyrInstance.toggleControls === 'function') {
+        window.plyrInstance.toggleControls();
+      }
+    }
+
+    function toggleMuteState() {
+      if (window.plyrInstance) {
+        window.plyrInstance.muted = !window.plyrInstance.muted;
+      } else if (videoEl) {
+        videoEl.muted = !videoEl.muted;
+      }
+    }
+
+    function showRippleIndicator(side) {
+      const el = document.getElementById(side === 'left' ? 'rippleLeft' : 'rippleRight');
+      if (!el) return;
+      el.classList.remove('animate');
+      void el.offsetWidth;
+      el.classList.add('animate');
+      setTimeout(() => {
+        el.classList.remove('animate');
+      }, 700);
+    }
+
+    // YouTube-style Tap Controls:
+    // Single tap -> Play / Pause
+    // Double tap Left -> Rewind 10s
+    // Double tap Right -> Forward 10s
+    let lastTapTime = 0;
+    let tapTimeout = null;
+    let lastTapZone = null;
+
+    function handleZoneTap(zone, e) {
+      if (!document.body.classList.contains('stream-started')) return;
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const now = Date.now();
+      const diff = now - lastTapTime;
+
+      if (diff < 320 && lastTapZone === zone) {
+        // Double-tap detected on same zone
+        clearTimeout(tapTimeout);
+        lastTapTime = 0;
+        lastTapZone = null;
+
+        if (zone === 'left') {
+          seekDelta(-10);
+          showRippleIndicator('left');
+        } else if (zone === 'right') {
+          seekDelta(10);
+          showRippleIndicator('right');
+        } else if (zone === 'center') {
+          togglePlayState();
+        }
+      } else {
+        // First tap candidate
+        lastTapTime = now;
+        lastTapZone = zone;
+        clearTimeout(tapTimeout);
+        tapTimeout = setTimeout(() => {
+          if (zone === 'center') {
+            // ONLY middle zone single-tap toggles Play / Pause!
+            togglePlayState();
           } else {
-            if (e && typeof e.preventDefault === 'function') e.preventDefault();
-            return;
+            // Left & Right side taps only toggle controls HUD without pausing
+            toggleControlsVisibility();
           }
-        }
+          lastTapTime = 0;
+          lastTapZone = null;
+        }, 320);
+      }
+    }
 
-        _playerAdPending = true;
-        _playerAdStartTime = Date.now();
-        _playerAdLeftApp = false;
+    const leftZone = document.getElementById('tapLeftZone');
+    const centerZone = document.getElementById('tapCenterZone');
+    const rightZone = document.getElementById('tapRightZone');
 
-        const hudBtn = document.getElementById('hudBtnText');
-        if (hudBtn) hudBtn.textContent = '⏳ Visiting...';
+    if (leftZone) leftZone.addEventListener('click', (e) => handleZoneTap('left', e));
+    if (centerZone) centerZone.addEventListener('click', (e) => handleZoneTap('center', e));
+    if (rightZone) rightZone.addEventListener('click', (e) => handleZoneTap('right', e));
 
-        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || 
-                      (window.Telegram?.WebApp?.platform === 'ios');
-        if (isIOS) {
-          showPassAlert("👉 On iPhone: Tap \"Open\" in Telegram to count your ad!");
-        }
+    // PC Keyboard Shortcuts
+    window.addEventListener('keydown', function (e) {
+      const tag = (document.activeElement?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea') return;
+      if (e.code === 'Space' || e.key === ' ' || e.key === 'k' || e.key === 'K') {
+        e.preventDefault();
+        togglePlayState();
+      } else if (e.key === 'ArrowLeft' || e.key === 'j' || e.key === 'J') {
+        e.preventDefault();
+        seekDelta(-10);
+        showRippleIndicator('left');
+      } else if (e.key === 'ArrowRight' || e.key === 'l' || e.key === 'L') {
+        e.preventDefault();
+        seekDelta(10);
+        showRippleIndicator('right');
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleFullscreenState();
+      } else if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        toggleMuteState();
+      }
+    });
 
-        document.addEventListener('visibilitychange', onPlayerVisibilityChange);
-        window.addEventListener('focus', onPlayerFocusReturn);
-        window.addEventListener('pageshow', onPlayerFocusReturn);
-        window.addEventListener('blur', function() { if (_playerAdPending) _playerAdLeftApp = true; }, { once: true });
-
-        // 1. If in genuine Telegram client, use Telegram SDK openLink
-        const tg = getActiveTelegramWebApp();
-        if (tg) {
-          if (e && typeof e.preventDefault === 'function') e.preventDefault();
-          // On iOS Telegram, SFSafariViewController opens over the webview without always firing iframe blur
-          setTimeout(function() { if (_playerAdPending) _playerAdLeftApp = true; }, 1200);
-          try {
-            tg.openLink(MONETAG_SMARTLINK);
-          } catch (_) {
-            window.open(MONETAG_SMARTLINK, '_blank');
-          }
-        } else {
-          setTimeout(function() { if (_playerAdPending) _playerAdLeftApp = true; }, 1200);
-          if (!e || !e.target || !e.target.closest || !e.target.closest('a')) {
-            try {
-              const w = window.open(MONETAG_SMARTLINK, '_blank');
-              if (!w || w.closed || typeof w.closed === 'undefined') {
-                window.location.href = MONETAG_SMARTLINK;
-              }
-            } catch (_) {
-              window.location.href = MONETAG_SMARTLINK;
-            }
-          }
-        }
-
-        // Poll for focus/visibility return (ensures iPhone SFSafariViewController close is detected even without iframe focus event)
-        if (_playerAdPollTimer) clearInterval(_playerAdPollTimer);
-        _playerAdPollTimer = setInterval(function() {
-          if (!_playerAdPending) {
-            clearInterval(_playerAdPollTimer);
-            _playerAdPollTimer = null;
-            return;
-          }
-          if (document.hidden || !document.hasFocus()) {
-            _playerAdLeftApp = true;
-          } else if (_playerAdLeftApp && (Date.now() - _playerAdStartTime >= 3500)) {
-            verifyAndCompletePlayerAd(false);
-          }
-        }, 600);
-
-        // Inform parent app in case parent maintains daily stats
+    // Orientation lock when Plyr triggers fullscreen
+    if (window.plyrInstance) {
+      window.plyrInstance.on('enterfullscreen', () => {
+        lockToLandscape();
         try {
           if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ action: "watchAdForPass", tierId: "4h" }, "*");
+            window.parent.postMessage({ action: 'playerEnteredFullscreen' }, '*');
           }
-        } catch (_) {}
+        } catch (_) { }
+      });
+      window.plyrInstance.on('exitfullscreen', () => {
+        unlockFromLandscape();
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ action: 'playerExitedFullscreen' }, '*');
+          }
+        } catch (_) { }
+      });
+    }
 
-        // Safety timeout if user clicked Cancel on Telegram prompt or never left
-        if (_playerCancelTimer) clearTimeout(_playerCancelTimer);
-        _playerCancelTimer = setTimeout(function() {
-          if (_playerAdPending) {
-            if (_playerAdLeftApp && !document.hidden) {
-              verifyAndCompletePlayerAd(false);
-            } else if (!_playerAdLeftApp) {
-              _playerAdPending = false;
-              cleanupPlayerAdListeners();
-              updatePassUI();
-              showPassAlert("⚠️ Sponsor visit not detected. Tap \"Open\" when Telegram asks!");
-            }
-          }
-        }, 12000);
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        lockToLandscape();
+      } else {
+        unlockFromLandscape();
       }
-
-      const btnGetPill = document.getElementById('btnGetPassPill');
-      if (btnGetPill) btnGetPill.addEventListener('click', triggerPassAdWatch);
-
-      const btnHudWatchAd = document.getElementById('btnHudWatchAd');
-      if (btnHudWatchAd) btnHudWatchAd.addEventListener('click', triggerPassAdWatch);
-
-      // Decrement logic:
-      // Real-time pass counts down continuously; Banked streaming time only decrements while video is playing!
-      setInterval(function() {
-        const state = getActivePassState();
-
-        if (state.realTimeSec > 0) {
-          // Real-time pass active: counts down automatically
-          updatePassUI();
-        } else if (state.bankSec > 0 && videoEl && !videoEl.paused && !videoEl.ended) {
-          // Banked streaming time: only ticks down while video is playing!
-          const newBank = state.bankSec - 1;
-          localStorage.setItem('filmhouse_stream_bank_sec', String(newBank));
-          updatePassUI();
-          if (newBank <= 0) {
-            videoEl.pause();
-            const hud = document.getElementById('streamPassHud');
-            if (hud) {
-              hud.style.display = 'flex';
-              hud.classList.add('pulse-alert');
-            }
-            showPassAlert("⚠️ Stream time expired. Watch 2 sponsor ads to resume!");
-            updatePassUI();
-          }
-        } else {
-          updatePassUI();
-          if (!state.hasAccess && videoEl && !videoEl.paused && !videoEl.ended) {
-            // Mid-stream expiry: pause playback and prompt user on bottom HUD
-            videoEl.pause();
-            const hud = document.getElementById('streamPassHud');
-            if (hud) {
-              hud.style.display = 'flex';
-              hud.classList.add('pulse-alert');
-            }
-            showPassAlert("⚠️ 4-Hour Pass Expired. Watch 2 sponsor ads to resume!");
-            updatePassUI();
-          }
-        }
-      }, 1000);
-
-      updatePassUI();
-
-      // Strict Playback Gate: Video is NEVER permitted to play without an active Pass or Banked Streaming Time!
-      if (videoEl) {
-        videoEl.addEventListener('play', function() {
-          const passState = getActivePassState();
-          if (!passState.hasAccess) {
-            videoEl.pause();
-            const hud = document.getElementById('streamPassHud');
-            if (hud) {
-              hud.style.display = 'flex';
-              hud.classList.add('pulse-alert');
-            }
-            showPassAlert("⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!");
-            updatePassUI();
-          }
-        });
+    });
+    document.addEventListener('webkitfullscreenchange', () => {
+      if (document.webkitFullscreenElement) {
+        lockToLandscape();
+      } else {
+        unlockFromLandscape();
       }
+    });
 
-      function showPreRollAd() {
-        const passState = getActivePassState();
-        if (!passState.hasAccess) {
-          const preRoll = document.getElementById('preRollOverlay');
-          if (preRoll) preRoll.style.display = 'flex';
-          updatePassUI();
-        }
-      }
-
-      // Click & Touch-to-Play Overlay (Requires active pass; otherwise triggers 2-Ad Sponsor HUD)
-      if (playOverlay) {
-        function triggerStreamPlay(e) {
-          if (e) {
-            e.preventDefault();
-            e.stopPropagation();
+    window.addEventListener('message', function (ev) {
+      if (!ev.data) return;
+      if (ev.data.action === 'switchServer' || ev.data.action === 'loadNewStream') {
+        const newStreamUrl = ev.data.url;
+        if (newStreamUrl) {
+          finalStreamUrl = newStreamUrl;
+          if (downloadBtn) downloadBtn.href = finalStreamUrl;
+          if (window._currentHls) {
+            window._currentHls.destroy();
+            window._currentHls = null;
           }
-
-          // If an ad was pending and >= 2.2s elapsed, complete it right on this tap!
-          if (_playerAdPending && (Date.now() - _playerAdStartTime >= 2200)) {
-            verifyAndCompletePlayerAd(true);
+          if (videoEl) {
+            videoEl.removeAttribute('src');
+            videoEl.load();
           }
-
-          const passState = getActivePassState();
-
-          if (passState.hasAccess) {
-            attachStreamSource();
-
-            // Keep pointerEvents = 'auto' until frames actually render so iOS never opens a black 00:00 native player!
-            playOverlay.style.pointerEvents = 'auto';
+          if (playOverlay) {
+            playOverlay.style.display = 'flex';
+            playOverlay.style.opacity = '1';
             playOverlay.classList.add('connecting');
-            const playTitle = document.getElementById('streamPlayTitle');
-            const playSub = document.getElementById('streamPlaySub');
-            if (playTitle) playTitle.textContent = '⚡ Connecting High-Speed Stream...';
-            if (playSub) playSub.textContent = 'Buffering 1080p Cinema • Starting Movie';
-
-            if (_connectTimeoutTimer) clearTimeout(_connectTimeoutTimer);
-            _connectTimeoutTimer = setTimeout(function() {
-              if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
-                console.warn("[Player] Stream connection timeout (>6s) on primary server");
-                if (errorCard) {
-                  errorCard.style.display = 'flex';
-                  errorCard.innerHTML = `
-                    <span>⚡ Server 1 connection is slow...</span>
-                    <button type="button" onclick="window.retryStreamPlayback()" style="background:#ffd700;color:#000;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Retry</button>
-                    <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Server 2 (VIP)</button>
-                  `;
-                }
-                restoreInteractivePlayOverlay(
-                  '▶ Tap to Retry Stream',
-                  '⚡ Slow response from Server 1 • Tap here or switch to Server 2 below'
-                );
-              }
-            }, 6000);
-
-            try {
-              const p = videoEl.play();
-              if (p !== undefined) {
-                p.then(() => {
-                  console.log("Stream video playback initiated successfully");
-                }).catch(err => {
-                  console.log("Direct videoEl.play notice:", err);
-                  if (window.plyrInstance) {
-                    window.plyrInstance.play().catch(() => {
-                      restoreInteractivePlayOverlay('▶ Tap to Start Movie', '1080p FHD Cinema Ready');
-                    });
-                  } else {
-                    restoreInteractivePlayOverlay('▶ Tap to Start Movie', '1080p FHD Cinema Ready');
-                  }
-                });
-              }
-            } catch (_) {
-              if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
-            }
-          } else {
-            // User has NO active pass -> Pulse the bottom HUD bar!
-            try { videoEl.pause(); } catch(_) {}
-            const hud = document.getElementById('streamPassHud');
-            if (hud) {
-              hud.style.display = 'flex';
-              hud.classList.remove('pulse-alert');
-              void hud.offsetWidth; // force reflow for CSS animation restart
-              hud.classList.add('pulse-alert');
-            }
-            showPassAlert("⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!");
-            updatePassUI();
+            const pt = document.getElementById('streamPlayTitle');
+            if (pt) pt.textContent = '⚡ Connecting Server 2...';
+            const ps = document.getElementById('streamPlaySub');
+            if (ps) ps.textContent = 'Buffering High-Speed Stream • Film House VIP';
           }
+          attachStreamSource();
+          if (videoEl) videoEl.play().catch(() => { });
         }
-
-        playOverlay.addEventListener('click', triggerStreamPlay, { passive: false });
-        playOverlay.addEventListener('touchend', function(e) {
-          triggerStreamPlay(e);
-        }, { passive: false });
-      }
-
-      // Monetag SmartLink on Direct Download button
-      if (downloadBtn) {
-        downloadBtn.addEventListener('click', function(e) {
-          openTelegramLink(MONETAG_SMARTLINK);
-        });
-      }
-
-      // Listen for parent Mini App fullscreen requests
-      // Detect and broadcast embedded subtitles and audio tracks to parent app
-      function detectAndBroadcastTracks() {
-        if (!videoEl) return;
-        // Ensure soft subtitles default to disabled unless explicitly activated
-        if (!window._subtitlesExplicitlyActive && videoEl.textTracks) {
+      } else if (ev.data.action === 'enterFullscreen') {
+        lockToLandscape();
+        if (window.plyrInstance && window.plyrInstance.fullscreen) {
+          window.plyrInstance.fullscreen.enter();
+        } else if (videoEl && videoEl.requestFullscreen) {
+          videoEl.requestFullscreen().catch(() => { });
+        }
+      } else if (ev.data.action === 'exitFullscreen') {
+        unlockFromLandscape();
+        if (window.plyrInstance && window.plyrInstance.fullscreen) {
+          window.plyrInstance.fullscreen.exit();
+        } else if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => { });
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      } else if (ev.data.action === 'togglePlay') {
+        togglePlayState();
+      } else if (ev.data.action === 'seek') {
+        seekDelta(parseFloat(ev.data.seconds || 0));
+      } else if (ev.data.action === 'toggleFullscreen') {
+        toggleFullscreenState();
+      } else if (ev.data.action === 'toggleMute') {
+        toggleMuteState();
+      } else if (ev.data.action === 'loadSubtitle') {
+        if (ev.data.text) {
+          attachSubtitleTrack(ev.data.text, ev.data.lang || 'Captions', true);
+        } else if (ev.data.url) {
+          attachSubtitleTrack(ev.data.url, ev.data.lang || 'Captions', false);
+        }
+        detectAndBroadcastTracks();
+      } else if (ev.data.action === 'toggleSubtitles') {
+        const enable = !!ev.data.enable;
+        window._subtitlesExplicitlyActive = enable;
+        let activeLabel = '';
+        if (videoEl.textTracks && videoEl.textTracks.length > 0) {
           for (let i = 0; i < videoEl.textTracks.length; i++) {
-            if (videoEl.textTracks[i].mode !== 'disabled') {
+            if (enable && i === 0) {
+              videoEl.textTracks[i].mode = 'showing';
+              activeLabel = videoEl.textTracks[i].label || videoEl.textTracks[i].language || 'ON';
+            } else {
               videoEl.textTracks[i].mode = 'disabled';
             }
           }
         }
-        const subTracks = [];
-        let anyShowing = false;
-        let showingLabel = '';
-
-        if (videoEl.textTracks) {
-          for (let i = 0; i < videoEl.textTracks.length; i++) {
-            const t = videoEl.textTracks[i];
-            const isShowing = (t.mode === 'showing');
-            if (isShowing) {
-              anyShowing = true;
-              showingLabel = t.label || t.language || 'ON';
-            }
-            subTracks.push({
-              index: i,
-              label: t.label || t.language || `Track ${i + 1}`,
-              lang: t.language || 'en',
-              kind: t.kind || 'subtitles',
-              mode: t.mode
-            });
-          }
-        }
-
-        const audioTracks = [];
-        if (window._currentHls && window._currentHls.audioTracks && window._currentHls.audioTracks.length > 0) {
-          const curIdx = window._currentHls.audioTrack;
-          window._currentHls.audioTracks.forEach((at, idx) => {
-            audioTracks.push({
-              index: idx,
-              label: at.name || at.lang || `Audio ${idx + 1}`,
-              lang: at.lang || '',
-              enabled: (idx === curIdx)
-            });
-          });
-        } else if (videoEl.audioTracks && videoEl.audioTracks.length > 0) {
-          for (let i = 0; i < videoEl.audioTracks.length; i++) {
-            const a = videoEl.audioTracks[i];
-            audioTracks.push({
-              index: i,
-              label: a.label || a.language || `Audio ${i + 1}`,
-              lang: a.language || '',
-              enabled: a.enabled
-            });
-          }
-        }
-
-        // Universal Fallback for mobile WebViews / Plyr where videoEl.audioTracks is not exposed
-        if (audioTracks.length === 0) {
-          audioTracks.push({
-            index: 0,
-            label: "Audio 1 (Original / Default)",
-            lang: "orig",
-            enabled: true
-          });
-        }
-
+        const tracks = videoEl.querySelectorAll('track');
+        tracks.forEach((t, i) => {
+          t.mode = (enable && i === 0) ? 'showing' : 'disabled';
+        });
         try {
           if (window.parent && window.parent !== window) {
             window.parent.postMessage({
-              action: 'videoTracksDetected',
-              subtitles: subTracks,
-              audios: audioTracks,
-              audioTracks: audioTracks,
-              subtitlesActive: anyShowing,
-              activeSubtitleLabel: showingLabel
+              action: 'subtitleStateChanged',
+              enabled: enable,
+              label: activeLabel || (enable ? 'On' : 'Off')
             }, '*');
           }
-        } catch (e) {}
-      }
-
-      videoEl.addEventListener('loadedmetadata', detectAndBroadcastTracks);
-      videoEl.addEventListener('canplay', detectAndBroadcastTracks);
-
-      async function lockToLandscape() {
-        try {
-          // 1. Native iOS / Safari / WebKit fullscreen rotation
-          if (videoEl && typeof videoEl.webkitEnterFullscreen === 'function' && !document.fullscreenElement) {
-            videoEl.webkitEnterFullscreen();
-          }
-        } catch (_) {}
-        try {
-          // 2. Telegram WebApp SDK orientation lock
-          if (window.Telegram?.WebApp?.lockOrientation) {
-            window.Telegram.WebApp.lockOrientation('landscape');
-          }
-        } catch (_) {}
-        try {
-          // 3. HTML5 Screen Orientation API
-          if (screen.orientation && screen.orientation.lock) {
-            await screen.orientation.lock('landscape').catch(() => {});
-          } else if (screen.lockOrientation) {
-            screen.lockOrientation('landscape');
-          } else if (screen.mozLockOrientation) {
-            screen.mozLockOrientation('landscape');
-          } else if (screen.msLockOrientation) {
-            screen.msLockOrientation('landscape');
-          }
-        } catch (_) {}
-      }
-
-      function unlockFromLandscape() {
-        try {
-          if (window.Telegram?.WebApp?.unlockOrientation) {
-            window.Telegram.WebApp.unlockOrientation();
-          }
-        } catch (_) {}
-        try {
-          if (screen.orientation && screen.orientation.unlock) {
-            screen.orientation.unlock();
-          } else if (screen.unlockOrientation) {
-            screen.unlockOrientation();
-          }
-        } catch (_) {}
-      }
-
-      function togglePlayState() {
-        if (window.plyrInstance) {
-          window.plyrInstance.togglePlay();
-        } else if (videoEl) {
-          if (videoEl.paused) videoEl.play().catch(() => {});
-          else videoEl.pause();
-        }
-      }
-
-      function seekDelta(seconds) {
-        if (window.plyrInstance) {
-          const cur = window.plyrInstance.currentTime || 0;
-          const dur = window.plyrInstance.duration || 0;
-          window.plyrInstance.currentTime = Math.max(0, Math.min(dur ? dur - 1 : 999999, cur + seconds));
-        } else if (videoEl) {
-          const cur = videoEl.currentTime || 0;
-          const dur = videoEl.duration || 0;
-          videoEl.currentTime = Math.max(0, Math.min(dur ? dur - 1 : 999999, cur + seconds));
-        }
-      }
-
-      function toggleFullscreenState() {
-        if (window.plyrInstance && window.plyrInstance.fullscreen) {
-          window.plyrInstance.fullscreen.toggle();
-        } else if (document.fullscreenElement) {
-          if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
-        } else if (videoEl && videoEl.requestFullscreen) {
-          videoEl.requestFullscreen().catch(() => {});
-        } else if (videoEl && typeof videoEl.webkitEnterFullscreen === 'function') {
-          videoEl.webkitEnterFullscreen();
-        }
-      }
-
-      function toggleControlsVisibility() {
-        if (window.plyrInstance && typeof window.plyrInstance.toggleControls === 'function') {
-          window.plyrInstance.toggleControls();
-        }
-      }
-
-      function toggleMuteState() {
-        if (window.plyrInstance) {
-          window.plyrInstance.muted = !window.plyrInstance.muted;
-        } else if (videoEl) {
-          videoEl.muted = !videoEl.muted;
-        }
-      }
-
-      function showRippleIndicator(side) {
-        const el = document.getElementById(side === 'left' ? 'rippleLeft' : 'rippleRight');
-        if (!el) return;
-        el.classList.remove('animate');
-        void el.offsetWidth;
-        el.classList.add('animate');
-        setTimeout(() => {
-          el.classList.remove('animate');
-        }, 700);
-      }
-
-      // YouTube-style Tap Controls:
-      // Single tap -> Play / Pause
-      // Double tap Left -> Rewind 10s
-      // Double tap Right -> Forward 10s
-      let lastTapTime = 0;
-      let tapTimeout = null;
-      let lastTapZone = null;
-
-      function handleZoneTap(zone, e) {
-        if (!document.body.classList.contains('stream-started')) return;
-        if (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        const now = Date.now();
-        const diff = now - lastTapTime;
-
-        if (diff < 320 && lastTapZone === zone) {
-          // Double-tap detected on same zone
-          clearTimeout(tapTimeout);
-          lastTapTime = 0;
-          lastTapZone = null;
-
-          if (zone === 'left') {
-            seekDelta(-10);
-            showRippleIndicator('left');
-          } else if (zone === 'right') {
-            seekDelta(10);
-            showRippleIndicator('right');
-          } else if (zone === 'center') {
-            togglePlayState();
-          }
-        } else {
-          // First tap candidate
-          lastTapTime = now;
-          lastTapZone = zone;
-          clearTimeout(tapTimeout);
-          tapTimeout = setTimeout(() => {
-            if (zone === 'center') {
-              // ONLY middle zone single-tap toggles Play / Pause!
-              togglePlayState();
+        } catch (_) { }
+      } else if (ev.data.action === 'selectSubtitleTrack') {
+        const targetIndex = ev.data.index; // -1 to turn off
+        const isEnabled = (targetIndex !== -1);
+        window._subtitlesExplicitlyActive = isEnabled;
+        let activeLabel = '';
+        if (videoEl.textTracks) {
+          for (let i = 0; i < videoEl.textTracks.length; i++) {
+            if (i === targetIndex) {
+              videoEl.textTracks[i].mode = 'showing';
+              activeLabel = videoEl.textTracks[i].label || videoEl.textTracks[i].language || 'ON';
             } else {
-              // Left & Right side taps only toggle controls HUD without pausing
-              toggleControlsVisibility();
-            }
-            lastTapTime = 0;
-            lastTapZone = null;
-          }, 320);
-        }
-      }
-
-      const leftZone = document.getElementById('tapLeftZone');
-      const centerZone = document.getElementById('tapCenterZone');
-      const rightZone = document.getElementById('tapRightZone');
-
-      if (leftZone) leftZone.addEventListener('click', (e) => handleZoneTap('left', e));
-      if (centerZone) centerZone.addEventListener('click', (e) => handleZoneTap('center', e));
-      if (rightZone) rightZone.addEventListener('click', (e) => handleZoneTap('right', e));
-
-      // PC Keyboard Shortcuts
-      window.addEventListener('keydown', function(e) {
-        const tag = (document.activeElement?.tagName || '').toLowerCase();
-        if (tag === 'input' || tag === 'textarea') return;
-        if (e.code === 'Space' || e.key === ' ' || e.key === 'k' || e.key === 'K') {
-          e.preventDefault();
-          togglePlayState();
-        } else if (e.key === 'ArrowLeft' || e.key === 'j' || e.key === 'J') {
-          e.preventDefault();
-          seekDelta(-10);
-          showRippleIndicator('left');
-        } else if (e.key === 'ArrowRight' || e.key === 'l' || e.key === 'L') {
-          e.preventDefault();
-          seekDelta(10);
-          showRippleIndicator('right');
-        } else if (e.key === 'f' || e.key === 'F') {
-          e.preventDefault();
-          toggleFullscreenState();
-        } else if (e.key === 'm' || e.key === 'M') {
-          e.preventDefault();
-          toggleMuteState();
-        }
-      });
-
-      // Orientation lock when Plyr triggers fullscreen
-      if (window.plyrInstance) {
-        window.plyrInstance.on('enterfullscreen', () => {
-          lockToLandscape();
-          try {
-            if (window.parent && window.parent !== window) {
-              window.parent.postMessage({ action: 'playerEnteredFullscreen' }, '*');
-            }
-          } catch (_) {}
-        });
-        window.plyrInstance.on('exitfullscreen', () => {
-          unlockFromLandscape();
-          try {
-            if (window.parent && window.parent !== window) {
-              window.parent.postMessage({ action: 'playerExitedFullscreen' }, '*');
-            }
-          } catch (_) {}
-        });
-      }
-
-      document.addEventListener('fullscreenchange', () => {
-        if (document.fullscreenElement) {
-          lockToLandscape();
-        } else {
-          unlockFromLandscape();
-        }
-      });
-      document.addEventListener('webkitfullscreenchange', () => {
-        if (document.webkitFullscreenElement) {
-          lockToLandscape();
-        } else {
-          unlockFromLandscape();
-        }
-      });
-
-      window.addEventListener('message', function(ev) {
-        if (!ev.data) return;
-        if (ev.data.action === 'switchServer' || ev.data.action === 'loadNewStream') {
-          const newStreamUrl = ev.data.url;
-          if (newStreamUrl) {
-            finalStreamUrl = newStreamUrl;
-            if (downloadBtn) downloadBtn.href = finalStreamUrl;
-            if (window._currentHls) {
-              window._currentHls.destroy();
-              window._currentHls = null;
-            }
-            if (videoEl) {
-              videoEl.removeAttribute('src');
-              videoEl.load();
-            }
-            if (playOverlay) {
-              playOverlay.style.display = 'flex';
-              playOverlay.style.opacity = '1';
-              playOverlay.classList.add('connecting');
-              const pt = document.getElementById('streamPlayTitle');
-              if (pt) pt.textContent = '⚡ Connecting Server 2...';
-              const ps = document.getElementById('streamPlaySub');
-              if (ps) ps.textContent = 'Buffering High-Speed Stream • Film House VIP';
-            }
-            attachStreamSource();
-            if (videoEl) videoEl.play().catch(() => {});
-          }
-        } else if (ev.data.action === 'enterFullscreen') {
-          lockToLandscape();
-          if (window.plyrInstance && window.plyrInstance.fullscreen) {
-            window.plyrInstance.fullscreen.enter();
-          } else if (videoEl && videoEl.requestFullscreen) {
-            videoEl.requestFullscreen().catch(() => {});
-          }
-        } else if (ev.data.action === 'exitFullscreen') {
-          unlockFromLandscape();
-          if (window.plyrInstance && window.plyrInstance.fullscreen) {
-            window.plyrInstance.fullscreen.exit();
-          } else if (document.exitFullscreen) {
-            document.exitFullscreen().catch(() => {});
-          } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-          }
-        } else if (ev.data.action === 'togglePlay') {
-          togglePlayState();
-        } else if (ev.data.action === 'seek') {
-          seekDelta(parseFloat(ev.data.seconds || 0));
-        } else if (ev.data.action === 'toggleFullscreen') {
-          toggleFullscreenState();
-        } else if (ev.data.action === 'toggleMute') {
-          toggleMuteState();
-        } else if (ev.data.action === 'loadSubtitle') {
-          if (ev.data.text) {
-            attachSubtitleTrack(ev.data.text, ev.data.lang || 'Captions', true);
-          } else if (ev.data.url) {
-            attachSubtitleTrack(ev.data.url, ev.data.lang || 'Captions', false);
-          }
-          detectAndBroadcastTracks();
-        } else if (ev.data.action === 'toggleSubtitles') {
-          const enable = !!ev.data.enable;
-          window._subtitlesExplicitlyActive = enable;
-          let activeLabel = '';
-          if (videoEl.textTracks && videoEl.textTracks.length > 0) {
-            for (let i = 0; i < videoEl.textTracks.length; i++) {
-              if (enable && i === 0) {
-                videoEl.textTracks[i].mode = 'showing';
-                activeLabel = videoEl.textTracks[i].label || videoEl.textTracks[i].language || 'ON';
-              } else {
-                videoEl.textTracks[i].mode = 'disabled';
-              }
-            }
-          }
-          const tracks = videoEl.querySelectorAll('track');
-          tracks.forEach((t, i) => {
-            t.mode = (enable && i === 0) ? 'showing' : 'disabled';
-          });
-          try {
-            if (window.parent && window.parent !== window) {
-              window.parent.postMessage({
-                action: 'subtitleStateChanged',
-                enabled: enable,
-                label: activeLabel || (enable ? 'On' : 'Off')
-              }, '*');
-            }
-          } catch (_) {}
-        } else if (ev.data.action === 'selectSubtitleTrack') {
-          const targetIndex = ev.data.index; // -1 to turn off
-          const isEnabled = (targetIndex !== -1);
-          window._subtitlesExplicitlyActive = isEnabled;
-          let activeLabel = '';
-          if (videoEl.textTracks) {
-            for (let i = 0; i < videoEl.textTracks.length; i++) {
-              if (i === targetIndex) {
-                videoEl.textTracks[i].mode = 'showing';
-                activeLabel = videoEl.textTracks[i].label || videoEl.textTracks[i].language || 'ON';
-              } else {
-                videoEl.textTracks[i].mode = 'disabled';
-              }
-            }
-          }
-          if (targetIndex === -1) {
-            const tracks = videoEl.querySelectorAll('track');
-            tracks.forEach(t => { t.mode = 'disabled'; });
-          }
-          try {
-            if (window.parent && window.parent !== window) {
-              window.parent.postMessage({
-                action: 'subtitleStateChanged',
-                enabled: isEnabled,
-                label: activeLabel || (isEnabled ? 'On' : 'Off')
-              }, '*');
-            }
-          } catch (_) {}
-        } else if (ev.data.action === 'selectAudioTrack') {
-          const targetIndex = parseInt(ev.data.index, 10);
-          window._selectedAudioTrackIndex = targetIndex;
-          if (window._currentHls && typeof window._currentHls.audioTrack !== 'undefined') {
-            window._currentHls.audioTrack = targetIndex;
-          }
-          let switchedClientSide = false;
-          if (videoEl && videoEl.audioTracks && videoEl.audioTracks.length > 1) {
-            for (let i = 0; i < videoEl.audioTracks.length; i++) {
-              videoEl.audioTracks[i].enabled = (i === targetIndex);
-            }
-            switchedClientSide = true;
-          }
-          // Only attempt stream reload if there are multiple tracks and not switched client-side
-          if (!switchedClientSide && targetIndex > 0 && ev.data.reloadWithTrack) {
-            try {
-              const curTime = (videoEl && videoEl.currentTime > 0) ? Math.floor(videoEl.currentTime) : 0;
-              const wasPlaying = (videoEl && !videoEl.paused);
-              let newUrl = finalStreamUrl || (videoEl ? videoEl.src : '');
-              if (newUrl) {
-                // Strip existing audio and seek parameters - NEVER inject destructive &ss=
-                newUrl = newUrl.replace(/([?&])audio=\d+/g, '').replace(/([?&])ss=\d+/g, '').replace(/([?&])t=\d+/g, '');
-                const sep = newUrl.includes('?') ? '&' : '?';
-                newUrl = `${newUrl}${sep}audio=${targetIndex}`;
-                finalStreamUrl = newUrl;
-
-                if (loaderEl) {
-                  loaderEl.style.display = 'flex';
-                  loaderEl.style.opacity = '1';
-                  const lt = loaderEl.querySelector('.loader-text');
-                  if (lt) lt.textContent = '🔊 Switching Audio Track...';
-                }
-
-                videoEl.src = newUrl;
-
-                const resumeHandler = function() {
-                  try {
-                    if (curTime > 0) {
-                      videoEl.currentTime = curTime;
-                    }
-                    if (wasPlaying) {
-                      videoEl.play().catch(() => {});
-                    }
-                  } catch (_) {}
-                };
-                videoEl.addEventListener('loadedmetadata', resumeHandler, { once: true });
-                videoEl.addEventListener('canplay', resumeHandler, { once: true });
-                detectAndBroadcastTracks();
-                return;
-              }
-            } catch (_) {}
-          }
-          detectAndBroadcastTracks();
-        } else if (ev.data.action === 'purgeSubtitles' || ev.data.action === 'removeSubtitle' || ev.data.action === 'nukeSubtitles') {
-          activeCues = [];
-          window._subtitlesDisabled = true;
-          window._subtitlesExplicitlyActive = false;
-          window._activeSubtitleTrack = null;
-          const customSubEl = document.getElementById('customSubtitleText');
-          if (customSubEl) {
-            customSubEl.textContent = '';
-            customSubEl.style.display = 'none';
-          }
-          if (videoEl && videoEl.textTracks) {
-            for (let i = 0; i < videoEl.textTracks.length; i++) {
               videoEl.textTracks[i].mode = 'disabled';
             }
           }
-          const dynamicSubs = videoEl ? videoEl.querySelectorAll('track') : [];
-          dynamicSubs.forEach(t => t.remove());
-          if (window.plyrInstance) {
-            try { window.plyrInstance.toggleCaptions(false); } catch (_) {}
+        }
+        if (targetIndex === -1) {
+          const tracks = videoEl.querySelectorAll('track');
+          tracks.forEach(t => { t.mode = 'disabled'; });
+        }
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+              action: 'subtitleStateChanged',
+              enabled: isEnabled,
+              label: activeLabel || (isEnabled ? 'On' : 'Off')
+            }, '*');
           }
-          const activeLabel = document.getElementById('activeSubLabel');
-          if (activeLabel) activeLabel.textContent = 'Subtitles';
+        } catch (_) { }
+      } else if (ev.data.action === 'selectAudioTrack') {
+        const targetIndex = parseInt(ev.data.index, 10);
+        window._selectedAudioTrackIndex = targetIndex;
+        if (window._currentHls && typeof window._currentHls.audioTrack !== 'undefined') {
+          window._currentHls.audioTrack = targetIndex;
+        }
+        let switchedClientSide = false;
+        if (videoEl && videoEl.audioTracks && videoEl.audioTracks.length > 1) {
+          for (let i = 0; i < videoEl.audioTracks.length; i++) {
+            videoEl.audioTracks[i].enabled = (i === targetIndex);
+          }
+          switchedClientSide = true;
+        }
+        // Only attempt stream reload if there are multiple tracks and not switched client-side
+        if (!switchedClientSide && targetIndex > 0 && ev.data.reloadWithTrack) {
           try {
-            if (window.parent && window.parent !== window) {
-              window.parent.postMessage({
-                action: 'subtitleStateChanged',
-                enabled: false,
-                label: 'Off'
-              }, '*');
+            const curTime = (videoEl && videoEl.currentTime > 0) ? Math.floor(videoEl.currentTime) : 0;
+            const wasPlaying = (videoEl && !videoEl.paused);
+            let newUrl = finalStreamUrl || (videoEl ? videoEl.src : '');
+            if (newUrl) {
+              // Strip existing audio and seek parameters - NEVER inject destructive &ss=
+              newUrl = newUrl.replace(/([?&])audio=\d+/g, '').replace(/([?&])ss=\d+/g, '').replace(/([?&])t=\d+/g, '');
+              const sep = newUrl.includes('?') ? '&' : '?';
+              newUrl = `${newUrl}${sep}audio=${targetIndex}`;
+              finalStreamUrl = newUrl;
+
+              if (loaderEl) {
+                loaderEl.style.display = 'flex';
+                loaderEl.style.opacity = '1';
+                const lt = loaderEl.querySelector('.loader-text');
+                if (lt) lt.textContent = '🔊 Switching Audio Track...';
+              }
+
+              videoEl.src = newUrl;
+
+              const resumeHandler = function () {
+                try {
+                  if (curTime > 0) {
+                    videoEl.currentTime = curTime;
+                  }
+                  if (wasPlaying) {
+                    videoEl.play().catch(() => { });
+                  }
+                } catch (_) { }
+              };
+              videoEl.addEventListener('loadedmetadata', resumeHandler, { once: true });
+              videoEl.addEventListener('canplay', resumeHandler, { once: true });
+              detectAndBroadcastTracks();
+              return;
             }
-          } catch (_) {}
-        } else if (ev.data.action === 'requestTracks') {
-          detectAndBroadcastTracks();
-        } else if (ev.data.action === 'adjustSubtitleOffset') {
-          adjustSubtitleOffset(parseFloat(ev.data.delta || 0), false);
-        } else if (ev.data.action === 'setSubtitleOffset') {
-          adjustSubtitleOffset(parseFloat(ev.data.offset || 0), true);
-        } else if (ev.data.action === 'syncToVoice') {
-          syncToVoice();
+          } catch (_) { }
         }
-      });
-
-      const defaultStreamServer = (serverParam || "https://filmhouse-stream.duckdns.org").replace(/\/+$/, "");
-      const isSeries = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
-
-      const playTitleEl = document.getElementById('streamPlayTitle');
-      const playSubEl = document.getElementById('streamPlaySub');
-      const cleanTitle = titleParam ? decodeURIComponent(titleParam).trim() : '';
-
-      if (playTitleEl) {
-        if (isSeries) {
-          playTitleEl.textContent = cleanTitle ? `▶ Start Watching "${cleanTitle}"` : '▶ Start Watching Series';
-        } else {
-          playTitleEl.textContent = cleanTitle ? `▶ Tap to Watch "${cleanTitle}"` : '▶ Tap to Watch Movie';
+        detectAndBroadcastTracks();
+      } else if (ev.data.action === 'purgeSubtitles' || ev.data.action === 'removeSubtitle' || ev.data.action === 'nukeSubtitles') {
+        activeCues = [];
+        window._subtitlesDisabled = true;
+        window._subtitlesExplicitlyActive = false;
+        window._activeSubtitleTrack = null;
+        const customSubEl = document.getElementById('customSubtitleText');
+        if (customSubEl) {
+          customSubEl.textContent = '';
+          customSubEl.style.display = 'none';
         }
+        if (videoEl && videoEl.textTracks) {
+          for (let i = 0; i < videoEl.textTracks.length; i++) {
+            videoEl.textTracks[i].mode = 'disabled';
+          }
+        }
+        const dynamicSubs = videoEl ? videoEl.querySelectorAll('track') : [];
+        dynamicSubs.forEach(t => t.remove());
+        if (window.plyrInstance) {
+          try { window.plyrInstance.toggleCaptions(false); } catch (_) { }
+        }
+        const activeLabel = document.getElementById('activeSubLabel');
+        if (activeLabel) activeLabel.textContent = 'Subtitles';
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+              action: 'subtitleStateChanged',
+              enabled: false,
+              label: 'Off'
+            }, '*');
+          }
+        } catch (_) { }
+      } else if (ev.data.action === 'requestTracks') {
+        detectAndBroadcastTracks();
+      } else if (ev.data.action === 'adjustSubtitleOffset') {
+        adjustSubtitleOffset(parseFloat(ev.data.delta || 0), false);
+      } else if (ev.data.action === 'setSubtitleOffset') {
+        adjustSubtitleOffset(parseFloat(ev.data.offset || 0), true);
+      } else if (ev.data.action === 'syncToVoice') {
+        syncToVoice();
       }
-      if (playSubEl) {
-        const displayQuality = (qualityParam && qualityParam.toLowerCase().includes('4k')) ? '4K UHD' : '1080p FHD';
-        playSubEl.textContent = `${displayQuality} • English (AAC) • Instant Play`;
-      }
+    });
 
-      if (titleParam) {
-        if (titleEl) titleEl.textContent = cleanTitle;
-        document.title = cleanTitle + " - Film House Cinema";
-      }
-      if (qualityParam && qualityEl) {
-        qualityEl.textContent = qualityParam;
-      }
+    const defaultStreamServer = (serverParam || "https://filmhouse-stream.duckdns.org").replace(/\/+$/, "");
+    const isSeries = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
 
-      finalStreamUrl = "";
+    const playTitleEl = document.getElementById('streamPlayTitle');
+    const playSubEl = document.getElementById('streamPlaySub');
+    const cleanTitle = titleParam ? decodeURIComponent(titleParam).trim() : '';
 
-      if (watchParam) {
-        let clean = decodeURIComponent(watchParam).trim();
-        
-        // Case 1: If clean is full URL (e.g. cloudflare / herokuapp / koyeb / raw)
-        if (clean.startsWith('http://') || clean.startsWith('https://')) {
-          if (clean.includes('watch=')) {
-            // Extract token from inside a watch URL
-            const match = clean.match(/watch=([a-zA-Z0-9_\-]+)/);
-            if (match && match[1]) {
-              clean = match[1];
-              finalStreamUrl = defaultStreamServer + "/dl/" + clean;
-            } else {
-              finalStreamUrl = clean;
-            }
-          } else if (clean.includes('/watch/')) {
-            // Replace /watch/ with /dl/ for direct video stream
-            finalStreamUrl = clean.replace('/watch/', '/dl/');
-          } else if (clean.includes('.trycloudflare.com/dl/') || clean.includes('herokuapp.com/dl/') || (clean.includes('filmhouse-stream.duckdns.org/dl/') && defaultStreamServer && !defaultStreamServer.includes('filmhouse-stream.duckdns.org'))) {
-            // Upgrade expired Cloudflare/Heroku/DuckDNS tunnels directly to defaultStreamServer
-            const tMatch = clean.match(/\/dl\/([a-zA-Z0-9_\-]+)/);
-            if (tMatch && tMatch[1]) {
-              finalStreamUrl = defaultStreamServer + "/dl/" + tMatch[1];
-            } else {
-              finalStreamUrl = clean;
-            }
+    if (playTitleEl) {
+      if (isSeries) {
+        playTitleEl.textContent = cleanTitle ? `▶ Start Watching "${cleanTitle}"` : '▶ Start Watching Series';
+      } else {
+        playTitleEl.textContent = cleanTitle ? `▶ Tap to Watch "${cleanTitle}"` : '▶ Tap to Watch Movie';
+      }
+    }
+    if (playSubEl) {
+      const displayQuality = (qualityParam && qualityParam.toLowerCase().includes('4k')) ? '4K UHD' : '1080p FHD';
+      playSubEl.textContent = `${displayQuality} • English (AAC) • Instant Play`;
+    }
+
+    if (titleParam) {
+      if (titleEl) titleEl.textContent = cleanTitle;
+      document.title = cleanTitle + " - Film House Cinema";
+    }
+    if (qualityParam && qualityEl) {
+      qualityEl.textContent = qualityParam;
+    }
+
+    finalStreamUrl = "";
+
+    if (watchParam) {
+      let clean = decodeURIComponent(watchParam).trim();
+
+      // Case 1: If clean is full URL (e.g. cloudflare / herokuapp / koyeb / raw)
+      if (clean.startsWith('http://') || clean.startsWith('https://')) {
+        if (clean.includes('watch=')) {
+          // Extract token from inside a watch URL
+          const match = clean.match(/watch=([a-zA-Z0-9_\-]+)/);
+          if (match && match[1]) {
+            clean = match[1];
+            finalStreamUrl = defaultStreamServer + "/dl/" + clean;
           } else {
             finalStreamUrl = clean;
           }
-        } 
-        // Case 2: Just a raw hex/token ID (e.g. MzE6YjE3NTE5M2ZhNzI5OWYwNg)
-        else {
-          finalStreamUrl = defaultStreamServer + "/dl/" + encodeURIComponent(clean);
-        }
-      }
-
-      if (audioParam && finalStreamUrl && !finalStreamUrl.includes('audio=')) {
-        finalStreamUrl += (finalStreamUrl.includes('?') ? '&' : '?') + 'audio=' + encodeURIComponent(audioParam);
-      }
-
-      // 1. Resume Playback Progress Logic (Strict Unique Key per Title/Episode)
-      let uniqueMediaId = urlParams.get('media_id') || urlParams.get('mid') || urlParams.get('tmdb') || urlParams.get('imdb') || '';
-      if (!uniqueMediaId && titleParam) {
-        uniqueMediaId = decodeURIComponent(titleParam).trim().replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-      }
-      if (!uniqueMediaId && watchParam) {
-        const tokenMatch = watchParam.match(/\/dl\/([^/?#&]+)/);
-        uniqueMediaId = tokenMatch ? tokenMatch[1] : btoa(watchParam).slice(-25);
-      }
-      const epParam = urlParams.get('ep');
-      const sParam = urlParams.get('s');
-      const epKeySuffix = epParam ? `_s${sParam || '1'}_e${epParam}` : '';
-      const resumeKey = `fh_resume_${uniqueMediaId}${epKeySuffix}`;
-      const resumeToast = document.getElementById('resumeToast');
-      const resumeTimeText = document.getElementById('resumeTimeText');
-      const btnResume = document.getElementById('btnResume');
-      const btnDismissResume = document.getElementById('btnDismissResume');
-
-      function formatTime(secs) {
-        const m = Math.floor(secs / 60);
-        const s = Math.floor(secs % 60);
-        return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-      }
-
-      const initialSeekTime = parseFloat(urlParams.get('t') || urlParams.get('time') || '0');
-      if (initialSeekTime > 0) {
-        const applySeek = function() {
-          try {
-            if (window.plyrInstance) window.plyrInstance.currentTime = initialSeekTime;
-            else videoEl.currentTime = initialSeekTime;
-          } catch (_) {}
-        };
-        videoEl.addEventListener('loadedmetadata', applySeek, { once: true });
-        videoEl.addEventListener('canplay', applySeek, { once: true });
-      }
-
-      videoEl.addEventListener('loadedmetadata', function() {
-        const saved = parseFloat(localStorage.getItem(resumeKey) || '0');
-        if (saved > 15 && videoEl.duration && (videoEl.duration - saved) > 30) {
-          if (resumeTimeText) resumeTimeText.textContent = formatTime(saved);
-          if (resumeToast) resumeToast.style.display = 'flex';
-          if (btnResume) {
-            btnResume.onclick = function() {
-              if (window.plyrInstance) { window.plyrInstance.currentTime = saved; window.plyrInstance.play(); } else { videoEl.currentTime = saved; videoEl.play().catch(() => {}); }
-              if (resumeToast) resumeToast.style.display = 'none';
-            };
+        } else if (clean.includes('/watch/')) {
+          // Replace /watch/ with /dl/ for direct video stream
+          finalStreamUrl = clean.replace('/watch/', '/dl/');
+        } else if (clean.includes('.trycloudflare.com/dl/') || clean.includes('herokuapp.com/dl/') || (clean.includes('filmhouse-stream.duckdns.org/dl/') && defaultStreamServer && !defaultStreamServer.includes('filmhouse-stream.duckdns.org'))) {
+          // Upgrade expired Cloudflare/Heroku/DuckDNS tunnels directly to defaultStreamServer
+          const tMatch = clean.match(/\/dl\/([a-zA-Z0-9_\-]+)/);
+          if (tMatch && tMatch[1]) {
+            finalStreamUrl = defaultStreamServer + "/dl/" + tMatch[1];
+          } else {
+            finalStreamUrl = clean;
           }
-          if (btnDismissResume) {
-            btnDismissResume.onclick = function() {
-              if (resumeToast) resumeToast.style.display = 'none';
-            };
-          }
-          setTimeout(function() { if (resumeToast) resumeToast.style.display = 'none'; }, 6000);
-        }
-      });
-
-      // Auto-hide playOverlay the moment video frames output (eliminates pitch black playback on start)
-      function autoHidePlayOverlay() {
-        const passState = getActivePassState();
-        if (!passState.hasAccess) {
-          try { videoEl.pause(); } catch(_) {}
-          updatePassUI();
-          return;
-        }
-        // STRICT: Only hide overlay when video is ACTUALLY outputting rendered frames!
-        if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
-          return;
-        }
-        if (_connectTimeoutTimer) {
-          clearTimeout(_connectTimeoutTimer);
-          _connectTimeoutTimer = null;
-        }
-        document.body.classList.add('stream-started');
-        document.body.classList.add('has-active-video');
-        if (playOverlay && playOverlay.style.display !== 'none') {
-          playOverlay.style.pointerEvents = 'none';
-          playOverlay.style.transition = 'opacity 0.45s ease';
-          playOverlay.style.opacity = '0';
-          setTimeout(() => { playOverlay.style.display = 'none'; }, 460);
-        }
-        if (loaderEl) {
-          loaderEl.style.opacity = '0';
-          setTimeout(() => { loaderEl.style.display = 'none'; }, 300);
-        }
-        if (errorCard) {
-          errorCard.style.display = 'none';
+        } else {
+          finalStreamUrl = clean;
         }
       }
-
-      // Keep connecting overlay informative as stream buffers — DO NOT prematurely hide into blackness!
-      videoEl.addEventListener('loadeddata', function() {
-        if (playOverlay && playOverlay.classList.contains('connecting')) {
-          const playSub = document.getElementById('streamPlaySub');
-          if (playSub) playSub.textContent = '⚡ Stream Ready • Rendering Cinema Frames...';
-        }
-      });
-      videoEl.addEventListener('canplay', function() {
-        if (playOverlay && playOverlay.classList.contains('connecting')) {
-          const playSub = document.getElementById('streamPlaySub');
-          if (playSub) playSub.textContent = '⚡ Buffering Video • Starting Movie...';
-        }
-      });
-
-      // Frame callback for instant seamless transition the millisecond first pixel is displayed
-      if (videoEl && 'requestVideoFrameCallback' in HTMLVideoElement.prototype) {
-        const onFrameRendered = function() {
-          if (videoEl.currentTime > 0.05 && !videoEl.paused) {
-            autoHidePlayOverlay();
-          } else if (!document.body.classList.contains('has-active-video')) {
-            videoEl.requestVideoFrameCallback(onFrameRendered);
-          }
-        };
-        videoEl.requestVideoFrameCallback(onFrameRendered);
+      // Case 2: Just a raw hex/token ID (e.g. MzE6YjE3NTE5M2ZhNzI5OWYwNg)
+      else {
+        finalStreamUrl = defaultStreamServer + "/dl/" + encodeURIComponent(clean);
       }
+    }
 
-      videoEl.addEventListener('timeupdate', function() {
-        const passState = getActivePassState();
-        if (!passState.hasAccess) {
-          try { videoEl.pause(); } catch(_) {}
-          updatePassUI();
-          return;
+    if (audioParam && finalStreamUrl && !finalStreamUrl.includes('audio=')) {
+      finalStreamUrl += (finalStreamUrl.includes('?') ? '&' : '?') + 'audio=' + encodeURIComponent(audioParam);
+    }
+
+    // 1. Resume Playback Progress Logic (Strict Unique Key per Title/Episode)
+    let uniqueMediaId = urlParams.get('media_id') || urlParams.get('mid') || urlParams.get('tmdb') || urlParams.get('imdb') || '';
+    if (!uniqueMediaId && titleParam) {
+      uniqueMediaId = decodeURIComponent(titleParam).trim().replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+    }
+    if (!uniqueMediaId && watchParam) {
+      const tokenMatch = watchParam.match(/\/dl\/([^/?#&]+)/);
+      uniqueMediaId = tokenMatch ? tokenMatch[1] : btoa(watchParam).slice(-25);
+    }
+    const epParam = urlParams.get('ep');
+    const sParam = urlParams.get('s');
+    const epKeySuffix = epParam ? `_s${sParam || '1'}_e${epParam}` : '';
+    const resumeKey = `fh_resume_${uniqueMediaId}${epKeySuffix}`;
+    const resumeToast = document.getElementById('resumeToast');
+    const resumeTimeText = document.getElementById('resumeTimeText');
+    const btnResume = document.getElementById('btnResume');
+    const btnDismissResume = document.getElementById('btnDismissResume');
+
+    function formatTime(secs) {
+      const m = Math.floor(secs / 60);
+      const s = Math.floor(secs % 60);
+      return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    const initialSeekTime = parseFloat(urlParams.get('t') || urlParams.get('time') || '0');
+    if (initialSeekTime > 0) {
+      const applySeek = function () {
+        try {
+          if (window.plyrInstance) window.plyrInstance.currentTime = initialSeekTime;
+          else videoEl.currentTime = initialSeekTime;
+        } catch (_) { }
+      };
+      videoEl.addEventListener('loadedmetadata', applySeek, { once: true });
+      videoEl.addEventListener('canplay', applySeek, { once: true });
+    }
+
+    videoEl.addEventListener('loadedmetadata', function () {
+      const saved = parseFloat(localStorage.getItem(resumeKey) || '0');
+      if (saved > 15 && videoEl.duration && (videoEl.duration - saved) > 30) {
+        if (resumeTimeText) resumeTimeText.textContent = formatTime(saved);
+        if (resumeToast) resumeToast.style.display = 'flex';
+        if (btnResume) {
+          btnResume.onclick = function () {
+            if (window.plyrInstance) { window.plyrInstance.currentTime = saved; window.plyrInstance.play(); } else { videoEl.currentTime = saved; videoEl.play().catch(() => { }); }
+            if (resumeToast) resumeToast.style.display = 'none';
+          };
         }
-        if (videoEl.currentTime > 0.1 && !videoEl.paused) {
+        if (btnDismissResume) {
+          btnDismissResume.onclick = function () {
+            if (resumeToast) resumeToast.style.display = 'none';
+          };
+        }
+        setTimeout(function () { if (resumeToast) resumeToast.style.display = 'none'; }, 6000);
+      }
+    });
+
+    // Auto-hide playOverlay the moment video frames output (eliminates pitch black playback on start)
+    function autoHidePlayOverlay() {
+      const passState = getActivePassState();
+      if (!passState.hasAccess) {
+        try { videoEl.pause(); } catch (_) { }
+        updatePassUI();
+        return;
+      }
+      // STRICT: Only hide overlay when video is ACTUALLY outputting rendered frames!
+      if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
+        return;
+      }
+      if (_connectTimeoutTimer) {
+        clearTimeout(_connectTimeoutTimer);
+        _connectTimeoutTimer = null;
+      }
+      document.body.classList.add('stream-started');
+      document.body.classList.add('has-active-video');
+      if (playOverlay && playOverlay.style.display !== 'none') {
+        playOverlay.style.pointerEvents = 'none';
+        playOverlay.style.transition = 'opacity 0.45s ease';
+        playOverlay.style.opacity = '0';
+        setTimeout(() => { playOverlay.style.display = 'none'; }, 460);
+      }
+      if (loaderEl) {
+        loaderEl.style.opacity = '0';
+        setTimeout(() => { loaderEl.style.display = 'none'; }, 300);
+      }
+      if (errorCard) {
+        errorCard.style.display = 'none';
+      }
+    }
+
+    // Keep connecting overlay informative as stream buffers — DO NOT prematurely hide into blackness!
+    videoEl.addEventListener('loadeddata', function () {
+      if (playOverlay && playOverlay.classList.contains('connecting')) {
+        const playSub = document.getElementById('streamPlaySub');
+        if (playSub) playSub.textContent = '⚡ Stream Ready • Rendering Cinema Frames...';
+      }
+    });
+    videoEl.addEventListener('canplay', function () {
+      if (playOverlay && playOverlay.classList.contains('connecting')) {
+        const playSub = document.getElementById('streamPlaySub');
+        if (playSub) playSub.textContent = '⚡ Buffering Video • Starting Movie...';
+      }
+    });
+
+    // Frame callback for instant seamless transition the millisecond first pixel is displayed
+    if (videoEl && 'requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+      const onFrameRendered = function () {
+        if (videoEl.currentTime > 0.05 && !videoEl.paused) {
           autoHidePlayOverlay();
+        } else if (!document.body.classList.contains('has-active-video')) {
+          videoEl.requestVideoFrameCallback(onFrameRendered);
         }
-        if (videoEl.currentTime > 5 && videoEl.duration && (videoEl.duration - videoEl.currentTime) > 15) {
-          localStorage.setItem(resumeKey, videoEl.currentTime);
+      };
+      videoEl.requestVideoFrameCallback(onFrameRendered);
+    }
+
+    videoEl.addEventListener('timeupdate', function () {
+      const passState = getActivePassState();
+      if (!passState.hasAccess) {
+        try { videoEl.pause(); } catch (_) { }
+        updatePassUI();
+        return;
+      }
+      if (videoEl.currentTime > 0.1 && !videoEl.paused) {
+        autoHidePlayOverlay();
+      }
+      if (videoEl.currentTime > 5 && videoEl.duration && (videoEl.duration - videoEl.currentTime) > 15) {
+        localStorage.setItem(resumeKey, videoEl.currentTime);
+      }
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            action: 'videoTimeUpdate',
+            currentTime: videoEl.currentTime,
+            duration: videoEl.duration || 0
+          }, '*');
         }
+      } catch (e) { }
+    });
+
+    // Handle buffering during active playback
+    videoEl.addEventListener('waiting', function () {
+      if (document.body.classList.contains('has-active-video')) {
+        if (loaderEl) {
+          loaderEl.style.display = 'flex';
+          loaderEl.style.opacity = '1';
+          const lt = loaderEl.querySelector('.loader-text');
+          if (lt) lt.textContent = '⚡ Buffering High-Speed Stream...';
+        }
+      }
+    });
+
+    videoEl.addEventListener('playing', function () {
+      if (loaderEl) {
+        loaderEl.style.opacity = '0';
+        setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 200);
+      }
+      if (videoEl.currentTime > 0.1) {
+        autoHidePlayOverlay();
+      }
+    });
+
+    videoEl.addEventListener('ended', function () {
+      try {
+        localStorage.removeItem(resumeKey);
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ action: 'videoEnded' }, '*');
+        }
+      } catch (e) { }
+    });
+
+    if (finalStreamUrl) {
+      if (downloadBtn) downloadBtn.href = finalStreamUrl;
+
+      // Always attach stream source with preload="metadata" so DNS/TLS and headers warm up immediately
+      attachStreamSource();
+      updatePassUI();
+
+      function hideStreamLoader() {
+        if (!loaderEl) return;
+        loaderEl.style.opacity = '0';
+        loaderEl.style.pointerEvents = 'none';
+        setTimeout(function () { if (loaderEl) loaderEl.style.display = 'none'; }, 300);
+      }
+
+      // Hide loader on ANY playback readiness or progress event
+      ['canplay', 'canplaythrough', 'playing', 'loadeddata', 'timeupdate', 'seeked'].forEach(function (evt) {
+        videoEl.addEventListener(evt, hideStreamLoader);
+      });
+
+      // Pre-warm metadata connection in background
+      try {
+        videoEl.load();
+      } catch (_) { }
+
+      // Fallback: If video already buffered enough data, hide immediately
+      if (videoEl.readyState >= 2) {
+        hideStreamLoader();
+      }
+
+      // Hide loader on pause, error, or stalled so user is never trapped behind spinner
+      ['error', 'pause', 'stalled', 'abort', 'suspend'].forEach(function (evt) {
+        videoEl.addEventListener(evt, hideStreamLoader);
+      });
+
+      // Safety fallback: Guarantee loader is ALWAYS hidden after 3.5s so user is never stuck on dark screen
+      setTimeout(function () {
+        hideStreamLoader();
+      }, 3500);
+
+      // Helper to switch to Server 2 on demand
+      window.switchToServer2 = function () {
         try {
           if (window.parent && window.parent !== window) {
-            window.parent.postMessage({
-              action: 'videoTimeUpdate',
-              currentTime: videoEl.currentTime,
-              duration: videoEl.duration || 0
-            }, '*');
+            window.parent.postMessage({ action: "selectServer", server: 2 }, "*");
           }
-        } catch (e) {}
-      });
-
-      // Handle buffering during active playback
-      videoEl.addEventListener('waiting', function() {
-        if (document.body.classList.contains('has-active-video')) {
+        } catch (e) { }
+        // Local fallback: update video source with server 2 param if parent does not immediately reload iframe
+        if (finalStreamUrl) {
+          const sep = finalStreamUrl.includes('?') ? '&' : '?';
+          const s2Url = finalStreamUrl.includes('server=2') ? finalStreamUrl : `${finalStreamUrl}${sep}server=2`;
+          finalStreamUrl = s2Url;
           if (loaderEl) {
             loaderEl.style.display = 'flex';
             loaderEl.style.opacity = '1';
             const lt = loaderEl.querySelector('.loader-text');
-            if (lt) lt.textContent = '⚡ Buffering High-Speed Stream...';
+            if (lt) lt.textContent = '⚡ Connecting to Server 2 (VIP)...';
+          }
+          if (videoEl) {
+            videoEl.src = s2Url;
+            videoEl.load();
+            videoEl.play().catch(() => { });
           }
         }
+      };
+
+      let streamSilentRetryCount = 0;
+
+      // Reset error state whenever stream is actively playing
+      videoEl.addEventListener('playing', function () {
+        streamSilentRetryCount = 0;
+        if (errorCard) errorCard.style.display = 'none';
       });
 
-      videoEl.addEventListener('playing', function() {
+      // Helper to retry stream playback on demand
+      window.retryStreamPlayback = function () {
+        if (errorCard) errorCard.style.display = 'none';
         if (loaderEl) {
-          loaderEl.style.opacity = '0';
-          setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 200);
+          loaderEl.style.display = 'flex';
+          loaderEl.style.opacity = '1';
+          const lt = loaderEl.querySelector('.loader-text');
+          if (lt) lt.textContent = '⚡ Reconnecting Stream...';
         }
-        if (videoEl.currentTime > 0.1) {
-          autoHidePlayOverlay();
-        }
-      });
-
-      videoEl.addEventListener('ended', function() {
-        try {
-          localStorage.removeItem(resumeKey);
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ action: 'videoEnded' }, '*');
-          }
-        } catch (e) {}
-      });
-
-      if (finalStreamUrl) {
-        if (downloadBtn) downloadBtn.href = finalStreamUrl;
-
-        // Always attach stream source with preload="metadata" so DNS/TLS and headers warm up immediately
-        attachStreamSource();
-        updatePassUI();
-
-        function hideStreamLoader() {
-          if (!loaderEl) return;
-          loaderEl.style.opacity = '0';
-          loaderEl.style.pointerEvents = 'none';
-          setTimeout(function() { if (loaderEl) loaderEl.style.display = 'none'; }, 300);
-        }
-
-        // Hide loader on ANY playback readiness or progress event
-        ['canplay', 'canplaythrough', 'playing', 'loadeddata', 'timeupdate', 'seeked'].forEach(function(evt) {
-          videoEl.addEventListener(evt, hideStreamLoader);
-        });
-
-        // Pre-warm metadata connection in background
         try {
           videoEl.load();
-        } catch (_) {}
+          if (window.plyrInstance) window.plyrInstance.play().catch(() => { });
+          else videoEl.play().catch(() => { });
+        } catch (_) { }
+      };
 
-        // Fallback: If video already buffered enough data, hide immediately
-        if (videoEl.readyState >= 2) {
-          hideStreamLoader();
+      // Discreet, non-blocking stream error notice with instant Server 2 fallback
+      videoEl.addEventListener('error', function (e) {
+        console.warn("Video stream load notice:", e, videoEl.error);
+        hideStreamLoader();
+        if (loaderEl) loaderEl.style.display = 'none';
+
+        // Attempt silent background recovery once before surfacing reconnect UI
+        if (streamSilentRetryCount < 1) {
+          streamSilentRetryCount++;
+          setTimeout(() => {
+            try {
+              videoEl.load();
+              if (window.plyrInstance) window.plyrInstance.play().catch(() => { });
+              else videoEl.play().catch(() => { });
+            } catch (_) { }
+          }, 1000);
+          return;
         }
 
-        // Hide loader on pause, error, or stalled so user is never trapped behind spinner
-        ['error', 'pause', 'stalled', 'abort', 'suspend'].forEach(function(evt) {
-          videoEl.addEventListener(evt, hideStreamLoader);
-        });
-
-        // Safety fallback: Guarantee loader is ALWAYS hidden after 3.5s so user is never stuck on dark screen
-        setTimeout(function() {
-          hideStreamLoader();
-        }, 3500);
-
-        // Helper to switch to Server 2 on demand
-        window.switchToServer2 = function() {
-          try {
-            if (window.parent && window.parent !== window) {
-              window.parent.postMessage({ action: "selectServer", server: 2 }, "*");
-            }
-          } catch (e) {}
-          // Local fallback: update video source with server 2 param if parent does not immediately reload iframe
-          if (finalStreamUrl) {
-            const sep = finalStreamUrl.includes('?') ? '&' : '?';
-            const s2Url = finalStreamUrl.includes('server=2') ? finalStreamUrl : `${finalStreamUrl}${sep}server=2`;
-            finalStreamUrl = s2Url;
-            if (loaderEl) {
-              loaderEl.style.display = 'flex';
-              loaderEl.style.opacity = '1';
-              const lt = loaderEl.querySelector('.loader-text');
-              if (lt) lt.textContent = '⚡ Connecting to Server 2 (VIP)...';
-            }
-            if (videoEl) {
-              videoEl.src = s2Url;
-              videoEl.load();
-              videoEl.play().catch(() => {});
-            }
-          }
-        };
-
-        let streamSilentRetryCount = 0;
-
-        // Reset error state whenever stream is actively playing
-        videoEl.addEventListener('playing', function() {
-          streamSilentRetryCount = 0;
-          if (errorCard) errorCard.style.display = 'none';
-        });
-
-        // Helper to retry stream playback on demand
-        window.retryStreamPlayback = function() {
-          if (errorCard) errorCard.style.display = 'none';
-          if (loaderEl) {
-            loaderEl.style.display = 'flex';
-            loaderEl.style.opacity = '1';
-            const lt = loaderEl.querySelector('.loader-text');
-            if (lt) lt.textContent = '⚡ Reconnecting Stream...';
-          }
-          try {
-            videoEl.load();
-            if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
-            else videoEl.play().catch(() => {});
-          } catch (_) {}
-        };
-
-        // Discreet, non-blocking stream error notice with instant Server 2 fallback
-        videoEl.addEventListener('error', function(e) {
-          console.warn("Video stream load notice:", e, videoEl.error);
-          hideStreamLoader();
-          if (loaderEl) loaderEl.style.display = 'none';
-
-          // Attempt silent background recovery once before surfacing reconnect UI
-          if (streamSilentRetryCount < 1) {
-            streamSilentRetryCount++;
-            setTimeout(() => {
-              try {
-                videoEl.load();
-                if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
-                else videoEl.play().catch(() => {});
-              } catch (_) {}
-            }, 1000);
-            return;
-          }
-
-          if (errorCard) {
-            errorCard.style.display = 'flex';
-            errorCard.innerHTML = `
+        if (errorCard) {
+          errorCard.style.display = 'flex';
+          errorCard.innerHTML = `
               <span>⚠️ Server 1 connection issue</span>
               <button type="button" onclick="window.retryStreamPlayback()" style="background:#ffd700;color:#000;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Retry</button>
               <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Server 2 (VIP)</button>
             `;
-          }
+        }
 
-          restoreInteractivePlayOverlay(
-            '▶ Reconnect Stream',
-            '⚡ Server 1 unavailable • Try Server 2 (VIP) below'
-          );
-        });
-      } else {
-        if (loaderEl) loaderEl.style.display = 'none';
-        if (errorCard) {
-          errorCard.style.display = 'flex';
-          errorCard.innerHTML = `
+        restoreInteractivePlayOverlay(
+          '▶ Reconnect Stream',
+          '⚡ Server 1 unavailable • Try Server 2 (VIP) below'
+        );
+      });
+    } else {
+      if (loaderEl) loaderEl.style.display = 'none';
+      if (errorCard) {
+        errorCard.style.display = 'flex';
+        errorCard.innerHTML = `
             <span>⚠️ Stream link is being prepared...</span>
             <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">Server 2 (VIP)</button>
           `;
-        }
-        restoreInteractivePlayOverlay(
-          '▶ Stream Link Updating',
-          '⚡ Please select Server 2 or another quality below'
-        );
       }
+      restoreInteractivePlayOverlay(
+        '▶ Stream Link Updating',
+        '⚡ Please select Server 2 or another quality below'
+      );
+    }
     });
-  
+
   </script>
 
-  
+
 </body>
+
 </html>
