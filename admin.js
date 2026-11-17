@@ -3200,11 +3200,15 @@ function showMovieDetails(movie) {
                 <select id="details-channel-edition-select" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; padding: 10px 12px; font-size: 13px;">
                     ${isSeries ? `
                         <option value="">Complete Series (All Seasons)</option>
+                        ${movie.last_uploaded_episode ? `<option value="Episode ${movie.last_uploaded_episode}" selected>Episode ${movie.last_uploaded_episode} (Latest Uploaded)</option>` : ''}
+                        ${Array.from({ length: Math.max(movie.last_uploaded_episode || 0, (movie.stream_links || []).length) }, (_, i) => {
+                            const ep = i + 1;
+                            if (ep === movie.last_uploaded_episode) return '';
+                            return `<option value="Episode ${ep}">Episode ${ep}</option>`;
+                        }).join('')}
                         <option value="Season 1">Season 1</option>
                         <option value="Season 2">Season 2</option>
                         <option value="Season 3">Season 3</option>
-                        <option value="Season 4">Season 4</option>
-                        <option value="Season 5">Season 5</option>
                         <option value="New Episodes">New Episodes Added</option>
                     ` : `
                         <option value="">Full Movie (Standard)</option>
@@ -4122,6 +4126,92 @@ function showMovieDetails(movie) {
     }
     
     movieDetailsModal.classList.add("active");
+
+    // Live Firestore background sync to pull latest aired episodes & links without requiring full reload
+    if (typeof db !== "undefined" && db && movie.csv_id) {
+        db.collection("movies").doc(movie.csv_id).get().then(liveSnap => {
+            if (liveSnap && liveSnap.exists) {
+                const liveData = liveSnap.data() || {};
+                let liveChanged = false;
+
+                // 1. Merge streams from in-memory movie + live Firestore
+                const liveStreams = Array.isArray(liveData.stream_links) ? liveData.stream_links : [];
+                const streamMap = new Map();
+                (movie.stream_links || []).forEach(s => {
+                    const key = `s${s.season || 1}_e${s.episode || 1}`;
+                    streamMap.set(key, s);
+                });
+                liveStreams.forEach(s => {
+                    const key = `s${s.season || 1}_e${s.episode || 1}`;
+                    const prev = streamMap.get(key) || {};
+                    streamMap.set(key, { ...prev, ...s });
+                });
+                const mergedStreams = Array.from(streamMap.values()).sort((a, b) => {
+                    const sDiff = (parseInt(a.season, 10) || 1) - (parseInt(b.season, 10) || 1);
+                    if (sDiff !== 0) return sDiff;
+                    return (parseInt(a.episode, 10) || 1) - (parseInt(b.episode, 10) || 1);
+                });
+
+                if (mergedStreams.length !== (movie.stream_links || []).length) {
+                    movie.stream_links = mergedStreams;
+                    currentStreams = extractMovieStreams(movie);
+                    liveChanged = true;
+                }
+
+                // 2. Merge download links
+                const liveLinks = Array.isArray(liveData.links) ? liveData.links : [];
+                const linkMap = new Map();
+                (movie.links || []).forEach(l => {
+                    if (l && (l.season || l.url)) linkMap.set(l.season || l.url, l);
+                });
+                liveLinks.forEach(l => {
+                    if (l && (l.season || l.url)) {
+                        const prev = linkMap.get(l.season || l.url) || {};
+                        linkMap.set(l.season || l.url, { ...prev, ...l });
+                    }
+                });
+                const mergedLinks = Array.from(linkMap.values());
+                if (mergedLinks.length !== (movie.links || []).length) {
+                    movie.links = mergedLinks;
+                    liveChanged = true;
+                }
+
+                if (liveData.last_uploaded_episode && liveData.last_uploaded_episode !== movie.last_uploaded_episode) {
+                    movie.last_uploaded_episode = liveData.last_uploaded_episode;
+                    liveChanged = true;
+                }
+
+                if (liveData.status && liveData.status !== movie.status) {
+                    movie.status = liveData.status;
+                    liveChanged = true;
+                }
+
+                if (liveChanged) {
+                    const mIdx = allCatalogMovies.findIndex(m => m.csv_id === movie.csv_id);
+                    if (mIdx !== -1) {
+                        allCatalogMovies[mIdx].stream_links = movie.stream_links;
+                        allCatalogMovies[mIdx].links = movie.links;
+                        allCatalogMovies[mIdx].status = movie.status;
+                        allCatalogMovies[mIdx].last_uploaded_episode = movie.last_uploaded_episode;
+                    }
+
+                    const viewList = document.getElementById("details-streams-view-list");
+                    if (viewList) {
+                        viewList.innerHTML = renderDetailsStreamsReadOnlyHTML(currentStreams, movie, isSeries);
+                    }
+                    const statusBadge = document.getElementById("details-streaming-status-badge");
+                    if (statusBadge) {
+                        statusBadge.textContent = isSeries 
+                            ? `🟢 ${currentStreams.length} Episode Stream(s) Ready` 
+                            : `🟢 Stream Active (${currentStreams.length} Qualities)`;
+                        statusBadge.style.cssText = "font-size: 10px; color: #4cd964; background: rgba(76, 217, 100, 0.15); border: 1px solid rgba(76, 217, 100, 0.3); font-weight: 700; padding: 2px 8px; border-radius: 10px;";
+                    }
+                    bindCopyTokenButtons();
+                    bindDeleteStreamButtons();
+                }
+            }
+        }).catch(err => console.warn("[MovieDetails] Firestore live sync notice:", err.message));
+    }
 }
 
 function renderCatalogList() {
@@ -6199,7 +6289,7 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
     const rawSeason = movieInfo.seasonOrPart || (isSeries ? "Complete Series" : "Full Movie");
 
     let seasonOrQualityText = isSeries 
-        ? (String(rawSeason).toLowerCase().includes("season") ? rawSeason : `Season ${rawSeason}`)
+        ? (String(rawSeason).toLowerCase().includes("season") || String(rawSeason).toLowerCase().includes("episode") ? rawSeason : `Season ${rawSeason}`)
         : (String(rawSeason).toLowerCase().includes("quality") ? rawSeason : `${rawSeason} Quality`);
     if (movieInfo.isSeriesComplete) {
         seasonOrQualityText = "Complete Series | All Seasons";
@@ -10305,38 +10395,71 @@ window.submitEpisodeUpload = async function() {
             const docSnap = await movieDocRef.get();
             const existingData = docSnap.exists ? docSnap.data() : {};
 
-            const streamLinks = Array.isArray(existingData.stream_links) ? [...existingData.stream_links] : [];
-            const links = Array.isArray(existingData.links) ? [...existingData.links] : [];
+            const catItem = allCatalogMovies.find(m => m.csv_id === csvId || (tmdbId && String(m.tmdb_id) === String(tmdbId)));
+
+            // Bidirectional merge for stream_links so no previous episodes are lost
+            const streamMap = new Map();
+            if (catItem && Array.isArray(catItem.stream_links)) {
+                catItem.stream_links.forEach(s => {
+                    const key = `s${s.season || 1}_e${s.episode || 1}`;
+                    streamMap.set(key, { ...s });
+                });
+            }
+            if (Array.isArray(existingData.stream_links)) {
+                existingData.stream_links.forEach(s => {
+                    const key = `s${s.season || 1}_e${s.episode || 1}`;
+                    const prev = streamMap.get(key) || {};
+                    streamMap.set(key, { ...prev, ...s });
+                });
+            }
 
             if (cleanStream) {
-                // If this episode slot already exists, update it; otherwise push
-                const existingIdx = streamLinks.findIndex(s => (s.episode === epNum || s.episode === String(epNum)) && (s.season === seasonNum || s.season === String(seasonNum)));
-                if (existingIdx !== -1) {
-                    streamLinks[existingIdx].stream_url = cleanStream;
-                    streamLinks[existingIdx].url = cleanStream;
-                } else {
-                    streamLinks.push({
-                        episode: epNum,
-                        season: seasonNum,
-                        quality: "720p",
-                        stream_url: cleanStream,
-                        url: cleanStream
-                    });
-                }
+                const epKey = `s${seasonNum}_e${epNum}`;
+                const existingEntry = streamMap.get(epKey) || {};
+                streamMap.set(epKey, {
+                    ...existingEntry,
+                    episode: epNum,
+                    episodeNum: epNum,
+                    season: seasonNum,
+                    quality: existingEntry.quality || "720p",
+                    name: `Episode ${epNum}`,
+                    seasonOrPart: `S0${seasonNum}E0${epNum}`.replace(/0(\d\d)/g, '$1'),
+                    stream_url: cleanStream,
+                    url: cleanStream
+                });
+            }
+
+            const streamLinks = Array.from(streamMap.values()).sort((a, b) => {
+                const sDiff = (parseInt(a.season, 10) || 1) - (parseInt(b.season, 10) || 1);
+                if (sDiff !== 0) return sDiff;
+                return (parseInt(a.episode, 10) || 1) - (parseInt(b.episode, 10) || 1);
+            });
+
+            // Bidirectional merge for Telegram download links
+            const linkMap = new Map();
+            if (catItem && Array.isArray(catItem.links)) {
+                catItem.links.forEach(l => {
+                    if (l && (l.season || l.url)) linkMap.set(l.season || l.url, { ...l });
+                });
+            }
+            if (Array.isArray(existingData.links)) {
+                existingData.links.forEach(l => {
+                    if (l && (l.season || l.url)) {
+                        const prev = linkMap.get(l.season || l.url) || {};
+                        linkMap.set(l.season || l.url, { ...prev, ...l });
+                    }
+                });
             }
 
             if (downloadUrl) {
                 const seasonLabel = `Season ${seasonNum} Ep ${epNum}`;
-                const existingLIdx = links.findIndex(l => l.season === seasonLabel);
-                if (existingLIdx !== -1) {
-                    links[existingLIdx].url = downloadUrl;
-                } else {
-                    links.push({
-                        url: downloadUrl,
-                        season: seasonLabel
-                    });
-                }
+                linkMap.set(seasonLabel, {
+                    url: downloadUrl,
+                    season: seasonLabel
+                });
             }
+
+            const links = Array.from(linkMap.values());
 
             const newStatus = isFinale ? "Completed" : "Ongoing";
 
@@ -10355,11 +10478,13 @@ window.submitEpisodeUpload = async function() {
             if ((notifySubscribers || postToChannel) && (tmdbId || csvId)) {
                 const currentAdminId = sessionStorage.getItem("admin_auth_id") || "1175336733";
                 const streamMiniAppUrl = `https://dans123456.github.io/filmhouse/?stream_id=${encodeURIComponent(csvId)}&season=${seasonNum}&ep=${epNum}`;
+                const targetChannel = localStorage.getItem("filmhouse_updates_channel_id") || "-1004272961286";
 
                 await db.collection("admin_broadcast_queue").add({
                     type: "series_episode_broadcast",
                     tmdb_id: tmdbId,
                     csv_id: csvId,
+                    channelId: targetChannel,
                     series_title: seriesTitle,
                     season: seasonNum,
                     episode: epNum,
@@ -10394,19 +10519,24 @@ window.submitEpisodeUpload = async function() {
                     console.warn("[SeriesTracker] Client-side subscriber purge warning:", purgeErr.message);
                 }
             }
-        }
 
-        // 4. Update memory cache and catalog
-        const catIdx = allCatalogMovies.findIndex(m => m.csv_id === csvId);
-        if (catIdx !== -1) {
-            allCatalogMovies[catIdx].last_uploaded_episode = epNum;
-            allCatalogMovies[catIdx].current_season = seasonNum;
-            allCatalogMovies[catIdx].status = isFinale ? "Completed" : "Ongoing";
-            if (!newlyUpdatedIds.includes(csvId)) {
-                newlyUpdatedIds.push(csvId);
+            // 4. Update memory cache and catalog with full stream links & download links
+            const catIdx = allCatalogMovies.findIndex(m => m.csv_id === csvId || (tmdbId && String(m.tmdb_id) === String(tmdbId)));
+            if (catIdx !== -1) {
+                allCatalogMovies[catIdx].last_uploaded_episode = epNum;
+                allCatalogMovies[catIdx].current_season = seasonNum;
+                allCatalogMovies[catIdx].status = isFinale ? "Completed" : "Ongoing";
+                allCatalogMovies[catIdx].stream_links = streamLinks;
+                allCatalogMovies[catIdx].links = links;
+                if (!newlyUpdatedIds.includes(allCatalogMovies[catIdx].csv_id)) {
+                    newlyUpdatedIds.push(allCatalogMovies[catIdx].csv_id);
+                }
+                catalogChangesMade = true;
+                updatePublishButtonState();
+                if (typeof renderCatalogList === "function") {
+                    renderCatalogList();
+                }
             }
-            catalogChangesMade = true;
-            updatePublishButtonState();
         }
 
         closeUploadEpisodeModal();

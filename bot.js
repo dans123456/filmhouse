@@ -7239,10 +7239,14 @@ async function init() {
                     if (processedBroadcastTasks.has(docId)) return;
                     processedBroadcastTasks.add(docId);
 
-                    // Skip historical tasks older than 60 seconds on startup
+                    // Skip expired tasks older than 24 hours on startup
                     if (data.timestamp) {
                         const docMs = data.timestamp.toMillis ? data.timestamp.toMillis() : new Date(data.timestamp).getTime();
-                        if (Date.now() - docMs > 60000) return;
+                        if (Date.now() - docMs > 86400000) {
+                            console.log(`[SecurityQueue] Skipping expired task ${docId} (>24h old)`);
+                            await db.collection("admin_broadcast_queue").doc(docId).update({ status: "expired" }).catch(() => {});
+                            return;
+                        }
                     }
 
                     // Authenticate sender
@@ -7309,6 +7313,7 @@ async function init() {
                                 posterImg = "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png";
                             }
 
+                            const fallbackChannel = process.env.MAIN_CHANNEL_ID || "@filmhouse_main";
                             let postRes;
                             try {
                                 postRes = await callTelegramWithRetry('sendPhoto', targetChannel, posterImg, {
@@ -7317,12 +7322,21 @@ async function init() {
                                     reply_markup: replyMarkup
                                 });
                             } catch (photoErr) {
-                                console.warn(`[SecurityQueue] sendPhoto failed (${photoErr.message}), falling back to sendMessage...`);
-                                postRes = await callTelegramWithRetry('sendMessage', targetChannel, caption, {
-                                    parse_mode: 'HTML',
-                                    reply_markup: replyMarkup,
-                                    disable_web_page_preview: false
-                                });
+                                console.warn(`[SecurityQueue] sendPhoto failed (${photoErr.message}) on ${targetChannel}, trying fallback ${fallbackChannel}...`);
+                                const chToTry = (photoErr.message && (photoErr.message.includes("chat not found") || photoErr.message.includes("bot is not a member")) && targetChannel !== fallbackChannel) ? fallbackChannel : targetChannel;
+                                try {
+                                    postRes = await callTelegramWithRetry('sendPhoto', chToTry, posterImg, {
+                                        caption: caption,
+                                        parse_mode: 'HTML',
+                                        reply_markup: replyMarkup
+                                    });
+                                } catch (_) {
+                                    postRes = await callTelegramWithRetry('sendMessage', chToTry, caption, {
+                                        parse_mode: 'HTML',
+                                        reply_markup: replyMarkup,
+                                        disable_web_page_preview: false
+                                    });
+                                }
                             }
 
                             console.log(`[SecurityQueue] Channel post delivered successfully for "${cleanTitle}" to ${targetChannel}`);
@@ -7427,24 +7441,43 @@ async function init() {
 
                             console.log(`[SeriesBroadcast] Processing episode broadcast for "${seriesTitle}" S${season}E${episode} (TMDB: ${tmdbId})...`);
 
-                            // 1. Fetch all subscribers for this series
+                            // 1. Fetch all subscribers for this series across multiple indexing strategies
                             let subscribers = [];
-                            try {
-                                const numSnap = await db.collection("subscriptions").where("tmdb_id", "==", tmdbId).get();
-                                numSnap.forEach(d => {
-                                    const s = d.data();
-                                    if (s && s.user_telegram_id) subscribers.push(s);
-                                });
+                            const seenSubUids = new Set();
+                            const addSubRecord = (s) => {
+                                if (s && s.user_telegram_id) {
+                                    const uid = String(s.user_telegram_id).trim();
+                                    if (uid && !seenSubUids.has(uid)) {
+                                        seenSubUids.add(uid);
+                                        subscribers.push(s);
+                                    }
+                                }
+                            };
 
-                                if (subscribers.length === 0) {
+                            try {
+                                if (tmdbId) {
+                                    const numSnap = await db.collection("subscriptions").where("tmdb_id", "==", tmdbId).get();
+                                    numSnap.forEach(d => addSubRecord(d.data()));
+
                                     const strSnap = await db.collection("subscriptions").where("tmdb_id", "==", String(tmdbId)).get();
-                                    strSnap.forEach(d => {
-                                        const s = d.data();
-                                        if (s && s.user_telegram_id) subscribers.push(s);
-                                    });
+                                    strSnap.forEach(d => addSubRecord(d.data()));
+
+                                    // Check users collection arrayUnion subscriptions
+                                    const userArraySnap = await db.collection("users").where("series_subscriptions", "array-contains", tmdbId).get();
+                                    userArraySnap.forEach(d => addSubRecord({ user_telegram_id: d.id, ...d.data() }));
+                                }
+
+                                if (csvId) {
+                                    const csvSnap = await db.collection("subscriptions").where("csv_id", "==", csvId).get();
+                                    csvSnap.forEach(d => addSubRecord(d.data()));
+                                }
+
+                                if (seriesTitle) {
+                                    const titleSnap = await db.collection("subscriptions").where("series_title", "==", seriesTitle).get();
+                                    titleSnap.forEach(d => addSubRecord(d.data()));
                                 }
                             } catch (subErr) {
-                                console.error(`[SeriesBroadcast] Failed to query subscriptions for ${tmdbId}:`, subErr.message);
+                                console.error(`[SeriesBroadcast] Query subscriptions note for ${tmdbId || csvId}:`, subErr.message);
                             }
 
                             console.log(`[SeriesBroadcast] Found ${subscribers.length} subscriber(s) for "${seriesTitle}".`);
@@ -7534,30 +7567,45 @@ async function init() {
                                         ]
                                     };
 
-                                    if (posterImg && String(posterImg).startsWith("http")) {
-                                        try {
-                                            await callTelegramWithRetry('sendPhoto', targetChannel, posterImg, {
-                                                caption: channelCaption,
-                                                parse_mode: 'HTML',
-                                                reply_markup: channelMarkup
-                                            });
-                                            channelPosted = true;
-                                        } catch (pErr) {
-                                            console.warn(`[SeriesBroadcast] Photo post to channel failed (${pErr.message}), falling back to text:`);
-                                            await callTelegramWithRetry('sendMessage', targetChannel, channelCaption, {
-                                                parse_mode: 'HTML',
-                                                reply_markup: channelMarkup
-                                            });
-                                            channelPosted = true;
+                                    const fallbackChannel = process.env.MAIN_CHANNEL_ID || "@filmhouse_main";
+
+                                    const attemptSend = async (ch) => {
+                                        if (posterImg && String(posterImg).startsWith("http")) {
+                                            try {
+                                                await callTelegramWithRetry('sendPhoto', ch, posterImg, {
+                                                    caption: channelCaption,
+                                                    parse_mode: 'HTML',
+                                                    reply_markup: channelMarkup
+                                                });
+                                                return true;
+                                            } catch (pErr) {
+                                                console.warn(`[SeriesBroadcast] Photo post to ${ch} failed (${pErr.message}), trying text...`);
+                                            }
                                         }
-                                    } else {
-                                        await callTelegramWithRetry('sendMessage', targetChannel, channelCaption, {
+                                        await callTelegramWithRetry('sendMessage', ch, channelCaption, {
                                             parse_mode: 'HTML',
                                             reply_markup: channelMarkup
                                         });
+                                        return true;
+                                    };
+
+                                    try {
+                                        await attemptSend(targetChannel);
                                         channelPosted = true;
+                                    } catch (pErr) {
+                                        console.warn(`[SeriesBroadcast] Post to ${targetChannel} failed (${pErr.message}), trying fallback ${fallbackChannel}...`);
+                                        if (targetChannel !== fallbackChannel) {
+                                            try {
+                                                await attemptSend(fallbackChannel);
+                                                channelPosted = true;
+                                            } catch (fbErr) {
+                                                console.error(`[SeriesBroadcast] Fallback channel post failed:`, fbErr.message);
+                                            }
+                                        }
                                     }
-                                    console.log(`[SeriesBroadcast] Successfully published episode announcement to Updates Channel!`);
+                                    if (channelPosted) {
+                                        console.log(`[SeriesBroadcast] Successfully published episode announcement to Updates Channel!`);
+                                    }
                                 } catch (chErr) {
                                     console.error(`[SeriesBroadcast] Failed to post episode announcement to channel:`, chErr.message);
                                 }
