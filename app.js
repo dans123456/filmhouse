@@ -8587,7 +8587,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=166_${Date.now()}`;
+        const cacheBuster = `v=167_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
@@ -8872,6 +8872,25 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         }
 
         // 1. Sleek Compact Streaming Server Strip (Only ~34px height)
+        const server1Target = streamTarget;
+        let server2Target = "";
+        if (movie.stream_links && Array.isArray(movie.stream_links)) {
+            const altLink = movie.stream_links.find(s => s && isStreamLinkValid(s.stream_url || s.url) && (s.stream_url || s.url) !== streamTarget);
+            if (altLink) server2Target = altLink.stream_url || altLink.url;
+        }
+        if (!server2Target && movie.links && Array.isArray(movie.links)) {
+            const altLink = movie.links.find(l => l && isStreamLinkValid(l.stream_url || l.url) && (l.stream_url || l.url) !== streamTarget);
+            if (altLink) server2Target = altLink.stream_url || altLink.url;
+        }
+        if (!server2Target && streamTarget) {
+            if (streamTarget.includes("filmhouse-stream.duckdns.org") && activeStreamingServerUrl && !activeStreamingServerUrl.includes("filmhouse-stream.duckdns.org")) {
+                server2Target = streamTarget.replace(/https?:\/\/filmhouse-stream\.duckdns\.org/, activeStreamingServerUrl);
+            } else {
+                const sep = streamTarget.includes("?") ? "&" : "?";
+                server2Target = `${streamTarget}${sep}server=2&vip=1`;
+            }
+        }
+
         const serverStrip = document.createElement("div");
         serverStrip.className = "cinema-server-compact-strip";
         serverStrip.innerHTML = `
@@ -8900,13 +8919,22 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 s1Btn.classList.add("active");
                 s2Btn.classList.remove("active");
                 showToast("Switched to Server 1 (Default HD)", "info");
+                if (server1Target) {
+                    setCinemaStream(server1Target, initialTitle);
+                }
             });
 
             s2Btn.addEventListener("click", () => {
                 s2Btn.classList.add("active");
                 s1Btn.classList.remove("active");
-                showToast("⚡ Connecting to High-Speed VIP Server...", "success");
+                showToast("⚡ Connected to High-Speed Server 2 (VIP)", "success");
                 triggerMonetagSmartLink();
+                const target = server2Target || server1Target;
+                if (target) {
+                    const sep = target.includes("?") ? "&" : "?";
+                    const finalTarget = (server2Target && server2Target !== server1Target) ? server2Target : `${target}${sep}server=2&vip=1&t=${Date.now()}`;
+                    setCinemaStream(finalTarget, initialTitle);
+                }
             });
         }
 
@@ -9221,8 +9249,14 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                             if (typeof saveDailyStats === "function") saveDailyStats();
                         }
                     } else if (e.data.action === "selectServer" || e.data.action === "switchServer") {
-                        const s2 = document.getElementById("cinema-server-2");
-                        if (s2) s2.click();
+                        const srv = e.data.server || 2;
+                        if (srv === 2) {
+                            const s2 = document.getElementById("cinema-server-2");
+                            if (s2) s2.click();
+                        } else {
+                            const s1 = document.getElementById("cinema-server-1");
+                            if (s1) s1.click();
+                        }
                     } else if (e.data.action === "playerEnteredFullscreen") {
                         try {
                             if (screen.orientation && screen.orientation.lock) {

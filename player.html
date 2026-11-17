@@ -274,7 +274,7 @@
       max-height: 100dvh !important;
       padding-top: 0 !important;
       margin: 0 !important;
-      background: #000000;
+      background-color: #080a11;
       background-size: cover !important;
       background-position: center center !important;
       background-repeat: no-repeat !important;
@@ -284,28 +284,40 @@
       align-items: center !important;
       justify-content: center !important;
     }
+    .video-viewport::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(10, 14, 24, 0.35) 0%, rgba(4, 6, 12, 0.85) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
     .video-viewport video {
       width: 100% !important;
       height: 100% !important;
       object-fit: contain !important;
-      background: #000000 !important;
+      background: transparent !important;
+      position: relative;
+      z-index: 2;
     }
     .plyr--video {
       width: 100% !important;
       height: 100% !important;
-      background: #000000 !important;
+      background: transparent !important;
       font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+      position: relative;
+      z-index: 2;
     }
     .plyr__video-wrapper {
       width: 100% !important;
       height: 100% !important;
-      background: #000000 !important;
+      background: transparent !important;
     }
     .plyr__video-wrapper video {
       width: 100% !important;
       height: 100% !important;
       object-fit: contain !important;
-      background: #000000 !important;
+      background: transparent !important;
     }
 
     /* Loading Overlay */
@@ -823,6 +835,7 @@
       }
 
       // Set Backdrop immediately as video poster and background to prevent black screen!
+      const defaultBackdropGradient = "linear-gradient(135deg, #0d121f 0%, #06080e 100%)";
       if (backdropParam && videoEl) {
         try {
           const cleanBackdrop = decodeURIComponent(backdropParam).trim();
@@ -837,9 +850,23 @@
             const playOverlayEl = document.getElementById("playOverlay");
             if (playOverlayEl) {
               playOverlayEl.style.backgroundImage = `url("${cleanBackdrop}")`;
+              playOverlayEl.style.backgroundSize = "cover";
+              playOverlayEl.style.backgroundPosition = "center";
             }
+            // Preload image; if it errors, ensure fallback styling remains vibrant
+            const imgTest = new Image();
+            imgTest.onerror = function() {
+              if (vp) vp.style.background = defaultBackdropGradient;
+              if (playOverlayEl) playOverlayEl.style.background = defaultBackdropGradient;
+            };
+            imgTest.src = cleanBackdrop;
           }
         } catch (_) {}
+      } else {
+        const vp = document.getElementById("viewport");
+        if (vp) vp.style.background = defaultBackdropGradient;
+        const playOverlayEl = document.getElementById("playOverlay");
+        if (playOverlayEl) playOverlayEl.style.background = defaultBackdropGradient;
       }
 
       // Initialize Modern Plyr Player with Film House Gold Branding
@@ -2016,13 +2043,22 @@
 
             if (_connectTimeoutTimer) clearTimeout(_connectTimeoutTimer);
             _connectTimeoutTimer = setTimeout(function() {
-              if (!document.body.classList.contains('stream-started') && (!videoEl || videoEl.paused || videoEl.currentTime === 0)) {
+              if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
+                console.warn("[Player] Stream connection timeout (>6s) on primary server");
+                if (errorCard) {
+                  errorCard.style.display = 'flex';
+                  errorCard.innerHTML = `
+                    <span>⚡ Server 1 connection is slow...</span>
+                    <button type="button" onclick="window.retryStreamPlayback()" style="background:#ffd700;color:#000;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Retry</button>
+                    <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Server 2 (VIP)</button>
+                  `;
+                }
                 restoreInteractivePlayOverlay(
                   '▶ Tap to Retry Stream',
-                  '⚡ Slow network response • Tap here or try Server 2 below'
+                  '⚡ Slow response from Server 1 • Tap here or switch to Server 2 below'
                 );
               }
-            }, 8000);
+            }, 6000);
 
             try {
               const p = videoEl.play();
@@ -2375,7 +2411,32 @@
 
       window.addEventListener('message', function(ev) {
         if (!ev.data) return;
-        if (ev.data.action === 'enterFullscreen') {
+        if (ev.data.action === 'switchServer' || ev.data.action === 'loadNewStream') {
+          const newStreamUrl = ev.data.url;
+          if (newStreamUrl) {
+            finalStreamUrl = newStreamUrl;
+            if (downloadBtn) downloadBtn.href = finalStreamUrl;
+            if (window._currentHls) {
+              window._currentHls.destroy();
+              window._currentHls = null;
+            }
+            if (videoEl) {
+              videoEl.removeAttribute('src');
+              videoEl.load();
+            }
+            if (playOverlay) {
+              playOverlay.style.display = 'flex';
+              playOverlay.style.opacity = '1';
+              playOverlay.classList.add('connecting');
+              const pt = document.getElementById('streamPlayTitle');
+              if (pt) pt.textContent = '⚡ Connecting Server 2...';
+              const ps = document.getElementById('streamPlaySub');
+              if (ps) ps.textContent = 'Buffering High-Speed Stream • Film House VIP';
+            }
+            attachStreamSource();
+            if (videoEl) videoEl.play().catch(() => {});
+          }
+        } else if (ev.data.action === 'enterFullscreen') {
           lockToLandscape();
           if (window.plyrInstance && window.plyrInstance.fullscreen) {
             window.plyrInstance.fullscreen.enter();
@@ -2688,11 +2749,16 @@
           updatePassUI();
           return;
         }
+        // STRICT: Only hide overlay when video is ACTUALLY outputting rendered frames!
+        if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
+          return;
+        }
         if (_connectTimeoutTimer) {
           clearTimeout(_connectTimeoutTimer);
           _connectTimeoutTimer = null;
         }
         document.body.classList.add('stream-started');
+        document.body.classList.add('has-active-video');
         if (playOverlay && playOverlay.style.display !== 'none') {
           playOverlay.style.pointerEvents = 'none';
           playOverlay.style.transition = 'opacity 0.45s ease';
@@ -2703,15 +2769,36 @@
           loaderEl.style.opacity = '0';
           setTimeout(() => { loaderEl.style.display = 'none'; }, 300);
         }
+        if (errorCard) {
+          errorCard.style.display = 'none';
+        }
       }
 
-      videoEl.addEventListener('playing', autoHidePlayOverlay);
-      videoEl.addEventListener('canplay', function() {
-        if (!videoEl.paused) autoHidePlayOverlay();
-      });
+      // Keep connecting overlay informative as stream buffers — DO NOT prematurely hide into blackness!
       videoEl.addEventListener('loadeddata', function() {
-        if (!videoEl.paused) autoHidePlayOverlay();
+        if (playOverlay && playOverlay.classList.contains('connecting')) {
+          const playSub = document.getElementById('streamPlaySub');
+          if (playSub) playSub.textContent = '⚡ Stream Ready • Rendering Cinema Frames...';
+        }
       });
+      videoEl.addEventListener('canplay', function() {
+        if (playOverlay && playOverlay.classList.contains('connecting')) {
+          const playSub = document.getElementById('streamPlaySub');
+          if (playSub) playSub.textContent = '⚡ Buffering Video • Starting Movie...';
+        }
+      });
+
+      // Frame callback for instant seamless transition the millisecond first pixel is displayed
+      if (videoEl && 'requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+        const onFrameRendered = function() {
+          if (videoEl.currentTime > 0.05 && !videoEl.paused) {
+            autoHidePlayOverlay();
+          } else if (!document.body.classList.contains('has-active-video')) {
+            videoEl.requestVideoFrameCallback(onFrameRendered);
+          }
+        };
+        videoEl.requestVideoFrameCallback(onFrameRendered);
+      }
 
       videoEl.addEventListener('timeupdate', function() {
         const passState = getActivePassState();
@@ -2720,7 +2807,7 @@
           updatePassUI();
           return;
         }
-        if (videoEl.currentTime > 0.05) {
+        if (videoEl.currentTime > 0.1 && !videoEl.paused) {
           autoHidePlayOverlay();
         }
         if (videoEl.currentTime > 5 && videoEl.duration && (videoEl.duration - videoEl.currentTime) > 15) {
@@ -2735,6 +2822,28 @@
             }, '*');
           }
         } catch (e) {}
+      });
+
+      // Handle buffering during active playback
+      videoEl.addEventListener('waiting', function() {
+        if (document.body.classList.contains('has-active-video')) {
+          if (loaderEl) {
+            loaderEl.style.display = 'flex';
+            loaderEl.style.opacity = '1';
+            const lt = loaderEl.querySelector('.loader-text');
+            if (lt) lt.textContent = '⚡ Buffering High-Speed Stream...';
+          }
+        }
+      });
+
+      videoEl.addEventListener('playing', function() {
+        if (loaderEl) {
+          loaderEl.style.opacity = '0';
+          setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 200);
+        }
+        if (videoEl.currentTime > 0.1) {
+          autoHidePlayOverlay();
+        }
       });
 
       videoEl.addEventListener('ended', function() {
@@ -2788,8 +2897,27 @@
         // Helper to switch to Server 2 on demand
         window.switchToServer2 = function() {
           try {
-            window.parent.postMessage({ action: "selectServer", server: 2 }, "*");
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({ action: "selectServer", server: 2 }, "*");
+            }
           } catch (e) {}
+          // Local fallback: update video source with server 2 param if parent does not immediately reload iframe
+          if (finalStreamUrl) {
+            const sep = finalStreamUrl.includes('?') ? '&' : '?';
+            const s2Url = finalStreamUrl.includes('server=2') ? finalStreamUrl : `${finalStreamUrl}${sep}server=2`;
+            finalStreamUrl = s2Url;
+            if (loaderEl) {
+              loaderEl.style.display = 'flex';
+              loaderEl.style.opacity = '1';
+              const lt = loaderEl.querySelector('.loader-text');
+              if (lt) lt.textContent = '⚡ Connecting to Server 2 (VIP)...';
+            }
+            if (videoEl) {
+              videoEl.src = s2Url;
+              videoEl.load();
+              videoEl.play().catch(() => {});
+            }
+          }
         };
 
         let streamSilentRetryCount = 0;
@@ -2806,6 +2934,8 @@
           if (loaderEl) {
             loaderEl.style.display = 'flex';
             loaderEl.style.opacity = '1';
+            const lt = loaderEl.querySelector('.loader-text');
+            if (lt) lt.textContent = '⚡ Reconnecting Stream...';
           }
           try {
             videoEl.load();
@@ -2814,19 +2944,14 @@
           } catch (_) {}
         };
 
-        // Discreet, non-blocking stream error notice
+        // Discreet, non-blocking stream error notice with instant Server 2 fallback
         videoEl.addEventListener('error', function(e) {
           console.warn("Video stream load notice:", e, videoEl.error);
           hideStreamLoader();
           if (loaderEl) loaderEl.style.display = 'none';
 
-          // STRICT: NEVER show error notice if user hasn't pressed play or stream hasn't started!
-          if (!document.body.classList.contains('stream-started')) {
-            return;
-          }
-
-          // Attempt silent background recovery twice before surfacing reconnect UI
-          if (streamSilentRetryCount < 2) {
+          // Attempt silent background recovery once before surfacing reconnect UI
+          if (streamSilentRetryCount < 1) {
             streamSilentRetryCount++;
             setTimeout(() => {
               try {
@@ -2834,24 +2959,37 @@
                 if (window.plyrInstance) window.plyrInstance.play().catch(() => {});
                 else videoEl.play().catch(() => {});
               } catch (_) {}
-            }, 1200);
+            }, 1000);
             return;
           }
 
           if (errorCard) {
             errorCard.style.display = 'flex';
             errorCard.innerHTML = `
-              <span>⚠️ Stream is reconnecting...</span>
+              <span>⚠️ Server 1 connection issue</span>
               <button type="button" onclick="window.retryStreamPlayback()" style="background:#ffd700;color:#000;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Retry</button>
-              <button type="button" onclick="window.switchToServer2()" style="background:rgba(255,255,255,0.18);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:700;cursor:pointer;">Server 2</button>
+              <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Server 2 (VIP)</button>
             `;
           }
+
+          restoreInteractivePlayOverlay(
+            '▶ Reconnect Stream',
+            '⚡ Server 1 unavailable • Try Server 2 (VIP) below'
+          );
         });
       } else {
         if (loaderEl) loaderEl.style.display = 'none';
-        if (errorCard && document.body.classList.contains('stream-started')) {
+        if (errorCard) {
           errorCard.style.display = 'flex';
+          errorCard.innerHTML = `
+            <span>⚠️ Stream link is being prepared...</span>
+            <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">Server 2 (VIP)</button>
+          `;
         }
+        restoreInteractivePlayOverlay(
+          '▶ Stream Link Updating',
+          '⚡ Please select Server 2 or another quality below'
+        );
       }
     });
   
