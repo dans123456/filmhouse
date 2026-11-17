@@ -7,10 +7,10 @@
     "type": "Series",
     "categories": [
       "Main",
+      "Hollywood/British Series",
       "Animated Movies",
       "Kids Shows and Movies (Nickelodeon and Disney)",
-      "Teen/High-School",
-      "Hollywood/British Series"
+      "Teen/High-School"
     ],
     "genres": [
       "Action & Adventure",
@@ -32,9 +32,21 @@
     "links": [
       {
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADFREAAtkY4EcAAc-ZRG_-BjMWBA",
-        "season": "Season 1"
+        "season": "Season 1",
+        "stream_url": ""
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADEgwAAiRm4EekQZJIr5EBGhYE",
+        "season": "Season 2",
+        "stream_url": ""
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADFAwAAiRm4EdgkKV7mnH2KRYE",
+        "season": "Season 3",
+        "stream_url": ""
       }
-    ]
+    ],
+    "is_ongoing": false
   },
   {
     "csv_id": "1559980-the-gospel-of-christmas",
