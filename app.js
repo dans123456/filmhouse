@@ -9802,18 +9802,35 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                             window.Telegram.WebApp.requestFullscreen();
                         }
                     } catch (e) { }
-                    // Automatically lock to landscape orientation for true edge-to-edge mobile viewing
+                    // Enter HTML5 fullscreen FIRST (Android Chrome only allows orientation lock while fullscreen),
+                    // then auto-rotate to landscape for true edge-to-edge mobile viewing.
+                    const lockLandscapeNow = () => {
+                        try {
+                            if (screen.orientation && screen.orientation.lock) {
+                                return screen.orientation.lock("landscape").catch(() => { });
+                            }
+                        } catch (e) { }
+                        try {
+                            if (window.Telegram?.WebApp?.lockOrientation) {
+                                window.Telegram.WebApp.lockOrientation("landscape");
+                            }
+                        } catch (e) { }
+                    };
+                    let fsRequest = null;
                     try {
-                        if (screen.orientation && screen.orientation.lock) {
-                            screen.orientation.lock("landscape").catch(() => { });
+                        if (theater.requestFullscreen) {
+                            fsRequest = theater.requestFullscreen();
+                        } else if (document.documentElement.requestFullscreen) {
+                            fsRequest = document.documentElement.requestFullscreen();
                         }
                     } catch (e) { }
-                    // PC / Desktop browser HTML5 Fullscreen API
-                    if (theater.requestFullscreen) {
-                        theater.requestFullscreen().catch(() => { });
-                    } else if (document.documentElement.requestFullscreen) {
-                        document.documentElement.requestFullscreen().catch(() => { });
-                    }
+                    Promise.resolve(fsRequest).then(lockLandscapeNow).catch(lockLandscapeNow);
+                    // Fallback: if the phone refused the rotation lock, rotate the layout with CSS instead
+                    setTimeout(() => {
+                        if (theater.classList.contains("is-fullscreen") && window.innerWidth < window.innerHeight && window.innerWidth <= 850) {
+                            theater.classList.add("theater-pseudo-landscape");
+                        }
+                    }, 600);
                     if (frame && frame.contentWindow) {
                         frame.contentWindow.postMessage({ action: "enterFullscreen" }, "*");
                     }

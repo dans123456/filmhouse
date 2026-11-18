@@ -694,6 +694,92 @@
         font-size: 10.5px;
       }
     }
+
+    /* =====================================================================
+       Mobile / touch control bar: 2 rows (full-width scrubber on top,
+       buttons below) + vertical volume popup so nothing gets squashed.
+       ===================================================================== */
+    @media (pointer: coarse), (max-width: 600px) {
+      :root {
+        --plyr-range-thumb-height: 16px;
+        --plyr-range-track-height: 6px;
+        --plyr-control-spacing: 6px;
+      }
+
+      .plyr--video .plyr__controls {
+        flex-wrap: wrap !important;
+        align-items: center;
+        row-gap: 0;
+        padding: 6px 10px 8px !important;
+      }
+
+      /* Row 1: full-width progress scrubber */
+      .plyr__controls .plyr__progress__container {
+        order: -1;
+        flex: 0 0 100% !important;
+        width: 100%;
+        min-width: 100%;
+        margin: 0 0 2px !important;
+        padding: 0 !important;
+      }
+
+      /* Row 2: buttons */
+      .plyr__controls > .plyr__controls__item:first-child {
+        margin-right: 0 !important;
+      }
+
+      .plyr__controls [data-plyr="restart"],
+      .plyr__controls [data-plyr="pip"] {
+        display: none !important;
+      }
+
+      .plyr__controls .plyr__control {
+        padding: 9px !important;
+      }
+
+      .plyr__controls .plyr__time {
+        font-size: 12px;
+        padding: 0 2px;
+      }
+
+      .plyr__controls [data-plyr="mute"] {
+        margin-left: auto !important;
+      }
+
+      /* Vertical volume popup (hidden until the speaker is tapped) */
+      .plyr__controls .plyr__volume {
+        position: absolute !important;
+        bottom: calc(100% + 6px);
+        left: 0;
+        width: 34px !important;
+        min-width: 34px !important;
+        max-width: 34px !important;
+        height: 112px;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: rgba(12, 15, 24, 0.92);
+        border: 1px solid rgba(255, 188, 0, 0.3);
+        border-radius: 17px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+        display: none !important;
+        z-index: 70;
+      }
+
+      .plyr__controls.fh-vol-open .plyr__volume {
+        display: block !important;
+      }
+
+      .plyr__controls .plyr__volume input[data-plyr="volume"] {
+        position: absolute !important;
+        left: 50%;
+        top: 50%;
+        width: 88px !important;
+        height: 22px;
+        margin: -11px 0 0 -44px !important;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+      }
+    }
   </style>
 </head>
 
@@ -1491,8 +1577,15 @@
     const subSearchInput = document.getElementById('subSearchInput');
     const btnDisableSubs = document.getElementById('btnDisableSubs');
 
+    function isPlayerFullscreenActive() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement ||
+        document.body.classList.contains('is-fullscreen') ||
+        (window.plyrInstance && window.plyrInstance.fullscreen && window.plyrInstance.fullscreen.active));
+    }
+
     function openSubtitlesModalView() {
-      if (window.parent && window.parent !== window) {
+      // In fullscreen the parent app's hub is hidden behind this iframe, so open the in-player panel instead
+      if (!isPlayerFullscreenActive() && window.parent && window.parent !== window) {
         try {
           window.parent.postMessage({ action: 'openSubtitlesHub' }, '*');
           return;
@@ -1507,6 +1600,42 @@
 
     if (openSubBtn1) openSubBtn1.onclick = openSubtitlesModalView;
     if (openSubBtn2) openSubBtn2.onclick = openSubtitlesModalView;
+
+    // Single subtitle system: the player's own [CC] button opens the same 60+ language hub as the app bar badge
+    document.addEventListener('click', function (e) {
+      const ccBtn = e.target && e.target.closest ? e.target.closest('.plyr__controls [data-plyr="captions"]') : null;
+      if (!ccBtn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      openSubtitlesModalView();
+    }, true);
+
+    // Vertical volume popup (touch): tapping the speaker toggles mute and shows a slim vertical slider for 3s
+    (function bindVolumePopup() {
+      let hideTimer = null;
+      const isTouchLayout = () => window.matchMedia('(pointer: coarse), (max-width: 600px)').matches;
+      function openVolumePopup() {
+        const c = document.querySelector('.plyr__controls');
+        if (!c) return;
+        const mute = c.querySelector('[data-plyr="mute"]');
+        const vol = c.querySelector('.plyr__volume');
+        if (mute && vol) {
+          vol.style.left = Math.max(2, mute.offsetLeft + mute.offsetWidth / 2 - 17) + 'px';
+        }
+        c.classList.add('fh-vol-open');
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => c.classList.remove('fh-vol-open'), 3000);
+      }
+      document.addEventListener('click', function (e) {
+        if (!isTouchLayout()) return;
+        if (e.target && e.target.closest && e.target.closest('.plyr__controls [data-plyr="mute"]')) openVolumePopup();
+      });
+      document.addEventListener('input', function (e) {
+        if (!isTouchLayout()) return;
+        if (e.target && e.target.matches && e.target.matches('[data-plyr="volume"]')) openVolumePopup();
+      });
+    })();
     if (closeSubBtn) closeSubBtn.onclick = () => { modalSubs.style.display = 'none'; };
 
     if (subSearchInput) {
