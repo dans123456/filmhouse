@@ -87,6 +87,17 @@
       font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
 
+    .plyr--video .plyr__controls {
+      z-index: 70 !important;
+      touch-action: manipulation;
+    }
+
+    .plyr--video:not(.plyr--hide-controls) .plyr__controls {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      transform: translateY(0) !important;
+    }
+
     .plyr__control--overlaid {
       background: linear-gradient(135deg, #ffd700, #ff9900) !important;
       color: #0b0d14 !important;
@@ -140,12 +151,12 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: calc(100% - 56px);
-      /* Leave bottom control bar accessible */
+      height: 100%;
       display: flex;
       z-index: 12;
       pointer-events: auto;
       user-select: none;
+      touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -2780,11 +2791,43 @@
       }
     }
 
-    function toggleControlsVisibility() {
-      if (window.plyrInstance && typeof window.plyrInstance.toggleControls === 'function') {
-        window.plyrInstance.toggleControls();
+    let _controlsAutoHideTimer = null;
+    function setControlsVisible(show) {
+      const plyrEl = document.querySelector('.plyr');
+      const pill = document.getElementById('watchPassPill');
+      clearTimeout(_controlsAutoHideTimer);
+
+      if (show) {
+        if (plyrEl) plyrEl.classList.remove('plyr--hide-controls');
+        if (pill) pill.classList.remove('pass-auto-hidden');
+        if (window.plyrInstance && typeof window.plyrInstance.toggleControls === 'function') {
+          try { window.plyrInstance.toggleControls(true); } catch (_) { }
+        }
+        if (videoEl && !videoEl.paused && !videoEl.ended) {
+          _controlsAutoHideTimer = setTimeout(() => {
+            setControlsVisible(false);
+          }, 3500);
+        }
+      } else {
+        if (plyrEl) plyrEl.classList.add('plyr--hide-controls');
+        if (pill) pill.classList.add('pass-auto-hidden');
+        if (window.plyrInstance && typeof window.plyrInstance.toggleControls === 'function') {
+          try { window.plyrInstance.toggleControls(false); } catch (_) { }
+        }
       }
     }
+
+    function toggleControlsVisibility() {
+      const plyrEl = document.querySelector('.plyr');
+      const isHidden = plyrEl ? plyrEl.classList.contains('plyr--hide-controls') : true;
+      setControlsVisible(isHidden);
+    }
+
+    document.addEventListener('pointerdown', function (e) {
+      if (e.target && e.target.closest && e.target.closest('.plyr__controls')) {
+        setControlsVisible(true);
+      }
+    }, { passive: true });
 
     function toggleMuteState() {
       if (window.plyrInstance) {
@@ -2806,9 +2849,10 @@
     }
 
     // YouTube-style Tap Controls:
-    // Single tap -> Play / Pause
+    // Single tap anywhere -> Toggle Media Controls HUD (critical for mobile fullscreen!)
     // Double tap Left -> Rewind 10s
     // Double tap Right -> Forward 10s
+    // Double tap Center -> Play / Pause
     let lastTapTime = 0;
     let tapTimeout = null;
     let lastTapZone = null;
@@ -2822,7 +2866,7 @@
       const now = Date.now();
       const diff = now - lastTapTime;
 
-      if (diff < 320 && lastTapZone === zone) {
+      if (diff < 300 && lastTapZone === zone) {
         // Double-tap detected on same zone
         clearTimeout(tapTimeout);
         lastTapTime = 0;
@@ -2836,6 +2880,7 @@
           showRippleIndicator('right');
         } else if (zone === 'center') {
           togglePlayState();
+          setControlsVisible(true);
         }
       } else {
         // First tap candidate
@@ -2843,16 +2888,11 @@
         lastTapZone = zone;
         clearTimeout(tapTimeout);
         tapTimeout = setTimeout(() => {
-          if (zone === 'center') {
-            // ONLY middle zone single-tap toggles Play / Pause!
-            togglePlayState();
-          } else {
-            // Left & Right side taps only toggle controls HUD without pausing
-            toggleControlsVisibility();
-          }
+          // Single tap anywhere on screen toggles media controls
+          toggleControlsVisibility();
           lastTapTime = 0;
           lastTapZone = null;
-        }, 320);
+        }, 280);
       }
     }
 

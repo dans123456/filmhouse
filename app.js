@@ -6304,6 +6304,110 @@ async function openSubtitlesPicker(movie) {
     }
 }
 
+// Shared Episode Upload Status Helper: distinguishes uploaded vs aired-not-uploaded vs upcoming episodes
+function getEpisodeUploadStatus(movie, seasonNum, ep) {
+    const epNum = ep.episode_number || 1;
+    const allStreams = Array.isArray(movie.stream_links) ? movie.stream_links : [];
+    const matchedStream = allStreams.find(s =>
+        s &&
+        (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) &&
+        (s.season == seasonNum || s.season_number == seasonNum || !s.season) &&
+        (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")
+    );
+
+    const streamUrl = (ep.stream_url && !String(ep.stream_url).includes("t.me"))
+        ? ep.stream_url
+        : (matchedStream ? (matchedStream.stream_url || matchedStream.url) : "");
+
+    const isUploaded = Boolean(
+        streamUrl ||
+        (seasonNum === 1 && epNum === 1 && movie.stream_url && !String(movie.stream_url).includes("t.me"))
+    );
+
+    let isFutureAirDate = false;
+    let formattedAirDate = "";
+    if (ep.air_date) {
+        const airMs = Date.parse(ep.air_date);
+        if (!isNaN(airMs)) {
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            if (airMs > todayStart.getTime()) {
+                isFutureAirDate = true;
+            }
+            formattedAirDate = new Date(airMs).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        }
+    }
+
+    const titleSlug = typeof normalizeTitleForComparison === "function"
+        ? normalizeTitleForComparison(movie.title)
+        : String(movie.title || "").toLowerCase();
+    const reqKey = `fh_ep_req_${movie.csv_id || movie.id || titleSlug}_S${seasonNum}E${epNum}`;
+    const isRequested = localStorage.getItem(reqKey) === "1";
+
+    return {
+        isUploaded,
+        streamUrl: streamUrl || ((seasonNum === 1 && epNum === 1 && movie.stream_url && !String(movie.stream_url).includes("t.me")) ? movie.stream_url : ""),
+        isFutureAirDate,
+        formattedAirDate,
+        reqKey,
+        isRequested
+    };
+}
+
+function triggerEpisodeRequestModal(movie, seasonNum, ep, actionBtn, statusBadge) {
+    const epNum = ep.episode_number || 1;
+    const status = getEpisodeUploadStatus(movie, seasonNum, ep);
+    if (status.isRequested) {
+        showToast(`You already requested S${seasonNum}:E${epNum} of "${movie.title}"! We're on it 🍿`, "info");
+        return;
+    }
+
+    const epMovieProxy = {
+        ...movie,
+        title: `${movie.title} (S${seasonNum}:E${epNum})`,
+        type: "Series Episode"
+    };
+
+    const streamModal = document.getElementById("stream-request-modal");
+    const streamDesc = document.getElementById("stream-request-modal-desc");
+    const btnConfirm = document.getElementById("btn-confirm-stream-request");
+
+    if (streamModal) {
+        if (streamDesc) {
+            streamDesc.textContent = status.isFutureAirDate
+                ? `Season ${seasonNum}, Episode ${epNum} airs on ${status.formattedAirDate}. Request early upload notification when it releases?`
+                : `Season ${seasonNum}, Episode ${epNum} of "${movie.title}" hasn't been uploaded yet. Would you like to request an upload?`;
+        }
+        streamModal.style.display = "flex";
+        requestAnimationFrame(() => streamModal.classList.add("active"));
+
+        if (btnConfirm) {
+            btnConfirm.onclick = async () => {
+                streamModal.classList.remove("active");
+                setTimeout(() => { streamModal.style.display = "none"; }, 250);
+                triggerMonetagSmartLink();
+                localStorage.setItem(status.reqKey, "1");
+                if (actionBtn) {
+                    actionBtn.textContent = status.isFutureAirDate ? "✓ Notified" : "✓ Requested";
+                    actionBtn.classList.add("requested");
+                }
+                if (statusBadge && !status.isFutureAirDate) {
+                    statusBadge.textContent = "✓ Requested";
+                    statusBadge.className = "episode-status-badge requested";
+                }
+                await submitDedicatedStreamRequest(epMovieProxy);
+            };
+        }
+    } else {
+        localStorage.setItem(status.reqKey, "1");
+        if (actionBtn) {
+            actionBtn.textContent = status.isFutureAirDate ? "✓ Notified" : "✓ Requested";
+            actionBtn.classList.add("requested");
+        }
+        submitDedicatedStreamRequest(epMovieProxy);
+    }
+}
+
 // TV Series Episode Guide (Collapsible dropdown with rich titles & synopsis)
 function renderMediaSeriesSection(movie, container, streamCallback) {
     if (!container) return;
@@ -6388,12 +6492,17 @@ function renderMediaSeriesSection(movie, container, streamCallback) {
             }
         }
 
-        if (countBadge) countBadge.textContent = `${episodes.length} Episodes`;
+        const uploadedCount = episodes.filter(ep => getEpisodeUploadStatus(movie, seasonObj.seasonNumber, ep).isUploaded).length;
+        if (countBadge) {
+            countBadge.textContent = `${uploadedCount} of ${episodes.length} Uploaded`;
+        }
 
         episodes.forEach(ep => {
             const epNum = ep.episode_number;
+            const epStatus = getEpisodeUploadStatus(movie, seasonObj.seasonNumber, ep);
+
             const epCard = document.createElement("div");
-            epCard.className = "episode-rich-card";
+            epCard.className = `episode-rich-card ${epStatus.isUploaded ? "uploaded" : "not-uploaded"}`;
 
             const topRow = document.createElement("div");
             topRow.className = "episode-rich-card-top";
@@ -6413,12 +6522,49 @@ function renderMediaSeriesSection(movie, container, streamCallback) {
             tagTitle.appendChild(epTitle);
             topRow.appendChild(tagTitle);
 
-            const playIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            playIcon.setAttribute("class", "cinema-ep-play-icon");
-            playIcon.style.cssText = "width:14px;height:14px;fill:currentColor;opacity:0.7;";
-            playIcon.innerHTML = `<use href="#icon-play"></use>`;
-            topRow.appendChild(playIcon);
+            const statusControls = document.createElement("div");
+            statusControls.className = "episode-rich-status-controls";
 
+            if (epStatus.isUploaded) {
+                const readyBadge = document.createElement("span");
+                readyBadge.className = "episode-status-badge ready";
+                readyBadge.textContent = "⚡ Stream";
+                statusControls.appendChild(readyBadge);
+
+                const playIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                playIcon.setAttribute("class", "cinema-ep-play-icon");
+                playIcon.style.cssText = "width:14px;height:14px;fill:#ffbc00;flex-shrink:0;";
+                playIcon.innerHTML = `<use href="#icon-play"></use>`;
+                statusControls.appendChild(playIcon);
+            } else {
+                const statusBadge = document.createElement("span");
+                if (epStatus.isFutureAirDate) {
+                    statusBadge.className = "episode-status-badge upcoming";
+                    statusBadge.textContent = `📅 Airs ${epStatus.formattedAirDate}`;
+                } else {
+                    statusBadge.className = `episode-status-badge ${epStatus.isRequested ? "requested" : "not-uploaded"}`;
+                    statusBadge.textContent = epStatus.isRequested ? "✓ Requested" : "⏳ Not Uploaded";
+                }
+                statusControls.appendChild(statusBadge);
+
+                const reqBtn = document.createElement("button");
+                reqBtn.type = "button";
+                reqBtn.className = `episode-request-pill ${epStatus.isRequested ? "requested" : ""}`;
+                reqBtn.textContent = epStatus.isRequested
+                    ? (epStatus.isFutureAirDate ? "✓ Notified" : "✓ Requested")
+                    : (epStatus.isFutureAirDate ? "🔔 Notify" : "📡 Request");
+                reqBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    triggerEpisodeRequestModal(movie, seasonObj.seasonNumber, ep, reqBtn, statusBadge);
+                });
+                statusControls.appendChild(reqBtn);
+
+                epCard.addEventListener("click", () => {
+                    triggerEpisodeRequestModal(movie, seasonObj.seasonNumber, ep, reqBtn, statusBadge);
+                });
+            }
+
+            topRow.appendChild(statusControls);
             epCard.appendChild(topRow);
 
             if (ep.overview) {
@@ -6428,41 +6574,15 @@ function renderMediaSeriesSection(movie, container, streamCallback) {
                 epCard.appendChild(syn);
             }
 
-            epCard.addEventListener("click", () => {
-                episodesList.querySelectorAll(".episode-rich-card").forEach(c => c.classList.remove("active"));
-                epCard.classList.add("active");
-
-                let epTarget = ep.stream_url || seasonObj.streamUrl || movie.stream_url || "";
-                if (movie.stream_links && Array.isArray(movie.stream_links)) {
-                    const foundStream = movie.stream_links.find(s => (s.episode == epNum || s.episode_number == epNum) && (s.season == seasonObj.seasonNumber || !s.season));
-                    if (foundStream) {
-                        epTarget = foundStream.stream_url || foundStream.url || epTarget;
-                    }
-                }
-                const epDisplayTitle = `${movie.title} • S${seasonObj.seasonNumber}:E${epNum}`;
-                streamCallback(epTarget, epDisplayTitle);
-                showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
-                // Update Next Episode Quick Jump button
-                let nextEpBtn = seriesHeader.querySelector(".cinema-next-ep-btn");
-                const nextEpObj = episodes.find(e => (e.episode_number || 1) === (epNum + 1));
-                if (nextEpObj) {
-                    if (!nextEpBtn) {
-                        nextEpBtn = document.createElement("button");
-                        nextEpBtn.type = "button";
-                        nextEpBtn.className = "cinema-next-ep-btn";
-                        seriesHeader.appendChild(nextEpBtn);
-                    }
-                    nextEpBtn.innerHTML = `<span>Next Ep ${epNum + 1}</span><span>▶️</span>`;
-                    nextEpBtn.onclick = () => {
-                        const nextCard = episodesGrid.children[epNum];
-                        if (nextCard) nextCard.click();
-                    };
-                    nextEpBtn.style.display = "inline-flex";
-                } else if (nextEpBtn) {
-                    nextEpBtn.style.display = "none";
-                }
-
-            });
+            if (epStatus.isUploaded) {
+                epCard.addEventListener("click", () => {
+                    episodesList.querySelectorAll(".episode-rich-card").forEach(c => c.classList.remove("active"));
+                    epCard.classList.add("active");
+                    const epDisplayTitle = `${movie.title} • S${seasonObj.seasonNumber}:E${epNum}`;
+                    streamCallback(epStatus.streamUrl, epDisplayTitle);
+                    showToast(`Playing ${seasonObj.name}: Episode ${epNum}`, "info");
+                });
+            }
 
             episodesList.appendChild(epCard);
         });
@@ -8665,7 +8785,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=168_${Date.now()}`;
+        const cacheBuster = `v=169_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
@@ -9481,20 +9601,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                 currentCinemaEpisodes = episodes;
 
                 // Count streamable episodes
-                const streamableCount = episodes.filter(ep => {
-                    if (ep.stream_url && !ep.stream_url.includes("t.me")) return true;
-                    const epNum = ep.episode_number;
-                    return allStreamLinks.some(s =>
-                        (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) &&
-                        (s.season == seasonObj.seasonNumber || !s.season) &&
-                        (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")
-                    ) || (epNum === 1 && movie.stream_url && !movie.stream_url.includes("t.me"));
-                }).length;
+                const streamableCount = episodes.filter(ep => getEpisodeUploadStatus(movie, seasonObj.seasonNumber, ep).isUploaded).length;
 
                 if (badgeEl) {
-                    badgeEl.textContent = streamableCount > 0
-                        ? `${streamableCount} Streamable • ${episodes.length} Episodes`
-                        : `${episodes.length} Episodes`;
+                    badgeEl.textContent = `${streamableCount} of ${episodes.length} Uploaded`;
                 }
 
                 episodes.forEach((ep, idx) => {
@@ -9502,8 +9612,10 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     const isEpActive = (currentSeason.seasonNumber === seasonObj.seasonNumber && currentEpisodeNum === epNum);
                     if (isEpActive) currentCinemaEpIndex = idx;
 
+                    const epStatus = getEpisodeUploadStatus(movie, seasonObj.seasonNumber, ep);
+
                     const epCard = document.createElement("div");
-                    epCard.className = `cinema-episode-card ${isEpActive ? "active" : ""}`;
+                    epCard.className = `cinema-episode-card ${isEpActive ? "active" : ""} ${epStatus.isUploaded ? "uploaded" : "not-uploaded"}`;
                     epCard.setAttribute("data-ep", epNum);
 
                     // Episode thumbnail with fallback
@@ -9537,20 +9649,21 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                         thumbWrap.appendChild(nowTag);
                     }
 
-                    // Check if this episode is stream-ready
-                    const hasStream = !!(
-                        (ep.stream_url && !ep.stream_url.includes("t.me")) ||
-                        allStreamLinks.some(s =>
-                            (s.episode == epNum || s.episodeNum == epNum || s.episode_number == epNum) &&
-                            (s.season == seasonObj.seasonNumber || !s.season) &&
-                            (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")
-                        ) || (epNum === 1 && movie.stream_url && !movie.stream_url.includes("t.me"))
-                    );
-
-                    // Stream Ready / Download Badge
+                    // Stream Ready / Not Uploaded / Upcoming Badge
                     const badgeTag = document.createElement("span");
-                    badgeTag.className = `cinema-ep-badge ${hasStream ? "ready" : "soon"}`;
-                    badgeTag.textContent = hasStream ? "⚡ Stream" : "📥 Download";
+                    if (epStatus.isUploaded) {
+                        badgeTag.className = "cinema-ep-badge ready";
+                        badgeTag.textContent = "⚡ Stream";
+                    } else if (epStatus.isFutureAirDate) {
+                        badgeTag.className = "cinema-ep-badge soon";
+                        badgeTag.textContent = `📅 Airs ${epStatus.formattedAirDate}`;
+                    } else if (epStatus.isRequested) {
+                        badgeTag.className = "cinema-ep-badge requested";
+                        badgeTag.textContent = "✓ Requested";
+                    } else {
+                        badgeTag.className = "cinema-ep-badge soon";
+                        badgeTag.textContent = "⏳ Not Uploaded";
+                    }
                     thumbWrap.appendChild(badgeTag);
 
                     // Runtime Tag
