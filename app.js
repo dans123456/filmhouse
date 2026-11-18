@@ -4404,6 +4404,17 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
         } catch (e) { }
     };
 
+    // Keep the movie backdrop visible until YouTube actually reports "playing".
+    // The iframe stays invisible while it loads/buffers so the user never sees a black screen.
+    iframeContainer.style.transition = "opacity 0.45s ease";
+    iframeContainer.style.opacity = "0";
+    let trailerRevealed = false;
+    const revealTrailer = () => {
+        trailerRevealed = true;
+        if (iframeContainer) iframeContainer.style.opacity = "1";
+        if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
+    };
+
     const stopAndRestoreBackdrop = () => {
         if (backdropContainer) {
             backdropContainer.classList.remove("hidden-for-playback");
@@ -4411,20 +4422,22 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
         }
         if (iframeContainer) {
             iframeContainer.style.display = "none";
+            iframeContainer.style.opacity = "1";
             iframeContainer.replaceChildren();
         }
         if (heroViewport) heroViewport.classList.remove("has-active-video");
         if (detailScreen) detailScreen.classList.remove("video-playing");
     };
 
+    // Safety net: if YouTube never reports a state (blocked autoplay / slow network),
+    // reveal the player after 6s so the user can still tap its play button.
     let crossfadeTimeout = setTimeout(() => {
-        if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
-    }, 1800);
+        if (!trailerRevealed) revealTrailer();
+    }, 6000);
 
     let progressPollInterval = null;
 
     iframe.onload = () => {
-        clearTimeout(crossfadeTimeout);
         try {
             iframe.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: 1 }), "*");
         } catch (e) { }
@@ -4436,9 +4449,9 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
             try {
                 iframe.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: 1 }), "*");
             } catch (e) { }
+            postCmd("addEventListener", ["onStateChange"]);
             postCmd("setVolume", [25]);
             postCmd("unMute");
-            if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
         }, 600);
 
         // Active duration/playback monitor to guarantee YouTube end-cards are NEVER shown
@@ -4477,8 +4490,9 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
 
             if (playerState !== null) {
                 if (playerState === 1) {
-                    // Playing
-                    if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
+                    // Playing: only now crossfade from the backdrop to the live trailer
+                    clearTimeout(crossfadeTimeout);
+                    revealTrailer();
                 } else if (playerState === 0) {
                     // Video ENDED - IMMEDIATELY remove iframe and restore clean movie backdrop!
                     // This guarantees YouTube's recommended video tiles NEVER appear.
@@ -4510,7 +4524,7 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
                 embedAndPlayHeroTrailer(trailerKeyOrUrl);
                 return;
             }
-            if (backdropContainer) backdropContainer.classList.add("hidden-for-playback");
+            revealTrailer();
             postCmd("playVideo");
             postCmd("setVolume", [25]);
             postCmd("unMute");
