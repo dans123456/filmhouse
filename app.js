@@ -10766,12 +10766,12 @@ function showCinemaPreRollModal(movie, onUnlocked) {
                 return;
             }
             deductPoints(300);
-            const FOUR_HOURS_MS = 4 * 3600 * 1000;
+            const NINETY_MINS_MS = 90 * 60 * 1000;
             const currentPass = parseInt(localStorage.getItem("filmhouse_watch_pass_until") || "0", 10);
-            const newExpiry = (currentPass > Date.now()) ? currentPass + FOUR_HOURS_MS : Date.now() + FOUR_HOURS_MS;
+            const newExpiry = (currentPass > Date.now()) ? currentPass + NINETY_MINS_MS : Date.now() + NINETY_MINS_MS;
             localStorage.setItem("filmhouse_watch_pass_until", String(newExpiry));
             localStorage.setItem("fh_ads_4h", "0");
-            showToast("🍿 4-Hour Pass Unlocked via Points! Enjoy your movie.", "success");
+            showToast("🍿 90-Minute Pass Unlocked via Points! Enjoy your movie.", "success");
             closeModal();
             if (typeof onUnlocked === "function") onUnlocked();
         };
@@ -10831,16 +10831,16 @@ function showCinemaPreRollModal(movie, onUnlocked) {
                 refreshPrerollUI();
 
                 if (newWatched >= 2) {
-                    const FOUR_HOURS_MS = 4 * 3600 * 1000;
+                    const NINETY_MINS_MS = 90 * 60 * 1000;
                     const currentPass = parseInt(localStorage.getItem("filmhouse_watch_pass_until") || "0", 10);
-                    const newExpiry = (currentPass > Date.now()) ? currentPass + FOUR_HOURS_MS : Date.now() + FOUR_HOURS_MS;
+                    const newExpiry = (currentPass > Date.now()) ? currentPass + NINETY_MINS_MS : Date.now() + NINETY_MINS_MS;
                     localStorage.setItem("filmhouse_watch_pass_until", String(newExpiry));
                     localStorage.setItem("fh_ads_4h", "0");
-                    showToast("🎉 4-Hour Cinema Pass Activated! Enjoy your movie.", "success");
+                    showToast("🎉 90-Minute Cinema Pass Activated! Enjoy your movie.", "success");
                     closeModal();
                     if (typeof onUnlocked === "function") onUnlocked();
                 } else {
-                    showToast("✅ Ad 1 of 2 Verified! Tap to watch the final ad and unlock your 4h Pass.", "success", 5000);
+                    showToast("✅ Ad 1 of 2 Verified! Tap to watch the final ad and unlock your 90m Pass.", "success", 5000);
                 }
             } else {
                 refreshPrerollUI();

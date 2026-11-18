@@ -720,15 +720,15 @@
 
 
 
-      <!-- 4-Hour Ad Pass Live Meter Pill -->
+      <!-- 90-Minute Ad Pass Live Meter Pill -->
       <div class='watch-pass-pill' id='watchPassPill'
         style='display:flex;position:absolute;top:12px;right:12px;z-index:55;align-items:center;gap:6px;background:rgba(12,15,24,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;font-size:11px;color:#cbd5e1;box-shadow:0 4px 15px rgba(0,0,0,0.5);'>
         <span id='passDot'
           style='width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;display:inline-block;'></span>
-        <span id='passTimerText' style='font-weight:600;color:#fff;'>Pass: 04:00:00</span>
+        <span id='passTimerText' style='font-weight:600;color:#fff;'>Pass: 01:30:00</span>
         <a id='btnGetPassPill' href='https://uplcm.com/4/12129103' target='_blank' rel='noopener noreferrer'
           style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:800;cursor:pointer;margin-left:2px;text-decoration:none;display:inline-flex;align-items:center;'>⚡
-          4h Pass</a>
+          90m Pass</a>
       </div>
 
       <!-- Multi-Language Subtitles Modal (60+ Languages) -->
@@ -822,7 +822,7 @@
           <span class='hud-icon'>🍿</span>
           <div class='hud-info'>
             <div class='hud-title-row'>
-              <span class='hud-title' id='hudPassTitle'>4-Hour Cinema Pass</span>
+              <span class='hud-title' id='hudPassTitle'>90-Minute Cinema Pass</span>
               <span class='hud-count' id='hudPassCount'>0/2 Ads</span>
             </div>
             <div class='hud-bar-track'>
@@ -840,7 +840,7 @@
       <!-- Subtle Floating Pass Alert Toast -->
       <div id='passAlertToast'
         style='display:none;position:absolute;bottom:64px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,188,0,0.5);color:#ffd700;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;z-index:53;box-shadow:0 6px 20px rgba(0,0,0,0.8);white-space:nowrap;pointer-events:none;text-align:center;'>
-        <span>⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!</span>
+        <span>⚡ Watch 2 sponsor ads below to unlock 90-Minute Stream!</span>
       </div>
 
       <!-- Sleek Floating Glassmorphic Resume Pill -->
@@ -1758,7 +1758,7 @@
       const hadPass = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10) > 0;
 
       if (hudTitle) {
-        hudTitle.textContent = hadPass ? 'Pass Expired • 4h' : '4-Hour Cinema Pass';
+        hudTitle.textContent = hadPass ? 'Pass Expired • 90m' : '90-Minute Cinema Pass';
       }
       if (hudCount) {
         hudCount.textContent = `${adsWatched4h}/2 Ads`;
@@ -1800,7 +1800,7 @@
           }
           timerText.style.color = '#fff';
         }
-        if (btnGet) btnGet.textContent = '⚡ +4h';
+        if (btnGet) btnGet.textContent = '⚡ +90m';
       } else {
         // No active pass -> Display sleek bottom HUD bar!
         if (hud) hud.style.display = 'flex';
@@ -1812,7 +1812,7 @@
         timerText.textContent = 'No Pass';
         timerText.style.color = '#94a3b8';
         if (btnGet) {
-          btnGet.textContent = adsWatched4h > 0 ? `⚡ ${adsWatched4h}/2` : '⚡ Get 4h';
+          btnGet.textContent = adsWatched4h > 0 ? `⚡ ${adsWatched4h}/2` : '⚡ Get 90m';
         }
       }
     }
@@ -1833,11 +1833,11 @@
     }
 
     function activateWatchPass(fromUserGesture) {
-      const FOUR_HOURS_MS = 4 * 3600 * 1000;
+      const NINETY_MINS_MS = 90 * 60 * 1000;
       const currentExpires = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
-      let newExpires = Date.now() + FOUR_HOURS_MS;
+      let newExpires = Date.now() + NINETY_MINS_MS;
       if (currentExpires > Date.now()) {
-        newExpires = currentExpires + FOUR_HOURS_MS;
+        newExpires = currentExpires + NINETY_MINS_MS;
       }
       localStorage.setItem('filmhouse_watch_pass_until', String(newExpires));
       localStorage.setItem('fh_ads_4h', '0');
@@ -1856,14 +1856,14 @@
         const playTitle = document.getElementById('streamPlayTitle');
         const playSub = document.getElementById('streamPlaySub');
         if (playTitle) playTitle.textContent = '⚡ Starting High-Speed Stream...';
-        if (playSub) playSub.textContent = '4-Hour Cinema Pass Active • Loading Movie';
+        if (playSub) playSub.textContent = '90-Minute Cinema Pass Active • Loading Movie';
       }
 
       if (videoEl) {
         const onAutoplayBlocked = function () {
           restoreInteractivePlayOverlay(
             '🎉 Pass Unlocked! ▶ Tap to Play',
-            '4-Hour Ad-Free Cinema Ready • Instant Start'
+            '90-Minute Ad-Free Cinema Ready • Instant Start'
           );
         };
 
@@ -1965,7 +1965,7 @@
         const watched = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10) + 1;
         localStorage.setItem('fh_ads_4h', String(watched));
         if (watched >= 2) {
-          showPassAlert("🎉 4-Hour Cinema Pass Activated!");
+          showPassAlert("🎉 90-Minute Cinema Pass Activated!");
           activateWatchPass(!!fromUserGesture);
           return 'unlocked';
         } else {
@@ -2003,7 +2003,7 @@
       _playerAdLeftApp = false;
 
       const hudBtn = document.getElementById('hudBtnText');
-      if (hudBtn) hudBtn.textContent = '⏳ Visiting...';
+      if (hudBtn) hudBtn.textContent = '⏳ Visiting sponsor...';
 
       const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
         (window.Telegram?.WebApp?.platform === 'ios');
@@ -2016,19 +2016,23 @@
       window.addEventListener('pageshow', onPlayerFocusReturn);
       window.addEventListener('blur', function () { if (_playerAdPending) _playerAdLeftApp = true; }, { once: true });
 
-      // 1. If in genuine Telegram client, use Telegram SDK openLink
+      // 1. Notify parent window to open Monetag SmartLink via Telegram WebApp SDK
+      if (window.parent && window.parent !== window) {
+        try {
+          window.parent.postMessage({ action: "openLink", url: MONETAG_SMARTLINK }, "*");
+        } catch (_) { }
+      }
+
+      // 2. Open via Telegram WebApp if directly available, or via window.open
       const tg = getActiveTelegramWebApp();
-      if (tg) {
+      if (tg && typeof tg.openLink === 'function') {
         if (e && typeof e.preventDefault === 'function') e.preventDefault();
-        // On iOS Telegram, SFSafariViewController opens over the webview without always firing iframe blur
-        setTimeout(function () { if (_playerAdPending) _playerAdLeftApp = true; }, 1200);
         try {
           tg.openLink(MONETAG_SMARTLINK);
         } catch (_) {
           window.open(MONETAG_SMARTLINK, '_blank');
         }
       } else {
-        setTimeout(function () { if (_playerAdPending) _playerAdLeftApp = true; }, 1200);
         if (!e || !e.target || !e.target.closest || !e.target.closest('a')) {
           try {
             const w = window.open(MONETAG_SMARTLINK, '_blank');
@@ -2059,7 +2063,7 @@
       // Inform parent app in case parent maintains daily stats
       try {
         if (window.parent && window.parent !== window) {
-          window.parent.postMessage({ action: "watchAdForPass", tierId: "4h" }, "*");
+          window.parent.postMessage({ action: "watchAdForPass", tierId: "90m" }, "*");
         }
       } catch (_) { }
 
@@ -2118,7 +2122,7 @@
             hud.style.display = 'flex';
             hud.classList.add('pulse-alert');
           }
-          showPassAlert("⚠️ 4-Hour Pass Expired. Watch 2 sponsor ads to resume!");
+          showPassAlert("⚠️ 90-Minute Pass Expired. Watch 2 sponsor ads to resume!");
           updatePassUI();
         }
       }
@@ -2137,7 +2141,7 @@
             hud.style.display = 'flex';
             hud.classList.add('pulse-alert');
           }
-          showPassAlert("⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!");
+          showPassAlert("⚡ Watch 2 sponsor ads below to unlock 90-Minute Stream!");
           updatePassUI();
         }
       });
@@ -2226,7 +2230,7 @@
             void hud.offsetWidth; // force reflow for CSS animation restart
             hud.classList.add('pulse-alert');
           }
-          showPassAlert("⚡ Watch 2 sponsor ads below to unlock 4-Hour Stream!");
+          showPassAlert("⚡ Watch 2 sponsor ads below to unlock 90-Minute Stream!");
           updatePassUI();
         }
       }
