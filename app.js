@@ -5065,16 +5065,26 @@ function openMediaDetailPage(movie) {
         iframeContainer.style.display = "none";
     }
 
-    // 2. Hero Viewport: Instantly hide old movie's backdrop, then smoothly fade in the new one
+    // 2. Hero Viewport: Always display movie backdrop/poster immediately so no black void occurs
     const backdropImg = document.getElementById("media-backdrop-img");
+    const targetBackdrop = movie.backdrop || movie.poster || "";
     if (backdropImg) {
-        backdropImg.style.opacity = "0"; // Instantly hide previous movie's backdrop
-        backdropImg.src = movie.backdrop || movie.poster || "";
-        backdropImg.alt = movie.title;
-        backdropImg.onload = () => {
-            backdropImg.style.opacity = "1";
-        };
-        if (backdropImg.complete && backdropImg.naturalWidth > 0) {
+        backdropImg.alt = movie.title || "Movie Backdrop";
+        if (targetBackdrop) {
+            backdropImg.src = targetBackdrop;
+            backdropImg.onload = () => { backdropImg.style.opacity = "1"; };
+            backdropImg.onerror = () => {
+                if (movie.poster && backdropImg.src !== movie.poster) {
+                    backdropImg.src = movie.poster;
+                    backdropImg.style.opacity = "1";
+                } else {
+                    backdropImg.style.opacity = "1";
+                }
+            };
+            if (backdropImg.complete && backdropImg.naturalWidth > 0) {
+                backdropImg.style.opacity = "1";
+            }
+        } else {
             backdropImg.style.opacity = "1";
         }
     }
@@ -5334,7 +5344,7 @@ function openMediaDetailPage(movie) {
 
         if (streamModal) {
             if (streamDesc) {
-                streamDesc.textContent = `"${movie.title}" is currently only available for download. Would you like to request an online streaming link?`;
+                streamDesc.textContent = `"${movie.title}" does not have an online streaming link yet. Would you like to request high-speed online streaming? Our cinema team will add it!`;
             }
             streamModal.style.display = "flex";
             requestAnimationFrame(() => {
@@ -5346,6 +5356,16 @@ function openMediaDetailPage(movie) {
                     streamModal.classList.remove("active");
                     setTimeout(() => { streamModal.style.display = "none"; }, 250);
                     triggerMonetagSmartLink();
+                    const sKey = `fh_stream_req_${movie.csv_id || movie.id || (typeof normalizeTitleForComparison === "function" ? normalizeTitleForComparison(movie.title) : movie.title.toLowerCase())}`;
+                    localStorage.setItem(sKey, "1");
+                    const heroStreamBtn = document.getElementById("btn-media-stream-main");
+                    if (heroStreamBtn) {
+                        heroStreamBtn.innerHTML = `<span class="action-icon">✓</span><span>Stream Requested</span>`;
+                        heroStreamBtn.classList.add("stream-requested");
+                        heroStreamBtn.onclick = () => {
+                            showToast(`You already requested online streaming for "${movie.title}"! We're on it 🍿`, "info");
+                        };
+                    }
                     await submitDedicatedStreamRequest(movie);
                 };
             }
@@ -5356,10 +5376,43 @@ function openMediaDetailPage(movie) {
         }
     }
 
-    // Wire Hero Stream Button
+    // 5. Wire Hero Stream Button with Smart "Request Stream" for In-Catalog Titles
     const streamBtn = document.getElementById("btn-media-stream-main");
+    const hasDirectStream = isTVShow
+        ? (Array.isArray(movie.stream_links) && movie.stream_links.length > 0)
+        : Boolean(
+            (movie.stream_url && !String(movie.stream_url).includes("t.me")) ||
+            (Array.isArray(movie.stream_links) && movie.stream_links.some(s => s && (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")))
+        );
+
+    const streamReqKey = `fh_stream_req_${movie.csv_id || movie.id || (typeof normalizeTitleForComparison === "function" ? normalizeTitleForComparison(movie.title) : movie.title.toLowerCase())}`;
+    const alreadyStreamRequested = Boolean(
+        localStorage.getItem(streamReqKey) === "1" ||
+        (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests) && currentUserRequests.some(r =>
+            (r.type === "stream" || r.requestType === "stream" || r.target === "stream_url") &&
+            r.title && titlesMatch(r.title, movie.title) &&
+            r.status !== "fulfilled"
+        ))
+    );
+
     if (streamBtn) {
-        streamBtn.onclick = () => playMediaStream();
+        if (!hasDirectStream && !isTVShow) {
+            if (alreadyStreamRequested) {
+                streamBtn.innerHTML = `<span class="action-icon">✓</span><span>Stream Requested</span>`;
+                streamBtn.classList.add("stream-requested");
+                streamBtn.onclick = () => {
+                    showToast(`You already requested online streaming for "${movie.title}"! We're processing it 🍿`, "info");
+                };
+            } else {
+                streamBtn.innerHTML = `<span class="action-icon">📡</span><span>Request Stream</span>`;
+                streamBtn.classList.remove("stream-requested");
+                streamBtn.onclick = () => playMediaStream();
+            }
+        } else {
+            streamBtn.innerHTML = `<span class="action-icon">👑</span><span>${isTVShow ? 'Stream S1:E1' : 'Stream'}</span>`;
+            streamBtn.classList.remove("stream-requested");
+            streamBtn.onclick = () => playMediaStream();
+        }
     }
 
     // 6. Wire Hero Download Button (All Qualities with Missing Request)
@@ -5877,9 +5930,16 @@ async function submitDedicatedStreamRequest(movie) {
             };
 
             await db.collection("requests").add(reqPayload);
+            const sKey = `fh_stream_req_${movie.csv_id || movie.id || (typeof normalizeTitleForComparison === "function" ? normalizeTitleForComparison(movie.title) : movie.title.toLowerCase())}`;
+            localStorage.setItem(sKey, "1");
+            if (typeof currentUserRequests !== "undefined" && Array.isArray(currentUserRequests)) {
+                currentUserRequests.push(reqPayload);
+            }
             showToast(`🚀 Stream request submitted for "${movie.title}"! We'll notify you once uploaded.`, "success");
             if (typeof triggerHaptic === "function") triggerHaptic("success");
         } else {
+            const sKey = `fh_stream_req_${movie.csv_id || movie.id || (typeof normalizeTitleForComparison === "function" ? normalizeTitleForComparison(movie.title) : movie.title.toLowerCase())}`;
+            localStorage.setItem(sKey, "1");
             showToast(`Stream request recorded for "${movie.title}"!`, "success");
         }
     } catch (err) {
@@ -6601,7 +6661,11 @@ function fetchTmdbDetailsForMedia(movie) {
 
             if (currentMediaDetailMovie && (currentMediaDetailMovie.csv_id === movie.csv_id || currentMediaDetailMovie.title === movie.title)) {
                 const backdropImg = document.getElementById("media-backdrop-img");
-                if (backdropImg && movie.backdrop) backdropImg.src = movie.backdrop;
+                if (backdropImg && movie.backdrop) {
+                    backdropImg.src = movie.backdrop;
+                    backdropImg.onload = () => { backdropImg.style.opacity = "1"; };
+                    backdropImg.style.opacity = "1";
+                }
 
                 const synopsisEl = document.getElementById("media-detail-synopsis");
                 if (synopsisEl && movie.overview) synopsisEl.textContent = movie.overview;
@@ -8601,7 +8665,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const playerBase = (typeof window !== "undefined" && window.location.hostname.includes("github.io"))
             ? "https://dans123456.github.io/filmhouse/player.html"
             : "./player.html";
-        const cacheBuster = `v=167_${Date.now()}`;
+        const cacheBuster = `v=168_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;

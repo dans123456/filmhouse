@@ -483,28 +483,28 @@
     }
 
     .stream-play-circle {
-      width: 72px;
-      height: 72px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
       background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 35px rgba(255, 188, 0, 0.65), 0 4px 15px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 30px rgba(255, 188, 0, 0.6), 0 4px 15px rgba(0, 0, 0, 0.5);
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
     }
 
     .stream-play-overlay:hover .stream-play-circle,
     .stream-play-overlay:active .stream-play-circle {
-      transform: scale(1.12);
-      box-shadow: 0 0 55px rgba(255, 188, 0, 0.95), 0 6px 20px rgba(0, 0, 0, 0.7);
+      transform: scale(1.1);
+      box-shadow: 0 0 45px rgba(255, 188, 0, 0.85), 0 6px 20px rgba(0, 0, 0, 0.7);
     }
 
     .stream-play-circle svg {
-      width: 30px;
-      height: 30px;
+      width: 24px;
+      height: 24px;
       fill: #000;
-      margin-left: 4px;
+      margin-left: 3px;
     }
 
     .stream-play-title {
@@ -695,37 +695,101 @@
       }
     }
 
+    /* Watch Pass Pill Styling & Auto-Hide on Controls Inactivity */
+    .watch-pass-pill {
+      display: flex;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 55;
+      align-items: center;
+      gap: 6px;
+      background: rgba(12, 15, 24, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: #cbd5e1;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      will-change: opacity, transform;
+      user-select: none;
+    }
+
+    .plyr--hide-controls .watch-pass-pill,
+    .plyr--hide-controls ~ .watch-pass-pill,
+    .video-viewport.controls-hidden .watch-pass-pill,
+    .watch-pass-pill.pass-auto-hidden {
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transform: translateY(-8px) scale(0.96) !important;
+    }
+
+    /* Common plyr control row layout across screens */
+    .plyr__controls-row {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      width: 100% !important;
+      min-width: 100% !important;
+      padding-top: 2px;
+    }
+
+    .plyr__controls-left {
+      flex: 1 1 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      min-width: 0 !important;
+    }
+
+    .plyr__controls-center {
+      flex: 0 0 auto !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+    }
+
+    .plyr__controls-right {
+      flex: 1 1 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      gap: 4px !important;
+      min-width: 0 !important;
+      position: relative !important;
+    }
+
     /* =====================================================================
        Mobile / touch control bar: 2 rows (full-width scrubber on top,
-       buttons below) + vertical volume popup so nothing gets squashed.
+       balanced 3-column buttons row below) + vertical volume popup.
        ===================================================================== */
     @media (pointer: coarse), (max-width: 600px) {
       :root {
-        --plyr-range-thumb-height: 16px;
-        --plyr-range-track-height: 6px;
-        --plyr-control-spacing: 6px;
+        --plyr-range-thumb-height: 12px;
+        --plyr-range-track-height: 3.5px;
+        --plyr-control-spacing: 4px;
       }
 
       .plyr--video .plyr__controls {
         flex-wrap: wrap !important;
         align-items: center;
-        row-gap: 0;
-        padding: 6px 10px 8px !important;
+        row-gap: 2px;
+        padding: 4px 10px 8px !important;
+        background: linear-gradient(180deg, transparent 0%, rgba(6, 8, 14, 0.94) 100%) !important;
       }
 
-      /* Row 1: full-width progress scrubber */
+      /* Row 1: full-width sleek progress scrubber */
       .plyr__controls .plyr__progress__container {
         order: -1;
         flex: 0 0 100% !important;
         width: 100%;
         min-width: 100%;
-        margin: 0 0 2px !important;
+        margin: 0 0 3px !important;
         padding: 0 !important;
-      }
-
-      /* Row 2: buttons */
-      .plyr__controls > .plyr__controls__item:first-child {
-        margin-right: 0 !important;
       }
 
       .plyr__controls [data-plyr="restart"],
@@ -733,34 +797,150 @@
         display: none !important;
       }
 
-      .plyr__controls .plyr__control {
-        padding: 9px !important;
+      /* Row 2: centered & proportioned controls container */
+      .plyr__controls-row {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        min-width: 100% !important;
       }
 
+      .plyr__controls-left {
+        flex: 1 1 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        min-width: 0 !important;
+      }
+
+      .plyr__controls-center {
+        flex: 0 0 auto !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+      }
+
+      .plyr__controls-right {
+        flex: 1 1 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 2px !important;
+        min-width: 0 !important;
+        position: relative !important;
+      }
+
+      /* Time display */
       .plyr__controls .plyr__time {
-        font-size: 12px;
-        padding: 0 2px;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        color: #cbd5e1 !important;
+        padding: 0 2px !important;
+        white-space: nowrap !important;
+        font-variant-numeric: tabular-nums !important;
       }
 
-      .plyr__controls [data-plyr="mute"] {
-        margin-left: auto !important;
+      /* Proportioned center playback buttons */
+      .plyr__controls [data-plyr="play"] {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background: rgba(255, 188, 0, 0.18) !important;
+        border: 1px solid rgba(255, 188, 0, 0.45) !important;
+        color: #ffd700 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 0 10px rgba(255, 188, 0, 0.25) !important;
+        transition: transform 0.15s ease, background 0.15s ease !important;
+      }
+
+      .plyr__controls [data-plyr="play"]:active {
+        transform: scale(0.92) !important;
+      }
+
+      .plyr__controls [data-plyr="play"] svg {
+        width: 15px !important;
+        height: 15px !important;
+        fill: #ffd700 !important;
+      }
+
+      .plyr__controls [data-plyr="rewind"],
+      .plyr__controls [data-plyr="fast-forward"] {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background: transparent !important;
+        color: #f1f5f9 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: transform 0.15s ease !important;
+      }
+
+      .plyr__controls [data-plyr="rewind"]:active,
+      .plyr__controls [data-plyr="fast-forward"]:active {
+        transform: scale(0.9) !important;
+      }
+
+      .plyr__controls [data-plyr="rewind"] svg,
+      .plyr__controls [data-plyr="fast-forward"] svg {
+        width: 14px !important;
+        height: 14px !important;
+        fill: #f1f5f9 !important;
+      }
+
+      /* Secondary action tools on the right */
+      .plyr__controls [data-plyr="mute"],
+      .plyr__controls [data-plyr="captions"],
+      .plyr__controls [data-plyr="settings"],
+      .plyr__controls [data-plyr="fullscreen"] {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        padding: 0 !important;
+        border-radius: 6px !important;
+        background: transparent !important;
+        color: #cbd5e1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      .plyr__controls [data-plyr="captions"] {
+        display: inline-flex !important; /* Always show CC button */
+      }
+
+      .plyr__controls [data-plyr="mute"] svg,
+      .plyr__controls [data-plyr="captions"] svg,
+      .plyr__controls [data-plyr="settings"] svg,
+      .plyr__controls [data-plyr="fullscreen"] svg {
+        width: 15px !important;
+        height: 15px !important;
       }
 
       /* Vertical volume popup (hidden until the speaker is tapped) */
       .plyr__controls .plyr__volume {
         position: absolute !important;
-        bottom: calc(100% + 6px);
-        left: 0;
-        width: 34px !important;
-        min-width: 34px !important;
-        max-width: 34px !important;
-        height: 112px;
+        bottom: calc(100% + 8px);
+        width: 32px !important;
+        min-width: 32px !important;
+        max-width: 32px !important;
+        height: 106px;
         margin: 0 !important;
         padding: 0 !important;
-        background: rgba(12, 15, 24, 0.92);
-        border: 1px solid rgba(255, 188, 0, 0.3);
-        border-radius: 17px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+        background: rgba(12, 15, 24, 0.94);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 188, 0, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
         display: none !important;
         z-index: 70;
       }
@@ -773,9 +953,9 @@
         position: absolute !important;
         left: 50%;
         top: 50%;
-        width: 88px !important;
-        height: 22px;
-        margin: -11px 0 0 -44px !important;
+        width: 82px !important;
+        height: 20px;
+        margin: -10px 0 0 -41px !important;
         transform: rotate(-90deg);
         transform-origin: 50% 50%;
       }
@@ -807,10 +987,9 @@
 
 
       <!-- 90-Minute Ad Pass Live Meter Pill -->
-      <div class='watch-pass-pill' id='watchPassPill'
-        style='display:flex;position:absolute;top:12px;right:12px;z-index:55;align-items:center;gap:6px;background:rgba(12,15,24,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:20px;font-size:11px;color:#cbd5e1;box-shadow:0 4px 15px rgba(0,0,0,0.5);'>
+      <div class='watch-pass-pill' id='watchPassPill'>
         <span id='passDot'
-          style='width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;display:inline-block;'></span>
+          style='width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;display:inline-block;flex-shrink:0;'></span>
         <span id='passTimerText' style='font-weight:600;color:#fff;'>Pass: 01:30:00</span>
         <a id='btnGetPassPill' href='https://uplcm.com/4/12129103' target='_blank' rel='noopener noreferrer'
           style='background:linear-gradient(135deg, #ffd700, #ff9900);color:#0b0d14;border:none;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:800;cursor:pointer;margin-left:2px;text-decoration:none;display:inline-flex;align-items:center;'>⚡
@@ -1120,9 +1299,66 @@
             keyboard: { focused: true, global: true }
           });
           window.plyrInstance = plyrInstance;
+          plyrInstance.on('ready', arrangePlyrControls);
+          plyrInstance.on('controlsshown', () => {
+            const pill = document.getElementById('watchPassPill');
+            if (pill) pill.classList.remove('pass-auto-hidden');
+          });
+          plyrInstance.on('controlshidden', () => {
+            const pill = document.getElementById('watchPassPill');
+            if (pill) pill.classList.add('pass-auto-hidden');
+          });
+          setTimeout(arrangePlyrControls, 50);
+          setTimeout(arrangePlyrControls, 500);
         }
       } catch (pErr) {
         console.warn("Plyr init fallback:", pErr);
+      }
+
+      function arrangePlyrControls() {
+        try {
+          const controls = document.querySelector('.plyr__controls');
+          if (!controls || controls.querySelector('.plyr__controls-row')) return;
+
+          const time = controls.querySelector('.plyr__time');
+          const rewind = controls.querySelector('[data-plyr="rewind"]');
+          const play = controls.querySelector('[data-plyr="play"]');
+          const ff = controls.querySelector('[data-plyr="fast-forward"]');
+          const mute = controls.querySelector('[data-plyr="mute"]');
+          const vol = controls.querySelector('.plyr__volume');
+          const cc = controls.querySelector('[data-plyr="captions"]');
+          const settings = controls.querySelector('[data-plyr="settings"]');
+          const fs = controls.querySelector('[data-plyr="fullscreen"]');
+
+          const row = document.createElement('div');
+          row.className = 'plyr__controls-row';
+
+          const left = document.createElement('div');
+          left.className = 'plyr__controls-left';
+          if (time) left.appendChild(time);
+
+          const center = document.createElement('div');
+          center.className = 'plyr__controls-center';
+          if (rewind) center.appendChild(rewind);
+          if (play) center.appendChild(play);
+          if (ff) center.appendChild(ff);
+
+          const right = document.createElement('div');
+          right.className = 'plyr__controls-right';
+          if (mute) right.appendChild(mute);
+          if (vol) right.appendChild(vol);
+          if (cc) right.appendChild(cc);
+          if (settings) right.appendChild(settings);
+          if (fs) right.appendChild(fs);
+
+          row.appendChild(left);
+          row.appendChild(center);
+          row.appendChild(right);
+
+          controls.appendChild(row);
+        } catch (e) {
+          console.warn("arrangePlyrControls notice:", e);
+        }
       }
 
       const loaderEl = document.getElementById('loader');
@@ -1913,23 +2149,30 @@
         const m = Math.floor((displaySec % 3600) / 60);
         const s = displaySec % 60;
         const pad = n => (n < 10 ? '0' : '') + n;
-        const modeLabel = state.realTimeSec > 0 ? 'Pass' : 'Bank';
-        timerText.textContent = `${modeLabel}: ${pad(h)}:${pad(m)}:${pad(s)}`;
+        const formattedTime = `${pad(h)}:${pad(m)}:${pad(s)}`;
 
         if (displaySec <= 600) {
           if (dot) {
             dot.style.background = '#f59e0b';
             dot.style.boxShadow = '0 0 6px #f59e0b';
           }
+          timerText.textContent = `⏱ ${formattedTime}`;
           timerText.style.color = '#f59e0b';
+          if (btnGet) {
+            btnGet.style.display = 'inline-flex';
+            btnGet.textContent = '⚡ +90m';
+          }
         } else {
           if (dot) {
             dot.style.background = '#10b981';
             dot.style.boxShadow = '0 0 6px #10b981';
           }
+          timerText.textContent = `⏱ ${formattedTime}`;
           timerText.style.color = '#fff';
+          if (btnGet) {
+            btnGet.style.display = 'none'; // Compact mode: keep screen clean while pass is plentiful
+          }
         }
-        if (btnGet) btnGet.textContent = '⚡ +90m';
       } else {
         // No active pass -> Display sleek bottom HUD bar!
         if (hud) hud.style.display = 'flex';
@@ -1941,6 +2184,7 @@
         timerText.textContent = 'No Pass';
         timerText.style.color = '#94a3b8';
         if (btnGet) {
+          btnGet.style.display = 'inline-flex';
           btnGet.textContent = adsWatched4h > 0 ? `⚡ ${adsWatched4h}/2` : '⚡ Get 90m';
         }
       }
