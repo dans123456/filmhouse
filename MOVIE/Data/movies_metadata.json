@@ -3102,10 +3102,6 @@
       {
         "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADFRgAAhzcUEePaNizI7iXNhYE",
         "season": "Season 1"
-      },
-      {
-        "season": "Season 1 Ep 9",
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADtQ8AAiRm4EcFW-_O5h9WsBYE"
       }
     ],
     "last_uploaded_episode": 9,
@@ -11922,18 +11918,24 @@
     "runtime": "",
     "links": [
       {
-        "url": "https://t.me/FilmHouseHDcams_bot?start=BQADAQADng0AAqbcWUZTM_AFE55qeBYE",
-        "quality": "Cinema Cut / HDCam"
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADXgsAAiRm6Ee3JySwSifyTxYE",
+        "quality": "1080p",
+        "stream_url": "OTY3OjBhM2JmZGY3NGVlOGJmZWU"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADRAsAAiRm6Ef-bqBEMTbFRRYE",
+        "quality": "720p",
+        "stream_url": "OTY3OjBhM2JmZGY3NGVlOGJmZWU"
       }
     ],
     "stream_links": [
       {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTY3OjBhM2JmZGY3NGVlOGJmZWU",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTY3OjBhM2JmZGY3NGVlOGJmZWU"
+        "quality": "720p",
+        "stream_url": "OTY3OjBhM2JmZGY3NGVlOGJmZWU",
+        "url": "OTY3OjBhM2JmZGY3NGVlOGJmZWU"
       }
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTY3OjBhM2JmZGY3NGVlOGJmZWU"
+    "stream_url": "OTY3OjBhM2JmZGY3NGVlOGJmZWU"
   },
   {
     "csv_id": "45284-outrage",
