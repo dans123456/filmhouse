@@ -10929,6 +10929,38 @@ function openUniversalShareModal(options) {
 
     const titleEl = document.getElementById("share-modal-title");
     const descEl = document.getElementById("share-modal-desc");
+    const copyTextEl = document.getElementById("share-opt-copy-text");
+
+    if (titleEl) titleEl.textContent = currentSharePayload.title || "Share";
+    if (descEl) descEl.textContent = currentSharePayload.desc || "Share with friends!";
+    if (copyTextEl) {
+        copyTextEl.textContent = currentSharePayload.type === "movie" ? "Copy Movie Link 🔗" : "Copy Invite Link 🔗";
+    }
+
+    // Auto-clipboard copy as convenience so user can paste immediately anywhere
+    if (navigator.clipboard?.writeText && (currentSharePayload.text || currentSharePayload.url)) {
+        navigator.clipboard.writeText(currentSharePayload.text || currentSharePayload.url).catch(() => { });
+    }
+
+    if (typeof triggerHaptic === "function") triggerHaptic("selection");
+    shareModal.classList.add("active");
+}
+
+// Share Media integration (triggers Universal Share Sheet)
+function shareMovie(movie) {
+    if (!movie) return;
+    const targetId = movie.csv_id || movie.tmdb_id || movie.id;
+    const directUrl = targetId ? `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${targetId}` : "https://t.me/Filmhouseappbot/filmhouseapp";
+    const ratingVal = movie.rating || movie.imdb_rating || movie.vote_average || "7.5";
+    const yearVal = movie.year || (movie.release_date ? movie.release_date.split("-")[0] : "");
+    const typeLabel = (movie.type || "").toLowerCase().includes("series") ? "Series" : "Movie";
+
+    const shareTitle = `${movie.title} ${yearVal ? `(${yearVal})` : ""}`.trim();
+    const shareText = `🎬 Watch "${movie.title}" on Film House App!\n⭐ Rating: ${ratingVal}/10 • ${typeLabel}\n🔥 Stream in HD or Download now:\n${directUrl}`;
+
+    openUniversalShareModal({
+        type: "movie",
+        title: `Share "${movie.title}"`,
         desc: `Send to friends on WhatsApp, X (Twitter), Telegram, or copy link! 🍿`,
         url: directUrl,
         text: shareText,
