@@ -2235,84 +2235,56 @@
     "director": "",
     "trailer": "aScUjuKvHSo",
     "runtime": "",
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTE2Njc6YzAyODdjZWFjN2I4YzI4Nw",
+    "stream_url": "OTI1MDpkOGUzMjI4OTk1YjViMmFk",
     "stream_links": [
       {
-        "season": 1,
-        "seasonOrPart": "S01E01",
         "episode": 1,
-        "episodeNum": 1,
-        "quality": "720P",
-        "name": "Episode 1",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTI1MDpkOGUzMjI4OTk1YjViMmFk",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTI1MDpkOGUzMjI4OTk1YjViMmFk"
+        "season": 1,
+        "stream_url": "OTI1MDpkOGUzMjI4OTk1YjViMmFk",
+        "url": "OTI1MDpkOGUzMjI4OTk1YjViMmFk"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E02",
         "episode": 2,
-        "episodeNum": 2,
-        "quality": "720P",
-        "name": "Episode 2",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTI1MTplYjg0NGMyYzZiNzU5MWMz",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTI1MTplYjg0NGMyYzZiNzU5MWMz"
+        "season": 1,
+        "stream_url": "OTI1MTplYjg0NGMyYzZiNzU5MWMz",
+        "url": "OTI1MTplYjg0NGMyYzZiNzU5MWMz"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E03",
         "episode": 3,
-        "episodeNum": 3,
-        "quality": "720P",
-        "name": "Episode 3",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTI1MjpkN2Y1MDQwOGMwOGYxN2Y3",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTI1MjpkN2Y1MDQwOGMwOGYxN2Y3"
+        "season": 1,
+        "stream_url": "OTI1MjpkN2Y1MDQwOGMwOGYxN2Y3",
+        "url": "OTI1MjpkN2Y1MDQwOGMwOGYxN2Y3"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E04",
         "episode": 4,
-        "episodeNum": 4,
-        "quality": "720P",
-        "name": "Episode 4",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTI1Mzo1MGIxOWY3MDA1Y2IxYzU0",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTI1Mzo1MGIxOWY3MDA1Y2IxYzU0"
+        "season": 1,
+        "stream_url": "OTI1Mzo1MGIxOWY3MDA1Y2IxYzU0",
+        "url": "OTI1Mzo1MGIxOWY3MDA1Y2IxYzU0"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E05",
         "episode": 5,
-        "episodeNum": 5,
-        "quality": "720P",
-        "name": "Episode 5",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTI1NTphMjIzMDVlNTJhN2VjNGNl",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTI1NTphMjIzMDVlNTJhN2VjNGNl"
+        "season": 1,
+        "stream_url": "OTI1NTphMjIzMDVlNTJhN2VjNGNl",
+        "url": "OTI1NTphMjIzMDVlNTJhN2VjNGNl"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E06",
         "episode": 6,
-        "episodeNum": 6,
-        "quality": "720P",
-        "name": "Episode 6",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTI1NDpjNTQ5MzJiNDI0MzI5OTJl",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTI1NDpjNTQ5MzJiNDI0MzI5OTJl"
+        "season": 1,
+        "stream_url": "OTI1NDpjNTQ5MzJiNDI0MzI5OTJl",
+        "url": "OTI1NDpjNTQ5MzJiNDI0MzI5OTJl"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E08",
         "episode": 8,
-        "episodeNum": 8,
-        "quality": "720P",
-        "name": "Episode 8",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTE2Njc6YzAyODdjZWFjN2I4YzI4Nw",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTE2Njc6YzAyODdjZWFjN2I4YzI4Nw"
+        "season": 1,
+        "stream_url": "MTE2Njc6YzAyODdjZWFjN2I4YzI4Nw",
+        "url": "MTE2Njc6YzAyODdjZWFjN2I4YzI4Nw"
       }
     ],
     "links": [
       {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADVQsAApzcgUf-O-TQbG3D1hYE",
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnxAAAjHNAAFEPO4662kuW3kWBA",
         "season": "Season 1",
-        "stream_url": ""
+        "stream_url": "OTI1MDpkOGUzMjI4OTk1YjViMmFk"
       }
     ],
     "status": "Ongoing",
