@@ -57,8 +57,14 @@
       if (u && u.first_name) return u.first_name;
     } catch (_) { }
     try {
-      if (window.state && window.state.user && (window.state.user.displayName || window.state.user.name)) {
-        return window.state.user.displayName || window.state.user.name;
+      if (window.state && window.state.user && (window.state.user.fullName || window.state.user.displayName || window.state.user.name)) {
+        return window.state.user.fullName || window.state.user.displayName || window.state.user.name;
+      }
+    } catch (_) { }
+    try {
+      var savedProfile = JSON.parse(localStorage.getItem('filmhouse_user_profile') || 'null');
+      if (savedProfile && (savedProfile.fullName || savedProfile.displayName || savedProfile.name)) {
+        return savedProfile.fullName || savedProfile.displayName || savedProfile.name;
       }
     } catch (_) { }
     try {
@@ -166,7 +172,7 @@
   ];
 
   /* ============ HELPERS ============ */
-  var root, overlay, spot, card, idx = 0, active = false, resizeT;
+  var root, overlay, spot, card, idx = 0, active = false, resizeT, stepToken = 0;
 
   function seen() {
     try {
@@ -472,6 +478,7 @@
   function go(n) {
     if (n < 0 || n >= STEPS.length) return;
     idx = n;
+    var myStep = ++stepToken;
     var s = STEPS[idx];
     render();
     spot.classList.remove('on');
@@ -479,6 +486,7 @@
 
     var tries = 0;
     (function attempt() {
+      if (!active || myStep !== stepToken) return;
       var t = s.target ? locate(s.target) : null;
       if (s.target && !t && tries < 6) {
         tries++;
@@ -495,6 +503,7 @@
       var mb = root.querySelector('.fh-min');
       if (mb) mb.style.display = t ? '' : 'none';
       setTimeout(function () {
+        if (!active || myStep !== stepToken) return;
         place(t);
         card.classList.add('on');
         card.querySelector('.fh-next').focus({ preventScroll: true });
@@ -517,6 +526,7 @@
 
   function end() {
     active = false;
+    stepToken++;
     markSeen();
     if (root) root.style.display = 'none';
     document.body.style.overflow = '';

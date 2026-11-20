@@ -16,6 +16,11 @@ service cloud.firestore {
     // Users: Read and write allowed for user profiles and points
     match /users/{userId} {
       allow read, write: if true;
+
+      match /loyalty_ledger/{entryId} {
+        allow create, read: if true;
+        allow update, delete: if false;
+      }
     }
     
     // Requests: Read and write allowed for user requests and admin fulfillment
@@ -62,6 +67,15 @@ service cloud.firestore {
       allow read, write: if true;
     }
     
+    // Release Reminders & Movie Likes
+    match /release_reminders/{reminderId} {
+      allow read, write: if true;
+    }
+
+    match /movie_likes/{movieId} {
+      allow read, write: if true;
+    }
+
     // Default fallback: Deny all other collections
     match /{document=**} {
       allow read, write: if false;

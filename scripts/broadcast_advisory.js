@@ -136,6 +136,7 @@ async function runBroadcast() {
     }
 
     const totalSec = Math.round((Date.now() - startTime) / 1000);
+    localStore.flushToDisk();
     console.log(`\n🎉 Broadcast Finished in ${totalSec}s!`);
     console.log(`✅ Total Delivered: ${successCount}`);
     console.log(`❌ Total Failed: ${failedCount} (${blockedCount} users flagged as blocked)`);

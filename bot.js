@@ -197,7 +197,8 @@ function titlesMatch(titleA, titleB) {
     if ((normA === 'the' && normB.includes('vampire diaries')) || (normB === 'the' && normA.includes('vampire diaries'))) return true;
 
     // Wings / The Wings Initiative / Wings Innovative alias
-    if ((normA.startsWith('wings') || normA.includes('wing')) && (normB.startsWith('wings') || normB.includes('wing'))) {
+    const isWingsAlias = (s) => s === 'wings' || s.startsWith('wings ') || s.startsWith('the wings');
+    if (isWingsAlias(normA) && isWingsAlias(normB)) {
         return true;
     }
     // Low Priest alias
@@ -389,9 +390,8 @@ setInterval(syncStreamingServerConfig, 30000);
 function performServerGitUpdate(onProgress) {
     return new Promise((resolve) => {
         const projectDir = path.resolve(__dirname);
-        // Discard local metadata cache changes and stash untracked files before pulling so dirty files never block git pull
-        // Use pull --no-rebase with auto-recovery to origin/main so divergent branches never cause fatal halts
-        const pullCmd = "git checkout -- MOVIE/Data/movies_metadata.json 2>/dev/null || true; git stash -u 2>/dev/null || true; git config pull.rebase false 2>/dev/null || true; git pull --no-rebase origin main || (git fetch origin main && git reset --hard origin/main)";
+        // Preserve runtime data/ and custom_aliases.json across git pull/reset while discarding dirty movies_metadata.json
+        const pullCmd = "BAK_DIR=/tmp/fh_update_bak_$$; mkdir -p \"$BAK_DIR\"; [ -d data ] && cp -a data \"$BAK_DIR/\" 2>/dev/null || true; [ -f custom_aliases.json ] && cp -a custom_aliases.json \"$BAK_DIR/\" 2>/dev/null || true; git checkout -- MOVIE/Data/movies_metadata.json 2>/dev/null || true; git stash -u 2>/dev/null || true; git config pull.rebase false 2>/dev/null || true; (git pull --no-rebase origin main || (git fetch origin main && git reset --hard origin/main)); PULL_RC=$?; [ -d \"$BAK_DIR/data\" ] && mkdir -p data && cp -a \"$BAK_DIR/data/.\" data/ 2>/dev/null || true; [ -f \"$BAK_DIR/custom_aliases.json\" ] && cp -a \"$BAK_DIR/custom_aliases.json\" ./custom_aliases.json 2>/dev/null || true; rm -rf \"$BAK_DIR\" 2>/dev/null || true; exit $PULL_RC";
         exec(pullCmd, { cwd: projectDir, timeout: 25000 }, (pullErr, pullOut, pullErrOut) => {
             if (pullErr) {
                 console.error("[ServerUpdater] git pull failed:", pullErr);
@@ -459,6 +459,27 @@ function escapeHtml(str) {
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
+}
+
+const TMDB_API_KEY = process.env.TMDB_API_KEY || "d638f7775bfa1b8d456dfd028ccbef19";
+
+// Ensures Telegram start/startapp deep-link parameter obeys the 64-char [A-Za-z0-9_-] limit
+function getSafeDeepLinkId(movieObj) {
+    if (!movieObj) return "";
+    const rawCsv = String(movieObj.csv_id || movieObj.id || "").trim();
+    const rawTmdb = String(movieObj.tmdb_id || "").trim();
+    if (rawCsv && rawCsv.length <= 55 && /^[A-Za-z0-9_-]+$/.test(rawCsv)) {
+        return rawCsv;
+    }
+    if (rawTmdb && /^[A-Za-z0-9_-]+$/.test(rawTmdb)) {
+        return rawTmdb;
+    }
+    const numericPrefix = rawCsv.split("-")[0];
+    if (numericPrefix && /^\d+$/.test(numericPrefix)) {
+        return numericPrefix;
+    }
+    const sanitized = rawCsv.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 55);
+    return sanitized;
 }
 
 // Markdown escaping helper for clean Telegram formatting
@@ -550,9 +571,19 @@ const _origConsoleLog = console.log;
 const _origConsoleWarn = console.warn;
 const _origConsoleError = console.error;
 
+function safeFormatConsoleArg(a) {
+    if (typeof a !== "object" || a === null) return String(a);
+    if (a.message) return String(a.message);
+    try {
+        return JSON.stringify(a);
+    } catch (_) {
+        return "[Object]";
+    }
+}
+
 console.log = function(...args) {
     _origConsoleLog.apply(console, args);
-    const msg = args.map(a => (typeof a === 'object' ? (a && a.message ? a.message : JSON.stringify(a)) : String(a))).join(' ');
+    const msg = args.map(safeFormatConsoleArg).join(' ');
     let cat = "server";
     const lower = msg.toLowerCase();
     if (lower.includes("adminbot") || lower.includes("admin bot") || lower.includes("admin command") || lower.includes("admin menu") || lower.includes("boost alert") || lower.includes("[admin")) {
@@ -569,7 +600,7 @@ console.log = function(...args) {
 
 console.warn = function(...args) {
     _origConsoleWarn.apply(console, args);
-    const msg = args.map(a => (typeof a === 'object' ? (a && a.message ? a.message : JSON.stringify(a)) : String(a))).join(' ');
+    const msg = args.map(safeFormatConsoleArg).join(' ');
     let cat = "server";
     const lower = msg.toLowerCase();
     if (lower.includes("admin")) cat = "admin_bot";
@@ -579,7 +610,7 @@ console.warn = function(...args) {
 
 console.error = function(...args) {
     _origConsoleError.apply(console, args);
-    const msg = args.map(a => (typeof a === 'object' ? (a && a.message ? a.message : JSON.stringify(a)) : String(a))).join(' ');
+    const msg = args.map(safeFormatConsoleArg).join(' ');
     recordLog("error", `❌ ${msg}`);
 };
 
@@ -651,29 +682,48 @@ try {
     console.warn("[CatalogAutoPublish] Error loading broadcast tracker:", bErr.message);
 }
 
+let isCatalogSyncBusy = false;
+
 // Automatically sync movies_metadata.json from GitHub to Ubuntu disk and update in-memory cache
 async function syncCatalogFromGitHub() {
+    if (isCatalogSyncBusy) {
+        console.log("[GitHubSync] Skipping background sync while scan/publish is active.");
+        return { success: false, skipped: true };
+    }
     try {
         const rawUrl = "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/Data/movies_metadata.json?t=" + Date.now();
         console.log("[GitHubSync] Checking GitHub for catalog updates...");
         const data = await fetchJsonFromUrl(rawUrl);
         if (Array.isArray(data) && data.length > 0) {
+            if (isCatalogSyncBusy) {
+                return { success: false, skipped: true };
+            }
             const currentCount = cachedMoviesMetadata ? cachedMoviesMetadata.length : 0;
             const localMetaPath = path.resolve(__dirname, "./MOVIE/Data/movies_metadata.json");
             
             const dir = path.dirname(localMetaPath);
             if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-            // Preserve locally indexed stream links so GitHub sync never clobbers newly matched streams
+            // Preserve locally indexed stream links, download links, and newly ingested items so GitHub sync never clobbers them
             if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
                 const streamMap = new Map();
+                const remoteIds = new Set(data.map(m => String(m.csv_id || m.id || "").toLowerCase().trim()).filter(Boolean));
+                const localOnlyItems = [];
                 cachedMoviesMetadata.forEach(m => {
                     const id = String(m.csv_id || m.id || "").toLowerCase().trim();
-                    if (id && (m.stream_url || (Array.isArray(m.stream_links) && m.stream_links.length > 0))) {
+                    if (id && (m.stream_url || (Array.isArray(m.stream_links) && m.stream_links.length > 0) || m.downloadLink || (Array.isArray(m.links) && m.links.length > 0))) {
                         streamMap.set(id, {
                             stream_url: m.stream_url,
-                            stream_links: m.stream_links
+                            stream_links: m.stream_links,
+                            downloadLink: m.downloadLink,
+                            links: m.links
                         });
+                    }
+                    if (id && !remoteIds.has(id) && (m.stream_url || (Array.isArray(m.stream_links) && m.stream_links.length > 0))) {
+                        const cleanLocal = { ...m };
+                        delete cleanLocal._docId;
+                        delete cleanLocal._ref;
+                        localOnlyItems.push(cleanLocal);
                     }
                 });
                 if (streamMap.size > 0) {
@@ -685,12 +735,21 @@ async function syncCatalogFromGitHub() {
                             if ((!m.stream_links || m.stream_links.length === 0) && existing.stream_links) {
                                 m.stream_links = existing.stream_links;
                             }
+                            if (!m.downloadLink && existing.downloadLink) m.downloadLink = existing.downloadLink;
+                            if ((!m.links || m.links.length === 0) && existing.links) {
+                                m.links = existing.links;
+                            }
                         }
                     });
                 }
+                if (localOnlyItems.length > 0) {
+                    data.unshift(...localOnlyItems);
+                }
             }
 
-            fs.writeFileSync(localMetaPath, JSON.stringify(data, null, 2), "utf8");
+            const tmpMetaPath = `${localMetaPath}.${process.pid}.${Date.now()}.tmp`;
+            fs.writeFileSync(tmpMetaPath, JSON.stringify(data, null, 2), "utf8");
+            fs.renameSync(tmpMetaPath, localMetaPath);
             cachedMoviesMetadata = data;
             console.log(`[GitHubSync] Successfully synchronized ${data.length} movies from GitHub main to Ubuntu disk! (Previous in-memory: ${currentCount})`);
 
@@ -716,7 +775,9 @@ async function syncCatalogFromGitHub() {
             try {
                 const dir = path.dirname(BROADCASTED_CATALOG_FILE);
                 if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-                fs.writeFileSync(BROADCASTED_CATALOG_FILE, JSON.stringify(Array.from(broadcastedCatalogIds)), "utf8");
+                const tmpBcPath = `${BROADCASTED_CATALOG_FILE}.${process.pid}.${Date.now()}.tmp`;
+                fs.writeFileSync(tmpBcPath, JSON.stringify(Array.from(broadcastedCatalogIds)), "utf8");
+                fs.renameSync(tmpBcPath, BROADCASTED_CATALOG_FILE);
             } catch (_) {}
 
             return { success: true, count: data.length, updated: data.length !== currentCount };
@@ -728,13 +789,13 @@ async function syncCatalogFromGitHub() {
     return { success: false, error: "Empty or invalid catalog data received" };
 }
 
-// Run initial catalog sync 5 seconds after startup, then poll every 20 seconds
+// Run initial catalog sync 5 seconds after startup, then poll every 5 minutes (instant updates still arrive via Firestore settings/catalog_sync)
 setTimeout(() => {
     syncCatalogFromGitHub().catch(() => {});
 }, 5000);
 setInterval(() => {
     syncCatalogFromGitHub().catch(() => {});
-}, 20 * 1000);
+}, 5 * 60 * 1000);
 
 // Load persisted pending requests from disk (immune to Firestore quota)
 try {
@@ -790,6 +851,11 @@ function setupBot(bot, adminBot) {
 
     // In-memory cache for banned users and admin lists to eliminate per-update Firestore latency
     const bannedUsersCache = new Set();
+    try {
+        localStore.getAllUsers().forEach(u => {
+            if (u && u.id && u.banned === true) bannedUsersCache.add(String(u.id));
+        });
+    } catch (_) {}
     const envAdmins = (process.env.ADMIN_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
     let cachedAdmins = Array.from(new Set(["1329840839", "1175336733", ...envAdmins]));
     let cachedMasters = Array.from(new Set(["1329840839", "1175336733", ...envAdmins]));
@@ -843,6 +909,8 @@ function setupBot(bot, adminBot) {
             }
         }
 
+        ctx.state = ctx.state || {};
+        ctx.state.wasNewLocalUser = !localStore.getUser(userId);
         localStore.upsertUser({
             id: userId,
             username: ctx.from.username || "",
@@ -878,7 +946,8 @@ function setupBot(bot, adminBot) {
     bot.use(async (ctx, next) => {
         if (!ctx.from) return next();
         const userId = String(ctx.from.id);
-        if (bannedUsersCache.has(userId)) {
+        if (bannedUsersCache.has(userId) || localStore.getUser(userId)?.banned === true) {
+            bannedUsersCache.add(userId);
             return ctx.reply("❌ Your access to Film House has been restricted.");
         }
         return next();
@@ -926,9 +995,10 @@ function setupBot(bot, adminBot) {
                 
                 // Check if the bot was blocked or chat wasn't found
                 const isUserError = err.message && (err.message.includes("blocked") || err.message.includes("chat not found") || err.message.includes("deactivated"));
-                const targetUserId = String(args[0]);
-                if (isUserError && targetUserId && targetUserId !== "undefined" && !targetUserId.startsWith("-") && !disableImmediateBlockedBotWrite) {
+                const targetUserId = String(args[0] || "").trim();
+                if (isUserError && /^\d+$/.test(targetUserId) && !disableImmediateBlockedBotWrite) {
                     console.log(`User ${targetUserId} has blocked the bot or chat was not found. Flagging in database.`);
+                    localStore.setBlocked(targetUserId, true);
                     await db.collection("users").doc(targetUserId).set({ blockedBot: true }, { merge: true }).catch(dbErr => {
                         console.error(`Error updating blockedBot status for ${targetUserId}:`, dbErr);
                     });
@@ -989,15 +1059,20 @@ function setupBot(bot, adminBot) {
                     }
                 }
             }
+            if (_recentlyBroadcastedKeys.size > 5000) {
+                const firstKey = _recentlyBroadcastedKeys.values().next().value;
+                _recentlyBroadcastedKeys.delete(firstKey);
+            }
             _recentlyBroadcastedKeys.add(dedupeKey);
             if (normId && seasonKey) _recentlyBroadcastedKeys.add(`${normId}_${seasonKey}`);
 
             const yearText = movieInfo.year ? ` (${movieInfo.year})` : "";
             const rawSeason = movieInfo.seasonOrPart || (isSeries ? "Complete Series" : "Full Movie");
+            const lowerRawSeason = String(rawSeason).toLowerCase();
 
             let seasonOrQualityText = isSeries 
-                ? (String(rawSeason).toLowerCase().includes("season") ? rawSeason : `Season ${rawSeason}`)
-                : (String(rawSeason).toLowerCase().includes("quality") ? rawSeason : `${rawSeason} Quality`);
+                ? (lowerRawSeason.includes("season") || lowerRawSeason.includes("episode") || lowerRawSeason.includes("complete") || lowerRawSeason.includes("series") ? rawSeason : `Season ${rawSeason}`)
+                : (lowerRawSeason.includes("quality") || lowerRawSeason.includes("full movie") || lowerRawSeason.includes("cut") || lowerRawSeason.includes("cam") ? rawSeason : `${rawSeason} Quality`);
             if (movieInfo.isSeriesComplete) {
                 seasonOrQualityText = "Complete Series | All Seasons";
             }
@@ -1100,9 +1175,9 @@ function setupBot(bot, adminBot) {
                 overviewLine = "\n";
             }
 
-            const movieId = movieInfo.csv_id || movieInfo.tmdb_id || movieInfo.id || "";
-            const deepLinkUrl = movieInfo.downloadLink || movieInfo.stream_url || (movieId 
-                ? `https://t.me/Filmhouseappbot?start=dl_${movieId}` 
+            const safeDeepId = getSafeDeepLinkId(movieInfo);
+            const deepLinkUrl = movieInfo.downloadLink || movieInfo.stream_url || (safeDeepId 
+                ? `https://t.me/Filmhouseappbot?start=dl_${safeDeepId}` 
                 : `https://t.me/Filmhouseappbot`);
 
             // Build high-impact announcement header badge and update callout
@@ -1210,8 +1285,8 @@ function setupBot(bot, adminBot) {
 
             console.log(`[CHANNEL PUBLISH] Publishing "${cleanTitle}" announcement to channel...`);
 
-            const miniAppUrl = movieId 
-                ? `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${movieId}`
+            const miniAppUrl = safeDeepId 
+                ? `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${safeDeepId}`
                 : `https://t.me/Filmhouseappbot/filmhouseapp`;
             const shareText = encodeURIComponent(`🍿 Watch "${cleanTitle}" on Film House!\nStream and download in HD:`);
             const shareUrl = encodeURIComponent(miniAppUrl);
@@ -1560,6 +1635,7 @@ function setupBot(bot, adminBot) {
 
                     // Prepare updated links array
                     const updatedLinks = [...currentLinks];
+                    const cleanReqSeason = String(reqSeason || "").trim().toLowerCase();
                     for (const pq of parsedQualities) {
                         const newEntry = {
                             url: pq.url,
@@ -1567,11 +1643,13 @@ function setupBot(bot, adminBot) {
                             ...(reqSeason ? { season: reqSeason } : {})
                         };
                         const replaceIdx = updatedLinks.findIndex(l => {
-                            if (typeof l === "string") return false;
-                            if (reqSeason && l.season && l.season.toLowerCase() === reqSeason.toLowerCase()) {
-                                return (l.quality || "").toUpperCase() === pq.quality;
+                            if (!l || typeof l === "string") return false;
+                            const lSeason = String(l.season || "").trim().toLowerCase();
+                            const lQuality = String(l.quality || "").toUpperCase();
+                            if (cleanReqSeason || lSeason) {
+                                return lSeason === cleanReqSeason && lQuality === pq.quality;
                             }
-                            return (l.quality || "").toUpperCase() === pq.quality;
+                            return lQuality === pq.quality;
                         });
                         if (replaceIdx >= 0) {
                             updatedLinks[replaceIdx] = newEntry;
@@ -1618,6 +1696,7 @@ function setupBot(bot, adminBot) {
                     // Atomic Writes
                     transaction.update(reqRef, {
                         status: "fulfilled",
+                        notifiedFulfilled: true,
                         downloadLink: primaryLink,
                         ...(isStreamReq ? { streamUrl: primaryLink, stream_url: primaryLink } : {}),
                         fulfilledBy: adminUsername,
@@ -1676,7 +1755,7 @@ function setupBot(bot, adminBot) {
                         ctx.chat.id,
                         replyMsg.message_id,
                         null,
-                        replyText + `\n\n━━━━━━━━━━━━━━━━━━━━\n✅ <b>FULFILLED by ${escapeHtml(adminUsername)} (${totalAdminFulfillCount} 🏆)</b>`,
+                        escapeHtml(replyText) + `\n\n━━━━━━━━━━━━━━━━━━━━\n✅ <b>FULFILLED by ${escapeHtml(adminUsername)} (${totalAdminFulfillCount} 🏆)</b>`,
                         { parse_mode: "HTML" }
                     ).catch(() => {});
                 }
@@ -1823,7 +1902,7 @@ function setupBot(bot, adminBot) {
             if (bareMatch) {
                 const potTitle = bareMatch[1].replace(/[()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
                 const potNum = parseInt(bareMatch[2], 10);
-                if (potTitle && (/(koleoso|yoruba|yorubahood)/i.test(potTitle) || potNum > 0)) {
+                if (potTitle && /(koleoso|yoruba|yorubahood)/i.test(potTitle) && potNum > 0) {
                     isSeries = true;
                     seasonNum = 1;
                     episodeNum = potNum;
@@ -2147,9 +2226,8 @@ function setupBot(bot, adminBot) {
 
             if (isFromChannel) {
                 const isConfiguredChannel = configuredIngestId && (chatId === configuredIngestId);
-                const isKeywordMatchedChannel = /vault|ingest|storage|stream|upload|files/i.test(chatTitle) || /vault|ingest|storage|stream|upload|files/i.test(chatUsername);
-                if (!isConfiguredChannel && !isKeywordMatchedChannel) {
-                    return false; // Not an ingest channel, ignore silently
+                if (!isConfiguredChannel) {
+                    return false; // Not the configured ingest channel, ignore silently
                 }
             } else {
                 const authorized = await isAdmin(senderId);
@@ -2337,6 +2415,10 @@ function setupBot(bot, adminBot) {
 
     async function handleMediaShowcaseCallback(ctx) {
         try {
+            const senderId = String(ctx.from ? ctx.from.id : "");
+            if (!(await isAdmin(senderId))) {
+                return ctx.answerCbQuery("⛔ Unauthorized.", { show_alert: true }).catch(() => {});
+            }
             const action = ctx.match[1];
             const sessionId = ctx.match[2];
             await ctx.answerCbQuery().catch(() => {});
@@ -2351,14 +2433,17 @@ function setupBot(bot, adminBot) {
                 try {
                     await ctx.deleteMessage();
                 } catch {
-                    await ctx.editMessageCaption("❌ <b>Showcase preview dismissed.</b>", { reply_markup: { inline_keyboard: [] } }).catch(() => {});
+                    await ctx.editMessageCaption("❌ <b>Showcase preview dismissed.</b>", { parse_mode: "HTML", reply_markup: { inline_keyboard: [] } }).catch(() => {});
                 }
                 return;
             }
 
             if (action === "edit") {
-                const senderId = String(ctx.from ? ctx.from.id : "");
                 pendingTitleEdits.set(senderId, { sessionId });
+                setTimeout(() => {
+                    const cur = pendingTitleEdits.get(senderId);
+                    if (cur && cur.sessionId === sessionId) pendingTitleEdits.delete(senderId);
+                }, 15 * 60 * 1000);
                 return ctx.reply(
                     `✏️ <b>Override Title / TMDB:</b>\n\nPlease reply to this message with the exact Movie or Series title and year (e.g. <code>Dune Part Two 2024</code>) or TMDB ID:`,
                     { parse_mode: "HTML" }
@@ -2486,7 +2571,17 @@ function setupBot(bot, adminBot) {
                 };
                 if (idx >= 0) {
                     const existingLinks = Array.isArray(cachedMoviesMetadata[idx].links) ? cachedMoviesMetadata[idx].links : [];
-                    const mergedLinks = [...existingLinks.filter(l => (l.quality || '').toUpperCase() !== (parsed.quality || '1080P').toUpperCase()), newLinkEntry];
+                    const filteredLinks = existingLinks.filter(l => {
+                        if (!l || typeof l !== "object") return true;
+                        if (parsed.isSeries && parsed.episodeNum) {
+                            return !((l.season == (parsed.seasonNum || 1)) &&
+                                (l.episode == parsed.episodeNum || l.episodeNum == parsed.episodeNum) &&
+                                String(l.quality || "").toUpperCase() === String(parsed.quality || "720P").toUpperCase());
+                        }
+                        return !(String(l.quality || "").toUpperCase() === String(parsed.quality || "1080P").toUpperCase() &&
+                            String(l.season || "") === String(parsed.seasonOrPart || ""));
+                    });
+                    const mergedLinks = [...filteredLinks, newLinkEntry];
                     cachedMoviesMetadata[idx] = { ...cachedMoviesMetadata[idx], ...catalogEntry, links: mergedLinks };
                 } else {
                     cachedMoviesMetadata.unshift(catalogEntry);
@@ -2516,10 +2611,9 @@ function setupBot(bot, adminBot) {
                 console.warn("[Media Forward Showcase] Admin stats update warning:", statErr.message);
             }
 
-            pendingMediaShowcases.delete(sessionId);
-
-            // If action is "post", also broadcast to Updates Channel
+            // If action is "post", also broadcast to Updates Channel and then clean up session
             if (action === "post") {
+                pendingMediaShowcases.delete(sessionId);
                 await ctx.reply("📢 <b>Broadcasting release announcement to Updates Channel...</b>", { parse_mode: "HTML" });
                 const res = await publishMovieToChannel({
                     ...tmdb,
@@ -2574,6 +2668,192 @@ function setupBot(bot, adminBot) {
     }
 
     // ==========================================
+    // SHARED PENDING REQUESTS HELPERS (Used by both Public Bot & Admin Bot)
+    // ==========================================
+    const getPendingRequestsList = async () => {
+        if (cachedPendingRequests.length > 0) return cachedPendingRequests;
+        try {
+            const fetchPromise = db.collection("requests").get();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 2500));
+            const snap = await Promise.race([fetchPromise, timeoutPromise]);
+            if (snap && snap.docs) {
+                cachedPendingRequests = snap.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .filter(r => {
+                        if (r.downloadLink && String(r.downloadLink).trim() !== "") return false;
+                        if (r.status === "fulfilled" || r.fulfilled === true) return false;
+                        if (r.status === "priority" || r.boosted === true || r.isPriority === true) return true;
+                        if (r.status === "claimed" || r.claimed === true) return false;
+                        return true;
+                    });
+                savePendingRequestsToDisk(cachedPendingRequests);
+            }
+        } catch (e) {
+            console.error("Error fetching pending requests:", e.message);
+        }
+        return cachedPendingRequests;
+    };
+
+    const renderOrEdit = async (ctx, payload) => {
+        const options = {
+            parse_mode: payload.parse_mode || "HTML",
+            reply_markup: {
+                inline_keyboard: payload.keyboard
+            }
+        };
+
+        const sendOrEdit = async (text, opts) => {
+            if (ctx.callbackQuery && ctx.callbackQuery.message) {
+                try {
+                    return await ctx.editMessageText(text, opts);
+                } catch (err) {
+                    if (err.message && err.message.includes("message is not modified")) {
+                        return;
+                    }
+                    return await ctx.reply(text, opts);
+                }
+            } else {
+                return await ctx.reply(text, opts);
+            }
+        };
+
+        try {
+            return await sendOrEdit(payload.text, options);
+        } catch (err) {
+            if (err.message && (err.message.includes("can't parse entities") || err.message.includes("entity"))) {
+                console.warn(`[AdminBot] HTML parse failed (${err.message}). Retrying plain text fallback...`);
+                const fallbackOpts = { ...options };
+                delete fallbackOpts.parse_mode;
+                const plainText = String(payload.text || "")
+                    .replace(/<[^>]+>/g, "")
+                    .replace(/&amp;/g, "&")
+                    .replace(/&lt;/g, "<")
+                    .replace(/&gt;/g, ">");
+                return await sendOrEdit(plainText, fallbackOpts);
+            }
+            throw err;
+        }
+    };
+
+    const getPendingRequestsPayload = (requests = [], page = 0, includeAdminMenuBack = true) => {
+        const groupedMap = {};
+        requests.forEach(r => {
+            const rawTitle = r.title || "Movie";
+            const cleanTitleKey = rawTitle.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "");
+            const tmdbPart = r.tmdb_id || r.tmdbId || "";
+            const yearPart = r.year || "";
+            const seasonPart = (r.seasonOrPart || "").toLowerCase().trim();
+            const groupKey = tmdbPart 
+                ? `${cleanTitleKey}_tmdb_${tmdbPart}_${seasonPart}` 
+                : (yearPart ? `${cleanTitleKey}_year_${yearPart}_${seasonPart}` : `${cleanTitleKey}_${seasonPart}`);
+            
+            const reqDate = parseRequestDate(r.requestedAt || r._localTime || r.createdAt || r.timestamp);
+
+            if (!groupedMap[groupKey]) {
+                groupedMap[groupKey] = {
+                    title: rawTitle,
+                    year: r.year || "",
+                    type: r.type || "Movie",
+                    seasonOrPart: r.seasonOrPart || "",
+                    isPriority: (r.status === "priority" || r.boosted || r.isPriority === true),
+                    requesters: [],
+                    latestDate: reqDate
+                };
+            } else {
+                if (reqDate && (!groupedMap[groupKey].latestDate || reqDate > groupedMap[groupKey].latestDate)) {
+                    groupedMap[groupKey].latestDate = reqDate;
+                }
+            }
+            if (r.status === "priority" || r.boosted || r.isPriority === true) {
+                groupedMap[groupKey].isPriority = true;
+            }
+            
+            const reqUser = r.requestedBy || r.user || r.userId || 'guest';
+            const userDisplay = String(reqUser).startsWith('@') ? reqUser : `@${reqUser}`;
+            if (!groupedMap[groupKey].requesters.includes(userDisplay)) {
+                groupedMap[groupKey].requesters.push(userDisplay);
+            }
+        });
+
+        const groupedList = Object.values(groupedMap);
+        groupedList.sort((a, b) => {
+            if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
+            if (b.requesters.length !== a.requesters.length) return b.requesters.length - a.requesters.length;
+            const timeA = a.latestDate ? a.latestDate.getTime() : 0;
+            const timeB = b.latestDate ? b.latestDate.getTime() : 0;
+            return timeB - timeA;
+        });
+
+        const pageSize = 10;
+        const totalPages = Math.ceil(groupedList.length / pageSize) || 1;
+        const currentPage = Math.max(0, Math.min(page, totalPages - 1));
+        const pageItems = groupedList.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+
+        let msg = `📋 <b>Pending Movie Requests (${requests.length} total, ${groupedList.length} titles):</b>\n`;
+        if (totalPages > 1) {
+            msg += `<i>Page ${currentPage + 1} of ${totalPages}</i>\n\n`;
+        } else {
+            msg += `\n`;
+        }
+
+        if (groupedList.length === 0) {
+            msg += `🎉 <b>All caught up!</b> There are no pending requests right now.\n\n`;
+        } else {
+            pageItems.forEach((item, idx) => {
+                const globalIdx = currentPage * pageSize + idx + 1;
+                const prioBadge = item.isPriority ? " 🔥 <b>[HIGH PRIORITY]</b>" : "";
+                const year = item.year && !item.title.includes(item.year) ? ` (${escapeHtml(item.year)})` : "";
+                const season = item.seasonOrPart ? ` [${escapeHtml(item.seasonOrPart)}]` : "";
+                const cleanTitle = escapeHtml(item.title);
+                const cleanType = escapeHtml(item.type);
+                
+                let requestersStr = "";
+                if (item.requesters.length === 1) {
+                    requestersStr = escapeHtml(item.requesters[0]);
+                } else {
+                    requestersStr = `Requesters (${item.requesters.length}): ` + item.requesters.map(u => escapeHtml(u)).join(", ");
+                }
+                
+                const dateFormatted = item.latestDate ? ` | 📅 ${formatRequestDateTime(item.latestDate, false)}` : "";
+                msg += `${globalIdx}. <b>${cleanTitle}</b>${year}${season}${prioBadge}\n   • 📁 <i>${cleanType}</i> | 👤 ${requestersStr}${dateFormatted}\n\n`;
+            });
+
+            msg += `💡 Open the Admin Web App to fulfill these requests with download links!\n`;
+        }
+
+        const navButtons = [];
+        if (currentPage > 0) {
+            navButtons.push({ text: "⬅️ Previous", callback_data: `admin_req_page_${currentPage - 1}` });
+        }
+        if (totalPages > 1) {
+            navButtons.push({ text: `${currentPage + 1}/${totalPages}`, callback_data: `admin_req_page_${currentPage}` });
+        }
+        if (currentPage < totalPages - 1) {
+            navButtons.push({ text: "Next ➡️", callback_data: `admin_req_page_${currentPage + 1}` });
+        }
+
+        const keyboard = [
+            [
+                { text: "👑 Open Admin to Fulfill 🚀", web_app: { url: "https://dans123456.github.io/filmhouse/admin.html" } }
+            ]
+        ];
+
+        if (navButtons.length > 0) {
+            keyboard.push(navButtons);
+        }
+
+        const bottomRow = [
+            { text: "🔄 Refresh Requests", callback_data: `admin_req_page_${currentPage}` }
+        ];
+        if (includeAdminMenuBack) {
+            bottomRow.push({ text: "« Back to Menu", callback_data: "admin_menu" });
+        }
+        keyboard.push(bottomRow);
+
+        return { text: msg, keyboard, parse_mode: "HTML" };
+    };
+
+    // ==========================================
     // DEDICATED ADMIN BOT SUITE (@Fiimhouse_adminBot)
     // ==========================================
     if (adminBot) {
@@ -2612,6 +2892,9 @@ function setupBot(bot, adminBot) {
 
         // Admin authorization gatekeeper
         adminBot.use(async (ctx, next) => {
+            if (ctx.updateType === 'channel_post' || ctx.channelPost) {
+                return next();
+            }
             const userId = String(ctx.from ? ctx.from.id : "");
             if (!userId) return;
             const authorized = await isAdmin(userId);
@@ -2632,6 +2915,9 @@ function setupBot(bot, adminBot) {
 
         // Admin Forward/Upload media handler for dedicated admin bot
         adminBot.on(['video', 'document', 'animation'], async (ctx, next) => {
+            if (ctx.message?.document?.file_name?.toLowerCase().endsWith('.txt')) {
+                return typeof next === 'function' ? next() : undefined;
+            }
             if (ctx.message && ctx.message.reply_to_message) {
                 const handled = await handleAdminReplyToFulfill(ctx);
                 if (handled) return;
@@ -2647,6 +2933,9 @@ function setupBot(bot, adminBot) {
 
         // Admin text handler for title overrides and stream link text forwards
         adminBot.on('text', async (ctx, next) => {
+            if (ctx.message?.text?.trim().startsWith('/')) {
+                return typeof next === 'function' ? next() : undefined;
+            }
             const senderId = String(ctx.from ? ctx.from.id : "");
             if (pendingTitleEdits.has(senderId)) {
                 const { sessionId } = pendingTitleEdits.get(senderId);
@@ -2697,73 +2986,6 @@ function setupBot(bot, adminBot) {
                 return recent.length > 3500 ? recent.slice(-3500) : recent;
             } catch (err) {
                 return `❌ Error reading log file: ${err.message}`;
-            }
-        };
-
-        // Helper: Fetch pending requests fast with in-memory fallback
-        const getPendingRequestsList = async () => {
-            if (cachedPendingRequests.length > 0) return cachedPendingRequests;
-            try {
-                const fetchPromise = db.collection("requests").get();
-                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 2500));
-                const snap = await Promise.race([fetchPromise, timeoutPromise]);
-                if (snap && snap.docs) {
-                    cachedPendingRequests = snap.docs
-                        .map(doc => ({ id: doc.id, ...doc.data() }))
-                        .filter(r => {
-                            if (r.downloadLink && String(r.downloadLink).trim() !== "") return false;
-                            if (r.status === "fulfilled" || r.fulfilled === true) return false;
-                            if (r.status === "priority" || r.boosted === true || r.isPriority === true) return true;
-                            if (r.status === "claimed" || r.claimed === true) return false;
-                            return true;
-                        });
-                    savePendingRequestsToDisk(cachedPendingRequests);
-                }
-            } catch (e) {
-                console.error("Error fetching pending requests:", e.message);
-            }
-            return cachedPendingRequests;
-        };
-
-        // Render helper: edits existing message if callback query, otherwise replies with new message
-        const renderOrEdit = async (ctx, payload) => {
-            const options = {
-                parse_mode: payload.parse_mode || "HTML",
-                reply_markup: {
-                    inline_keyboard: payload.keyboard
-                }
-            };
-
-            const sendOrEdit = async (text, opts) => {
-                if (ctx.callbackQuery && ctx.callbackQuery.message) {
-                    try {
-                        return await ctx.editMessageText(text, opts);
-                    } catch (err) {
-                        if (err.message && err.message.includes("message is not modified")) {
-                            return;
-                        }
-                        return await ctx.reply(text, opts);
-                    }
-                } else {
-                    return await ctx.reply(text, opts);
-                }
-            };
-
-            try {
-                return await sendOrEdit(payload.text, options);
-            } catch (err) {
-                if (err.message && (err.message.includes("can't parse entities") || err.message.includes("entity"))) {
-                    console.warn(`[AdminBot] HTML parse failed (${err.message}). Retrying plain text fallback...`);
-                    const fallbackOpts = { ...options };
-                    delete fallbackOpts.parse_mode;
-                    const plainText = String(payload.text || "")
-                        .replace(/<[^>]+>/g, "")
-                        .replace(/&amp;/g, "&")
-                        .replace(/&lt;/g, "<")
-                        .replace(/&gt;/g, ">");
-                    return await sendOrEdit(plainText, fallbackOpts);
-                }
-                throw err;
             }
         };
 
@@ -2830,126 +3052,6 @@ function setupBot(bot, adminBot) {
             ];
 
             return { text, keyboard, parse_mode: "HTML" };
-        };
-
-        // View 2: Pending Requests (Grouped with Pagination)
-        const getPendingRequestsPayload = (requests = [], page = 0) => {
-            // Group requests by Title + TMDB ID / Year + Season
-            const groupedMap = {};
-            requests.forEach(r => {
-                const rawTitle = r.title || "Movie";
-                const cleanTitleKey = rawTitle.toLowerCase().trim().replace(/\s*\([^)]+\)\s*$/g, "");
-                const tmdbPart = r.tmdb_id || r.tmdbId || "";
-                const yearPart = r.year || "";
-                const seasonPart = (r.seasonOrPart || "").toLowerCase().trim();
-                const groupKey = tmdbPart 
-                    ? `${cleanTitleKey}_tmdb_${tmdbPart}_${seasonPart}` 
-                    : (yearPart ? `${cleanTitleKey}_year_${yearPart}_${seasonPart}` : `${cleanTitleKey}_${seasonPart}`);
-                
-                const reqDate = parseRequestDate(r.requestedAt || r._localTime || r.createdAt || r.timestamp);
-
-                if (!groupedMap[groupKey]) {
-                    groupedMap[groupKey] = {
-                        title: rawTitle,
-                        year: r.year || "",
-                        type: r.type || "Movie",
-                        seasonOrPart: r.seasonOrPart || "",
-                        isPriority: (r.status === "priority" || r.boosted || r.isPriority === true),
-                        requesters: [],
-                        latestDate: reqDate
-                    };
-                } else {
-                    if (reqDate && (!groupedMap[groupKey].latestDate || reqDate > groupedMap[groupKey].latestDate)) {
-                        groupedMap[groupKey].latestDate = reqDate;
-                    }
-                }
-                if (r.status === "priority" || r.boosted || r.isPriority === true) {
-                    groupedMap[groupKey].isPriority = true;
-                }
-                
-                const reqUser = r.requestedBy || r.user || r.userId || 'guest';
-                const userDisplay = String(reqUser).startsWith('@') ? reqUser : `@${reqUser}`;
-                if (!groupedMap[groupKey].requesters.includes(userDisplay)) {
-                    groupedMap[groupKey].requesters.push(userDisplay);
-                }
-            });
-
-            const groupedList = Object.values(groupedMap);
-            
-            // Sort: High priority first, then by requester count descending, then newest request
-            groupedList.sort((a, b) => {
-                if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
-                if (b.requesters.length !== a.requesters.length) return b.requesters.length - a.requesters.length;
-                const timeA = a.latestDate ? a.latestDate.getTime() : 0;
-                const timeB = b.latestDate ? b.latestDate.getTime() : 0;
-                return timeB - timeA;
-            });
-
-            const pageSize = 10;
-            const totalPages = Math.ceil(groupedList.length / pageSize) || 1;
-            const currentPage = Math.max(0, Math.min(page, totalPages - 1));
-            const pageItems = groupedList.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
-
-            let msg = `📋 <b>Pending Movie Requests (${requests.length} total, ${groupedList.length} titles):</b>\n`;
-            if (totalPages > 1) {
-                msg += `<i>Page ${currentPage + 1} of ${totalPages}</i>\n\n`;
-            } else {
-                msg += `\n`;
-            }
-
-            if (groupedList.length === 0) {
-                msg += `🎉 <b>All caught up!</b> There are no pending requests right now.\n\n`;
-            } else {
-                pageItems.forEach((item, idx) => {
-                    const globalIdx = currentPage * pageSize + idx + 1;
-                    const prioBadge = item.isPriority ? " 🔥 <b>[HIGH PRIORITY]</b>" : "";
-                    const year = item.year && !item.title.includes(item.year) ? ` (${escapeHtml(item.year)})` : "";
-                    const season = item.seasonOrPart ? ` [${escapeHtml(item.seasonOrPart)}]` : "";
-                    const cleanTitle = escapeHtml(item.title);
-                    const cleanType = escapeHtml(item.type);
-                    
-                    let requestersStr = "";
-                    if (item.requesters.length === 1) {
-                        requestersStr = escapeHtml(item.requesters[0]);
-                    } else {
-                        requestersStr = `Requesters (${item.requesters.length}): ` + item.requesters.map(u => escapeHtml(u)).join(", ");
-                    }
-                    
-                    const dateFormatted = item.latestDate ? ` | 📅 ${formatRequestDateTime(item.latestDate, false)}` : "";
-                    msg += `${globalIdx}. <b>${cleanTitle}</b>${year}${season}${prioBadge}\n   • 📁 <i>${cleanType}</i> | 👤 ${requestersStr}${dateFormatted}\n\n`;
-                });
-
-                msg += `💡 Open the Admin Web App to fulfill these requests with download links!\n`;
-            }
-
-            // Pagination buttons
-            const navButtons = [];
-            if (currentPage > 0) {
-                navButtons.push({ text: "⬅️ Previous", callback_data: `admin_req_page_${currentPage - 1}` });
-            }
-            if (totalPages > 1) {
-                navButtons.push({ text: `${currentPage + 1}/${totalPages}`, callback_data: `admin_req_page_${currentPage}` });
-            }
-            if (currentPage < totalPages - 1) {
-                navButtons.push({ text: "Next ➡️", callback_data: `admin_req_page_${currentPage + 1}` });
-            }
-
-            const keyboard = [
-                [
-                    { text: "👑 Open Admin to Fulfill 🚀", web_app: { url: "https://dans123456.github.io/filmhouse/admin.html" } }
-                ]
-            ];
-
-            if (navButtons.length > 0) {
-                keyboard.push(navButtons);
-            }
-
-            keyboard.push([
-                { text: "🔄 Refresh Requests", callback_data: `admin_req_page_${currentPage}` },
-                { text: "« Back to Menu", callback_data: "admin_menu" }
-            ]);
-
-            return { text: msg, keyboard, parse_mode: "HTML" };
         };
 
         // View 3A: Server & Diagnostic Logs Category Selection Menu
@@ -3184,11 +3286,11 @@ function setupBot(bot, adminBot) {
                 `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
                 `How to forward files to your Stream Bot (<b>@FilmHouseStreamer_bot</b>):\n\n` +
                 `🎥 <b>Forwarding Movies:</b>\n` +
-                `• Forward any single movie file $\rightarrow$ receives a direct stream link immediately.\n` +
-                `• Forwarding 2 qualities (e.g. 1080p and 720p) of the same movie $\rightarrow$ groups them into a single <b>Multi-Quality Movie Card</b>!\n\n` +
+                `• Forward any single movie file → receives a direct stream link immediately.\n` +
+                `• Forwarding 2 qualities (e.g. 1080p and 720p) of the same movie → groups them into a single <b>Multi-Quality Movie Card</b>!\n\n` +
                 `📺 <b>Forwarding TV Series:</b>\n` +
                 `• Select up to 60 episodes in Telegram and forward all at once.\n` +
-                `• The bot buffers incoming files, automatically sorts them strictly <b>Ep 1 $\rightarrow$ Ep 60</b> in numerical order.\n` +
+                `• The bot buffers incoming files, automatically sorts them strictly <b>Ep 1 → Ep 60</b> in numerical order.\n` +
                 `• It sends a single continuous message with all links formatted cleanly (Option A delivery with no file attachment).\n\n` +
                 `❌ <b>How to Cancel Frozen Batches:</b>\n` +
                 `• Send <code>/cancel</code> or tap the <b>[ ❌ Cancel Batch ]</b> inline button anytime to abort a batch!`;
@@ -3697,6 +3799,8 @@ function setupBot(bot, adminBot) {
 
             const scanSessionState = { cancelled: false };
             if (sessionId) activeScanSessions.set(sessionId, scanSessionState);
+            isCatalogSyncBusy = true;
+            try {
 
             const updateProgress = async (text) => {
                 if (!ctx || !progressMsg) return;
@@ -3794,8 +3898,8 @@ function setupBot(bot, adminBot) {
                                     m._docId = live._docId;
                                     m._ref = live._ref;
                                     if (live.stream_url) m.stream_url = live.stream_url;
-                                    if (Array.isArray(live.stream_links)) m.stream_links = live.stream_links;
-                                    if (Array.isArray(live.links)) m.links = live.links;
+                                    if (Array.isArray(live.stream_links) && live.stream_links.length > 0) m.stream_links = live.stream_links;
+                                    if (Array.isArray(live.links) && live.links.length > 0) m.links = live.links;
                                 }
                             });
                         }
@@ -3877,12 +3981,14 @@ function setupBot(bot, adminBot) {
                         m.title && titlesMatch(m.title, parsed.cleanTitle)
                     );
                     if (!catalogMatch && parsed.year) {
+                        const firstSignificantWord = parsed.cleanTitle.toLowerCase().split(/\s+/).find(w => w.length >= 4 && !STOP_WORDS.has(w)) || "";
                         catalogMatch = cachedMoviesMetadata.find(m => {
                             if (!m.title) return false;
                             const titleOk = titlesMatch(m.title, parsed.cleanTitle);
-                            const mYear = m.year ? String(m.year).substring(0, 4) : '';
+                            const mYearRaw = m.year || m.release_date || '';
+                            const mYear = mYearRaw ? String(mYearRaw).substring(0, 4) : '';
                             const yearOk = mYear === String(parsed.year).substring(0, 4);
-                            return titleOk || (yearOk && m.title.toLowerCase().includes(parsed.cleanTitle.toLowerCase().split(' ')[0]));
+                            return titleOk || (yearOk && firstSignificantWord && m.title.toLowerCase().includes(firstSignificantWord));
                         });
                     }
                 }
@@ -4146,6 +4252,10 @@ function setupBot(bot, adminBot) {
                 unmatchedFiles,
                 githubPublished
             };
+            } finally {
+                isCatalogSyncBusy = false;
+                if (sessionId) activeScanSessions.delete(sessionId);
+            }
         }
 
         const scanUnmatchedSessions = new Map();
@@ -4275,6 +4385,7 @@ function setupBot(bot, adminBot) {
             const newSessionId = "auto_" + Date.now().toString(36);
             const result = await processBatchMediaItems(items, ctx, progressMsg, baseServer, newSessionId, false, true);
             scanUnmatchedSessions.set(newSessionId, result);
+            setTimeout(() => scanUnmatchedSessions.delete(newSessionId), 60 * 60 * 1000);
 
             const payload = buildUnmatchedReportPayload(newSessionId, result, 0);
             await ctx.telegram.editMessageText(ctx.chat.id, progressMsg.message_id, undefined, payload.text, {
@@ -4702,7 +4813,7 @@ function setupBot(bot, adminBot) {
             const isAuthorized = await isAdmin(senderId).catch(() => false);
             if (!isAuthorized) return;
             return ctx.reply(
-                '📡 <b>Library Scanner, Quick Scan & Auto-Ingest</b> are best run from your Admin Bot.\n\nPlease send <code>/scanquick</code> or <code>/scanlibrary</code> to <b>@FilmHouseAdminBot</b> (your admin bot DM) to begin.',
+                '📡 <b>Library Scanner, Quick Scan & Auto-Ingest</b> are best run from your Admin Bot.\n\nPlease send <code>/scanquick</code> or <code>/scanlibrary</code> to <b>@Fiimhouse_adminBot</b> (your admin bot DM) to begin.',
                 { parse_mode: 'HTML' }
             );
         });
@@ -5138,6 +5249,7 @@ function setupBot(bot, adminBot) {
         console.log(`User /start: ${fullName} (${username ? '@' + username : 'No handle'}, ID: ${userId})`);
 
         // Update local user store immediately on Ubuntu
+        const wasNewLocalUser = ctx.state?.wasNewLocalUser !== undefined ? ctx.state.wasNewLocalUser : !localStore.getUser(userId);
         localStore.upsertUser({
             id: userId,
             username: username,
@@ -5153,8 +5265,7 @@ function setupBot(bot, adminBot) {
         (async () => {
             try {
                 const userRef = db.collection("users").doc(userId);
-                const existingLocal = localStore.getUser(userId);
-                let isNewUser = !existingLocal;
+                let isNewUser = Boolean(wasNewLocalUser);
                 if (isNewUser) {
                     try {
                         const userDoc = await userRef.get();
@@ -5216,8 +5327,8 @@ function setupBot(bot, adminBot) {
                             }).catch(() => {});
                             await ctx.telegram.sendMessage(
                                 referrerId,
-                                `🔔 *New Referral!* 🔔\n\nYour friend *${fullName}* has joined Film House using your invite link! 🎉\n\nYou have been awarded *+5 Loyalty Points*! 🏆`,
-                                { parse_mode: "Markdown" }
+                                `🔔 <b>New Referral!</b> 🔔\n\nYour friend <b>${escapeHtml(fullName)}</b> has joined Film House using your invite link! 🎉\n\nYou have been awarded <b>+5 Loyalty Points</b>! 🏆`,
+                                { parse_mode: "HTML" }
                             ).catch(() => {});
                         }
                     }
@@ -5283,8 +5394,9 @@ function setupBot(bot, adminBot) {
                 const doc = await docRef.get();
                 if (doc.exists) {
                     const reqData = doc.data();
+                    const safeReqTitle = escapeHtml(reqData.title || "Movie");
                     if (reqData.status === "priority" || reqData.boosted === true) {
-                        await ctx.reply(`ℹ️ *Your request for "${reqData.title}" is already boosted to High Priority!* 🚀`, { parse_mode: "Markdown" }).catch(() => {});
+                        await ctx.reply(`ℹ️ <b>Your request for "${safeReqTitle}" is already boosted to High Priority!</b> 🚀`, { parse_mode: "HTML" }).catch(() => {});
                     } else {
                         // Check user points balance in Firestore
                         const userRef = db.collection("users").doc(userId);
@@ -5292,11 +5404,11 @@ function setupBot(bot, adminBot) {
                         const userPoints = userDoc.exists ? (userDoc.data().points || 0) : 0;
                         if (userPoints < 1000) {
                             await ctx.reply(
-                                `⚠️ *Not enough Loyalty Points!*\n\n` +
-                                `You currently have *${userPoints.toLocaleString()}* points. Boosting your request for *${reqData.title}* to High Priority requires *1,000* points.\n\n` +
+                                `⚠️ <b>Not enough Loyalty Points!</b>\n\n` +
+                                `You currently have <b>${userPoints.toLocaleString()}</b> points. Boosting your request for <b>${safeReqTitle}</b> to High Priority requires <b>1,000</b> points.\n\n` +
                                 `Launch the app to mine points and complete daily tasks! 🪙`,
                                 {
-                                    parse_mode: "Markdown",
+                                    parse_mode: "HTML",
                                     reply_markup: {
                                         inline_keyboard: [
                                             [{ text: "Mine Points 🪙", url: "https://t.me/Filmhouseappbot/filmhouseapp?startapp=mining" }],
@@ -5306,7 +5418,15 @@ function setupBot(bot, adminBot) {
                                 }
                             ).catch(() => {});
                         } else {
-                            // Deduct 1,000 points atomically
+                            // Mark as priority in requests collection first, then deduct 1,000 points
+                            await docRef.update({
+                                status: "priority",
+                                boosted: true,
+                                boostedAt: admin.firestore.FieldValue.serverTimestamp(),
+                                boostedBy: username ? `@${username}` : fullName,
+                                boostedById: userId,
+                                notifiedPriority: false
+                            });
                             await userRef.update({
                                 points: admin.firestore.FieldValue.increment(-1000)
                             });
@@ -5317,23 +5437,14 @@ function setupBot(bot, adminBot) {
                                 reason: "request_boost",
                                 balanceAfter: Math.max(0, userPoints - 1000),
                                 timestamp: admin.firestore.FieldValue.serverTimestamp(),
-                                metadata: { requestId: reqId, movieTitle: reqData.title }
+                                metadata: { requestId: docId, movieTitle: reqData.title }
                             }).catch(() => {});
-                            // Mark as priority in requests collection - will trigger admin DMs via real-time listener
-                            await docRef.update({
-                                status: "priority",
-                                boosted: true,
-                                boostedAt: admin.firestore.FieldValue.serverTimestamp(),
-                                boostedBy: username ? `@${username}` : fullName,
-                                boostedById: userId,
-                                notifiedPriority: false
-                            });
                             await ctx.reply(
-                                `🚀 *Request Successfully Boosted to High Priority!* 🚀\n\n` +
-                                `*Title:* ${reqData.title}\n` +
-                                `*Points Deducted:* 1,000 pts (Remaining: ${(userPoints - 1000).toLocaleString()})\n\n` +
+                                `🚀 <b>Request Successfully Boosted to High Priority!</b> 🚀\n\n` +
+                                `<b>Title:</b> ${safeReqTitle}\n` +
+                                `<b>Points Deducted:</b> 1,000 pts (Remaining: ${(userPoints - 1000).toLocaleString()})\n\n` +
                                 `⚡ Our admin team has received an urgent notification in their DMs and will fulfill your request promptly! 🍿`,
-                                { parse_mode: "Markdown" }
+                                { parse_mode: "HTML" }
                             ).catch(() => {});
                         }
                     }
@@ -5341,6 +5452,7 @@ function setupBot(bot, adminBot) {
             } catch (err) {
                 console.error("Error processing boost start payload:", err);
             }
+            return;
         }
 
         // Check for download deep-link payload (start=dl_movieId or start=movie_movieId)
@@ -5663,11 +5775,11 @@ function setupBot(bot, adminBot) {
         const userIsAdmin = await isAdmin(userId);
 
         let helpMsg = 
-            `📖 *Film House Help & Guide*\n\n` +
-            `• Click the *Launch Film House* button to open the movie library.\n` +
+            `📖 <b>Film House Help &amp; Guide</b>\n\n` +
+            `• Click the <b>Launch Film House</b> button to open the movie library.\n` +
             `• Request films or series directly inside the app if they aren't available.\n` +
             `• You will receive a direct notification message when your requests are fulfilled!\n\n` +
-            `*Commands List:*\n` +
+            `<b>Commands List:</b>\n` +
             `/start - Open the welcome screen and launch app\n` +
             `/settings - View your profile info and points status\n` +
             `/myid - Get your device sync ID for PC/Mac browser\n` +
@@ -5675,14 +5787,14 @@ function setupBot(bot, adminBot) {
 
         if (userIsAdmin) {
             helpMsg += 
-                `\n\n_Admins Only:_\n` +
-                `/broadcast <msg> - Broadcast a message to all users\n` +
-                `/ban <user_id> - Ban a user from the bot and app\n` +
-                `/unban <user_id> - Unban a restricted user`;
+                `\n\n<i>Admins Only:</i>\n` +
+                `/broadcast &lt;msg&gt; - Broadcast a message to all users\n` +
+                `/ban &lt;user_id&gt; - Ban a user from the bot and app\n` +
+                `/unban &lt;user_id&gt; - Unban a restricted user`;
         }
 
         return ctx.reply(helpMsg, { 
-            parse_mode: 'Markdown',
+            parse_mode: 'HTML',
             reply_to_message_id: ctx.message.message_id
         });
     });
@@ -5959,7 +6071,7 @@ function setupBot(bot, adminBot) {
             });
         }
         const list = await getPendingRequestsList();
-        return renderOrEdit(ctx, getPendingRequestsPayload(list, 0));
+        return renderOrEdit(ctx, getPendingRequestsPayload(list, 0, false));
     });
 
     bot.action(/^admin_req_page_(\d+)$/, async (ctx) => {
@@ -5968,7 +6080,7 @@ function setupBot(bot, adminBot) {
         if (!adminIds.includes(userId)) return;
         const page = parseInt(ctx.match[1], 10) || 0;
         const list = await getPendingRequestsList();
-        return renderOrEdit(ctx, getPendingRequestsPayload(list, page));
+        return renderOrEdit(ctx, getPendingRequestsPayload(list, page, false));
     });
 
     // Command: /broadcast (Seamless In-Place Single-Message Editing)
@@ -6061,11 +6173,22 @@ function setupBot(bot, adminBot) {
             { parse_mode: 'Markdown' }
         ).catch(() => {});
 
+        const isFromAdminBot = ctx.botInfo && bot.botInfo && ctx.botInfo.id !== bot.botInfo.id;
+
         for (let i = 0; i < totalSubs; i++) {
             const u = subscribers[i];
             try {
                 if (replyTo) {
-                    await callTelegramWithRetry('copyMessage', u.id, ctx.chat.id, replyTo.message_id);
+                    if (isFromAdminBot) {
+                        const msgBody = replyTo.text || replyTo.caption || textParam || "";
+                        if (msgBody) {
+                            await callTelegramWithRetry('sendMessage', u.id, msgBody, { parse_mode: "HTML" });
+                        } else {
+                            throw new Error("Media reply broadcast must be sent directly in the Public Bot (@Filmhouseappbot) chat.");
+                        }
+                    } else {
+                        await callTelegramWithRetry('copyMessage', u.id, ctx.chat.id, replyTo.message_id);
+                    }
                 } else {
                     await callTelegramWithRetry('sendMessage', u.id, textParam, { parse_mode: "Markdown" });
                 }
@@ -6119,24 +6242,16 @@ function setupBot(bot, adminBot) {
         ).catch(() => {});
     };
 
-    bot.command('broadcast', handleSeamlessBroadcast);
-    if (adminBot) adminBot.command('broadcast', handleSeamlessBroadcast);
-    if (adminBot) {
-        adminBot.command('ban', async (ctx) => bot.handleUpdate(ctx.update));
-        adminBot.command('unban', async (ctx) => bot.handleUpdate(ctx.update));
-        adminBot.command('setwelcomecaption', async (ctx) => bot.handleUpdate(ctx.update));
-    }
-
     // Command: /ban <user_id> (Admin Only)
-    bot.command('ban', async (ctx) => {
+    const handleBanCommand = async (ctx) => {
         const userId = String(ctx.from.id);
         if (!(await isMasterAdmin(userId))) {
             return ctx.reply("❌ Unauthorized. This command is restricted to Master Administrators.");
         }
 
-        const targetId = ctx.message.text.substring(4).trim(); // remove "/ban" prefix
+        const targetId = (ctx.message.text || "").replace(/^\/ban(?:@\w+)?/i, "").trim();
         if (!targetId || isNaN(targetId)) {
-            return ctx.reply("Please specify a valid Telegram User ID to ban. Format: `/ban <user_id>`");
+            return ctx.reply("Please specify a valid Telegram User ID to ban. Format: <code>/ban &lt;user_id&gt;</code>", { parse_mode: "HTML" });
         }
 
         try {
@@ -6146,26 +6261,26 @@ function setupBot(bot, adminBot) {
             bannedUsersCache.add(targetId);
             localStore.setBanned(targetId, true);
             try {
-                await ctx.telegram.sendMessage(targetId, "❌ Your access to Film House has been restricted.");
+                await bot.telegram.sendMessage(targetId, "❌ Your access to Film House has been restricted.");
             } catch (notifyErr) {}
 
-            return ctx.reply(`✅ Successfully banned User ID \`${targetId}\`. They are blocked from using the app.`, { parse_mode: 'Markdown' });
+            return ctx.reply(`✅ Successfully banned User ID <code>${escapeHtml(targetId)}</code>. They are blocked from using the app.`, { parse_mode: 'HTML' });
         } catch (err) {
             console.error("Error banning user:", err);
             return ctx.reply(`❌ Error banning user: ${err.message}`);
         }
-    });
+    };
 
     // Command: /unban <user_id> (Admin Only)
-    bot.command('unban', async (ctx) => {
+    const handleUnbanCommand = async (ctx) => {
         const userId = String(ctx.from.id);
         if (!(await isMasterAdmin(userId))) {
             return ctx.reply("❌ Unauthorized. This command is restricted to Master Administrators.");
         }
 
-        const targetId = ctx.message.text.substring(6).trim(); // remove "/unban" prefix
+        const targetId = (ctx.message.text || "").replace(/^\/unban(?:@\w+)?/i, "").trim();
         if (!targetId || isNaN(targetId)) {
-            return ctx.reply("Please specify a valid Telegram User ID to unban. Format: `/unban <user_id>`");
+            return ctx.reply("Please specify a valid Telegram User ID to unban. Format: <code>/unban &lt;user_id&gt;</code>", { parse_mode: "HTML" });
         }
 
         try {
@@ -6175,24 +6290,24 @@ function setupBot(bot, adminBot) {
             
             // Notify user
             try {
-                await ctx.telegram.sendMessage(targetId, "🟢 Your access to Film House has been restored! Type /start to open the app.");
+                await bot.telegram.sendMessage(targetId, "🟢 Your access to Film House has been restored! Type /start to open the app.");
             } catch (notifyErr) {}
 
-            return ctx.reply(`✅ Successfully unbanned User ID \`${targetId}\`. Access has been restored.`, { parse_mode: 'Markdown' });
+            return ctx.reply(`✅ Successfully unbanned User ID <code>${escapeHtml(targetId)}</code>. Access has been restored.`, { parse_mode: 'HTML' });
         } catch (err) {
             console.error("Error unbanning user:", err);
             return ctx.reply(`❌ Error unbanning user: ${err.message}`);
         }
-    });
+    };
 
     // Command: /setwelcomecaption <text> (Admin Only)
-    bot.command('setwelcomecaption', async (ctx) => {
+    const handleSetWelcomeCaptionCommand = async (ctx) => {
         const userId = String(ctx.from.id);
         if (!(await isMasterAdmin(userId))) {
             return ctx.reply("❌ Unauthorized. This command is restricted to Master Administrators.");
         }
 
-        const newCaption = ctx.message.text.substring(18).trim(); // remove "/setwelcomecaption" prefix
+        const newCaption = (ctx.message.text || "").replace(/^\/setwelcomecaption(?:@\w+)?/i, "").trim();
         if (!newCaption) {
             return ctx.reply(
                 "📝 *How to use /setwelcomecaption*:\n\n" +
@@ -6214,7 +6329,18 @@ function setupBot(bot, adminBot) {
             console.error("Error setting welcome caption:", err);
             return ctx.reply("❌ Failed to update welcome caption in Firestore.");
         }
-    });
+    };
+
+    bot.command('broadcast', handleSeamlessBroadcast);
+    bot.command('ban', handleBanCommand);
+    bot.command('unban', handleUnbanCommand);
+    bot.command('setwelcomecaption', handleSetWelcomeCaptionCommand);
+    if (adminBot) {
+        adminBot.command('broadcast', handleSeamlessBroadcast);
+        adminBot.command('ban', handleBanCommand);
+        adminBot.command('unban', handleUnbanCommand);
+        adminBot.command('setwelcomecaption', handleSetWelcomeCaptionCommand);
+    }
 
     // Command: /setwelcomephoto (Admin Only)
     bot.command('setwelcomephoto', async (ctx) => {
@@ -6293,12 +6419,16 @@ function setupBot(bot, adminBot) {
 
     // 1-Click Vault Setup Action from Channel Member Add
     bot.action(/^set_vault:(.+)$/, async (ctx) => {
+        const senderId = String(ctx.from?.id || "");
+        if (!(await isAdmin(senderId))) {
+            return ctx.answerCbQuery("⛔ Unauthorized. Only administrators can configure the ingest vault.", { show_alert: true }).catch(() => {});
+        }
         const chatId = ctx.match[1];
         dynamicIngestChannelId = chatId;
         try {
             await db.collection("system").doc("ingest_config").set({
                 channelId: chatId,
-                setBy: String(ctx.from?.id || ""),
+                setBy: senderId,
                 updatedAt: new Date().toISOString()
             }, { merge: true });
             await ctx.editMessageText(`✅ <b>Ingest Vault Configured!</b>\n\nThis channel is now your automated Ingest Channel. Whenever files are posted or dropped here, FilmHouse will automatically index, extract stream links, match TMDB, and send you confirmation cards!`, { parse_mode: "HTML" });
@@ -6309,6 +6439,8 @@ function setupBot(bot, adminBot) {
 
     bot.on('my_chat_member', async (ctx) => {
         try {
+            const senderId = String(ctx.from?.id || "");
+            if (!(await isAdmin(senderId))) return;
             const member = ctx.myChatMember;
             if (!member) return;
             const newStatus = member.new_chat_member?.status;
@@ -6410,11 +6542,11 @@ function setupBot(bot, adminBot) {
             const text = ctx.message.text;
             
             const defaultAdmins = ["1329840839", "1175336733"];
-            const notifyText = `💬 *New Message in Group!*\n\n*From:* ${userTag} (ID: \`${userId}\`)\n*Message:* ${text}`;
+            const notifyText = `💬 <b>New Message in Group!</b>\n\n<b>From:</b> ${escapeHtml(userTag)} (ID: <code>${escapeHtml(userId)}</code>)\n<b>Message:</b> ${escapeHtml(text)}`;
             
             for (const adminId of defaultAdmins) {
                 try {
-                    await ctx.telegram.sendMessage(adminId, notifyText, { parse_mode: "Markdown" });
+                    await ctx.telegram.sendMessage(adminId, notifyText, { parse_mode: "HTML" });
                 } catch (e) {
                     console.warn(`Could not notify admin ${adminId} of group message:`, e.message);
                 }
@@ -6639,14 +6771,17 @@ function setupBot(bot, adminBot) {
                             ]
                         };
 
+                        const cleanHandle = u.username && u.username !== "guest" && u.username !== "None"
+                            ? '@' + escapeHtml(u.username.replace(/^@/, ''))
+                            : "None";
                         await editMessageInPlace(
-                            `👤 *Your Profile Status*\n\n` +
-                            `• *Telegram ID:* \`${userId}\`\n` +
-                            `• *Username:* ${u.username && u.username !== "guest" && u.username !== "None" ? '@' + u.username.replace(/^@/, '') : "None"}\n` +
-                            `• *Loyalty Points:* 🪙 \`${points.toLocaleString()}\` pts\n` +
-                            `• *VIP Badge:* 🏆 \`${badge}\``,
+                            `👤 <b>Your Profile Status</b>\n\n` +
+                            `• <b>Telegram ID:</b> <code>${escapeHtml(userId)}</code>\n` +
+                            `• <b>Username:</b> ${cleanHandle}\n` +
+                            `• <b>Loyalty Points:</b> 🪙 <code>${points.toLocaleString()}</code> pts\n` +
+                            `• <b>VIP Badge:</b> 🏆 <code>${escapeHtml(badge)}</code>`,
                             { 
-                                parse_mode: 'Markdown',
+                                parse_mode: 'HTML',
                                 reply_markup: settingsMarkup
                             }
                         );
@@ -6724,7 +6859,9 @@ async function checkAndRunWeeklyBackup(botToUse, force = false, targetChatId = n
                     const row = fields.map(field => {
                         let val = data[field];
                         if (val === undefined || val === null) return "";
-                        let str = Array.isArray(val) ? val.join(", ") : String(val);
+                        let str = Array.isArray(val)
+                            ? val.map(v => typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v)).join(" | ")
+                            : (typeof val === 'object' ? JSON.stringify(val) : String(val));
                         str = str.replace(/"/g, '""');
                         if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
                             str = `"${str}"`;
@@ -6849,21 +6986,6 @@ async function init() {
             console.error("Failed to register bot commands menu:", err);
         });
 
-        // Register Commands Menu for Admin Bot
-        if (adminBot) {
-            adminBot.telegram.setMyCommands([
-                { command: 'start', description: 'Admin Command Center 👑' },
-                { command: 'logs', description: 'View live server & bot logs 📜' },
-                { command: 'pending', description: 'List pending movie requests 📋' },
-                { command: 'backup', description: 'Trigger catalog CSV backup 💾' },
-                { command: 'stats', description: 'Server metrics & subscriber counts 📊' }
-            ]).then(() => {
-                console.log("Admin Bot commands menu registered successfully!");
-            }).catch(err => {
-                console.warn("Failed to register admin bot commands menu:", err.message);
-            });
-        }
-
         const isLocalEnvironment = !process.env.RENDER_EXTERNAL_URL && !process.env.RENDER;
         const forcePolling = process.env.POLLING === "true" || process.argv.includes("--polling") || isLocalEnvironment;
         
@@ -6932,15 +7054,6 @@ async function init() {
                     if (handleApiLogRequest(req, res)) return;
                 } else if (req.url === secretPath) {
                     webhookCallback(req, res);
-                } else if (req.url === '/debug-info') {
-                    res.writeHead(200, { "Content-Type": "application/json" });
-                    res.end(JSON.stringify({
-                        tokenPrefix: botToken ? botToken.substring(0, 12) : "missing",
-                        secretPath: secretPath,
-                        webhookUrl: webhookUrl,
-                        firebaseProjectId: admin.app().options.projectId || "unknown",
-                        firebaseCertProject: admin.app().options.credential && admin.app().options.credential.projectId ? admin.app().options.credential.projectId : "unknown"
-                    }));
                 } else if (req.url === '/' || req.url === '/healthz') {
                     res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
                     res.end("Film House Bot is active and running! 🍿");
@@ -6955,13 +7068,25 @@ async function init() {
             });
             
             const webhookTargetUrl = webhookUrl.endsWith('/') ? `${webhookUrl}${secretPath.substring(1)}` : `${webhookUrl}${secretPath}`;
-            bot.telegram.setWebhook(webhookTargetUrl)
+            bot.telegram.setWebhook(webhookTargetUrl, {
+                allowed_updates: ['message', 'callback_query', 'channel_post', 'my_chat_member']
+            })
                 .then(() => {
                     console.log(`Telegram Webhook set successfully to: ${webhookTargetUrl}`);
                 })
                 .catch(err => {
                     console.error("Failed to set Telegram Webhook:", err);
                 });
+
+            if (adminBot) {
+                adminBot.launch({
+                    allowedUpdates: ['message', 'callback_query', 'channel_post', 'my_chat_member']
+                }).then(() => {
+                    console.log("Film House Admin Bot started in polling mode alongside public webhook! 👑");
+                }).catch(err => {
+                    console.error("Admin Bot launch error:", err.message);
+                });
+            }
 
             // Start self-ping keep-alive loop (every 10 minutes)
             setInterval(() => {
@@ -6985,13 +7110,6 @@ async function init() {
             server = http.createServer((req, res) => {
                 if (req.url === '/api/log') {
                     if (handleApiLogRequest(req, res)) return;
-                } else if (req.url === '/debug-info') {
-                    res.writeHead(200, { "Content-Type": "application/json" });
-                    res.end(JSON.stringify({
-                        tokenPrefix: botToken ? botToken.substring(0, 12) : "missing",
-                        mode: "polling",
-                        firebaseProjectId: admin.app().options.projectId || "unknown"
-                    }));
                 } else if (req.url === '/' || req.url === '/healthz') {
                     res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
                     res.end("Film House Bot is active and running (Polling)! 🍿");
@@ -7006,13 +7124,13 @@ async function init() {
             });
             
             bot.launch({
-                allowedUpdates: ['message', 'callback_query']
+                allowedUpdates: ['message', 'callback_query', 'channel_post', 'my_chat_member']
             }).catch(err => console.error("Public Bot launch error:", err.message));
             console.log("Film House Public Bot successfully started! 🚀 Running command listener (Polling)...");
 
             if (adminBot) {
                 adminBot.launch({
-                    allowedUpdates: ['message', 'callback_query']
+                    allowedUpdates: ['message', 'callback_query', 'channel_post', 'my_chat_member']
                 }).then(() => {
                     console.log("Film House Admin Bot successfully started! 👑 Running listener (@Fiimhouse_adminBot)...");
                 }).catch(err => {
@@ -7189,7 +7307,7 @@ async function init() {
                                             await new Promise(resolve => setTimeout(resolve, 50));
                                         } catch (e) {
                                             if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
-                                                await db.collection("users").doc(uid).update({ blockedBot: true });
+                                                await db.collection("users").doc(uid).set({ blockedBot: true }, { merge: true }).catch(() => {});
                                             }
                                             console.warn(`Failed to send bulk reminder to user ${uid}:`, e.message);
                                         }
@@ -7199,7 +7317,7 @@ async function init() {
                             } catch (err) {
                                 console.error("Error executing bulk reminder database query:", err);
                             }
-                        } else {
+                        } else if (userId) {
                             try {
                                 await callTelegramWithRetry('sendMessage', userId, text, {
                                     parse_mode: "HTML",
@@ -7217,7 +7335,7 @@ async function init() {
                                 console.log(`Manual mine reminder successfully sent to user ${userId}`);
                             } catch (e) {
                                 if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
-                                    await db.collection("users").doc(userId).update({ blockedBot: true });
+                                    await db.collection("users").doc(userId).set({ blockedBot: true }, { merge: true }).catch(() => {});
                                 }
                                 console.warn(`Failed to send manual mine reminder to ${userId}:`, e.message);
                             }
@@ -7237,6 +7355,10 @@ async function init() {
                     
                     if (data.status && data.status !== "pending") return;
                     if (processedBroadcastTasks.has(docId)) return;
+                    if (processedBroadcastTasks.size > 5000) {
+                        const firstTask = processedBroadcastTasks.values().next().value;
+                        processedBroadcastTasks.delete(firstTask);
+                    }
                     processedBroadcastTasks.add(docId);
 
                     // Skip expired tasks older than 24 hours on startup
@@ -7275,10 +7397,11 @@ async function init() {
                             const yearText = movie.release_date ? ` (${movie.release_date.substring(0, 4)})` : (movie.year ? ` (${movie.year})` : "");
                             const isSeries = (movie.type || "").toLowerCase() === "series" || (movie.type || "").toLowerCase() === "tv";
                             const rawSeason = movie.seasonOrPart || (isSeries ? "Complete Series" : "Full Movie");
+                            const lowerRawSeason = String(rawSeason).toLowerCase();
 
                             let seasonOrQualityText = isSeries 
-                                ? (String(rawSeason).toLowerCase().includes("season") ? rawSeason : `Season ${rawSeason}`)
-                                : (String(rawSeason).toLowerCase().includes("quality") ? rawSeason : `${rawSeason} Quality`);
+                                ? (lowerRawSeason.includes("season") || lowerRawSeason.includes("episode") || lowerRawSeason.includes("complete") || lowerRawSeason.includes("series") ? rawSeason : `Season ${rawSeason}`)
+                                : (lowerRawSeason.includes("quality") || lowerRawSeason.includes("full movie") || lowerRawSeason.includes("cut") || lowerRawSeason.includes("cam") ? rawSeason : `${rawSeason} Quality`);
                             if (movie.isSeriesComplete) {
                                 seasonOrQualityText = "Complete Series | All Seasons";
                             }
@@ -7299,7 +7422,8 @@ async function init() {
                                             `📝 <i>${escapeHtml((movie.overview || "No synopsis available.").substring(0, 200))}...</i>\n\n` +
                                             `🍿 <b>Stream or Download via Film House App:</b>`;
 
-                            const deepLink = movie.csv_id ? `https://t.me/Filmhouseappbot?start=dl_${movie.csv_id}` : `https://t.me/Filmhouseappbot`;
+                            const safeId = getSafeDeepLinkId(movie);
+                            const deepLink = safeId ? `https://t.me/Filmhouseappbot?start=dl_${safeId}` : `https://t.me/Filmhouseappbot`;
                             const replyMarkup = {
                                 inline_keyboard: [
                                     [
@@ -7352,6 +7476,49 @@ async function init() {
                                 error: postErr.message
                             }).catch(() => {});
                         }
+                    } else if (data.type === "channel_announcement") {
+                        try {
+                            const targetChannel = data.channelId || process.env.UPDATES_CHANNEL_ID || "-1002098683402";
+                            const fallbackChannel = process.env.MAIN_CHANNEL_ID || "@filmhouse_main";
+                            const msgText = data.message || "";
+                            let replyMarkup = undefined;
+                            if (data.includeButton === true && data.buttonUrl) {
+                                replyMarkup = {
+                                    inline_keyboard: [
+                                        [{ text: data.buttonText || "🍿 Open Film House", url: data.buttonUrl }]
+                                    ]
+                                };
+                            }
+                            let postRes = null;
+                            try {
+                                postRes = await callTelegramWithRetry('sendMessage', targetChannel, msgText, {
+                                    parse_mode: 'HTML',
+                                    ...(replyMarkup ? { reply_markup: replyMarkup } : {})
+                                });
+                            } catch (chErr) {
+                                if (targetChannel !== fallbackChannel) {
+                                    postRes = await callTelegramWithRetry('sendMessage', fallbackChannel, msgText, {
+                                        parse_mode: 'HTML',
+                                        ...(replyMarkup ? { reply_markup: replyMarkup } : {})
+                                    });
+                                } else {
+                                    throw chErr;
+                                }
+                            }
+                            await db.collection("admin_broadcast_queue").doc(docId).update({
+                                status: "completed",
+                                deliveredCount: 1,
+                                failedCount: 0,
+                                messageId: postRes?.message_id || null,
+                                processedAt: admin.firestore.FieldValue.serverTimestamp()
+                            }).catch(() => {});
+                        } catch (annErr) {
+                            console.error(`[SecurityQueue] Channel announcement failed for task ${docId}:`, annErr.message);
+                            await db.collection("admin_broadcast_queue").doc(docId).update({
+                                status: "failed",
+                                error: annErr.message
+                            }).catch(() => {});
+                        }
                     } else if (data.type === "user_broadcast") {
                         try {
                             const messageText = data.message;
@@ -7372,8 +7539,8 @@ async function init() {
                             if (data.includeButton === true) {
                                 const btnText = data.buttonText || "🍿 Open Film House";
                                 const rawUrl = data.buttonUrl || "https://dans123456.github.io/filmhouse/";
-                                // If web URL, open mini app via web_app so clicking directly launches the app inside Telegram
-                                if (rawUrl.startsWith("https://") || rawUrl.startsWith("http://")) {
+                                const isWebAppSafe = /^https:\/\//i.test(rawUrl) && !/https?:\/\/(t\.me|telegram\.me)\//i.test(rawUrl);
+                                if (isWebAppSafe) {
                                     replyMarkup = {
                                         inline_keyboard: [
                                             [{ text: btnText, web_app: { url: rawUrl } }]
@@ -7491,14 +7658,20 @@ async function init() {
                                 `🎬 <b>Season ${season}, Episode ${episode}</b>${epTitleLine} is now ready to watch!\n\n` +
                                 `<i>Tap below to stream instantly in Full HD or download directly on Telegram.</i>`;
 
-                            const streamMiniAppUrl = data.stream_url || `https://dans123456.github.io/filmhouse/?stream_id=${encodeURIComponent(csvId)}&season=${season}&ep=${episode}`;
+                            const streamMiniAppUrl = data.stream_url || `https://dans123456.github.io/filmhouse/?movie=${encodeURIComponent(csvId)}&season=${season}&ep=${episode}`;
+                            const safeDeepId = getSafeDeepLinkId({ csv_id: csvId, tmdb_id: tmdbId });
+                            const channelStreamUrl = `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${encodeURIComponent(safeDeepId || csvId)}`;
                             const actionRow = [
                                 { text: `▶️ Stream S${season}E${episode}`, web_app: { url: streamMiniAppUrl } }
+                            ];
+                            const channelActionRow = [
+                                { text: `▶️ Stream S${season}E${episode}`, url: channelStreamUrl }
                             ];
 
                             if (data.download_url && (data.download_url.startsWith("http://") || data.download_url.startsWith("https://") || data.download_url.startsWith("t.me/"))) {
                                 const dlUrl = data.download_url.startsWith("t.me/") ? `https://${data.download_url}` : data.download_url;
                                 actionRow.push({ text: `⬇️ Download S${season}E${episode}`, url: dlUrl });
+                                channelActionRow.push({ text: `⬇️ Download S${season}E${episode}`, url: dlUrl });
                             }
 
                             const replyMarkup = {
@@ -7559,7 +7732,7 @@ async function init() {
 
                                     const channelMarkup = {
                                         inline_keyboard: [
-                                            actionRow,
+                                            channelActionRow,
                                             [
                                                 { text: "🍿 Open Film House Mini App", url: "https://t.me/Filmhouseappbot/filmhouseapp" },
                                                 { text: "📢 Join Channel", url: "https://t.me/filmhouse_main" }
@@ -7612,7 +7785,7 @@ async function init() {
                             }
 
                             // If this was marked to purge subscriptions (season completed)
-                            if (data.purge_subscriptions === true) {
+                            if (data.purge_subscriptions === true && !isNaN(tmdbId)) {
                                 try {
                                     console.log(`[SeriesBroadcast] Season complete. Purging subscriptions for TMDB ${tmdbId}...`);
                                     const purgeDocs = [];
@@ -7621,12 +7794,22 @@ async function init() {
                                     const pSnap2 = await db.collection("subscriptions").where("tmdb_id", "==", String(tmdbId)).get();
                                     pSnap2.forEach(d => purgeDocs.push(d.ref));
 
-                                    if (purgeDocs.length > 0) {
+                                    for (let i = 0; i < purgeDocs.length; i += 450) {
                                         const pBatch = db.batch();
-                                        purgeDocs.forEach(ref => pBatch.delete(ref));
+                                        purgeDocs.slice(i, i + 450).forEach(ref => pBatch.delete(ref));
                                         await pBatch.commit();
-                                        console.log(`[SeriesBroadcast] Purged ${purgeDocs.length} subscription records for completed series.`);
                                     }
+                                    const uSnap = await db.collection("users").where("series_subscriptions", "array-contains", tmdbId).get();
+                                    for (let i = 0; i < uSnap.docs.length; i += 450) {
+                                        const uBatch = db.batch();
+                                        uSnap.docs.slice(i, i + 450).forEach(d => {
+                                            uBatch.update(d.ref, {
+                                                series_subscriptions: admin.firestore.FieldValue.arrayRemove(tmdbId)
+                                            });
+                                        });
+                                        await uBatch.commit();
+                                    }
+                                    console.log(`[SeriesBroadcast] Purged ${purgeDocs.length} subscription records for completed series.`);
                                 } catch (pErr) {
                                     console.error(`[SeriesBroadcast] Subscriber purge failed:`, pErr.message);
                                 }
@@ -7650,6 +7833,13 @@ async function init() {
                     } else if (data.type === "series_purge_subscriptions") {
                         try {
                             const tmdbId = parseInt(data.tmdb_id, 10);
+                            if (isNaN(tmdbId)) {
+                                await db.collection("admin_broadcast_queue").doc(docId).update({
+                                    status: "failed",
+                                    error: "Invalid tmdb_id"
+                                }).catch(() => {});
+                                return;
+                            }
                             console.log(`[SecurityQueue] Standalone subscriber purge for TMDB ${tmdbId}...`);
                             const purgeDocs = [];
                             const pSnap1 = await db.collection("subscriptions").where("tmdb_id", "==", tmdbId).get();
@@ -7657,10 +7847,20 @@ async function init() {
                             const pSnap2 = await db.collection("subscriptions").where("tmdb_id", "==", String(tmdbId)).get();
                             pSnap2.forEach(d => purgeDocs.push(d.ref));
 
-                            if (purgeDocs.length > 0) {
+                            for (let i = 0; i < purgeDocs.length; i += 450) {
                                 const pBatch = db.batch();
-                                purgeDocs.forEach(ref => pBatch.delete(ref));
+                                purgeDocs.slice(i, i + 450).forEach(ref => pBatch.delete(ref));
                                 await pBatch.commit();
+                            }
+                            const uSnap = await db.collection("users").where("series_subscriptions", "array-contains", tmdbId).get();
+                            for (let i = 0; i < uSnap.docs.length; i += 450) {
+                                const uBatch = db.batch();
+                                uSnap.docs.slice(i, i + 450).forEach(d => {
+                                    uBatch.update(d.ref, {
+                                        series_subscriptions: admin.firestore.FieldValue.arrayRemove(tmdbId)
+                                    });
+                                });
+                                await uBatch.commit();
                             }
 
                             await db.collection("admin_broadcast_queue").doc(docId).update({
@@ -7696,6 +7896,55 @@ async function init() {
                     await docSnap.ref.update({ status: "completed" }).catch(() => {});
                 } catch (err) {
                     console.error("[FallbackQueue] Error:", err.message);
+                }
+            } else if (data.type === "channel_announcement") {
+                try {
+                    const targetChannel = data.channelId || process.env.UPDATES_CHANNEL_ID || "-1002098683402";
+                    let replyMarkup = undefined;
+                    if (data.includeButton && data.buttonUrl) {
+                        replyMarkup = {
+                            inline_keyboard: [[{ text: data.buttonText || "🍿 Open Film House", url: data.buttonUrl }]]
+                        };
+                    }
+                    await callTelegramWithRetry('sendMessage', targetChannel, data.message || "", {
+                        parse_mode: 'HTML',
+                        ...(replyMarkup ? { reply_markup: replyMarkup } : {})
+                    });
+                    await docSnap.ref.update({ status: "completed" }).catch(() => {});
+                } catch (err) {
+                    console.error("[FallbackQueue] Channel announcement error:", err.message);
+                }
+            } else if (data.type === "user_broadcast" && data.message) {
+                try {
+                    let eligibleUsers = [];
+                    if (Array.isArray(data.targetUserIds) && data.targetUserIds.length > 0) {
+                        eligibleUsers = data.targetUserIds.map(id => ({ id: String(id) }));
+                    } else {
+                        eligibleUsers = localStore.getActiveSubscribers();
+                    }
+                    let replyMarkup = undefined;
+                    if (data.includeButton === true && data.buttonUrl) {
+                        const rawUrl = String(data.buttonUrl);
+                        const isWebAppSafe = /^https:\/\//i.test(rawUrl) && !/https?:\/\/(t\.me|telegram\.me)\//i.test(rawUrl);
+                        replyMarkup = {
+                            inline_keyboard: [[isWebAppSafe
+                                ? { text: data.buttonText || "🍿 Open Film House", web_app: { url: rawUrl } }
+                                : { text: data.buttonText || "🍿 Open Film House", url: rawUrl }
+                            ]]
+                        };
+                    }
+                    for (const u of eligibleUsers) {
+                        try {
+                            await callTelegramWithRetry('sendMessage', u.id, data.message, {
+                                parse_mode: 'HTML',
+                                ...(replyMarkup ? { reply_markup: replyMarkup } : {})
+                            });
+                        } catch (_) {}
+                        await new Promise(r => setTimeout(r, 40));
+                    }
+                    await docSnap.ref.update({ status: "completed" }).catch(() => {});
+                } catch (err) {
+                    console.error("[FallbackQueue] User broadcast error:", err.message);
                 }
             }
         }, (err) => console.warn("Fallback broadcast queue listener warning:", err.message));
@@ -7847,7 +8096,7 @@ async function init() {
                             });
                         } catch (e) {
                             if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
-                                await db.collection("users").doc(userId).update({ blockedBot: true }).catch(() => {});
+                                await db.collection("users").doc(userId).set({ blockedBot: true }, { merge: true }).catch(() => {});
                             }
                             console.warn(`Failed to send request confirmation to ${userId}:`, e.message);
                         }
@@ -7949,15 +8198,17 @@ async function init() {
                         const cleanBooster = escapeHtml(String(boosterName).replace(/[*_`~]/g, '').trim());
 
                         // 1. Send confirmation to requesting user
-                        const text = `🚀 <b>Request Boosted!</b>\n\n` +
-                                     `Your request for <b>${cleanTitle}</b>${cleanYear} has been successfully boosted to <b>High Priority</b>! Our admin team has received an emergency alert in their private DMs and is working on fulfilling it! 🍿`;
-                        try {
-                            await callTelegramWithRetry('sendMessage', userId, text, { parse_mode: "HTML" });
-                        } catch (e) {
-                            if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
-                                await db.collection("users").doc(userId).update({ blockedBot: true }).catch(() => {});
+                        if (userId) {
+                            const text = `🚀 <b>Request Boosted!</b>\n\n` +
+                                         `Your request for <b>${cleanTitle}</b>${cleanYear} has been successfully boosted to <b>High Priority</b>! Our admin team has received an emergency alert in their private DMs and is working on fulfilling it! 🍿`;
+                            try {
+                                await callTelegramWithRetry('sendMessage', userId, text, { parse_mode: "HTML" });
+                            } catch (e) {
+                                if (e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"))) {
+                                    await db.collection("users").doc(userId).set({ blockedBot: true }, { merge: true }).catch(() => {});
+                                }
+                                console.warn(`Failed to send boost confirmation to ${userId}:`, e.message);
                             }
-                            console.warn(`Failed to send boost confirmation to ${userId}:`, e.message);
                         }
 
                         // 2. Notify admins in their DMs with high-visibility HTML alert and Delete Request button
@@ -8137,7 +8388,8 @@ async function init() {
                         }
                     }
 
-                    if (data.status === "fulfilled" && data.notifiedFulfilled !== true && downloadLink) {
+                    const notifyLink = downloadLink || data.stream_url || data.streamUrl || (data.csv_id ? `https://dans123456.github.io/filmhouse/index.html?movie=${encodeURIComponent(data.csv_id)}` : "");
+                    if (data.status === "fulfilled" && data.notifiedFulfilled !== true && notifyLink) {
                         const cleanUserTitle = escapeHtml(title || "Movie");
                         const cleanYearSuffix = year ? ` (${escapeHtml(year)})` : "";
                         const isSeries = (data.type || "").toLowerCase() === "series" || (data.type || "").toLowerCase() === "tv";
@@ -8173,35 +8425,44 @@ async function init() {
                                          `Your request for <b>${cleanUserTitle}</b>${cleanYearSuffix} has been fulfilled! 🍿\n\n` +
                                          `${detailText}\n\n` +
                                          `Thank you for using Film House!`;
-                            try {
-                                await callTelegramWithRetry('sendMessage', userId, text, {
-                                    parse_mode: "HTML",
-                                    reply_markup: {
-                                        inline_keyboard: [
-                                            [
-                                                {
-                                                    text: buttonText,
-                                                    url: downloadLink
-                                                }
+                            if (userId) {
+                                try {
+                                    const btnTargetUrl = downloadLink || (data.csv_id ? `https://dans123456.github.io/filmhouse/index.html?movie=${encodeURIComponent(data.csv_id)}` : "https://t.me/Filmhouseappbot/filmhouseapp");
+                                    await callTelegramWithRetry('sendMessage', userId, text, {
+                                        parse_mode: "HTML",
+                                        reply_markup: {
+                                            inline_keyboard: [
+                                                [
+                                                    {
+                                                        text: buttonText,
+                                                        url: btnTargetUrl
+                                                    }
+                                                ]
                                             ]
-                                        ]
-                                    }
-                                });
-                                await db.collection("requests").doc(docId).update({ 
+                                        }
+                                    });
+                                    await db.collection("requests").doc(docId).update({ 
+                                        notifiedFulfilled: true,
+                                        notificationStatus: "delivered",
+                                        notificationError: null,
+                                        notifiedAt: admin.firestore.FieldValue.serverTimestamp()
+                                    }).catch(() => {});
+                                } catch (e) {
+                                    console.warn(`Failed to send request fulfillment to ${userId}:`, e.message);
+                                    const isBlocked = e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"));
+                                    if (isBlocked) await db.collection("users").doc(userId).set({ blockedBot: true }, { merge: true }).catch(() => {});
+                                    await db.collection("requests").doc(docId).update({ 
+                                        notifiedFulfilled: true,
+                                        notificationStatus: "failed",
+                                        notificationError: e.message,
+                                        isBlockedUser: isBlocked,
+                                        notifiedAt: admin.firestore.FieldValue.serverTimestamp()
+                                    }).catch(() => {});
+                                }
+                            } else {
+                                await db.collection("requests").doc(docId).update({
                                     notifiedFulfilled: true,
-                                    notificationStatus: "delivered",
-                                    notificationError: null,
-                                    notifiedAt: admin.firestore.FieldValue.serverTimestamp()
-                                }).catch(() => {});
-                            } catch (e) {
-                                console.warn(`Failed to send request fulfillment to ${userId}:`, e.message);
-                                const isBlocked = e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"));
-                                if (isBlocked) await db.collection("users").doc(userId).update({ blockedBot: true });
-                                await db.collection("requests").doc(docId).update({ 
-                                    notifiedFulfilled: true,
-                                    notificationStatus: "failed",
-                                    notificationError: e.message,
-                                    isBlockedUser: isBlocked,
+                                    notificationStatus: "skipped_guest",
                                     notifiedAt: admin.firestore.FieldValue.serverTimestamp()
                                 }).catch(() => {});
                             }
@@ -8325,12 +8586,12 @@ async function init() {
                         );
                         await db.collection("users").doc(userId).update({
                             farmingReminded: true
-                        });
+                        }).catch(() => {});
                         console.log(`Farming completion notification sent to user ${userId}`);
                     } catch (notifyErr) {
                         await db.collection("users").doc(userId).update({
                             farmingReminded: true
-                        });
+                        }).catch(() => {});
                         console.warn(`Could not send farming reminder to ${userId}:`, notifyErr.message);
                     }
                 }
@@ -8343,7 +8604,7 @@ async function init() {
 
         // Automated Smart Ongoing Series Tracker (Smart Polling, Hiatus Handling, Admin Alerts & Cleanup)
         const { startSeriesTrackerService } = require("./seriesTracker.js");
-        startSeriesTrackerService(db, adminBot || bot);
+        startSeriesTrackerService(db, { adminBot: adminBot || bot, userBot: bot });
 
         // Graceful shutdown hooks
         
@@ -8405,14 +8666,22 @@ async function init() {
             console.log(`Received ${signal}. Shutting down gracefully...`);
             clearInterval(statusInterval);
             try {
+                localStore.flushToDisk();
+            } catch (_) {}
+            try {
                 await db.collection("settings").doc("bot_status").set({
                     lastPing: admin.firestore.FieldValue.serverTimestamp(),
                     mode: webhookUrl ? "webhook" : "polling",
                     status: "offline"
                 });
             } catch (e) {}
-            bot.stop(signal);
-            if (adminBot) adminBot.stop(signal);
+            try { bot.stop(signal); } catch (_) {}
+            if (adminBot) {
+                try { adminBot.stop(signal); } catch (_) {}
+            }
+            if (server && typeof server.close === "function") {
+                try { server.close(); } catch (_) {}
+            }
             process.exit(0);
         };
 

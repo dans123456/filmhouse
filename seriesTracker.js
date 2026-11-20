@@ -10,6 +10,27 @@ const { SeriesStatus, sanitizeSeriesTrackerData } = require("./seriesSchema.js")
 const TMDB_API_KEY = process.env.TMDB_API_KEY || "d638f7775bfa1b8d456dfd028ccbef19";
 const DEFAULT_ADMIN_IDS = ["1175336733", "1329840839"];
 
+function escapeHtml(str) {
+    if (str === null || str === undefined) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function resolveBots(botInstance) {
+    if (!botInstance) return { adminBot: null, userBot: null };
+    if (botInstance.adminBot || botInstance.userBot) {
+        return {
+            adminBot: botInstance.adminBot || botInstance.userBot || null,
+            userBot: botInstance.userBot || botInstance.adminBot || null
+        };
+    }
+    return { adminBot: botInstance, userBot: botInstance };
+}
+
 /**
  * Resolves list of admin IDs to alert (including dynamic admins stored in Firestore settings).
  */
@@ -22,7 +43,12 @@ async function getAdminRecipientIds(db = null) {
             const adminDoc = await db.collection("settings").doc("admins").get();
             if (adminDoc.exists) {
                 const data = adminDoc.data() || {};
-                const list = Array.isArray(data.admin_ids) ? data.admin_ids : (Array.isArray(data.list) ? data.list : []);
+                const list = [
+                    ...(Array.isArray(data.ids) ? data.ids : []),
+                    ...(Array.isArray(data.masters) ? data.masters : []),
+                    ...(Array.isArray(data.admin_ids) ? data.admin_ids : []),
+                    ...(Array.isArray(data.list) ? data.list : [])
+                ];
                 list.forEach(id => { if (id) ids.add(String(id)); });
                 if (data.master_id) ids.add(String(data.master_id));
             }
@@ -37,25 +63,30 @@ async function getAdminRecipientIds(db = null) {
  * Sends a Telegram alert to all admins.
  */
 async function sendAdminSeriesAlert(botInstance, message, inlineKeyboard = null, db = null) {
-    if (!botInstance) {
+    const { adminBot } = resolveBots(botInstance);
+    if (!adminBot) {
         console.log("[SeriesTracker] (Dry-Run Alert):", message);
-        return;
+        return false;
     }
 
     const adminIds = await getAdminRecipientIds(db);
     const extra = inlineKeyboard ? { reply_markup: { inline_keyboard: inlineKeyboard } } : {};
+    let anySent = false;
 
     for (const adminId of adminIds) {
         try {
-            if (typeof botInstance.telegram?.sendMessage === "function") {
-                await botInstance.telegram.sendMessage(adminId, message, { parse_mode: "HTML", ...extra });
-            } else if (typeof botInstance.sendMessage === "function") {
-                await botInstance.sendMessage(adminId, message, { parse_mode: "HTML", ...extra });
+            if (typeof adminBot.telegram?.sendMessage === "function") {
+                await adminBot.telegram.sendMessage(adminId, message, { parse_mode: "HTML", ...extra });
+                anySent = true;
+            } else if (typeof adminBot.sendMessage === "function") {
+                await adminBot.sendMessage(adminId, message, { parse_mode: "HTML", ...extra });
+                anySent = true;
             }
         } catch (err) {
             console.warn(`[SeriesTracker] Could not alert admin ${adminId}:`, err.message);
         }
     }
+    return anySent;
 }
 
 /**
@@ -103,9 +134,10 @@ async function runSeriesTrackerCycle(db, botInstance = null) {
                 continue;
             }
 
-            const nextAirDate = data.next_air_date ? String(data.next_air_date).split("T")[0] : null;
+            const nextPollSource = data.next_poll_date || data.next_air_date;
+            const nextAirDate = nextPollSource ? String(nextPollSource).split("T")[0] : null;
 
-            // Only poll if next_air_date is due (today or earlier) or missing
+            // Only poll if next_air_date / next_poll_date is due (today or earlier) or missing
             if (nextAirDate && nextAirDate > todayIso) {
                 // Not due yet; protect TMDB rate limits
                 continue;
@@ -131,6 +163,7 @@ async function runSeriesTrackerCycle(db, botInstance = null) {
 
                 let updatedStatus = data.status;
                 let updatedNextAirDate = data.next_air_date;
+                let updatedNextPollDate = null;
                 let updatedTotalEpisodes = data.total_episodes || 0;
 
                 // 2. Fetch Season specific details to know total episodes for this season
@@ -150,15 +183,17 @@ async function runSeriesTrackerCycle(db, botInstance = null) {
                 if (!nextEpisodeToAir) {
                     // No upcoming episode scheduled
                     updatedStatus = SeriesStatus.ON_BREAK;
-                    // Push next check by 7 days to poll only once a week
+                    updatedNextAirDate = null;
+                    // Push next check by 7 days in next_poll_date to poll only once a week without faking next_air_date
                     const futureDate = new Date();
                     futureDate.setDate(futureDate.getDate() + 7);
-                    updatedNextAirDate = futureDate.toISOString().split("T")[0];
+                    updatedNextPollDate = futureDate.toISOString().split("T")[0];
                     stats.hiatusMarked++;
-                    console.log(`[SeriesTracker] "${seriesTitle}" set to 'On Break'. Next check: ${updatedNextAirDate}`);
+                    console.log(`[SeriesTracker] "${seriesTitle}" set to 'On Break'. Next check: ${updatedNextPollDate}`);
                 } else {
                     updatedStatus = SeriesStatus.ONGOING;
                     updatedNextAirDate = nextEpisodeToAir.air_date || null;
+                    updatedNextPollDate = null;
                 }
 
                 // 4. ADMIN NOTIFICATIONS
@@ -169,26 +204,30 @@ async function runSeriesTrackerCycle(db, botInstance = null) {
 
                     // Only alert if this aired episode belongs to the current tracked season and hasn't been uploaded
                     if (airedSeason === currentSeasonNum && airedEpNumber > lastUploaded) {
-                        const lastAlerted = data.last_admin_alert_episode || 0;
+                        const lastAlertedSeason = data.last_admin_alert_season || 0;
+                        const lastAlertedEp = (lastAlertedSeason === airedSeason) ? (data.last_admin_alert_episode || 0) : 0;
 
-                        // Check we haven't already alerted admins for this exact episode
-                        if (airedEpNumber > lastAlerted) {
+                        // Check we haven't already alerted admins for this exact season & episode
+                        if (airedEpNumber > lastAlertedEp) {
                             const alertMsg = 
                                 `🚨 <b>New Episode Aired!</b>\n\n` +
-                                `📺 <b>${seriesTitle}</b>\n` +
+                                `📺 <b>${escapeHtml(seriesTitle)}</b>\n` +
                                 `🎬 <b>Season ${airedSeason}, Episode ${airedEpNumber}</b>\n` +
-                                `📅 Air Date: <code>${lastEpisodeToAir.air_date}</code>\n` +
+                                `📅 Air Date: <code>${escapeHtml(lastEpisodeToAir.air_date)}</code>\n` +
                                 `📦 Upload Status: Episode ${lastUploaded} of ${updatedTotalEpisodes || "?"}\n\n` +
                                 `👉 <i>Please upload the streaming token and download link in Admin Panel.</i>`;
 
-                            await sendAdminSeriesAlert(botInstance, alertMsg, null, db);
-                            stats.alertsSent++;
-                            console.log(`[SeriesTracker] Alerted admins for ${seriesTitle} S${airedSeason}E${airedEpNumber}`);
+                            const sentOk = await sendAdminSeriesAlert(botInstance, alertMsg, null, db);
+                            if (sentOk) {
+                                stats.alertsSent++;
+                                console.log(`[SeriesTracker] Alerted admins for ${seriesTitle} S${airedSeason}E${airedEpNumber}`);
 
-                            // Record that we alerted for this episode
-                            await doc.ref.set({
-                                last_admin_alert_episode: airedEpNumber
-                            }, { merge: true });
+                                // Record that we alerted for this episode
+                                await doc.ref.set({
+                                    last_admin_alert_season: airedSeason,
+                                    last_admin_alert_episode: airedEpNumber
+                                }, { merge: true });
+                            }
                         }
                     }
                 }
@@ -197,6 +236,7 @@ async function runSeriesTrackerCycle(db, botInstance = null) {
                 await doc.ref.set({
                     status: updatedStatus,
                     next_air_date: updatedNextAirDate,
+                    next_poll_date: updatedNextPollDate,
                     total_episodes: updatedTotalEpisodes,
                     last_tracker_sync: new Date().toISOString()
                 }, { merge: true });
@@ -224,7 +264,15 @@ async function runSeriesTrackerCycle(db, botInstance = null) {
 
         for (const doc of completedSnap.docs) {
             const data = doc.data();
-            const lastUpdated = data.last_updated_timestamp ? new Date(data.last_updated_timestamp).getTime() : 0;
+            const rawTs = data.last_updated_timestamp;
+            let lastUpdated = 0;
+            if (rawTs) {
+                if (typeof rawTs.toMillis === "function") lastUpdated = rawTs.toMillis();
+                else if (typeof rawTs.toDate === "function") lastUpdated = rawTs.toDate().getTime();
+                else if (typeof rawTs._seconds === "number") lastUpdated = rawTs._seconds * 1000;
+                else if (typeof rawTs.seconds === "number") lastUpdated = rawTs.seconds * 1000;
+                else lastUpdated = new Date(rawTs).getTime() || 0;
+            }
 
             if (lastUpdated > 0 && (now.getTime() - lastUpdated) > FOURTEEN_DAYS_MS) {
                 // Older than 14 days - reset status to null
@@ -241,47 +289,68 @@ async function runSeriesTrackerCycle(db, botInstance = null) {
     // 3. MOVIE RELEASE REMINDERS DISPATCHER
     // =========================================================================
     try {
+        const { userBot } = resolveBots(botInstance);
         const remindersSnap = await db.collection("release_reminders")
             .where("status", "==", "pending")
-            .limit(50)
             .get();
 
+        let processedDueCount = 0;
         for (const rDoc of remindersSnap.docs) {
+            if (processedDueCount >= 50) break;
             const rData = rDoc.data();
             const relDate = rData.release_date ? String(rData.release_date).split("T")[0] : null;
             
             // Check if release date has arrived (<= today)
             if (relDate && relDate <= todayIso) {
+                processedDueCount++;
                 const userTelegramId = rData.user_id;
                 const movieTitle = rData.movie_title || "Your requested movie";
                 
-                if (botInstance && userTelegramId) {
-                    try {
-                        const alertMsg = 
-                            `🍿 <b>"${movieTitle}" is Officially Released!</b>\n\n` +
-                            `Great news! The movie you asked to be alerted about has officially premiered (${relDate}).\n\n` +
-                            `👉 Open Film House now to stream or download:`;
-                        
-                        const miniAppUrl = "https://t.me/Filmhouse_robot/app";
-                        const keyboard = [[{ text: "🎬 Open Film House", url: miniAppUrl }]];
-                        
-                        if (typeof botInstance.telegram?.sendMessage === "function") {
-                            await botInstance.telegram.sendMessage(userTelegramId, alertMsg, { parse_mode: "HTML", reply_markup: { inline_keyboard: keyboard } });
-                        } else if (typeof botInstance.sendMessage === "function") {
-                            await botInstance.sendMessage(userTelegramId, alertMsg, { parse_mode: "HTML", reply_markup: { inline_keyboard: keyboard } });
-                        }
-                    } catch (sendErr) {
-                        console.warn(`[ReleaseReminder] Could not send reminder to user ${userTelegramId}:`, sendErr.message);
+                if (!userTelegramId) {
+                    await rDoc.ref.set({
+                        status: "failed_invalid_user",
+                        notified_at: new Date().toISOString()
+                    }, { merge: true });
+                    continue;
+                }
+
+                if (!userBot) {
+                    continue;
+                }
+
+                try {
+                    const alertMsg = 
+                        `🍿 <b>"${escapeHtml(movieTitle)}" is Officially Released!</b>\n\n` +
+                        `Great news! The movie you asked to be alerted about has officially premiered (${escapeHtml(relDate)}).\n\n` +
+                        `👉 Open Film House now to stream or download:`;
+                    
+                    const miniAppUrl = "https://t.me/Filmhouseappbot/filmhouseapp";
+                    const keyboard = [[{ text: "🎬 Open Film House", url: miniAppUrl }]];
+                    
+                    if (typeof userBot.telegram?.sendMessage === "function") {
+                        await userBot.telegram.sendMessage(userTelegramId, alertMsg, { parse_mode: "HTML", reply_markup: { inline_keyboard: keyboard } });
+                    } else if (typeof userBot.sendMessage === "function") {
+                        await userBot.sendMessage(userTelegramId, alertMsg, { parse_mode: "HTML", reply_markup: { inline_keyboard: keyboard } });
+                    }
+
+                    // Mark as notified only after successful delivery
+                    await rDoc.ref.set({
+                        status: "notified",
+                        notified_at: new Date().toISOString()
+                    }, { merge: true });
+                    stats.alertsSent++;
+                    console.log(`[ReleaseReminder] Sent release alert for "${movieTitle}" to user ${userTelegramId}`);
+                } catch (sendErr) {
+                    console.warn(`[ReleaseReminder] Could not send reminder to user ${userTelegramId}:`, sendErr.message);
+                    const errMsg = String(sendErr.message || "");
+                    if (errMsg.includes("403") || errMsg.includes("blocked") || errMsg.includes("chat not found") || errMsg.includes("deactivated")) {
+                        await rDoc.ref.set({
+                            status: "failed_blocked",
+                            error: errMsg,
+                            notified_at: new Date().toISOString()
+                        }, { merge: true });
                     }
                 }
-                
-                // Mark as notified
-                await rDoc.ref.set({
-                    status: "notified",
-                    notified_at: new Date().toISOString()
-                }, { merge: true });
-                stats.alertsSent++;
-                console.log(`[ReleaseReminder] Sent release alert for "${movieTitle}" to user ${userTelegramId}`);
             }
         }
     } catch (reminderErr) {

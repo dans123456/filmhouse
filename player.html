@@ -88,8 +88,43 @@
     }
 
     .plyr--video .plyr__controls {
-      z-index: 70 !important;
+      z-index: 45 !important;
+      flex-wrap: wrap !important;
+      align-items: center;
+      row-gap: 2px;
+      padding: 6px 12px 8px !important;
+      background: linear-gradient(180deg, transparent 0%, rgba(6, 8, 14, 0.94) 100%) !important;
       touch-action: manipulation;
+    }
+
+    .plyr__controls .plyr__progress__container {
+      order: -1;
+      flex: 0 0 100% !important;
+      width: 100%;
+      min-width: 100%;
+      margin: 0 0 2px !important;
+      padding: 0 !important;
+    }
+
+    .plyr__controls .plyr__controls__item:first-child,
+    .plyr__controls .plyr__time {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+
+    .plyr__controls-left {
+      gap: 4px !important;
+      white-space: nowrap !important;
+    }
+
+    .plyr__controls .plyr__time + .plyr__time::before {
+      content: "/";
+      margin-right: 4px;
+      opacity: 0.6;
+    }
+
+    body.custom-subs-active .plyr__captions {
+      display: none !important;
     }
 
     .plyr--video:not(.plyr--hide-controls) .plyr__controls {
@@ -361,7 +396,6 @@
       background: transparent !important;
       font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
       position: relative;
-      z-index: 2;
     }
 
     .plyr__video-wrapper {
@@ -730,7 +764,7 @@
     }
 
     .plyr--hide-controls .watch-pass-pill,
-    .plyr--hide-controls ~ .watch-pass-pill,
+    .plyr--hide-controls~.watch-pass-pill,
     .video-viewport.controls-hidden .watch-pass-pill,
     .watch-pass-pill.pass-auto-hidden {
       opacity: 0 !important;
@@ -778,7 +812,8 @@
        Mobile / touch control bar: 2 rows (full-width scrubber on top,
        balanced 3-column buttons row below) + vertical volume popup.
        ===================================================================== */
-    @media (pointer: coarse), (max-width: 600px) {
+    @media (pointer: coarse),
+    (max-width: 600px) {
       :root {
         --plyr-range-thumb-height: 12px;
         --plyr-range-track-height: 3.5px;
@@ -925,7 +960,8 @@
       }
 
       .plyr__controls [data-plyr="captions"] {
-        display: inline-flex !important; /* Always show CC button */
+        display: inline-flex !important;
+        /* Always show CC button */
       }
 
       .plyr__controls [data-plyr="mute"] svg,
@@ -1174,6 +1210,7 @@
   <script type='text/javascript'>
 
     document.addEventListener("DOMContentLoaded", function () {
+      let unauthorizedEmbed = false;
       try {
         if (window.self !== window.top) {
           document.documentElement.classList.add('in-iframe');
@@ -1183,11 +1220,31 @@
           const isAllowed = allowedEmbeds.some(o => ref.includes(o)) || !ref;
           if (!isAllowed) {
             document.body.innerHTML = "<div style='color:#ef4444;text-align:center;padding:50px 20px;font-family:sans-serif;'><h2>⛔ Access Denied</h2><p style='color:#94a3b8;'>Unauthorized embedding detected. Watch exclusively inside <b>@Filmhouseappbot</b>.</p></div>";
-            throw new Error("Unauthorized embed origin.");
+            unauthorizedEmbed = true;
           }
         }
       } catch (e) {
         document.documentElement.classList.add('in-iframe');
+      }
+      if (unauthorizedEmbed) return;
+
+      function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, c => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[c]));
+      }
+
+      function safeDecodeParam(v) {
+        if (!v) return '';
+        try {
+          return decodeURIComponent(v);
+        } catch (_) {
+          return String(v);
+        }
       }
 
       const urlParams = new URLSearchParams(window.location.search);
@@ -1222,10 +1279,13 @@
             hls.on(Hls.Events.ERROR, function (evt, data) {
               if (data.fatal) {
                 console.warn("HLS streaming error, falling back to direct video.src:", data);
+                try { hls.destroy(); } catch (_) { }
+                if (window._currentHls === hls) window._currentHls = null;
                 videoEl.src = finalStreamUrl;
               }
             });
           } catch (hErr) {
+            window._currentHls = null;
             videoEl.src = finalStreamUrl;
           }
         } else {
@@ -1251,7 +1311,7 @@
       const defaultBackdropGradient = "linear-gradient(135deg, #0d121f 0%, #06080e 100%)";
       if (backdropParam && videoEl) {
         try {
-          const cleanBackdrop = decodeURIComponent(backdropParam).trim();
+          const cleanBackdrop = safeDecodeParam(backdropParam).trim();
           if (cleanBackdrop) {
             videoEl.setAttribute("poster", cleanBackdrop);
             const vp = document.getElementById("viewport");
@@ -1307,7 +1367,8 @@
             speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
             seekTime: 10,
             tooltips: { controls: true, seek: true },
-            keyboard: { focused: true, global: true }
+            keyboard: { focused: true, global: true },
+            fullscreen: { enabled: true, fallback: true, iosNative: false, container: '#viewport' }
           });
           window.plyrInstance = plyrInstance;
           plyrInstance.on('ready', arrangePlyrControls);
@@ -1331,14 +1392,14 @@
           const controls = document.querySelector('.plyr__controls');
           if (!controls || controls.querySelector('.plyr__controls-row')) return;
 
-          const time = controls.querySelector('.plyr__time');
+          const times = controls.querySelectorAll('.plyr__time');
           const rewind = controls.querySelector('[data-plyr="rewind"]');
           const play = controls.querySelector('[data-plyr="play"]');
           const ff = controls.querySelector('[data-plyr="fast-forward"]');
           const mute = controls.querySelector('[data-plyr="mute"]');
           const vol = controls.querySelector('.plyr__volume');
           const cc = controls.querySelector('[data-plyr="captions"]');
-          const settings = controls.querySelector('[data-plyr="settings"]');
+          const menu = controls.querySelector('.plyr__menu') || controls.querySelector('[data-plyr="settings"]');
           const fs = controls.querySelector('[data-plyr="fullscreen"]');
 
           const row = document.createElement('div');
@@ -1346,7 +1407,7 @@
 
           const left = document.createElement('div');
           left.className = 'plyr__controls-left';
-          if (time) left.appendChild(time);
+          times.forEach(t => left.appendChild(t));
 
           const center = document.createElement('div');
           center.className = 'plyr__controls-center';
@@ -1359,7 +1420,7 @@
           if (mute) right.appendChild(mute);
           if (vol) right.appendChild(vol);
           if (cc) right.appendChild(cc);
-          if (settings) right.appendChild(settings);
+          if (menu) right.appendChild(menu);
           if (fs) right.appendChild(fs);
 
           row.appendChild(left);
@@ -1367,6 +1428,15 @@
           row.appendChild(right);
 
           controls.appendChild(row);
+          row.style.order = '2';
+
+          // Move any stray items (e.g. dynamically inserted time/controls) into the row so nothing floats above
+          Array.from(controls.children).forEach(ch => {
+            if (ch !== row && !ch.classList.contains('plyr__progress__container')) {
+              if (ch.classList.contains('plyr__time')) left.appendChild(ch);
+              else right.appendChild(ch);
+            }
+          });
         } catch (e) {
           console.warn("arrangePlyrControls notice:", e);
         }
@@ -1452,7 +1522,7 @@
         if (!vttOrSrtText) return [];
         const cues = [];
         const clean = String(vttOrSrtText).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        const timeRegex = /(?:(\d{1,2}):)?(\d{2}):(\d{2})[,.](\d{3})\s*-->\s* (?: (\d{ 1, 2 }):)?(\d{ 2 }): (\d{ 2 })[,.](\d{ 3}) /;
+        const timeRegex = /(?:(\d{1,2}):)?(\d{2}):(\d{2})[,.](\d{3})\s*-->\s*(?:(\d{1,2}):)?(\d{2}):(\d{2})[,.](\d{3})/;
     const blocks = clean.split(/\n\s*\n/);
     for (const block of blocks) {
       const lines = block.trim().split('\n');
@@ -1536,7 +1606,7 @@
           const blob = new Blob([vttText], { type: 'text/vtt' });
           vttBlobUrl = URL.createObjectURL(blob);
         } else {
-          const cleanUrl = decodeURIComponent(subUrlOrContent).trim();
+          const cleanUrl = safeDecodeParam(subUrlOrContent).trim();
           try {
             const directRes = await fetch(cleanUrl);
             if (directRes && directRes.ok) {
@@ -1576,10 +1646,13 @@
           }
         }
 
-        if (srtTextContent) {
-          activeCues = parseVttCues(srtTextContent);
-          window._subtitlesDisabled = false;
-          window._subtitlesExplicitlyActive = true;
+        activeCues = srtTextContent ? parseVttCues(srtTextContent) : [];
+        window._subtitlesDisabled = false;
+        window._subtitlesExplicitlyActive = true;
+        if (activeCues.length > 0) {
+          document.body.classList.add('custom-subs-active');
+        } else {
+          document.body.classList.remove('custom-subs-active');
         }
 
         const existing = videoEl.querySelectorAll('track.dynamic-sub');
@@ -1592,6 +1665,9 @@
         track.srclang = 'en';
         track.src = vttBlobUrl;
         track.default = true;
+        track.addEventListener('load', () => {
+          applyOffsetToTextTracks();
+        });
         videoEl.appendChild(track);
 
         setTimeout(() => {
@@ -1608,6 +1684,7 @@
               window.plyrInstance.toggleCaptions(true);
             } catch (_) { }
           }
+          updateSubtitleDisplay();
         }, 150);
 
         const activeLabel = document.getElementById('activeSubLabel');
@@ -1633,7 +1710,7 @@
 
       let imdbId = urlParams.get('imdb') || '';
       const tmdbId = urlParams.get('tmdb') || '';
-      const rawTitle = titleParam ? decodeURIComponent(titleParam).trim() : '';
+      const rawTitle = titleParam ? safeDecodeParam(titleParam).trim() : '';
       const isSeriesMode = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
 
       if (!imdbId && (tmdbId || rawTitle)) {
@@ -1670,7 +1747,7 @@
       if (!imdbId) {
         subListContainer.innerHTML = `
             <div style="text-align:center;padding:24px 10px;color:#94a3b8;font-size:12px;">
-              <p style="margin:0 0 8px 0;font-weight:700;color:#fff;">ℹ️ No IMDb ID found for "${escapeHtml ? escapeHtml(rawTitle) : rawTitle}".</p>
+              <p style="margin:0 0 8px 0;font-weight:700;color:#fff;">ℹ️ No IMDb ID found for "${escapeHtml(rawTitle)}".</p>
               <p style="margin:0;">You can upload your own <b>.srt</b> or <b>.vtt</b> file below.</p>
             </div>
           `;
@@ -1767,7 +1844,7 @@
       if (filtered.length === 0) {
         subListContainer.innerHTML = `
             <div style="text-align:center;padding:24px 10px;color:#94a3b8;font-size:12px;">
-              No subtitles found matching "${searchVal || activeSubLangFilter}".
+              No subtitles found matching "${escapeHtml(searchVal || activeSubLangFilter)}".
             </div>
           `;
         return;
@@ -1782,9 +1859,9 @@
               <div style="display:flex;align-items:center;gap:10px;overflow:hidden;flex:1;">
                 <span style="font-size:18px;">${meta.flag}</span>
                 <div style="overflow:hidden;">
-                  <div style="font-size:12px;font-weight:700;color:#fff;">${meta.name}</div>
+                  <div style="font-size:12px;font-weight:700;color:#fff;">${escapeHtml(meta.name)}</div>
                   <div style="font-size:10.5px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px;">
-                    ${releaseText}
+                    ${escapeHtml(releaseText)}
                   </div>
                 </div>
               </div>
@@ -1834,7 +1911,7 @@
       // In fullscreen the parent app's hub is hidden behind this iframe, so open the in-player panel instead
       if (!isPlayerFullscreenActive() && window.parent && window.parent !== window) {
         try {
-          window.parent.postMessage({ action: 'openSubtitlesHub' }, '*');
+          window.parent.postMessage({ action: 'openSubtitlesHub', tab: 'subs' }, '*');
           return;
         } catch (e) { }
       }
@@ -1893,18 +1970,38 @@
 
     if (btnDisableSubs) {
       btnDisableSubs.onclick = () => {
+        activeCues = [];
         window._subtitlesDisabled = true;
+        window._subtitlesExplicitlyActive = false;
+        document.body.classList.remove('custom-subs-active');
         const customSubEl = document.getElementById('customSubtitleText');
-        if (customSubEl) customSubEl.style.display = 'none';
+        if (customSubEl) {
+          customSubEl.textContent = '';
+          customSubEl.style.display = 'none';
+        }
         if (videoEl && videoEl.textTracks) {
           for (let i = 0; i < videoEl.textTracks.length; i++) {
             videoEl.textTracks[i].mode = 'disabled';
           }
         }
-        const dynamicSubs = videoEl.querySelectorAll('track.dynamic-sub');
-        dynamicSubs.forEach(t => t.remove());
+        if (videoEl) {
+          const dynamicSubs = videoEl.querySelectorAll('track.dynamic-sub');
+          dynamicSubs.forEach(t => t.remove());
+        }
+        if (window.plyrInstance) {
+          try { window.plyrInstance.toggleCaptions(false); } catch (_) { }
+        }
         const activeLabel = document.getElementById('activeSubLabel');
         if (activeLabel) activeLabel.textContent = 'Subtitles';
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+              action: 'subtitleStateChanged',
+              enabled: false,
+              label: 'Off'
+            }, '*');
+          }
+        } catch (_) { }
         showSubToast('Subtitles Disabled', 'ℹ️');
         if (modalSubs) modalSubs.style.display = 'none';
       };
@@ -2102,6 +2199,7 @@
       if (expiresAt > Date.now()) {
         realTimeRemaining = Math.floor((expiresAt - Date.now()) / 1000);
       } else if (expiresAt > 0) {
+        localStorage.setItem('fh_had_pass', '1');
         localStorage.removeItem('filmhouse_watch_pass_until');
       }
 
@@ -2129,9 +2227,10 @@
 
       if (!pill || !timerText) return;
 
+      const rawExpiresBefore = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10);
       const state = getActivePassState();
       const adsWatched4h = parseInt(localStorage.getItem('fh_ads_4h') || '0', 10);
-      const hadPass = parseInt(localStorage.getItem('filmhouse_watch_pass_until') || '0', 10) > 0;
+      const hadPass = rawExpiresBefore > 0 || localStorage.getItem('fh_had_pass') === '1';
 
       if (hudTitle) {
         hudTitle.textContent = hadPass ? 'Pass Expired • 90m' : '90-Minute Cinema Pass';
@@ -2224,6 +2323,7 @@
         newExpires = currentExpires + NINETY_MINS_MS;
       }
       localStorage.setItem('filmhouse_watch_pass_until', String(newExpires));
+      localStorage.setItem('fh_had_pass', '1');
       localStorage.setItem('fh_ads_4h', '0');
       updatePassUI();
 
@@ -2251,16 +2351,41 @@
           );
         };
 
+        // Refresh stalled socket if user was away in sponsor browser tab
+        try {
+          if (videoEl.readyState === 0) {
+            if (window._currentHls) window._currentHls.startLoad();
+            else videoEl.load();
+          }
+        } catch (_) { }
+
+        if (_connectTimeoutTimer) clearTimeout(_connectTimeoutTimer);
+        _connectTimeoutTimer = setTimeout(function () {
+          if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
+            if (errorCard) {
+              errorCard.style.display = 'flex';
+              errorCard.innerHTML = `
+                  <span>⚡ Server 1 connection is slow...</span>
+                  <button type="button" onclick="window.retryStreamPlayback()" style="background:#ffd700;color:#000;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Retry</button>
+                  <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Server 2 (VIP)</button>
+                `;
+            }
+            restoreInteractivePlayOverlay(
+              '▶ Tap to Retry Stream',
+              '⚡ Slow response from Server 1 • Tap here or switch to Server 2 below'
+            );
+          }
+        }, 5500);
+
         try {
           const p = videoEl.play();
           if (p !== undefined) {
             p.then(() => {
-              // Started playing; if still at 0 after 2.5s and paused, restore button
               setTimeout(() => {
-                if (videoEl.paused) onAutoplayBlocked();
-              }, 2500);
+                if (videoEl.paused || videoEl.currentTime < 0.05) onAutoplayBlocked();
+              }, 1400);
             }).catch(() => {
-              // iOS blocked non-gesture autoplay after returning from Safari: show instant 1-tap play button!
+              // Mobile WebView blocked non-gesture autoplay after returning from sponsor tab
               onAutoplayBlocked();
             });
           }
@@ -2268,13 +2393,13 @@
           onAutoplayBlocked();
         }
 
-        // Safety check for iOS: if not playing within 1.6s when triggered without a direct tap, prompt user to tap Play
+        // Fast fallback for mobile WebViews: if frames haven't started advancing within 1.2s without a direct tap, prompt instant 1-tap Play
         if (!fromUserGesture) {
           setTimeout(() => {
-            if (videoEl && videoEl.paused && !document.body.classList.contains('stream-started')) {
+            if (videoEl && (videoEl.paused || videoEl.currentTime < 0.05) && !document.body.classList.contains('stream-started')) {
               onAutoplayBlocked();
             }
-          }, 1600);
+          }, 1200);
         }
       }
     }
@@ -2395,28 +2520,34 @@
         showPassAlert("👉 On iPhone: Tap \"Open\" in Telegram to count your ad!");
       }
 
-      document.addEventListener('visibilitychange', onPlayerVisibilityChange);
-      window.addEventListener('focus', onPlayerFocusReturn);
-      window.addEventListener('pageshow', onPlayerFocusReturn);
-      window.addEventListener('blur', function () { if (_playerAdPending) _playerAdLeftApp = true; }, { once: true });
-
-      // 1. Notify parent window to open Monetag SmartLink via Telegram WebApp SDK
-      if (window.parent && window.parent !== window) {
+      // Pre-buffer opening frames while user visits sponsor page
+      if (videoEl) {
         try {
-          window.parent.postMessage({ action: "openLink", url: MONETAG_SMARTLINK }, "*");
+          videoEl.preload = 'auto';
+          attachStreamSource();
         } catch (_) { }
       }
 
-      // 2. Open via Telegram WebApp if directly available, or via window.open
-      const tg = getActiveTelegramWebApp();
-      if (tg && typeof tg.openLink === 'function') {
+      document.addEventListener('visibilitychange', onPlayerVisibilityChange);
+      window.addEventListener('focus', onPlayerFocusReturn);
+      window.addEventListener('pageshow', onPlayerFocusReturn);
+
+      // 1. If inside Telegram WebApp, notify parent window to open Monetag SmartLink via Telegram SDK
+      const activeTg = getActiveTelegramWebApp();
+      if (activeTg && window.parent && window.parent !== window) {
         if (e && typeof e.preventDefault === 'function') e.preventDefault();
         try {
-          tg.openLink(MONETAG_SMARTLINK);
+          window.parent.postMessage({ action: "openLink", url: MONETAG_SMARTLINK }, "*");
+        } catch (_) { }
+      } else if (activeTg && typeof activeTg.openLink === 'function') {
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        try {
+          activeTg.openLink(MONETAG_SMARTLINK);
         } catch (_) {
           window.open(MONETAG_SMARTLINK, '_blank');
         }
       } else {
+        // 2. Normal browser: let <a href="..." target="_blank"> open synchronously so popup blockers never block it
         if (!e || !e.target || !e.target.closest || !e.target.closest('a')) {
           try {
             const w = window.open(MONETAG_SMARTLINK, '_blank');
@@ -2429,7 +2560,7 @@
         }
       }
 
-      // Poll for focus/visibility return (ensures iPhone SFSafariViewController close is detected even without iframe focus event)
+      // Poll for visibility return (only mark left app when document.hidden or parent relayed hidden; never fake-count from iframe focus quirk)
       if (_playerAdPollTimer) clearInterval(_playerAdPollTimer);
       _playerAdPollTimer = setInterval(function () {
         if (!_playerAdPending) {
@@ -2437,7 +2568,7 @@
           _playerAdPollTimer = null;
           return;
         }
-        if (document.hidden || !document.hasFocus()) {
+        if (document.hidden) {
           _playerAdLeftApp = true;
         } else if (_playerAdLeftApp && (Date.now() - _playerAdStartTime >= 3500)) {
           verifyAndCompletePlayerAd(false);
@@ -2557,6 +2688,12 @@
 
         if (passState.hasAccess) {
           attachStreamSource();
+          try {
+            if (videoEl && videoEl.readyState === 0) {
+              if (window._currentHls) window._currentHls.startLoad();
+              else videoEl.load();
+            }
+          } catch (_) { }
 
           // Keep pointerEvents = 'auto' until frames actually render so iOS never opens a black 00:00 native player!
           playOverlay.style.pointerEvents = 'auto';
@@ -2888,7 +3025,6 @@
         lastTapZone = zone;
         clearTimeout(tapTimeout);
         tapTimeout = setTimeout(() => {
-          // Single tap anywhere on screen toggles media controls
           toggleControlsVisibility();
           lastTapTime = 0;
           lastTapZone = null;
@@ -2896,656 +3032,727 @@
       }
     }
 
-    const leftZone = document.getElementById('tapLeftZone');
-    const centerZone = document.getElementById('tapCenterZone');
-    const rightZone = document.getElementById('tapRightZone');
+        const leftZone = document.getElementById('tapLeftZone');
+        const centerZone = document.getElementById('tapCenterZone');
+        const rightZone = document.getElementById('tapRightZone');
 
-    if (leftZone) leftZone.addEventListener('click', (e) => handleZoneTap('left', e));
-    if (centerZone) centerZone.addEventListener('click', (e) => handleZoneTap('center', e));
-    if (rightZone) rightZone.addEventListener('click', (e) => handleZoneTap('right', e));
+        if (leftZone) leftZone.addEventListener('click', (e) => handleZoneTap('left', e));
+        if (centerZone) centerZone.addEventListener('click', (e) => handleZoneTap('center', e));
+        if (rightZone) rightZone.addEventListener('click', (e) => handleZoneTap('right', e));
 
-    // PC Keyboard Shortcuts
-    window.addEventListener('keydown', function (e) {
-      const tag = (document.activeElement?.tagName || '').toLowerCase();
-      if (tag === 'input' || tag === 'textarea') return;
-      if (e.code === 'Space' || e.key === ' ' || e.key === 'k' || e.key === 'K') {
-        e.preventDefault();
-        togglePlayState();
-      } else if (e.key === 'ArrowLeft' || e.key === 'j' || e.key === 'J') {
-        e.preventDefault();
-        seekDelta(-10);
-        showRippleIndicator('left');
-      } else if (e.key === 'ArrowRight' || e.key === 'l' || e.key === 'L') {
-        e.preventDefault();
-        seekDelta(10);
-        showRippleIndicator('right');
-      } else if (e.key === 'f' || e.key === 'F') {
-        e.preventDefault();
-        toggleFullscreenState();
-      } else if (e.key === 'm' || e.key === 'M') {
-        e.preventDefault();
-        toggleMuteState();
-      }
-    });
-
-    // Orientation lock when Plyr triggers fullscreen
-    if (window.plyrInstance) {
-      window.plyrInstance.on('enterfullscreen', () => {
-        lockToLandscape();
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ action: 'playerEnteredFullscreen' }, '*');
+        // PC Keyboard Shortcuts
+        window.addEventListener('keydown', function (e) {
+          const tag = (document.activeElement?.tagName || '').toLowerCase();
+          if (tag === 'input' || tag === 'textarea') return;
+          if (e.code === 'Space' || e.key === ' ' || e.key === 'k' || e.key === 'K') {
+            e.preventDefault();
+            togglePlayState();
+          } else if (e.key === 'ArrowLeft' || e.key === 'j' || e.key === 'J') {
+            e.preventDefault();
+            seekDelta(-10);
+            showRippleIndicator('left');
+          } else if (e.key === 'ArrowRight' || e.key === 'l' || e.key === 'L') {
+            e.preventDefault();
+            seekDelta(10);
+            showRippleIndicator('right');
+          } else if (e.key === 'f' || e.key === 'F') {
+            e.preventDefault();
+            toggleFullscreenState();
+          } else if (e.key === 'm' || e.key === 'M') {
+            e.preventDefault();
+            toggleMuteState();
           }
-        } catch (_) { }
-      });
-      window.plyrInstance.on('exitfullscreen', () => {
-        unlockFromLandscape();
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ action: 'playerExitedFullscreen' }, '*');
-          }
-        } catch (_) { }
-      });
-    }
-
-    document.addEventListener('fullscreenchange', () => {
-      if (document.fullscreenElement) {
-        lockToLandscape();
-      } else {
-        unlockFromLandscape();
-      }
-    });
-    document.addEventListener('webkitfullscreenchange', () => {
-      if (document.webkitFullscreenElement) {
-        lockToLandscape();
-      } else {
-        unlockFromLandscape();
-      }
-    });
-
-    window.addEventListener('message', function (ev) {
-      if (!ev.data) return;
-      if (ev.data.action === 'switchServer' || ev.data.action === 'loadNewStream') {
-        const newStreamUrl = ev.data.url;
-        if (newStreamUrl) {
-          finalStreamUrl = newStreamUrl;
-          if (downloadBtn) downloadBtn.href = finalStreamUrl;
-          if (window._currentHls) {
-            window._currentHls.destroy();
-            window._currentHls = null;
-          }
-          if (videoEl) {
-            videoEl.removeAttribute('src');
-            videoEl.load();
-          }
-          if (playOverlay) {
-            playOverlay.style.display = 'flex';
-            playOverlay.style.opacity = '1';
-            playOverlay.classList.add('connecting');
-            const pt = document.getElementById('streamPlayTitle');
-            if (pt) pt.textContent = '⚡ Connecting Server 2...';
-            const ps = document.getElementById('streamPlaySub');
-            if (ps) ps.textContent = 'Buffering High-Speed Stream • Film House VIP';
-          }
-          attachStreamSource();
-          if (videoEl) videoEl.play().catch(() => { });
-        }
-      } else if (ev.data.action === 'enterFullscreen') {
-        lockToLandscape();
-        if (window.plyrInstance && window.plyrInstance.fullscreen) {
-          window.plyrInstance.fullscreen.enter();
-        } else if (videoEl && videoEl.requestFullscreen) {
-          videoEl.requestFullscreen().catch(() => { });
-        }
-      } else if (ev.data.action === 'exitFullscreen') {
-        unlockFromLandscape();
-        if (window.plyrInstance && window.plyrInstance.fullscreen) {
-          window.plyrInstance.fullscreen.exit();
-        } else if (document.exitFullscreen) {
-          document.exitFullscreen().catch(() => { });
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        }
-      } else if (ev.data.action === 'togglePlay') {
-        togglePlayState();
-      } else if (ev.data.action === 'seek') {
-        seekDelta(parseFloat(ev.data.seconds || 0));
-      } else if (ev.data.action === 'toggleFullscreen') {
-        toggleFullscreenState();
-      } else if (ev.data.action === 'toggleMute') {
-        toggleMuteState();
-      } else if (ev.data.action === 'loadSubtitle') {
-        if (ev.data.text) {
-          attachSubtitleTrack(ev.data.text, ev.data.lang || 'Captions', true);
-        } else if (ev.data.url) {
-          attachSubtitleTrack(ev.data.url, ev.data.lang || 'Captions', false);
-        }
-        detectAndBroadcastTracks();
-      } else if (ev.data.action === 'toggleSubtitles') {
-        const enable = !!ev.data.enable;
-        window._subtitlesExplicitlyActive = enable;
-        let activeLabel = '';
-        if (videoEl.textTracks && videoEl.textTracks.length > 0) {
-          for (let i = 0; i < videoEl.textTracks.length; i++) {
-            if (enable && i === 0) {
-              videoEl.textTracks[i].mode = 'showing';
-              activeLabel = videoEl.textTracks[i].label || videoEl.textTracks[i].language || 'ON';
-            } else {
-              videoEl.textTracks[i].mode = 'disabled';
-            }
-          }
-        }
-        const tracks = videoEl.querySelectorAll('track');
-        tracks.forEach((t, i) => {
-          t.mode = (enable && i === 0) ? 'showing' : 'disabled';
         });
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage({
-              action: 'subtitleStateChanged',
-              enabled: enable,
-              label: activeLabel || (enable ? 'On' : 'Off')
-            }, '*');
+
+        // Orientation lock when Plyr triggers fullscreen
+        if (window.plyrInstance) {
+          window.plyrInstance.on('enterfullscreen', () => {
+            lockToLandscape();
+            try {
+              if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ action: 'playerEnteredFullscreen' }, '*');
+              }
+            } catch (_) { }
+          });
+          window.plyrInstance.on('exitfullscreen', () => {
+            unlockFromLandscape();
+            try {
+              if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ action: 'playerExitedFullscreen' }, '*');
+              }
+            } catch (_) { }
+          });
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+          if (document.fullscreenElement) {
+            lockToLandscape();
+          } else {
+            unlockFromLandscape();
           }
-        } catch (_) { }
-      } else if (ev.data.action === 'selectSubtitleTrack') {
-        const targetIndex = ev.data.index; // -1 to turn off
-        const isEnabled = (targetIndex !== -1);
-        window._subtitlesExplicitlyActive = isEnabled;
-        let activeLabel = '';
-        if (videoEl.textTracks) {
-          for (let i = 0; i < videoEl.textTracks.length; i++) {
-            if (i === targetIndex) {
-              videoEl.textTracks[i].mode = 'showing';
-              activeLabel = videoEl.textTracks[i].label || videoEl.textTracks[i].language || 'ON';
+        });
+        document.addEventListener('webkitfullscreenchange', () => {
+          if (document.webkitFullscreenElement) {
+            lockToLandscape();
+          } else {
+            unlockFromLandscape();
+          }
+        });
+
+        window.addEventListener('message', function (ev) {
+          if (!ev.data) return;
+          if (ev.data.action === 'switchServer' || ev.data.action === 'loadNewStream') {
+            const newStreamUrl = ev.data.url;
+            if (newStreamUrl) {
+              finalStreamUrl = newStreamUrl;
+              if (downloadBtn) downloadBtn.href = finalStreamUrl;
+              if (window._currentHls) {
+                window._currentHls.destroy();
+                window._currentHls = null;
+              }
+              if (videoEl) {
+                videoEl.removeAttribute('src');
+                videoEl.load();
+              }
+              if (playOverlay) {
+                playOverlay.style.display = 'flex';
+                playOverlay.style.opacity = '1';
+                playOverlay.classList.add('connecting');
+                const pt = document.getElementById('streamPlayTitle');
+                if (pt) pt.textContent = '⚡ Connecting Server 2...';
+                const ps = document.getElementById('streamPlaySub');
+                if (ps) ps.textContent = 'Buffering High-Speed Stream • Film House VIP';
+              }
+              attachStreamSource();
+              if (videoEl) videoEl.play().catch(() => { });
+            }
+          } else if (ev.data.action === 'enterFullscreen') {
+            lockToLandscape();
+            if (window.plyrInstance && window.plyrInstance.fullscreen) {
+              window.plyrInstance.fullscreen.enter();
+            } else if (videoEl && videoEl.requestFullscreen) {
+              videoEl.requestFullscreen().catch(() => { });
+            }
+          } else if (ev.data.action === 'exitFullscreen') {
+            unlockFromLandscape();
+            if (window.plyrInstance && window.plyrInstance.fullscreen) {
+              window.plyrInstance.fullscreen.exit();
+            } else if (document.exitFullscreen) {
+              document.exitFullscreen().catch(() => { });
+            } else if (document.webkitExitFullscreen) {
+              document.webkitExitFullscreen();
+            }
+          } else if (ev.data.action === 'togglePlay') {
+            togglePlayState();
+          } else if (ev.data.action === 'seek') {
+            seekDelta(parseFloat(ev.data.seconds || 0));
+          } else if (ev.data.action === 'toggleFullscreen') {
+            toggleFullscreenState();
+          } else if (ev.data.action === 'toggleMute') {
+            toggleMuteState();
+          } else if (ev.data.action === 'loadSubtitle') {
+            const subPromise = ev.data.text
+              ? attachSubtitleTrack(ev.data.text, ev.data.lang || 'Captions', true)
+              : (ev.data.url ? attachSubtitleTrack(ev.data.url, ev.data.lang || 'Captions', false) : Promise.resolve());
+            Promise.resolve(subPromise).then(() => {
+              detectAndBroadcastTracks();
+            });
+          } else if (ev.data.action === 'toggleSubtitles') {
+            const enable = !!ev.data.enable;
+            window._subtitlesExplicitlyActive = enable;
+            window._subtitlesDisabled = !enable;
+            if (enable && activeCues && activeCues.length > 0) {
+              document.body.classList.add('custom-subs-active');
+              updateSubtitleDisplay();
             } else {
-              videoEl.textTracks[i].mode = 'disabled';
+              document.body.classList.remove('custom-subs-active');
+              const customSubEl = document.getElementById('customSubtitleText');
+              if (customSubEl) customSubEl.style.display = 'none';
+            }
+            let activeLabel = '';
+            if (videoEl.textTracks && videoEl.textTracks.length > 0) {
+              for (let i = 0; i < videoEl.textTracks.length; i++) {
+                if (enable && i === 0) {
+                  videoEl.textTracks[i].mode = 'showing';
+                  activeLabel = videoEl.textTracks[i].label || videoEl.textTracks[i].language || 'ON';
+                } else {
+                  videoEl.textTracks[i].mode = 'disabled';
+                }
+              }
+            }
+            const tracks = videoEl.querySelectorAll('track');
+            tracks.forEach((t, i) => {
+              if (t.track) t.track.mode = (enable && i === 0) ? 'showing' : 'disabled';
+            });
+            if (window.plyrInstance) {
+              try { window.plyrInstance.toggleCaptions(enable); } catch (_) { }
+            }
+            try {
+              if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                  action: 'subtitleStateChanged',
+                  enabled: enable,
+                  label: activeLabel || (enable ? 'On' : 'Off')
+                }, '*');
+              }
+            } catch (_) { }
+          } else if (ev.data.action === 'selectSubtitleTrack') {
+            const targetIndex = parseInt(ev.data.index, 10); // -1 to turn off
+            const isEnabled = (targetIndex !== -1 && !isNaN(targetIndex));
+            window._subtitlesExplicitlyActive = isEnabled;
+            window._subtitlesDisabled = !isEnabled;
+            let activeLabel = '';
+            if (videoEl.textTracks) {
+              for (let i = 0; i < videoEl.textTracks.length; i++) {
+                if (isEnabled && i === targetIndex) {
+                  videoEl.textTracks[i].mode = 'showing';
+                  activeLabel = videoEl.textTracks[i].label || videoEl.textTracks[i].language || 'ON';
+                } else {
+                  videoEl.textTracks[i].mode = 'disabled';
+                }
+              }
+            }
+            const selectedNativeTrack = isEnabled && videoEl.textTracks ? videoEl.textTracks[targetIndex] : null;
+            const isDynamicTrack = selectedNativeTrack && activeCues && activeCues.length > 0 && targetIndex === videoEl.textTracks.length - 1;
+            if (isDynamicTrack) {
+              document.body.classList.add('custom-subs-active');
+              updateSubtitleDisplay();
+            } else {
+              document.body.classList.remove('custom-subs-active');
+              const customSubEl = document.getElementById('customSubtitleText');
+              if (customSubEl) customSubEl.style.display = 'none';
+            }
+            if (!isEnabled) {
+              const tracks = videoEl.querySelectorAll('track');
+              tracks.forEach(t => { if (t.track) t.track.mode = 'disabled'; });
+            }
+            if (window.plyrInstance) {
+              try { window.plyrInstance.toggleCaptions(isEnabled); } catch (_) { }
+            }
+            try {
+              if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                  action: 'subtitleStateChanged',
+                  enabled: isEnabled,
+                  label: activeLabel || (isEnabled ? 'On' : 'Off')
+                }, '*');
+              }
+            } catch (_) { }
+          } else if (ev.data.action === 'selectAudioTrack') {
+            const targetIndex = parseInt(ev.data.index, 10);
+            window._selectedAudioTrackIndex = targetIndex;
+            let switchedClientSide = false;
+            if (window._currentHls && typeof window._currentHls.audioTrack !== 'undefined') {
+              window._currentHls.audioTrack = targetIndex;
+              if (window._currentHls.audioTracks && window._currentHls.audioTracks.length > 1) {
+                switchedClientSide = true;
+              }
+            }
+            if (!switchedClientSide && videoEl && videoEl.audioTracks && videoEl.audioTracks.length > 1) {
+              for (let i = 0; i < videoEl.audioTracks.length; i++) {
+                videoEl.audioTracks[i].enabled = (i === targetIndex);
+              }
+              switchedClientSide = true;
+            }
+            // Reload with ?audio=N when switching server-side audio (including back to Track 0)
+            if (!switchedClientSide && targetIndex >= 0 && !isNaN(targetIndex) && ev.data.reloadWithTrack) {
+              try {
+                const curTime = (videoEl && videoEl.currentTime > 0) ? Math.floor(videoEl.currentTime) : 0;
+                const wasPlaying = (videoEl && !videoEl.paused);
+                let newUrl = finalStreamUrl || (videoEl ? videoEl.src : '');
+                if (newUrl) {
+                  const uObj = new URL(newUrl, window.location.href);
+                  const prevAudio = uObj.searchParams.get('audio');
+                  if (prevAudio === String(targetIndex) || (!prevAudio && targetIndex === 0)) {
+                    detectAndBroadcastTracks();
+                    return;
+                  }
+                  uObj.searchParams.delete('ss');
+                  uObj.searchParams.delete('t');
+                  uObj.searchParams.set('audio', String(targetIndex));
+                  newUrl = uObj.toString();
+                  finalStreamUrl = newUrl;
+
+                  if (loaderEl) {
+                    loaderEl.style.display = 'flex';
+                    loaderEl.style.opacity = '1';
+                    const lt = loaderEl.querySelector('.loader-text');
+                    if (lt) lt.textContent = '🔊 Switching Audio Track...';
+                  }
+
+                  if (window._currentHls) {
+                    try { window._currentHls.destroy(); } catch (_) { }
+                    window._currentHls = null;
+                  }
+                  videoEl.removeAttribute('src');
+                  attachStreamSource();
+
+                  let resumeApplied = false;
+                  const resumeHandler = function () {
+                    if (resumeApplied) return;
+                    resumeApplied = true;
+                    try {
+                      if (curTime > 0) {
+                        videoEl.currentTime = curTime;
+                      }
+                      if (wasPlaying) {
+                        videoEl.play().catch(() => { });
+                      }
+                    } catch (_) { }
+                  };
+                  videoEl.addEventListener('loadedmetadata', resumeHandler, { once: true });
+                  videoEl.addEventListener('canplay', resumeHandler, { once: true });
+                  detectAndBroadcastTracks();
+                  return;
+                }
+              } catch (_) { }
+            }
+            detectAndBroadcastTracks();
+          } else if (ev.data.action === 'purgeSubtitles' || ev.data.action === 'removeSubtitle' || ev.data.action === 'nukeSubtitles') {
+            activeCues = [];
+            window._subtitlesDisabled = true;
+            window._subtitlesExplicitlyActive = false;
+            window._activeSubtitleTrack = null;
+            document.body.classList.remove('custom-subs-active');
+            const customSubEl = document.getElementById('customSubtitleText');
+            if (customSubEl) {
+              customSubEl.textContent = '';
+              customSubEl.style.display = 'none';
+            }
+            if (videoEl && videoEl.textTracks) {
+              for (let i = 0; i < videoEl.textTracks.length; i++) {
+                videoEl.textTracks[i].mode = 'disabled';
+              }
+            }
+            const dynamicSubs = videoEl ? videoEl.querySelectorAll('track') : [];
+            dynamicSubs.forEach(t => t.remove());
+            if (window.plyrInstance) {
+              try { window.plyrInstance.toggleCaptions(false); } catch (_) { }
+            }
+            const activeLabel = document.getElementById('activeSubLabel');
+            if (activeLabel) activeLabel.textContent = 'Subtitles';
+            try {
+              if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                  action: 'subtitleStateChanged',
+                  enabled: false,
+                  label: 'Off'
+                }, '*');
+              }
+            } catch (_) { }
+          } else if (ev.data.action === 'requestTracks') {
+            detectAndBroadcastTracks();
+          } else if (ev.data.action === 'adjustSubtitleOffset') {
+            adjustSubtitleOffset(parseFloat(ev.data.delta || 0), false);
+          } else if (ev.data.action === 'setSubtitleOffset') {
+            adjustSubtitleOffset(parseFloat(ev.data.offset || 0), true);
+          } else if (ev.data.action === 'syncToVoice') {
+            syncToVoice();
+          }
+        });
+
+        const defaultStreamServer = (serverParam || "https://filmhouse-stream.duckdns.org").replace(/\/+$/, "");
+        const isSeries = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
+
+        const playTitleEl = document.getElementById('streamPlayTitle');
+        const playSubEl = document.getElementById('streamPlaySub');
+        const cleanTitle = titleParam ? safeDecodeParam(titleParam).trim() : '';
+
+        if (playTitleEl) {
+          if (isSeries) {
+            playTitleEl.textContent = cleanTitle ? `▶ Start Watching "${cleanTitle}"` : '▶ Start Watching Series';
+          } else {
+            playTitleEl.textContent = cleanTitle ? `▶ Tap to Watch "${cleanTitle}"` : '▶ Tap to Watch Movie';
+          }
+        }
+        if (playSubEl) {
+          const displayQuality = (qualityParam && qualityParam.toLowerCase().includes('4k')) ? '4K UHD' : '1080p FHD';
+          playSubEl.textContent = `${displayQuality} • English (AAC) • Instant Play`;
+        }
+
+        if (titleParam) {
+          if (titleEl) titleEl.textContent = cleanTitle;
+          document.title = cleanTitle + " - Film House Cinema";
+        }
+        if (qualityParam && qualityEl) {
+          qualityEl.textContent = qualityParam;
+        }
+
+        finalStreamUrl = "";
+
+        if (watchParam) {
+          let clean = safeDecodeParam(watchParam).trim();
+
+          // Case 1: If clean is full URL (e.g. cloudflare / herokuapp / koyeb / raw)
+          if (clean.startsWith('http://') || clean.startsWith('https://')) {
+            if (clean.includes('watch=')) {
+              // Extract token from inside a watch URL
+              const match = clean.match(/watch=([a-zA-Z0-9_\-]+)/);
+              if (match && match[1]) {
+                clean = match[1];
+                finalStreamUrl = defaultStreamServer + "/dl/" + clean;
+              } else {
+                finalStreamUrl = clean;
+              }
+            } else if (clean.includes('/watch/')) {
+              // Replace /watch/ with /dl/ for direct video stream
+              finalStreamUrl = clean.replace('/watch/', '/dl/');
+            } else if (clean.includes('.trycloudflare.com/dl/') || clean.includes('herokuapp.com/dl/') || (clean.includes('filmhouse-stream.duckdns.org/dl/') && defaultStreamServer && !defaultStreamServer.includes('filmhouse-stream.duckdns.org'))) {
+              // Upgrade expired Cloudflare/Heroku/DuckDNS tunnels directly to defaultStreamServer
+              const tMatch = clean.match(/\/dl\/([a-zA-Z0-9_\-]+)/);
+              if (tMatch && tMatch[1]) {
+                finalStreamUrl = defaultStreamServer + "/dl/" + tMatch[1];
+              } else {
+                finalStreamUrl = clean;
+              }
+            } else {
+              finalStreamUrl = clean;
+            }
+          }
+          // Case 2: Just a raw hex/token ID (e.g. MzE6YjE3NTE5M2ZhNzI5OWYwNg)
+          else {
+            finalStreamUrl = defaultStreamServer + "/dl/" + encodeURIComponent(clean);
+          }
+        }
+
+        if (audioParam && finalStreamUrl && !finalStreamUrl.includes('audio=')) {
+          finalStreamUrl += (finalStreamUrl.includes('?') ? '&' : '?') + 'audio=' + encodeURIComponent(audioParam);
+        }
+
+        // 1. Resume Playback Progress Logic (Strict Unique Key per Title/Episode)
+        let uniqueMediaId = urlParams.get('media_id') || urlParams.get('mid') || urlParams.get('tmdb') || urlParams.get('imdb') || '';
+        if (!uniqueMediaId && titleParam) {
+          uniqueMediaId = safeDecodeParam(titleParam).trim().replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+        }
+        if (!uniqueMediaId && watchParam) {
+          const tokenMatch = watchParam.match(/\/dl\/([^/?#&]+)/);
+          if (tokenMatch) {
+            uniqueMediaId = tokenMatch[1];
+          } else {
+            try {
+              uniqueMediaId = btoa(unescape(encodeURIComponent(watchParam))).slice(-25);
+            } catch (_) {
+              uniqueMediaId = watchParam.replace(/[^a-zA-Z0-9]/g, '_').slice(-25);
             }
           }
         }
-        if (targetIndex === -1) {
-          const tracks = videoEl.querySelectorAll('track');
-          tracks.forEach(t => { t.mode = 'disabled'; });
-        }
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage({
-              action: 'subtitleStateChanged',
-              enabled: isEnabled,
-              label: activeLabel || (isEnabled ? 'On' : 'Off')
-            }, '*');
-          }
-        } catch (_) { }
-      } else if (ev.data.action === 'selectAudioTrack') {
-        const targetIndex = parseInt(ev.data.index, 10);
-        window._selectedAudioTrackIndex = targetIndex;
-        if (window._currentHls && typeof window._currentHls.audioTrack !== 'undefined') {
-          window._currentHls.audioTrack = targetIndex;
-        }
-        let switchedClientSide = false;
-        if (videoEl && videoEl.audioTracks && videoEl.audioTracks.length > 1) {
-          for (let i = 0; i < videoEl.audioTracks.length; i++) {
-            videoEl.audioTracks[i].enabled = (i === targetIndex);
-          }
-          switchedClientSide = true;
-        }
-        // Only attempt stream reload if there are multiple tracks and not switched client-side
-        if (!switchedClientSide && targetIndex > 0 && ev.data.reloadWithTrack) {
-          try {
-            const curTime = (videoEl && videoEl.currentTime > 0) ? Math.floor(videoEl.currentTime) : 0;
-            const wasPlaying = (videoEl && !videoEl.paused);
-            let newUrl = finalStreamUrl || (videoEl ? videoEl.src : '');
-            if (newUrl) {
-              // Strip existing audio and seek parameters - NEVER inject destructive &ss=
-              newUrl = newUrl.replace(/([?&])audio=\d+/g, '').replace(/([?&])ss=\d+/g, '').replace(/([?&])t=\d+/g, '');
-              const sep = newUrl.includes('?') ? '&' : '?';
-              newUrl = `${newUrl}${sep}audio=${targetIndex}`;
-              finalStreamUrl = newUrl;
+        const epParam = urlParams.get('ep');
+        const sParam = urlParams.get('s');
+        const epKeySuffix = epParam ? `_s${sParam || '1'}_e${epParam}` : '';
+        const resumeKey = `fh_resume_${uniqueMediaId}${epKeySuffix}`;
+        const resumeToast = document.getElementById('resumeToast');
+        const resumeTimeText = document.getElementById('resumeTimeText');
+        const btnResume = document.getElementById('btnResume');
+        const btnDismissResume = document.getElementById('btnDismissResume');
 
+        function formatTime(secs) {
+          const m = Math.floor(secs / 60);
+          const s = Math.floor(secs % 60);
+          return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        }
+
+        const initialSeekTime = parseFloat(urlParams.get('t') || urlParams.get('time') || '0');
+        if (initialSeekTime > 0) {
+          let initialSeekApplied = false;
+          const applySeek = function () {
+            if (initialSeekApplied) return;
+            initialSeekApplied = true;
+            try {
+              if (window.plyrInstance) window.plyrInstance.currentTime = initialSeekTime;
+              else videoEl.currentTime = initialSeekTime;
+            } catch (_) { }
+          };
+          videoEl.addEventListener('loadedmetadata', applySeek, { once: true });
+          videoEl.addEventListener('canplay', applySeek, { once: true });
+        }
+
+        videoEl.addEventListener('loadedmetadata', function () {
+          const saved = parseFloat(localStorage.getItem(resumeKey) || '0');
+          if (saved > 15 && videoEl.duration && (videoEl.duration - saved) > 30) {
+            if (resumeTimeText) resumeTimeText.textContent = formatTime(saved);
+            if (resumeToast) resumeToast.style.display = 'flex';
+            if (btnResume) {
+              btnResume.onclick = function () {
+                if (window.plyrInstance) { window.plyrInstance.currentTime = saved; window.plyrInstance.play(); } else { videoEl.currentTime = saved; videoEl.play().catch(() => { }); }
+                if (resumeToast) resumeToast.style.display = 'none';
+              };
+            }
+            if (btnDismissResume) {
+              btnDismissResume.onclick = function () {
+                if (resumeToast) resumeToast.style.display = 'none';
+              };
+            }
+            setTimeout(function () { if (resumeToast) resumeToast.style.display = 'none'; }, 6000);
+          }
+        });
+
+        // Auto-hide playOverlay the moment video frames output (eliminates pitch black playback on start)
+        function autoHidePlayOverlay() {
+          const passState = getActivePassState();
+          if (!passState.hasAccess) {
+            try { videoEl.pause(); } catch (_) { }
+            updatePassUI();
+            return;
+          }
+          // STRICT: Only hide overlay when video is ACTUALLY outputting rendered frames!
+          if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
+            return;
+          }
+          if (_connectTimeoutTimer) {
+            clearTimeout(_connectTimeoutTimer);
+            _connectTimeoutTimer = null;
+          }
+          document.body.classList.add('stream-started');
+          document.body.classList.add('has-active-video');
+          if (playOverlay && playOverlay.style.display !== 'none') {
+            playOverlay.style.pointerEvents = 'none';
+            playOverlay.style.transition = 'opacity 0.45s ease';
+            playOverlay.style.opacity = '0';
+            setTimeout(() => { playOverlay.style.display = 'none'; }, 460);
+          }
+          if (loaderEl) {
+            loaderEl.style.opacity = '0';
+            setTimeout(() => { loaderEl.style.display = 'none'; }, 300);
+          }
+          if (errorCard) {
+            errorCard.style.display = 'none';
+          }
+        }
+
+        // Keep connecting overlay informative as stream buffers — DO NOT prematurely hide into blackness!
+        videoEl.addEventListener('loadeddata', function () {
+          if (playOverlay && playOverlay.classList.contains('connecting')) {
+            const playSub = document.getElementById('streamPlaySub');
+            if (playSub) playSub.textContent = '⚡ Stream Ready • Rendering Cinema Frames...';
+          }
+        });
+        videoEl.addEventListener('canplay', function () {
+          if (playOverlay && playOverlay.classList.contains('connecting')) {
+            const playSub = document.getElementById('streamPlaySub');
+            if (playSub) playSub.textContent = '⚡ Buffering Video • Starting Movie...';
+          }
+        });
+
+        // Frame callback for instant seamless transition the millisecond first pixel is displayed
+        if (videoEl && 'requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+          const onFrameRendered = function () {
+            if (videoEl.currentTime > 0.05 && !videoEl.paused) {
+              autoHidePlayOverlay();
+            } else if (!document.body.classList.contains('has-active-video')) {
+              videoEl.requestVideoFrameCallback(onFrameRendered);
+            }
+          };
+          videoEl.requestVideoFrameCallback(onFrameRendered);
+        }
+
+        videoEl.addEventListener('timeupdate', function () {
+          const passState = getActivePassState();
+          if (!passState.hasAccess) {
+            try { videoEl.pause(); } catch (_) { }
+            updatePassUI();
+            return;
+          }
+          if (videoEl.currentTime > 0.1 && !videoEl.paused) {
+            autoHidePlayOverlay();
+          }
+          if (videoEl.currentTime > 5 && videoEl.duration && (videoEl.duration - videoEl.currentTime) > 15) {
+            localStorage.setItem(resumeKey, videoEl.currentTime);
+          }
+          try {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({
+                action: 'videoTimeUpdate',
+                currentTime: videoEl.currentTime,
+                duration: videoEl.duration || 0
+              }, '*');
+            }
+          } catch (e) { }
+        });
+
+        // Handle buffering during active playback
+        videoEl.addEventListener('waiting', function () {
+          if (document.body.classList.contains('has-active-video')) {
+            if (loaderEl) {
+              loaderEl.style.display = 'flex';
+              loaderEl.style.opacity = '1';
+              const lt = loaderEl.querySelector('.loader-text');
+              if (lt) lt.textContent = '⚡ Buffering High-Speed Stream...';
+            }
+          }
+        });
+
+        videoEl.addEventListener('playing', function () {
+          if (loaderEl) {
+            loaderEl.style.opacity = '0';
+            setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 200);
+          }
+          if (videoEl.currentTime > 0.1) {
+            autoHidePlayOverlay();
+          }
+        });
+
+        videoEl.addEventListener('ended', function () {
+          try {
+            localStorage.removeItem(resumeKey);
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({ action: 'videoEnded' }, '*');
+            }
+          } catch (e) { }
+        });
+
+        if (finalStreamUrl) {
+          if (downloadBtn) downloadBtn.href = finalStreamUrl;
+
+          // Always attach stream source with preload="metadata" so DNS/TLS and headers warm up immediately
+          attachStreamSource();
+          updatePassUI();
+
+          function hideStreamLoader() {
+            if (!loaderEl) return;
+            loaderEl.style.opacity = '0';
+            loaderEl.style.pointerEvents = 'none';
+            setTimeout(function () { if (loaderEl) loaderEl.style.display = 'none'; }, 300);
+          }
+
+          // Hide loader on ANY playback readiness or progress event
+          ['canplay', 'canplaythrough', 'playing', 'loadeddata', 'timeupdate', 'seeked'].forEach(function (evt) {
+            videoEl.addEventListener(evt, hideStreamLoader);
+          });
+
+          // Pre-warm metadata connection in background (never reset active HLS MediaSource)
+          try {
+            if (!window._currentHls) videoEl.load();
+          } catch (_) { }
+
+          // Fallback: If video already buffered enough data, hide immediately
+          if (videoEl.readyState >= 2) {
+            hideStreamLoader();
+          }
+
+          // Hide loader on pause, error, or stalled so user is never trapped behind spinner
+          ['error', 'pause', 'stalled', 'abort', 'suspend'].forEach(function (evt) {
+            videoEl.addEventListener(evt, hideStreamLoader);
+          });
+
+          // Safety fallback: Guarantee loader is ALWAYS hidden after 3.5s so user is never stuck on dark screen
+          setTimeout(function () {
+            hideStreamLoader();
+          }, 3500);
+
+          // Helper to switch to Server 2 on demand
+          window.switchToServer2 = function () {
+            try {
+              if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ action: "selectServer", server: 2 }, "*");
+              }
+            } catch (e) { }
+            // Local fallback: update video source with server 2 param if parent does not immediately reload iframe
+            if (finalStreamUrl) {
+              const sep = finalStreamUrl.includes('?') ? '&' : '?';
+              const s2Url = finalStreamUrl.includes('server=2') ? finalStreamUrl : `${finalStreamUrl}${sep}server=2`;
+              finalStreamUrl = s2Url;
               if (loaderEl) {
                 loaderEl.style.display = 'flex';
                 loaderEl.style.opacity = '1';
                 const lt = loaderEl.querySelector('.loader-text');
-                if (lt) lt.textContent = '🔊 Switching Audio Track...';
+                if (lt) lt.textContent = '⚡ Connecting to Server 2 (VIP)...';
               }
-
-              videoEl.src = newUrl;
-
-              const resumeHandler = function () {
-                try {
-                  if (curTime > 0) {
-                    videoEl.currentTime = curTime;
-                  }
-                  if (wasPlaying) {
-                    videoEl.play().catch(() => { });
-                  }
-                } catch (_) { }
-              };
-              videoEl.addEventListener('loadedmetadata', resumeHandler, { once: true });
-              videoEl.addEventListener('canplay', resumeHandler, { once: true });
-              detectAndBroadcastTracks();
-              return;
+              if (videoEl) {
+                if (window._currentHls) {
+                  try { window._currentHls.destroy(); } catch (_) { }
+                  window._currentHls = null;
+                }
+                videoEl.removeAttribute('src');
+                attachStreamSource();
+                if (!window._currentHls) videoEl.load();
+                videoEl.play().catch(() => { });
+              }
             }
-          } catch (_) { }
-        }
-        detectAndBroadcastTracks();
-      } else if (ev.data.action === 'purgeSubtitles' || ev.data.action === 'removeSubtitle' || ev.data.action === 'nukeSubtitles') {
-        activeCues = [];
-        window._subtitlesDisabled = true;
-        window._subtitlesExplicitlyActive = false;
-        window._activeSubtitleTrack = null;
-        const customSubEl = document.getElementById('customSubtitleText');
-        if (customSubEl) {
-          customSubEl.textContent = '';
-          customSubEl.style.display = 'none';
-        }
-        if (videoEl && videoEl.textTracks) {
-          for (let i = 0; i < videoEl.textTracks.length; i++) {
-            videoEl.textTracks[i].mode = 'disabled';
-          }
-        }
-        const dynamicSubs = videoEl ? videoEl.querySelectorAll('track') : [];
-        dynamicSubs.forEach(t => t.remove());
-        if (window.plyrInstance) {
-          try { window.plyrInstance.toggleCaptions(false); } catch (_) { }
-        }
-        const activeLabel = document.getElementById('activeSubLabel');
-        if (activeLabel) activeLabel.textContent = 'Subtitles';
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage({
-              action: 'subtitleStateChanged',
-              enabled: false,
-              label: 'Off'
-            }, '*');
-          }
-        } catch (_) { }
-      } else if (ev.data.action === 'requestTracks') {
-        detectAndBroadcastTracks();
-      } else if (ev.data.action === 'adjustSubtitleOffset') {
-        adjustSubtitleOffset(parseFloat(ev.data.delta || 0), false);
-      } else if (ev.data.action === 'setSubtitleOffset') {
-        adjustSubtitleOffset(parseFloat(ev.data.offset || 0), true);
-      } else if (ev.data.action === 'syncToVoice') {
-        syncToVoice();
-      }
-    });
-
-    const defaultStreamServer = (serverParam || "https://filmhouse-stream.duckdns.org").replace(/\/+$/, "");
-    const isSeries = typeParam === 'series' || typeParam === 'tv' || urlParams.has('ep');
-
-    const playTitleEl = document.getElementById('streamPlayTitle');
-    const playSubEl = document.getElementById('streamPlaySub');
-    const cleanTitle = titleParam ? decodeURIComponent(titleParam).trim() : '';
-
-    if (playTitleEl) {
-      if (isSeries) {
-        playTitleEl.textContent = cleanTitle ? `▶ Start Watching "${cleanTitle}"` : '▶ Start Watching Series';
-      } else {
-        playTitleEl.textContent = cleanTitle ? `▶ Tap to Watch "${cleanTitle}"` : '▶ Tap to Watch Movie';
-      }
-    }
-    if (playSubEl) {
-      const displayQuality = (qualityParam && qualityParam.toLowerCase().includes('4k')) ? '4K UHD' : '1080p FHD';
-      playSubEl.textContent = `${displayQuality} • English (AAC) • Instant Play`;
-    }
-
-    if (titleParam) {
-      if (titleEl) titleEl.textContent = cleanTitle;
-      document.title = cleanTitle + " - Film House Cinema";
-    }
-    if (qualityParam && qualityEl) {
-      qualityEl.textContent = qualityParam;
-    }
-
-    finalStreamUrl = "";
-
-    if (watchParam) {
-      let clean = decodeURIComponent(watchParam).trim();
-
-      // Case 1: If clean is full URL (e.g. cloudflare / herokuapp / koyeb / raw)
-      if (clean.startsWith('http://') || clean.startsWith('https://')) {
-        if (clean.includes('watch=')) {
-          // Extract token from inside a watch URL
-          const match = clean.match(/watch=([a-zA-Z0-9_\-]+)/);
-          if (match && match[1]) {
-            clean = match[1];
-            finalStreamUrl = defaultStreamServer + "/dl/" + clean;
-          } else {
-            finalStreamUrl = clean;
-          }
-        } else if (clean.includes('/watch/')) {
-          // Replace /watch/ with /dl/ for direct video stream
-          finalStreamUrl = clean.replace('/watch/', '/dl/');
-        } else if (clean.includes('.trycloudflare.com/dl/') || clean.includes('herokuapp.com/dl/') || (clean.includes('filmhouse-stream.duckdns.org/dl/') && defaultStreamServer && !defaultStreamServer.includes('filmhouse-stream.duckdns.org'))) {
-          // Upgrade expired Cloudflare/Heroku/DuckDNS tunnels directly to defaultStreamServer
-          const tMatch = clean.match(/\/dl\/([a-zA-Z0-9_\-]+)/);
-          if (tMatch && tMatch[1]) {
-            finalStreamUrl = defaultStreamServer + "/dl/" + tMatch[1];
-          } else {
-            finalStreamUrl = clean;
-          }
-        } else {
-          finalStreamUrl = clean;
-        }
-      }
-      // Case 2: Just a raw hex/token ID (e.g. MzE6YjE3NTE5M2ZhNzI5OWYwNg)
-      else {
-        finalStreamUrl = defaultStreamServer + "/dl/" + encodeURIComponent(clean);
-      }
-    }
-
-    if (audioParam && finalStreamUrl && !finalStreamUrl.includes('audio=')) {
-      finalStreamUrl += (finalStreamUrl.includes('?') ? '&' : '?') + 'audio=' + encodeURIComponent(audioParam);
-    }
-
-    // 1. Resume Playback Progress Logic (Strict Unique Key per Title/Episode)
-    let uniqueMediaId = urlParams.get('media_id') || urlParams.get('mid') || urlParams.get('tmdb') || urlParams.get('imdb') || '';
-    if (!uniqueMediaId && titleParam) {
-      uniqueMediaId = decodeURIComponent(titleParam).trim().replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-    }
-    if (!uniqueMediaId && watchParam) {
-      const tokenMatch = watchParam.match(/\/dl\/([^/?#&]+)/);
-      uniqueMediaId = tokenMatch ? tokenMatch[1] : btoa(watchParam).slice(-25);
-    }
-    const epParam = urlParams.get('ep');
-    const sParam = urlParams.get('s');
-    const epKeySuffix = epParam ? `_s${sParam || '1'}_e${epParam}` : '';
-    const resumeKey = `fh_resume_${uniqueMediaId}${epKeySuffix}`;
-    const resumeToast = document.getElementById('resumeToast');
-    const resumeTimeText = document.getElementById('resumeTimeText');
-    const btnResume = document.getElementById('btnResume');
-    const btnDismissResume = document.getElementById('btnDismissResume');
-
-    function formatTime(secs) {
-      const m = Math.floor(secs / 60);
-      const s = Math.floor(secs % 60);
-      return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-    }
-
-    const initialSeekTime = parseFloat(urlParams.get('t') || urlParams.get('time') || '0');
-    if (initialSeekTime > 0) {
-      const applySeek = function () {
-        try {
-          if (window.plyrInstance) window.plyrInstance.currentTime = initialSeekTime;
-          else videoEl.currentTime = initialSeekTime;
-        } catch (_) { }
-      };
-      videoEl.addEventListener('loadedmetadata', applySeek, { once: true });
-      videoEl.addEventListener('canplay', applySeek, { once: true });
-    }
-
-    videoEl.addEventListener('loadedmetadata', function () {
-      const saved = parseFloat(localStorage.getItem(resumeKey) || '0');
-      if (saved > 15 && videoEl.duration && (videoEl.duration - saved) > 30) {
-        if (resumeTimeText) resumeTimeText.textContent = formatTime(saved);
-        if (resumeToast) resumeToast.style.display = 'flex';
-        if (btnResume) {
-          btnResume.onclick = function () {
-            if (window.plyrInstance) { window.plyrInstance.currentTime = saved; window.plyrInstance.play(); } else { videoEl.currentTime = saved; videoEl.play().catch(() => { }); }
-            if (resumeToast) resumeToast.style.display = 'none';
           };
-        }
-        if (btnDismissResume) {
-          btnDismissResume.onclick = function () {
-            if (resumeToast) resumeToast.style.display = 'none';
-          };
-        }
-        setTimeout(function () { if (resumeToast) resumeToast.style.display = 'none'; }, 6000);
-      }
-    });
 
-    // Auto-hide playOverlay the moment video frames output (eliminates pitch black playback on start)
-    function autoHidePlayOverlay() {
-      const passState = getActivePassState();
-      if (!passState.hasAccess) {
-        try { videoEl.pause(); } catch (_) { }
-        updatePassUI();
-        return;
-      }
-      // STRICT: Only hide overlay when video is ACTUALLY outputting rendered frames!
-      if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
-        return;
-      }
-      if (_connectTimeoutTimer) {
-        clearTimeout(_connectTimeoutTimer);
-        _connectTimeoutTimer = null;
-      }
-      document.body.classList.add('stream-started');
-      document.body.classList.add('has-active-video');
-      if (playOverlay && playOverlay.style.display !== 'none') {
-        playOverlay.style.pointerEvents = 'none';
-        playOverlay.style.transition = 'opacity 0.45s ease';
-        playOverlay.style.opacity = '0';
-        setTimeout(() => { playOverlay.style.display = 'none'; }, 460);
-      }
-      if (loaderEl) {
-        loaderEl.style.opacity = '0';
-        setTimeout(() => { loaderEl.style.display = 'none'; }, 300);
-      }
-      if (errorCard) {
-        errorCard.style.display = 'none';
-      }
-    }
+          let streamSilentRetryCount = 0;
 
-    // Keep connecting overlay informative as stream buffers — DO NOT prematurely hide into blackness!
-    videoEl.addEventListener('loadeddata', function () {
-      if (playOverlay && playOverlay.classList.contains('connecting')) {
-        const playSub = document.getElementById('streamPlaySub');
-        if (playSub) playSub.textContent = '⚡ Stream Ready • Rendering Cinema Frames...';
-      }
-    });
-    videoEl.addEventListener('canplay', function () {
-      if (playOverlay && playOverlay.classList.contains('connecting')) {
-        const playSub = document.getElementById('streamPlaySub');
-        if (playSub) playSub.textContent = '⚡ Buffering Video • Starting Movie...';
-      }
-    });
+          // Reset error state whenever stream is actively playing
+          videoEl.addEventListener('playing', function () {
+            streamSilentRetryCount = 0;
+            if (errorCard) errorCard.style.display = 'none';
+          });
 
-    // Frame callback for instant seamless transition the millisecond first pixel is displayed
-    if (videoEl && 'requestVideoFrameCallback' in HTMLVideoElement.prototype) {
-      const onFrameRendered = function () {
-        if (videoEl.currentTime > 0.05 && !videoEl.paused) {
-          autoHidePlayOverlay();
-        } else if (!document.body.classList.contains('has-active-video')) {
-          videoEl.requestVideoFrameCallback(onFrameRendered);
-        }
-      };
-      videoEl.requestVideoFrameCallback(onFrameRendered);
-    }
-
-    videoEl.addEventListener('timeupdate', function () {
-      const passState = getActivePassState();
-      if (!passState.hasAccess) {
-        try { videoEl.pause(); } catch (_) { }
-        updatePassUI();
-        return;
-      }
-      if (videoEl.currentTime > 0.1 && !videoEl.paused) {
-        autoHidePlayOverlay();
-      }
-      if (videoEl.currentTime > 5 && videoEl.duration && (videoEl.duration - videoEl.currentTime) > 15) {
-        localStorage.setItem(resumeKey, videoEl.currentTime);
-      }
-      try {
-        if (window.parent && window.parent !== window) {
-          window.parent.postMessage({
-            action: 'videoTimeUpdate',
-            currentTime: videoEl.currentTime,
-            duration: videoEl.duration || 0
-          }, '*');
-        }
-      } catch (e) { }
-    });
-
-    // Handle buffering during active playback
-    videoEl.addEventListener('waiting', function () {
-      if (document.body.classList.contains('has-active-video')) {
-        if (loaderEl) {
-          loaderEl.style.display = 'flex';
-          loaderEl.style.opacity = '1';
-          const lt = loaderEl.querySelector('.loader-text');
-          if (lt) lt.textContent = '⚡ Buffering High-Speed Stream...';
-        }
-      }
-    });
-
-    videoEl.addEventListener('playing', function () {
-      if (loaderEl) {
-        loaderEl.style.opacity = '0';
-        setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 200);
-      }
-      if (videoEl.currentTime > 0.1) {
-        autoHidePlayOverlay();
-      }
-    });
-
-    videoEl.addEventListener('ended', function () {
-      try {
-        localStorage.removeItem(resumeKey);
-        if (window.parent && window.parent !== window) {
-          window.parent.postMessage({ action: 'videoEnded' }, '*');
-        }
-      } catch (e) { }
-    });
-
-    if (finalStreamUrl) {
-      if (downloadBtn) downloadBtn.href = finalStreamUrl;
-
-      // Always attach stream source with preload="metadata" so DNS/TLS and headers warm up immediately
-      attachStreamSource();
-      updatePassUI();
-
-      function hideStreamLoader() {
-        if (!loaderEl) return;
-        loaderEl.style.opacity = '0';
-        loaderEl.style.pointerEvents = 'none';
-        setTimeout(function () { if (loaderEl) loaderEl.style.display = 'none'; }, 300);
-      }
-
-      // Hide loader on ANY playback readiness or progress event
-      ['canplay', 'canplaythrough', 'playing', 'loadeddata', 'timeupdate', 'seeked'].forEach(function (evt) {
-        videoEl.addEventListener(evt, hideStreamLoader);
-      });
-
-      // Pre-warm metadata connection in background
-      try {
-        videoEl.load();
-      } catch (_) { }
-
-      // Fallback: If video already buffered enough data, hide immediately
-      if (videoEl.readyState >= 2) {
-        hideStreamLoader();
-      }
-
-      // Hide loader on pause, error, or stalled so user is never trapped behind spinner
-      ['error', 'pause', 'stalled', 'abort', 'suspend'].forEach(function (evt) {
-        videoEl.addEventListener(evt, hideStreamLoader);
-      });
-
-      // Safety fallback: Guarantee loader is ALWAYS hidden after 3.5s so user is never stuck on dark screen
-      setTimeout(function () {
-        hideStreamLoader();
-      }, 3500);
-
-      // Helper to switch to Server 2 on demand
-      window.switchToServer2 = function () {
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ action: "selectServer", server: 2 }, "*");
-          }
-        } catch (e) { }
-        // Local fallback: update video source with server 2 param if parent does not immediately reload iframe
-        if (finalStreamUrl) {
-          const sep = finalStreamUrl.includes('?') ? '&' : '?';
-          const s2Url = finalStreamUrl.includes('server=2') ? finalStreamUrl : `${finalStreamUrl}${sep}server=2`;
-          finalStreamUrl = s2Url;
-          if (loaderEl) {
-            loaderEl.style.display = 'flex';
-            loaderEl.style.opacity = '1';
-            const lt = loaderEl.querySelector('.loader-text');
-            if (lt) lt.textContent = '⚡ Connecting to Server 2 (VIP)...';
-          }
-          if (videoEl) {
-            videoEl.src = s2Url;
-            videoEl.load();
-            videoEl.play().catch(() => { });
-          }
-        }
-      };
-
-      let streamSilentRetryCount = 0;
-
-      // Reset error state whenever stream is actively playing
-      videoEl.addEventListener('playing', function () {
-        streamSilentRetryCount = 0;
-        if (errorCard) errorCard.style.display = 'none';
-      });
-
-      // Helper to retry stream playback on demand
-      window.retryStreamPlayback = function () {
-        if (errorCard) errorCard.style.display = 'none';
-        if (loaderEl) {
-          loaderEl.style.display = 'flex';
-          loaderEl.style.opacity = '1';
-          const lt = loaderEl.querySelector('.loader-text');
-          if (lt) lt.textContent = '⚡ Reconnecting Stream...';
-        }
-        try {
-          videoEl.load();
-          if (window.plyrInstance) window.plyrInstance.play().catch(() => { });
-          else videoEl.play().catch(() => { });
-        } catch (_) { }
-      };
-
-      // Discreet, non-blocking stream error notice with instant Server 2 fallback
-      videoEl.addEventListener('error', function (e) {
-        console.warn("Video stream load notice:", e, videoEl.error);
-        hideStreamLoader();
-        if (loaderEl) loaderEl.style.display = 'none';
-
-        // Attempt silent background recovery once before surfacing reconnect UI
-        if (streamSilentRetryCount < 1) {
-          streamSilentRetryCount++;
-          setTimeout(() => {
+          // Helper to retry stream playback on demand
+          window.retryStreamPlayback = function () {
+            if (errorCard) errorCard.style.display = 'none';
+            if (loaderEl) {
+              loaderEl.style.display = 'flex';
+              loaderEl.style.opacity = '1';
+              const lt = loaderEl.querySelector('.loader-text');
+              if (lt) lt.textContent = '⚡ Reconnecting Stream...';
+            }
             try {
-              videoEl.load();
+              if (window._currentHls) {
+                window._currentHls.startLoad();
+              } else {
+                videoEl.load();
+              }
               if (window.plyrInstance) window.plyrInstance.play().catch(() => { });
               else videoEl.play().catch(() => { });
             } catch (_) { }
-          }, 1000);
-          return;
-        }
+          };
 
-        if (errorCard) {
-          errorCard.style.display = 'flex';
-          errorCard.innerHTML = `
+          // Discreet, non-blocking stream error notice with instant Server 2 fallback
+          videoEl.addEventListener('error', function (e) {
+            console.warn("Video stream load notice:", e, videoEl.error);
+            hideStreamLoader();
+            if (loaderEl) loaderEl.style.display = 'none';
+
+            // Attempt silent background recovery once before surfacing reconnect UI
+            if (streamSilentRetryCount < 1) {
+              streamSilentRetryCount++;
+              setTimeout(() => {
+                try {
+                  if (window._currentHls) {
+                    window._currentHls.startLoad();
+                  } else {
+                    videoEl.load();
+                  }
+                  const wasInitiated = document.body.classList.contains('stream-started') || (playOverlay && playOverlay.classList.contains('connecting'));
+                  if (wasInitiated) {
+                    if (window.plyrInstance) window.plyrInstance.play().catch(() => { });
+                    else videoEl.play().catch(() => { });
+                  }
+                } catch (_) { }
+              }, 1000);
+              return;
+            }
+
+            if (errorCard) {
+              errorCard.style.display = 'flex';
+              errorCard.innerHTML = `
               <span>⚠️ Server 1 connection issue</span>
               <button type="button" onclick="window.retryStreamPlayback()" style="background:#ffd700;color:#000;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Retry</button>
               <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Server 2 (VIP)</button>
             `;
-        }
+            }
 
-        restoreInteractivePlayOverlay(
-          '▶ Reconnect Stream',
-          '⚡ Server 1 unavailable • Try Server 2 (VIP) below'
-        );
-      });
-    } else {
-      if (loaderEl) loaderEl.style.display = 'none';
-      if (errorCard) {
-        errorCard.style.display = 'flex';
-        errorCard.innerHTML = `
+            restoreInteractivePlayOverlay(
+              '▶ Reconnect Stream',
+              '⚡ Server 1 unavailable • Try Server 2 (VIP) below'
+            );
+          });
+        } else {
+          if (loaderEl) loaderEl.style.display = 'none';
+          if (errorCard) {
+            errorCard.style.display = 'flex';
+            errorCard.innerHTML = `
             <span>⚠️ Stream link is being prepared...</span>
             <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">Server 2 (VIP)</button>
           `;
-      }
-      restoreInteractivePlayOverlay(
-        '▶ Stream Link Updating',
-        '⚡ Please select Server 2 or another quality below'
-      );
-    }
-    });
+          }
+          restoreInteractivePlayOverlay(
+            '▶ Stream Link Updating',
+            '⚡ Please select Server 2 or another quality below'
+          );
+        }
+      });
 
   </script>
 

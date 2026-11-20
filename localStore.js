@@ -46,13 +46,14 @@ class LocalUserStore {
     }
 
     flushToDisk() {
+        const tempPath = `${this.filePath}.${process.pid}.${Date.now()}.tmp`;
         try {
             const arr = Array.from(this.users.values());
-            const tempPath = `${this.filePath}.tmp`;
             fs.writeFileSync(tempPath, JSON.stringify(arr, null, 2), "utf8");
             fs.renameSync(tempPath, this.filePath);
         } catch (err) {
             console.error("[LocalUserStore] Error writing users to disk:", err.message);
+            try { if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath); } catch (_) {}
         }
     }
 
@@ -79,21 +80,47 @@ class LocalUserStore {
     setBlocked(userId, isBlocked) {
         if (!userId) return;
         const id = String(userId);
-        const user = this.users.get(id);
-        if (user) {
+        let user = this.users.get(id);
+        if (!user) {
+            user = {
+                id: id,
+                username: "",
+                fullName: "Telegram User",
+                points: 0,
+                badge: "",
+                blockedBot: Boolean(isBlocked),
+                banned: false,
+                joinedDate: Date.now(),
+                lastSeen: Date.now()
+            };
+            this.users.set(id, user);
+        } else {
             user.blockedBot = Boolean(isBlocked);
-            this.scheduleSave();
         }
+        this.scheduleSave();
     }
 
     setBanned(userId, isBanned) {
         if (!userId) return;
         const id = String(userId);
-        const user = this.users.get(id);
-        if (user) {
+        let user = this.users.get(id);
+        if (!user) {
+            user = {
+                id: id,
+                username: "",
+                fullName: "Telegram User",
+                points: 0,
+                badge: "",
+                blockedBot: false,
+                banned: Boolean(isBanned),
+                joinedDate: Date.now(),
+                lastSeen: Date.now()
+            };
+            this.users.set(id, user);
+        } else {
             user.banned = Boolean(isBanned);
-            this.scheduleSave();
         }
+        this.scheduleSave();
     }
 
     getAllUsers() {
@@ -115,6 +142,16 @@ class LocalUserStore {
             console.log("[LocalUserStore] Attempting one-time background sync from Firestore users collection...");
             const snapshot = await db.collection("users").get();
             let addedCount = 0;
+            const parseTs = (val) => {
+                if (!val) return Date.now();
+                if (typeof val === "number") return val;
+                if (typeof val.toMillis === "function") return val.toMillis();
+                if (typeof val.toDate === "function") return val.toDate().getTime();
+                if (typeof val._seconds === "number") return val._seconds * 1000;
+                if (typeof val.seconds === "number") return val.seconds * 1000;
+                const d = new Date(val).getTime();
+                return isNaN(d) ? Date.now() : d;
+            };
             snapshot.forEach(doc => {
                 const data = doc.data();
                 const id = String(doc.id);
@@ -128,8 +165,8 @@ class LocalUserStore {
                         badge: data.badge || "",
                         blockedBot: data.blockedBot === true,
                         banned: data.banned === true,
-                        joinedDate: data.joinedDate ? (data.joinedDate.toMillis ? data.joinedDate.toMillis() : Date.now()) : Date.now(),
-                        lastSeen: data.lastSeen ? (data.lastSeen.toMillis ? data.lastSeen.toMillis() : Date.now()) : Date.now()
+                        joinedDate: parseTs(data.joinedDate),
+                        lastSeen: parseTs(data.lastSeen)
                     });
                     addedCount++;
                 } else {

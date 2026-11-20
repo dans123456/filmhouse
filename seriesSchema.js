@@ -24,15 +24,15 @@ function buildSubscriptionDocId(userTelegramId, tmdbId) {
 function sanitizeSeriesTrackerData(data = {}) {
     return {
         tmdb_id: data.tmdb_id ? parseInt(data.tmdb_id, 10) : null,
-        status: [SeriesStatus.ONGOING, SeriesStatus.ON_BREAK, SeriesStatus.COMPLETED].includes(data.status) 
-            ? data.status 
+        status: [SeriesStatus.ONGOING, SeriesStatus.ON_BREAK, SeriesStatus.COMPLETED].includes(data.status)
+            ? data.status
             : null,
         current_season: data.current_season ? parseInt(data.current_season, 10) : 1,
-        last_uploaded_episode: typeof data.last_uploaded_episode === "number" 
-            ? data.last_uploaded_episode 
+        last_uploaded_episode: typeof data.last_uploaded_episode === "number"
+            ? data.last_uploaded_episode
             : parseInt(data.last_uploaded_episode, 10) || 0,
-        total_episodes: typeof data.total_episodes === "number" 
-            ? data.total_episodes 
+        total_episodes: typeof data.total_episodes === "number"
+            ? data.total_episodes
             : parseInt(data.total_episodes, 10) || 0,
         next_air_date: data.next_air_date ? String(data.next_air_date).trim() : null,
         last_updated_timestamp: data.last_updated_timestamp || new Date().toISOString()
@@ -53,7 +53,7 @@ function getSeriesCountdownBadge(series = {}) {
         return { label: "Season Complete", variant: "completed" };
     }
 
-    if (status === SeriesStatus.ON_BREAK && !nextAirDate) {
+    if (status === SeriesStatus.ON_BREAK) {
         return { label: "On Break", variant: "break" };
     }
 
@@ -61,20 +61,31 @@ function getSeriesCountdownBadge(series = {}) {
         return status ? { label: status, variant: "status" } : null;
     }
 
-    const airDate = new Date(nextAirDate);
-    if (isNaN(airDate.getTime())) {
-        return status ? { label: status, variant: "status" } : null;
+    const isoMatch = String(nextAirDate).trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+    let airYear, airMonth, airDay;
+    if (isoMatch) {
+        airYear = parseInt(isoMatch[1], 10);
+        airMonth = parseInt(isoMatch[2], 10) - 1;
+        airDay = parseInt(isoMatch[3], 10);
+    } else {
+        const airDate = new Date(nextAirDate);
+        if (isNaN(airDate.getTime())) {
+            return status ? { label: status, variant: "status" } : null;
+        }
+        airYear = airDate.getUTCFullYear();
+        airMonth = airDate.getUTCMonth();
+        airDay = airDate.getUTCDate();
     }
 
     const now = new Date();
     // Normalize both to UTC midnight for precise day calculation
-    const utcAir = Date.UTC(airDate.getFullYear(), airDate.getMonth(), airDate.getDate());
-    const utcNow = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const utcAir = Date.UTC(airYear, airMonth, airDay);
+    const utcNow = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
     const diffDays = Math.ceil((utcAir - utcNow) / (1000 * 60 * 60 * 24));
 
     if (diffDays > 1) {
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const formattedDate = `${monthNames[airDate.getMonth()]} ${airDate.getDate()}`;
+        const formattedDate = `${monthNames[airMonth]} ${airDay}`;
         return { label: `Next Episode: ${formattedDate}`, variant: "upcoming" };
     }
 
@@ -82,11 +93,11 @@ function getSeriesCountdownBadge(series = {}) {
         return { label: "Airs Tomorrow", variant: "tomorrow" };
     }
 
-    if (diffDays <= 0) {
+    if (diffDays === 0) {
         return { label: "New Episode Today", variant: "today" };
     }
 
-    return null;
+    return status ? { label: status, variant: "status" } : null;
 }
 
 if (typeof window !== "undefined") {

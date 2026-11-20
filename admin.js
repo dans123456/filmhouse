@@ -119,8 +119,36 @@ function getCleanRequestTitle(title) {
 
 let isCurrentUserSlaveAdmin = false;
 
+// Unified Admin Identity Resolver across Telegram WebApp, Magic Token Session, and LocalStorage
+function getCurrentAdminIdentity() {
+    const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
+    if (tgUser && tgUser.id) {
+        const id = String(tgUser.id);
+        const name = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || "Admin"}`;
+        return { id, name };
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = String(
+        sessionStorage.getItem("admin_auth_id") ||
+        window.currentAdminTelegramId ||
+        urlParams.get("tg_id") ||
+        urlParams.get("admin_id") ||
+        localStorage.getItem("filmhouse_admin_id") ||
+        localStorage.getItem("filmhouse_admin_tg_id") ||
+        "test-admin"
+    );
+    const name = String(
+        sessionStorage.getItem("admin_auth_name") ||
+        urlParams.get("admin_name") ||
+        localStorage.getItem("filmhouse_admin_name") ||
+        localStorage.getItem("filmhouse_admin_username") ||
+        "Admin"
+    );
+    return { id, name };
+}
+
 // Premium Floating Toast Notification Helper
-function showToast(message, type = "success") {
+function showToast(message, type = "success", duration = 3000) {
     console.log(`[Toast] [${type}] ${message}`);
     let toastContainer = document.getElementById("admin-toast-container");
     if (!toastContainer) {
@@ -183,13 +211,14 @@ function showToast(message, type = "success") {
         toast.style.transform = "translateY(0)";
     }, 10);
 
+    const ms = typeof duration === "number" && duration > 0 ? duration : 3000;
     setTimeout(() => {
         toast.style.opacity = "0";
         toast.style.transform = "translateY(-20px)";
         setTimeout(() => {
             toast.remove();
         }, 300);
-    }, 3000);
+    }, ms);
 }
 
 // Collapsible Panel Toggle Helper
@@ -330,7 +359,8 @@ function parseBulkLinks(rawText, isSeries) {
     }
 
     function detectSeason(str, fallbackIdx) {
-        const sMatch = str.match(/season\s*(\d+)/i) || str.match(/s(\d+)/i);
+        const stripped = str.replace(/https?:\/\/[^\s]+|t\.me\/[^\s]+/gi, " ");
+        const sMatch = stripped.match(/\bseason\s*(\d+)/i) || stripped.match(/\bs(\d{1,2})\b/i);
         if (sMatch) {
             return `Season ${parseInt(sMatch[1], 10)}`;
         }
@@ -400,10 +430,10 @@ function parseBulkStreams(rawText, isSeries) {
 
         if (isSeries) {
             const epNum = specifiedEpisode || (idx + 1);
-            parsed.push({ url: cleaned, episode: epNum });
+            parsed.push({ url: cleaned, stream_url: cleaned, episode: epNum });
         } else {
             const quality = specifiedQuality || detectQuality(line, idx);
-            parsed.push({ url: cleaned, quality });
+            parsed.push({ url: cleaned, stream_url: cleaned, quality });
         }
     });
 
@@ -901,8 +931,10 @@ function updateStatsCounters() {
     const oneDayMs = 24 * 60 * 60 * 1000;
     const activeToday = allUsers.filter(u => {
         if (!u.lastSeen) return false;
-        const lastSeenMs = u.lastSeen.seconds * 1000;
-        return (now - lastSeenMs) <= oneDayMs;
+        const lastSeenMs = typeof getSafeTimestamp === "function"
+            ? getSafeTimestamp(u.lastSeen)
+            : (u.lastSeen.seconds ? u.lastSeen.seconds * 1000 : new Date(u.lastSeen).getTime());
+        return lastSeenMs > 0 && (now - lastSeenMs) <= oneDayMs;
     }).length;
     
     const activeTodayEl = document.getElementById("stat-active-today");
@@ -1063,8 +1095,13 @@ function deleteUserFromFirestore(userId) {
         alert("Firebase is not loaded!");
         return;
     }
-    db.collection("users").doc(userId).delete()
+    db.collection("users").doc(String(userId)).delete()
         .then(() => {
+            allUsers = allUsers.filter(u => String(u.id) !== String(userId));
+            if (typeof saveUsersToCache === "function") saveUsersToCache(allUsers);
+            updateStatsCounters();
+            renderUsersList();
+            populateAllocatorDropdowns();
             alert("User deleted successfully!");
         })
         .catch(err => {
@@ -1162,6 +1199,7 @@ function renderRequestsList() {
             counts[key] = { 
                 title: rawTitle, 
                 type: r.type || "Movie", 
+                category: r.category || "",
                 year: yearPart,
                 tmdb_id: r.tmdb_id || null,
                 csv_id: r.csv_id || null,
@@ -1184,6 +1222,9 @@ function renderRequestsList() {
                 latestDate: reqDate
             };
         } else {
+            if (r.category && !counts[key].category) {
+                counts[key].category = r.category;
+            }
             if (reqTime > 0) {
                 if (reqTime < counts[key].earliestTimestamp) {
                     counts[key].earliestTimestamp = reqTime;
@@ -1338,8 +1379,7 @@ function renderRequestsList() {
         row.className = "list-row";
         row.style.cssText = "display: flex; flex-direction: column; padding: 12px 16px; border-bottom: 1px solid var(--border-color); gap: 8px;";
 
-        const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-        const currentAdminId = String(tgUser ? tgUser.id : (new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || "test-admin"));
+        const currentAdminId = getCurrentAdminIdentity().id;
         
         let badgeMarkup = "";
         let isLockedByOther = false;
@@ -1584,9 +1624,7 @@ function fulfillMovieTitleRequests(title, docIds, reqMeta = null) {
     if (targetDocIds.length === 0) return;
 
     // Check if already claimed by another admin
-    const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-    const currentAdminId = String(tgUser ? tgUser.id : (new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || "test-admin"));
-    const currentAdminName = tgUser ? (tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`) : "Admin";
+    const { id: currentAdminId, name: currentAdminName } = getCurrentAdminIdentity();
 
     // Query Firestore ONLY for these exact request documents
     const docPromises = targetDocIds.map(id => db.collection("requests").doc(id).get());
@@ -1661,9 +1699,9 @@ function fulfillMovieTitleRequests(title, docIds, reqMeta = null) {
                 return false;
             });
 
-            const matchedReq = (reqMeta && reqMeta.title) ? reqMeta : (allRequests.find(r => targetDocIds.includes(r.docId)) || allRequests.find(r => r.title.toLowerCase().trim() === title.toLowerCase().trim()));
+            const matchedReq = (reqMeta && reqMeta.title) ? reqMeta : (allRequests.find(r => targetDocIds.includes(r.docId)) || allRequests.find(r => (r.title || "").toLowerCase().trim() === (title || "").toLowerCase().trim()));
             currentFulfillReq = matchedReq;
-            const isSeries = matchedReq ? ((matchedReq.type || "").toLowerCase() === 'series' || (matchedReq.type || "").toLowerCase() === 'tv') : (existingMovie ? (existingMovie.type || "").toLowerCase() === 'series' : false);
+            const isSeries = isRequestSeries(matchedReq, existingMovie);
             
             let reqSpec = matchedReq ? (matchedReq.seasonOrPart || "") : "";
             if (!reqSpec && title) {
@@ -1691,46 +1729,49 @@ function fulfillMovieTitleRequests(title, docIds, reqMeta = null) {
     });
 }
 
-function releaseClaimLock(title, docIds = []) {
+async function releaseClaimLock(title, docIds = []) {
     if (typeof firebase === "undefined" || !db) return;
     
-    const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-    const currentAdminId = String(tgUser ? tgUser.id : (new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || "test-admin"));
+    const currentAdminId = getCurrentAdminIdentity().id;
     
     if (Array.isArray(docIds) && docIds.length > 0) {
-        const batch = db.batch();
-        let count = 0;
-        docIds.forEach(id => {
-            batch.update(db.collection("requests").doc(id), {
-                adminClaimId: firebase.firestore.FieldValue.delete(),
-                adminClaimName: firebase.firestore.FieldValue.delete(),
-                adminClaimTime: firebase.firestore.FieldValue.delete()
-            });
-            count++;
-        });
-        if (count > 0) {
-            batch.commit().catch(err => console.error("Error releasing claim lock:", err));
+        try {
+            for (let i = 0; i < docIds.length; i += 450) {
+                const batch = db.batch();
+                docIds.slice(i, i + 450).forEach(id => {
+                    batch.update(db.collection("requests").doc(id), {
+                        adminClaimId: firebase.firestore.FieldValue.delete(),
+                        adminClaimName: firebase.firestore.FieldValue.delete(),
+                        adminClaimTime: firebase.firestore.FieldValue.delete()
+                    });
+                });
+                await batch.commit();
+            }
+        } catch (err) {
+            console.error("Error releasing claim lock:", err);
         }
         return;
     }
 
     if (!title) return;
-    db.collection("requests").where("title", "==", title).get().then(snapshot => {
-        const batch = db.batch();
-        let count = 0;
+    db.collection("requests").where("title", "==", title).get().then(async snapshot => {
+        const docsToRelease = [];
         snapshot.forEach(doc => {
             const data = doc.data();
             if (data.adminClaimId === currentAdminId && data.status !== "fulfilled" && data.status !== "claimed") {
-                batch.update(doc.ref, {
+                docsToRelease.push(doc.ref);
+            }
+        });
+        for (let i = 0; i < docsToRelease.length; i += 450) {
+            const batch = db.batch();
+            docsToRelease.slice(i, i + 450).forEach(ref => {
+                batch.update(ref, {
                     adminClaimId: firebase.firestore.FieldValue.delete(),
                     adminClaimName: firebase.firestore.FieldValue.delete(),
                     adminClaimTime: firebase.firestore.FieldValue.delete()
                 });
-                count++;
-            }
-        });
-        if (count > 0) {
-            batch.commit().catch(err => console.error("Error releasing claim lock:", err));
+            });
+            await batch.commit();
         }
     }).catch(err => console.error("Error querying requests for release lock:", err));
 }
@@ -1783,11 +1824,11 @@ if (requestsSortSelect) {
     });
 }
 
-// Batch-delete all fulfilled requests from Firestore
-function clearFulfilledRequests() {
+// Batch-delete all fulfilled requests from Firestore (chunked to <= 450 ops per batch)
+async function clearFulfilledRequests() {
     if (typeof firebase === "undefined" || !db) return;
     
-    const fulfilledDocs = allRequests.filter(r => r.status === "fulfilled" || r.status === "claimed" || r.claimed === true);
+    const fulfilledDocs = allRequests.filter(r => isRequestFulfilled(r));
     if (fulfilledDocs.length === 0) {
         showToast("No fulfilled requests to clear.", "info");
         return;
@@ -1797,17 +1838,19 @@ function clearFulfilledRequests() {
         return;
     }
     
-    const batch = db.batch();
-    fulfilledDocs.forEach(r => {
-        batch.delete(db.collection("requests").doc(r.docId));
-    });
-    
-    batch.commit().then(() => {
+    try {
+        for (let i = 0; i < fulfilledDocs.length; i += 450) {
+            const batch = db.batch();
+            fulfilledDocs.slice(i, i + 450).forEach(r => {
+                if (r.docId) batch.delete(db.collection("requests").doc(r.docId));
+            });
+            await batch.commit();
+        }
         showToast(`Cleared ${fulfilledDocs.length} fulfilled requests from the database. 🗑️`, "success");
-    }).catch(err => {
+    } catch (err) {
         console.error("Error clearing fulfilled requests:", err);
         showToast("Failed to clear fulfilled requests.", "error");
-    });
+    }
 }
 
 // --- CATALOG MANAGER LOGIC ---
@@ -1931,28 +1974,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         } catch (e) {
             console.error("Error loading Telegram settings from Firestore:", e);
-        }
-
-        try {
-            const welcomeDoc = await db.collection("settings").doc("welcome").get();
-            if (welcomeDoc.exists) {
-                const welcomeData = welcomeDoc.data();
-                const welcomeImgInput = document.getElementById("telegram-welcome-image");
-                if (welcomeImgInput) welcomeImgInput.value = welcomeData.photoUrl || "";
-                const welcomeTextInput = document.getElementById("telegram-welcome-text");
-                if (welcomeTextInput) welcomeTextInput.value = welcomeData.text || "";
-                
-                const appTextInput = document.getElementById("telegram-welcome-app-text");
-                if (appTextInput) appTextInput.value = welcomeData.appButtonText || "";
-                const appUrlInput = document.getElementById("telegram-welcome-app-url");
-                if (appUrlInput) appUrlInput.value = welcomeData.appButtonUrl || "";
-                const chanTextInput = document.getElementById("telegram-welcome-channel-text");
-                if (chanTextInput) chanTextInput.value = welcomeData.channelButtonText || "";
-                const chanUrlInput = document.getElementById("telegram-welcome-channel-url");
-                if (chanUrlInput) chanUrlInput.value = welcomeData.channelButtonUrl || "";
-            }
-        } catch (e) {
-            console.error("Error loading welcome settings from Firestore:", e);
         }
 
         // Setup real-time listener for Telegram Bot Status
@@ -2166,9 +2187,9 @@ async function verifyAdminAccess() {
             const decoded = atob(authToken);
             const [tokenAdminId, tokenExpiry] = decoded.split(":");
             if (tokenAdminId && tokenExpiry && Date.now() < parseInt(tokenExpiry, 10)) {
-                if (["1329840839", "1175336733"].includes(tokenAdminId)) {
+                if (authorizedIds.includes(tokenAdminId) || masters.includes(tokenAdminId) || ["1329840839", "1175336733"].includes(tokenAdminId)) {
                     sessionStorage.setItem("admin_auth_id", tokenAdminId);
-                    sessionStorage.setItem("admin_auth_name", `Master Admin (${tokenAdminId})`);
+                    sessionStorage.setItem("admin_auth_name", masters.includes(tokenAdminId) ? `Master Admin (${tokenAdminId})` : `Admin (${tokenAdminId})`);
                     console.log(`[Security] Authenticated via 1-Click Magic Login Token for Admin ${tokenAdminId}`);
                 }
             }
@@ -2189,12 +2210,15 @@ async function verifyAdminAccess() {
     }
 
     const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-    if (tgUser) {
+    if (tgUser && tgUser.id) {
         const uName = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name || 'Admin'}`;
         sessionStorage.setItem("admin_auth_name", uName);
         sessionStorage.setItem("admin_auth_id", String(tgUser.id));
     }
-    const currentTgId = tgUser ? String(tgUser.id) : (sessionStorage.getItem("admin_auth_id") || null);
+    const currentTgId = (tgUser && tgUser.id) ? String(tgUser.id) : (sessionStorage.getItem("admin_auth_id") || null);
+    if (currentTgId) {
+        window.currentAdminTelegramId = currentTgId;
+    }
 
     const idBox = document.getElementById("your-tg-id-box");
     if (idBox) {
@@ -2217,12 +2241,16 @@ async function verifyAdminAccess() {
             "requests-panel",
             "editors-choice-panel",
             "broadcast-panel",
-            "allocator-panel"
+            "allocator-panel",
+            "admin-analytics-panel",
+            "users-panel"
         ];
         panelsToHide.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.style.display = "none";
         });
+        renderUsersList();
+        renderRequestsList();
 
         // Update header title to content curation center
         const adminTitle = document.querySelector(".admin-title span:last-child");
@@ -2547,7 +2575,7 @@ if (serverBotUpdateBtn) {
         }, 25000);
 
         try {
-            const adminId = window.currentAdminTelegramId || localStorage.getItem("filmhouse_admin_tg_id") || "admin";
+            const adminId = getCurrentAdminIdentity().id;
             await db.collection("settings").doc("server_tasks").set({
                 action: "git_update",
                 status: "pending",
@@ -2633,13 +2661,8 @@ if (testTelegramBtn) {
         testTelegramBtn.textContent = "Testing... ⏳";
 
         // Determine destination chat ID: try current admin ID, fallback to prompt
-        const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-        let testChatId = tgUser ? String(tgUser.id) : null;
-        
-        if (!testChatId) {
-            const urlParams = new URLSearchParams(window.location.search);
-            testChatId = urlParams.get("tg_id") || urlParams.get("admin_id");
-        }
+        const currentIdentity = getCurrentAdminIdentity();
+        let testChatId = (currentIdentity.id && currentIdentity.id !== "test-admin" && currentIdentity.id !== "admin") ? String(currentIdentity.id) : null;
 
         if (!testChatId) {
             testChatId = prompt("Enter your Telegram User ID to receive the test message:");
@@ -2970,15 +2993,15 @@ function showMovieDetails(movie) {
     detailsBody.innerHTML = `
         <!-- Read-Only Title Info View -->
         <div id="details-title-info-view" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
-            <img src="${posterUrl}" style="width: 130px; height: 180px; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+            <img src="${escapeHTML(posterUrl)}" style="width: 130px; height: 180px; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
             <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; justify-content: center;">
-                <h4 style="margin: 0 0 10px 0; font-size: 18px; font-family: var(--font-heading); color: #fff; line-height: 1.3;">${movie.title} ${cinemaCutBadge}</h4>
-                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>ID:</strong> ${movie.csv_id}</p>
-                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Type:</strong> <span style="text-transform: uppercase; font-weight: 600; color: ${badgeColor};">${movie.type}</span></p>
-                ${movie.release_date ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Release Date:</strong> ${movie.release_date}</p>` : ''}
-                ${movie.rating ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Rating:</strong> ⭐ ${movie.rating}/10</p>` : ''}
-                ${movie.director ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Director:</strong> ${movie.director}</p>` : ''}
-                ${movie.cast && movie.cast.length ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"><strong>Cast:</strong> ${movie.cast.join(', ')}</p>` : ''}
+                <h4 style="margin: 0 0 10px 0; font-size: 18px; font-family: var(--font-heading); color: #fff; line-height: 1.3;">${escapeHTML(movie.title)} ${cinemaCutBadge}</h4>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>ID:</strong> ${escapeHTML(movie.csv_id)}</p>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Type:</strong> <span style="text-transform: uppercase; font-weight: 600; color: ${badgeColor};">${escapeHTML(movie.type)}</span></p>
+                ${movie.release_date ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Release Date:</strong> ${escapeHTML(movie.release_date)}</p>` : ''}
+                ${movie.rating ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Rating:</strong> ⭐ ${escapeHTML(movie.rating)}/10</p>` : ''}
+                ${movie.director ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary);"><strong>Director:</strong> ${escapeHTML(movie.director)}</p>` : ''}
+                ${movie.cast && movie.cast.length ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"><strong>Cast:</strong> ${escapeHTML(movie.cast.map(c => typeof c === 'object' && c !== null ? (c.name || '') : String(c)).filter(Boolean).join(', '))}</p>` : ''}
             </div>
         </div>
 
@@ -3105,7 +3128,7 @@ function showMovieDetails(movie) {
         ${movie.overview ? `
         <div style="margin-bottom: 20px;">
             <h5 style="margin: 0 0 6px 0; color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Synopsis</h5>
-            <p style="margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">${movie.overview}</p>
+            <p style="margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">${escapeHTML(movie.overview)}</p>
         </div>
         ` : ''}
 
@@ -3270,8 +3293,9 @@ function showMovieDetails(movie) {
                 editMovieIdInput.value = parsed.id;
                 const typeSelect = document.getElementById("edit-movie-type");
                 if (typeSelect) {
-                    typeSelect.value = parsed.type;
+                    typeSelect.value = parsed.type === "tv" ? "Series" : "Movie";
                     renderLinkInputs();
+                    renderDetailsStreamInputs();
                 }
             }
         });
@@ -3299,7 +3323,8 @@ function showMovieDetails(movie) {
 
     function renderLinkInputs() {
         inputsWrapper.innerHTML = "";
-        const isSeriesMovie = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+        const editTypeVal = document.getElementById("edit-movie-type")?.value;
+        const isSeriesMovie = (editTypeVal || movie.type || "").toLowerCase() === 'series';
 
         currentLinks.forEach((link, idx) => {
             const urlVal = typeof link === 'object' && link !== null ? link.url : link;
@@ -3448,10 +3473,14 @@ function showMovieDetails(movie) {
                 }
                 
                 currentStreams = streams;
+                currentEditStreams = streams.length > 0
+                    ? JSON.parse(JSON.stringify(streams))
+                    : [isSeries ? { episode: 1, season: 1, stream_url: "" } : { quality: "720p", stream_url: "" }];
                 catalogChangesMade = true;
                 if (!newlyUpdatedIds.includes(targetMovie.csv_id) && !newlyAddedIds.includes(targetMovie.csv_id)) {
                     newlyUpdatedIds.push(targetMovie.csv_id);
                 }
+                renderCatalogList();
                 updatePublishButtonState();
                 
                 // Re-render the view list
@@ -3471,7 +3500,6 @@ function showMovieDetails(movie) {
                 }
                 
                 bindCopyTokenButtons();
-            bindDeleteStreamButtons();
                 bindDeleteStreamButtons();
                 
                 if (typeof showToast === 'function') {
@@ -3649,7 +3677,8 @@ function showMovieDetails(movie) {
         if (!wrapper) return;
         wrapper.innerHTML = "";
 
-        const isCurrentSeries = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+        const editTypeVal = document.getElementById("edit-movie-type")?.value;
+        const isCurrentSeries = (editTypeVal || movie.type || "").toLowerCase() === 'series';
 
         if (counter) {
             const validCount = currentEditStreams.filter(s => (s.stream_url || s.url || '').trim().length > 0).length;
@@ -3761,7 +3790,8 @@ function showMovieDetails(movie) {
     const btnAddDetailsStream = document.getElementById("btn-add-details-stream-input");
     if (btnAddDetailsStream) {
         btnAddDetailsStream.addEventListener("click", () => {
-            const isCurrentSeries = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            const editTypeVal = document.getElementById("edit-movie-type")?.value;
+            const isCurrentSeries = (editTypeVal || movie.type || "").toLowerCase() === 'series';
             const nextEp = currentEditStreams.length + 1;
             currentEditStreams.push(isCurrentSeries ? { episode: nextEp, season: 1, stream_url: "" } : { quality: "720p", stream_url: "" });
             renderDetailsStreamInputs();
@@ -3785,7 +3815,8 @@ function showMovieDetails(movie) {
 
     if (detailsBulkStreamsApply && detailsBulkStreamsInput) {
         detailsBulkStreamsApply.addEventListener("click", () => {
-            const isCurrentSeries = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            const editTypeVal = document.getElementById("edit-movie-type")?.value;
+            const isCurrentSeries = (editTypeVal || movie.type || "").toLowerCase() === 'series';
             const parsed = parseBulkStreams(detailsBulkStreamsInput.value, isCurrentSeries);
             if (parsed.length === 0) {
                 alert("Please paste at least one valid stream token or URL!");
@@ -3794,7 +3825,7 @@ function showMovieDetails(movie) {
             currentEditStreams = parsed.map((s, idx) => {
                 const u = cleanStreamInput(s.url || s.stream_url);
                 if (isCurrentSeries) {
-                    return { episode: s.episode || (idx + 1), season: 1, stream_url: u, url: u };
+                    return { episode: s.episode || (idx + 1), season: parseInt(s.season, 10) || 1, stream_url: u, url: u };
                 }
                 return { quality: s.quality || '720p', stream_url: u, url: u };
             });
@@ -3809,7 +3840,8 @@ function showMovieDetails(movie) {
     const btnDetailsAutoSlots = document.getElementById("btn-details-auto-slots");
     if (btnDetailsAutoSlots) {
         btnDetailsAutoSlots.addEventListener("click", () => {
-            const isCurrentSeries = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            const editTypeVal = document.getElementById("edit-movie-type")?.value;
+            const isCurrentSeries = (editTypeVal || movie.type || "").toLowerCase() === 'series';
             if (isCurrentSeries) {
                 const suggestedCount = Math.max(currentLinks.length, currentEditStreams.length, 10);
                 const countPrompt = prompt("How many episode slots would you like to generate?", suggestedCount);
@@ -3824,7 +3856,7 @@ function showMovieDetails(movie) {
                     const existing = currentEditStreams.find(s => s.episode === ep);
                     newSlots.push({
                         episode: ep,
-                        season: 1,
+                        season: existing ? (parseInt(existing.season, 10) || 1) : 1,
                         stream_url: existing ? existing.stream_url : "",
                         url: existing ? existing.stream_url : ""
                     });
@@ -3871,7 +3903,8 @@ function showMovieDetails(movie) {
     const btnAddLink = document.getElementById("btn-add-link-input");
     if (btnAddLink) {
         btnAddLink.addEventListener("click", () => {
-            const isSeriesMovie = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            const editTypeVal = document.getElementById("edit-movie-type")?.value;
+            const isSeriesMovie = (editTypeVal || movie.type || "").toLowerCase() === 'series';
             const nextSeason = `Season ${currentLinks.length + 1}`;
             currentLinks.push(isSeriesMovie ? { url: "", season: nextSeason } : { url: "", quality: "720p" });
             renderLinkInputs();
@@ -3894,7 +3927,8 @@ function showMovieDetails(movie) {
 
     if (detailsBulkApply && detailsBulkInput) {
         detailsBulkApply.addEventListener("click", () => {
-            const isSeriesType = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            const editTypeVal = document.getElementById("edit-movie-type")?.value;
+            const isSeriesType = (editTypeVal || movie.type || "").toLowerCase() === 'series';
             const parsed = parseBulkLinks(detailsBulkInput.value, isSeriesType);
             if (parsed.length === 0) {
                 alert("Please paste at least one valid link!");
@@ -3923,7 +3957,8 @@ function showMovieDetails(movie) {
     const saveLinksBtn = document.getElementById("btn-save-links-changes");
     if (saveLinksBtn) {
         saveLinksBtn.addEventListener("click", () => {
-            const isSeriesType = (document.getElementById("edit-movie-type")?.value || "").toLowerCase() === 'series' || (movie.type || "").toLowerCase() === 'series';
+            const editTypeVal = document.getElementById("edit-movie-type")?.value;
+            const isSeriesType = (editTypeVal || movie.type || "").toLowerCase() === 'series';
             const finalLinks = currentLinks.filter(l => {
                 const urlVal = typeof l === 'object' && l !== null ? l.url : l;
                 return urlVal && urlVal.trim() !== "";
@@ -3943,7 +3978,7 @@ function showMovieDetails(movie) {
             }).map((s, idx) => {
                 const u = cleanStreamInput(s.stream_url || s.url);
                 if (isSeriesType) {
-                    return { episode: s.episode || (idx + 1), season: 1, stream_url: u, url: u };
+                    return { episode: s.episode || (idx + 1), season: parseInt(s.season, 10) || 1, stream_url: u, url: u };
                 }
                 return { quality: s.quality || '720p', stream_url: u, url: u };
             });
@@ -3971,6 +4006,10 @@ function showMovieDetails(movie) {
             const movieIndex = allCatalogMovies.findIndex(m => m.csv_id === movie.csv_id);
             if (movieIndex !== -1) {
                 const prevId = allCatalogMovies[movieIndex].csv_id;
+                if (prevId !== newId && allCatalogMovies.some((m, i) => i !== movieIndex && m.csv_id === newId)) {
+                    alert(`Error: Another title in the catalog already uses the ID "${newId}"!`);
+                    return;
+                }
                 
                 allCatalogMovies[movieIndex].title = newTitle;
                 allCatalogMovies[movieIndex].csv_id = newId;
@@ -4046,6 +4085,8 @@ function showMovieDetails(movie) {
                     if (newlyAddedIds.includes(prevId)) {
                         newlyAddedIds = newlyAddedIds.filter(id => id !== prevId);
                         newlyAddedIds.push(newId);
+                    } else if (!newlyDeletedIds.includes(prevId)) {
+                        newlyDeletedIds.push(prevId);
                     }
                     if (newlyUpdatedIds.includes(prevId)) {
                         newlyUpdatedIds = newlyUpdatedIds.filter(id => id !== prevId);
@@ -4059,9 +4100,13 @@ function showMovieDetails(movie) {
                     }
                 }
                 
+                invalidateCatalogLookupCache();
                 catalogChangesMade = true;
                 renderCatalogList();
                 updatePublishButtonState();
+                if (typeof initOngoingSeriesTracker === "function") {
+                    initOngoingSeriesTracker(true);
+                }
                 
                 alert("Title details updated locally! Click 'Publish Changes 🚀' in the header to save them to GitHub.");
                 movieDetailsModal.classList.remove("active");
@@ -4137,20 +4182,23 @@ function showMovieDetails(movie) {
                 // 1. Merge streams from in-memory movie + live Firestore
                 const liveStreams = Array.isArray(liveData.stream_links) ? liveData.stream_links : [];
                 const streamMap = new Map();
-                (movie.stream_links || []).forEach(s => {
-                    const key = `s${s.season || 1}_e${s.episode || 1}`;
+                (movie.stream_links || []).forEach((s, idx) => {
+                    const key = isSeries ? `s${s.season || 1}_e${s.episode || (idx + 1)}` : `q_${normalizeQualityName(s.quality || "720p")}_${idx}`;
                     streamMap.set(key, s);
                 });
-                liveStreams.forEach(s => {
-                    const key = `s${s.season || 1}_e${s.episode || 1}`;
+                liveStreams.forEach((s, idx) => {
+                    const key = isSeries ? `s${s.season || 1}_e${s.episode || (idx + 1)}` : `q_${normalizeQualityName(s.quality || "720p")}_${idx}`;
                     const prev = streamMap.get(key) || {};
                     streamMap.set(key, { ...prev, ...s });
                 });
-                const mergedStreams = Array.from(streamMap.values()).sort((a, b) => {
-                    const sDiff = (parseInt(a.season, 10) || 1) - (parseInt(b.season, 10) || 1);
-                    if (sDiff !== 0) return sDiff;
-                    return (parseInt(a.episode, 10) || 1) - (parseInt(b.episode, 10) || 1);
-                });
+                const mergedStreams = Array.from(streamMap.values());
+                if (isSeries) {
+                    mergedStreams.sort((a, b) => {
+                        const sDiff = (parseInt(a.season, 10) || 1) - (parseInt(b.season, 10) || 1);
+                        if (sDiff !== 0) return sDiff;
+                        return (parseInt(a.episode, 10) || 1) - (parseInt(b.episode, 10) || 1);
+                    });
+                }
 
                 if (mergedStreams.length !== (movie.stream_links || []).length) {
                     movie.stream_links = mergedStreams;
@@ -5336,7 +5384,7 @@ if (addMovieForm) {
                         // Update UI dropdown value to match correct type
                         const typeSelect = document.getElementById("movie-type");
                         if (typeSelect) {
-                            typeSelect.value = (fallbackType === 'tv') ? 'Series' : 'Movie';
+                            typeSelect.value = (fallbackType === 'tv') ? 'tv' : 'movie';
                         }
                     } else {
                         throw new Error(`Failed to fetch from both movie and tv endpoints for TMDB ID ${numericId}`);
@@ -5435,6 +5483,7 @@ if (addMovieForm) {
         
         allCatalogMovies.unshift(newMovie);
         newlyAddedIds.push(id); // Show new addition badge!
+        invalidateCatalogLookupCache();
         catalogChangesMade = true;
         
         updatePublishButtonState();
@@ -5444,10 +5493,6 @@ if (addMovieForm) {
         const postAddMovieToChan = document.getElementById("add-movie-post-to-channel");
         if (postAddMovieToChan && !postAddMovieToChan.checked) {
             newMovie.channelBroadcasted = true; // Admin opted out of broadcast
-        }
-        // Always record publication duty activity for the admin adding the movie to catalog
-        if (typeof window.recordAdminActivity === 'function') {
-            window.recordAdminActivity("publication", title);
         }
         
         if (submitBtn) {
@@ -5476,10 +5521,11 @@ function generateCSVContent() {
     
     // Convert back to original order: reverse unshift sequence if necessary, but we can just write as is
     const rows = allCatalogMovies.map(movie => {
+        const mTypeStr = (movie.type || "").toLowerCase();
         const row = [
             escapeCSV(movie.title),
             escapeCSV(movie.csv_id),
-            escapeCSV(movie.type.toLowerCase() === 'series' || movie.type.toLowerCase() === 'tv' ? 'tv' : 'movie')
+            escapeCSV(mTypeStr === 'series' || mTypeStr === 'tv' ? 'tv' : 'movie')
         ];
         
         // Output up to 40 links columns
@@ -5631,9 +5677,10 @@ if (publishBtn) {
                     
                     let mergedCount = 0;
                     const localCsvIds = new Set(allCatalogMovies.map(m => m.csv_id));
+                    const deletedSet = new Set(newlyDeletedIds);
                     
                     remoteMovies.forEach(rm => {
-                        if (rm.csv_id && !localCsvIds.has(rm.csv_id)) {
+                        if (rm.csv_id && !localCsvIds.has(rm.csv_id) && !deletedSet.has(rm.csv_id)) {
                             allCatalogMovies.push(rm);
                             mergedCount++;
                         }
@@ -5643,7 +5690,7 @@ if (publishBtn) {
                         invalidateCatalogLookupCache();
                         console.log(`Auto-merged ${mergedCount} remote movies into local list to prevent overwrite deletion!`);
                         // Ensure lists are sorted consistently
-                        allCatalogMovies.sort((a, b) => a.title.localeCompare(b.title));
+                        allCatalogMovies.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
                         renderCatalogList();
                     }
                 } catch (err) {
@@ -5702,7 +5749,7 @@ if (publishBtn) {
                         chunk.forEach(op => {
                             const movieRef = db.collection("movies").doc(op.docId);
                             if (op.type === "set") {
-                                fsBatch.set(movieRef, op.data, { merge: true });
+                                fsBatch.set(movieRef, JSON.parse(JSON.stringify(op.data)), { merge: true });
                             } else if (op.type === "delete") {
                                 fsBatch.delete(movieRef);
                             }
@@ -5721,7 +5768,7 @@ if (publishBtn) {
                 try {
                     await db.collection("settings").doc("catalog_sync").set({
                         lastPublishedAt: Date.now(),
-                        publishedBy: (typeof currentAdminName !== "undefined" && currentAdminName) ? currentAdminName : "admin"
+                        publishedBy: getCurrentAdminIdentity().name || "admin"
                     }, { merge: true });
                 } catch (syncDocErr) {
                     console.warn("Failed to notify bot of catalog publish:", syncDocErr);
@@ -5939,7 +5986,9 @@ function showCSVReviewModal(importedMovies) {
             const existing = existingMap.get(m.csv_id);
             const isTitleDiff = existing.title !== m.title;
             const isTypeDiff = existing.type !== m.type;
-            const isLinksDiff = JSON.stringify(existing.links) !== JSON.stringify(m.links);
+            const existingLinkUrls = (existing.links || []).map(l => typeof l === "object" && l !== null ? (l.url || "") : String(l || "").trim());
+            const importedLinkUrls = (m.links || []).map(l => typeof l === "object" && l !== null ? (l.url || "") : String(l || "").trim());
+            const isLinksDiff = JSON.stringify(existingLinkUrls) !== JSON.stringify(importedLinkUrls);
             if (isTitleDiff || isTypeDiff || isLinksDiff) {
                 updated.push({ newMovie: m, oldMovie: existing });
             }
@@ -5988,11 +6037,11 @@ function showCSVReviewModal(importedMovies) {
                         <h4 style="margin: 0 0 8px 0; color: #4caf50; font-size: 14px;">Pending Additions (${added.length})</h4>
                         <div id="added-preview-list" style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(76, 175, 80, 0.1);">
                             ${added.map(m => `
-                                <div id="preview-row-${m.csv_id}" style="display: flex; gap: 10px; align-items: center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div id="preview-row-${escapeHTML(m.csv_id)}" style="display: flex; gap: 10px; align-items: center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);">
                                     <div class="preview-spinner" style="width: 32px; height: 42px; background: rgba(255,255,255,0.05); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px;">⏳</div>
                                     <div style="flex: 1;">
-                                        <div style="font-weight: 600; color: #fff;">${m.title}</div>
-                                        <div style="font-size: 11px; color: var(--text-secondary);">ID: ${m.csv_id} | Type: ${m.type}</div>
+                                        <div style="font-weight: 600; color: #fff;">${escapeHTML(m.title)}</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">ID: ${escapeHTML(m.csv_id)} | Type: ${escapeHTML(m.type)}</div>
                                     </div>
                                 </div>
                             `).join('')}
@@ -6006,9 +6055,9 @@ function showCSVReviewModal(importedMovies) {
                         <div style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(33, 150, 243, 0.1);">
                             ${updated.map(u => `
                                 <div style="padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                    <div style="font-weight: 600; color: #fff;">${u.newMovie.title}</div>
+                                    <div style="font-weight: 600; color: #fff;">${escapeHTML(u.newMovie.title)}</div>
                                     <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-                                        ${u.oldMovie.title !== u.newMovie.title ? `<span style="color: #ff9800; text-decoration: line-through;">${u.oldMovie.title}</span> ➔ <span style="color: #4caf50;">${u.newMovie.title}</span><br>` : ''}
+                                        ${u.oldMovie.title !== u.newMovie.title ? `<span style="color: #ff9800; text-decoration: line-through;">${escapeHTML(u.oldMovie.title)}</span> ➔ <span style="color: #4caf50;">${escapeHTML(u.newMovie.title)}</span><br>` : ''}
                                         ${u.oldMovie.links.length !== u.newMovie.links.length ? `Links: ${u.oldMovie.links.length} ➔ ${u.newMovie.links.length}` : 'Links content updated'}
                                     </div>
                                 </div>
@@ -6022,7 +6071,7 @@ function showCSVReviewModal(importedMovies) {
                         <h4 style="margin: 12px 0 8px 0; color: #f44336; font-size: 14px;">Titles to Remove (${activeRemoved.length})</h4>
                         <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid rgba(244, 67, 54, 0.1);">
                             ${activeRemoved.map(m => `
-                                <div style="color: #e57373; text-decoration: line-through; padding: 4px 6px;">${m.title}</div>
+                                <div style="color: #e57373; text-decoration: line-through; padding: 4px 6px;">${escapeHTML(m.title)}</div>
                             `).join('')}
                         </div>
                     </div>
@@ -6040,13 +6089,13 @@ function showCSVReviewModal(importedMovies) {
         const row = document.getElementById(`preview-row-${m.csv_id}`);
         if (row && preview) {
             row.innerHTML = `
-                <img src="${preview.poster || 'MOVIE/img/FilmHouse3_nobg.png'}" style="width: 32px; height: 46px; border-radius: 4px; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
+                <img src="${escapeHTML(preview.poster || 'MOVIE/img/FilmHouse3_nobg.png')}" style="width: 32px; height: 46px; border-radius: 4px; object-fit: cover;" onerror="this.src='MOVIE/img/FilmHouse3_nobg.png'">
                 <div style="flex: 1;">
                     <div style="font-weight: 600; color: #fff; display: flex; justify-content: space-between; align-items: center;">
-                        <span>${preview.title || m.title}</span>
+                        <span>${escapeHTML(preview.title || m.title)}</span>
                         <span style="font-size: 10px; color: #ffbc00;">⭐ ${preview.rating ? preview.rating.toFixed(1) : '0.0'}</span>
                     </div>
-                    <div style="font-size: 11px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 340px;" title="${preview.overview}">${preview.overview || 'No synopsis loaded.'}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 340px;" title="${escapeHTML(preview.overview)}">${escapeHTML(preview.overview || 'No synopsis loaded.')}</div>
                 </div>
             `;
             m.tmdb_id = preview.tmdb_id;
@@ -6092,31 +6141,54 @@ if (confirmCSVImportBtn && csvReviewModal) {
             let finalCatalog = [...allCatalogMovies];
             
             if (isOverwrite) {
-                // If overwrite mode is checked, remove all movies not in the imported CSV
+                // If overwrite mode is checked, remove all movies not in the imported CSV and record deletions
                 const importedIds = new Set(pendingImportChanges.importedList.map(m => m.csv_id));
+                finalCatalog.forEach(ex => {
+                    if (!importedIds.has(ex.csv_id) && !newlyDeletedIds.includes(ex.csv_id)) {
+                        newlyDeletedIds.push(ex.csv_id);
+                    }
+                });
                 finalCatalog = finalCatalog.filter(ex => importedIds.has(ex.csv_id));
             }
             
             pendingImportChanges.importedList.forEach(imported => {
                 const existingIdx = finalCatalog.findIndex(ex => ex.csv_id === imported.csv_id);
+                const isImpSeries = (imported.type || "").toLowerCase() === "series" || (imported.type || "").toLowerCase() === "tv";
                 if (existingIdx !== -1) {
+                    const prevLinks = Array.isArray(finalCatalog[existingIdx].links) ? finalCatalog[existingIdx].links : [];
+                    const structuredLinks = (imported.links || []).map((rawUrl, lIdx) => {
+                        const cleanU = typeof rawUrl === "object" && rawUrl !== null ? (rawUrl.url || "") : String(rawUrl || "").trim();
+                        const matchedOld = prevLinks.find(pl => {
+                            const oldU = typeof pl === "object" && pl !== null ? (pl.url || "") : String(pl || "").trim();
+                            return oldU === cleanU;
+                        });
+                        if (matchedOld && typeof matchedOld === "object") {
+                            return { ...matchedOld, url: cleanU };
+                        }
+                        return isImpSeries ? { url: cleanU, season: `Season ${lIdx + 1}` } : { url: cleanU, quality: lIdx === 0 ? "720p" : "1080p" };
+                    });
                     // Update only CSV-controlled columns (Title, Type, Links)
                     // Keep all other rich TMDB/custom metadata fields intact!
                     finalCatalog[existingIdx] = {
                         ...finalCatalog[existingIdx],
                         title: (finalCatalog[existingIdx].tmdb_id && finalCatalog[existingIdx].title) ? finalCatalog[existingIdx].title : imported.title,
                         type: imported.type,
-                        links: imported.links
+                        links: structuredLinks
                     };
                 } else {
+                    const structuredLinks = (imported.links || []).map((rawUrl, lIdx) => {
+                        const cleanU = typeof rawUrl === "object" && rawUrl !== null ? (rawUrl.url || "") : String(rawUrl || "").trim();
+                        return isImpSeries ? { url: cleanU, season: `Season ${lIdx + 1}` } : { url: cleanU, quality: lIdx === 0 ? "720p" : "1080p" };
+                    });
                     // Set safe default values for new movies if TMDB preview wasn't fetched yet
                     finalCatalog.push({
                         ...imported,
+                        links: structuredLinks,
                         categories: imported.categories || ["Main"],
                         genres: imported.genres || [],
                         overview: imported.overview || "No synopsis available.",
-                        poster: imported.poster || "img/FilmHouse3_nobg.png",
-                        backdrop: imported.backdrop || "img/FilmHouse.png",
+                        poster: imported.poster || "MOVIE/img/FilmHouse3_nobg.png",
+                        backdrop: imported.backdrop || "MOVIE/img/FilmHouse.png",
                         rating: imported.rating || 0,
                         release_date: imported.release_date || "",
                         language: imported.language || "en",
@@ -6129,8 +6201,9 @@ if (confirmCSVImportBtn && csvReviewModal) {
             });
             
             allCatalogMovies = finalCatalog;
-            newlyAddedIds = pendingImportChanges.added.map(m => m.csv_id);
-            newlyUpdatedIds = pendingImportChanges.updated.map(u => u.newMovie.csv_id);
+            invalidateCatalogLookupCache();
+            newlyAddedIds = Array.from(new Set([...newlyAddedIds, ...pendingImportChanges.added.map(m => m.csv_id)]));
+            newlyUpdatedIds = Array.from(new Set([...newlyUpdatedIds, ...pendingImportChanges.updated.map(u => u.newMovie.csv_id)]));
             
             catalogChangesMade = true;
             updatePublishButtonState();
@@ -6242,6 +6315,12 @@ window.closeFulfillRequestModal = function() {
     if (fulfillBulkWrapper) fulfillBulkWrapper.style.display = "none";
     if (fulfillBulkInput) fulfillBulkInput.value = "";
     if (btnFulfillBulkToggle) btnFulfillBulkToggle.textContent = "📋 Bulk Paste";
+    const fulfillBulkStreamsWrapper = document.getElementById("fulfill-bulk-streams-wrapper");
+    const fulfillBulkStreamsInput = document.getElementById("fulfill-bulk-streams-input");
+    const btnFulfillBulkStreamsToggle = document.getElementById("btn-fulfill-bulk-streams-toggle");
+    if (fulfillBulkStreamsWrapper) fulfillBulkStreamsWrapper.style.display = "none";
+    if (fulfillBulkStreamsInput) fulfillBulkStreamsInput.value = "";
+    if (btnFulfillBulkStreamsToggle) btnFulfillBulkStreamsToggle.textContent = "📋 Bulk Paste";
     const fulfillStreamInput = document.getElementById("fulfill-stream-url");
     if (fulfillStreamInput) fulfillStreamInput.value = "";
 };
@@ -6287,10 +6366,11 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
     const yearText = movieInfo.release_date ? ` (${movieInfo.release_date.substring(0, 4)})` : (movieInfo.year ? ` (${movieInfo.year})` : "");
     const isSeries = (movieInfo.type || "").toLowerCase() === "series" || (movieInfo.type || "").toLowerCase() === "tv";
     const rawSeason = movieInfo.seasonOrPart || (isSeries ? "Complete Series" : "Full Movie");
+    const lowerRawSeason = String(rawSeason).toLowerCase();
 
     let seasonOrQualityText = isSeries 
-        ? (String(rawSeason).toLowerCase().includes("season") || String(rawSeason).toLowerCase().includes("episode") ? rawSeason : `Season ${rawSeason}`)
-        : (String(rawSeason).toLowerCase().includes("quality") ? rawSeason : `${rawSeason} Quality`);
+        ? (lowerRawSeason.includes("season") || lowerRawSeason.includes("episode") || lowerRawSeason.includes("complete") || lowerRawSeason.includes("series") ? rawSeason : `Season ${rawSeason}`)
+        : (lowerRawSeason.includes("quality") || lowerRawSeason.includes("full movie") || lowerRawSeason.includes("cut") || lowerRawSeason.includes("cam") ? rawSeason : `${rawSeason} Quality`);
     if (movieInfo.isSeriesComplete) {
         seasonOrQualityText = "Complete Series | All Seasons";
     }
@@ -6400,7 +6480,7 @@ window.broadcastMovieToMainChannel = async function(movieInfo) {
         }
 
         showToast(`📢 Announcement for "${cleanTitle}" queued for channel broadcast! ✈️`, "success");
-        if (typeof window.recordAdminActivity === 'function') {
+        if (movieInfo.forceBroadcast && typeof window.recordAdminActivity === 'function') {
             window.recordAdminActivity("publication", cleanTitle);
         }
         return { ok: true, taskId: taskId };
@@ -6842,7 +6922,7 @@ function renderAdminLeaderboard() {
     if (topSubEl) {
         const topAdmin = adminList.find(a => a.workUnits > 0);
         if (topAdmin) {
-            topSubEl.textContent = `Top: ${escapeHTML(topAdmin.name)} (${topAdmin.workSharePercent}% Work Share)`;
+            topSubEl.textContent = `Top: ${topAdmin.name} (${topAdmin.workSharePercent}% Work Share)`;
         } else {
             topSubEl.textContent = `${activeCount} active in last 24h`;
         }
@@ -7001,8 +7081,30 @@ const adminPerfModal = document.getElementById("admin-perf-modal");
 
 // --- LIVE STREAMERS & AUDIENCE PRESENCE TRACKING ---
 let activeStreamersUnsubscribe = null;
+let activeStreamsFallbackUnsubscribe = null;
+let activeStreamersPruneTimer = null;
+let primaryStreamersMap = new Map();
+let fallbackStreamersMap = new Map();
 let currentActiveStreamersList = [];
 let totalStreamPlaysCount = 0;
+
+function recomputeAndRenderActiveStreamers() {
+    const now = Date.now();
+    const combined = new Map();
+    primaryStreamersMap.forEach((v, k) => {
+        const hb = v.lastHeartbeatMs || v.startedAtMs || 0;
+        if (Math.abs(now - hb) < 120000) combined.set(String(v.userId || v.id || k), v);
+    });
+    fallbackStreamersMap.forEach((v, k) => {
+        const hb = v.lastHeartbeatMs || v.startedAtMs || 0;
+        const uid = String(v.userId || v.id || k);
+        if (Math.abs(now - hb) < 120000 && !combined.has(uid)) {
+            combined.set(uid, v);
+        }
+    });
+    currentActiveStreamersList = Array.from(combined.values());
+    renderActiveStreamersUI();
+}
 
 function listenToActiveStreamers() {
     if (typeof firebase === "undefined" || !db) return;
@@ -7025,7 +7127,7 @@ function listenToActiveStreamers() {
     if (activeStreamersUnsubscribe) activeStreamersUnsubscribe();
     activeStreamersUnsubscribe = db.collection("settings").doc("active_streamers").onSnapshot(doc => {
         const now = Date.now();
-        const activeList = [];
+        const nextPrimary = new Map();
         const staleKeysToDelete = {};
         
         if (doc && doc.exists) {
@@ -7039,8 +7141,9 @@ function listenToActiveStreamers() {
 
                 // Active if heartbeat is within last 120 seconds (tolerant of clock skew)
                 if (Math.abs(diff) < 120000) {
-                    activeList.push({
-                        id: s.userId || key,
+                    const id = String(s.userId || key);
+                    nextPrimary.set(id, {
+                        id,
                         ...s,
                         lastHeartbeatMs: hb
                     });
@@ -7055,35 +7158,42 @@ function listenToActiveStreamers() {
             }
         }
 
-        currentActiveStreamersList = activeList;
-        renderActiveStreamersUI();
+        primaryStreamersMap = nextPrimary;
+        recomputeAndRenderActiveStreamers();
     }, err => {
         console.warn("settings/active_streamers listener notice:", err);
     });
 
     // Fallback collection listener (if rules permit)
+    if (activeStreamsFallbackUnsubscribe) {
+        try { activeStreamsFallbackUnsubscribe(); } catch (_) {}
+    }
     try {
-        db.collection("active_streams").onSnapshot(snapshot => {
-            if (!snapshot || snapshot.empty) return;
+        activeStreamsFallbackUnsubscribe = db.collection("active_streams").onSnapshot(snapshot => {
             const now = Date.now();
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if (!data) return;
-                const hb = data.lastHeartbeatMs || (data.lastHeartbeat && data.lastHeartbeat.toMillis ? data.lastHeartbeat.toMillis() : 0) || now;
-                if (Math.abs(now - hb) < 120000) {
-                    const exists = currentActiveStreamersList.some(s => s.id === doc.id || s.userId === data.userId);
-                    if (!exists) {
-                        currentActiveStreamersList.push({
-                            id: doc.id,
+            const nextFallback = new Map();
+            if (snapshot && !snapshot.empty) {
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (!data) return;
+                    const hb = data.lastHeartbeatMs || (data.lastHeartbeat && data.lastHeartbeat.toMillis ? data.lastHeartbeat.toMillis() : 0) || now;
+                    if (Math.abs(now - hb) < 120000) {
+                        const id = String(data.userId || doc.id);
+                        nextFallback.set(id, {
+                            id,
                             ...data,
                             lastHeartbeatMs: hb
                         });
-                        renderActiveStreamersUI();
                     }
-                }
-            });
+                });
+            }
+            fallbackStreamersMap = nextFallback;
+            recomputeAndRenderActiveStreamers();
         }, () => {});
     } catch (_) {}
+
+    if (activeStreamersPruneTimer) clearInterval(activeStreamersPruneTimer);
+    activeStreamersPruneTimer = setInterval(recomputeAndRenderActiveStreamers, 30000);
 }
 
 function renderActiveStreamersUI() {
@@ -7122,7 +7232,7 @@ function renderActiveStreamersUI() {
 
     const now = Date.now();
     listEl.innerHTML = currentActiveStreamersList.map(st => {
-        let startedMs = now;
+        let startedMs = st.startedAtMs || now;
         if (st.startedAt && st.startedAt.toMillis) startedMs = st.startedAt.toMillis();
         else if (st.startedAt instanceof Date) startedMs = st.startedAt.getTime();
         
@@ -7282,7 +7392,6 @@ function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", i
     }
 
     row.appendChild(labelBadge);
-    urlInput.addEventListener("input", () => { if (typeof updateFulfillFolderBadges === "function") updateFulfillFolderBadges(); });
     row.appendChild(urlInput);
 
     if (!isSeries) {
@@ -7306,10 +7415,27 @@ function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", i
     removeBtn.textContent = "✕";
     removeBtn.title = "Remove Link";
     removeBtn.style.cssText = "background: rgba(255, 59, 48, 0.2); color: #ff3b30; border: none; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;";
-    removeBtn.onclick = () => row.remove();
+    removeBtn.onclick = () => {
+        row.remove();
+        if (typeof updateFulfillFolderBadges === "function") updateFulfillFolderBadges();
+    };
     row.appendChild(removeBtn);
 
     wrapper.appendChild(row);
+}
+
+function isRequestSeries(reqObj, existingMovie = null) {
+    if (existingMovie && existingMovie.type) {
+        const et = String(existingMovie.type).toLowerCase();
+        return et === "series" || et === "tv";
+    }
+    if (!reqObj) return false;
+    const rt = String(reqObj.type || "").toLowerCase();
+    const rc = String(reqObj.category || "").toLowerCase();
+    const rsp = String(reqObj.seasonOrPart || "").toLowerCase();
+    if (rt === "series" || rt === "tv" || rc === "series" || rc === "tv") return true;
+    if (rsp.includes("season") || rsp.includes("episode") || /\bs\d+e\d+/i.test(rsp)) return true;
+    return false;
 }
 
 const btnAddFulfillLinkInput = document.getElementById("btn-add-fulfill-link-input");
@@ -7317,9 +7443,10 @@ if (btnAddFulfillLinkInput) {
     btnAddFulfillLinkInput.addEventListener("click", () => {
         const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
         const nextIdx = wrapper ? wrapper.querySelectorAll(".fulfill-link-row").length : 0;
-        const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === currentFulfillTitle.toLowerCase().trim());
-        const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+        const matchedReq = (currentFulfillReq && currentFulfillReq.title) ? currentFulfillReq : allRequests.find(r => (r.title || "").toLowerCase().trim() === (currentFulfillTitle || "").toLowerCase().trim());
+        const isSeries = isRequestSeries(matchedReq);
         addFulfillLinkInputRow(nextIdx, "", "720p", isSeries, false);
+        if (typeof updateFulfillFolderBadges === "function") updateFulfillFolderBadges();
     });
 }
 
@@ -7341,8 +7468,8 @@ if (btnApplyFulfillBulkLinks && fulfillBulkInput) {
     btnApplyFulfillBulkLinks.addEventListener("click", () => {
         const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
         if (!wrapper) return;
-        const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === (typeof currentFulfillTitle !== 'undefined' ? currentFulfillTitle.toLowerCase().trim() : ""));
-        const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+        const matchedReq = (currentFulfillReq && currentFulfillReq.title) ? currentFulfillReq : allRequests.find(r => (r.title || "").toLowerCase().trim() === (typeof currentFulfillTitle !== 'undefined' ? (currentFulfillTitle || "").toLowerCase().trim() : ""));
+        const isSeries = isRequestSeries(matchedReq);
 
         const parsed = parseBulkLinks(fulfillBulkInput.value, isSeries);
         if (parsed.length === 0) {
@@ -7358,6 +7485,7 @@ if (btnApplyFulfillBulkLinks && fulfillBulkInput) {
         fulfillBulkInput.value = "";
         if (fulfillBulkWrapper) fulfillBulkWrapper.style.display = "none";
         if (btnFulfillBulkToggle) btnFulfillBulkToggle.textContent = "📋 Bulk Paste";
+        if (typeof updateFulfillFolderBadges === "function") updateFulfillFolderBadges();
     });
 }
 
@@ -7400,10 +7528,11 @@ function renderFulfillStreamLinksInputs(existingMovie, isSeries = true, reqSpec 
             const u = item.url || item.stream_url || "";
             const q = item.quality || "720p";
             const ep = item.episode || (idx + 1);
-            addFulfillStreamLinkInputRow(idx, u, q, isSeries, idx === 0, ep);
+            const sNum = parseInt(item.season, 10) || 1;
+            addFulfillStreamLinkInputRow(idx, u, q, isSeries, idx === 0, ep, sNum);
         });
     } else {
-        addFulfillStreamLinkInputRow(0, "", "720p", isSeries, true, 1);
+        addFulfillStreamLinkInputRow(0, "", "720p", isSeries, true, 1, 1);
     }
     const hasAnyRealStream = existingStreams.some(s => s && (s.url || s.stream_url));
     const streamsFolderContent = document.getElementById("fulfill-streams-folder-content");
@@ -7428,13 +7557,14 @@ function renderFulfillStreamLinksInputs(existingMovie, isSeries = true, reqSpec 
     }
 }
 
-function addFulfillStreamLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", isSeries = true, isRequested = false, defaultEp = 1) {
+function addFulfillStreamLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", isSeries = true, isRequested = false, defaultEp = 1, defaultSeason = 1) {
     const wrapper = document.getElementById("fulfill-streams-inputs-wrapper");
     if (!wrapper) return;
 
     const row = document.createElement("div");
     row.className = "fulfill-stream-row";
     row.dataset.index = idx;
+    row.dataset.season = defaultSeason || 1;
     row.style.cssText = `display: flex; flex-wrap: wrap; gap: 6px; align-items: center; background: ${isRequested ? 'rgba(76, 217, 100, 0.08)' : 'rgba(255,255,255,0.02)'}; padding: 8px 10px; border-radius: 6px; border: 1px solid ${isRequested ? 'rgba(76, 217, 100, 0.35)' : 'rgba(255,255,255,0.05)'}; margin-bottom: 8px; width: 100%; box-sizing: border-box;`;
 
     const labelBadge = document.createElement("span");
@@ -7528,9 +7658,9 @@ if (btnAddFulfillStreamInput) {
     btnAddFulfillStreamInput.addEventListener("click", () => {
         const wrapper = document.getElementById("fulfill-streams-inputs-wrapper");
         const nextIdx = wrapper ? wrapper.querySelectorAll(".fulfill-stream-row").length : 0;
-        const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === currentFulfillTitle.toLowerCase().trim());
-        const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
-        addFulfillStreamLinkInputRow(nextIdx, "", "720p", isSeries, false, nextIdx + 1);
+        const matchedReq = (currentFulfillReq && currentFulfillReq.title) ? currentFulfillReq : allRequests.find(r => (r.title || "").toLowerCase().trim() === (currentFulfillTitle || "").toLowerCase().trim());
+        const isSeries = isRequestSeries(matchedReq);
+        addFulfillStreamLinkInputRow(nextIdx, "", "720p", isSeries, false, nextIdx + 1, 1);
     });
 }
 
@@ -7552,8 +7682,8 @@ if (btnApplyFulfillBulkStreams && fulfillBulkStreamsInput) {
     btnApplyFulfillBulkStreams.addEventListener("click", () => {
         const wrapper = document.getElementById("fulfill-streams-inputs-wrapper");
         if (!wrapper) return;
-        const matchedReq = allRequests.find(r => r.title.toLowerCase().trim() === (typeof currentFulfillTitle !== 'undefined' ? currentFulfillTitle.toLowerCase().trim() : ""));
-        const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
+        const matchedReq = (currentFulfillReq && currentFulfillReq.title) ? currentFulfillReq : allRequests.find(r => (r.title || "").toLowerCase().trim() === (typeof currentFulfillTitle !== 'undefined' ? (currentFulfillTitle || "").toLowerCase().trim() : ""));
+        const isSeries = isRequestSeries(matchedReq);
 
         const parsed = parseBulkStreams(fulfillBulkStreamsInput.value, isSeries);
         if (parsed.length === 0) {
@@ -7563,12 +7693,13 @@ if (btnApplyFulfillBulkStreams && fulfillBulkStreamsInput) {
 
         wrapper.replaceChildren();
         parsed.forEach((item, idx) => {
-            addFulfillStreamLinkInputRow(idx, item.url, item.quality || "720p", isSeries, idx === 0, item.episode || (idx + 1));
+            addFulfillStreamLinkInputRow(idx, item.url, item.quality || "720p", isSeries, idx === 0, item.episode || (idx + 1), item.season || 1);
         });
 
         fulfillBulkStreamsInput.value = "";
         if (fulfillBulkStreamsWrapper) fulfillBulkStreamsWrapper.style.display = "none";
         if (btnFulfillBulkStreamsToggle) btnFulfillBulkStreamsToggle.textContent = "📋 Bulk Paste";
+        if (typeof updateFulfillFolderBadges === "function") updateFulfillFolderBadges();
     });
 }
 
@@ -7594,14 +7725,16 @@ if (fulfillForm && fulfillRequestModal) {
         });
 
         const hasAnyUrl = linksToSave.some(l => l.url !== "");
-        if (!hasAnyUrl) {
-            showToast("Please enter at least one download link!", "warning");
-            return;
-        }
 
         // Extract structured stream links
         const streamRows = Array.from(document.querySelectorAll("#fulfill-streams-inputs-wrapper .fulfill-stream-row"));
         const validFulfillStreams = [];
+
+        const matchTitle = (currentFulfillTitle || "").toLowerCase().trim();
+        const matchedReq = (currentFulfillReq && currentFulfillReq.title) ? currentFulfillReq : (allRequests.find(r => (r.title || "").toLowerCase().trim() === matchTitle) || allRequests.find(r => (currentFulfillDocIds || []).includes(r.docId)));
+        const reqTmdbId = matchedReq ? (matchedReq.tmdb_id || matchedReq.tmdbId) : null;
+        const reqYear = matchedReq ? (matchedReq.year || (matchedReq.release_date ? String(matchedReq.release_date).substring(0, 4) : "")) : "";
+        const isSeries = isRequestSeries(matchedReq);
 
         streamRows.forEach((row, idx) => {
             const urlInput = row.querySelector(".fulfill-stream-url-input");
@@ -7610,16 +7743,22 @@ if (fulfillForm && fulfillRequestModal) {
             const rawUrl = urlInput ? urlInput.value.trim() : "";
             const cleanToken = cleanStreamInput(rawUrl);
             if (cleanToken) {
-                const isSeriesNow = (currentFulfillReq && currentFulfillReq.type) ? ((currentFulfillReq.type || "").toLowerCase() === 'series' || (currentFulfillReq.type || "").toLowerCase() === 'tv') : true;
-                if (isSeriesNow) {
+                if (isSeries) {
                     const epNum = epInput ? parseInt(epInput.value, 10) : (idx + 1);
-                    validFulfillStreams.push({ episode: epNum, season: 1, stream_url: cleanToken, url: cleanToken });
+                    const rowSeason = parseInt(row.dataset.season, 10) || 1;
+                    validFulfillStreams.push({ episode: epNum, season: rowSeason, stream_url: cleanToken, url: cleanToken });
                 } else {
                     const quality = qualitySelect ? qualitySelect.value : (idx === 0 ? "720p" : "1080p");
                     validFulfillStreams.push({ quality, stream_url: cleanToken, url: cleanToken });
                 }
             }
         });
+
+        const isStreamOnlyFulfill = (matchedReq && (matchedReq.isStreamRequest || matchedReq.type === "stream" || matchedReq.requestType === "stream")) && validFulfillStreams.length > 0;
+        if (!hasAnyUrl && !isStreamOnlyFulfill) {
+            showToast("Please enter at least one download link (or stream link for a Stream Request)!", "warning");
+            return;
+        }
 
         const cleanStreamVal = validFulfillStreams.length > 0 ? (validFulfillStreams[0].stream_url || validFulfillStreams[0].url) : "";
 
@@ -7629,13 +7768,9 @@ if (fulfillForm && fulfillRequestModal) {
         const submitBtn = fulfillForm.querySelector("button[type='submit']");
         const cancelBtn = document.getElementById("btn-close-fulfill-modal");
         if (submitBtn) submitBtn.disabled = true;
-        
+
+        try {
         // 1. Sync to local CSV catalog
-        const matchTitle = currentFulfillTitle.toLowerCase().trim();
-        const matchedReq = (currentFulfillReq && currentFulfillReq.title) ? currentFulfillReq : (allRequests.find(r => r.title.toLowerCase().trim() === matchTitle) || allRequests.find(r => (currentFulfillDocIds || []).includes(r.docId)));
-        const reqTmdbId = matchedReq ? (matchedReq.tmdb_id || matchedReq.tmdbId) : null;
-        const reqYear = matchedReq ? (matchedReq.year || (matchedReq.release_date ? matchedReq.release_date.substring(0, 4) : "")) : "";
-        const isSeries = matchedReq ? (matchedReq.type.toLowerCase() === 'series' || matchedReq.type.toLowerCase() === 'tv') : true;
 
         const cleanTitle = currentFulfillTitle.replace(/\s*\([^)]+\)\s*$/g, "").trim();
         const cleanMatchTitle = cleanTitle.toLowerCase();
@@ -7905,11 +8040,7 @@ if (fulfillForm && fulfillRequestModal) {
             requestChunks.push(targetDocIds.slice(i, i + 450));
         }
  
-        const tgUserForFulfill = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe?.user : null;
-        const currentAdminName = tgUserForFulfill 
-            ? (tgUserForFulfill.username ? `@${tgUserForFulfill.username}` : `${tgUserForFulfill.first_name || 'Admin'}`) 
-            : (sessionStorage.getItem("admin_auth_name") || localStorage.getItem("filmhouse_admin_username") || "Admin");
-        const currentAdminId = String(tgUserForFulfill ? tgUserForFulfill.id : (sessionStorage.getItem("admin_auth_id") || new URLSearchParams(window.location.search).get("tg_id") || new URLSearchParams(window.location.search).get("admin_id") || ""));
+        const { id: currentAdminId, name: currentAdminName } = getCurrentAdminIdentity();
 
         const postToChanEl = document.getElementById("fulfill-post-to-channel");
         const shouldPostToChannel = postToChanEl ? postToChanEl.checked : true;
@@ -7921,6 +8052,7 @@ if (fulfillForm && fulfillRequestModal) {
                 batch.update(ref, {
                     status: "fulfilled",
                     downloadLink: downloadLink,
+                    stream_url: cleanStreamVal || "",
                     fulfilledBy: currentAdminName,
                     fulfilledById: currentAdminId || "",
                     publishToChannel: shouldPostToChannel,
@@ -8028,6 +8160,28 @@ if (fulfillForm && fulfillRequestModal) {
                     const jsonData = await getJSONResponse.json();
                     const shaCSV = csvData.sha;
                     const shaJSON = jsonData.sha;
+
+                    if (jsonData.content) {
+                        try {
+                            const decodedJSON = decodeURIComponent(escape(atob(jsonData.content.replace(/\s/g, ""))));
+                            const remoteMovies = JSON.parse(decodedJSON);
+                            const localCsvIds = new Set(allCatalogMovies.map(m => m.csv_id));
+                            const deletedSet = new Set(newlyDeletedIds);
+                            let mergedCount = 0;
+                            remoteMovies.forEach(rm => {
+                                if (rm.csv_id && !localCsvIds.has(rm.csv_id) && !deletedSet.has(rm.csv_id)) {
+                                    allCatalogMovies.push(rm);
+                                    mergedCount++;
+                                }
+                            });
+                            if (mergedCount > 0) {
+                                invalidateCatalogLookupCache();
+                                allCatalogMovies.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+                            }
+                        } catch (mergeErr) {
+                            console.warn("Fulfill auto-merge remote check warning:", mergeErr);
+                        }
+                    }
                     
                     const csvContent = generateCSVContent();
                     const jsonContent = JSON.stringify(allCatalogMovies, null, 2);
@@ -8053,9 +8207,34 @@ if (fulfillForm && fulfillRequestModal) {
                     if (jsonResData && jsonResData.content) {
                         lastKnownJsonSha = jsonResData.content.sha;
                     }
+
+                    if (typeof db !== "undefined" && db && (newlyDeletedIds.length > 0 || newlyUpdatedIds.length > 0 || newlyAddedIds.length > 0)) {
+                        try {
+                            const ops = [];
+                            allCatalogMovies.forEach(m => {
+                                if (newlyAddedIds.includes(m.csv_id) || newlyUpdatedIds.includes(m.csv_id)) {
+                                    ops.push({ type: "set", docId: m.csv_id, data: JSON.parse(JSON.stringify(m)) });
+                                }
+                            });
+                            newlyDeletedIds.forEach(id => ops.push({ type: "delete", docId: id }));
+                            for (let i = 0; i < ops.length; i += 400) {
+                                const fsBatch = db.batch();
+                                ops.slice(i, i + 400).forEach(op => {
+                                    const ref = db.collection("movies").doc(op.docId);
+                                    if (op.type === "set") fsBatch.set(ref, op.data, { merge: true });
+                                    else fsBatch.delete(ref);
+                                });
+                                await fsBatch.commit();
+                            }
+                        } catch (fsErr) {
+                            console.warn("Fulfill auto-publish Firestore sync warning:", fsErr);
+                        }
+                    }
+
                     catalogChangesMade = false;
                     newlyAddedIds = [];
                     newlyUpdatedIds = [];
+                    newlyDeletedIds = [];
                     localStorage.removeItem("filmhouse_unpublished_catalog");
                     
                     // Trigger instant catalog sync on the server/bot
@@ -8111,6 +8290,14 @@ if (fulfillForm && fulfillRequestModal) {
             console.error("Error fulfilling requests:", err);
             showToast("Failed to fulfill requests: " + err.message, "error");
         });
+        } catch (syncErr) {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Fulfill Request";
+            }
+            console.error("Error during request fulfillment setup:", syncErr);
+            showToast("Failed to fulfill request: " + syncErr.message, "error");
+        }
     });
 }
 
@@ -8351,24 +8538,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 
                 let queuePayload;
+                const includeBtn = document.getElementById("broadcast-include-button")?.checked || false;
+                const customBtnText = (document.getElementById("broadcast-button-text")?.value.trim()) || "🍿 Open Film House";
+                const customBtnUrl = (document.getElementById("broadcast-button-url")?.value.trim()) || "https://dans123456.github.io/filmhouse/";
                 if (targetType === "channel") {
+                    const targetChannel = localStorage.getItem("filmhouse_updates_channel_id") || "-1002098683402";
                     queuePayload = {
-                        type: "channel_post",
+                        type: "channel_announcement",
                         adminId: String(currentAdminId),
-                        channelId: "-1002098683402",
-                        movie: {
-                            title: "Official Announcement",
-                            overview: message,
-                            backdrop: "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png",
-                            poster: "https://raw.githubusercontent.com/dans123456/filmhouse/main/MOVIE/img/FilmHouse.png"
-                        },
+                        channelId: targetChannel,
+                        message: message,
+                        includeButton: includeBtn,
+                        buttonText: customBtnText,
+                        buttonUrl: customBtnUrl,
                         status: "pending",
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     };
                 } else {
-                    const includeBtn = document.getElementById("broadcast-include-button")?.checked || false;
-                    const customBtnText = (document.getElementById("broadcast-button-text")?.value.trim()) || "🍿 Open Film House";
-                    const customBtnUrl = (document.getElementById("broadcast-button-url")?.value.trim()) || "https://dans123456.github.io/filmhouse/";
                     queuePayload = {
                         type: "user_broadcast",
                         adminId: String(currentAdminId),
@@ -8411,12 +8597,23 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
                 
+                let broadcastWatchdog = setTimeout(() => {
+                    if (isBroadcasting) {
+                        isBroadcasting = false;
+                        btnStartBroadcast.disabled = false;
+                        btnStartBroadcast.textContent = "Send Broadcast Message ✈️";
+                        if (statusLabel) statusLabel.textContent = "Broadcast queued on server (still processing or bot offline).";
+                        try { unsubscribe(); } catch (_) {}
+                    }
+                }, 45000);
+
                 // Real-time listener for server task completion
                 const unsubscribe = taskRef.onSnapshot((docSnap) => {
                     if (!docSnap.exists) return;
                     const taskData = docSnap.data();
                     
                     if (taskData.status === "completed") {
+                        clearTimeout(broadcastWatchdog);
                         if (statusLabel) statusLabel.textContent = `Completed! Delivered to ${taskData.deliveredCount ?? 'all'} active users (${taskData.failedCount ?? 0} blocked/failed)`;
                         if (progressBar) progressBar.style.width = "100%";
                         if (progressRatio) progressRatio.textContent = "100%";
@@ -8428,15 +8625,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         btnStartBroadcast.textContent = "Send Broadcast Message ✈️";
                         showToast("📢 Broadcast completed successfully!", "success");
                         unsubscribe();
-                    } else if (taskData.status === "failed") {
-                        if (statusLabel) statusLabel.textContent = `Broadcast failed: ${taskData.error || 'Server error'}`;
+                    } else if (taskData.status === "failed" || taskData.status === "expired") {
+                        clearTimeout(broadcastWatchdog);
+                        if (statusLabel) statusLabel.textContent = `Broadcast ${taskData.status}: ${taskData.error || taskData.reason || 'Server error'}`;
                         if (progressBar) progressBar.style.width = "100%";
                         isBroadcasting = false;
                         btnStartBroadcast.disabled = false;
                         btnStartBroadcast.textContent = "Send Broadcast Message ✈️";
-                        showToast(`❌ Broadcast failed: ${taskData.error}`, "error");
+                        showToast(`❌ Broadcast ${taskData.status}: ${taskData.error || taskData.reason || 'Failed'}`, "error");
                         unsubscribe();
                     } else if (taskData.status === "rejected") {
+                        clearTimeout(broadcastWatchdog);
                         if (statusLabel) statusLabel.textContent = `Broadcast rejected: ${taskData.reason || 'Unauthorized admin ID'}`;
                         isBroadcasting = false;
                         btnStartBroadcast.disabled = false;
@@ -8444,6 +8643,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         showToast(`🚫 Broadcast rejected: ${taskData.reason}`, "error");
                         unsubscribe();
                     }
+                }, (err) => {
+                    clearTimeout(broadcastWatchdog);
+                    console.warn("Broadcast snapshot listener error:", err);
+                    isBroadcasting = false;
+                    btnStartBroadcast.disabled = false;
+                    btnStartBroadcast.textContent = "Send Broadcast Message ✈️";
                 });
             } catch (err) {
                 console.error("Broadcast queue error:", err);
@@ -8611,7 +8816,7 @@ function renderEditorsChoiceSelectionList() {
         const bChecked = selectedEditorPicks.includes(b.csv_id);
         if (aChecked && !bChecked) return -1;
         if (!aChecked && bChecked) return 1;
-        return a.title.localeCompare(b.title);
+        return (a.title || "").localeCompare(b.title || "");
     });
 
     filtered.forEach(m => {
@@ -8780,21 +8985,38 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!confirm(`Are you sure you want to allocate ${amount} points from admin ${senderUser.fullName} to user ${recipientUser.fullName}?`)) {
                 return;
             }
+
+            if (typeof firebase === "undefined" || !db) {
+                alert("Database connection offline!");
+                return;
+            }
             
-            // Perform Firestore updates
+            // Perform atomic Firestore transaction
             const senderRef = db.collection("users").doc(String(senderId));
             const recipientRef = db.collection("users").doc(String(recipientId));
             
-            const batch = db.batch();
-            batch.update(senderRef, { points: senderPoints - amount });
-            batch.update(recipientRef, { points: parseInt(recipientUser.points || 0) + amount });
-            
-            batch.commit().then(() => {
+            db.runTransaction(async (t) => {
+                const [sDoc, rDoc] = await Promise.all([t.get(senderRef), t.get(recipientRef)]);
+                const liveSenderPts = sDoc.exists ? parseInt(sDoc.data().points || 0, 10) : senderPoints;
+                if (liveSenderPts < amount) {
+                    throw new Error(`Insufficient live balance (${liveSenderPts} pts available).`);
+                }
+                const liveRecipientPts = rDoc.exists ? parseInt(rDoc.data().points || 0, 10) : parseInt(recipientUser.points || 0, 10);
+                t.set(senderRef, { points: liveSenderPts - amount }, { merge: true });
+                t.set(recipientRef, { points: liveRecipientPts + amount }, { merge: true });
+                return { newSenderPts: liveSenderPts - amount, newRecipientPts: liveRecipientPts + amount };
+            }).then(({ newSenderPts, newRecipientPts }) => {
+                senderUser.points = newSenderPts;
+                recipientUser.points = newRecipientPts;
+                if (typeof saveUsersToCache === "function") saveUsersToCache(allUsers);
+                renderUsersList();
+                updateStatsCounters();
+                populateAllocatorDropdowns();
                 alert(`Successfully allocated +${amount} points from ${senderUser.fullName} to ${recipientUser.fullName}!`);
                 if (amountInput) amountInput.value = "";
                 
                 // Notify recipient securely via admin_broadcast_queue
-                const currentAdminId = sessionStorage.getItem("admin_auth_id") || "1175336733";
+                const currentAdminId = getCurrentAdminIdentity().id;
                 const rewardMsg = `🎁 <b>Points Reward Allocated!</b>\n\nAn administrator has allocated <b>+${amount} Points</b> to your Film House account balance! Thank you for using our app! 🍿`;
                 db.collection("admin_broadcast_queue").add({
                     type: "user_broadcast",
@@ -8805,8 +9027,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 }).catch(err => console.warn("Failed to queue points allocation notification:", err));
             }).catch(err => {
-                console.error("Points allocation batch error:", err);
-                alert("Database update failed! Check logs.");
+                console.error("Points allocation transaction error:", err);
+                alert("Points allocation failed: " + (err.message || "Check logs."));
             });
         });
     }
@@ -9147,7 +9369,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!rawStreamHint) return "";
                 if (rawStreamHint.includes(",") || rawStreamHint.includes(";") || rawStreamHint.includes("\n")) {
                     const parsed = parseBulkStreams(rawStreamHint.replace(/[,;]+/g, "\n"), isSeries);
-                    return parsed.length > 0 ? parsed[0].stream_url : (streamTokenHint || "");
+                    return parsed.length > 0 ? (parsed[0].stream_url || parsed[0].url) : (streamTokenHint || "");
                 }
                 return streamTokenHint || "";
             })(),
@@ -9217,7 +9439,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 batchStagedMovies[itemIdx].stream_links[streamIdx].url = cleaned;
             }
             if (batchStagedMovies[itemIdx]?.stream_links?.length > 0) {
-                batchStagedMovies[itemIdx].stream_url = batchStagedMovies[itemIdx].stream_links[0].stream_url || "";
+                batchStagedMovies[itemIdx].stream_url = batchStagedMovies[itemIdx].stream_links[0].stream_url || batchStagedMovies[itemIdx].stream_links[0].url || "";
             }
         });
     }
@@ -9857,6 +10079,21 @@ document.addEventListener("DOMContentLoaded", () => {
             btnFetchBatchTmdb.disabled = false;
             btnFetchBatchTmdb.textContent = originalText;
 
+            // Sequentially deduplicate uniqueIds across concurrent Promise.all results
+            const usedIds = new Set(allCatalogMovies.map(m => m.csv_id));
+            results.forEach(item => {
+                if (item && !item.error && item.id) {
+                    const baseId = item.id;
+                    let candidate = baseId;
+                    let c = 1;
+                    while (usedIds.has(candidate)) {
+                        candidate = `${baseId}-${c++}`;
+                    }
+                    item.id = candidate;
+                    usedIds.add(candidate);
+                }
+            });
+
             batchStagedMovies = results;
             renderBatchStagingTable();
 
@@ -9924,12 +10161,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else if (item.stream_url) {
                     const cleaned = cleanStreamInput(item.stream_url);
                     if (cleaned) {
-                        finalStreams = [{
-                            quality: item.isSeries ? undefined : '720p',
-                            episode: item.isSeries ? 1 : undefined,
-                            stream_url: cleaned,
-                            url: cleaned
-                        }];
+                        finalStreams = [item.isSeries
+                            ? { episode: 1, season: 1, stream_url: cleaned, url: cleaned }
+                            : { quality: '720p', stream_url: cleaned, url: cleaned }
+                        ];
                     }
                 }
 
@@ -9967,14 +10202,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (item.title) importedTitles.push(item.title);
             });
 
-            if (importedTitles.length > 0) {
-                if (typeof window.recordAdminBatchActivity === 'function') {
-                    window.recordAdminBatchActivity("publication", importedTitles);
-                } else if (typeof window.recordAdminActivity === 'function') {
-                    window.recordAdminActivity("publication", importedTitles[0]);
-                }
-            }
-
+            invalidateCatalogLookupCache();
             catalogChangesMade = true;
             updatePublishButtonState();
             renderCatalogList();
@@ -10091,12 +10319,64 @@ async function initOngoingSeriesTracker(forceRefresh = false) {
             const fsData = firestoreSeriesMap[csvKey] || firestoreSeriesMap[tmdbKey] || {};
 
             const numTmdbId = item.tmdb_id || (parseInt(item.csv_id, 10) || null);
-            const status = fsData.status || item.status || (item.is_ongoing ? "Ongoing" : null);
-            const currentSeason = fsData.current_season || item.current_season || 1;
-            const lastUploaded = typeof fsData.last_uploaded_episode === "number" ? fsData.last_uploaded_episode : (item.last_uploaded_episode || 0);
+            const status = fsData.status || item.status || ((fsData.is_ongoing || item.is_ongoing) ? "Ongoing" : null);
+            const mergedStreamLinks = (Array.isArray(fsData.stream_links) && fsData.stream_links.length > 0)
+                ? fsData.stream_links
+                : (item.stream_links || []);
+            const mergedLinks = (Array.isArray(fsData.links) && fsData.links.length > 0)
+                ? fsData.links
+                : (item.links || []);
+
+            // Determine current_season and auto-calculate highest uploaded episode from stream_links / links
+            let currentSeason = fsData.current_season || item.current_season || 1;
+            let lastUploaded = typeof fsData.last_uploaded_episode === "number" ? fsData.last_uploaded_episode : (item.last_uploaded_episode || 0);
+
+            if (!fsData.current_season && !item.current_season && mergedStreamLinks.length > 0) {
+                let maxDetectedSeason = 1;
+                mergedStreamLinks.forEach(s => {
+                    const sNum = Number(s?.season || s?.season_number || 1);
+                    if (sNum > maxDetectedSeason) maxDetectedSeason = sNum;
+                });
+                currentSeason = maxDetectedSeason;
+            }
+
+            mergedStreamLinks.forEach(s => {
+                if (!s) return;
+                const url = s.stream_url || s.url || "";
+                if (!url || String(url).includes("t.me")) return;
+                const sNum = Number(s.season || s.season_number || 1);
+                const eNum = Number(s.episode || s.episodeNum || s.episode_number || 0);
+                if (sNum === Number(currentSeason) && eNum > lastUploaded) {
+                    lastUploaded = eNum;
+                }
+            });
+
+            mergedLinks.forEach(l => {
+                if (!l || typeof l !== "object") return;
+                const raw = String(l.season || l.seasonOrPart || "");
+                const m = raw.match(/Season\s*(\d+)\s*Ep(?:isode)?\s*(\d+)/i) || raw.match(/S0*(\d+)E0*(\d+)/i);
+                if (m) {
+                    const sNum = parseInt(m[1], 10);
+                    const eNum = parseInt(m[2], 10);
+                    if (sNum === Number(currentSeason) && eNum > lastUploaded) {
+                        lastUploaded = eNum;
+                    }
+                }
+            });
+
             const totalEpisodes = typeof fsData.total_episodes === "number" ? fsData.total_episodes : (item.total_episodes || 0);
             const nextAirDate = fsData.next_air_date || item.next_air_date || null;
             const subCount = seriesSubscriptionsMap[String(numTmdbId)] || 0;
+
+            // Keep in-memory catalog item synchronized with Firestore tracker state
+            if (status && item.status !== status) {
+                item.status = status;
+                item.is_ongoing = (status === "Ongoing" || status === "On Break");
+            }
+            if (currentSeason) item.current_season = currentSeason;
+            if (lastUploaded > (item.last_uploaded_episode || 0)) item.last_uploaded_episode = lastUploaded;
+            if (totalEpisodes) item.total_episodes = totalEpisodes;
+            if (nextAirDate) item.next_air_date = nextAirDate;
 
             return {
                 ...item,
@@ -10107,8 +10387,8 @@ async function initOngoingSeriesTracker(forceRefresh = false) {
                 total_episodes: totalEpisodes,
                 next_air_date: nextAirDate,
                 subscriber_count: subCount,
-                stream_links: fsData.stream_links || item.stream_links || [],
-                links: fsData.links || item.links || []
+                stream_links: mergedStreamLinks,
+                links: mergedLinks
             };
         }).filter(item => {
             // Show any series that has status 'Ongoing', 'On Break', 'Completed', or has active subscribers, or next_air_date
@@ -10345,6 +10625,8 @@ window.openUploadEpisodeModal = function(series) {
     if (streamInput) streamInput.value = "";
     if (downloadInput) downloadInput.value = "";
     if (notifyCheckbox) notifyCheckbox.checked = true;
+    const channelCheckbox = document.getElementById("upload-ep-channel-checkbox");
+    if (channelCheckbox) channelCheckbox.checked = true;
 
     // If nextEpisode >= total_episodes, check finale box automatically
     if (finaleCheckbox) {
@@ -10467,7 +10749,7 @@ window.submitEpisodeUpload = async function() {
                 status: newStatus,
                 current_season: seasonNum,
                 last_uploaded_episode: epNum,
-                last_updated_timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                last_updated_timestamp: new Date().toISOString(),
                 stream_links: streamLinks,
                 links: links
             }, { merge: true });
@@ -10476,7 +10758,7 @@ window.submitEpisodeUpload = async function() {
 
             // 2. Queue Telegram Push Notification to Subscribed Users & Updates Channel
             if ((notifySubscribers || postToChannel) && (tmdbId || csvId)) {
-                const currentAdminId = sessionStorage.getItem("admin_auth_id") || "1175336733";
+                const currentAdminId = getCurrentAdminIdentity().id;
                 const streamMiniAppUrl = `https://dans123456.github.io/filmhouse/?stream_id=${encodeURIComponent(csvId)}&season=${seasonNum}&ep=${epNum}`;
                 const targetChannel = localStorage.getItem("filmhouse_updates_channel_id") || "-1004272961286";
 
@@ -10505,14 +10787,17 @@ window.submitEpisodeUpload = async function() {
                 console.log(`[SeriesTracker] Queued episode broadcast (Subscribers: ${notifySubscribers}, Channel: ${postToChannel}) for TMDB ${tmdbId}`);
             }
 
-            // 3. If finale, purge subscriptions directly from client as well
-            if (isFinale && tmdbId) {
+            // 3. If finale and NOT notifying subscribers via bot (which purges after notifying), purge directly from client
+            if (isFinale && tmdbId && !notifySubscribers) {
                 try {
                     const purgeSnap = await db.collection("subscriptions").where("tmdb_id", "in", [tmdbId, String(tmdbId)]).get();
                     if (!purgeSnap.empty) {
-                        const batch = db.batch();
-                        purgeSnap.forEach(d => batch.delete(d.ref));
-                        await batch.commit();
+                        const docs = purgeSnap.docs;
+                        for (let i = 0; i < docs.length; i += 450) {
+                            const batch = db.batch();
+                            docs.slice(i, i + 450).forEach(d => batch.delete(d.ref));
+                            await batch.commit();
+                        }
                         console.log(`[SeriesTracker] Purged ${purgeSnap.size} subscriber records for completed season.`);
                     }
                 } catch (purgeErr) {
@@ -10569,21 +10854,35 @@ window.markSeasonCompleted = async function(series) {
         if (typeof db !== "undefined" && db) {
             await db.collection("movies").doc(series.csv_id).set({
                 status: "Completed",
-                last_updated_timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                last_updated_timestamp: new Date().toISOString()
             }, { merge: true });
 
             if (series.tmdb_id) {
                 const purgeSnap = await db.collection("subscriptions").where("tmdb_id", "in", [series.tmdb_id, String(series.tmdb_id)]).get();
                 if (!purgeSnap.empty) {
-                    const batch = db.batch();
-                    purgeSnap.forEach(d => batch.delete(d.ref));
-                    await batch.commit();
+                    const docs = purgeSnap.docs;
+                    for (let i = 0; i < docs.length; i += 450) {
+                        const batch = db.batch();
+                        docs.slice(i, i + 450).forEach(d => batch.delete(d.ref));
+                        await batch.commit();
+                    }
                 }
             }
         }
 
         series.status = "Completed";
         series.subscriber_count = 0;
+        const catIdx = allCatalogMovies.findIndex(m => m.csv_id === series.csv_id || (series.tmdb_id && String(m.tmdb_id) === String(series.tmdb_id)));
+        if (catIdx !== -1) {
+            allCatalogMovies[catIdx].status = "Completed";
+            allCatalogMovies[catIdx].is_ongoing = false;
+            if (!newlyUpdatedIds.includes(allCatalogMovies[catIdx].csv_id)) {
+                newlyUpdatedIds.push(allCatalogMovies[catIdx].csv_id);
+            }
+            catalogChangesMade = true;
+            updatePublishButtonState();
+            if (typeof renderCatalogList === "function") renderCatalogList();
+        }
         showToast(`"${sTitle}" marked as Season Completed & subscribers purged! ✅`, "success");
         renderOngoingSeriesList();
 
@@ -10649,23 +10948,28 @@ window.renderTrackSeriesSearch = function(query = "") {
         card.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; gap: 10px;";
         
         const isAlreadyOngoing = m.status === "Ongoing";
+        const posterSrc = typeof getPosterUrl === "function" ? getPosterUrl(m.poster) : (m.poster || "MOVIE/img/FilmHouse3_nobg.png");
 
         card.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                <img src="${m.poster || 'img/FilmHouse3_nobg.png'}" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" onerror="this.src='img/FilmHouse3_nobg.png'">
+                <img src="${escapeHTML(posterSrc)}" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" onerror="this.onerror=null;this.src='MOVIE/img/FilmHouse3_nobg.png'">
                 <div style="min-width: 0;">
                     <div style="font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(m.title)}</div>
                     <div style="font-size: 11px; color: var(--text-secondary); display: flex; gap: 8px; margin-top: 2px;">
-                        <span>${m.year || 'Series'}</span>
-                        <span>TMDB: ${m.tmdb_id || m.csv_id || 'N/A'}</span>
-                        <span style="color: ${isAlreadyOngoing ? '#4cd964' : 'var(--text-muted)'}; font-weight: 600;">${m.status || 'Not Tracked'}</span>
+                        <span>${escapeHTML(m.year || 'Series')}</span>
+                        <span>TMDB: ${escapeHTML(m.tmdb_id || m.csv_id || 'N/A')}</span>
+                        <span style="color: ${isAlreadyOngoing ? '#4cd964' : 'var(--text-muted)'}; font-weight: 600;">${escapeHTML(m.status || 'Not Tracked')}</span>
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-sm ${isAlreadyOngoing ? 'btn-secondary' : 'btn-primary'}" style="padding: 6px 12px; font-size: 11px; font-weight: 700; flex-shrink: 0; border-radius: 6px;" onclick="startTrackingSeries('${m.csv_id}', '${m.tmdb_id || m.csv_id}')">
+            <button type="button" class="btn btn-sm ${isAlreadyOngoing ? 'btn-secondary' : 'btn-primary'} btn-track-series-action" style="padding: 6px 12px; font-size: 11px; font-weight: 700; flex-shrink: 0; border-radius: 6px;">
                 ${isAlreadyOngoing ? '✓ Tracked' : '+ Track'}
             </button>
         `;
+        const trackBtn = card.querySelector(".btn-track-series-action");
+        if (trackBtn) {
+            trackBtn.addEventListener("click", () => startTrackingSeries(m.csv_id, m.tmdb_id || m.csv_id));
+        }
         list.appendChild(card);
     });
 };
@@ -10686,16 +10990,39 @@ document.addEventListener("DOMContentLoaded", () => {
 window.startTrackingSeries = async function(csvId, tmdbId) {
     if (!csvId) return;
     try {
+        let detectedSeason = 1;
+        let detectedLastEp = 0;
         const movieIndex = allCatalogMovies.findIndex(m => String(m.csv_id) === String(csvId));
         if (movieIndex !== -1) {
-            allCatalogMovies[movieIndex].status = "Ongoing";
-            allCatalogMovies[movieIndex].is_ongoing = true;
+            const item = allCatalogMovies[movieIndex];
+            item.status = "Ongoing";
+            item.is_ongoing = true;
+            detectedSeason = item.current_season || 1;
+            detectedLastEp = item.last_uploaded_episode || 0;
+            if (Array.isArray(item.stream_links)) {
+                item.stream_links.forEach(s => {
+                    if (!s) return;
+                    const sNum = Number(s.season || s.season_number || 1);
+                    const eNum = Number(s.episode || s.episodeNum || s.episode_number || 0);
+                    if (sNum === Number(detectedSeason) && eNum > detectedLastEp) detectedLastEp = eNum;
+                });
+            }
+            item.current_season = detectedSeason;
+            item.last_uploaded_episode = detectedLastEp;
+            if (!newlyUpdatedIds.includes(item.csv_id) && !newlyAddedIds.includes(item.csv_id)) {
+                newlyUpdatedIds.push(item.csv_id);
+            }
+            catalogChangesMade = true;
+            if (typeof updatePublishButtonState === "function") updatePublishButtonState();
+            if (typeof renderCatalogList === "function") renderCatalogList();
         }
 
         if (typeof db !== "undefined" && db) {
             await db.collection("movies").doc(String(csvId)).set({
                 status: "Ongoing",
                 is_ongoing: true,
+                current_season: detectedSeason,
+                last_uploaded_episode: detectedLastEp,
                 tmdb_id: parseInt(tmdbId, 10) || tmdbId,
                 last_updated_timestamp: new Date().toISOString()
             }, { merge: true });
