@@ -3632,6 +3632,17 @@
           if (videoEl.currentTime > 0.1 && !videoEl.paused) {
             autoHidePlayOverlay();
           }
+          if (!window._codecFallbackChecked && videoEl.readyState >= 2 && videoEl.currentTime >= 1.5 && !videoEl.paused && videoEl.videoWidth === 0 && videoEl.videoHeight === 0) {
+            window._codecFallbackChecked = true;
+            if (errorCard) {
+              errorCard.style.display = 'flex';
+              errorCard.innerHTML = `
+                <span>⚠️ Audio-only stream (video codec unsupported on this device)</span>
+                <button type="button" onclick="try{window.parent.postMessage({action:'switchTo720pQuality'},'*')}catch(_){}" style="background:#ffd700;color:#000;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Try 720p</button>
+                <button type="button" onclick="window.switchToServer2()" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#0b0d14;border:none;border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:800;cursor:pointer;">⚡ Server 2</button>
+              `;
+            }
+          }
           if (videoEl.currentTime > 5 && videoEl.duration && (videoEl.duration - videoEl.currentTime) > 15) {
             localStorage.setItem(resumeKey, videoEl.currentTime);
           }
