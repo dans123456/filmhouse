@@ -92,8 +92,8 @@
     },
     {
       icon: '🔍',
-      title: 'Smart Search & Filters',
-      text: 'Search any movie, series, or anime in milliseconds. Use the filters to sort by genre, IMDb rating, year, or release date with live results.',
+      title: 'Smart Search & Requests',
+      text: 'Search any movie, series, or anime in milliseconds. Can\'t find a title? You can request any missing movie or series directly from Search!',
       tab: 'home',
       target: {
         selectors: ['#global-search-input', '.search-bar-wrapper', '.search-icon']
@@ -129,7 +129,7 @@
     {
       icon: '🎫',
       title: 'Ad-Free Cinema Passes',
-      text: 'Spend points or watch quick sponsor ads to unlock 4h, 6h, or 10h passes. The pass timer ONLY counts down while you\'re actively streaming!',
+      text: 'Spend points or watch 2 quick sponsor ads in the player to unlock a 90-Minute Cinema Pass for uninterrupted streaming!',
       tab: 'mining',
       target: {
         selectors: ['.mining-cinema-perks-card', '#btn-redeem-cinema-pass-mining', '#btn-watch-ad-4h']
@@ -154,9 +154,9 @@
       }
     },
     {
-      icon: '📩',
-      title: 'Request Movies & Feedback',
-      text: 'Can\'t find a movie? Submit a request here. When added, you\'ll receive an instant fulfillment notification right on your screen!',
+      icon: '💬',
+      title: 'Feedback & Bug Reports',
+      text: 'Spotted a bug or have an idea to make Film House better? Send us your feedback directly here—every message goes straight to our team!',
       tab: 'feedback',
       target: {
         selectors: ['#feedback-form', '.feedback-card', '.bottom-nav-item[data-target="feedback"]']
