@@ -792,8 +792,10 @@
       align-items: center !important;
       justify-content: space-between !important;
       width: 100% !important;
-      min-width: 100% !important;
-      padding-top: 2px;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      padding: 2px 4px 0 !important;
+      box-sizing: border-box !important;
     }
 
     .plyr__controls-left {
@@ -802,6 +804,7 @@
       align-items: center !important;
       justify-content: flex-start !important;
       min-width: 0 !important;
+      padding-left: 4px !important;
     }
 
     .plyr__controls-center {
@@ -817,9 +820,44 @@
       display: flex !important;
       align-items: center !important;
       justify-content: flex-end !important;
-      gap: 4px !important;
+      gap: 2px !important;
       min-width: 0 !important;
       position: relative !important;
+    }
+
+    /* Keep volume slider inside popup so right side never crowds center controls */
+    .plyr__controls .plyr__volume {
+      position: absolute !important;
+      bottom: calc(100% + 8px);
+      width: 32px !important;
+      min-width: 32px !important;
+      max-width: 32px !important;
+      height: 106px;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: rgba(12, 15, 24, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 188, 0, 0.35);
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
+      display: none !important;
+      z-index: 70;
+    }
+
+    .plyr__controls.fh-vol-open .plyr__volume {
+      display: block !important;
+    }
+
+    .plyr__controls .plyr__volume input[data-plyr="volume"] {
+      position: absolute !important;
+      left: 50%;
+      top: 50%;
+      width: 82px !important;
+      height: 20px;
+      margin: -10px 0 0 -41px !important;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
     }
 
     /* =====================================================================
@@ -1976,11 +2014,9 @@
         hideTimer = setTimeout(() => c.classList.remove('fh-vol-open'), 3000);
       }
       document.addEventListener('click', function (e) {
-        if (!isTouchLayout()) return;
         if (e.target && e.target.closest && e.target.closest('.plyr__controls [data-plyr="mute"]')) openVolumePopup();
       });
       document.addEventListener('input', function (e) {
-        if (!isTouchLayout()) return;
         if (e.target && e.target.matches && e.target.matches('[data-plyr="volume"]')) openVolumePopup();
       });
     })();
@@ -3012,10 +3048,10 @@
     }
 
     // YouTube-style Tap Controls:
-    // Single tap anywhere -> Toggle Media Controls HUD (critical for mobile fullscreen!)
+    // Single tap Center -> Instant Play / Pause + Show Controls
+    // Single tap Left/Right -> Toggle Media Controls HUD
     // Double tap Left -> Rewind 10s
     // Double tap Right -> Forward 10s
-    // Double tap Center -> Play / Pause
     let lastTapTime = 0;
     let tapTimeout = null;
     let lastTapZone = null;
@@ -3026,11 +3062,20 @@
         e.preventDefault();
         e.stopPropagation();
       }
+      if (zone === 'center') {
+        clearTimeout(tapTimeout);
+        lastTapTime = 0;
+        lastTapZone = null;
+        togglePlayState();
+        setControlsVisible(true);
+        return;
+      }
+
       const now = Date.now();
       const diff = now - lastTapTime;
 
       if (diff < 300 && lastTapZone === zone) {
-        // Double-tap detected on same zone
+        // Double-tap detected on same side zone
         clearTimeout(tapTimeout);
         lastTapTime = 0;
         lastTapZone = null;
@@ -3041,12 +3086,9 @@
         } else if (zone === 'right') {
           seekDelta(10);
           showRippleIndicator('right');
-        } else if (zone === 'center') {
-          togglePlayState();
-          setControlsVisible(true);
         }
       } else {
-        // First tap candidate
+        // First tap candidate on side zone
         lastTapTime = now;
         lastTapZone = zone;
         clearTimeout(tapTimeout);
@@ -3054,7 +3096,7 @@
           toggleControlsVisibility();
           lastTapTime = 0;
           lastTapZone = null;
-        }, 280);
+        }, 240);
       }
     }
 
@@ -3399,6 +3441,10 @@
         if (titleParam) {
           if (titleEl) titleEl.textContent = cleanTitle;
           document.title = cleanTitle + " - Film House Cinema";
+          if (loaderEl) {
+            const lt = loaderEl.querySelector('.loader-text');
+            if (lt) lt.textContent = `▶ Playing "${cleanTitle}"...`;
+          }
         }
         if (qualityParam && qualityEl) {
           qualityEl.textContent = qualityParam;
@@ -3607,7 +3653,8 @@
               loaderEl.style.display = 'flex';
               loaderEl.style.opacity = '1';
               const lt = loaderEl.querySelector('.loader-text');
-              if (lt) lt.textContent = '⚡ Buffering High-Speed Stream...';
+              const activeName = (titleEl && titleEl.textContent) ? titleEl.textContent.trim() : 'Movie';
+              if (lt) lt.textContent = `▶ Playing "${activeName}"...`;
             }
           }
         });
