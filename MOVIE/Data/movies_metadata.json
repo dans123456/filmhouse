@@ -1,5 +1,39 @@
 [
   {
+    "csv_id": "1568060-perfect-liars",
+    "tmdb_id": 1568060,
+    "imdb_id": "",
+    "title": "Perfect Liars",
+    "type": "Movie",
+    "categories": [
+      "Main",
+      "Hollywood/British Movies"
+    ],
+    "genres": [
+      "Drama",
+      "Romance",
+      "Thriller"
+    ],
+    "overview": "Jude Derry arrives at the exclusive Tagus university with a hidden mission: to infiltrate the circle of the Cash brothers and uncover the truth about her brother's death. What begins as revenge turns into a dangerous triangle of seduction, forbidden attraction and lies, drawing her toward a truth she may not be ready to face.",
+    "poster": "https://image.tmdb.org/t/p/w500/kej8EipJOvfHUHFg5wtT7gQ6bNb.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/OiXyM1w9NxdV450GpV92B0YPMj.jpg",
+    "rating": 7.3,
+    "release_date": "2026-11-20",
+    "language": "es",
+    "cast": [],
+    "director": "",
+    "trailer": "50v6k3LUcxU",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD3AgAApArEURvMsv9whjPQBYE",
+        "quality": "720p"
+      }
+    ]
+  },
+  {
     "csv_id": "656908-ramayana-rise-of-a-legend",
     "tmdb_id": 656908,
     "imdb_id": "",
