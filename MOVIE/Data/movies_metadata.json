@@ -119088,19 +119088,23 @@
     "trailer": "2C2lyCIusKo",
     "runtime": "",
     "links": [
-      "https://t.me/FilmHouseFile2bot?start=BQADAQADogwAAnavkUb0zJuu9NRidxYE"
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADogwAAnavkUb0zJuu9NRidxYE",
+        "quality": "720p",
+        "stream_url": "MTAxOTY6MzhmNzE5Njc5MzFiYTkzYw"
+      }
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTE2NzQ6YWM0OTg5YmI3NjVmZGNiNA",
+    "stream_url": "MTAxOTY6MzhmNzE5Njc5MzFiYTkzYw",
     "stream_links": [
       {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTAxOTY6MzhmNzE5Njc5MzFiYTkzYw",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAxOTY6MzhmNzE5Njc5MzFiYTkzYw"
+        "quality": "720p",
+        "stream_url": "MTAxOTY6MzhmNzE5Njc5MzFiYTkzYw",
+        "url": "MTAxOTY6MzhmNzE5Njc5MzFiYTkzYw"
       },
       {
-        "quality": "1080P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTE2NzQ6YWM0OTg5YmI3NjVmZGNiNA",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTE2NzQ6YWM0OTg5YmI3NjVmZGNiNA"
+        "quality": "1080p",
+        "stream_url": "MTE2NzQ6YWM0OTg5YmI3NjVmZGNiNA",
+        "url": "MTE2NzQ6YWM0OTg5YmI3NjVmZGNiNA"
       }
     ]
   },
