@@ -4392,7 +4392,7 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
 
     const embedUrl = ytKey.startsWith("http")
         ? ytKey
-        : `https://www.youtube.com/embed/${ytKey}?autoplay=1&mute=1&playsinline=1&fs=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+        : `https://www.youtube.com/embed/${ytKey}?autoplay=1&mute=0&playsinline=1&fs=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
 
     iframeContainer.replaceChildren();
     iframeContainer.style.display = "block";
@@ -4415,19 +4415,6 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
             iframe.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), "*");
         } catch (e) { }
     };
-
-    // Unmute pill for mobile inline autoplay (browsers require mute=1 for autoplay)
-    const unmuteBtn = document.createElement("button");
-    unmuteBtn.type = "button";
-    unmuteBtn.textContent = "🔇 Tap for Sound";
-    unmuteBtn.style.cssText = "position:absolute;bottom:14px;right:14px;z-index:12;background:rgba(10,14,24,0.86);color:#ffd700;border:1px solid rgba(255,188,0,0.45);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 12px rgba(0,0,0,0.5);";
-    unmuteBtn.onclick = (ev) => {
-        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-        postCmd("unMute");
-        postCmd("setVolume", [75]);
-        unmuteBtn.remove();
-    };
-    iframeContainer.appendChild(unmuteBtn);
 
     // Keep the movie backdrop visible until YouTube actually reports "playing" (playerState === 1).
     // The iframe stays invisible while it loads/buffers so the user never sees a black screen.
@@ -4463,7 +4450,8 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
             iframe.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: 1 }), "*");
         } catch (e) { }
         postCmd("addEventListener", ["onStateChange"]);
-        postCmd("mute");
+        postCmd("setVolume", [25]);
+        postCmd("unMute");
         postCmd("playVideo");
 
         setTimeout(() => {
@@ -4471,6 +4459,8 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
                 iframe.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: 1 }), "*");
             } catch (e) { }
             postCmd("addEventListener", ["onStateChange"]);
+            postCmd("setVolume", [25]);
+            postCmd("unMute");
         }, 600);
 
         // Active duration/playback monitor to guarantee YouTube end-cards are NEVER shown
@@ -4537,15 +4527,14 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
 
     if (previewFab) {
         previewFab.onclick = () => {
-            if (iframeContainer && iframeContainer.style.display === "none") {
+            if (iframeContainer && (iframeContainer.style.display === "none" || !iframeContainer.querySelector("iframe"))) {
                 embedAndPlayHeroTrailer(trailerKeyOrUrl);
                 return;
             }
             revealTrailer();
             postCmd("unMute");
-            postCmd("setVolume", [75]);
+            postCmd("setVolume", [25]);
             postCmd("playVideo");
-            if (unmuteBtn && unmuteBtn.parentNode) unmuteBtn.remove();
         };
     }
 }
@@ -5153,13 +5142,18 @@ function openMediaDetailPage(movie) {
         iframeContainer.style.display = "none";
     }
 
-    // 2. Hero Viewport: Always display movie backdrop/poster immediately so no black void occurs
+    // 2. Hero Viewport: Immediately clear previous movie's backdrop before setting new one so old artwork never flashes
     const backdropImg = document.getElementById("media-backdrop-img");
+    const backdropContainer = document.getElementById("media-backdrop-container");
     const targetBackdrop = movie.backdrop || movie.poster || "";
+    if (backdropContainer) {
+        backdropContainer.style.backgroundImage = "";
+    }
     if (backdropImg) {
+        backdropImg.style.opacity = "0";
+        backdropImg.src = "";
         backdropImg.alt = movie.title || "Movie Backdrop";
         if (targetBackdrop) {
-            backdropImg.src = targetBackdrop;
             backdropImg.onload = () => { backdropImg.style.opacity = "1"; };
             backdropImg.onerror = () => {
                 if (movie.poster && backdropImg.src !== movie.poster) {
@@ -5169,6 +5163,7 @@ function openMediaDetailPage(movie) {
                     backdropImg.style.opacity = "1";
                 }
             };
+            backdropImg.src = targetBackdrop;
             if (backdropImg.complete && backdropImg.naturalWidth > 0) {
                 backdropImg.style.opacity = "1";
             }
@@ -5177,7 +5172,6 @@ function openMediaDetailPage(movie) {
         }
     }
 
-    const backdropContainer = document.getElementById("media-backdrop-container");
     const previewFab = document.getElementById("btn-hero-play-preview");
 
     if (backdropContainer) {
@@ -5187,8 +5181,6 @@ function openMediaDetailPage(movie) {
             backdropContainer.style.backgroundImage = `url("${targetBackdrop}")`;
             backdropContainer.style.backgroundSize = "cover";
             backdropContainer.style.backgroundPosition = "center 25%";
-        } else {
-            backdropContainer.style.backgroundImage = "";
         }
     }
 
@@ -8906,14 +8898,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
         const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
 
-        // Fast pre-buffering animation overlay with movie backdrop for instant visual feedback (no black screen)
-        if (movieBackdrop) {
-            container.style.backgroundImage = `linear-gradient(rgba(8, 10, 16, 0.45), rgba(5, 7, 12, 0.72)), url("${movieBackdrop}")`;
-            container.style.backgroundSize = "cover";
-            container.style.backgroundPosition = "center";
-        } else {
-            container.style.backgroundImage = "";
-        }
+        // Fast pre-buffering animation overlay with clean movie title
+        container.style.backgroundImage = "";
         const loader = document.createElement("div");
         loader.className = "cinema-stream-loader";
         loader.id = "cinema-stream-loader";
@@ -8924,8 +8910,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         }
         loader.innerHTML = `
             <div class="cinema-loader-spinner"></div>
-            <div class="cinema-loader-title">Preparing Cinema Player...</div>
-            <div class="cinema-loader-sub">⚡ Film House High-Speed Engine</div>
+            <div class="cinema-loader-title">Playing "${escapeHTML(currentMediaTitle)}"...</div>
+            <div class="cinema-loader-sub">Loading stream...</div>
         `;
         container.appendChild(loader);
 

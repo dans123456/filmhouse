@@ -476,7 +476,21 @@
       transition: opacity 0.35s ease, transform 0.3s ease;
       overflow: hidden;
       padding: 24px 16px;
-      pointer-events: auto !important;
+      pointer-events: auto;
+    }
+
+    body.stream-started .stream-play-overlay {
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    body.has-active-video .video-viewport {
+      background-image: none !important;
+      background-color: #000000 !important;
+    }
+
+    body.has-active-video .plyr--video {
+      background: #000000 !important;
     }
 
     .stream-play-overlay::before {
@@ -824,7 +838,11 @@
         flex-wrap: wrap !important;
         align-items: center;
         row-gap: 2px;
-        padding: 4px 10px 8px !important;
+        padding: 4px 8px 6px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
         background: linear-gradient(180deg, transparent 0%, rgba(6, 8, 14, 0.94) 100%) !important;
       }
 
@@ -834,7 +852,7 @@
         flex: 0 0 100% !important;
         width: 100%;
         min-width: 100%;
-        margin: 0 0 3px !important;
+        margin: 0 0 2px !important;
         padding: 0 !important;
       }
 
@@ -849,7 +867,8 @@
         align-items: center !important;
         justify-content: space-between !important;
         width: 100% !important;
-        min-width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
       }
 
       .plyr__controls-left {
@@ -858,6 +877,7 @@
         align-items: center !important;
         justify-content: flex-start !important;
         min-width: 0 !important;
+        overflow: hidden !important;
       }
 
       .plyr__controls-center {
@@ -865,7 +885,7 @@
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 6px !important;
+        gap: 4px !important;
       }
 
       .plyr__controls-right {
@@ -873,19 +893,23 @@
         display: flex !important;
         align-items: center !important;
         justify-content: flex-end !important;
-        gap: 2px !important;
+        gap: 1px !important;
         min-width: 0 !important;
         position: relative !important;
       }
 
       /* Time display */
       .plyr__controls .plyr__time {
-        font-size: 11px !important;
+        font-size: 10.5px !important;
         font-weight: 600 !important;
         color: #cbd5e1 !important;
         padding: 0 2px !important;
         white-space: nowrap !important;
         font-variant-numeric: tabular-nums !important;
+      }
+
+      .plyr__controls .plyr__time--duration {
+        display: none !important;
       }
 
       /* Proportioned center playback buttons */
@@ -2339,8 +2363,9 @@
         playOverlay.classList.add('connecting');
         const playTitle = document.getElementById('streamPlayTitle');
         const playSub = document.getElementById('streamPlaySub');
-        if (playTitle) playTitle.textContent = '⚡ Starting High-Speed Stream...';
-        if (playSub) playSub.textContent = '90-Minute Cinema Pass Active • Loading Movie';
+        const activeTitle = (titleEl && titleEl.textContent) ? titleEl.textContent.trim() : 'Movie';
+        if (playTitle) playTitle.textContent = `▶ Playing "${activeTitle}"...`;
+        if (playSub) playSub.textContent = 'Loading stream...';
       }
 
       if (videoEl) {
@@ -2700,8 +2725,9 @@
           playOverlay.classList.add('connecting');
           const playTitle = document.getElementById('streamPlayTitle');
           const playSub = document.getElementById('streamPlaySub');
-          if (playTitle) playTitle.textContent = '⚡ Connecting High-Speed Stream...';
-          if (playSub) playSub.textContent = 'Buffering 1080p Cinema • Starting Movie';
+          const activeTitle = (titleEl && titleEl.textContent) ? titleEl.textContent.trim() : 'Movie';
+          if (playTitle) playTitle.textContent = `▶ Playing "${activeTitle}"...`;
+          if (playSub) playSub.textContent = 'Loading stream...';
 
           if (_connectTimeoutTimer) clearTimeout(_connectTimeoutTimer);
           _connectTimeoutTimer = setTimeout(function () {
@@ -3504,6 +3530,11 @@
           }
           document.body.classList.add('stream-started');
           document.body.classList.add('has-active-video');
+          const vpEl = document.getElementById('viewport');
+          if (vpEl) {
+            vpEl.style.backgroundImage = 'none';
+            vpEl.style.backgroundColor = '#000000';
+          }
           if (playOverlay && playOverlay.style.display !== 'none') {
             playOverlay.style.pointerEvents = 'none';
             playOverlay.style.transition = 'opacity 0.45s ease';
