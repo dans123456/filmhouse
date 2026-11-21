@@ -4359,7 +4359,7 @@ function stopAllBackgroundTrailers() {
     }
 }
 
-function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
+function embedAndPlayHeroTrailer(trailerKeyOrUrl, userTriggered = false) {
     if (!trailerKeyOrUrl) return;
     const cModal = document.getElementById("cinema-modal");
     if ((cModal && cModal.classList.contains("active")) || window._suppressTrailerPlayback) {
@@ -4421,7 +4421,12 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
     iframeContainer.style.transition = "opacity 0.45s ease";
     iframeContainer.style.opacity = "0";
     let trailerRevealed = false;
+    let trailerMuteFallbackTimer = null;
+    let trailerRevealTimer = null;
+
     const revealTrailer = () => {
+        if (trailerMuteFallbackTimer) { clearTimeout(trailerMuteFallbackTimer); trailerMuteFallbackTimer = null; }
+        if (trailerRevealTimer) { clearTimeout(trailerRevealTimer); trailerRevealTimer = null; }
         trailerRevealed = true;
         if (heroViewport) heroViewport.classList.add("has-active-video");
         if (detailScreen) detailScreen.classList.add("video-playing");
@@ -4430,6 +4435,8 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
     };
 
     const stopAndRestoreBackdrop = () => {
+        if (trailerMuteFallbackTimer) { clearTimeout(trailerMuteFallbackTimer); trailerMuteFallbackTimer = null; }
+        if (trailerRevealTimer) { clearTimeout(trailerRevealTimer); trailerRevealTimer = null; }
         if (backdropContainer) {
             backdropContainer.classList.remove("hidden-for-playback");
             backdropContainer.style.display = "block";
@@ -4442,6 +4449,22 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
         if (heroViewport) heroViewport.classList.remove("has-active-video");
         if (detailScreen) detailScreen.classList.remove("video-playing");
     };
+
+    if (userTriggered) {
+        trailerRevealTimer = setTimeout(() => {
+            if (!trailerRevealed) revealTrailer();
+        }, 500);
+    } else {
+        trailerMuteFallbackTimer = setTimeout(() => {
+            if (!trailerRevealed) {
+                postCmd("mute");
+                postCmd("playVideo");
+            }
+        }, 2200);
+        trailerRevealTimer = setTimeout(() => {
+            if (!trailerRevealed) revealTrailer();
+        }, 4000);
+    }
 
     let progressPollInterval = null;
 
@@ -4528,7 +4551,7 @@ function embedAndPlayHeroTrailer(trailerKeyOrUrl) {
     if (previewFab) {
         previewFab.onclick = () => {
             if (iframeContainer && (iframeContainer.style.display === "none" || !iframeContainer.querySelector("iframe"))) {
-                embedAndPlayHeroTrailer(trailerKeyOrUrl);
+                embedAndPlayHeroTrailer(trailerKeyOrUrl, true);
                 return;
             }
             revealTrailer();
@@ -5529,7 +5552,7 @@ function openMediaDetailPage(movie) {
             trailerBtn.style.display = "flex";
             trailerBtn.onclick = () => {
                 if (movie.trailer) {
-                    embedAndPlayHeroTrailer(movie.trailer);
+                    embedAndPlayHeroTrailer(movie.trailer, true);
                     const heroViewport = document.getElementById("media-hero-viewport");
                     if (heroViewport) heroViewport.scrollIntoView({ behavior: "smooth", block: "start" });
                 } else if (movie.imdb_id) {
@@ -10915,6 +10938,27 @@ function openUniversalShareModal(options) {
 
     const titleEl = document.getElementById("share-modal-title");
     const descEl = document.getElementById("share-modal-desc");
+    const copyTextEl = document.getElementById("share-opt-copy-text");
+
+    if (titleEl) titleEl.textContent = currentSharePayload.title || "Share";
+    if (descEl) descEl.textContent = currentSharePayload.desc || "Share with friends!";
+    if (copyTextEl) {
+        copyTextEl.textContent = currentSharePayload.type === "movie" ? "Copy Movie Link 🔗" : "Copy Invite Link 🔗";
+    }
+
+    // Auto-clipboard copy as convenience so user can paste immediately anywhere
+    if (navigator.clipboard?.writeText && (currentSharePayload.text || currentSharePayload.url)) {
+        navigator.clipboard.writeText(currentSharePayload.text || currentSharePayload.url).catch(() => { });
+    }
+
+    if (typeof triggerHaptic === "function") triggerHaptic("selection");
+    shareModal.classList.add("active");
+}
+
+// Share Media integration (triggers Universal Share Sheet)
+function shareMovie(movie) {
+    if (!movie) return;
+    const targetId = movie.csv_id || movie.tmdb_id || movie.id;
     const copyTextEl = document.getElementById("share-opt-copy-text");
 
     if (titleEl) titleEl.textContent = currentSharePayload.title || "Share";
