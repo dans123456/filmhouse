@@ -8891,7 +8891,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     }
 
     // Helper to switch or reload the cinema stream iframe
-    function setCinemaStream(targetUrl, currentTitle) {
+    function setCinemaStream(targetUrl, currentTitle, tried720Fallback = false) {
         if (!container) return;
         container.replaceChildren();
         if (!targetUrl) return;
@@ -8901,6 +8901,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             return;
         }
         const directUrl = resolveDirectStreamUrl(targetUrl);
+        window._currentCinemaStreamUrl = directUrl;
         const currentMediaTitle = currentTitle || initialTitle;
         const currentMovieKey = getScopedMediaSubtitleKey(movie, currentSeason ? currentSeason.seasonNumber : 1, currentEpisodeNum);
         const subParam = (state.activeSubtitleUrl && state.activeSubtitleMovieId === currentMovieKey)
@@ -8919,7 +8920,8 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const cacheBuster = `v=171_${Date.now()}`;
         const _savedTheme = localStorage.getItem("filmhouse_theme_accent") || "gold";
         const themeParam = `&theme=${encodeURIComponent(_savedTheme)}`;
-        const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}`;
+        const tried720Param = tried720Fallback ? "&tried720=1" : "";
+        const playerSrc = `${playerBase}?${cacheBuster}&watch=${encodeURIComponent(directUrl)}&title=${encodeURIComponent(currentMediaTitle)}&type=${isTVShow ? 'series' : 'movie'}&backdrop=${encodeURIComponent(movieBackdrop)}&server=${encodeURIComponent(activeStreamingServerUrl)}${imdbParam}${tmdbParam}${mediaIdParam}${seriesEpParam}${subParam}${themeParam}${tried720Param}`;
 
         // Fast pre-buffering animation overlay with clean movie title
         container.style.backgroundImage = "";
@@ -9214,12 +9216,21 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
             closeQualityModal();
         }
 
-        window._activeCinemaSwitch720p = () => {
+        window._activeCinemaSwitch720p = (isAuto = false) => {
             const qualities = getMovieAvailableQualities();
-            const q720 = qualities.find(q => /720/i.test(q.label || q.badge)) || qualities[0];
+            const curResolved = window._currentCinemaStreamUrl || "";
+            const q720 = qualities.find(q => /720/i.test(q.label || q.badge) && resolveDirectStreamUrl(q.url) !== curResolved)
+                || qualities.find(q => resolveDirectStreamUrl(q.url) !== curResolved)
+                || (!isAuto ? qualities[0] : null);
             if (q720) {
-                selectQualityOption(q720);
-                showToast("⚡ Stream Reloaded (720p HD)", "success");
+                if (isAuto) {
+                    const qLabelEl = document.getElementById("cinema-quality-label");
+                    if (qLabelEl) qLabelEl.textContent = q720.label.replace(/\s*\(.*\)/, "");
+                    setCinemaStream(q720.url, initialTitle, true);
+                } else {
+                    selectQualityOption(q720);
+                    showToast("⚡ Stream Reloaded (720p HD)", "success");
+                }
             }
         };
 
@@ -9935,7 +9946,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
                     }
                 } else if (e.data.action === "switchTo720pQuality") {
                     if (typeof window._activeCinemaSwitch720p === "function") {
-                        window._activeCinemaSwitch720p();
+                        window._activeCinemaSwitch720p(Boolean(e.data.auto));
                     }
                 } else if (e.data.action === "openLink" && e.data.url) {
                     try {
