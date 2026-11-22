@@ -97,6 +97,18 @@
       touch-action: manipulation;
     }
 
+    .plyr--video .plyr__controls button,
+    .plyr--video .plyr__controls .plyr__progress input[type="range"] {
+      pointer-events: auto !important;
+      cursor: pointer;
+    }
+
+    .plyr--video .plyr__progress {
+      padding: 8px 0 !important;
+      margin: -4px 0 !important;
+      touch-action: none !important;
+    }
+
     .plyr__controls .plyr__progress__container {
       order: -1;
       flex: 0 0 100% !important;
@@ -1428,6 +1440,7 @@
             settings: ['captions', 'quality', 'speed'],
             speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
             seekTime: 10,
+            clickToPlay: false,
             tooltips: { controls: true, seek: true },
             keyboard: { focused: true, global: true },
             fullscreen: { enabled: true, fallback: true, iosNative: false, container: '#viewport' }
@@ -1491,6 +1504,19 @@
 
           controls.appendChild(row);
           row.style.order = '2';
+
+          // Move tap gestures & custom subtitles inside .plyr so they work in all fullscreen modes
+          const plyrRoot = controls.closest('.plyr');
+          const tapG = document.getElementById('tapGestures');
+          const subOv = document.getElementById('customSubtitleOverlay');
+          if (plyrRoot) {
+            if (tapG && tapG.parentNode !== plyrRoot) {
+              plyrRoot.insertBefore(tapG, controls);
+            }
+            if (subOv && subOv.parentNode !== plyrRoot) {
+              plyrRoot.insertBefore(subOv, controls);
+            }
+          }
 
           // Move any stray items (e.g. dynamically inserted time/controls) into the row so nothing floats above
           Array.from(controls.children).forEach(ch => {
@@ -3062,12 +3088,19 @@
         e.preventDefault();
         e.stopPropagation();
       }
+      const plyrEl = document.querySelector('.plyr');
+      const controlsHidden = plyrEl ? plyrEl.classList.contains('plyr--hide-controls') : false;
+
       if (zone === 'center') {
         clearTimeout(tapTimeout);
         lastTapTime = 0;
         lastTapZone = null;
-        togglePlayState();
-        setControlsVisible(true);
+        if (controlsHidden) {
+          setControlsVisible(true);
+        } else {
+          togglePlayState();
+          setControlsVisible(true);
+        }
         return;
       }
 
@@ -3093,10 +3126,10 @@
         lastTapZone = zone;
         clearTimeout(tapTimeout);
         tapTimeout = setTimeout(() => {
-          toggleControlsVisibility();
+          setControlsVisible(controlsHidden);
           lastTapTime = 0;
           lastTapZone = null;
-        }, 240);
+        }, 220);
       }
     }
 
