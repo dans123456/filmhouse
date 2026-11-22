@@ -138669,7 +138669,8 @@
     "links": [
       {
         "url": "https://t.me/FilmHouseFilebot?start=BQADAQADWQ4AAoywoEajoU0_XxGNdRYE",
-        "quality": "720p"
+        "quality": "720p",
+        "stream_url": "MTE2NjQ6MWM4ZTExMjM3MTdkMTY4Mw"
       }
     ],
     "poster": "https://image.tmdb.org/t/p/w500/63kGofUkt1Mx0SIL4XI4Z5AoSgt.jpg",
@@ -138700,12 +138701,12 @@
     "director": "Sam Taylor-Johnson",
     "trailer": "6FDTMRK7-24",
     "runtime": "125 min",
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTE2NjQ6MWM4ZTExMjM3MTdkMTY4Mw",
+    "stream_url": "MTE2NjQ6MWM4ZTExMjM3MTdkMTY4Mw",
     "stream_links": [
       {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTE2NjQ6MWM4ZTExMjM3MTdkMTY4Mw",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTE2NjQ6MWM4ZTExMjM3MTdkMTY4Mw"
+        "quality": "720p",
+        "stream_url": "MTE2NjQ6MWM4ZTExMjM3MTdkMTY4Mw",
+        "url": "MTE2NjQ6MWM4ZTExMjM3MTdkMTY4Mw"
       }
     ]
   },
