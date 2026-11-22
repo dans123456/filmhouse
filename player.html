@@ -139,9 +139,11 @@
       display: none !important;
     }
 
-    .plyr--video:not(.plyr--hide-controls) .plyr__controls {
+    .plyr--video:not(.plyr--hide-controls) .plyr__controls,
+    .plyr--video.fh-controls-visible .plyr__controls {
       opacity: 1 !important;
       pointer-events: auto !important;
+      visibility: visible !important;
       transform: translateY(0) !important;
     }
 
@@ -345,12 +347,13 @@
       display: inline-flex;
     }
 
-    .plyr--hide-controls .fh-exit-fs-btn {
+    .plyr--hide-controls:not(.fh-controls-visible) .fh-exit-fs-btn {
       opacity: 0 !important;
       pointer-events: none !important;
     }
 
-    .plyr:not(.plyr--hide-controls) .fh-exit-fs-btn {
+    .plyr:not(.plyr--hide-controls) .fh-exit-fs-btn,
+    .plyr.fh-controls-visible .fh-exit-fs-btn {
       opacity: 1 !important;
       pointer-events: auto !important;
     }
@@ -3029,13 +3032,7 @@
 
     async function lockToLandscape() {
       try {
-        // 1. Native iOS / Safari / WebKit fullscreen rotation
-        if (videoEl && typeof videoEl.webkitEnterFullscreen === 'function' && !document.fullscreenElement) {
-          videoEl.webkitEnterFullscreen();
-        }
-      } catch (_) { }
-      try {
-        // 2. Telegram WebApp SDK orientation lock
+        // 1. Telegram WebApp SDK orientation lock
         if (window.Telegram?.WebApp?.lockOrientation) {
           window.Telegram.WebApp.lockOrientation('landscape');
         }
@@ -3109,28 +3106,28 @@
       clearTimeout(_controlsAutoHideTimer);
 
       if (show) {
-        if (plyrEl) plyrEl.classList.remove('plyr--hide-controls');
-        if (pill) pill.classList.remove('pass-auto-hidden');
-        if (window.plyrInstance && typeof window.plyrInstance.toggleControls === 'function') {
-          try { window.plyrInstance.toggleControls(true); } catch (_) { }
+        if (plyrEl) {
+          plyrEl.classList.remove('plyr--hide-controls');
+          plyrEl.classList.add('fh-controls-visible');
         }
+        if (pill) pill.classList.remove('pass-auto-hidden');
         if (videoEl && !videoEl.paused && !videoEl.ended) {
           _controlsAutoHideTimer = setTimeout(() => {
             setControlsVisible(false);
           }, 4500);
         }
       } else {
-        if (plyrEl) plyrEl.classList.add('plyr--hide-controls');
-        if (pill) pill.classList.add('pass-auto-hidden');
-        if (window.plyrInstance && typeof window.plyrInstance.toggleControls === 'function') {
-          try { window.plyrInstance.toggleControls(false); } catch (_) { }
+        if (plyrEl) {
+          plyrEl.classList.add('plyr--hide-controls');
+          plyrEl.classList.remove('fh-controls-visible');
         }
+        if (pill) pill.classList.add('pass-auto-hidden');
       }
     }
 
     function toggleControlsVisibility() {
       const plyrEl = document.querySelector('.plyr');
-      const isHidden = plyrEl ? plyrEl.classList.contains('plyr--hide-controls') : true;
+      const isHidden = plyrEl ? (plyrEl.classList.contains('plyr--hide-controls') && !plyrEl.classList.contains('fh-controls-visible')) : true;
       setControlsVisible(isHidden);
     }
 
@@ -3175,7 +3172,7 @@
         e.stopPropagation();
       }
       const plyrEl = document.querySelector('.plyr');
-      const controlsHidden = plyrEl ? plyrEl.classList.contains('plyr--hide-controls') : false;
+      const controlsHidden = plyrEl ? (plyrEl.classList.contains('plyr--hide-controls') && !plyrEl.classList.contains('fh-controls-visible')) : false;
 
       if (zone === 'center') {
         clearTimeout(tapTimeout);
