@@ -298,6 +298,63 @@
       bottom: 26px !important;
     }
 
+    :fullscreen .plyr__controls,
+    :-webkit-full-screen .plyr__controls,
+    .plyr--fullscreen-active .plyr__controls,
+    body.is-fullscreen .plyr__controls {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      z-index: 60 !important;
+      padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    }
+
+    .fh-exit-fs-btn {
+      display: none;
+      position: fixed;
+      top: max(14px, env(safe-area-inset-top));
+      right: 16px;
+      z-index: 65;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: rgba(10, 12, 18, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+      transition: opacity 0.25s ease, transform 0.2s ease;
+    }
+
+    .fh-exit-fs-btn:active {
+      transform: scale(0.95);
+    }
+
+    :fullscreen .fh-exit-fs-btn,
+    :-webkit-full-screen .fh-exit-fs-btn,
+    .plyr--fullscreen-active .fh-exit-fs-btn,
+    body.is-fullscreen .fh-exit-fs-btn {
+      display: inline-flex;
+    }
+
+    .plyr--hide-controls .fh-exit-fs-btn {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    .plyr:not(.plyr--hide-controls) .fh-exit-fs-btn {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
     .custom-sub-text {
       display: none;
       background: rgba(0, 0, 0, 0.75);
@@ -1349,6 +1406,9 @@
             hls.on(Hls.Events.MANIFEST_PARSED, function () {
               if (loaderEl) loaderEl.style.opacity = '0';
               setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 400);
+              if (hls.audioTracks && hls.audioTracks.length > 0 && hls.audioTrack === -1) {
+                try { hls.audioTrack = 0; } catch (_) { }
+              }
               if (typeof detectAndBroadcastTracks === 'function') detectAndBroadcastTracks();
             });
             hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, function () {
@@ -1448,6 +1508,7 @@
             speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
             seekTime: 10,
             clickToPlay: false,
+            hideControls: false,
             tooltips: { controls: true, seek: true },
             keyboard: { focused: true, global: true },
             fullscreen: { enabled: true, fallback: true, iosNative: false, container: '#viewport' }
@@ -1522,6 +1583,24 @@
             }
             if (subOv && subOv.parentNode !== plyrRoot) {
               plyrRoot.insertBefore(subOv, controls);
+            }
+            if (!document.getElementById('exitFullscreenBtn')) {
+              const exitBtn = document.createElement('button');
+              exitBtn.id = 'exitFullscreenBtn';
+              exitBtn.type = 'button';
+              exitBtn.className = 'fh-exit-fs-btn';
+              exitBtn.setAttribute('aria-label', 'Exit Fullscreen');
+              exitBtn.innerHTML = '<span>✕</span><span>Exit</span>';
+              exitBtn.addEventListener('click', function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                if (window.plyrInstance && window.plyrInstance.fullscreen && window.plyrInstance.fullscreen.active) {
+                  window.plyrInstance.fullscreen.exit();
+                } else {
+                  toggleFullscreenState();
+                }
+              });
+              plyrRoot.appendChild(exitBtn);
             }
           }
 
@@ -3038,7 +3117,7 @@
         if (videoEl && !videoEl.paused && !videoEl.ended) {
           _controlsAutoHideTimer = setTimeout(() => {
             setControlsVisible(false);
-          }, 3500);
+          }, 4500);
         }
       } else {
         if (plyrEl) plyrEl.classList.add('plyr--hide-controls');
@@ -3172,10 +3251,16 @@
           }
         });
 
+        // Always keep controls visible when paused
+        if (videoEl) {
+          videoEl.addEventListener('pause', () => setControlsVisible(true));
+        }
+
         // Orientation lock when Plyr triggers fullscreen
         if (window.plyrInstance) {
           window.plyrInstance.on('enterfullscreen', () => {
             lockToLandscape();
+            setControlsVisible(true);
             try {
               if (window.parent && window.parent !== window) {
                 window.parent.postMessage({ action: 'playerEnteredFullscreen' }, '*');
@@ -3184,6 +3269,7 @@
           });
           window.plyrInstance.on('exitfullscreen', () => {
             unlockFromLandscape();
+            setControlsVisible(true);
             try {
               if (window.parent && window.parent !== window) {
                 window.parent.postMessage({ action: 'playerExitedFullscreen' }, '*');
@@ -3198,6 +3284,7 @@
           } else {
             unlockFromLandscape();
           }
+          setControlsVisible(true);
         });
         document.addEventListener('webkitfullscreenchange', () => {
           if (document.webkitFullscreenElement) {
@@ -3205,6 +3292,7 @@
           } else {
             unlockFromLandscape();
           }
+          setControlsVisible(true);
         });
 
         window.addEventListener('message', function (ev) {
