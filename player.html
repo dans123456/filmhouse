@@ -3729,6 +3729,55 @@
         if (finalStreamUrl) {
           if (downloadBtn) downloadBtn.href = finalStreamUrl;
 
+          // Auto-upgrade multi-audio / MKV / HEVC streams to Multi-Audio HLS (.m3u8) when supported by stream server
+          (function probeAndUpgradeToHls() {
+            try {
+              if (!finalStreamUrl || finalStreamUrl.includes('.m3u8')) return;
+              const u = new URL(finalStreamUrl, window.location.href);
+              const m = u.pathname.match(/^\/(?:dl|stream)\/([a-zA-Z0-9_\-]+)/);
+              if (!m || !m[1]) return;
+              const token = m[1];
+              const probeUrl = `${u.origin}/api/probe/${encodeURIComponent(token)}`;
+              const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+              const timer = ctrl ? setTimeout(() => ctrl.abort(), 5000) : null;
+
+              fetch(probeUrl, ctrl ? { signal: ctrl.signal } : {})
+                .then(r => (r.ok ? r.json() : null))
+                .then(data => {
+                  if (timer) clearTimeout(timer);
+                  if (!data || !data.ok || !data.hls_path) return;
+                  const shouldUseHls = !!(data.needs_hls || (Array.isArray(data.audio_tracks) && data.audio_tracks.length > 1) || audioParam);
+                  if (!shouldUseHls) return;
+
+                  const hlsUrl = `${u.origin}${data.hls_path}`;
+                  if (finalStreamUrl === hlsUrl) return;
+
+                  const wasPlaying = videoEl && !videoEl.paused && !videoEl.ended && videoEl.currentTime > 0;
+                  const resumeAt = (videoEl && videoEl.currentTime > 1) ? videoEl.currentTime : 0;
+
+                  finalStreamUrl = hlsUrl;
+                  if (window._currentHls) {
+                    try { window._currentHls.destroy(); } catch (_) { }
+                    window._currentHls = null;
+                  }
+                  if (videoEl) {
+                    videoEl.removeAttribute('src');
+                    try { videoEl.load(); } catch (_) { }
+                  }
+                  attachStreamSource();
+                  if (resumeAt > 0 && videoEl) {
+                    videoEl.addEventListener('loadedmetadata', function () {
+                      try { videoEl.currentTime = resumeAt; } catch (_) { }
+                    }, { once: true });
+                  }
+                  if (wasPlaying && videoEl) {
+                    videoEl.play().catch(() => { });
+                  }
+                })
+                .catch(() => { if (timer) clearTimeout(timer); });
+            } catch (_) { }
+          })();
+
           // Always attach stream source with preload="metadata" so DNS/TLS and headers warm up immediately
           attachStreamSource();
           updatePassUI();
