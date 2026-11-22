@@ -1349,6 +1349,13 @@
             hls.on(Hls.Events.MANIFEST_PARSED, function () {
               if (loaderEl) loaderEl.style.opacity = '0';
               setTimeout(() => { if (loaderEl) loaderEl.style.display = 'none'; }, 400);
+              if (typeof detectAndBroadcastTracks === 'function') detectAndBroadcastTracks();
+            });
+            hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, function () {
+              if (typeof detectAndBroadcastTracks === 'function') detectAndBroadcastTracks();
+            });
+            hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, function () {
+              if (typeof detectAndBroadcastTracks === 'function') detectAndBroadcastTracks();
             });
             hls.on(Hls.Events.ERROR, function (evt, data) {
               if (data.fatal) {
