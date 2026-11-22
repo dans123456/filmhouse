@@ -159257,14 +159257,18 @@
     "trailer": "MikgqM0LXr4",
     "runtime": "",
     "links": [
-      "https://t.me/filmHouseFile1bot?start=BQADAQAD5h0AAq-ESEZdWMTd2Bn_vBYE"
+      {
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD5h0AAq-ESEZdWMTd2Bn_vBYE",
+        "quality": "720p",
+        "stream_url": "OTU3Nzo2NTY1YTJkYjA5OTIzZTY4"
+      }
     ],
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTU3Nzo2NTY1YTJkYjA5OTIzZTY4",
+    "stream_url": "OTU3Nzo2NTY1YTJkYjA5OTIzZTY4",
     "stream_links": [
       {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTU3Nzo2NTY1YTJkYjA5OTIzZTY4",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTU3Nzo2NTY1YTJkYjA5OTIzZTY4"
+        "quality": "720p",
+        "stream_url": "OTU3Nzo2NTY1YTJkYjA5OTIzZTY4",
+        "url": "OTU3Nzo2NTY1YTJkYjA5OTIzZTY4"
       }
     ]
   },
