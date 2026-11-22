@@ -10997,7 +10997,7 @@ function shareMovie(movie) {
     const typeLabel = (movie.type || "").toLowerCase().includes("series") ? "Series" : "Movie";
 
     const shareTitle = `${movie.title} ${yearVal ? `(${yearVal})` : ""}`.trim();
-    const shareText = `🎬 Watch "${movie.title}" on Film House App!\n⭐ Rating: ${ratingVal}/10 • ${typeLabel}\n🔥 Stream in HD or Download now:\n${directUrl}`;
+    const shareText = `🎬 Check out "${movie.title}" on Film House!\n⭐ Rating: ${ratingVal}/10 • ${typeLabel}\n${directUrl}`;
 
     openUniversalShareModal({
         type: "movie",

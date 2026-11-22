@@ -1288,25 +1288,31 @@ function setupBot(bot, adminBot) {
             const miniAppUrl = safeDeepId 
                 ? `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${safeDeepId}`
                 : `https://t.me/Filmhouseappbot/filmhouseapp`;
-            const shareText = encodeURIComponent(`🍿 Watch "${cleanTitle}" on Film House!\nStream and download in HD:`);
+            const safeShareBody = `🍿 Check out "${cleanTitle}" on Film House!`;
+            const safeShareWithUrl = `${safeShareBody}\n${miniAppUrl}`;
+            const shareText = encodeURIComponent(safeShareBody);
             const shareUrl = encodeURIComponent(miniAppUrl);
-
-            const mainBtnLabel = (movieInfo.broadcastMode === "stream_available" || movieInfo.isStreamRequest || bMode.includes("stream"))
-                ? "▶️ Stream Now in 1080p FHD 🍿"
-                : "🎬 Watch / Download in App 🍿";
 
             const channelReplyMarkup = {
                 inline_keyboard: [
                     [
                         {
-                            text: mainBtnLabel,
-                            url: miniAppUrl
+                            text: "💬 Share on WhatsApp",
+                            url: `https://wa.me/?text=${encodeURIComponent(safeShareWithUrl)}`
+                        },
+                        {
+                            text: "✈️ Share on Telegram",
+                            url: `https://t.me/share/url?url=${shareUrl}&text=${shareText}`
                         }
                     ],
                     [
                         {
-                            text: "📢 Share with Friends",
-                            url: `https://t.me/share/url?url=${shareUrl}&text=${shareText}`
+                            text: "𝕏 Share on X",
+                            url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(safeShareWithUrl)}`
+                        },
+                        {
+                            text: "🌐 Share on Facebook",
+                            url: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`
                         }
                     ]
                 ]
