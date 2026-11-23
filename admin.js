@@ -342,10 +342,13 @@ function normalizeQualityName(str) {
     return "720p";
 }
 
-function parseBulkLinks(rawText, isSeries) {
+function parseBulkLinks(rawText, isSeries, opts = {}) {
     if (!rawText || typeof rawText !== "string") return [];
     const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
     const parsed = [];
+    const isEpisodeMode = isSeries && opts && opts.mode === "episode";
+    const epSeasonNum = Math.max(1, parseInt(opts?.seasonNum, 10) || 1);
+    const epStartNum = Math.max(1, parseInt(opts?.startEp, 10) || 1);
 
     function detectQuality(str, fallbackIdx) {
         const lower = str.toLowerCase();
@@ -374,7 +377,9 @@ function parseBulkLinks(rawText, isSeries) {
             url = "https://" + url;
         }
         if (isSeries) {
-            const season = detectSeason(line, idx);
+            const season = isEpisodeMode
+                ? `S${epSeasonNum}E${epStartNum + idx}`
+                : detectSeason(line, idx);
             parsed.push({ url, season });
         } else {
             const quality = detectQuality(line, idx);
@@ -3329,7 +3334,7 @@ function showMovieDetails(movie) {
         currentLinks.forEach((link, idx) => {
             const urlVal = typeof link === 'object' && link !== null ? link.url : link;
             const qualityVal = typeof link === 'object' && link !== null && link.quality ? link.quality : "720p";
-            const seasonLabel = `Season ${idx + 1}`;
+            const seasonLabel = row.dataset.seriesLabel || `Season ${idx + 1}`;
             
             const wrapper = document.createElement("div");
             wrapper.style.display = "flex";
@@ -4701,7 +4706,7 @@ function renderAddMovieLinks() {
         input.addEventListener("input", (e) => {
             const idx = parseInt(e.target.dataset.index);
             const isSeriesNow = movieTypeSelect && (movieTypeSelect.value.toLowerCase() === 'tv' || movieTypeSelect.value.toLowerCase() === 'series');
-            const seasonLabel = `Season ${idx + 1}`;
+            const seasonLabel = row.dataset.seriesLabel || `Season ${idx + 1}`;
             if (typeof addMovieLinksState[idx] !== 'object' || addMovieLinksState[idx] === null) {
                 addMovieLinksState[idx] = isSeriesNow ? { url: e.target.value.trim(), season: seasonLabel } : { url: e.target.value.trim(), quality: "720p" };
             } else {
@@ -5219,16 +5224,37 @@ if (btnAddMovieBulkToggle && addMovieBulkWrapper) {
     });
 }
 
+const addMovieBulkMode = document.getElementById("add-movie-bulk-mode");
+const addMovieBulkEpOpts = document.getElementById("add-movie-bulk-ep-opts");
+if (addMovieBulkMode && addMovieBulkEpOpts) {
+    addMovieBulkMode.addEventListener("change", () => {
+        addMovieBulkEpOpts.style.display = addMovieBulkMode.value === "episode" ? "inline-flex" : "none";
+    });
+}
+
 if (btnApplyAddBulkLinks && addMovieBulkInput) {
     btnApplyAddBulkLinks.addEventListener("click", () => {
         const movieTypeSelect = document.getElementById("movie-type");
         const isSeries = movieTypeSelect && (movieTypeSelect.value.toLowerCase() === 'tv' || movieTypeSelect.value.toLowerCase() === 'series');
-        const parsed = parseBulkLinks(addMovieBulkInput.value, isSeries);
+        const mode = addMovieBulkMode ? addMovieBulkMode.value : "season";
+        const seasonNum = document.getElementById("add-movie-bulk-season")?.value;
+        const startEp = document.getElementById("add-movie-bulk-start-ep")?.value;
+        const parsed = parseBulkLinks(addMovieBulkInput.value, isSeries, { mode, seasonNum, startEp });
         if (parsed.length === 0) {
             alert("Please paste at least one valid link!");
             return;
         }
-        addMovieLinksState = parsed;
+        if (isSeries && mode === "episode" && Array.isArray(addMovieLinksState) && addMovieLinksState.length > 0) {
+            const merged = [...addMovieLinksState];
+            parsed.forEach(item => {
+                const existingIdx = merged.findIndex(x => String(x.season || "").toUpperCase() === String(item.season || "").toUpperCase());
+                if (existingIdx >= 0) merged[existingIdx] = item;
+                else merged.push(item);
+            });
+            addMovieLinksState = merged;
+        } else {
+            addMovieLinksState = parsed;
+        }
         renderAddMovieLinks();
         addMovieBulkInput.value = "";
         if (addMovieBulkWrapper) addMovieBulkWrapper.style.display = "none";
@@ -7358,14 +7384,16 @@ function renderFulfillLinksInputs(existingMovie, isSeries = true, reqSpec = "") 
     }
 }
 
-function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", isSeries = true, isRequested = false) {
+function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", isSeries = true, isRequested = false, customLabel = "") {
     const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
     if (!wrapper) return;
 
     const seasonNum = idx + 1;
+    const seriesDisplayLabel = customLabel || `Season ${seasonNum}`;
     const row = document.createElement("div");
     row.className = "fulfill-link-row";
     row.dataset.index = idx;
+    if (isSeries && customLabel) row.dataset.seriesLabel = customLabel;
     row.style.cssText = `display: flex; flex-wrap: wrap; gap: 6px; align-items: center; background: ${isRequested ? 'rgba(255, 188, 0, 0.08)' : 'rgba(255,255,255,0.02)'}; padding: 8px 10px; border-radius: 6px; border: 1px solid ${isRequested ? 'rgba(255, 188, 0, 0.4)' : 'rgba(255,255,255,0.05)'}; margin-bottom: 8px; width: 100%; box-sizing: border-box;`;
 
     const labelBadge = document.createElement("span");
@@ -7374,7 +7402,7 @@ function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", i
     const normQuality = normalizeQualityName(defaultQuality);
 
     if (isSeries) {
-        labelBadge.innerHTML = `<span>Link ${seasonNum} (Season ${seasonNum})</span>${isRequested ? '<span style="font-size:9px; background:#ffbc00; color:#000; padding:1px 4px; border-radius:3px;">⚡ REQUESTED</span>' : ''}`;
+        labelBadge.innerHTML = `<span>Link ${seasonNum} (${escapeHTML(seriesDisplayLabel)})</span>${isRequested ? '<span style="font-size:9px; background:#ffbc00; color:#000; padding:1px 4px; border-radius:3px;">⚡ REQUESTED</span>' : ''}`;
     } else {
         labelBadge.innerHTML = `<span>Link ${seasonNum}:</span>${isRequested ? `<span style="font-size:9px; background:#ffbc00; color:#000; padding:1px 4px; border-radius:3px;">⚡ REQUESTED (${escapeHTML(normQuality)})</span>` : ''}`;
     }
@@ -7383,7 +7411,7 @@ function addFulfillLinkInputRow(idx, defaultUrl = "", defaultQuality = "720p", i
     urlInput.type = "text";
     urlInput.className = "fulfill-link-url-input";
     urlInput.value = defaultUrl;
-    urlInput.placeholder = isSeries ? `Paste download URL for Season ${seasonNum}...` : `Paste download URL for ${normQuality}...`;
+    urlInput.placeholder = isSeries ? `Paste download URL for ${seriesDisplayLabel}...` : `Paste download URL for ${normQuality}...`;
     urlInput.style.cssText = "flex: 1; min-width: 140px; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; outline: none; box-sizing: border-box;";
 
     urlInput.addEventListener("input", () => { if (typeof updateFulfillFolderBadges === "function") updateFulfillFolderBadges(); });
@@ -7464,14 +7492,25 @@ if (btnFulfillBulkToggle && fulfillBulkWrapper) {
     });
 }
 
+const fulfillBulkMode = document.getElementById("fulfill-bulk-mode");
+const fulfillBulkEpOpts = document.getElementById("fulfill-bulk-ep-opts");
+if (fulfillBulkMode && fulfillBulkEpOpts) {
+    fulfillBulkMode.addEventListener("change", () => {
+        fulfillBulkEpOpts.style.display = fulfillBulkMode.value === "episode" ? "inline-flex" : "none";
+    });
+}
+
 if (btnApplyFulfillBulkLinks && fulfillBulkInput) {
     btnApplyFulfillBulkLinks.addEventListener("click", () => {
         const wrapper = document.getElementById("fulfill-links-inputs-wrapper");
         if (!wrapper) return;
         const matchedReq = (currentFulfillReq && currentFulfillReq.title) ? currentFulfillReq : allRequests.find(r => (r.title || "").toLowerCase().trim() === (typeof currentFulfillTitle !== 'undefined' ? (currentFulfillTitle || "").toLowerCase().trim() : ""));
         const isSeries = isRequestSeries(matchedReq);
+        const mode = fulfillBulkMode ? fulfillBulkMode.value : "season";
+        const seasonNum = document.getElementById("fulfill-bulk-season")?.value;
+        const startEp = document.getElementById("fulfill-bulk-start-ep")?.value;
 
-        const parsed = parseBulkLinks(fulfillBulkInput.value, isSeries);
+        const parsed = parseBulkLinks(fulfillBulkInput.value, isSeries, { mode, seasonNum, startEp });
         if (parsed.length === 0) {
             alert("Please paste at least one valid link!");
             return;
@@ -7479,7 +7518,7 @@ if (btnApplyFulfillBulkLinks && fulfillBulkInput) {
 
         wrapper.replaceChildren();
         parsed.forEach((item, idx) => {
-            addFulfillLinkInputRow(idx, item.url, item.quality || "720p", isSeries, idx === 0);
+            addFulfillLinkInputRow(idx, item.url, item.quality || "720p", isSeries, idx === 0, isSeries ? (item.season || "") : "");
         });
 
         fulfillBulkInput.value = "";
@@ -7716,7 +7755,7 @@ if (fulfillForm && fulfillRequestModal) {
             const qualitySelect = row.querySelector(".fulfill-link-quality-select");
             const url = urlInput ? urlInput.value.trim() : "";
             const quality = qualitySelect ? qualitySelect.value : "720p";
-            const seasonLabel = `Season ${idx + 1}`;
+            const seasonLabel = row.dataset.seriesLabel || `Season ${idx + 1}`;
 
             linksToSave.push({ seasonLabel, quality, url, index: idx });
             if (url && (!primaryNotificationLink || idx === 0)) {

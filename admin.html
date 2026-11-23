@@ -1286,6 +1286,19 @@
                             <button type="button" class="btn btn-secondary btn-sm" id="btn-add-movie-bulk-links-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
                         </div>
                         <div id="add-movie-bulk-links-wrapper" style="display: none; margin-top: 10px;">
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; font-size: 11px;">
+                                <label style="color: var(--text-secondary);">Mode:</label>
+                                <select id="add-movie-bulk-mode" style="padding: 4px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px;">
+                                    <option value="season">By Season (S1, S2...)</option>
+                                    <option value="episode">By Episode (S1E1, S1E2...)</option>
+                                </select>
+                                <span id="add-movie-bulk-ep-opts" style="display: none; align-items: center; gap: 6px;">
+                                    <label style="color: var(--text-secondary);">Season:</label>
+                                    <input type="number" id="add-movie-bulk-season" min="1" value="1" style="width: 52px; padding: 4px 6px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px;">
+                                    <label style="color: var(--text-secondary);">Start Ep:</label>
+                                    <input type="number" id="add-movie-bulk-start-ep" min="1" value="1" style="width: 56px; padding: 4px 6px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px;">
+                                </span>
+                            </div>
                             <textarea id="add-movie-bulk-links-input" placeholder="Paste multiple links (one per line)...&#10;Line 1 -> Season 1 (or 720p)&#10;Line 2 -> Season 2 (or 1080p)..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
                             <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
                                 <button type="button" class="btn btn-primary btn-sm" id="btn-apply-add-bulk-links" style="font-size: 11px; padding: 4px 10px;">Apply Links</button>
@@ -1484,6 +1497,19 @@
                                 <button type="button" class="btn btn-secondary btn-sm" id="btn-fulfill-bulk-links-toggle" style="font-size: 11px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #ffbc00; border-color: rgba(255, 188, 0, 0.3);">📋 Bulk Paste</button>
                             </div>
                             <div id="fulfill-bulk-links-wrapper" style="display: none; margin-top: 10px;">
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; font-size: 11px;">
+                                    <label style="color: var(--text-secondary);">Mode:</label>
+                                    <select id="fulfill-bulk-mode" style="padding: 4px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px;">
+                                        <option value="season">By Season (S1, S2...)</option>
+                                        <option value="episode">By Episode (S1E1, S1E2...)</option>
+                                    </select>
+                                    <span id="fulfill-bulk-ep-opts" style="display: none; align-items: center; gap: 6px;">
+                                        <label style="color: var(--text-secondary);">Season:</label>
+                                        <input type="number" id="fulfill-bulk-season" min="1" value="1" style="width: 52px; padding: 4px 6px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px;">
+                                        <label style="color: var(--text-secondary);">Start Ep:</label>
+                                        <input type="number" id="fulfill-bulk-start-ep" min="1" value="1" style="width: 56px; padding: 4px 6px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 11px;">
+                                    </span>
+                                </div>
                                 <textarea id="fulfill-bulk-links-input" placeholder="Paste multiple links (one per line)...&#10;Line 1 -> Season 1&#10;Line 2 -> Season 2..." style="width: 100%; min-height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; color: #fff; font-size: 12px; font-family: monospace; resize: vertical; box-sizing: border-box;"></textarea>
                                 <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
                                     <button type="button" class="btn btn-primary btn-sm" id="btn-apply-fulfill-bulk-links" style="font-size: 11px; padding: 4px 10px;">Apply Links</button>
