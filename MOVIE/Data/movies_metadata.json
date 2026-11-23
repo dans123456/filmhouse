@@ -1,5 +1,45 @@
 [
   {
+    "csv_id": "205272-reasonable-doubt",
+    "tmdb_id": 205272,
+    "imdb_id": "",
+    "title": "Reasonable Doubt",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "overview": "In this legal drama, you’ll judge Jax Stewart for her questionable ethics and wild interpretations of the law… until you’re the one in trouble. Then you’ll see her for what she is: the most brilliant and fearless defense attorney in Los Angeles who bucks the justice system at every chance she gets.",
+    "poster": "https://image.tmdb.org/t/p/w500/v9p9VbljJdJ9GjLqp3l5YpWJ8HO.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/5Nu95w2oWsbmDeAjG2NJF4x33Ud.jpg",
+    "rating": 6.2,
+    "release_date": "2022-09-27",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "ztaqk6reLlc",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADdQoAAj6lIETVivyEqYufqxYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADfgoAAj6lIERoiX8sAz3_LhYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADhQoAAj6lIETA8PoLpOjlrBYE",
+        "season": "Season 3"
+      }
+    ]
+  },
+  {
     "csv_id": "1568060-perfect-liars",
     "tmdb_id": 1568060,
     "imdb_id": "",
@@ -96921,7 +96961,11 @@
     ],
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/NzIwMjpkNzEzYzBjYWFhOTExMGFm",
     "current_season": 6,
-    "last_uploaded_episode": 5
+    "last_uploaded_episode": 5,
+    "status": "Ongoing",
+    "is_ongoing": true,
+    "total_episodes": 9,
+    "next_air_date": "2026-12-02"
   },
   {
     "csv_id": "1007359-dinner-at-my-place",
