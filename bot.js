@@ -2210,8 +2210,88 @@ function setupBot(bot, adminBot) {
         return { fileObj, text, rawFilename, streamUrl, fileDeepLink, fileSizeStr };
     }
 
+    const SHOWCASES_STORE_PATH = path.join(__dirname, "data", "pending_showcases.json");
     const pendingMediaShowcases = new Map();
     const pendingTitleEdits = new Map(); // adminId -> { sessionId }
+
+    function loadPendingShowcases() {
+        try {
+            if (!fs.existsSync(SHOWCASES_STORE_PATH)) return;
+            const raw = JSON.parse(fs.readFileSync(SHOWCASES_STORE_PATH, "utf8"));
+            const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+            for (const [sid, sess] of Object.entries(raw || {})) {
+                if (sess && (!sess.createdAt || sess.createdAt >= cutoff)) {
+                    pendingMediaShowcases.set(sid, sess);
+                }
+            }
+        } catch (_) { }
+    }
+
+    function savePendingShowcases() {
+        try {
+            const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+            const entries = Array.from(pendingMediaShowcases.entries())
+                .filter(([, s]) => s && (!s.createdAt || s.createdAt >= cutoff))
+                .slice(-200);
+            const obj = Object.fromEntries(entries);
+            fs.mkdirSync(path.dirname(SHOWCASES_STORE_PATH), { recursive: true });
+            fs.writeFileSync(SHOWCASES_STORE_PATH, JSON.stringify(obj), "utf8");
+        } catch (_) { }
+    }
+
+    loadPendingShowcases();
+
+    let ingestBatchQueue = [];
+    let ingestBatchTimer = null;
+
+    async function flushIngestBatch() {
+        const batch = ingestBatchQueue.splice(0, ingestBatchQueue.length);
+        ingestBatchTimer = null;
+        if (batch.length === 0) return;
+        const masterAdmins = await getAllAdminIds();
+
+        if (batch.length <= 2) {
+            for (const item of batch) {
+                for (const admId of masterAdmins) {
+                    try {
+                        if (item.photoUrl && item.photoUrl.startsWith("http")) {
+                            await callTelegramWithRetry('sendPhoto', admId, item.photoUrl, {
+                                caption: `📥 <b>Ingest Vault Detected New File!</b>\n\n` + item.previewCaption,
+                                parse_mode: "HTML",
+                                reply_markup: item.showcaseKeyboard
+                            });
+                        } else {
+                            await callTelegramWithRetry('sendMessage', admId, `📥 <b>Ingest Vault Detected New File!</b>\n\n` + item.previewCaption, {
+                                parse_mode: "HTML",
+                                reply_markup: item.showcaseKeyboard
+                            });
+                        }
+                    } catch (e) {
+                        console.warn(`[Ingest Dispatch] Error sending preview to admin ${admId}:`, e.message);
+                    }
+                }
+            }
+            return;
+        }
+
+        // Batch summary for 3+ rapid files (prevents 500+ DM floods)
+        const sampleLines = batch.slice(0, 6).map((it, i) => `${i + 1}. <b>${escapeHtml(it.title)}</b>${it.year ? ` (${escapeHtml(it.year)})` : ""}`);
+        const extraCount = batch.length - sampleLines.length;
+        const summaryText =
+            `📥 <b>Ingest Vault Batch Summary</b>\n\n` +
+            `Detected <b>${batch.length}</b> new files in a batch:\n` +
+            sampleLines.join("\n") +
+            (extraCount > 0 ? `\n<i>...and ${extraCount} more file(s).</i>` : "") +
+            `\n\n💡 <i>Batch alerts grouped into 1 summary to prevent DM spam. Use Admin Panel or forward a single file to DM to publish individually.</i>`;
+
+        for (const admId of masterAdmins) {
+            try {
+                await callTelegramWithRetry('sendMessage', admId, summaryText, { parse_mode: "HTML" });
+            } catch (e) {
+                console.warn(`[Ingest Batch] Error sending summary to admin ${admId}:`, e.message);
+            }
+        }
+    }
 
     async function handleAdminMediaForward(ctx, isFromChannel = false) {
         try {
@@ -2315,9 +2395,10 @@ function setupBot(bot, adminBot) {
                 adminId: targetAdminId,
                 adminName,
                 isFromChannel,
-                existingInCatalog
+                existingInCatalog,
+                createdAt: Date.now()
             });
-            setTimeout(() => pendingMediaShowcases.delete(sessionId), 30 * 60 * 1000);
+            savePendingShowcases();
 
             const genresStr = (tmdb.genres && tmdb.genres.length > 0) ? tmdb.genres.slice(0, 3).join(", ") : (tmdb.type || "Movie");
             const ratingStr = tmdb.rating ? `⭐ <b>${tmdb.rating}/10</b>` : "⭐ <i>Unrated</i>";
@@ -2373,27 +2454,17 @@ function setupBot(bot, adminBot) {
 
             const photoUrl = epMeta?.still || tmdb.backdrop || tmdb.poster;
 
-            // If triggered from Ingest Channel, dispatch to Master Admins in private chat
+            // If triggered from Ingest Channel, batch rapid uploads (1-2 = card, 3+ = 1 summary DM)
             if (isFromChannel) {
-                const masterAdmins = await getAllAdminIds();
-                for (const admId of masterAdmins) {
-                    try {
-                        if (photoUrl && photoUrl.startsWith("http")) {
-                            await callTelegramWithRetry('sendPhoto', admId, photoUrl, {
-                                caption: `📥 <b>Ingest Vault Detected New File!</b>\n\n` + previewCaption,
-                                parse_mode: "HTML",
-                                reply_markup: showcaseKeyboard
-                            });
-                        } else {
-                            await callTelegramWithRetry('sendMessage', admId, `📥 <b>Ingest Vault Detected New File!</b>\n\n` + previewCaption, {
-                                parse_mode: "HTML",
-                                reply_markup: showcaseKeyboard
-                            });
-                        }
-                    } catch (e) {
-                        console.warn(`[Ingest Dispatch] Error sending preview to admin ${admId}:`, e.message);
-                    }
-                }
+                ingestBatchQueue.push({
+                    photoUrl,
+                    previewCaption,
+                    showcaseKeyboard,
+                    title: tmdb.title || parsed.cleanTitle || "Unknown",
+                    year: tmdb.year || ""
+                });
+                if (ingestBatchTimer) clearTimeout(ingestBatchTimer);
+                ingestBatchTimer = setTimeout(() => { flushIngestBatch().catch(() => {}); }, 8000);
                 return true;
             }
 
@@ -2439,6 +2510,7 @@ function setupBot(bot, adminBot) {
 
             if (action === "dis") {
                 pendingMediaShowcases.delete(sessionId);
+                savePendingShowcases();
                 try {
                     await ctx.deleteMessage();
                 } catch {
@@ -2623,6 +2695,7 @@ function setupBot(bot, adminBot) {
             // If action is "post", also broadcast to Updates Channel and then clean up session
             if (action === "post") {
                 pendingMediaShowcases.delete(sessionId);
+                savePendingShowcases();
                 await ctx.reply("📢 <b>Broadcasting release announcement to Updates Channel...</b>", { parse_mode: "HTML" });
                 const res = await publishMovieToChannel({
                     ...tmdb,
