@@ -1841,6 +1841,28 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Subtitle Size (%) Bar -->
+                            <div class="cinema-sub-size-bar"
+                                style="display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 9px; padding: 7px 10px; margin-bottom: 9px;">
+                                <div style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: #fff;">
+                                    <span>Aa Size:</span>
+                                    <span id="cinema-sub-size-display" style="color: #ffd700; font-family: monospace; font-size: 12px; font-weight: 800;">100%</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                                    <button type="button" id="btn-cinema-sub-size-minus"
+                                        style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 3px 8px; border-radius: 5px; font-size: 10.5px; font-weight: 700; cursor: pointer;">-10%</button>
+                                    <button type="button" class="cinema-sub-size-preset" data-sub-pct="100"
+                                        style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; padding: 3px 7px; border-radius: 5px; font-size: 10px; font-weight: 700; cursor: pointer;">100%</button>
+                                    <button type="button" class="cinema-sub-size-preset" data-sub-pct="125"
+                                        style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; padding: 3px 7px; border-radius: 5px; font-size: 10px; font-weight: 700; cursor: pointer;">125%</button>
+                                    <button type="button" class="cinema-sub-size-preset" data-sub-pct="150"
+                                        style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; padding: 3px 7px; border-radius: 5px; font-size: 10px; font-weight: 700; cursor: pointer;">150%</button>
+                                    <button type="button" class="cinema-sub-size-preset" data-sub-pct="200"
+                                        style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; padding: 3px 7px; border-radius: 5px; font-size: 10px; font-weight: 700; cursor: pointer;">200%</button>
+                                    <button type="button" id="btn-cinema-sub-size-plus"
+                                        style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 3px 8px; border-radius: 5px; font-size: 10.5px; font-weight: 700; cursor: pointer;">+10%</button>
+                                </div>
+                            </div>
                             <!-- Search Bar -->
                             <div class="cinema-sub-search-wrap">
                                 <input type="text" id="cinema-hub-sub-search"

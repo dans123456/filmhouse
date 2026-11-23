@@ -8583,6 +8583,39 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
     if (btnSyncReset) btnSyncReset.onclick = () => sendSubtitleOffsetDelta(0);
     if (btnSyncPlus) btnSyncPlus.onclick = () => sendSubtitleOffsetDelta(0.5);
 
+    // Subtitle Size (%) Controls (70% - 220%)
+    const subSizeDisplay = document.getElementById("cinema-sub-size-display");
+    const btnSubSizeMinus = document.getElementById("btn-cinema-sub-size-minus");
+    const btnSubSizePlus = document.getElementById("btn-cinema-sub-size-plus");
+    const subSizePresets = document.querySelectorAll(".cinema-sub-size-preset");
+    let cinemaSubSizePct = parseInt(localStorage.getItem("fh_sub_size_pct") || "100", 10);
+    if (isNaN(cinemaSubSizePct) || cinemaSubSizePct < 70 || cinemaSubSizePct > 220) cinemaSubSizePct = 100;
+
+    function applyCinemaSubSizePct(pct, broadcast = true) {
+        const clamped = Math.max(70, Math.min(220, Math.round(Number(pct) || 100)));
+        cinemaSubSizePct = clamped;
+        try { localStorage.setItem("fh_sub_size_pct", String(clamped)); } catch (_) { }
+        if (subSizeDisplay) subSizeDisplay.textContent = `${clamped}%`;
+        subSizePresets.forEach(b => {
+            const isMatch = parseInt(b.dataset.subPct, 10) === clamped;
+            b.style.borderColor = isMatch ? "#ffbc00" : "rgba(255,255,255,0.12)";
+            b.style.color = isMatch ? "#ffbc00" : "#cbd5e1";
+        });
+        if (broadcast) {
+            const frame = container.querySelector("iframe");
+            if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage({ action: "setSubtitleSize", pct: clamped }, "*");
+            }
+            if (typeof triggerHaptic === "function") triggerHaptic("light");
+        }
+    }
+    if (btnSubSizeMinus) btnSubSizeMinus.onclick = () => applyCinemaSubSizePct(cinemaSubSizePct - 10);
+    if (btnSubSizePlus) btnSubSizePlus.onclick = () => applyCinemaSubSizePct(cinemaSubSizePct + 10);
+    subSizePresets.forEach(b => {
+        b.onclick = () => applyCinemaSubSizePct(parseInt(b.dataset.subPct || "100", 10));
+    });
+    applyCinemaSubSizePct(cinemaSubSizePct, false);
+
     // Quality Switcher Modal Bindings
     const qModal = document.getElementById("cinema-quality-modal");
     const qCloseBtn = document.getElementById("cinema-quality-close");

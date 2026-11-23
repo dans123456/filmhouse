@@ -1300,12 +1300,6 @@ function setupBot(bot, adminBot) {
                 inline_keyboard: [
                     [
                         {
-                            text: "🍿 Open FilmHouse",
-                            url: miniAppUrl
-                        }
-                    ],
-                    [
-                        {
                             text: "💬 Share on WhatsApp",
                             url: `https://wa.me/?text=${encodeURIComponent(safeShareWithUrl)}`
                         },
@@ -7675,7 +7669,9 @@ async function init() {
 
                             const streamMiniAppUrl = data.stream_url || `https://dans123456.github.io/filmhouse/?movie=${encodeURIComponent(csvId)}&season=${season}&ep=${episode}`;
                             const safeDeepId = getSafeDeepLinkId({ csv_id: csvId, tmdb_id: tmdbId });
-                            const channelStreamUrl = `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${encodeURIComponent(safeDeepId || csvId)}`;
+                            const channelStreamUrl = safeDeepId
+                                ? `https://t.me/Filmhouseappbot?start=dl_${encodeURIComponent(safeDeepId)}`
+                                : `https://t.me/Filmhouseappbot`;
                             const actionRow = [
                                 { text: `▶️ Stream S${season}E${episode}`, web_app: { url: streamMiniAppUrl } }
                             ];
@@ -7748,9 +7744,6 @@ async function init() {
 
                                     const channelMarkup = {
                                         inline_keyboard: [
-                                            [
-                                                { text: "🍿 Open FilmHouse", url: channelStreamUrl }
-                                            ],
                                             [
                                                 { text: "💬 Share on WhatsApp", url: `https://wa.me/?text=${encodeURIComponent(epShareText)}` },
                                                 { text: "✈️ Share on Telegram", url: `https://t.me/share/url?url=${encodeURIComponent(channelStreamUrl)}&text=${encodeURIComponent(`📺 "${seriesTitle}" S${season}E${episode} on Film House!`)}` }

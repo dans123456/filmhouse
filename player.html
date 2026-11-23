@@ -364,7 +364,7 @@
       color: #ffffff;
       padding: 3px 8px;
       border-radius: 4px;
-      font-size: clamp(11px, 2.6vw, 15px);
+      font-size: calc(clamp(12px, 2.4vw, 24px) * var(--sub-scale, 1));
       font-weight: 600;
       line-height: 1.25;
       letter-spacing: 0.2px;
@@ -1241,6 +1241,23 @@
               <button id='btnSubOffsetPlus' type='button'
                 style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;'
                 title='Delay subtitles 0.5s'>+0.5s</button>
+            </div>
+          </div>
+          <div style='display:flex;align-items:center;justify-content:space-between;gap:4px;border-top:1px solid rgba(255,255,255,0.08);padding-top:5px;'>
+            <div style='display:flex;align-items:center;gap:4px;font-size:10px;color:#cbd5e1;font-weight:700;'>
+              <span>Aa Size:</span>
+              <span id='subSizeDisplay' style='color:#ffbc00;font-family:monospace;'>100%</span>
+            </div>
+            <div style='display:flex;align-items:center;gap:3px;'>
+              <button id='btnSubSizeMinus' type='button'
+                style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;'
+                title='Decrease subtitle size'>-10%</button>
+              <button id='btnSubSizeReset' type='button'
+                style='background:rgba(255,255,255,0.06);color:#94a3b8;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'
+                title='Reset subtitle size to 100%'>100%</button>
+              <button id='btnSubSizePlus' type='button'
+                style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;'
+                title='Increase subtitle size'>+10%</button>
             </div>
           </div>
         </div>
@@ -2285,6 +2302,28 @@
     if (btnSubMinus) btnSubMinus.onclick = () => adjustSubtitleOffset(-0.5, false);
     if (btnSubReset) btnSubReset.onclick = () => adjustSubtitleOffset(0, true);
     if (btnSubPlus) btnSubPlus.onclick = () => adjustSubtitleOffset(0.5, false);
+
+    let currentSubSizePct = parseInt(localStorage.getItem('fh_sub_size_pct') || '100', 10);
+    if (isNaN(currentSubSizePct) || currentSubSizePct < 70 || currentSubSizePct > 220) currentSubSizePct = 100;
+
+    function setSubtitleSizePct(pct, silent = false) {
+      const clamped = Math.max(70, Math.min(220, Math.round(Number(pct) || 100)));
+      currentSubSizePct = clamped;
+      try { localStorage.setItem('fh_sub_size_pct', String(clamped)); } catch (_) { }
+      const subOvEl = document.getElementById('customSubtitleOverlay');
+      if (subOvEl) subOvEl.style.setProperty('--sub-scale', String(clamped / 100));
+      const szDisp = document.getElementById('subSizeDisplay');
+      if (szDisp) szDisp.textContent = `${clamped}%`;
+      if (!silent) showSubToast(`Aa Subtitle Size: ${clamped}%`, 'Aa');
+    }
+
+    const btnSubSizeMinus = document.getElementById('btnSubSizeMinus');
+    const btnSubSizeReset = document.getElementById('btnSubSizeReset');
+    const btnSubSizePlus = document.getElementById('btnSubSizePlus');
+    if (btnSubSizeMinus) btnSubSizeMinus.onclick = () => setSubtitleSizePct(currentSubSizePct - 10);
+    if (btnSubSizeReset) btnSubSizeReset.onclick = () => setSubtitleSizePct(100);
+    if (btnSubSizePlus) btnSubSizePlus.onclick = () => setSubtitleSizePct(currentSubSizePct + 10);
+    setSubtitleSizePct(currentSubSizePct, true);
 
     // Restore saved subtitle offset if existing
     if (currentSubOffset !== 0) {
@@ -3539,6 +3578,8 @@
             adjustSubtitleOffset(parseFloat(ev.data.delta || 0), false);
           } else if (ev.data.action === 'setSubtitleOffset') {
             adjustSubtitleOffset(parseFloat(ev.data.offset || 0), true);
+          } else if (ev.data.action === 'setSubtitleSize') {
+            setSubtitleSizePct(parseInt(ev.data.pct || 100, 10), false);
           } else if (ev.data.action === 'syncToVoice') {
             syncToVoice();
           }
