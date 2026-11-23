@@ -37,7 +37,8 @@
         "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADhQoAAj6lIETA8PoLpOjlrBYE",
         "season": "Season 3"
       }
-    ]
+    ],
+    "current_season": 1
   },
   {
     "csv_id": "1568060-perfect-liars",
@@ -4391,110 +4392,82 @@
     "director": "",
     "trailer": "Q7Xj7sASXSU",
     "runtime": "",
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIxMTpjYWFhZjkwOGYzNjhkOGRm",
+    "stream_url": "MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I",
     "stream_links": [
       {
-        "season": 1,
-        "seasonOrPart": "S01E01",
         "episode": 1,
-        "episodeNum": 1,
-        "quality": "1080P",
-        "name": "Episode 1",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I"
+        "season": 1,
+        "stream_url": "MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I",
+        "url": "MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E02",
         "episode": 2,
-        "episodeNum": 2,
-        "quality": "1080P",
-        "name": "Episode 2",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MjM5OjFjMzRmNjliNDg3YTQ5ZjU",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjM5OjFjMzRmNjliNDg3YTQ5ZjU"
+        "season": 1,
+        "stream_url": "MjM5OjFjMzRmNjliNDg3YTQ5ZjU",
+        "url": "MjM5OjFjMzRmNjliNDg3YTQ5ZjU"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E03",
         "episode": 3,
-        "episodeNum": 3,
-        "quality": "1080P",
-        "name": "Episode 3",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MjQwOmRmNzRiZGYzNWM3NDk0YmY",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjQwOmRmNzRiZGYzNWM3NDk0YmY"
+        "season": 1,
+        "stream_url": "MjQwOmRmNzRiZGYzNWM3NDk0YmY",
+        "url": "MjQwOmRmNzRiZGYzNWM3NDk0YmY"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E04",
         "episode": 4,
-        "episodeNum": 4,
-        "quality": "1080P",
-        "name": "Episode 4",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MjQxOmM2ZDc4Y2YwOWMwYzZjNmQ",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjQxOmM2ZDc4Y2YwOWMwYzZjNmQ"
+        "season": 1,
+        "stream_url": "MjQxOmM2ZDc4Y2YwOWMwYzZjNmQ",
+        "url": "MjQxOmM2ZDc4Y2YwOWMwYzZjNmQ"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E05",
         "episode": 5,
-        "episodeNum": 5,
-        "quality": "1080P",
-        "name": "Episode 5",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MjQyOmY4NzEyMGNiNDhmOTc5YmY",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjQyOmY4NzEyMGNiNDhmOTc5YmY"
+        "season": 1,
+        "stream_url": "MjQyOmY4NzEyMGNiNDhmOTc5YmY",
+        "url": "MjQyOmY4NzEyMGNiNDhmOTc5YmY"
       },
       {
-        "quality": "1080P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MjQzOjZkNTg3ODVkMTA0MGYyZmU",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjQzOjZkNTg3ODVkMTA0MGYyZmU",
-        "season": 1,
-        "seasonOrPart": "S01E06",
         "episode": 6,
-        "episodeNum": 6,
-        "name": "Episode 6"
+        "season": 1,
+        "stream_url": "MjQzOjZkNTg3ODVkMTA0MGYyZmU",
+        "url": "MjQzOjZkNTg3ODVkMTA0MGYyZmU"
       },
       {
-        "season": 1,
-        "seasonOrPart": "S01E09",
-        "episode": 9,
-        "episodeNum": 9,
-        "quality": "720P",
-        "name": "Episode 9",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTEzMTU6OWU3M2E4OTQ1NTRiZGVkZA",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTEzMTU6OWU3M2E4OTQ1NTRiZGVkZA"
-      },
-      {
-        "season": 1,
-        "seasonOrPart": "S01E08",
-        "episode": 8,
-        "episodeNum": 8,
-        "quality": "720P",
-        "name": "Episode 8",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTA3NDY6YzU3YzAyMjY2NGI3NWM1ZQ",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTA3NDY6YzU3YzAyMjY2NGI3NWM1ZQ"
-      },
-      {
-        "season": 1,
-        "seasonOrPart": "S01E07",
         "episode": 7,
-        "episodeNum": 7,
-        "quality": "720P",
-        "name": "Episode 7",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTIxMTpjYWFhZjkwOGYzNjhkOGRm",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIxMTpjYWFhZjkwOGYzNjhkOGRm"
+        "season": 1,
+        "stream_url": "OTIxMTpjYWFhZjkwOGYzNjhkOGRm",
+        "url": "OTIxMTpjYWFhZjkwOGYzNjhkOGRm"
+      },
+      {
+        "episode": 8,
+        "season": 1,
+        "stream_url": "MTA3NDY6YzU3YzAyMjY2NGI3NWM1ZQ",
+        "url": "MTA3NDY6YzU3YzAyMjY2NGI3NWM1ZQ"
+      },
+      {
+        "episode": 9,
+        "season": 1,
+        "stream_url": "MTEzMTU6OWU3M2E4OTQ1NTRiZGVkZA",
+        "url": "MTEzMTU6OWU3M2E4OTQ1NTRiZGVkZA"
+      },
+      {
+        "episode": 10,
+        "season": 1,
+        "stream_url": "MTI4NjA6YTU4YTFiMzc5NWIyM2I2Nw",
+        "url": "MTI4NjA6YTU4YTFiMzc5NWIyM2I2Nw"
       }
     ],
     "links": [
       {
-        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADFRgAAhzcUEePaNizI7iXNhYE",
-        "season": "Season 1"
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADyAoAAj6lIES4md8SyON3DhYE",
+        "season": "Season 1",
+        "stream_url": "MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I"
       }
     ],
-    "last_uploaded_episode": 9,
+    "last_uploaded_episode": 10,
     "current_season": 1,
     "status": "Ongoing",
     "total_episodes": 12,
-    "next_air_date": "2026-11-23"
+    "next_air_date": "2026-11-23",
+    "is_ongoing": true
   },
   {
     "csv_id": "559907-the-green-knight",
