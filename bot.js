@@ -1184,7 +1184,10 @@ function setupBot(bot, adminBot) {
             let headerBadge = "🍿 <b>NEW RELEASE ADDED!</b> 🎬";
             let updateCallout = "";
 
-            const rawSpec = movieInfo.seasonOrPart || (movieInfo.updateType || "");
+            const rawSpec = String(movieInfo.seasonOrPart || (movieInfo.updateType || ""))
+                .replace(/\b(webrip|hdrip|bdrip|dvdrip|bluray|brrip|x265|x264|h\.?265|h\.?264|hevc|hdts|camrip|cam|download|free\s*stream)\b/gi, "")
+                .replace(/\s{2,}/g, " ")
+                .trim();
             const specLower = String(rawSpec).toLowerCase().trim();
             const bMode = String(movieInfo.broadcastMode || (movieInfo.isUpdate ? "updated" : "")).toLowerCase();
             const isExplicitRelease = bMode === "released" || bMode === "release" || bMode === "new";
@@ -1246,7 +1249,7 @@ function setupBot(bot, adminBot) {
                     updateCallout = `📌 <b>Update:</b> <b>${escapeHtml(rawSpec)} Now Available!</b> ⚡\n`;
                 } else {
                     headerBadge = isExplicitUpdate ? "✨ <b>MOVIE UPDATED!</b> 🍿" : "🍿 <b>NEW MOVIE ADDED!</b> 🎬";
-                    updateCallout = isExplicitUpdate ? `📌 <b>Update:</b> <b>HD Direct Stream & Download Live!</b> ⚡\n` : `📁 <b>Type:</b> Full Movie • HD Quality\n`;
+                    updateCallout = isExplicitUpdate ? `📌 <b>Update:</b> <b>Catalog entry updated!</b> ⚡\n` : `📁 <b>Type:</b> Full Movie • HD Quality\n`;
                 }
             }
 
@@ -1257,7 +1260,7 @@ function setupBot(bot, adminBot) {
                 `${updateCallout}\n` +
                 metaLine +
                 overviewLine +
-                `👉 <a href="${deepLinkUrl}">CLICK HERE TO DOWNLOAD</a> ✔️`;
+                `✨ <a href="${deepLinkUrl}">View Details in FilmHouse</a>`;
 
             // Prioritize landscape poster, fallback to backdrop, then vertical poster, then working GitHub raw banner
             let bannerUrl = "";
@@ -1295,6 +1298,12 @@ function setupBot(bot, adminBot) {
 
             const channelReplyMarkup = {
                 inline_keyboard: [
+                    [
+                        {
+                            text: "🍿 Open FilmHouse",
+                            url: miniAppUrl
+                        }
+                    ],
                     [
                         {
                             text: "💬 Share on WhatsApp",
