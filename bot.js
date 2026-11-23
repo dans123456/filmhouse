@@ -7738,19 +7738,26 @@ async function init() {
                                         }
                                     }
 
+                                    const epShareText = `📺 "${seriesTitle}" Season ${season}, Episode ${episode} on Film House!\n${channelStreamUrl}`;
                                     const channelCaption = 
-                                        `📺 <b>NEW EPISODE RELEASED!</b> 🍿\n` +
+                                        `📺 <b>NEW EPISODE ADDED!</b> 🍿\n` +
                                         `━━━━━━━━━━━━━━━━━━━━━━\n` +
                                         `🎬 <b>${cleanSafe(seriesTitle)}</b>\n` +
                                         `📌 <b>Season ${season}, Episode ${episode}</b>${epTitleLine}\n\n` +
-                                        `⚡ <i>Now ready for instant 1080p streaming & high-speed Telegram download!</i>`;
+                                        `✨ <a href="${channelStreamUrl}">View Details in FilmHouse</a>`;
 
                                     const channelMarkup = {
                                         inline_keyboard: [
-                                            channelActionRow,
                                             [
-                                                { text: "🍿 Open Film House Mini App", url: "https://t.me/Filmhouseappbot/filmhouseapp" },
-                                                { text: "📢 Join Channel", url: "https://t.me/filmhouse_main" }
+                                                { text: "🍿 Open FilmHouse", url: channelStreamUrl }
+                                            ],
+                                            [
+                                                { text: "💬 Share on WhatsApp", url: `https://wa.me/?text=${encodeURIComponent(epShareText)}` },
+                                                { text: "✈️ Share on Telegram", url: `https://t.me/share/url?url=${encodeURIComponent(channelStreamUrl)}&text=${encodeURIComponent(`📺 "${seriesTitle}" S${season}E${episode} on Film House!`)}` }
+                                            ],
+                                            [
+                                                { text: "𝕏 Share on X", url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(epShareText)}` },
+                                                { text: "🌐 Share on Facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(channelStreamUrl)}` }
                                             ]
                                         ]
                                     };
