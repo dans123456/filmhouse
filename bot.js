@@ -2296,6 +2296,7 @@ function setupBot(bot, adminBot) {
     const recentIngestKeys = new Map();
     async function handleAdminMediaForward(ctx, isFromChannel = false) {
         try {
+            if (isFromChannel) return true;
             const msg = ctx.channelPost || ctx.message;
             if (!msg) return false;
 
