@@ -4648,7 +4648,7 @@ function setupBot(bot, adminBot) {
             const isAutoIngest = cmdText.includes('auto') || cmdText.includes('ingest');
             const matchNum = cmdText.match(/\b(\d+)\b/);
             const customLimit = matchNum ? parseInt(matchNum[1], 10) : 50;
-            return executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, customLimit);
+            executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, customLimit).catch(e => console.error('[ScanQuick] Background error:', e));
         });
 
         adminBot.command('scanlibrary', async (ctx) => {
@@ -4658,11 +4658,11 @@ function setupBot(bot, adminBot) {
             const isQuick = cmdText.includes('quick') || cmdText.includes('fast');
             const matchNum = cmdText.match(/\b(\d+)\b/);
             const limit = isQuick ? (matchNum ? parseInt(matchNum[1], 10) : 50) : false;
-            return executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, limit);
+            executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, limit).catch(e => console.error('[ScanLibrary] Background error:', e));
         });
 
         adminBot.command(['autoingest', 'ingestlibrary', 'autocatalog'], async (ctx) => {
-            return executeLibraryScanWorkflow(ctx, false, true, false);
+            executeLibraryScanWorkflow(ctx, false, true, false).catch(e => console.error('[AutoIngest] Background error:', e));
         });
 
         adminBot.command(['publishcatalog', 'pushcatalog', 'syncgithub'], async (ctx) => {

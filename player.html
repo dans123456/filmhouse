@@ -2575,8 +2575,9 @@
         } catch (_) { }
 
         if (_connectTimeoutTimer) clearTimeout(_connectTimeoutTimer);
+        const _timeoutMs1 = (finalStreamUrl && finalStreamUrl.includes('.m3u8')) || window._currentHls ? 18000 : 10000;
         _connectTimeoutTimer = setTimeout(function () {
-          if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
+          if (!videoEl || ((videoEl.paused || videoEl.currentTime < 0.1) && videoEl.readyState < 2)) {
             if (errorCard) {
               errorCard.style.display = 'flex';
               errorCard.innerHTML = `
@@ -2590,7 +2591,7 @@
               '⚡ Slow response from Server 1 • Tap here or switch to Server 2 below'
             );
           }
-        }, 5500);
+        }, _timeoutMs1);
 
         try {
           const p = videoEl.play();
@@ -2920,9 +2921,10 @@
           if (playSub) playSub.textContent = 'Loading stream...';
 
           if (_connectTimeoutTimer) clearTimeout(_connectTimeoutTimer);
+          const _timeoutMs2 = (finalStreamUrl && finalStreamUrl.includes('.m3u8')) || window._currentHls ? 18000 : 10000;
           _connectTimeoutTimer = setTimeout(function () {
-            if (!videoEl || videoEl.paused || videoEl.currentTime < 0.1) {
-              console.warn("[Player] Stream connection timeout (>6s) on primary server");
+            if (!videoEl || ((videoEl.paused || videoEl.currentTime < 0.1) && videoEl.readyState < 2)) {
+              console.warn("[Player] Stream connection timeout on primary server");
               if (errorCard) {
                 errorCard.style.display = 'flex';
                 errorCard.innerHTML = `
@@ -2936,7 +2938,7 @@
                 '⚡ Slow response from Server 1 • Tap here or switch to Server 2 below'
               );
             }
-          }, 6000);
+          }, _timeoutMs2);
 
           try {
             const p = videoEl.play();
