@@ -3882,6 +3882,8 @@
                   const resumeAt = (videoEl && videoEl.currentTime > 1) ? videoEl.currentTime : 0;
 
                   finalStreamUrl = hlsUrl;
+                  window._isSwappingToHls = true;
+                  setTimeout(() => { window._isSwappingToHls = false; }, 1000);
                   if (window._currentHls) {
                     try { window._currentHls.destroy(); } catch (_) { }
                     window._currentHls = null;
@@ -4001,9 +4003,13 @@
 
           // Discreet, non-blocking stream error notice with instant Server 2 fallback
           videoEl.addEventListener('error', function (e) {
+            if (window._isSwappingToHls) return;
             console.warn("Video stream load notice:", e, videoEl.error);
             hideStreamLoader();
             if (loaderEl) loaderEl.style.display = 'none';
+            if (!document.body.classList.contains('stream-started') && !(playOverlay && playOverlay.classList.contains('connecting'))) {
+              return;
+            }
 
             // Attempt silent background recovery once before surfacing reconnect UI
             if (streamSilentRetryCount < 1) {

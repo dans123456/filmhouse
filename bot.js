@@ -1176,9 +1176,9 @@ function setupBot(bot, adminBot) {
             }
 
             const safeDeepId = getSafeDeepLinkId(movieInfo);
-            const deepLinkUrl = movieInfo.downloadLink || movieInfo.stream_url || (safeDeepId 
-                ? `https://t.me/Filmhouseappbot?start=dl_${safeDeepId}` 
-                : `https://t.me/Filmhouseappbot`);
+            const deepLinkUrl = safeDeepId
+                ? `https://t.me/Filmhouseappbot?start=dl_${safeDeepId}`
+                : (movieInfo.downloadLink || movieInfo.stream_url || `https://t.me/Filmhouseappbot`);
 
             // Build high-impact announcement header badge and update callout
             let headerBadge = "🍿 <b>NEW RELEASE ADDED!</b> 🎬";
@@ -2293,6 +2293,7 @@ function setupBot(bot, adminBot) {
         }
     }
 
+    const recentIngestKeys = new Map();
     async function handleAdminMediaForward(ctx, isFromChannel = false) {
         try {
             const msg = ctx.channelPost || ctx.message;
@@ -2303,6 +2304,20 @@ function setupBot(bot, adminBot) {
 
             const { fileObj, text, rawFilename, streamUrl, fileDeepLink, fileSizeStr } = mediaInfo;
             if (!fileObj && !streamUrl) return false;
+
+            // Deduplicate identical file/stream alerts across DM + Ingest Channel within 30s
+            const dedupKey = String(streamUrl || fileObj?.file_unique_id || `${msg.chat?.id}_${msg.message_id}`).trim();
+            const lastSeen = recentIngestKeys.get(dedupKey);
+            if (lastSeen && (Date.now() - lastSeen) < 30000) {
+                return true;
+            }
+            recentIngestKeys.set(dedupKey, Date.now());
+            if (recentIngestKeys.size > 200) {
+                const cutoff = Date.now() - 30000;
+                for (const [k, ts] of recentIngestKeys.entries()) {
+                    if (ts < cutoff) recentIngestKeys.delete(k);
+                }
+            }
 
             // Security Authorization:
             // 1. If from channel: verify chat ID matches configured Ingest Channel OR auto-detected via keywords (Vault, Ingest, Storage, Stream, Upload, Files)
