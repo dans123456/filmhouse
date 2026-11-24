@@ -832,6 +832,23 @@ function setupBot(bot, adminBot) {
         });
     }
 
+    // Normalize capitalized slash commands (e.g. /Scanlibrary -> /scanlibrary) so phone autocorrect never breaks commands
+    const normalizeSlashCommand = (ctx, next) => {
+        const text = ctx.message?.text;
+        if (typeof text === 'string' && text.startsWith('/')) {
+            const spaceIdx = text.indexOf(' ');
+            const cmdPart = spaceIdx === -1 ? text : text.slice(0, spaceIdx);
+            const rest = spaceIdx === -1 ? '' : text.slice(spaceIdx);
+            const lowerCmd = cmdPart.toLowerCase();
+            if (lowerCmd !== cmdPart) {
+                ctx.message.text = lowerCmd + rest;
+            }
+        }
+        return next();
+    };
+    bot.use(normalizeSlashCommand);
+    if (adminBot) adminBot.use(normalizeSlashCommand);
+
     // Middleware to automatically make all context replies direct thread replies to the triggering message
     bot.use(async (ctx, next) => {
         const messageId = ctx.message ? ctx.message.message_id : (ctx.callbackQuery && ctx.callbackQuery.message ? ctx.callbackQuery.message.message_id : undefined);
