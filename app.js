@@ -854,8 +854,48 @@ async function initializeDatabase() {
         statusEl.textContent = "Loading catalog metadata...";
         const response = await fetch(`${JSON_FILE_PATH}?t=${Date.now()}`);
         if (response.ok) {
-            const data = await response.json();
-            if (data && data.length > 0) {
+            const rawData = await response.json();
+            if (rawData && rawData.length > 0) {
+                // Merge duplicate series/movie entries (e.g. separate per-episode rows sharing the same csv_id/tmdb_id)
+                const mergedMap = new Map();
+                const data = [];
+                rawData.forEach(item => {
+                    if (!item) return;
+                    const key = item.csv_id
+                        ? String(item.csv_id).toLowerCase().trim()
+                        : (item.tmdb_id ? `${String(item.tmdb_id)}_${(item.type || "").toLowerCase()}` : null);
+                    if (!key) {
+                        data.push(item);
+                        return;
+                    }
+                    if (!mergedMap.has(key)) {
+                        const clone = { ...item };
+                        if (Array.isArray(item.stream_links)) clone.stream_links = [...item.stream_links];
+                        mergedMap.set(key, clone);
+                        data.push(clone);
+                    } else {
+                        const target = mergedMap.get(key);
+                        if (Array.isArray(item.stream_links) && item.stream_links.length > 0) {
+                            if (!Array.isArray(target.stream_links)) target.stream_links = [];
+                            item.stream_links.forEach(sl => {
+                                if (!sl) return;
+                                const sUrl = sl.stream_url || sl.url || "";
+                                const sKey = `${sl.season || 1}_${sl.episode || sl.episodeNum || ""}_${sUrl}`;
+                                const exists = target.stream_links.some(t => `${t.season || 1}_${t.episode || t.episodeNum || ""}_${t.stream_url || t.url || ""}` === sKey);
+                                if (!exists) target.stream_links.push(sl);
+                            });
+                        }
+                        if (!target.stream_url && item.stream_url) target.stream_url = item.stream_url;
+                        if (Array.isArray(item.series_links) && item.series_links.length > 0) {
+                            if (!Array.isArray(target.series_links)) target.series_links = [];
+                            item.series_links.forEach(dl => {
+                                if (dl && !target.series_links.some(x => (x.url || x) === (dl.url || dl))) {
+                                    target.series_links.push(dl);
+                                }
+                            });
+                        }
+                    }
+                });
                 // Auto-migration for manually added/imported entries missing categories or assets
                 data.forEach(m => {
                     // Prepend MOVIE/ to local assets relative paths to resolve 404s

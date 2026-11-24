@@ -2055,6 +2055,15 @@ body.tg-back-visible #btn-close-cinema {
     z-index: 15;
     flex-shrink: 0;
     min-height: 44px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.cinema-player-controls-bar::-webkit-scrollbar {
+    display: none;
 }
 
 .cinema-controls-single-row {
@@ -2063,6 +2072,7 @@ body.tg-back-visible #btn-close-cinema {
     justify-content: space-between;
     gap: 8px;
     width: 100%;
+    min-width: 0;
 }
 
 .cinema-controls-left {
@@ -3730,7 +3740,7 @@ body.tg-back-visible #btn-close-cinema {
 
     .cinema-theater-container {
         width: 100% !important;
-        max-width: 100% !important;
+        max-width: 100vw !important;
         min-height: 100vh !important;
         height: auto !important;
         max-height: none !important;
@@ -3739,10 +3749,12 @@ body.tg-back-visible #btn-close-cinema {
         box-shadow: none !important;
         display: flex !important;
         flex-direction: column !important;
-        overflow: visible !important;
+        overflow-x: hidden !important;
+        overflow-y: visible !important;
         background: #06080d !important;
         padding: 0 !important;
         margin: 0 !important;
+        box-sizing: border-box !important;
     }
 
     .cinema-header-wrapper {
@@ -3783,7 +3795,8 @@ body.tg-back-visible #btn-close-cinema {
         margin: 0 auto !important;
         padding: 24px 20px 80px 20px !important;
         box-sizing: border-box !important;
-        overflow: visible !important;
+        overflow-x: hidden !important;
+        overflow-y: visible !important;
         height: auto !important;
         flex: none !important;
         gap: 18px !important;
