@@ -3852,6 +3852,7 @@ function setupBot(bot, adminBot) {
 
             // Source 2: Query Stream Server API (/api/media) with Admin Key
             const apiEndpoints = [
+                "http://127.0.0.1:8088/api/media",
                 "http://127.0.0.1:8080/api/media",
                 "https://filmhouse-stream.duckdns.org/api/media"
             ];
@@ -4906,14 +4907,17 @@ function setupBot(bot, adminBot) {
         });
 
         // Also register on main bot for convenience (admin-only guarded inside)
-        bot.command(['scanquick', 'fastscan', 'quickscan', 'scanlibrary', 'autoingest', 'ingestlibrary', 'publishcatalog'], async (ctx) => {
+        bot.command(['scanquick', 'fastscan', 'quickscan', 'scanlibrary', 'autoingest', 'ingestlibrary'], async (ctx) => {
             const senderId = String(ctx.from?.id || '');
             const isAuthorized = await isAdmin(senderId).catch(() => false);
             if (!isAuthorized) return;
-            return ctx.reply(
-                '📡 <b>Library Scanner, Quick Scan & Auto-Ingest</b> are best run from your Admin Bot.\n\nPlease send <code>/scanquick</code> or <code>/scanlibrary</code> to <b>@Fiimhouse_adminBot</b> (your admin bot DM) to begin.',
-                { parse_mode: 'HTML' }
-            );
+            const cmdText = String(ctx.message?.text || '').toLowerCase();
+            const isForce = cmdText.includes('force') || cmdText.includes('all');
+            const isAutoIngest = cmdText.includes('auto') || cmdText.includes('ingest');
+            const isQuick = cmdText.includes('quick') || cmdText.includes('fast');
+            const matchNum = cmdText.match(/\b(\d+)\b/);
+            const limit = isQuick ? (matchNum ? parseInt(matchNum[1], 10) : 50) : false;
+            executeLibraryScanWorkflow(ctx, isForce, isAutoIngest, limit).catch(e => console.error('[MainBot Scan] Background error:', e));
         });
 
         const pendingAdminPostActions = new Map();
