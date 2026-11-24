@@ -3334,7 +3334,7 @@ function showMovieDetails(movie) {
         currentLinks.forEach((link, idx) => {
             const urlVal = typeof link === 'object' && link !== null ? link.url : link;
             const qualityVal = typeof link === 'object' && link !== null && link.quality ? link.quality : "720p";
-            const seasonLabel = row.dataset.seriesLabel || `Season ${idx + 1}`;
+            const seasonLabel = (typeof link === 'object' && link !== null && link.season) ? link.season : `Season ${idx + 1}`;
             
             const wrapper = document.createElement("div");
             wrapper.style.display = "flex";
@@ -4706,7 +4706,7 @@ function renderAddMovieLinks() {
         input.addEventListener("input", (e) => {
             const idx = parseInt(e.target.dataset.index);
             const isSeriesNow = movieTypeSelect && (movieTypeSelect.value.toLowerCase() === 'tv' || movieTypeSelect.value.toLowerCase() === 'series');
-            const seasonLabel = row.dataset.seriesLabel || `Season ${idx + 1}`;
+            const seasonLabel = (typeof addMovieLinksState[idx] === 'object' && addMovieLinksState[idx] !== null && addMovieLinksState[idx].season) ? addMovieLinksState[idx].season : `Season ${idx + 1}`;
             if (typeof addMovieLinksState[idx] !== 'object' || addMovieLinksState[idx] === null) {
                 addMovieLinksState[idx] = isSeriesNow ? { url: e.target.value.trim(), season: seasonLabel } : { url: e.target.value.trim(), quality: "720p" };
             } else {
@@ -5352,7 +5352,7 @@ if (addMovieForm) {
         }).map((l, idx) => {
             const urlVal = (typeof l === 'object' && l !== null ? l.url : l).trim();
             if (isInitialSeries) {
-                return { url: urlVal, season: `Season ${idx + 1}` };
+                return { url: urlVal, season: (typeof l === 'object' && l !== null && l.season) ? l.season : `Season ${idx + 1}` };
             }
             const qualityVal = (typeof l === 'object' && l !== null && l.quality) ? l.quality : "720p";
             return { url: urlVal, quality: qualityVal };
