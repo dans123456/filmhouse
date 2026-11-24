@@ -1,92 +1,5 @@
 [
   {
-    "csv_id": "208569-will-trent",
-    "tmdb_id": 208569,
-    "imdb_id": "",
-    "title": "Will Trent",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series"
-    ],
-    "genres": [
-      "Crime",
-      "Drama",
-      "Comedy"
-    ],
-    "overview": "Special Agent Will Trent was abandoned at birth and endured a harsh coming-of-age in Atlanta's overwhelmed foster care system. Determined to make sure no one feels as he did, he now has the highest clearance rate.",
-    "poster": "https://image.tmdb.org/t/p/w500/qG5O46gUxxYGImld03tl2zLhvrg.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/9pGzG5CYx2XM8JFFQvMk9Z3z9ze.jpg",
-    "rating": 7.3,
-    "release_date": "2023-01-03",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "Iy9PoT19ujk",
-    "runtime": "",
-    "stream_url": "",
-    "stream_links": [],
-    "links": [
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQAD_goAAj6lKESgh3Mst4RZAhYE",
-        "season": "Season 1"
-      },
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADBQsAAj6lKESfziE8R0RfBhYE",
-        "season": "Season 2"
-      },
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADDAsAAj6lKESzEXAIlae1PxYE",
-        "season": "Season 3"
-      },
-      {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADEwsAAj6lKER5MKdYQEK8qxYE",
-        "season": "Season 4"
-      }
-    ]
-  },
-  {
-    "csv_id": "205272-reasonable-doubt",
-    "tmdb_id": 205272,
-    "imdb_id": "",
-    "title": "Reasonable Doubt",
-    "type": "Series",
-    "categories": [
-      "Main",
-      "Hollywood/British Series"
-    ],
-    "genres": [
-      "Drama"
-    ],
-    "overview": "In this legal drama, you’ll judge Jax Stewart for her questionable ethics and wild interpretations of the law… until you’re the one in trouble. Then you’ll see her for what she is: the most brilliant and fearless defense attorney in Los Angeles who bucks the justice system at every chance she gets.",
-    "poster": "https://image.tmdb.org/t/p/w500/v9p9VbljJdJ9GjLqp3l5YpWJ8HO.jpg",
-    "backdrop": "https://image.tmdb.org/t/p/w1280/5Nu95w2oWsbmDeAjG2NJF4x33Ud.jpg",
-    "rating": 6.2,
-    "release_date": "2022-09-27",
-    "language": "en",
-    "cast": [],
-    "director": "",
-    "trailer": "ztaqk6reLlc",
-    "runtime": "",
-    "stream_url": "",
-    "stream_links": [],
-    "links": [
-      {
-        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADdQoAAj6lIETVivyEqYufqxYE",
-        "season": "Season 1"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADfgoAAj6lIERoiX8sAz3_LhYE",
-        "season": "Season 2"
-      },
-      {
-        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADhQoAAj6lIETA8PoLpOjlrBYE",
-        "season": "Season 3"
-      }
-    ],
-    "current_season": 1
-  },
-  {
     "csv_id": "1568060-perfect-liars",
     "tmdb_id": 1568060,
     "imdb_id": "",
@@ -2432,7 +2345,7 @@
     ],
     "status": "Ongoing",
     "is_ongoing": true,
-    "last_uploaded_episode": 7,
+    "last_uploaded_episode": 8,
     "current_season": 1,
     "total_episodes": 10,
     "next_air_date": "2026-11-25"
@@ -4438,82 +4351,110 @@
     "director": "",
     "trailer": "Q7Xj7sASXSU",
     "runtime": "",
-    "stream_url": "MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIxMTpjYWFhZjkwOGYzNjhkOGRm",
     "stream_links": [
       {
+        "season": 1,
+        "seasonOrPart": "S01E01",
         "episode": 1,
-        "season": 1,
-        "stream_url": "MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I",
-        "url": "MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I"
+        "episodeNum": 1,
+        "quality": "1080P",
+        "name": "Episode 1",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I"
       },
       {
+        "season": 1,
+        "seasonOrPart": "S01E02",
         "episode": 2,
-        "season": 1,
-        "stream_url": "MjM5OjFjMzRmNjliNDg3YTQ5ZjU",
-        "url": "MjM5OjFjMzRmNjliNDg3YTQ5ZjU"
+        "episodeNum": 2,
+        "quality": "1080P",
+        "name": "Episode 2",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MjM5OjFjMzRmNjliNDg3YTQ5ZjU",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjM5OjFjMzRmNjliNDg3YTQ5ZjU"
       },
       {
+        "season": 1,
+        "seasonOrPart": "S01E03",
         "episode": 3,
-        "season": 1,
-        "stream_url": "MjQwOmRmNzRiZGYzNWM3NDk0YmY",
-        "url": "MjQwOmRmNzRiZGYzNWM3NDk0YmY"
+        "episodeNum": 3,
+        "quality": "1080P",
+        "name": "Episode 3",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MjQwOmRmNzRiZGYzNWM3NDk0YmY",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjQwOmRmNzRiZGYzNWM3NDk0YmY"
       },
       {
+        "season": 1,
+        "seasonOrPart": "S01E04",
         "episode": 4,
-        "season": 1,
-        "stream_url": "MjQxOmM2ZDc4Y2YwOWMwYzZjNmQ",
-        "url": "MjQxOmM2ZDc4Y2YwOWMwYzZjNmQ"
+        "episodeNum": 4,
+        "quality": "1080P",
+        "name": "Episode 4",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MjQxOmM2ZDc4Y2YwOWMwYzZjNmQ",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjQxOmM2ZDc4Y2YwOWMwYzZjNmQ"
       },
       {
+        "season": 1,
+        "seasonOrPart": "S01E05",
         "episode": 5,
-        "season": 1,
-        "stream_url": "MjQyOmY4NzEyMGNiNDhmOTc5YmY",
-        "url": "MjQyOmY4NzEyMGNiNDhmOTc5YmY"
+        "episodeNum": 5,
+        "quality": "1080P",
+        "name": "Episode 5",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MjQyOmY4NzEyMGNiNDhmOTc5YmY",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjQyOmY4NzEyMGNiNDhmOTc5YmY"
       },
       {
+        "quality": "1080P",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MjQzOjZkNTg3ODVkMTA0MGYyZmU",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjQzOjZkNTg3ODVkMTA0MGYyZmU",
+        "season": 1,
+        "seasonOrPart": "S01E06",
         "episode": 6,
-        "season": 1,
-        "stream_url": "MjQzOjZkNTg3ODVkMTA0MGYyZmU",
-        "url": "MjQzOjZkNTg3ODVkMTA0MGYyZmU"
+        "episodeNum": 6,
+        "name": "Episode 6"
       },
       {
-        "episode": 7,
         "season": 1,
-        "stream_url": "OTIxMTpjYWFhZjkwOGYzNjhkOGRm",
-        "url": "OTIxMTpjYWFhZjkwOGYzNjhkOGRm"
-      },
-      {
-        "episode": 8,
-        "season": 1,
-        "stream_url": "MTA3NDY6YzU3YzAyMjY2NGI3NWM1ZQ",
-        "url": "MTA3NDY6YzU3YzAyMjY2NGI3NWM1ZQ"
-      },
-      {
+        "seasonOrPart": "S01E09",
         "episode": 9,
-        "season": 1,
-        "stream_url": "MTEzMTU6OWU3M2E4OTQ1NTRiZGVkZA",
-        "url": "MTEzMTU6OWU3M2E4OTQ1NTRiZGVkZA"
+        "episodeNum": 9,
+        "quality": "720P",
+        "name": "Episode 9",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MTEzMTU6OWU3M2E4OTQ1NTRiZGVkZA",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTEzMTU6OWU3M2E4OTQ1NTRiZGVkZA"
       },
       {
-        "episode": 10,
         "season": 1,
-        "stream_url": "MTI4NjA6YTU4YTFiMzc5NWIyM2I2Nw",
-        "url": "MTI4NjA6YTU4YTFiMzc5NWIyM2I2Nw"
+        "seasonOrPart": "S01E08",
+        "episode": 8,
+        "episodeNum": 8,
+        "quality": "720P",
+        "name": "Episode 8",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MTA3NDY6YzU3YzAyMjY2NGI3NWM1ZQ",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTA3NDY6YzU3YzAyMjY2NGI3NWM1ZQ"
+      },
+      {
+        "season": 1,
+        "seasonOrPart": "S01E07",
+        "episode": 7,
+        "episodeNum": 7,
+        "quality": "720P",
+        "name": "Episode 7",
+        "url": "https://filmhouse-stream.duckdns.org/dl/OTIxMTpjYWFhZjkwOGYzNjhkOGRm",
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIxMTpjYWFhZjkwOGYzNjhkOGRm"
       }
     ],
     "links": [
       {
-        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADyAoAAj6lIES4md8SyON3DhYE",
-        "season": "Season 1",
-        "stream_url": "MjM4Ojc2ZTE2Y2M4NmU1ZTYzN2I"
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADFRgAAhzcUEePaNizI7iXNhYE",
+        "season": "Season 1"
       }
     ],
-    "last_uploaded_episode": 10,
+    "last_uploaded_episode": 9,
     "current_season": 1,
     "status": "Ongoing",
     "total_episodes": 12,
-    "next_air_date": "2026-11-23",
-    "is_ongoing": true
+    "next_air_date": "2026-11-23"
   },
   {
     "csv_id": "559907-the-green-knight",
@@ -96982,9 +96923,7 @@
     "current_season": 6,
     "last_uploaded_episode": 5,
     "status": "Ongoing",
-    "is_ongoing": true,
-    "total_episodes": 9,
-    "next_air_date": "2026-12-02"
+    "is_ongoing": true
   },
   {
     "csv_id": "1007359-dinner-at-my-place",
