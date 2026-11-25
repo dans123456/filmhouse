@@ -82,6 +82,16 @@ function titlesMatch(titleA, titleB) {
     const colB = getCollapsedTitle(titleB);
     if (colA && colB && colA === colB) return true;
 
+    // Sequel number guard: never fuzzy-match Part 1 with Part 2 / II / 3, etc.
+    const extractSequelTag = (s) => {
+        const map = { ii: "2", iii: "3", iv: "4", v: "5", vi: "6", vii: "7", viii: "8", ix: "9", two: "2", three: "3", four: "4", five: "5" };
+        const m = s.match(/(?:^|\s)(?:part\s+|vol(?:ume)?\s+|chapter\s+)?([2-9]|1[0-9]|ii|iii|iv|v|vi|vii|viii|ix|two|three|four|five)(?:\s|$)/i);
+        if (!m) return "";
+        const tok = m[1].toLowerCase();
+        return map[tok] || tok;
+    };
+    if (extractSequelTag(normA) !== extractSequelTag(normB)) return false;
+
     // 3. Keyword-level comparison with stop-word filtering
     const toksA = normA.split(/\s+/).filter(Boolean);
     const toksB = normB.split(/\s+/).filter(Boolean);

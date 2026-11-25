@@ -222,6 +222,16 @@ function titlesMatch(titleA, titleB) {
     // 3. Singular / plural tolerance on full title (e.g. "testament" vs "testaments")
     if (normA.replace(/s$/, "") === normB.replace(/s$/, "")) return true;
 
+    // Sequel number guard: never prefix-match "Movie" with "Movie 2" / "Movie Part 2" / "Movie II"
+    const extractSequelTag = (s) => {
+        const map = { ii: "2", iii: "3", iv: "4", v: "5", vi: "6", vii: "7", viii: "8", ix: "9", two: "2", three: "3", four: "4", five: "5" };
+        const m = s.match(/(?:^|\s)(?:part\s+|vol(?:ume)?\s+|chapter\s+)?([2-9]|1[0-9]|ii|iii|iv|v|vi|vii|viii|ix|two|three|four|five)(?:\s|$)/i);
+        if (!m) return "";
+        const tok = m[1].toLowerCase();
+        return map[tok] || tok;
+    };
+    if (extractSequelTag(normA) !== extractSequelTag(normB)) return false;
+
     // 4. Safe multi-word prefix subtitle match (min 2 content words & >= 8 chars, e.g. "House of the Dragon" vs "House of the Dragon Season 1")
     const stopSet = new Set(["the", "a", "an", "of", "in", "on", "at", "to", "for", "and", "or", "is"]);
     const shortStr = normA.length <= normB.length ? normA : normB;

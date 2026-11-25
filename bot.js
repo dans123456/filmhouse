@@ -245,6 +245,18 @@ function titlesMatch(titleA, titleB) {
         if (dedupA.length >= 5 && dedupA === dedupB) return true;
     }
 
+    // Sequel number guard: never fuzzy-match Part 1 with Part 2 / II / 3, etc.
+    const extractSequelTag = (s) => {
+        const wordNums = { two: "2", three: "3", four: "4", five: "5", six: "6" };
+        const m = s.match(/(?:^|\s)(?:part\s+|vol(?:ume)?\s+|chapter\s+)?([2-9]|1[0-9]|ii|iii|iv|v|vi|vii|viii|ix|two|three|four|five)(?:\s|$)/i);
+        if (!m) return "";
+        const tok = m[1].toLowerCase();
+        return wordNums[tok] || romanToNum(tok) || tok;
+    };
+    if (extractSequelTag(normA) !== extractSequelTag(normB)) {
+        return false;
+    }
+
     // Subtitle / Prefix match: e.g. "Maxton Hall — The World Between Us" vs "Maxton Hall"
     // or "Brand New Cherry Flavor" vs "Brand New Cherry"
     // or "All Quiet on the Western Front" vs "All Quiet on the Western"
@@ -4090,22 +4102,33 @@ function setupBot(bot, adminBot) {
                     continue;
                 }
 
-                // Match against in-memory catalog
+                // Match against in-memory catalog (Priority: 1. Exact title + year -> 2. Exact title -> 3. Safe titlesMatch + year check)
                 let catalogMatch = null;
                 if (cachedMoviesMetadata && Array.isArray(cachedMoviesMetadata)) {
-                    catalogMatch = cachedMoviesMetadata.find(m =>
-                        m.title && titlesMatch(m.title, parsed.cleanTitle)
-                    );
-                    if (!catalogMatch && parsed.year) {
-                        const firstSignificantWord = parsed.cleanTitle.toLowerCase().split(/\s+/).find(w => w.length >= 4 && !STOP_WORDS.has(w)) || "";
-                        catalogMatch = cachedMoviesMetadata.find(m => {
-                            if (!m.title) return false;
-                            const titleOk = titlesMatch(m.title, parsed.cleanTitle);
-                            const mYearRaw = m.year || m.release_date || '';
-                            const mYear = mYearRaw ? String(mYearRaw).substring(0, 4) : '';
-                            const yearOk = mYear === String(parsed.year).substring(0, 4);
-                            return titleOk || (yearOk && firstSignificantWord && m.title.toLowerCase().includes(firstSignificantWord));
-                        });
+                    const normParsed = normalizeTitleForComparison(parsed.cleanTitle);
+                    const pYear = parsed.year ? parseInt(String(parsed.year).substring(0, 4), 10) : null;
+                    const yearsCompatible = (m) => {
+                        if (!pYear || isNaN(pYear)) return true;
+                        const mYearRaw = m.year || m.release_date || '';
+                        const mYear = mYearRaw ? parseInt(String(mYearRaw).substring(0, 4), 10) : null;
+                        if (!mYear || isNaN(mYear)) return true;
+                        return Math.abs(mYear - pYear) <= 1;
+                    };
+
+                    if (pYear) {
+                        catalogMatch = cachedMoviesMetadata.find(m =>
+                            m.title && normalizeTitleForComparison(m.title) === normParsed && yearsCompatible(m)
+                        );
+                    }
+                    if (!catalogMatch) {
+                        catalogMatch = cachedMoviesMetadata.find(m =>
+                            m.title && normalizeTitleForComparison(m.title) === normParsed && yearsCompatible(m)
+                        );
+                    }
+                    if (!catalogMatch) {
+                        catalogMatch = cachedMoviesMetadata.find(m =>
+                            m.title && titlesMatch(m.title, parsed.cleanTitle) && yearsCompatible(m)
+                        );
                     }
                 }
 
