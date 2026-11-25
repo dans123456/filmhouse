@@ -10455,12 +10455,36 @@ async function initOngoingSeriesTracker(forceRefresh = false) {
 
             const numTmdbId = item.tmdb_id || (parseInt(item.csv_id, 10) || null);
             const status = fsData.status || item.status || ((fsData.is_ongoing || item.is_ongoing) ? "Ongoing" : null);
-            const mergedStreamLinks = (Array.isArray(fsData.stream_links) && fsData.stream_links.length > 0)
-                ? fsData.stream_links
-                : (item.stream_links || []);
-            const mergedLinks = (Array.isArray(fsData.links) && fsData.links.length > 0)
-                ? fsData.links
-                : (item.links || []);
+            const streamMergeMap = new Map();
+            (Array.isArray(item.stream_links) ? item.stream_links : []).forEach((s, idx) => {
+                if (!s) return;
+                const sNum = Number(s.season || s.season_number || 1);
+                const eNum = Number(s.episode || s.episodeNum || s.episode_number || (idx + 1));
+                streamMergeMap.set(`s${sNum}_e${eNum}`, { ...s, season: sNum, episode: eNum });
+            });
+            (Array.isArray(fsData.stream_links) ? fsData.stream_links : []).forEach((s, idx) => {
+                if (!s) return;
+                const sNum = Number(s.season || s.season_number || 1);
+                const eNum = Number(s.episode || s.episodeNum || s.episode_number || (idx + 1));
+                const key = `s${sNum}_e${eNum}`;
+                const prev = streamMergeMap.get(key) || {};
+                streamMergeMap.set(key, { ...prev, ...s, season: sNum, episode: eNum });
+            });
+            const mergedStreamLinks = Array.from(streamMergeMap.values()).sort((a, b) => (a.season - b.season) || (a.episode - b.episode));
+
+            const linkMergeMap = new Map();
+            (Array.isArray(item.links) ? item.links : []).forEach(l => {
+                if (!l) return;
+                const k = typeof l === "object" ? (l.season || l.seasonOrPart || l.url || JSON.stringify(l)) : String(l);
+                linkMergeMap.set(k, typeof l === "object" ? { ...l } : l);
+            });
+            (Array.isArray(fsData.links) ? fsData.links : []).forEach(l => {
+                if (!l) return;
+                const k = typeof l === "object" ? (l.season || l.seasonOrPart || l.url || JSON.stringify(l)) : String(l);
+                const prev = linkMergeMap.get(k);
+                linkMergeMap.set(k, (typeof prev === "object" && typeof l === "object") ? { ...prev, ...l } : l);
+            });
+            const mergedLinks = Array.from(linkMergeMap.values());
 
             // Determine current_season and auto-calculate highest uploaded episode from stream_links / links
             let currentSeason = fsData.current_season || item.current_season || 1;
@@ -10512,6 +10536,7 @@ async function initOngoingSeriesTracker(forceRefresh = false) {
             if (lastUploaded > (item.last_uploaded_episode || 0)) item.last_uploaded_episode = lastUploaded;
             if (totalEpisodes) item.total_episodes = totalEpisodes;
             if (nextAirDate) item.next_air_date = nextAirDate;
+            if (mergedStreamLinks.length > 0) item.stream_links = mergedStreamLinks;
 
             return {
                 ...item,

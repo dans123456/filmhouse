@@ -5454,8 +5454,8 @@ function openMediaDetailPage(movie) {
             }
         }
 
-        // Real-time Firestore Sync: Pick up freshest stream links and episodes live (zero delay)
-        if (typeof db !== "undefined" && db && (movie.csv_id || movie.id)) {
+        // Fallback Firestore lookup ONLY when streamTarget is missing locally (prevents burning daily Firestore read quota)
+        if (!streamTarget && typeof db !== "undefined" && db && (movie.csv_id || movie.id)) {
             try {
                 const docKey = String(movie.csv_id || movie.id);
                 const snap = await db.collection("movies").doc(docKey).get();

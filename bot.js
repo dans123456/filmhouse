@@ -3990,7 +3990,7 @@ function setupBot(bot, adminBot) {
             // 2. Pre-fetch live catalogue from Firestore to MERGE live stream links without overwriting the 2,200+ catalog
             try {
                 if (typeof db !== 'undefined' && db && typeof db.collection === 'function') {
-                    const snap = await db.collection('movies').get();
+                    const snap = await db.collection('movies').where('status', 'in', ['Ongoing', 'On Break', 'Completed']).limit(100).get();
                     if (!snap.empty) {
                         console.log(`[ScanLibrary] Merging ${snap.size} live catalogue documents from Firestore.`);
                         const fsMap = new Map();
@@ -4026,7 +4026,15 @@ function setupBot(bot, adminBot) {
                                     m._docId = live._docId;
                                     m._ref = live._ref;
                                     if (live.stream_url) m.stream_url = live.stream_url;
-                                    if (Array.isArray(live.stream_links) && live.stream_links.length > 0) m.stream_links = live.stream_links;
+                                    if (Array.isArray(live.stream_links) && live.stream_links.length > 0) {
+                                        if (!Array.isArray(m.stream_links)) m.stream_links = [];
+                                        live.stream_links.forEach(ls => {
+                                            if (!ls) return;
+                                            const lUrl = ls.stream_url || ls.url || "";
+                                            const exists = m.stream_links.some(ms => (ms.stream_url || ms.url || "") === lUrl);
+                                            if (lUrl && !exists) m.stream_links.push(ls);
+                                        });
+                                    }
                                     if (Array.isArray(live.links) && live.links.length > 0) m.links = live.links;
                                 }
                             });
@@ -7317,9 +7325,9 @@ async function init() {
             }
         };
 
-        // Initial sync and periodic sync (every 60 seconds)
+        // Initial sync and periodic sync (every 30 minutes)
         updateBotStatus("online");
-        const statusInterval = setInterval(() => updateBotStatus("online"), 60 * 1000);
+        const statusInterval = setInterval(() => updateBotStatus("online"), 30 * 60 * 1000);
 
         // Start weekly movie catalog backup checker (runs every 12 hours, never on immediate reboot)
         setInterval(async () => {
@@ -7328,7 +7336,7 @@ async function init() {
 
         // Start background synchronization from Firestore to Ubuntu local user store
         setTimeout(() => localStore.syncFromFirestore(db), 10 * 1000);
-        setInterval(() => localStore.syncFromFirestore(db), 6 * 60 * 60 * 1000);
+        setInterval(() => localStore.syncFromFirestore(db), 24 * 60 * 60 * 1000);
 
         // Start keep-alive ping loop for external File Bots
         let cachedPingUrls = [];
