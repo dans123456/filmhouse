@@ -10921,19 +10921,6 @@ function openDownloadModal(movie) {
 
                 const sublabel = document.createElement("span");
                 sublabel.className = "download-link-sublabel";
-                sublabel.style.cssText = "font-size: 9px; color: var(--text-muted); opacity: 0.75;";
-                sublabel.textContent = "Tap to Request Season";
-
-                labelWrap.appendChild(label);
-                labelWrap.appendChild(sublabel);
-                missingItem.appendChild(labelWrap);
-
-                const reqActionBtn = document.createElement("button");
-                reqActionBtn.className = "btn-request-season-action";
-
-                const reqSeasonStr = `Season ${seasonNum}`;
-                const cleanMovieTitle = getCleanRequestTitle(movie.title).toLowerCase();
-
                 const isAlreadyReq = currentUserRequests && currentUserRequests.some(r => {
                     const matchesTitle = titlesMatch(r.title, movie.title);
                     const matchesSeason = (r.seasonOrPart && r.seasonOrPart.toLowerCase() === reqSeasonStr.toLowerCase()) ||
