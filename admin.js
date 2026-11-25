@@ -735,6 +735,35 @@ function getCatalogLookupCache() {
 }
 
 // Helper: Check if a pending request already has matching content with active links in the catalog (for UI badge and one-click fulfillment)
+function findCatalogMovieForRequest(reqMeta, fallbackTitle = "", yearStr = "") {
+    if (!Array.isArray(allCatalogMovies) || allCatalogMovies.length === 0) return null;
+    const rawTitle = String(fallbackTitle || (reqMeta && reqMeta.title) || "").trim();
+    const cleanReqTitle = rawTitle
+        .replace(/\s*\[[^\]]*\]\s*/g, " ")
+        .replace(/\s*\((?:s\d+[:\s\-]*e\d+|season\s*\d+[^)]*|part\s*\d+[^)]*|\d{4})\)\s*/gi, " ")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+    const extractedYearMatch = rawTitle.match(/\((\d{4})\)/);
+    const effectiveYear = String(yearStr || (reqMeta && reqMeta.year) || (extractedYearMatch ? extractedYearMatch[1] : "")).trim();
+    const reqTmdb = reqMeta && reqMeta.tmdb_id ? String(reqMeta.tmdb_id).trim() : "";
+    const reqCsv = reqMeta && reqMeta.csv_id ? String(reqMeta.csv_id).toLowerCase().trim() : "";
+
+    return allCatalogMovies.find(m => {
+        if (!m) return false;
+        if (reqCsv && m.csv_id && String(m.csv_id).toLowerCase().trim() === reqCsv) return true;
+        const mTmdb = m.tmdb_id ? String(m.tmdb_id).trim() : (m.csv_id && /^\d+-/.test(String(m.csv_id)) ? String(m.csv_id).split("-")[0] : "");
+        if (reqTmdb && mTmdb) {
+            return reqTmdb === mTmdb;
+        }
+        // Fallback title match (works even when reqTmdb is missing and mTmdb exists)
+        if (cleanReqTitle && m.title && titlesMatch(m.title, cleanReqTitle)) {
+            if (effectiveYear && m.year && String(m.year).slice(0, 4) !== effectiveYear.slice(0, 4)) return false;
+            return true;
+        }
+        return false;
+    }) || null;
+}
+
 function hasCatalogMatch(r) {
     if (!r || !allCatalogMovies || allCatalogMovies.length === 0) return false;
     const cache = getCatalogLookupCache();
@@ -1523,6 +1552,15 @@ function renderRequestsList() {
         }
 
         const toggleId = `toggle-${req.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${req.docIds[0]}`;
+        const matchedCatMovie = !req.isFulfilled ? findCatalogMovieForRequest(req, req.title, req.year) : null;
+        const catStreamCount = matchedCatMovie
+            ? ((Array.isArray(matchedCatMovie.stream_links) && matchedCatMovie.stream_links.length > 0)
+                ? matchedCatMovie.stream_links.filter(s => s && (s.stream_url || s.url)).length
+                : (matchedCatMovie.stream_url ? 1 : 0))
+            : 0;
+        const syncedStreamCallout = catStreamCount > 0
+            ? `<div style="margin-top: 5px; display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; color: #4cd964; background: rgba(76, 217, 100, 0.12); border: 1px solid rgba(76, 217, 100, 0.3); padding: 2px 8px; border-radius: 6px; font-weight: 700;">⚡ ${catStreamCount} Stream Link${catStreamCount > 1 ? 's' : ''} Auto-Detected in Catalog — Tap Fulfill to Publish!</div>`
+            : "";
 
         row.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
@@ -1534,6 +1572,7 @@ function renderRequestsList() {
                         ${claimBadgeMarkup}
                     </h5>
                     ${dateDisplayMarkup}
+                    ${syncedStreamCallout}
                     <p style="margin: 4px 0 0 0; font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
                         <span style="text-transform: uppercase; font-weight: bold;">${escapeHTML(req.type)}</span>
                         <span style="color: var(--text-muted);">•</span>
@@ -1682,27 +1721,7 @@ function fulfillMovieTitleRequests(title, docIds, reqMeta = null) {
             
             titleEl.textContent = `Fulfill Request: "${title}${yearStr && !title.includes(yearStr) ? ` (${yearStr})` : ''}"`;
             
-            const reqTmdb = reqMeta && reqMeta.tmdb_id ? String(reqMeta.tmdb_id).trim() : "";
-            const existingMovie = allCatalogMovies.find(m => {
-                const mTmdb = m.tmdb_id ? String(m.tmdb_id).trim() : (m.csv_id && !isNaN(m.csv_id) ? String(m.csv_id).trim() : "");
-                if (reqTmdb && mTmdb) {
-                    return reqTmdb === mTmdb;
-                }
-                if (reqTmdb && !mTmdb) {
-                    if (titlesMatch(m.title, title)) {
-                        if (yearStr && m.year && String(m.year) === yearStr) return true;
-                        if (!yearStr) return true;
-                    }
-                    return false;
-                }
-                if (!reqTmdb && !mTmdb) {
-                    if (titlesMatch(m.title, title)) {
-                        if (yearStr && m.year && String(m.year) === yearStr) return true;
-                        if (!yearStr) return true;
-                    }
-                }
-                return false;
-            });
+            const existingMovie = findCatalogMovieForRequest(reqMeta, title, yearStr);
 
             const matchedReq = (reqMeta && reqMeta.title) ? reqMeta : (allRequests.find(r => targetDocIds.includes(r.docId)) || allRequests.find(r => (r.title || "").toLowerCase().trim() === (title || "").toLowerCase().trim()));
             currentFulfillReq = matchedReq;
@@ -2917,6 +2936,39 @@ async function loadCatalog() {
             }
         }
         
+        // Merge duplicate csv_id/tmdb_id series rows so all scanned episode stream_links appear together
+        if (Array.isArray(responseData)) {
+            const mergedMap = new Map();
+            const mergedList = [];
+            responseData.forEach(item => {
+                if (!item) return;
+                const key = item.csv_id ? String(item.csv_id).toLowerCase().trim() : null;
+                if (!key) {
+                    mergedList.push(item);
+                    return;
+                }
+                if (!mergedMap.has(key)) {
+                    const clone = { ...item };
+                    if (Array.isArray(item.stream_links)) clone.stream_links = [...item.stream_links];
+                    mergedMap.set(key, clone);
+                    mergedList.push(clone);
+                } else {
+                    const target = mergedMap.get(key);
+                    if (Array.isArray(item.stream_links) && item.stream_links.length > 0) {
+                        if (!Array.isArray(target.stream_links)) target.stream_links = [];
+                        item.stream_links.forEach(sl => {
+                            if (!sl) return;
+                            const sKey = `${sl.season || 1}_${sl.episode || sl.episodeNum || ""}_${sl.stream_url || sl.url || ""}`;
+                            if (!target.stream_links.some(t => `${t.season || 1}_${t.episode || t.episodeNum || ""}_${t.stream_url || t.url || ""}` === sKey)) {
+                                target.stream_links.push(sl);
+                            }
+                        });
+                    }
+                    if (!target.stream_url && item.stream_url) target.stream_url = item.stream_url;
+                }
+            });
+            responseData = mergedList;
+        }
         allCatalogMovies = responseData;
         invalidateCatalogLookupCache();
         originalCatalogCount = allCatalogMovies.length;
@@ -7574,10 +7626,11 @@ function renderFulfillStreamLinksInputs(existingMovie, isSeries = true, reqSpec 
         addFulfillStreamLinkInputRow(0, "", "720p", isSeries, true, 1, 1);
     }
     const hasAnyRealStream = existingStreams.some(s => s && (s.url || s.stream_url));
+    const isDedicatedStreamReq = Boolean(currentFulfillReq && (currentFulfillReq.isStreamRequest || currentFulfillReq.type === "stream" || currentFulfillReq.requestType === "stream"));
     const streamsFolderContent = document.getElementById("fulfill-streams-folder-content");
     const streamsChevron = document.getElementById("fulfill-streams-chevron");
     if (streamsFolderContent) {
-        if (hasAnyRealStream) {
+        if (hasAnyRealStream || isDedicatedStreamReq) {
             streamsFolderContent.style.display = "block";
             if (streamsChevron) streamsChevron.textContent = "▼";
         } else {

@@ -3713,7 +3713,7 @@ function setupBot(bot, adminBot) {
         }
 
         // Auto-publish movies_metadata.json to GitHub repository via GitHub REST API
-        async function publishMetadataToGitHub(reason = "Auto-sync stream links from Library Scan [skip ci]", explicitToken = null) {
+        async function publishMetadataToGitHub(reason = "Auto-sync stream links from Library Scan", explicitToken = null) {
             if (!cachedMoviesMetadata || !Array.isArray(cachedMoviesMetadata) || cachedMoviesMetadata.length === 0) {
                 console.warn("[GitHubPublish] No cached metadata to publish.");
                 return { success: false, error: "Empty metadata" };
@@ -4344,7 +4344,7 @@ function setupBot(bot, adminBot) {
             if (newlyMatched > 0 || autoIngested > 0) {
                 try {
                     console.log(`[ScanLibrary] Auto-publishing to GitHub (${newlyMatched} new stream links, ${autoIngested} auto-ingested)...`);
-                    const pubRes = await publishMetadataToGitHub(`Auto-sync ${newlyMatched} stream links from Library Scan [skip ci]`);
+                    const pubRes = await publishMetadataToGitHub(`Auto-sync ${newlyMatched} stream links from Library Scan`);
                     if (pubRes && pubRes.success) {
                         githubPublished = true;
                         console.log('[ScanLibrary] GitHub auto-publish succeeded!');
