@@ -1729,8 +1729,11 @@ function fulfillMovieTitleRequests(title, docIds, reqMeta = null) {
             
             let reqSpec = matchedReq ? (matchedReq.seasonOrPart || "") : "";
             if (!reqSpec && title) {
-                const qMatch = title.match(/\(([^)]+)\)$/);
-                if (qMatch) {
+                const seMatch = title.match(/\((s\d+[:\s\-]*e\d+|season\s*\d+[^)]*)\)/i);
+                const qMatch = title.match(/\((?!\d{4}\))([^)]+)\)$/);
+                if (seMatch) {
+                    reqSpec = seMatch[1].trim();
+                } else if (qMatch) {
                     reqSpec = qMatch[1].trim();
                 }
             }
@@ -7614,16 +7617,45 @@ function renderFulfillStreamLinksInputs(existingMovie, isSeries = true, reqSpec 
         }
     }
 
+    // Parse requested Season & Episode from reqSpec or title (e.g. "S2:E1", "S02E05", "Season 2")
+    const specCombined = `${reqSpec || ""} ${typeof currentFulfillTitle !== "undefined" ? currentFulfillTitle : ""}`;
+    const seReqMatch = specCombined.match(/\bs(\d{1,2})[:\s\-]*e(\d{1,3})\b/i)
+        || specCombined.match(/season\s*(\d{1,2})\s*(?:ep(?:isode)?\s*(\d{1,3}))?/i);
+    const targetReqSeason = seReqMatch ? (parseInt(seReqMatch[1], 10) || 1) : null;
+    const targetReqEp = (seReqMatch && seReqMatch[2]) ? (parseInt(seReqMatch[2], 10) || 1) : (targetReqSeason ? 1 : null);
+
+    if (isSeries && existingStreams.length > 0) {
+        // Assign explicit season/episode before sorting so unnumbered items stay ordered
+        existingStreams = existingStreams.map((item, idx) => {
+            const spMatch = String(item.seasonOrPart || item.name || "").match(/\bs(\d{1,2})[:\s\-]*e(\d{1,3})\b/i);
+            const sNum = parseInt(item.season || item.season_number || (spMatch ? spMatch[1] : 1), 10) || 1;
+            const ep = parseInt(item.episode || item.episodeNum || item.episode_number || (spMatch ? spMatch[2] : (idx + 1)), 10) || (idx + 1);
+            return { ...item, season: sNum, episode: ep };
+        });
+        existingStreams.sort((a, b) => (a.season - b.season) || (a.episode - b.episode));
+
+        // If a specific Sx:Ey was requested and is not yet in existingStreams, add an empty slot for that exact Sx:Ey
+        if (targetReqSeason && targetReqEp && !existingStreams.some(s => s.season === targetReqSeason && s.episode === targetReqEp)) {
+            existingStreams.push({ url: "", stream_url: "", quality: "720p", season: targetReqSeason, episode: targetReqEp });
+            existingStreams.sort((a, b) => (a.season - b.season) || (a.episode - b.episode));
+        }
+    }
+
     if (existingStreams.length > 0) {
         existingStreams.forEach((item, idx) => {
             const u = item.url || item.stream_url || "";
             const q = item.quality || "720p";
             const ep = item.episode || (idx + 1);
             const sNum = parseInt(item.season, 10) || 1;
-            addFulfillStreamLinkInputRow(idx, u, q, isSeries, idx === 0, ep, sNum);
+            const isReqRow = isSeries && targetReqSeason
+                ? (sNum === targetReqSeason && ep === (targetReqEp || 1))
+                : (idx === 0);
+            addFulfillStreamLinkInputRow(idx, u, q, isSeries, isReqRow, ep, sNum);
         });
     } else {
-        addFulfillStreamLinkInputRow(0, "", "720p", isSeries, true, 1, 1);
+        const initSeason = (isSeries && targetReqSeason) ? targetReqSeason : 1;
+        const initEp = (isSeries && targetReqEp) ? targetReqEp : 1;
+        addFulfillStreamLinkInputRow(0, "", "720p", isSeries, true, initEp, initSeason);
     }
     const hasAnyRealStream = existingStreams.some(s => s && (s.url || s.stream_url));
     const isDedicatedStreamReq = Boolean(currentFulfillReq && (currentFulfillReq.isStreamRequest || currentFulfillReq.type === "stream" || currentFulfillReq.requestType === "stream"));
@@ -7663,10 +7695,11 @@ function addFulfillStreamLinkInputRow(idx, defaultUrl = "", defaultQuality = "72
     labelBadge.style.cssText = "font-size: 11px; color: #4cd964; font-weight: 800; flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;";
     
     const epNum = defaultEp || (idx + 1);
+    const sNumDisplay = parseInt(defaultSeason, 10) || 1;
     const normQuality = normalizeQualityName(defaultQuality);
 
     if (isSeries) {
-        labelBadge.innerHTML = `<span>Episode ${epNum}:</span>${isRequested ? '<span style="font-size:9px; background:#4cd964; color:#000; padding:1px 4px; border-radius:3px;">⚡ STREAM</span>' : ''}`;
+        labelBadge.innerHTML = `<span>S${sNumDisplay}:E${epNum}:</span>${isRequested ? '<span style="font-size:9px; background:#4cd964; color:#000; padding:1px 4px; border-radius:3px;">⚡ REQUESTED</span>' : ''}`;
     } else {
         labelBadge.innerHTML = `<span>Stream ${idx + 1}:</span>${isRequested ? '<span style="font-size:9px; background:#4cd964; color:#000; padding:1px 4px; border-radius:3px;">⚡ PRIMARY</span>' : ''}`;
     }
@@ -7677,7 +7710,7 @@ function addFulfillStreamLinkInputRow(idx, defaultUrl = "", defaultQuality = "72
     urlInput.type = "text";
     urlInput.className = "fulfill-stream-url-input";
     urlInput.value = cleanInitial;
-    urlInput.placeholder = isSeries ? `Paste token / URL for Episode ${epNum}...` : `Paste stream token / URL for ${normQuality}...`;
+    urlInput.placeholder = isSeries ? `Paste token / URL for S${sNumDisplay}:E${epNum}...` : `Paste stream token / URL for ${normQuality}...`;
     urlInput.style.cssText = "flex: 1; min-width: 140px; padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; font-size: 12px; font-family: monospace; outline: none; box-sizing: border-box;";
 
     row.appendChild(labelBadge);
