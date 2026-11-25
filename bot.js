@@ -4114,20 +4114,25 @@ function setupBot(bot, adminBot) {
                         if (!mYear || isNaN(mYear)) return true;
                         return Math.abs(mYear - pYear) <= 1;
                     };
+                    const typeCompatible = (m) => {
+                        const mType = String(m.type || '').toLowerCase();
+                        const mIsSeries = mType === 'series' || mType === 'tv';
+                        return Boolean(parsed.isSeries) === mIsSeries;
+                    };
 
                     if (pYear) {
                         catalogMatch = cachedMoviesMetadata.find(m =>
-                            m.title && normalizeTitleForComparison(m.title) === normParsed && yearsCompatible(m)
+                            m.title && normalizeTitleForComparison(m.title) === normParsed && yearsCompatible(m) && typeCompatible(m)
                         );
                     }
                     if (!catalogMatch) {
                         catalogMatch = cachedMoviesMetadata.find(m =>
-                            m.title && normalizeTitleForComparison(m.title) === normParsed && yearsCompatible(m)
+                            m.title && normalizeTitleForComparison(m.title) === normParsed && yearsCompatible(m) && typeCompatible(m)
                         );
                     }
                     if (!catalogMatch) {
                         catalogMatch = cachedMoviesMetadata.find(m =>
-                            m.title && titlesMatch(m.title, parsed.cleanTitle) && yearsCompatible(m)
+                            m.title && titlesMatch(m.title, parsed.cleanTitle) && yearsCompatible(m) && typeCompatible(m)
                         );
                     }
                 }
