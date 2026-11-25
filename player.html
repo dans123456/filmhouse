@@ -2519,6 +2519,14 @@
     function restoreInteractivePlayOverlay(titleMsg, subMsg) {
       if (!playOverlay) return;
       if (document.body.classList.contains('stream-started') && videoEl && !videoEl.paused && videoEl.currentTime > 0) return;
+      const isErrorOrRetry = /retry|reconnect|slow|unavailable|issue/i.test(`${titleMsg || ''} ${subMsg || ''}`);
+      if (!isErrorOrRetry) {
+        if (_connectTimeoutTimer) {
+          clearTimeout(_connectTimeoutTimer);
+          _connectTimeoutTimer = null;
+        }
+        if (errorCard) errorCard.style.display = 'none';
+      }
       playOverlay.style.display = 'flex';
       playOverlay.style.opacity = '1';
       playOverlay.style.pointerEvents = 'auto';

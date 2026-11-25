@@ -219,21 +219,49 @@ function titlesMatch(titleA, titleB) {
     const colB = getCollapsedTitle(titleB);
     if (colA && colB && colA === colB) return true;
 
-    // 3. Significant substring match (e.g. "House of Dragon" in "The House of Dragon: Season 1")
-    if (colA.length >= 4 && colB.length >= 4) {
-        if (colA.includes(colB) || colB.includes(colA)) return true;
-    }
+    // 3. Singular / plural tolerance on full title (e.g. "testament" vs "testaments")
+    if (normA.replace(/s$/, "") === normB.replace(/s$/, "")) return true;
 
-    // 4. Token overlap comparison
-    const toksA = normA.split(" ").filter(t => t.length > 1);
-    const toksB = normB.split(" ").filter(t => t.length > 1);
-    if (toksA.length > 0 && toksB.length > 0) {
-        const intersection = toksA.filter(t => toksB.includes(t));
-        const minLen = Math.min(toksA.length, toksB.length);
-        if (intersection.length === minLen && minLen >= 1) return true;
+    // 4. Safe multi-word prefix subtitle match (min 2 content words & >= 8 chars, e.g. "House of the Dragon" vs "House of the Dragon Season 1")
+    const stopSet = new Set(["the", "a", "an", "of", "in", "on", "at", "to", "for", "and", "or", "is"]);
+    const shortStr = normA.length <= normB.length ? normA : normB;
+    const longStr = normA.length <= normB.length ? normB : normA;
+    const shortContentWords = shortStr.split(/\s+/).filter(w => w.length > 1 && !stopSet.has(w));
+    if (shortContentWords.length >= 2 && shortStr.length >= 8 && longStr.startsWith(shortStr + " ")) {
+        return true;
     }
 
     return false;
+}
+
+function isSameCatalogMedia(a, b) {
+    if (!a || !b) return false;
+    const isSeriesMedia = (item) => {
+        const t = String(item.type || "").toLowerCase();
+        return t === "series" || t === "tv" || t.includes("series");
+    };
+    if (a.type && b.type && isSeriesMedia(a) !== isSeriesMedia(b)) {
+        return false;
+    }
+    if (a.csv_id && b.csv_id && String(a.csv_id).toLowerCase().trim() === String(b.csv_id).toLowerCase().trim()) {
+        return true;
+    }
+    if (a.id && b.id && String(a.id).toLowerCase().trim() === String(b.id).toLowerCase().trim() && !String(a.id).startsWith("tmdb_")) {
+        return true;
+    }
+    if (a.tmdb_id && b.tmdb_id) {
+        return String(a.tmdb_id).trim() === String(b.tmdb_id).trim();
+    }
+    if (!a.title || !b.title) return false;
+    const normA = normalizeTitleForComparison(a.title);
+    const normB = normalizeTitleForComparison(b.title);
+    if (!normA || normA !== normB) return false;
+    const yA = String(a.year || a.release_date || "").slice(0, 4);
+    const yB = String(b.year || b.release_date || "").slice(0, 4);
+    if (/^\d{4}$/.test(yA) && /^\d{4}$/.test(yB) && yA !== yB) {
+        return false;
+    }
+    return true;
 }
 
 // Clean request/catalog titles by stripping trailing parenthesis groups and symbols
@@ -5114,12 +5142,7 @@ function openMediaDetailPage(movie) {
 
     // Auto-enrich movie from state.movies if available (preserves stream_url, links, quality, backdrop, trailers)
     if (state.movies && Array.isArray(state.movies)) {
-        const localMatch = state.movies.find(m =>
-            (m.id && (m.id === movie.id || m.id === movie.csv_id)) ||
-            (m.csv_id && (m.csv_id === movie.id || m.csv_id === movie.csv_id)) ||
-            (m.tmdb_id && movie.tmdb_id && String(m.tmdb_id) === String(movie.tmdb_id)) ||
-            (m.title && movie.title && m.title.trim().toLowerCase() === movie.title.trim().toLowerCase())
-        );
+        const localMatch = state.movies.find(m => isSameCatalogMedia(m, movie));
         if (localMatch) {
             movie.stream_url = movie.stream_url || localMatch.stream_url;
             movie.stream_links = movie.stream_links || localMatch.stream_links;
@@ -5396,12 +5419,7 @@ function openMediaDetailPage(movie) {
 
         // Secondary catalog fallback: search state.movies
         if (!streamTarget && state.movies && Array.isArray(state.movies)) {
-            const localMatch = state.movies.find(m =>
-                (m.id && (m.id === movie.id || m.id === movie.csv_id)) ||
-                (m.csv_id && (m.csv_id === movie.id || m.csv_id === movie.csv_id)) ||
-                (m.tmdb_id && movie.tmdb_id && String(m.tmdb_id) === String(movie.tmdb_id)) ||
-                (m.title && movie.title && m.title.trim().toLowerCase() === movie.title.trim().toLowerCase())
-            );
+            const localMatch = state.movies.find(m => isSameCatalogMedia(m, movie));
             if (localMatch) {
                 streamTarget = isTVShow ? "" : (localMatch.stream_url || "");
                 if (!streamTarget && localMatch.stream_links && Array.isArray(localMatch.stream_links)) {
@@ -5458,8 +5476,8 @@ function openMediaDetailPage(movie) {
             }
         }
 
-        // Only stop/clean up the trailer if we actually have a valid stream or TV Show to play
-        if (isTVShow || streamTarget) {
+        // Only stop/clean up the trailer and open Cinema Modal when a real stream link exists (Option A)
+        if (streamTarget) {
             if (typeof currentHeroTrailerCleanup === "function") {
                 try { currentHeroTrailerCleanup(); } catch (e) { }
                 currentHeroTrailerCleanup = null;
@@ -5528,12 +5546,10 @@ function openMediaDetailPage(movie) {
 
     // 5. Wire Hero Stream Button with Smart "Request Stream" for In-Catalog Titles
     const streamBtn = document.getElementById("btn-media-stream-main");
-    const hasDirectStream = isTVShow
-        ? (Array.isArray(movie.stream_links) && movie.stream_links.length > 0)
-        : Boolean(
-            (movie.stream_url && !String(movie.stream_url).includes("t.me")) ||
-            (Array.isArray(movie.stream_links) && movie.stream_links.some(s => s && (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")))
-        );
+    const hasDirectStream = Boolean(
+        (movie.stream_url && !String(movie.stream_url).includes("t.me")) ||
+        (Array.isArray(movie.stream_links) && movie.stream_links.some(s => s && (s.stream_url || s.url) && !String(s.stream_url || s.url).includes("t.me")))
+    );
 
     const streamReqKey = `fh_stream_req_${movie.csv_id || movie.id || (typeof normalizeTitleForComparison === "function" ? normalizeTitleForComparison(movie.title) : movie.title.toLowerCase())}`;
     const alreadyStreamRequested = Boolean(
@@ -5546,7 +5562,7 @@ function openMediaDetailPage(movie) {
     );
 
     if (streamBtn) {
-        if (!hasDirectStream && !isTVShow) {
+        if (!hasDirectStream) {
             if (alreadyStreamRequested) {
                 streamBtn.innerHTML = `<span class="action-icon">✓</span><span>Stream Requested</span>`;
                 streamBtn.classList.add("stream-requested");
@@ -16607,11 +16623,7 @@ function triggerOverlaySearch(query) {
                         `;
                         const listDiv = globalContainer.querySelector(".external-results-list");
                         uniqueExt.forEach(m => {
-                            const localMatch = state.movies.find(lm =>
-                                (lm.tmdb_id && String(lm.tmdb_id) === String(m.tmdb_id)) ||
-                                (lm.csv_id && String(lm.csv_id) === String(m.tmdb_id)) ||
-                                (lm.title && typeof titlesMatch === "function" && titlesMatch(lm.title, m.title))
-                            );
+                            const localMatch = state.movies.find(lm => isSameCatalogMedia(lm, m));
                             if (localMatch) {
                                 m.stream_url = localMatch.stream_url || m.stream_url;
                                 m.stream_links = localMatch.stream_links || m.stream_links;
