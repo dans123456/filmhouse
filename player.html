@@ -166,12 +166,54 @@
     }
 
     .plyr__menu__container {
-      background: rgba(15, 23, 42, 0.96) !important;
+      background: rgba(15, 23, 42, 0.98) !important;
       backdrop-filter: blur(14px) !important;
       -webkit-backdrop-filter: blur(14px) !important;
-      border: 1px solid rgba(255, 188, 0, 0.3) !important;
+      border: 1px solid rgba(255, 188, 0, 0.35) !important;
       border-radius: 10px !important;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
+      min-width: 140px !important;
+      width: max-content !important;
+      max-width: 220px !important;
+      padding: 6px !important;
+      z-index: 50 !important;
+    }
+
+    .plyr__menu__container [role="menu"] {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 3px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    .plyr__menu__container button,
+    .plyr__menu__container [role="menuitem"],
+    .plyr__menu__container [role="menuitemradio"],
+    .plyr__menu__container .plyr__control--forward,
+    .plyr__menu__container .plyr__control--back {
+      width: 100% !important;
+      min-width: 125px !important;
+      max-width: 100% !important;
+      height: auto !important;
+      min-height: 32px !important;
+      padding: 6px 12px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      font-size: 13px !important;
+      color: #fff !important;
+      white-space: nowrap !important;
+      background: transparent !important;
+      border-radius: 6px !important;
+      box-sizing: border-box !important;
+    }
+
+    .plyr__menu__container button:hover,
+    .plyr__menu__container [role="menuitem"]:hover,
+    .plyr__menu__container [role="menuitemradio"]:hover {
+      background: rgba(255, 188, 0, 0.15) !important;
+      color: #ffbc00 !important;
     }
 
     .plyr__menu__container button[role="menuitemradio"][aria-checked="true"]::before {
@@ -1077,13 +1119,16 @@
       }
 
       /* Secondary action tools on the right */
-      .plyr__controls [data-plyr="mute"],
-      .plyr__controls [data-plyr="captions"],
-      .plyr__controls [data-plyr="settings"],
-      .plyr__controls [data-plyr="fullscreen"] {
-        width: 28px !important;
-        height: 28px !important;
-        min-width: 28px !important;
+      .plyr__controls-right > [data-plyr="mute"],
+      .plyr__controls-right > [data-plyr="audio"],
+      .plyr__controls-right > [data-plyr="captions"],
+      .plyr__controls-right > [data-plyr="settings"],
+      .plyr__controls-right > [data-plyr="fullscreen"],
+      .plyr__controls-right > .plyr__menu > [data-plyr="settings"] {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px !important;
+        max-width: 26px !important;
         padding: 0 !important;
         border-radius: 6px !important;
         background: transparent !important;
@@ -1091,19 +1136,23 @@
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
+        flex-shrink: 0 !important;
+        box-sizing: border-box !important;
       }
 
-      .plyr__controls [data-plyr="captions"] {
+      .plyr__controls-right > [data-plyr="captions"],
+      .plyr__controls-right > [data-plyr="audio"] {
         display: inline-flex !important;
-        /* Always show CC button */
+        /* Always show Audio and CC buttons */
       }
 
-      .plyr__controls [data-plyr="mute"] svg,
-      .plyr__controls [data-plyr="captions"] svg,
-      .plyr__controls [data-plyr="settings"] svg,
-      .plyr__controls [data-plyr="fullscreen"] svg {
-        width: 15px !important;
-        height: 15px !important;
+      .plyr__controls-right [data-plyr="mute"] svg,
+      .plyr__controls-right [data-plyr="audio"] svg,
+      .plyr__controls-right [data-plyr="captions"] svg,
+      .plyr__controls-right [data-plyr="settings"] svg,
+      .plyr__controls-right [data-plyr="fullscreen"] svg {
+        width: 14px !important;
+        height: 14px !important;
       }
 
       /* Vertical volume popup (hidden until the speaker is tapped) */
@@ -1177,14 +1226,15 @@
           90m Pass</a>
       </div>
 
-      <!-- Multi-Language Subtitles Modal (60+ Languages) -->
+      <!-- Multi-Language Subtitles & Audio Modal (60+ Languages) -->
       <div id='subtitlesModal'
         style='display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(8,10,15,0.96);backdrop-filter:blur(18px);z-index:60;flex-direction:column;padding:8px 12px;box-sizing:border-box;overflow:hidden;'>
         <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-shrink:0;'>
-          <div style='display:flex;align-items:center;gap:6px;'>
-            <span
-              style='background:#ffbc00;color:#000;font-weight:900;font-size:9.5px;padding:1px 5px;border-radius:4px;'>CC</span>
-            <span style='font-size:12.5px;font-weight:800;color:#fff;'>Subtitles (60+ Languages)</span>
+          <div style='display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.08);padding:2px;border-radius:6px;'>
+            <button id='inPlayerTabSubs' type='button'
+              style='border:none;background:#ffbc00;color:#000;font-weight:800;font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;'>💬 Subtitles</button>
+            <button id='inPlayerTabAudio' type='button'
+              style='border:none;background:transparent;color:#cbd5e1;font-weight:700;font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;'>🗣️ Audio</button>
           </div>
           <div style='display:flex;align-items:center;gap:6px;'>
             <button id='btnDisableSubs'
@@ -1196,78 +1246,84 @@
           </div>
         </div>
 
-        <!-- Search Bar -->
-        <div style='margin-bottom:5px;flex-shrink:0;'>
-          <input id='subSearchInput' placeholder='🔍 Search language...'
-            style='width:100%;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);padding:5px 10px;border-radius:6px;color:#fff;font-size:11px;outline:none;'
-            type='text' />
-        </div>
+        <!-- Fullscreen Audio Tracks Pane -->
+        <div id='inPlayerAudioPane' style='display:none;flex:1 1 auto;min-height:0;overflow-y:auto;flex-direction:column;gap:6px;padding:4px 0;-webkit-overflow-scrolling:touch;'></div>
 
-        <!-- Quick Language Filter Pills -->
-        <div id='subLangPills'
-          style='display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-bottom:5px;scrollbar-width:none;flex-shrink:0;'>
-          <button class='sub-pill active' data-lang='all'
-            style='white-space:nowrap;background:#ffbc00;color:#000;border:1px solid #ffbc00;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800;cursor:pointer;'
-            type='button'>All</button>
-        </div>
+        <!-- Fullscreen Subtitles Pane -->
+        <div id='inPlayerSubsPane' style='display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden;'>
+          <!-- Search Bar -->
+          <div style='margin-bottom:5px;flex-shrink:0;'>
+            <input id='subSearchInput' placeholder='🔍 Search language...'
+              style='width:100%;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);padding:5px 10px;border-radius:6px;color:#fff;font-size:11px;outline:none;'
+              type='text' />
+          </div>
 
-        <!-- Live Subtitle Sync Offset Tuner -->
-        <div id='subSyncBar'
-          style='display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 8px;margin-bottom:6px;flex-shrink:0;'>
-          <div style='display:flex;align-items:center;justify-content:space-between;'>
-            <div style='display:flex;align-items:center;gap:5px;'>
-              <span style='font-size:11px;'>⏱️</span>
-              <span style='font-size:10.5px;font-weight:700;color:#cbd5e1;'>Sync:</span>
-              <span id='subOffsetDisplay'
-                style='color:#ffd700;font-family:monospace;font-size:11px;font-weight:800;'>0.0s</span>
-            </div>
-            <button id='btnSubVoice' type='button'
-              style='background:linear-gradient(135deg,#ffbc00 0%,#ff8800 100%);color:#000;border:none;border-radius:5px;padding:3px 8px;font-size:10.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:3px;'
-              title='Align subtitles to spoken voice immediately'>🎯 Sync to Voice</button>
+          <!-- Quick Language Filter Pills -->
+          <div id='subLangPills'
+            style='display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-bottom:5px;scrollbar-width:none;flex-shrink:0;'>
+            <button class='sub-pill active' data-lang='all'
+              style='white-space:nowrap;background:#ffbc00;color:#000;border:1px solid #ffbc00;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800;cursor:pointer;'
+              type='button'>All</button>
           </div>
-          <div style='display:flex;align-items:center;justify-content:space-between;gap:4px;'>
-            <button id='btnSubIntro15' type='button'
-              style='background:rgba(255,188,0,0.15);border:1px solid rgba(255,188,0,0.3);color:#ffbc00;border-radius:4px;padding:2px 6px;font-size:9.5px;font-weight:700;cursor:pointer;'
-              title='Skip 15s studio intro credits'>+15s Intro</button>
-            <div style='display:flex;align-items:center;gap:3px;'>
-              <button id='btnSubOffsetM15' type='button'
-                style='background:rgba(255,255,255,0.08);color:#fff;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'>-15s</button>
-              <button id='btnSubOffsetMinus' type='button'
-                style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;'
-                title='Advance subtitles 0.5s'>-0.5s</button>
-              <button id='btnSubOffsetReset' type='button'
-                style='background:rgba(255,255,255,0.06);color:#94a3b8;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'
-                title='Reset sync to 0s'>Reset</button>
-              <button id='btnSubOffsetPlus' type='button'
-                style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;'
-                title='Delay subtitles 0.5s'>+0.5s</button>
-            </div>
-          </div>
-          <div style='display:flex;align-items:center;justify-content:space-between;gap:4px;border-top:1px solid rgba(255,255,255,0.08);padding-top:5px;'>
-            <div style='display:flex;align-items:center;gap:4px;font-size:10px;color:#cbd5e1;font-weight:700;'>
-              <span>Aa Size:</span>
-              <span id='subSizeDisplay' style='color:#ffbc00;font-family:monospace;'>100%</span>
-            </div>
-            <div style='display:flex;align-items:center;gap:3px;'>
-              <button id='btnSubSizeMinus' type='button'
-                style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;'
-                title='Decrease subtitle size'>-10%</button>
-              <button id='btnSubSizeReset' type='button'
-                style='background:rgba(255,255,255,0.06);color:#94a3b8;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'
-                title='Reset subtitle size to 100%'>100%</button>
-              <button id='btnSubSizePlus' type='button'
-                style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;'
-                title='Increase subtitle size'>+10%</button>
-            </div>
-          </div>
-        </div>
 
-        <!-- Subtitles List -->
-        <div id='subtitlesList'
-          style='flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding-right:2px;-webkit-overflow-scrolling:touch;'>
-          <div id='subListLoading' style='text-align:center;padding:20px 10px;color:#94a3b8;font-size:11.5px;'>
-            <div class='spinner' style='margin:0 auto 8px;width:20px;height:20px;'></div>
-            Connecting to OpenSubtitles (60+ languages)...
+          <!-- Live Subtitle Sync Offset Tuner -->
+          <div id='subSyncBar'
+            style='display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 8px;margin-bottom:6px;flex-shrink:0;'>
+            <div style='display:flex;align-items:center;justify-content:space-between;'>
+              <div style='display:flex;align-items:center;gap:5px;'>
+                <span style='font-size:11px;'>⏱️</span>
+                <span style='font-size:10.5px;font-weight:700;color:#cbd5e1;'>Sync:</span>
+                <span id='subOffsetDisplay'
+                  style='color:#ffd700;font-family:monospace;font-size:11px;font-weight:800;'>0.0s</span>
+              </div>
+              <button id='btnSubVoice' type='button'
+                style='background:linear-gradient(135deg,#ffbc00 0%,#ff8800 100%);color:#000;border:none;border-radius:5px;padding:3px 8px;font-size:10.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:3px;'
+                title='Align subtitles to spoken voice immediately'>🎯 Sync to Voice</button>
+            </div>
+            <div style='display:flex;align-items:center;justify-content:space-between;gap:4px;'>
+              <button id='btnSubIntro15' type='button'
+                style='background:rgba(255,188,0,0.15);border:1px solid rgba(255,188,0,0.3);color:#ffbc00;border-radius:4px;padding:2px 6px;font-size:9.5px;font-weight:700;cursor:pointer;'
+                title='Skip 15s studio intro credits'>+15s Intro</button>
+              <div style='display:flex;align-items:center;gap:3px;'>
+                <button id='btnSubOffsetM15' type='button'
+                  style='background:rgba(255,255,255,0.08);color:#fff;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'>-15s</button>
+                <button id='btnSubOffsetMinus' type='button'
+                  style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;'
+                  title='Advance subtitles 0.5s'>-0.5s</button>
+                <button id='btnSubOffsetReset' type='button'
+                  style='background:rgba(255,255,255,0.06);color:#94a3b8;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'
+                  title='Reset sync to 0s'>Reset</button>
+                <button id='btnSubOffsetPlus' type='button'
+                  style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;cursor:pointer;'
+                  title='Delay subtitles 0.5s'>+0.5s</button>
+              </div>
+            </div>
+            <div style='display:flex;align-items:center;justify-content:space-between;gap:4px;border-top:1px solid rgba(255,255,255,0.08);padding-top:5px;'>
+              <div style='display:flex;align-items:center;gap:4px;font-size:10px;color:#cbd5e1;font-weight:700;'>
+                <span>Aa Size:</span>
+                <span id='subSizeDisplay' style='color:#ffbc00;font-family:monospace;'>100%</span>
+              </div>
+              <div style='display:flex;align-items:center;gap:3px;'>
+                <button id='btnSubSizeMinus' type='button'
+                  style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;'
+                  title='Decrease subtitle size'>-10%</button>
+                <button id='btnSubSizeReset' type='button'
+                  style='background:rgba(255,255,255,0.06);color:#94a3b8;border:none;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:600;cursor:pointer;'
+                  title='Reset subtitle size to 100%'>100%</button>
+                <button id='btnSubSizePlus' type='button'
+                  style='background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;'
+                  title='Increase subtitle size'>+10%</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subtitles List -->
+          <div id='subtitlesList'
+            style='flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding-right:2px;-webkit-overflow-scrolling:touch;'>
+            <div id='subListLoading' style='text-align:center;padding:20px 10px;color:#94a3b8;font-size:11.5px;'>
+              <div class='spinner' style='margin:0 auto 8px;width:20px;height:20px;'></div>
+              Connecting to OpenSubtitles (60+ languages)...
+            </div>
           </div>
         </div>
       </div>
@@ -1582,6 +1638,22 @@
           right.className = 'plyr__controls-right';
           if (mute) right.appendChild(mute);
           if (vol) right.appendChild(vol);
+
+          // Dedicated Audio Languages button
+          const audioBtn = document.createElement('button');
+          audioBtn.type = 'button';
+          audioBtn.className = 'plyr__control plyr__control--audio';
+          audioBtn.setAttribute('data-plyr', 'audio');
+          audioBtn.setAttribute('aria-label', 'Audio & Languages');
+          audioBtn.title = 'Audio & Languages';
+          audioBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+              <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+            </svg>
+          `;
+          right.appendChild(audioBtn);
+
           if (cc) right.appendChild(cc);
           if (menu) right.appendChild(menu);
           if (fs) right.appendChild(fs);
@@ -2101,32 +2173,118 @@
         (window.plyrInstance && window.plyrInstance.fullscreen && window.plyrInstance.fullscreen.active));
     }
 
-    function openSubtitlesModalView() {
+    function switchInPlayerTab(tab) {
+      const tabSubs = document.getElementById('inPlayerTabSubs');
+      const tabAudio = document.getElementById('inPlayerTabAudio');
+      const paneSubs = document.getElementById('inPlayerSubsPane');
+      const paneAudio = document.getElementById('inPlayerAudioPane');
+      const offBtn = document.getElementById('btnDisableSubs');
+
+      if (tab === 'audio') {
+        if (tabAudio) { tabAudio.style.background = '#ffbc00'; tabAudio.style.color = '#000'; }
+        if (tabSubs) { tabSubs.style.background = 'transparent'; tabSubs.style.color = '#cbd5e1'; }
+        if (paneSubs) paneSubs.style.display = 'none';
+        if (paneAudio) {
+          paneAudio.style.display = 'flex';
+          renderInPlayerAudioTracks();
+        }
+        if (offBtn) offBtn.style.display = 'none';
+      } else {
+        if (tabSubs) { tabSubs.style.background = '#ffbc00'; tabSubs.style.color = '#000'; }
+        if (tabAudio) { tabAudio.style.background = 'transparent'; tabAudio.style.color = '#cbd5e1'; }
+        if (paneAudio) paneAudio.style.display = 'none';
+        if (paneSubs) paneSubs.style.display = 'flex';
+        if (offBtn) offBtn.style.display = 'inline-block';
+      }
+    }
+
+    function renderInPlayerAudioTracks() {
+      const container = document.getElementById('inPlayerAudioPane');
+      if (!container) return;
+      container.replaceChildren();
+
+      const tracks = (window._cachedAudioTracks && window._cachedAudioTracks.length > 0)
+        ? window._cachedAudioTracks
+        : [{ index: 0, label: "Audio 1 (Original / Default)", enabled: true }];
+
+      tracks.forEach(track => {
+        const item = document.createElement('div');
+        const isActive = (track.enabled || track.index === window._selectedAudioTrackIndex);
+        item.style.cssText = `
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 14px;
+          background: ${isActive ? 'rgba(255,188,0,0.12)' : 'rgba(255,255,255,0.04)'};
+          border: 1px solid ${isActive ? '#ffbc00' : 'rgba(255,255,255,0.1)'};
+          border-radius: 8px;
+          cursor: pointer;
+          margin-bottom: 6px;
+        `;
+        const escapeStr = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        item.innerHTML = `
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:16px;">🗣️</span>
+            <div>
+              <div style="font-size:12.5px;font-weight:700;color:${isActive ? '#ffbc00' : '#fff'};">${escapeStr(track.label)}</div>
+              <div style="font-size:10px;color:#94a3b8;">${track.lang ? escapeStr(track.lang.toUpperCase()) : 'Default Audio'}</div>
+            </div>
+          </div>
+          ${isActive ? '<span style="font-size:10.5px;font-weight:800;color:#ffbc00;background:rgba(255,188,0,0.2);padding:2px 8px;border-radius:12px;">Active</span>' : ''}
+        `;
+        item.onclick = () => {
+          window.postMessage({ action: 'switchAudioTrack', index: track.index, reloadWithTrack: true }, '*');
+          window._selectedAudioTrackIndex = track.index;
+          tracks.forEach(t => t.enabled = (t.index === track.index));
+          renderInPlayerAudioTracks();
+          showNotificationToast(`🔊 Audio: ${track.label}`);
+        };
+        container.appendChild(item);
+      });
+    }
+
+    const tabSubsBtn = document.getElementById('inPlayerTabSubs');
+    const tabAudioBtn = document.getElementById('inPlayerTabAudio');
+    if (tabSubsBtn) tabSubsBtn.onclick = () => switchInPlayerTab('subs');
+    if (tabAudioBtn) tabAudioBtn.onclick = () => switchInPlayerTab('audio');
+
+    function openSubtitlesModalView(defaultTab = 'subs') {
       // In fullscreen the parent app's hub is hidden behind this iframe, so open the in-player panel instead
       if (!isPlayerFullscreenActive() && window.parent && window.parent !== window) {
         try {
-          window.parent.postMessage({ action: 'openSubtitlesHub', tab: 'subs' }, '*');
+          window.parent.postMessage({ action: 'openSubtitlesHub', tab: defaultTab || 'subs' }, '*');
           return;
         } catch (e) { }
       }
       if (!modalSubs) return;
       modalSubs.style.display = 'flex';
-      if (loadedSubtitlesList.length === 0) {
+      switchInPlayerTab(defaultTab || 'subs');
+      if (defaultTab === 'subs' && loadedSubtitlesList.length === 0) {
         fetchMovieSubtitles();
       }
     }
 
-    if (openSubBtn1) openSubBtn1.onclick = openSubtitlesModalView;
-    if (openSubBtn2) openSubBtn2.onclick = openSubtitlesModalView;
+    if (openSubBtn1) openSubBtn1.onclick = () => openSubtitlesModalView('subs');
+    if (openSubBtn2) openSubBtn2.onclick = () => openSubtitlesModalView('subs');
 
-    // Single subtitle system: the player's own [CC] button opens the same 60+ language hub as the app bar badge
+    // Dual Language & Subtitle system: [audio] opens Audio tab, [CC] opens Subtitles tab
     document.addEventListener('click', function (e) {
       const ccBtn = e.target && e.target.closest ? e.target.closest('.plyr__controls [data-plyr="captions"]') : null;
-      if (!ccBtn) return;
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      openSubtitlesModalView();
+      if (ccBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        openSubtitlesModalView('subs');
+        return;
+      }
+      const audioBtn = e.target && e.target.closest ? e.target.closest('.plyr__controls [data-plyr="audio"]') : null;
+      if (audioBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        openSubtitlesModalView('audio');
+        return;
+      }
     }, true);
 
     // Vertical volume popup (touch): tapping the speaker toggles mute and shows a slim vertical slider for 3s
@@ -3061,6 +3219,7 @@
           enabled: true
         });
       }
+      window._cachedAudioTracks = audioTracks;
 
       try {
         if (window.parent && window.parent !== window) {
