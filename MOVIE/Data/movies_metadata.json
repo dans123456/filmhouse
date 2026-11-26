@@ -104131,16 +104131,6 @@
         "quality": "720P",
         "url": "https://filmhouse-stream.duckdns.org/dl/MTA1MDM6MWNlZGY0N2VjZDAwYjBhMQ",
         "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTA1MDM6MWNlZGY0N2VjZDAwYjBhMQ"
-      },
-      {
-        "quality": "1080P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTc6Mjc1OTkxNTJhZTZmMzhkNw",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTc6Mjc1OTkxNTJhZTZmMzhkNw"
-      },
-      {
-        "quality": "2160P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTY6ZWJiNDFlYThkZDc5NjNiOQ",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTY6ZWJiNDFlYThkZDc5NjNiOQ"
       }
     ]
   },
@@ -174652,22 +174642,22 @@
         "stream_url": "MTMzNTg6MjFkMWI4MGIwMWYxZDk3Zg"
       }
     ],
-    "stream_url": "MTMzNTg6MjFkMWI4MGIwMWYxZDk3Zg",
+    "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTg6MjFkMWI4MGIwMWYxZDk3Zg",
     "stream_links": [
       {
         "quality": "720p",
-        "stream_url": "MTMzNTg6MjFkMWI4MGIwMWYxZDk3Zg",
-        "url": "MTMzNTg6MjFkMWI4MGIwMWYxZDk3Zg"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTg6MjFkMWI4MGIwMWYxZDk3Zg",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTg6MjFkMWI4MGIwMWYxZDk3Zg"
       },
       {
         "quality": "1080p",
-        "stream_url": "MTMzNTc6Mjc1OTkxNTJhZTZmMzhkNw",
-        "url": "MTMzNTc6Mjc1OTkxNTJhZTZmMzhkNw"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTc6Mjc1OTkxNTJhZTZmMzhkNw",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTc6Mjc1OTkxNTJhZTZmMzhkNw"
       },
       {
         "quality": "2160p (4K)",
-        "stream_url": "MTMzNTY6ZWJiNDFlYThkZDc5NjNiOQ",
-        "url": "MTMzNTY6ZWJiNDFlYThkZDc5NjNiOQ"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTY6ZWJiNDFlYThkZDc5NjNiOQ",
+        "url": "https://filmhouse-stream.duckdns.org/dl/MTMzNTY6ZWJiNDFlYThkZDc5NjNiOQ"
       }
     ]
   },
