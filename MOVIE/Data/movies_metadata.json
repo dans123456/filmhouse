@@ -102,82 +102,114 @@
       {
         "quality": "720p",
         "stream_url": "MTI4NzY6MjE5MmRiOWU3MmYzNTIzMQ",
-        "url": "MTI4NzY6MjE5MmRiOWU3MmYzNTIzMQ"
+        "url": "MTI4NzY6MjE5MmRiOWU3MmYzNTIzMQ",
+        "season": 1,
+        "episode": 1
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NzU6NTM3MmEwZjc5NThlYTkyYg",
-        "url": "MTI4NzU6NTM3MmEwZjc5NThlYTkyYg"
+        "url": "MTI4NzU6NTM3MmEwZjc5NThlYTkyYg",
+        "season": 1,
+        "episode": 2
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NzQ6MWE0NzhiZDQxMDZhNzg0YQ",
-        "url": "MTI4NzQ6MWE0NzhiZDQxMDZhNzg0YQ"
+        "url": "MTI4NzQ6MWE0NzhiZDQxMDZhNzg0YQ",
+        "season": 1,
+        "episode": 3
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NzM6OTE2Y2Q3OTU0MDNkNzdjNw",
-        "url": "MTI4NzM6OTE2Y2Q3OTU0MDNkNzdjNw"
+        "url": "MTI4NzM6OTE2Y2Q3OTU0MDNkNzdjNw",
+        "season": 1,
+        "episode": 4
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NzI6MGJjYjE2N2RkYTk5MGY0YQ",
-        "url": "MTI4NzI6MGJjYjE2N2RkYTk5MGY0YQ"
+        "url": "MTI4NzI6MGJjYjE2N2RkYTk5MGY0YQ",
+        "season": 1,
+        "episode": 5
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NzE6ZGQzYTYzN2NiYmQ1OWViMg",
-        "url": "MTI4NzE6ZGQzYTYzN2NiYmQ1OWViMg"
+        "url": "MTI4NzE6ZGQzYTYzN2NiYmQ1OWViMg",
+        "season": 1,
+        "episode": 6
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NzA6YmVmNDdjMjM4Y2MzYjRhNg",
-        "url": "MTI4NzA6YmVmNDdjMjM4Y2MzYjRhNg"
+        "url": "MTI4NzA6YmVmNDdjMjM4Y2MzYjRhNg",
+        "season": 1,
+        "episode": 7
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4Njg6NTMyOGQ2Njg2NGQ4MDY3Nw",
-        "url": "MTI4Njg6NTMyOGQ2Njg2NGQ4MDY3Nw"
+        "url": "MTI4Njg6NTMyOGQ2Njg2NGQ4MDY3Nw",
+        "season": 1,
+        "episode": 8
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4Njk6NDRlNzExNjZlZDhlMzVlNA",
-        "url": "MTI4Njk6NDRlNzExNjZlZDhlMzVlNA"
+        "url": "MTI4Njk6NDRlNzExNjZlZDhlMzVlNA",
+        "season": 1,
+        "episode": 9
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4Njc6YWU1NDhlNjU2ZjY4NDE4Zg",
-        "url": "MTI4Njc6YWU1NDhlNjU2ZjY4NDE4Zg"
+        "url": "MTI4Njc6YWU1NDhlNjU2ZjY4NDE4Zg",
+        "season": 1,
+        "episode": 10
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NjY6OGQ3NGUyOGY1ODFlZTZlOA",
-        "url": "MTI4NjY6OGQ3NGUyOGY1ODFlZTZlOA"
+        "url": "MTI4NjY6OGQ3NGUyOGY1ODFlZTZlOA",
+        "season": 1,
+        "episode": 11
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NjU6NGIwNjgxODQ4ODM5MGIwOQ",
-        "url": "MTI4NjU6NGIwNjgxODQ4ODM5MGIwOQ"
+        "url": "MTI4NjU6NGIwNjgxODQ4ODM5MGIwOQ",
+        "season": 1,
+        "episode": 12
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NjQ6YWIzMjMwYTBkMmQ1NTQwNQ",
-        "url": "MTI4NjQ6YWIzMjMwYTBkMmQ1NTQwNQ"
+        "url": "MTI4NjQ6YWIzMjMwYTBkMmQ1NTQwNQ",
+        "season": 1,
+        "episode": 13
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NjM6MGZiOGI0NWJmZWZhN2FjYQ",
-        "url": "MTI4NjM6MGZiOGI0NWJmZWZhN2FjYQ"
+        "url": "MTI4NjM6MGZiOGI0NWJmZWZhN2FjYQ",
+        "season": 1,
+        "episode": 14
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NjI6YTdkNjg4ZDhmYjEzNDI2MA",
-        "url": "MTI4NjI6YTdkNjg4ZDhmYjEzNDI2MA"
+        "url": "MTI4NjI6YTdkNjg4ZDhmYjEzNDI2MA",
+        "season": 1,
+        "episode": 15
       },
       {
         "quality": "1080p",
         "stream_url": "MTI4NjE6NWIzNDFmODdhOTI0MWZmYg",
-        "url": "MTI4NjE6NWIzNDFmODdhOTI0MWZmYg"
+        "url": "MTI4NjE6NWIzNDFmODdhOTI0MWZmYg",
+        "season": 1,
+        "episode": 16
       }
     ],
     "current_season": 1,
@@ -12050,64 +12082,80 @@
     "director": "",
     "trailer": "aScUjuKvHSo",
     "runtime": "",
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTE2NzU6NzgyNGFlM2Y3OTJjMjY0NQ",
+    "stream_url": "OTI1MDpkOGUzMjI4OTk1YjViMmFk",
     "stream_links": [
       {
-        "quality": "720p",
-        "stream_url": "OTI1MDpkOGUzMjI4OTk1YjViMmFk",
-        "url": "OTI1MDpkOGUzMjI4OTk1YjViMmFk"
-      },
-      {
-        "quality": "720p",
-        "stream_url": "OTI1MTplYjg0NGMyYzZiNzU5MWMz",
-        "url": "OTI1MTplYjg0NGMyYzZiNzU5MWMz"
-      },
-      {
-        "quality": "720p",
-        "stream_url": "OTI1MjpkN2Y1MDQwOGMwOGYxN2Y3",
-        "url": "OTI1MjpkN2Y1MDQwOGMwOGYxN2Y3"
-      },
-      {
-        "quality": "720p",
-        "stream_url": "OTI1Mzo1MGIxOWY3MDA1Y2IxYzU0",
-        "url": "OTI1Mzo1MGIxOWY3MDA1Y2IxYzU0"
-      },
-      {
-        "quality": "720p",
-        "stream_url": "OTI1NTphMjIzMDVlNTJhN2VjNGNl",
-        "url": "OTI1NTphMjIzMDVlNTJhN2VjNGNl"
-      },
-      {
-        "quality": "720p",
-        "stream_url": "OTI1NDpjNTQ5MzJiNDI0MzI5OTJl",
-        "url": "OTI1NDpjNTQ5MzJiNDI0MzI5OTJl"
-      },
-      {
-        "quality": "720p",
-        "stream_url": "MTE2Njc6YzAyODdjZWFjN2I4YzI4Nw",
-        "url": "MTE2Njc6YzAyODdjZWFjN2I4YzI4Nw"
-      },
-      {
+        "episode": 1,
         "season": 1,
-        "seasonOrPart": "S01E07",
+        "stream_url": "MTE2Njc6YzAyODdjZWFjN2I4YzI4Nw",
+        "url": "MTE2Njc6YzAyODdjZWFjN2I4YzI4Nw",
+        "quality": "720p"
+      },
+      {
+        "episode": 2,
+        "season": 1,
+        "stream_url": "OTI1MTplYjg0NGMyYzZiNzU5MWMz",
+        "url": "OTI1MTplYjg0NGMyYzZiNzU5MWMz",
+        "quality": "720p"
+      },
+      {
+        "episode": 3,
+        "season": 1,
+        "stream_url": "OTI1MjpkN2Y1MDQwOGMwOGYxN2Y3",
+        "url": "OTI1MjpkN2Y1MDQwOGMwOGYxN2Y3",
+        "quality": "720p"
+      },
+      {
+        "episode": 4,
+        "season": 1,
+        "stream_url": "OTI1Mzo1MGIxOWY3MDA1Y2IxYzU0",
+        "url": "OTI1Mzo1MGIxOWY3MDA1Y2IxYzU0",
+        "quality": "720p"
+      },
+      {
+        "episode": 5,
+        "season": 1,
+        "stream_url": "OTI1NTphMjIzMDVlNTJhN2VjNGNl",
+        "url": "OTI1NTphMjIzMDVlNTJhN2VjNGNl",
+        "quality": "720p"
+      },
+      {
+        "episode": 6,
+        "season": 1,
+        "stream_url": "OTI1NDpjNTQ5MzJiNDI0MzI5OTJl",
+        "url": "OTI1NDpjNTQ5MzJiNDI0MzI5OTJl",
+        "quality": "720p"
+      },
+      {
         "episode": 7,
-        "episodeNum": 7,
-        "quality": "720P",
-        "name": "Episode 7",
+        "season": 1,
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTE2NzU6NzgyNGFlM2Y3OTJjMjY0NQ",
         "url": "https://filmhouse-stream.duckdns.org/dl/MTE2NzU6NzgyNGFlM2Y3OTJjMjY0NQ",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTE2NzU6NzgyNGFlM2Y3OTJjMjY0NQ"
+        "quality": "720P",
+        "episodeNum": 7,
+        "name": "Episode 7",
+        "seasonOrPart": "S01E07"
       }
     ],
     "links": [
       {
-        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnxAAAjHNAAFEPO4662kuW3kWBA",
-        "quality": "720p",
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADyAkAAv0YQETqP4Le-rrFXhYE",
+        "season": "Season 1",
         "stream_url": "OTI1MDpkOGUzMjI4OTk1YjViMmFk"
+      },
+      {
+        "quality": "720p",
+        "url": "https://t.me/filmHouseFile1bot?start=BQADAQADnxAAAjHNAAFEPO4662kuW3kWBA",
+        "stream_url": "OTI1MDpkOGUzMjI4OTk1YjViMmFk"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQADyAkAAv0YQETqP4Le-rrFXhYE",
+        "season": "Season 1 Ep 10"
       }
     ],
-    "status": "Ongoing",
+    "status": "Completed",
     "is_ongoing": true,
-    "last_uploaded_episode": 8,
+    "last_uploaded_episode": 10,
     "current_season": 1,
     "total_episodes": 10,
     "next_air_date": "2026-11-25"
@@ -13034,7 +13082,9 @@
       {
         "quality": "720P",
         "url": "https://filmhouse-stream.duckdns.org/dl/MTAwMjY6NmZkYTU1YzJlM2M1NTQ5Ng",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAwMjY6NmZkYTU1YzJlM2M1NTQ5Ng"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAwMjY6NmZkYTU1YzJlM2M1NTQ5Ng",
+        "season": 1,
+        "episode": 1
       }
     ],
     "links": [
@@ -13043,7 +13093,8 @@
         "season": "Season 1"
       }
     ],
-    "current_season": 1
+    "current_season": 1,
+    "last_uploaded_episode": 1
   },
   {
     "csv_id": "96677-lupin",
@@ -14238,12 +14289,13 @@
         "season": "Season 1"
       }
     ],
-    "last_uploaded_episode": 11,
+    "last_uploaded_episode": 12,
     "current_season": 1,
-    "status": "Ongoing",
+    "status": "Completed",
     "total_episodes": 12,
     "next_air_date": "2026-11-24",
-    "downloadLink": "https://t.me/Filmhouseappbot?start=BQACAgQAAyEFAAMBC6_7fgACMt5rBSFqOJh9VmAVgFvKmtqEpE0MawAC-SEAAq_6IFDpdjlyF0bDkT0E"
+    "downloadLink": "https://t.me/Filmhouseappbot?start=BQACAgQAAyEFAAMBC6_7fgACMt5rBSFqOJh9VmAVgFvKmtqEpE0MawAC-SEAAq_6IFDpdjlyF0bDkT0E",
+    "is_ongoing": false
   },
   {
     "csv_id": "559907-the-green-knight",
@@ -22343,10 +22395,13 @@
       {
         "quality": "720P",
         "url": "https://filmhouse-stream.duckdns.org/dl/MTExMDY6OGFjM2VmMDQwNmEyZDVjYg",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTExMDY6OGFjM2VmMDQwNmEyZDVjYg"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTExMDY6OGFjM2VmMDQwNmEyZDVjYg",
+        "season": 1,
+        "episode": 1
       }
     ],
-    "current_season": 1
+    "current_season": 1,
+    "last_uploaded_episode": 1
   },
   {
     "csv_id": "60708-gotham",
@@ -25937,11 +25992,6 @@
     ],
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTk5OmYwZjU0NWFhNDkzOTMzZmM",
     "stream_links": [
-      {
-        "quality": "720p",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTAwMzpjMTY4NzllMzE3M2FlN2Zi",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAwMzpjMTY4NzllMzE3M2FlN2Zi"
-      },
       {
         "season": 1,
         "seasonOrPart": "S01E01",
@@ -31033,11 +31083,6 @@
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTI0NzQ6Y2EyZTI0ZDAwYjM2NzQwZA",
     "stream_links": [
       {
-        "quality": "1080P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTI0NzQ6Y2EyZTI0ZDAwYjM2NzQwZA",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTI0NzQ6Y2EyZTI0ZDAwYjM2NzQwZA"
-      },
-      {
         "season": 1,
         "seasonOrPart": "S01E01",
         "episode": 1,
@@ -32681,11 +32726,6 @@
     ],
     "channelBroadcasted": true,
     "stream_links": [
-      {
-        "quality": "720p",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTU3Nzo1MjVhN2NhODVjNmVkNjQ0",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTU3Nzo1MjVhN2NhODVjNmVkNjQ0"
-      },
       {
         "season": 1,
         "seasonOrPart": "S01E01",
@@ -43286,11 +43326,6 @@
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTI3MzE6ODJkOThlOWJlNmZlOWE0ZA",
     "stream_links": [
       {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTI3MzE6ODJkOThlOWJlNmZlOWE0ZA",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTI3MzE6ODJkOThlOWJlNmZlOWE0ZA"
-      },
-      {
         "season": 1,
         "seasonOrPart": "S01E01",
         "episode": 1,
@@ -51125,11 +51160,6 @@
     ],
     "stream_links": [
       {
-        "quality": "720p",
-        "url": "https://filmhouse-stream.duckdns.org/dl/NjUxOjAyMmFmNWMwYzdhYjkzNTM",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NjUxOjAyMmFmNWMwYzdhYjkzNTM"
-      },
-      {
         "season": 1,
         "seasonOrPart": "S01E01",
         "episode": 1,
@@ -53909,11 +53939,6 @@
     ],
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTk4NDoyNjc1ZTRlZWNkODRiNWE2",
     "stream_links": [
-      {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTk4NDoyNjc1ZTRlZWNkODRiNWE2",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTk4NDoyNjc1ZTRlZWNkODRiNWE2"
-      },
       {
         "season": 1,
         "seasonOrPart": "S01E01",
@@ -68631,11 +68656,6 @@
     ],
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTg3ODoxZDVkZGNlNmJiOWNjYjc5",
     "stream_links": [
-      {
-        "quality": "1080P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTk3NzplMTk1NDg4ZmNjY2VkMmU4",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTk3NzplMTk1NDg4ZmNjY2VkMmU4"
-      },
       {
         "season": 1,
         "seasonOrPart": "S01E01",
@@ -90711,7 +90731,9 @@
       {
         "quality": "1080P",
         "url": "https://filmhouse-stream.duckdns.org/dl/NTc3ODo4ZDY3M2ExZWE0ZmU0M2Ux",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTc3ODo4ZDY3M2ExZWE0ZmU0M2Ux"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTc3ODo4ZDY3M2ExZWE0ZmU0M2Ux",
+        "season": 1,
+        "episode": 1
       },
       {
         "season": 1,
@@ -97227,11 +97249,6 @@
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTIzNjY6M2YxYWY0OWYxZmQyYTc2NQ",
     "stream_links": [
       {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTIzNjY6M2YxYWY0OWYxZmQyYTc2NQ",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTIzNjY6M2YxYWY0OWYxZmQyYTc2NQ"
-      },
-      {
         "season": 1,
         "seasonOrPart": "S01E01",
         "episode": 1,
@@ -99734,11 +99751,6 @@
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTIzMDU6MzYxNTZiOGJiZDEwYTUxYQ",
     "stream_links": [
       {
-        "quality": "1080P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTIzMDU6MzYxNTZiOGJiZDEwYTUxYQ",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTIzMDU6MzYxNTZiOGJiZDEwYTUxYQ"
-      },
-      {
         "season": 1,
         "seasonOrPart": "S01E01",
         "episode": 1,
@@ -100311,7 +100323,9 @@
       {
         "quality": "720P",
         "url": "https://filmhouse-stream.duckdns.org/dl/OTg3MTpkYzZlYzE1MTllYzI4NTdl",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTg3MTpkYzZlYzE1MTllYzI4NTdl"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTg3MTpkYzZlYzE1MTllYzI4NTdl",
+        "season": 1,
+        "episode": 1
       },
       {
         "season": 2,
@@ -101876,15 +101890,20 @@
       {
         "quality": "720P",
         "url": "https://filmhouse-stream.duckdns.org/dl/OTgzODpiZTRhNmU3NjI5OGJlNDE0",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTgzODpiZTRhNmU3NjI5OGJlNDE0"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTgzODpiZTRhNmU3NjI5OGJlNDE0",
+        "season": 1,
+        "episode": 1
       },
       {
         "quality": "1080P",
         "url": "https://filmhouse-stream.duckdns.org/dl/MTIyODE6ODNiMGRkNGE1ZmM5MjE2YQ",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTIyODE6ODNiMGRkNGE1ZmM5MjE2YQ"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTIyODE6ODNiMGRkNGE1ZmM5MjE2YQ",
+        "season": 1,
+        "episode": 2
       }
     ],
-    "current_season": 1
+    "current_season": 1,
+    "last_uploaded_episode": 2
   },
   {
     "csv_id": "22059-the-fantastic-four",
@@ -102320,11 +102339,14 @@
       {
         "quality": "2160P",
         "url": "https://filmhouse-stream.duckdns.org/dl/OTE1OjY0YjMxMTY3MzYzNGExZDU",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTE1OjY0YjMxMTY3MzYzNGExZDU"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTE1OjY0YjMxMTY3MzYzNGExZDU",
+        "season": 1,
+        "episode": 1
       }
     ],
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTE1OjY0YjMxMTY3MzYzNGExZDU",
-    "current_season": 1
+    "current_season": 1,
+    "last_uploaded_episode": 1
   },
   {
     "csv_id": "106355-captain-america",
@@ -104964,16 +104986,6 @@
     ],
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTY0NTpiNmZjNjVkYjU1ZWQwNzQ4",
     "stream_links": [
-      {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTAzNzM6ODg5NzhhMDdiOTEwNmViNQ",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAzNzM6ODg5NzhhMDdiOTEwNmViNQ"
-      },
-      {
-        "quality": "1080P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTY0NTpiNmZjNjVkYjU1ZWQwNzQ4",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTY0NTpiNmZjNjVkYjU1ZWQwNzQ4"
-      },
       {
         "season": 1,
         "seasonOrPart": "S01E01",
@@ -122824,10 +122836,13 @@
       {
         "quality": "720P",
         "url": "https://filmhouse-stream.duckdns.org/dl/OTkyMTo4ZWI0ZTJmMGUzZmViYjll",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTkyMTo4ZWI0ZTJmMGUzZmViYjll"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTkyMTo4ZWI0ZTJmMGUzZmViYjll",
+        "season": 1,
+        "episode": 1
       }
     ],
-    "current_season": 1
+    "current_season": 1,
+    "last_uploaded_episode": 1
   },
   {
     "csv_id": "844185-unfrosted",
@@ -132820,7 +132835,9 @@
       {
         "quality": "1080P",
         "url": "https://filmhouse-stream.duckdns.org/dl/ODQzNDo3MzQxZjdkYzIwOGQ0MDM2",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODQzNDo3MzQxZjdkYzIwOGQ0MDM2"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODQzNDo3MzQxZjdkYzIwOGQ0MDM2",
+        "season": 1,
+        "episode": 1
       },
       {
         "season": 1,
@@ -136832,11 +136849,6 @@
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTY0OTo2YWRlMmZiNWVlN2YwMWM0",
     "stream_links": [
       {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTY0OTo2YWRlMmZiNWVlN2YwMWM0",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTY0OTo2YWRlMmZiNWVlN2YwMWM0"
-      },
-      {
         "season": 1,
         "seasonOrPart": "S01E01",
         "episode": 1,
@@ -137427,7 +137439,9 @@
       {
         "quality": "1080P",
         "url": "https://filmhouse-stream.duckdns.org/dl/ODc4OTpjYzU1OTg5YjBmZjJjZWY2",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc4OTpjYzU1OTg5YjBmZjJjZWY2"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODc4OTpjYzU1OTg5YjBmZjJjZWY2",
+        "season": 1,
+        "episode": 1
       },
       {
         "season": 1,
@@ -138688,11 +138702,6 @@
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIyNDo5MzI4NzNiZjFlZGUxYzBj",
     "stream_links": [
       {
-        "quality": "1080P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTIwOTpkN2M2YjhkNjc3OTNmN2Zi",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTIwOTpkN2M2YjhkNjc3OTNmN2Zi"
-      },
-      {
         "season": 1,
         "seasonOrPart": "S01E01",
         "episode": 1,
@@ -138857,7 +138866,9 @@
       {
         "quality": "1080P",
         "url": "https://filmhouse-stream.duckdns.org/dl/ODk4Njo0YjYxNjMxOGUwYzdhYzY0",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk4Njo0YjYxNjMxOGUwYzdhYzY0"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/ODk4Njo0YjYxNjMxOGUwYzdhYzY0",
+        "season": 1,
+        "episode": 1
       },
       {
         "season": 1,
@@ -141390,96 +141401,132 @@
       {
         "quality": "720p",
         "stream_url": "MTMwMzE6ODI2ZmVmZmY1M2U2Njk3Ng",
-        "url": "MTMwMzE6ODI2ZmVmZmY1M2U2Njk3Ng"
+        "url": "MTMwMzE6ODI2ZmVmZmY1M2U2Njk3Ng",
+        "season": 1,
+        "episode": 1
       },
       {
         "quality": "1080p",
         "stream_url": "MTMwMzA6NjJjOGUwZmYxYmZhNjczMA",
-        "url": "MTMwMzA6NjJjOGUwZmYxYmZhNjczMA"
+        "url": "MTMwMzA6NjJjOGUwZmYxYmZhNjczMA",
+        "season": 1,
+        "episode": 2
       },
       {
         "quality": "1080p",
         "stream_url": "MTMwMjk6M2I3MDQ0OWVjZGM3ZDNlZA",
-        "url": "MTMwMjk6M2I3MDQ0OWVjZGM3ZDNlZA"
+        "url": "MTMwMjk6M2I3MDQ0OWVjZGM3ZDNlZA",
+        "season": 1,
+        "episode": 3
       },
       {
         "quality": "1080p",
         "stream_url": "MTMwMjg6YTlmOGU1MGJhNzhhODY3Ng",
-        "url": "MTMwMjg6YTlmOGU1MGJhNzhhODY3Ng"
+        "url": "MTMwMjg6YTlmOGU1MGJhNzhhODY3Ng",
+        "season": 1,
+        "episode": 4
       },
       {
         "quality": "1080p",
         "stream_url": "MTMwMjc6YjFkYmIxZjNiZjgyZDEwMQ",
-        "url": "MTMwMjc6YjFkYmIxZjNiZjgyZDEwMQ"
+        "url": "MTMwMjc6YjFkYmIxZjNiZjgyZDEwMQ",
+        "season": 1,
+        "episode": 5
       },
       {
         "quality": "1080p",
         "stream_url": "MTMwMjY6MzMwYWI4NDdhMGU1OGE5Nw",
-        "url": "MTMwMjY6MzMwYWI4NDdhMGU1OGE5Nw"
+        "url": "MTMwMjY6MzMwYWI4NDdhMGU1OGE5Nw",
+        "season": 1,
+        "episode": 6
       },
       {
         "quality": "1080p",
         "stream_url": "MTMwMjU6MjZkNjBhMjJiNWJmZjRiNg",
-        "url": "MTMwMjU6MjZkNjBhMjJiNWJmZjRiNg"
+        "url": "MTMwMjU6MjZkNjBhMjJiNWJmZjRiNg",
+        "season": 1,
+        "episode": 7
       },
       {
         "quality": "1080p",
         "stream_url": "MTMwMjQ6OGE0YzE0NDM0MmRkNTlkMQ",
-        "url": "MTMwMjQ6OGE0YzE0NDM0MmRkNTlkMQ"
+        "url": "MTMwMjQ6OGE0YzE0NDM0MmRkNTlkMQ",
+        "season": 1,
+        "episode": 8
       },
       {
         "quality": "1080p",
         "stream_url": "MTMwMjM6YmJhMjYxZTY5NjI2Nzk4OA",
-        "url": "MTMwMjM6YmJhMjYxZTY5NjI2Nzk4OA"
+        "url": "MTMwMjM6YmJhMjYxZTY5NjI2Nzk4OA",
+        "season": 1,
+        "episode": 9
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMTA6MjUyZTQwNmIzZmRmNzcyYg",
-        "url": "MTMzMTA6MjUyZTQwNmIzZmRmNzcyYg"
+        "url": "MTMzMTA6MjUyZTQwNmIzZmRmNzcyYg",
+        "season": 1,
+        "episode": 10
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMTE6YTk4MjYzZjNkZjk3NDAyOQ",
-        "url": "MTMzMTE6YTk4MjYzZjNkZjk3NDAyOQ"
+        "url": "MTMzMTE6YTk4MjYzZjNkZjk3NDAyOQ",
+        "season": 1,
+        "episode": 11
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMTI6MmQyZDIxNDljZDk2YTAxZg",
-        "url": "MTMzMTI6MmQyZDIxNDljZDk2YTAxZg"
+        "url": "MTMzMTI6MmQyZDIxNDljZDk2YTAxZg",
+        "season": 1,
+        "episode": 12
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMTM6YzI0NDViOGQyNWUyYzA5Mg",
-        "url": "MTMzMTM6YzI0NDViOGQyNWUyYzA5Mg"
+        "url": "MTMzMTM6YzI0NDViOGQyNWUyYzA5Mg",
+        "season": 1,
+        "episode": 13
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMTQ6YWJjZmUxZGNmODMzNGU4OQ",
-        "url": "MTMzMTQ6YWJjZmUxZGNmODMzNGU4OQ"
+        "url": "MTMzMTQ6YWJjZmUxZGNmODMzNGU4OQ",
+        "season": 1,
+        "episode": 14
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMTU6NzJhMzQ4ODBlYTU2YjRhMA",
-        "url": "MTMzMTU6NzJhMzQ4ODBlYTU2YjRhMA"
+        "url": "MTMzMTU6NzJhMzQ4ODBlYTU2YjRhMA",
+        "season": 1,
+        "episode": 15
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMTY6YzFjNjY4ZGUxYTZlODY3MA",
-        "url": "MTMzMTY6YzFjNjY4ZGUxYTZlODY3MA"
+        "url": "MTMzMTY6YzFjNjY4ZGUxYTZlODY3MA",
+        "season": 1,
+        "episode": 16
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMTc6MThhNWYzZjQ2NjdkMTlkNw",
-        "url": "MTMzMTc6MThhNWYzZjQ2NjdkMTlkNw"
+        "url": "MTMzMTc6MThhNWYzZjQ2NjdkMTlkNw",
+        "season": 1,
+        "episode": 17
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMTg6YzVmYTNjZDRiOGQzOTA2ZQ",
-        "url": "MTMzMTg6YzVmYTNjZDRiOGQzOTA2ZQ"
+        "url": "MTMzMTg6YzVmYTNjZDRiOGQzOTA2ZQ",
+        "season": 1,
+        "episode": 18
       }
     ],
     "stream_url": "MTMwMzE6ODI2ZmVmZmY1M2U2Njk3Ng",
-    "last_uploaded_episode": 9
+    "last_uploaded_episode": 18
   },
   {
     "csv_id": "1381913-at-ease",
@@ -141544,10 +141591,13 @@
       {
         "quality": "720P",
         "url": "https://filmhouse-stream.duckdns.org/dl/MzY3MzphMWYzNmNlYjQ1MjBlNWYy",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MzY3MzphMWYzNmNlYjQ1MjBlNWYy"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MzY3MzphMWYzNmNlYjQ1MjBlNWYy",
+        "season": 1,
+        "episode": 1
       }
     ],
-    "current_season": 1
+    "current_season": 1,
+    "last_uploaded_episode": 1
   },
   {
     "csv_id": "257346-avengers-confidential-black-widow-punisher",
@@ -144500,11 +144550,14 @@
       {
         "quality": "1080P",
         "url": "https://filmhouse-stream.duckdns.org/dl/NTA4OjQwOTE5OGU5MDQzZGRjMDI",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTA4OjQwOTE5OGU5MDQzZGRjMDI"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTA4OjQwOTE5OGU5MDQzZGRjMDI",
+        "season": 1,
+        "episode": 1
       }
     ],
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/NTA4OjQwOTE5OGU5MDQzZGRjMDI",
-    "current_season": 1
+    "current_season": 1,
+    "last_uploaded_episode": 1
   },
   {
     "title": "Casanova",
@@ -144913,11 +144966,6 @@
     ],
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTYwOTpmNjZiNTNjMzk3ZjdlNTk3",
     "stream_links": [
-      {
-        "quality": "1080P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTYwOTpmNjZiNTNjMzk3ZjdlNTk3",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTYwOTpmNjZiNTNjMzk3ZjdlNTk3"
-      },
       {
         "season": 1,
         "seasonOrPart": "S01E01",
@@ -146996,187 +147044,261 @@
       {
         "quality": "720p",
         "stream_url": "MTMzNTQ6MTNhYmExYzNjYjcwY2U3NQ",
-        "url": "MTMzNTQ6MTNhYmExYzNjYjcwY2U3NQ"
+        "url": "MTMzNTQ6MTNhYmExYzNjYjcwY2U3NQ",
+        "season": 1,
+        "episode": 1
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNTU6ZjYwYzkyNjFkNWNkZTU1Yw",
-        "url": "MTMzNTU6ZjYwYzkyNjFkNWNkZTU1Yw"
+        "url": "MTMzNTU6ZjYwYzkyNjFkNWNkZTU1Yw",
+        "season": 1,
+        "episode": 2
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNTM6MWYzZGQ3MzllYmMzZjk3Ng",
-        "url": "MTMzNTM6MWYzZGQ3MzllYmMzZjk3Ng"
+        "url": "MTMzNTM6MWYzZGQ3MzllYmMzZjk3Ng",
+        "season": 1,
+        "episode": 3
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNTI6MzlmMDRkMGVlNDczNmQ1Zg",
-        "url": "MTMzNTI6MzlmMDRkMGVlNDczNmQ1Zg"
+        "url": "MTMzNTI6MzlmMDRkMGVlNDczNmQ1Zg",
+        "season": 1,
+        "episode": 4
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNTE6MmUyYjk5MWQyZTRhMWYzNQ",
-        "url": "MTMzNTE6MmUyYjk5MWQyZTRhMWYzNQ"
+        "url": "MTMzNTE6MmUyYjk5MWQyZTRhMWYzNQ",
+        "season": 1,
+        "episode": 5
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNTA6NGJhOTllYWFhODkzZTU3ZQ",
-        "url": "MTMzNTA6NGJhOTllYWFhODkzZTU3ZQ"
+        "url": "MTMzNTA6NGJhOTllYWFhODkzZTU3ZQ",
+        "season": 1,
+        "episode": 6
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNDk6MWYyNjZkMTJmODE2ZGZkMQ",
-        "url": "MTMzNDk6MWYyNjZkMTJmODE2ZGZkMQ"
+        "url": "MTMzNDk6MWYyNjZkMTJmODE2ZGZkMQ",
+        "season": 1,
+        "episode": 7
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNDg6MWQ0NzNjNGU3NmM5Y2Y0Mg",
-        "url": "MTMzNDg6MWQ0NzNjNGU3NmM5Y2Y0Mg"
+        "url": "MTMzNDg6MWQ0NzNjNGU3NmM5Y2Y0Mg",
+        "season": 1,
+        "episode": 8
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNDc6MjYzNjBmYjlmZTRhZjhhOQ",
-        "url": "MTMzNDc6MjYzNjBmYjlmZTRhZjhhOQ"
+        "url": "MTMzNDc6MjYzNjBmYjlmZTRhZjhhOQ",
+        "season": 1,
+        "episode": 9
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNDY6ZjFkZjc2OGYwMTkyYzE5NA",
-        "url": "MTMzNDY6ZjFkZjc2OGYwMTkyYzE5NA"
+        "url": "MTMzNDY6ZjFkZjc2OGYwMTkyYzE5NA",
+        "season": 1,
+        "episode": 10
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNDQ6MTgyNzQ5MzBiZTA4YmYzYw",
-        "url": "MTMzNDQ6MTgyNzQ5MzBiZTA4YmYzYw"
+        "url": "MTMzNDQ6MTgyNzQ5MzBiZTA4YmYzYw",
+        "season": 1,
+        "episode": 11
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNDU6OWJkYTczMTcyMmNjMjY2Yg",
-        "url": "MTMzNDU6OWJkYTczMTcyMmNjMjY2Yg"
+        "url": "MTMzNDU6OWJkYTczMTcyMmNjMjY2Yg",
+        "season": 1,
+        "episode": 12
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNDM6NDBkMDY4NWRlMWIzODUzZg",
-        "url": "MTMzNDM6NDBkMDY4NWRlMWIzODUzZg"
+        "url": "MTMzNDM6NDBkMDY4NWRlMWIzODUzZg",
+        "season": 1,
+        "episode": 13
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNDI6ODYyYWVlYzRjY2EzZWY0Mw",
-        "url": "MTMzNDI6ODYyYWVlYzRjY2EzZWY0Mw"
+        "url": "MTMzNDI6ODYyYWVlYzRjY2EzZWY0Mw",
+        "season": 1,
+        "episode": 14
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNDE6MmEzZDIwZjdhMzQ5YzZmMA",
-        "url": "MTMzNDE6MmEzZDIwZjdhMzQ5YzZmMA"
+        "url": "MTMzNDE6MmEzZDIwZjdhMzQ5YzZmMA",
+        "season": 1,
+        "episode": 15
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzNDA6YTNhODYwMDYwODg5NmMzMw",
-        "url": "MTMzNDA6YTNhODYwMDYwODg5NmMzMw"
+        "url": "MTMzNDA6YTNhODYwMDYwODg5NmMzMw",
+        "season": 1,
+        "episode": 16
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMzk6MGNjYTFhOGUwOTIxNTg4NA",
-        "url": "MTMzMzk6MGNjYTFhOGUwOTIxNTg4NA"
+        "url": "MTMzMzk6MGNjYTFhOGUwOTIxNTg4NA",
+        "season": 1,
+        "episode": 17
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMzg6NzE2YmY3MTFhM2JkZGM2Ng",
-        "url": "MTMzMzg6NzE2YmY3MTFhM2JkZGM2Ng"
+        "url": "MTMzMzg6NzE2YmY3MTFhM2JkZGM2Ng",
+        "season": 1,
+        "episode": 18
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMzc6ODNkNGVmMjJlYmI0ZWViYQ",
-        "url": "MTMzMzc6ODNkNGVmMjJlYmI0ZWViYQ"
+        "url": "MTMzMzc6ODNkNGVmMjJlYmI0ZWViYQ",
+        "season": 1,
+        "episode": 19
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMzY6NTkxYzhkMjY5OTNhNzk2Mg",
-        "url": "MTMzMzY6NTkxYzhkMjY5OTNhNzk2Mg"
+        "url": "MTMzMzY6NTkxYzhkMjY5OTNhNzk2Mg",
+        "season": 1,
+        "episode": 20
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMzU6ZTMwMzdkZmRiNTVlOGM4NA",
-        "url": "MTMzMzU6ZTMwMzdkZmRiNTVlOGM4NA"
+        "url": "MTMzMzU6ZTMwMzdkZmRiNTVlOGM4NA",
+        "season": 1,
+        "episode": 21
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMzQ6Mzg3YTQ0YjQ2YWRiODY0Nw",
-        "url": "MTMzMzQ6Mzg3YTQ0YjQ2YWRiODY0Nw"
+        "url": "MTMzMzQ6Mzg3YTQ0YjQ2YWRiODY0Nw",
+        "season": 1,
+        "episode": 22
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMzM6NDcyMTNlNGQ5ZGE3N2U2YQ",
-        "url": "MTMzMzM6NDcyMTNlNGQ5ZGE3N2U2YQ"
+        "url": "MTMzMzM6NDcyMTNlNGQ5ZGE3N2U2YQ",
+        "season": 1,
+        "episode": 23
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMzE6YmJkZWE0MTFhMjU2NTA4Yg",
-        "url": "MTMzMzE6YmJkZWE0MTFhMjU2NTA4Yg"
+        "url": "MTMzMzE6YmJkZWE0MTFhMjU2NTA4Yg",
+        "season": 1,
+        "episode": 24
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMzI6OWI5ZThjNGJlZjBiNzE3NA",
-        "url": "MTMzMzI6OWI5ZThjNGJlZjBiNzE3NA"
+        "url": "MTMzMzI6OWI5ZThjNGJlZjBiNzE3NA",
+        "season": 1,
+        "episode": 25
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMzA6NjY3NmY0NTRkYTZkNWY0Mw",
-        "url": "MTMzMzA6NjY3NmY0NTRkYTZkNWY0Mw"
+        "url": "MTMzMzA6NjY3NmY0NTRkYTZkNWY0Mw",
+        "season": 1,
+        "episode": 26
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMjk6YzE3YmExYmM0ZWQxODkyZQ",
-        "url": "MTMzMjk6YzE3YmExYmM0ZWQxODkyZQ"
+        "url": "MTMzMjk6YzE3YmExYmM0ZWQxODkyZQ",
+        "season": 1,
+        "episode": 27
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMjg6NmNlYWI2MmJkOTI0MzVhYw",
-        "url": "MTMzMjg6NmNlYWI2MmJkOTI0MzVhYw"
+        "url": "MTMzMjg6NmNlYWI2MmJkOTI0MzVhYw",
+        "season": 1,
+        "episode": 28
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMjc6NDk2YjRmZDY3ZmU5NjBkNA",
-        "url": "MTMzMjc6NDk2YjRmZDY3ZmU5NjBkNA"
+        "url": "MTMzMjc6NDk2YjRmZDY3ZmU5NjBkNA",
+        "season": 1,
+        "episode": 29
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMjY6YjdmNzQwODlhNjBkZWNkNg",
-        "url": "MTMzMjY6YjdmNzQwODlhNjBkZWNkNg"
+        "url": "MTMzMjY6YjdmNzQwODlhNjBkZWNkNg",
+        "season": 1,
+        "episode": 30
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMjU6NDkxY2EzYTkxZDI5NGEwNQ",
-        "url": "MTMzMjU6NDkxY2EzYTkxZDI5NGEwNQ"
+        "url": "MTMzMjU6NDkxY2EzYTkxZDI5NGEwNQ",
+        "season": 1,
+        "episode": 31
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMjQ6ODdmY2E2ZWZiNjRkMmZhNQ",
-        "url": "MTMzMjQ6ODdmY2E2ZWZiNjRkMmZhNQ"
+        "url": "MTMzMjQ6ODdmY2E2ZWZiNjRkMmZhNQ",
+        "season": 1,
+        "episode": 32
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMjM6NDE0ZWNmOTU1Y2NiODE3YQ",
-        "url": "MTMzMjM6NDE0ZWNmOTU1Y2NiODE3YQ"
+        "url": "MTMzMjM6NDE0ZWNmOTU1Y2NiODE3YQ",
+        "season": 1,
+        "episode": 33
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMjI6YTBmZDJhYTZiNzAwM2U0MQ",
-        "url": "MTMzMjI6YTBmZDJhYTZiNzAwM2U0MQ"
+        "url": "MTMzMjI6YTBmZDJhYTZiNzAwM2U0MQ",
+        "season": 1,
+        "episode": 34
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMjA6YWJiMTEyNDYwNDU5Y2RkMQ",
-        "url": "MTMzMjA6YWJiMTEyNDYwNDU5Y2RkMQ"
+        "url": "MTMzMjA6YWJiMTEyNDYwNDU5Y2RkMQ",
+        "season": 1,
+        "episode": 35
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMjE6MGU0Y2E3YjJiZGY5YWNmZA",
-        "url": "MTMzMjE6MGU0Y2E3YjJiZGY5YWNmZA"
+        "url": "MTMzMjE6MGU0Y2E3YjJiZGY5YWNmZA",
+        "season": 1,
+        "episode": 36
       },
       {
         "quality": "1080p",
         "stream_url": "MTMzMTk6MjZlNjE2ODQwMWFlMDBmMQ",
-        "url": "MTMzMTk6MjZlNjE2ODQwMWFlMDBmMQ"
+        "url": "MTMzMTk6MjZlNjE2ODQwMWFlMDBmMQ",
+        "season": 1,
+        "episode": 37
       }
     ],
     "stream_url": "MTMzNTQ6MTNhYmExYzNjYjcwY2U3NQ",
@@ -148460,30 +148582,41 @@
       {
         "quality": "720p",
         "stream_url": "MTE2NzI6MzlhOGVlYWEyNDNlNjAwMA",
-        "url": "MTE2NzI6MzlhOGVlYWEyNDNlNjAwMA"
+        "url": "MTE2NzI6MzlhOGVlYWEyNDNlNjAwMA",
+        "season": 1,
+        "episode": 1
       },
       {
         "quality": "720p",
         "stream_url": "MTE2NzE6OTFjM2I2Y2RmNzM0NWFjNQ",
-        "url": "MTE2NzE6OTFjM2I2Y2RmNzM0NWFjNQ"
+        "url": "MTE2NzE6OTFjM2I2Y2RmNzM0NWFjNQ",
+        "season": 1,
+        "episode": 2
       },
       {
         "quality": "720p",
         "stream_url": "MTE2NzA6YmQwYWY3ZWI2MGNjNjVjYQ",
-        "url": "MTE2NzA6YmQwYWY3ZWI2MGNjNjVjYQ"
+        "url": "MTE2NzA6YmQwYWY3ZWI2MGNjNjVjYQ",
+        "season": 1,
+        "episode": 3
       },
       {
         "quality": "720p",
         "stream_url": "MTE2Njk6NzYxMmQ2ODM4MWZlMTgwYg",
-        "url": "MTE2Njk6NzYxMmQ2ODM4MWZlMTgwYg"
+        "url": "MTE2Njk6NzYxMmQ2ODM4MWZlMTgwYg",
+        "season": 1,
+        "episode": 4
       },
       {
         "quality": "720p",
         "stream_url": "MTE2Njg6ZjA5MWMzNDk2NmUyZDg5MQ",
-        "url": "MTE2Njg6ZjA5MWMzNDk2NmUyZDg5MQ"
+        "url": "MTE2Njg6ZjA5MWMzNDk2NmUyZDg5MQ",
+        "season": 1,
+        "episode": 5
       }
     ],
-    "current_season": 1
+    "current_season": 1,
+    "last_uploaded_episode": 5
   },
   {
     "title": "Ecstasy",
@@ -151460,7 +151593,9 @@
       {
         "quality": "1080P",
         "url": "https://filmhouse-stream.duckdns.org/dl/OTAwMjpiNzU1ZWUxYzM2MDQxMWVk",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTAwMjpiNzU1ZWUxYzM2MDQxMWVk"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTAwMjpiNzU1ZWUxYzM2MDQxMWVk",
+        "season": 1,
+        "episode": 1
       },
       {
         "season": 1,
@@ -152900,7 +153035,9 @@
       {
         "quality": "720p",
         "url": "https://filmhouse-stream.duckdns.org/dl/MjAyMTphNzQ3M2FjMjAwZWM3Nzkx",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjAyMTphNzQ3M2FjMjAwZWM3Nzkx"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MjAyMTphNzQ3M2FjMjAwZWM3Nzkx",
+        "season": 1,
+        "episode": 1
       },
       {
         "season": 2,
@@ -156295,12 +156432,6 @@
     ],
     "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTA0OTpmMWYyNjQwOGM4ZDE3ZmY4",
     "stream_links": [
-      {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/OTA3NDphYzJiMDc1MGNhOGU4ODA2",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/OTA3NDphYzJiMDc1MGNhOGU4ODA2",
-        "season": "Season 1"
-      },
       {
         "season": 1,
         "seasonOrPart": "S01E01",
@@ -169694,7 +169825,9 @@
       {
         "quality": "1080P",
         "url": "https://filmhouse-stream.duckdns.org/dl/MTAxODM6ZDA5MDVmZTk3M2Q3ZTY4Nw",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAxODM6ZDA5MDVmZTk3M2Q3ZTY4Nw"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAxODM6ZDA5MDVmZTk3M2Q3ZTY4Nw",
+        "season": 1,
+        "episode": 1
       },
       {
         "season": 1,
@@ -183186,7 +183319,9 @@
       {
         "quality": "720p",
         "url": "https://filmhouse-stream.duckdns.org/dl/MTg2ODplMjc3NDQ2MDJlOWQ1N2I4",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTg2ODplMjc3NDQ2MDJlOWQ1N2I4"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTg2ODplMjc3NDQ2MDJlOWQ1N2I4",
+        "season": 1,
+        "episode": 1
       },
       {
         "season": 1,
@@ -190187,11 +190322,14 @@
       {
         "quality": "720P",
         "url": "https://filmhouse-stream.duckdns.org/dl/MTAwMjc6OTRkOGRkMDgxZWYzZThmNA",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAwMjc6OTRkOGRkMDgxZWYzZThmNA"
+        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTAwMjc6OTRkOGRkMDgxZWYzZThmNA",
+        "season": 1,
+        "episode": 1
       }
     ],
     "links": [],
-    "current_season": 1
+    "current_season": 1,
+    "last_uploaded_episode": 1
   },
   {
     "csv_id": "1564614-leviticus",
