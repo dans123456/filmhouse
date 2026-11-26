@@ -458,18 +458,41 @@ function parseBulkStreams(rawText, isSeries) {
 function extractMovieStreams(targetMovie) {
     if (!targetMovie) return [];
     
+    const isSeries = (targetMovie.type || '').toLowerCase() === 'series' || (targetMovie.type || '').toLowerCase() === 'tv';
     if (Array.isArray(targetMovie.stream_links)) {
         if (targetMovie.stream_links.length > 0) {
-            return targetMovie.stream_links.map((s, idx) => {
+            const streams = targetMovie.stream_links.map((s, idx) => {
                 const token = cleanStreamInput(typeof s === 'object' && s !== null ? (s.stream_url || s.url || '') : s);
+                let ep = (typeof s === 'object' && s !== null && s.episode) ? parseInt(s.episode, 10) : null;
+                let sNum = (typeof s === 'object' && s !== null && s.season) ? parseInt(s.season, 10) : 1;
+                if (!ep || isNaN(ep)) {
+                    const rawName = String((typeof s === 'object' && s !== null ? (s.name || s.seasonOrPart || '') : '')).trim();
+                    const m = rawName.match(/S0*(\d+)E0*(\d+)/i) || rawName.match(/Season\s*(\d+)\s*Ep(?:isode)?\s*(\d+)/i) || rawName.match(/Ep(?:isode)?\s*(\d+)/i);
+                    if (m) {
+                        if (m[2]) {
+                            sNum = parseInt(m[1], 10) || 1;
+                            ep = parseInt(m[2], 10);
+                        } else {
+                            ep = parseInt(m[1], 10);
+                        }
+                    } else {
+                        ep = idx + 1;
+                    }
+                }
                 return {
-                    episode: (typeof s === 'object' && s !== null && s.episode) ? parseInt(s.episode, 10) : (idx + 1),
-                    season: (typeof s === 'object' && s !== null && s.season) ? parseInt(s.season, 10) : 1,
+                    episode: ep,
+                    season: sNum,
                     quality: (typeof s === 'object' && s !== null && s.quality) ? s.quality : '720p',
+                    name: (typeof s === 'object' && s !== null && s.name) ? s.name : `Episode ${ep}`,
                     stream_url: token,
                     url: token
                 };
             }).filter(s => !!s.stream_url);
+
+            if (isSeries || streams.some(s => s.episode > 1)) {
+                streams.sort((a, b) => ((a.season || 1) - (b.season || 1)) || ((a.episode || 0) - (b.episode || 0)));
+            }
+            return streams;
         } else if (targetMovie.stream_url === "" || targetMovie.stream_url === undefined) {
             // Explicitly cleared empty streams array, do not resurrect old stream_url from links
             return [];
@@ -487,6 +510,7 @@ function extractMovieStreams(targetMovie) {
                         episode: l.episode || (idx + 1),
                         season: l.season || 1,
                         quality: l.quality || '720p',
+                        name: `Episode ${l.episode || (idx + 1)}`,
                         stream_url: token,
                         url: token
                     });
@@ -494,7 +518,12 @@ function extractMovieStreams(targetMovie) {
             }
         });
     }
-    if (extracted.length > 0) return extracted;
+    if (extracted.length > 0) {
+        if (isSeries || extracted.some(s => s.episode > 1)) {
+            extracted.sort((a, b) => ((a.season || 1) - (b.season || 1)) || ((a.episode || 0) - (b.episode || 0)));
+        }
+        return extracted;
+    }
     
     // Fallback to targetMovie.stream_url
     const single = cleanStreamInput(targetMovie.stream_url || '');
@@ -2976,6 +3005,16 @@ async function loadCatalog() {
                                 target.stream_links.push(sl);
                             }
                         });
+                        if (target.stream_links.length > 1) {
+                            target.stream_links.sort((a, b) => {
+                                const sA = parseInt(a.season, 10) || 1;
+                                const sB = parseInt(b.season, 10) || 1;
+                                if (sA !== sB) return sA - sB;
+                                const eA = parseInt(a.episode || a.episodeNum, 10) || 0;
+                                const eB = parseInt(b.episode || b.episodeNum, 10) || 0;
+                                return eA - eB;
+                            });
+                        }
                     }
                     if (!target.stream_url && item.stream_url) target.stream_url = item.stream_url;
                 }
@@ -3018,9 +3057,16 @@ function renderDetailsStreamsReadOnlyHTML(streams, movie, isSeries) {
         `;
     }
 
-    return streams.map((s, idx) => {
+    const sortedStreams = [...streams];
+    if (isSeries || sortedStreams.some(s => (s.episode && s.episode > 1) || (s.season && s.season > 1))) {
+        sortedStreams.sort((a, b) => ((a.season || 1) - (b.season || 1)) || ((a.episode || 0) - (b.episode || 0)));
+    }
+
+    return sortedStreams.map((s, idx) => {
         const epNum = s.episode || (idx + 1);
-        const label = isSeries ? `Episode ${epNum}` : (s.quality || `Link ${idx + 1}`);
+        const sNum = s.season || 1;
+        const seasonPrefix = (isSeries && sNum > 1) ? `S${sNum}:` : '';
+        const label = isSeries ? `${seasonPrefix}Episode ${epNum}` : (s.quality || `Link ${idx + 1}`);
         const tokenVal = s.stream_url || s.url || '';
         const playUrl = `https://dans123456.github.io/filmhouse/player.html?watch=${encodeURIComponent(tokenVal)}&title=${encodeURIComponent(movie.title)}${isSeries ? `&ep=${epNum}` : ''}`;
         

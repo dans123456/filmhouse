@@ -4310,6 +4310,17 @@ function setupBot(bot, adminBot) {
                     }
                 }
 
+                if (Array.isArray(currentStreamLinks) && currentStreamLinks.length > 1) {
+                    currentStreamLinks.sort((a, b) => {
+                        const sA = parseInt(a.season, 10) || 1;
+                        const sB = parseInt(b.season, 10) || 1;
+                        if (sA !== sB) return sA - sB;
+                        const eA = parseInt(a.episode || a.episodeNum, 10) || 0;
+                        const eB = parseInt(b.episode || b.episodeNum, 10) || 0;
+                        return eA - eB;
+                    });
+                }
+
                 // Update catalogMatch in memory immediately
                 catalogMatch.links = currentLinks;
                 catalogMatch.stream_links = currentStreamLinks;
