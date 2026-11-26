@@ -1120,15 +1120,14 @@
 
       /* Secondary action tools on the right */
       .plyr__controls-right > [data-plyr="mute"],
-      .plyr__controls-right > [data-plyr="audio"],
       .plyr__controls-right > [data-plyr="captions"],
       .plyr__controls-right > [data-plyr="settings"],
       .plyr__controls-right > [data-plyr="fullscreen"],
       .plyr__controls-right > .plyr__menu > [data-plyr="settings"] {
-        width: 26px !important;
-        height: 26px !important;
-        min-width: 26px !important;
-        max-width: 26px !important;
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
         padding: 0 !important;
         border-radius: 6px !important;
         background: transparent !important;
@@ -1140,19 +1139,24 @@
         box-sizing: border-box !important;
       }
 
-      .plyr__controls-right > [data-plyr="captions"],
-      .plyr__controls-right > [data-plyr="audio"] {
+      /* On mobile & touch screens, hide the redundant volume slider/button to prevent cramping */
+      @media (max-width: 650px), (pointer: coarse) {
+        .plyr__controls [data-plyr="mute"],
+        .plyr__controls .plyr__volume {
+          display: none !important;
+        }
+      }
+
+      .plyr__controls-right > [data-plyr="captions"] {
         display: inline-flex !important;
-        /* Always show Audio and CC buttons */
       }
 
       .plyr__controls-right [data-plyr="mute"] svg,
-      .plyr__controls-right [data-plyr="audio"] svg,
       .plyr__controls-right [data-plyr="captions"] svg,
       .plyr__controls-right [data-plyr="settings"] svg,
       .plyr__controls-right [data-plyr="fullscreen"] svg {
-        width: 14px !important;
-        height: 14px !important;
+        width: 15px !important;
+        height: 15px !important;
       }
 
       /* Vertical volume popup (hidden until the speaker is tapped) */
@@ -1638,22 +1642,6 @@
           right.className = 'plyr__controls-right';
           if (mute) right.appendChild(mute);
           if (vol) right.appendChild(vol);
-
-          // Dedicated Audio Languages button
-          const audioBtn = document.createElement('button');
-          audioBtn.type = 'button';
-          audioBtn.className = 'plyr__control plyr__control--audio';
-          audioBtn.setAttribute('data-plyr', 'audio');
-          audioBtn.setAttribute('aria-label', 'Audio & Languages');
-          audioBtn.title = 'Audio & Languages';
-          audioBtn.innerHTML = `
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
-              <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
-            </svg>
-          `;
-          right.appendChild(audioBtn);
-
           if (cc) right.appendChild(cc);
           if (menu) right.appendChild(menu);
           if (fs) right.appendChild(fs);
@@ -2248,41 +2236,36 @@
     if (tabSubsBtn) tabSubsBtn.onclick = () => switchInPlayerTab('subs');
     if (tabAudioBtn) tabAudioBtn.onclick = () => switchInPlayerTab('audio');
 
-    function openSubtitlesModalView(defaultTab = 'subs') {
+    function openSubtitlesModalView(preferredTab = null) {
+      const hasDualAudio = (window._cachedAudioTracks && window._cachedAudioTracks.length > 1);
+      const defaultTab = preferredTab || (hasDualAudio ? 'audio' : 'subs');
+
       // In fullscreen the parent app's hub is hidden behind this iframe, so open the in-player panel instead
       if (!isPlayerFullscreenActive() && window.parent && window.parent !== window) {
         try {
-          window.parent.postMessage({ action: 'openSubtitlesHub', tab: defaultTab || 'subs' }, '*');
+          window.parent.postMessage({ action: 'openSubtitlesHub', tab: defaultTab }, '*');
           return;
         } catch (e) { }
       }
       if (!modalSubs) return;
       modalSubs.style.display = 'flex';
-      switchInPlayerTab(defaultTab || 'subs');
+      switchInPlayerTab(defaultTab);
       if (defaultTab === 'subs' && loadedSubtitlesList.length === 0) {
         fetchMovieSubtitles();
       }
     }
 
-    if (openSubBtn1) openSubBtn1.onclick = () => openSubtitlesModalView('subs');
-    if (openSubBtn2) openSubBtn2.onclick = () => openSubtitlesModalView('subs');
+    if (openSubBtn1) openSubBtn1.onclick = () => openSubtitlesModalView();
+    if (openSubBtn2) openSubBtn2.onclick = () => openSubtitlesModalView();
 
-    // Dual Language & Subtitle system: [audio] opens Audio tab, [CC] opens Subtitles tab
+    // Unified Language Hub: [CC] opens the combined Audio & Subtitles sheet
     document.addEventListener('click', function (e) {
       const ccBtn = e.target && e.target.closest ? e.target.closest('.plyr__controls [data-plyr="captions"]') : null;
       if (ccBtn) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        openSubtitlesModalView('subs');
-        return;
-      }
-      const audioBtn = e.target && e.target.closest ? e.target.closest('.plyr__controls [data-plyr="audio"]') : null;
-      if (audioBtn) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        openSubtitlesModalView('audio');
+        openSubtitlesModalView();
         return;
       }
     }, true);

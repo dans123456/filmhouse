@@ -8854,6 +8854,24 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
         const receivedAudios = data.audioTracks || data.audios;
         if (receivedAudios && Array.isArray(receivedAudios) && audioTrackList && receivedAudios.length > 0) {
             audioTrackList.replaceChildren();
+
+            const dualAudioBadge = document.getElementById("cinema-dual-audio-badge");
+            if (dualAudioBadge) {
+                if (receivedAudios.length > 1) {
+                    dualAudioBadge.textContent = receivedAudios.length === 2 ? "🎧 DUAL AUDIO" : `🎧 ${receivedAudios.length} AUDIOS`;
+                    dualAudioBadge.style.display = "inline-flex";
+                } else {
+                    dualAudioBadge.style.display = "none";
+                }
+            }
+
+            const tabAudioEl = document.getElementById("cinema-hub-tab-audio");
+            if (tabAudioEl) {
+                tabAudioEl.innerHTML = receivedAudios.length > 1 
+                    ? `<svg><use href="#icon-speaker"></use></svg> Audio (${receivedAudios.length})` 
+                    : `<svg><use href="#icon-speaker"></use></svg> Audio`;
+            }
+
             receivedAudios.forEach((a) => {
                 const aBtn = document.createElement("button");
                 aBtn.type = "button";
@@ -9448,6 +9466,7 @@ function openCinemaModalCore(movie, customStreamUrl, customTitle) {
 
         metaHtml += `<span class="meta-sep">•</span><span class="meta-quality-tag">HD</span>`;
         metaHtml += `<span class="meta-sub-tag">SUB</span>`;
+        metaHtml += `<span class="meta-audio-tag" id="cinema-dual-audio-badge" style="display:none; margin-left: 4px; background: rgba(255, 188, 0, 0.18); border: 1px solid rgba(255, 188, 0, 0.5); color: #ffd700; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 4px;">🎧 DUAL AUDIO</span>`;
 
         metaLine.innerHTML = metaHtml;
         headerEl.appendChild(metaLine);
