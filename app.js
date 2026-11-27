@@ -6096,12 +6096,19 @@ async function submitDedicatedStreamRequest(movie) {
     isSubmittingStreamReq = true;
     try {
         if (typeof firebase !== "undefined" && db) {
+            const rawMediaType = String(movie.type || movie.category || "Movie");
+            const isSeriesMedia = /series|tv|episode/i.test(rawMediaType) || /\b(s\d+[:\s\-]*e\d+|season\s*\d+)\b/i.test(String(movie.title || ""));
+            const epSpecMatch = String(movie.seasonOrPart || movie.title || "").match(/\((s\d+[:\s\-]*e\d+|season\s*\d+[^)]*)\)/i)
+                || String(movie.seasonOrPart || "").match(/\b(s\d+[:\s\-]*e\d+|season\s*\d+.*)/i);
+            const resolvedSeasonOrPart = movie.seasonOrPart || (epSpecMatch ? epSpecMatch[1].trim() : "");
+
             const reqPayload = {
                 title: movie.title,
                 cleanTitle: typeof normalizeTitleForComparison === "function" ? normalizeTitleForComparison(movie.title) : movie.title.toLowerCase(),
-                category: movie.type || "Movie",
+                category: isSeriesMedia ? "Series" : "Movie",
                 year: movie.year || (movie.release_date ? movie.release_date.split("-")[0] : ""),
-                type: "stream",
+                type: isSeriesMedia ? "Series" : "Movie",
+                seasonOrPart: resolvedSeasonOrPart,
                 requestType: "stream",
                 target: "stream_url",
                 quality: "Stream (Online Player)",
@@ -6555,7 +6562,8 @@ function triggerEpisodeRequestModal(movie, seasonNum, ep, actionBtn, statusBadge
     const epMovieProxy = {
         ...movie,
         title: `${movie.title} (S${seasonNum}:E${epNum})`,
-        type: "Series Episode"
+        seasonOrPart: `S${seasonNum}:E${epNum}`,
+        type: "Series"
     };
 
     const streamModal = document.getElementById("stream-request-modal");
@@ -13422,6 +13430,7 @@ function initManualRequestModal() {
                     title: requestTitle,
                     seasonOrPart: specs,
                     status: "pending",
+                    requestType: "download",
                     tmdb_id: null,
                     csv_id: "",
                     type: selectedType,
@@ -14048,12 +14057,19 @@ function renderUserRequests(requests) {
                 </div>
             ` : "";
 
+            const isReqStreamCard = isStreamRequest(r);
+            const displayMediaType = String(r.type || "").toLowerCase() === "stream" ? (r.category || "Movie") : (r.type || "Movie");
+            const reqModeBadgeHTML = isReqStreamCard
+                ? `<span style="font-size: 9.5px; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35); color: #c084fc; padding: 1px 6px; border-radius: 10px; font-weight: 700;">🟣 Stream</span>`
+                : `<span style="font-size: 9.5px; background: rgba(0, 200, 255, 0.12); border: 1px solid rgba(0, 200, 255, 0.3); color: #00c8ff; padding: 1px 6px; border-radius: 10px; font-weight: 700;">📥 Download</span>`;
+
             item.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px;">
                     <div style="flex: 1;">
                         <h5 style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; font-family: var(--font-heading);">${escapeHTML(r.title)}${r.year ? ` (${r.year})` : ""}</h5>
                         <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                            <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">${escapeHTML(r.type || "Movie")}</span>
+                            <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">${escapeHTML(displayMediaType)}</span>
+                            ${reqModeBadgeHTML}
                         </div>
                         ${dateBadgeHTML}
                     </div>
@@ -14478,6 +14494,7 @@ function logMovieRequestToFirestore(movie, specs = "") {
             title: requestTitle,
             seasonOrPart: specs || "",
             status: "pending",
+            requestType: "download",
             tmdb_id: movie.tmdb_id || null,
             csv_id: movie.csv_id || "",
             type: movie.type || "Movie",

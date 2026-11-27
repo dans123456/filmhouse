@@ -494,6 +494,137 @@ function getSafeDeepLinkId(movieObj) {
     return sanitized;
 }
 
+function isStreamFulfillDoc(data) {
+    if (!data) return false;
+    if (data.fulfilledMode === "download") return false;
+    if (data.fulfilledMode === "stream") return true;
+    return data.type === "stream" || data.requestType === "stream" || data.target === "stream_url";
+}
+
+function buildUserFulfillmentNotification(data, rawTitle, rawYear, downloadLink = "") {
+    const isStream = isStreamFulfillDoc(data);
+    const titleStr = String(rawTitle || data?.title || "Movie").trim();
+    const isSeries = /series|tv|episode/i.test(String(data?.type || ""))
+        || /series|tv|episode/i.test(String(data?.category || ""))
+        || /\b(s\d+[:\s\-]*e\d+|season\s*\d+)\b/i.test(titleStr)
+        || /\b(s\d+[:\s\-]*e\d+|season\s*\d+)\b/i.test(String(data?.seasonOrPart || ""));
+
+    let requestedSpec = String(data?.seasonOrPart || "").trim();
+    if (!requestedSpec && titleStr) {
+        const epMatch = titleStr.match(/\((s\d+[:\s\-]*e\d+)\)/i) || titleStr.match(/\b(s\d+[:\s\-]*e\d+)\b/i);
+        const sMatch = titleStr.match(/\((season\s*\d+[^)]*)\)/i) || titleStr.match(/\b(season\s*\d+)\b/i);
+        if (epMatch) requestedSpec = epMatch[1].trim();
+        else if (sMatch) requestedSpec = sMatch[1].trim();
+    }
+
+    const baseTitleRaw = requestedSpec
+        ? titleStr.replace(new RegExp(`\\s*\\(${requestedSpec.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\)\\s*`, "i"), "").trim() || titleStr
+        : titleStr;
+    const cleanUserTitle = escapeHtml(baseTitleRaw);
+    const cleanYearSuffix = rawYear && !baseTitleRaw.includes(String(rawYear)) ? ` (${escapeHtml(String(rawYear))})` : "";
+
+    const safeDeepId = getSafeDeepLinkId({
+        csv_id: data?.csv_id || "",
+        tmdb_id: data?.tmdb_id || "",
+        title: baseTitleRaw
+    });
+    const miniAppUrl = safeDeepId
+        ? `https://t.me/Filmhouseappbot/filmhouseapp?startapp=movie_${safeDeepId}`
+        : `https://t.me/Filmhouseappbot/filmhouseapp`;
+
+    if (isStream) {
+        if (isSeries) {
+            const isEpSpec = /\bs\d+[:\s\-]*e\d+\b/i.test(requestedSpec) || /episode\s*\d+/i.test(requestedSpec);
+            if (requestedSpec) {
+                const cleanSpec = escapeHtml(requestedSpec);
+                const text =
+                    `🍿 <b>${isEpSpec ? "Episode" : "Series"} Stream Ready!</b>\n\n` +
+                    `Good news! <b>${cleanUserTitle} (${cleanSpec})</b> is now live on the Film House Online Player! ⚡\n\n` +
+                    `Tap below to start watching immediately — no download needed.\n\n` +
+                    `Thank you for using Film House!`;
+                return {
+                    text,
+                    buttonText: isEpSpec ? "▶️ Watch Episode Now 🍿" : `▶️ Watch ${requestedSpec} Now 🍿`,
+                    buttonUrl: miniAppUrl
+                };
+            }
+            const text =
+                `🍿 <b>Series Stream Ready!</b>\n\n` +
+                `Good news! Online streaming episodes for <b>${cleanUserTitle}</b>${cleanYearSuffix} are now live on the Film House Cinema Player! ⚡📺\n\n` +
+                `Tap below to pick your episode and start streaming right away.\n\n` +
+                `Thank you for using Film House!`;
+            return {
+                text,
+                buttonText: "▶️ Watch Series Online 🍿",
+                buttonUrl: miniAppUrl
+            };
+        }
+
+        const text =
+            `🍿 <b>Stream Request Ready!</b>\n\n` +
+            `Good news! The online cinema stream for <b>${cleanUserTitle}</b>${cleanYearSuffix} is now live! ⚡\n\n` +
+            `Tap below to launch the movie directly inside the Film House Player — no download needed.\n\n` +
+            `Thank you for using Film House!`;
+        return {
+            text,
+            buttonText: "▶️ Watch Online Now 🍿",
+            buttonUrl: miniAppUrl
+        };
+    }
+
+    // Download Request Fulfillment
+    const dlTargetUrl = downloadLink || miniAppUrl;
+    if (isSeries) {
+        const sLabel = requestedSpec || "Series";
+        const isComplete = data?.isSeriesComplete === true || data?.status === "completed" || sLabel.toLowerCase() === "all seasons";
+        if (isComplete) {
+            const text =
+                `🎉 <b>Complete Series Download Ready!</b>\n\n` +
+                `All seasons of <b>${cleanUserTitle}</b>${cleanYearSuffix} have been uploaded to Film House! 📺📥\n\n` +
+                `Tap below to open the Film House App and pick any season to download.\n\n` +
+                `Thank you for using Film House!`;
+            return {
+                text,
+                buttonText: "📥 Open Series Downloads 🍿",
+                buttonUrl: miniAppUrl
+            };
+        }
+        if (sLabel.toLowerCase().includes("season 1") || sLabel.toLowerCase() === "s1") {
+            const text =
+                `🎉 <b>Series Download Ready!</b>\n\n` +
+                `<b>Season 1</b> of <b>${cleanUserTitle}</b>${cleanYearSuffix} is now ready for download! 📥 We are currently uploading the remaining seasons as well.\n\n` +
+                `Thank you for using Film House!`;
+            return {
+                text,
+                buttonText: "📥 Download Season 1 🎬",
+                buttonUrl: dlTargetUrl
+            };
+        }
+        const specTitleSuffix = requestedSpec ? ` — <b>${escapeHtml(requestedSpec)}</b>` : "";
+        const text =
+            `🎉 <b>Series Download Ready!</b>\n\n` +
+            `Your download request for <b>${cleanUserTitle}</b>${cleanYearSuffix}${specTitleSuffix} has been fulfilled! 📥\n\n` +
+            `Tap below to get ${requestedSpec ? `<b>${escapeHtml(requestedSpec)}</b>` : "your files"} directly on Telegram (or open the Film House App for other seasons).\n\n` +
+            `Thank you for using Film House!`;
+        return {
+            text,
+            buttonText: `📥 Download ${sLabel} 🎬`,
+            buttonUrl: dlTargetUrl
+        };
+    }
+
+    const text =
+        `🎉 <b>Download Request Fulfilled!</b>\n\n` +
+        `Your download request for <b>${cleanUserTitle}</b>${cleanYearSuffix} is now ready! 📥\n\n` +
+        `Tap the button below to get your file directly on Telegram (or open the Film House App for all qualities).\n\n` +
+        `Thank you for using Film House!`;
+    return {
+        text,
+        buttonText: "📥 Download Now 🎬",
+        buttonUrl: dlTargetUrl
+    };
+}
+
 // Markdown escaping helper for clean Telegram formatting
 function escapeMarkdown(str) {
     if (!str) return "";
@@ -1734,9 +1865,13 @@ function setupBot(bot, adminBot) {
                     // Atomic Writes
                     transaction.update(reqRef, {
                         status: "fulfilled",
+                        fulfilledMode: isStreamReq ? "stream" : "download",
+                        requestType: isStreamReq ? "stream" : "download",
+                        csv_id: movieDocKey,
                         notifiedFulfilled: true,
-                        downloadLink: primaryLink,
-                        ...(isStreamReq ? { streamUrl: primaryLink, stream_url: primaryLink } : {}),
+                        ...(isStreamReq
+                            ? { streamUrl: primaryLink, stream_url: primaryLink }
+                            : { downloadLink: primaryLink }),
                         fulfilledBy: adminUsername,
                         fulfilledById: adminId,
                         fulfilledQualities: parsedQualities,
@@ -1781,8 +1916,9 @@ function setupBot(bot, adminBot) {
             // 6. Post-Fulfillment Alerts
             // Edit original request alert message in the admin group if possible
             const fulfilledAlertText = 
-                `✅ <b>Request Fulfilled!</b> 🍿\n` +
+                `${isStreamReq ? "✅🟣 <b>Stream Request Fulfilled!</b>" : "✅📥 <b>Download Request Fulfilled!</b>"} 🍿\n` +
                 `🎬 <b>Title:</b> <b>${escapeHtml(reqTitle)}</b>\n` +
+                `📌 <b>Type:</b> ${isStreamReq ? "🟣 Online Stream" : "📥 Telegram Download"}\n` +
                 `👑 <b>Fulfilled by:</b> ${escapeHtml(adminUsername)} (${totalAdminFulfillCount} 🏆)\n` +
                 `🔗 <b>Added Link(s):</b>\n` +
                 parsedQualities.map(pq => `• <b>${pq.quality}:</b> <code>${escapeHtml(pq.url)}</code>`).join("\n");
@@ -1802,25 +1938,29 @@ function setupBot(bot, adminBot) {
             // Send confirmation reply in admin group
             await ctx.reply(fulfilledAlertText, { parse_mode: "HTML" });
 
-            // Notify the user via User Bot API DM
-            const requesterUserId = reqData.userId || reqData.user_id;
-            if (requesterUserId) {
-                const userMsg = 
-                    `🎉 <b>Good news!</b>\n\n` +
-                    `✅ Your request for <b>${escapeHtml(reqTitle)}</b> has been fulfilled!\n\n` +
-                    (reqSeason ? `📺 <b>Season:</b> ${escapeHtml(reqSeason)}\n\n` : "") +
-                    `Enjoy streaming and downloading in the Film House Mini App! 🍿`;
-
-                const miniAppUrl = `https://dans123456.github.io/filmhouse/index.html?movie=${encodeURIComponent(movieDocKey)}`;
+            // Notify the user via User Bot API DM with tailored Stream vs Download message
+            const requesterUserId = reqData.requestedById || reqData.userId || reqData.user_id;
+            if (requesterUserId && requesterUserId !== "unknown") {
+                const notifyPayload = buildUserFulfillmentNotification(
+                    {
+                        ...reqData,
+                        csv_id: movieDocKey,
+                        fulfilledMode: isStreamReq ? "stream" : "download",
+                        seasonOrPart: reqSeason || reqData.seasonOrPart || ""
+                    },
+                    reqTitle,
+                    reqData.year || "",
+                    isStreamReq ? "" : primaryLink
+                );
                 try {
-                    await callTelegramWithRetry("sendMessage", requesterUserId, userMsg, {
+                    await callTelegramWithRetry("sendMessage", requesterUserId, notifyPayload.text, {
                         parse_mode: "HTML",
                         reply_markup: {
                             inline_keyboard: [
                                 [
                                     {
-                                        text: "▶️ Watch / Download Now 🎬",
-                                        url: miniAppUrl
+                                        text: notifyPayload.buttonText,
+                                        url: notifyPayload.buttonUrl
                                     }
                                 ]
                             ]
@@ -8256,10 +8396,10 @@ async function init() {
 
                         const userReqText = isStreamReq
                             ? `🍿 <b>Stream Request Received!</b>\n\nYour request for an online streaming link of <b>${cleanTitle}</b>${cleanYear} has been logged in our queue.\n\nWe will notify you here as soon as the stream player is active! 🚀`
-                            : `🍿 <b>Request Received!</b>\n\nYour request for <b>${cleanTitle}</b>${cleanYear} (${cleanType}) has been logged in our queue.\n\n` +
+                            : `📥 <b>Download Request Received!</b>\n\nYour download request for <b>${cleanTitle}</b>${cleanYear} (${cleanType}) has been logged in our queue.\n\n` +
                                 (canBoost 
                                     ? `💡 <b>Boost Available!</b> You can boost this request to <b>High Priority</b> for 1,000 points to get it faster! 🚀`
-                                    : `We will notify you here as soon as it is fulfilled! 🚀`);
+                                    : `We will notify you here as soon as your download file is ready! 🚀`);
 
                         try {
                             await callTelegramWithRetry('sendMessage', userId, userReqText, {
@@ -8447,7 +8587,7 @@ async function init() {
                     if (data.status === "fulfilled" && data.publishToChannel !== false && !data.channelMessageId) {
                         const rawClean = String(title || "").toLowerCase().replace(/\s*\([^)]+\)\s*$/g, "").trim();
                         const movieKey = String(data.csv_id || data.tmdb_id || rawClean || docId).toLowerCase().trim();
-                        const isStreamFulfill = (data.type === "stream" || data.requestType === "stream" || data.target === "stream_url" || !!data.streamUrl || !!data.stream_url);
+                        const isStreamFulfill = isStreamFulfillDoc(data);
                         const specKey = String(data.seasonOrPart || (isStreamFulfill ? "stream_available" : "")).toLowerCase().trim();
                         const fullKey = specKey ? `${movieKey}_${specKey}` : movieKey;
 
@@ -8560,158 +8700,138 @@ async function init() {
                         }
                     }
 
-                    const notifyLink = downloadLink || data.stream_url || data.streamUrl || (data.csv_id ? `https://dans123456.github.io/filmhouse/index.html?movie=${encodeURIComponent(data.csv_id)}` : "");
-                    if (data.status === "fulfilled" && data.notifiedFulfilled !== true && notifyLink) {
-                        const cleanUserTitle = escapeHtml(title || "Movie");
-                        const cleanYearSuffix = year ? ` (${escapeHtml(year)})` : "";
-                        const isSeries = (data.type || "").toLowerCase() === "series" || (data.type || "").toLowerCase() === "tv";
-                        let detailText = "";
-                        let buttonText = "Download/Watch Now 🎬";
-                        if (isSeries) {
-                                let requestedSeason = data.seasonOrPart || "";
-                                if (!requestedSeason && title) {
-                                    const sMatch = title.match(/Season\s*\d+/i) || title.match(/\(Season\s*\d+\)/i) || title.match(/S\d+/i);
-                                    if (sMatch) {
-                                        requestedSeason = sMatch[0].replace(/[()]/g, '').trim();
-                                    }
-                                }
-                                const sLabel = requestedSeason ? requestedSeason : "Series";
-                                const isComplete = data.isSeriesComplete === true || data.status === "completed" || sLabel.toLowerCase() === "all seasons";
+                    const isDocStreamFulfill = isStreamFulfillDoc(data);
+                    const hasFulfillTarget = isDocStreamFulfill
+                        ? !!(data.stream_url || data.streamUrl || data.csv_id || data.tmdb_id || title)
+                        : !!(downloadLink || data.csv_id);
 
-                                if (isComplete) {
-                                    detailText = `🎉 <b>All Seasons Completed!</b>\n\nAll seasons of <b>${cleanUserTitle}</b> have been fully uploaded to Film House! Enjoy the full series! 📺`;
-                                    buttonText = "Open Film House App 🍿";
-                                } else if (sLabel.toLowerCase().includes("season 1") || sLabel.toLowerCase() === "s1") {
-                                    detailText = `🍿 <b>Good news!</b>\n\n<b>Season 1</b> of <b>${cleanUserTitle}</b> is now ready! We are currently uploading the remaining seasons... 🚀`;
-                                    buttonText = "Get Season 1 🍿";
-                                } else {
-                                    detailText = `🚀 <b>Season Update!</b>\n\n<b>${escapeHtml(sLabel)}</b> of <b>${cleanUserTitle}</b> has just been added! To download remaining seasons, open Film House App! 🍿`;
-                                    buttonText = `Get ${sLabel} 🍿`;
-                                }
-                            } else {
-                                detailText = "💡 <b>Note:</b> This is a single movie request, so this contains the full film. Enjoy! 🍿";
-                                buttonText = "Get Movie 🎬";
-                            }
-
-                            const text = `🎉 <b>Good news!</b>\n\n` +
-                                         `Your request for <b>${cleanUserTitle}</b>${cleanYearSuffix} has been fulfilled! 🍿\n\n` +
-                                         `${detailText}\n\n` +
-                                         `Thank you for using Film House!`;
-                            if (userId) {
-                                try {
-                                    const btnTargetUrl = downloadLink || (data.csv_id ? `https://dans123456.github.io/filmhouse/index.html?movie=${encodeURIComponent(data.csv_id)}` : "https://t.me/Filmhouseappbot/filmhouseapp");
-                                    await callTelegramWithRetry('sendMessage', userId, text, {
-                                        parse_mode: "HTML",
-                                        reply_markup: {
-                                            inline_keyboard: [
-                                                [
-                                                    {
-                                                        text: buttonText,
-                                                        url: btnTargetUrl
-                                                    }
-                                                ]
+                    if (data.status === "fulfilled" && data.notifiedFulfilled !== true && hasFulfillTarget) {
+                        const notifyPayload = buildUserFulfillmentNotification(data, title, year, downloadLink);
+                        if (userId) {
+                            try {
+                                await callTelegramWithRetry('sendMessage', userId, notifyPayload.text, {
+                                    parse_mode: "HTML",
+                                    reply_markup: {
+                                        inline_keyboard: [
+                                            [
+                                                {
+                                                    text: notifyPayload.buttonText,
+                                                    url: notifyPayload.buttonUrl
+                                                }
                                             ]
-                                        }
-                                    });
-                                    await db.collection("requests").doc(docId).update({ 
-                                        notifiedFulfilled: true,
-                                        notificationStatus: "delivered",
-                                        notificationError: null,
-                                        notifiedAt: admin.firestore.FieldValue.serverTimestamp()
-                                    }).catch(() => {});
-                                } catch (e) {
-                                    console.warn(`Failed to send request fulfillment to ${userId}:`, e.message);
-                                    const isBlocked = e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"));
-                                    if (isBlocked) await db.collection("users").doc(userId).set({ blockedBot: true }, { merge: true }).catch(() => {});
-                                    await db.collection("requests").doc(docId).update({ 
-                                        notifiedFulfilled: true,
-                                        notificationStatus: "failed",
-                                        notificationError: e.message,
-                                        isBlockedUser: isBlocked,
-                                        notifiedAt: admin.firestore.FieldValue.serverTimestamp()
-                                    }).catch(() => {});
-                                }
-                            } else {
-                                await db.collection("requests").doc(docId).update({
+                                        ]
+                                    }
+                                });
+                                await db.collection("requests").doc(docId).update({ 
                                     notifiedFulfilled: true,
-                                    notificationStatus: "skipped_guest",
+                                    notificationStatus: "delivered",
+                                    notificationError: null,
+                                    notifiedAt: admin.firestore.FieldValue.serverTimestamp()
+                                }).catch(() => {});
+                            } catch (e) {
+                                console.warn(`Failed to send request fulfillment to ${userId}:`, e.message);
+                                const isBlocked = e.message && (e.message.includes("blocked") || e.message.includes("chat not found") || e.message.includes("deactivated"));
+                                if (isBlocked) await db.collection("users").doc(userId).set({ blockedBot: true }, { merge: true }).catch(() => {});
+                                await db.collection("requests").doc(docId).update({ 
+                                    notifiedFulfilled: true,
+                                    notificationStatus: "failed",
+                                    notificationError: e.message,
+                                    isBlockedUser: isBlocked,
                                     notifiedAt: admin.firestore.FieldValue.serverTimestamp()
                                 }).catch(() => {});
                             }
-
-                            // Notify admins of the fulfillment
-                            try {
-                                const allAdmins = await getAllAdminIds();
-
-                                const pendingCount = cachedPendingRequests.length;
-                                const fulfilledBy = data.fulfilledBy || data.adminClaimName || "An Admin";
-                                const cleanAdminTitle = escapeHtml(title || "Movie");
-                                const cleanAdminYear = year ? ` (${escapeHtml(year)})` : "";
-                                const cleanFulfilledBy = escapeHtml(fulfilledBy);
-                                const cleanReqUser = escapeHtml(username || `User ${userId}`);
-                                const displayUser = cleanReqUser.startsWith('@') ? cleanReqUser : `@${cleanReqUser}`;
-
-                                // Track fulfillment counts per admin in Firestore safely (verified admin only)
-                                let adminTotalFulfillCount = 0;
-                                const rawAdminId = data.fulfilledById || (fulfilledBy && fulfilledBy.toLowerCase() !== 'admin' ? fulfilledBy : null);
-                                if (rawAdminId) {
-                                    const adminIdKey = String(rawAdminId).replace(/[^a-zA-Z0-9_]/g, "_");
-                                    try {
-                                        const statsDocRef = db.collection("settings").doc("admin_stats");
-                                        const statsDoc = await statsDocRef.get();
-                                        let currentStats = statsDoc && statsDoc.exists ? statsDoc.data() || {} : {};
-                                        // Purge fake legacy "admin" or "Admin" key if present
-                                        delete currentStats.admin;
-                                        delete currentStats.Admin;
-                                        const adminStat = currentStats[adminIdKey] || { count: 0, fulfillments: 0, name: fulfilledBy };
-                                        adminStat.count = (adminStat.count || 0) + 1;
-                                        adminStat.fulfillments = (adminStat.fulfillments || 0) + 1;
-                                        adminStat.name = fulfilledBy || adminStat.name;
-                                        adminStat.lastFulfilledAt = Date.now();
-                                        adminStat.lastActiveAt = Date.now();
-                                        adminTotalFulfillCount = adminStat.fulfillments || adminStat.count;
-                                        currentStats[adminIdKey] = adminStat;
-                                        await statsDocRef.set(currentStats, { merge: true });
-                                    } catch (statErr) {
-                                        console.warn("Could not update admin fulfillment stats:", statErr.message);
-                                    }
-                                }
-
-                                recordLog("admin_app", `Request fulfilled: "${cleanAdminTitle}" by ${cleanFulfilledBy}`);
-
-                                const fulfillDateFormatted = formatRequestDateTime(new Date(), true);
-                                const countBadge = adminTotalFulfillCount > 0 ? ` (${adminTotalFulfillCount} Fulfilled 🏆)` : "";
-                                const adminNotifyText = `✅ <b>Request Fulfilled!</b>\n\n` +
-                                                     `🎬 <b>Title:</b> <b>${cleanAdminTitle}</b>${cleanAdminYear}\n` +
-                                                     `👤 <b>Fulfilled by:</b> ${cleanFulfilledBy}${countBadge}\n` +
-                                                     `🍿 <b>Requested for:</b> ${displayUser} (ID: <code>${escapeHtml(userId)}</code>)\n` +
-                                                     `📅 <b>Fulfilled:</b> ${fulfillDateFormatted}\n\n` +
-                                                     `⚡ <b>Remaining Queue:</b> <code>${pendingCount}</code> pending request(s) left.`;
-
-                                for (const adminId of allAdmins) {
-                                    try {
-                                        const adminUrl = `https://dans123456.github.io/filmhouse/admin.html?tg_id=${adminId}`;
-                                        const adminPanelBtn = String(adminId).startsWith("-")
-                                            ? { text: "👑 Open Film House Admin 🚀", url: adminUrl }
-                                            : { text: "👑 Open Film House Admin 🚀", web_app: { url: adminUrl } };
-                                        const adminReplyMarkup = {
-                                            inline_keyboard: [
-                                                ...(downloadLink ? [[{ text: "📥 Download Movie / Series 🍿", url: downloadLink }]] : []),
-                                                [adminPanelBtn]
-                                            ]
-                                        };
-                                        await callAdminTelegramWithRetry('sendMessage', adminId, adminNotifyText, {
-                                            parse_mode: "HTML",
-                                            reply_markup: adminReplyMarkup
-                                        });
-                                    } catch (err) {
-                                        console.warn(`Failed to notify admin ${adminId} of fulfillment:`, err.message);
-                                    }
-                                }
-                            } catch (adminErr) {
-                                console.error("Error in admin notification:", adminErr);
-                            }
+                        } else {
+                            await db.collection("requests").doc(docId).update({
+                                notifiedFulfilled: true,
+                                notificationStatus: "skipped_guest",
+                                notifiedAt: admin.firestore.FieldValue.serverTimestamp()
+                            }).catch(() => {});
                         }
+
+                        // Notify admins of the fulfillment
+                        try {
+                            const allAdmins = await getAllAdminIds();
+
+                            const pendingCount = cachedPendingRequests.length;
+                            const fulfilledBy = data.fulfilledBy || data.adminClaimName || "An Admin";
+                            const cleanAdminTitle = escapeHtml(title || "Movie");
+                            const cleanAdminYear = year ? ` (${escapeHtml(year)})` : "";
+                            const cleanFulfilledBy = escapeHtml(fulfilledBy);
+                            const cleanReqUser = escapeHtml(username || `User ${userId}`);
+                            const displayUser = cleanReqUser.startsWith('@') ? cleanReqUser : `@${cleanReqUser}`;
+
+                            // Track fulfillment counts per admin in Firestore safely (verified admin only)
+                            let adminTotalFulfillCount = 0;
+                            const rawAdminId = data.fulfilledById || (fulfilledBy && fulfilledBy.toLowerCase() !== 'admin' ? fulfilledBy : null);
+                            if (rawAdminId) {
+                                const adminIdKey = String(rawAdminId).replace(/[^a-zA-Z0-9_]/g, "_");
+                                try {
+                                    const statsDocRef = db.collection("settings").doc("admin_stats");
+                                    const statsDoc = await statsDocRef.get();
+                                    let currentStats = statsDoc && statsDoc.exists ? statsDoc.data() || {} : {};
+                                    // Purge fake legacy "admin" or "Admin" key if present
+                                    delete currentStats.admin;
+                                    delete currentStats.Admin;
+                                    const adminStat = currentStats[adminIdKey] || { count: 0, fulfillments: 0, name: fulfilledBy };
+                                    adminStat.count = (adminStat.count || 0) + 1;
+                                    adminStat.fulfillments = (adminStat.fulfillments || 0) + 1;
+                                    adminStat.name = fulfilledBy || adminStat.name;
+                                    adminStat.lastFulfilledAt = Date.now();
+                                    adminStat.lastActiveAt = Date.now();
+                                    adminTotalFulfillCount = adminStat.fulfillments || adminStat.count;
+                                    currentStats[adminIdKey] = adminStat;
+                                    await statsDocRef.set(currentStats, { merge: true });
+                                } catch (statErr) {
+                                    console.warn("Could not update admin fulfillment stats:", statErr.message);
+                                }
+                            }
+
+                            const reqModeLabel = isDocStreamFulfill ? "Stream" : "Download";
+                            recordLog("admin_app", `${reqModeLabel} request fulfilled: "${cleanAdminTitle}" by ${cleanFulfilledBy}`);
+
+                            const fulfillDateFormatted = formatRequestDateTime(new Date(), true);
+                            const countBadge = adminTotalFulfillCount > 0 ? ` (${adminTotalFulfillCount} Fulfilled 🏆)` : "";
+                            const adminHeader = isDocStreamFulfill
+                                ? `✅🟣 <b>Stream Request Fulfilled!</b>`
+                                : `✅📥 <b>Download Request Fulfilled!</b>`;
+                            const adminTypeLine = isDocStreamFulfill
+                                ? `📌 <b>Request Type:</b> 🟣 Online Stream\n`
+                                : `📌 <b>Request Type:</b> 📥 Telegram Download\n`;
+                            const adminNotifyText = `${adminHeader}\n\n` +
+                                                 `🎬 <b>Title:</b> <b>${cleanAdminTitle}</b>${cleanAdminYear}\n` +
+                                                 adminTypeLine +
+                                                 `👤 <b>Fulfilled by:</b> ${cleanFulfilledBy}${countBadge}\n` +
+                                                 `🍿 <b>Requested for:</b> ${displayUser} (ID: <code>${escapeHtml(userId)}</code>)\n` +
+                                                 `📅 <b>Fulfilled:</b> ${fulfillDateFormatted}\n\n` +
+                                                 `⚡ <b>Remaining Queue:</b> <code>${pendingCount}</code> pending request(s) left.`;
+
+                            for (const adminId of allAdmins) {
+                                try {
+                                    const adminUrl = `https://dans123456.github.io/filmhouse/admin.html?tg_id=${adminId}`;
+                                    const adminPanelBtn = String(adminId).startsWith("-")
+                                        ? { text: "👑 Open Film House Admin 🚀", url: adminUrl }
+                                        : { text: "👑 Open Film House Admin 🚀", web_app: { url: adminUrl } };
+                                    const mediaActionRow = isDocStreamFulfill
+                                        ? [[{ text: "▶️ Open Stream in Film House 🍿", url: notifyPayload.buttonUrl }]]
+                                        : (downloadLink ? [[{ text: "📥 Download Movie / Series 🍿", url: downloadLink }]] : []);
+                                    const adminReplyMarkup = {
+                                        inline_keyboard: [
+                                            ...mediaActionRow,
+                                            [adminPanelBtn]
+                                        ]
+                                    };
+                                    await callAdminTelegramWithRetry('sendMessage', adminId, adminNotifyText, {
+                                        parse_mode: "HTML",
+                                        reply_markup: adminReplyMarkup
+                                    });
+                                } catch (err) {
+                                    console.warn(`Failed to notify admin ${adminId} of fulfillment:`, err.message);
+                                }
+                            }
+                        } catch (adminErr) {
+                            console.error("Error in admin notification:", adminErr);
+                        }
+                    }
                     }
             });
         }, (err) => console.error("Requests listener error:", err));
