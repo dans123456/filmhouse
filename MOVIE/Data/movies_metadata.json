@@ -6127,15 +6127,21 @@
     "director": "",
     "trailer": "",
     "runtime": "",
-    "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTIyNTg6NzUwMTc2YzA2OWU0YzNmMQ",
+    "stream_url": "MTIyNTg6NzUwMTc2YzA2OWU0YzNmMQ",
     "stream_links": [
       {
-        "quality": "720P",
-        "url": "https://filmhouse-stream.duckdns.org/dl/MTIyNTg6NzUwMTc2YzA2OWU0YzNmMQ",
-        "stream_url": "https://filmhouse-stream.duckdns.org/dl/MTIyNTg6NzUwMTc2YzA2OWU0YzNmMQ"
+        "quality": "720p",
+        "stream_url": "MTIyNTg6NzUwMTc2YzA2OWU0YzNmMQ",
+        "url": "MTIyNTg6NzUwMTc2YzA2OWU0YzNmMQ"
       }
     ],
-    "links": []
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile3bot?start=BQADAQAD5wgAAo1OUEQ9RF1S4-oIexYE",
+        "quality": "720p",
+        "stream_url": "MTIyNTg6NzUwMTc2YzA2OWU0YzNmMQ"
+      }
+    ]
   },
   {
     "csv_id": "12445-harry-potter-and-the-deathly-hallows-part-2",
