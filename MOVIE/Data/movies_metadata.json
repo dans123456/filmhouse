@@ -1,5 +1,58 @@
 [
   {
+    "csv_id": "63174-lucifer",
+    "tmdb_id": 63174,
+    "imdb_id": "",
+    "title": "Lucifer",
+    "type": "Series",
+    "categories": [
+      "Main",
+      "Hollywood/British Series"
+    ],
+    "genres": [
+      "Crime",
+      "Sci-Fi & Fantasy"
+    ],
+    "overview": "Bored and unhappy as the Lord of Hell, Lucifer Morningstar abandoned his throne and retired to Los Angeles, where he has teamed up with LAPD detective Chloe Decker to take down criminals. But the longer he's away from the underworld, the greater the threat that the worst of humanity could escape.",
+    "poster": "https://image.tmdb.org/t/p/w500/ekZobS8isE6mA53RAiGDG93hBxL.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/w1280/ta5oblpMlEcIPIS2YGcq9XEkWK2.jpg",
+    "rating": 8.4,
+    "release_date": "2016-01-25",
+    "language": "en",
+    "cast": [],
+    "director": "",
+    "trailer": "X4bF_quwNtw",
+    "runtime": "",
+    "stream_url": "",
+    "stream_links": [],
+    "links": [
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADhxMAAo1OUESsWvDo1RMLuhYE",
+        "season": "Season 1"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADihMAAo1OUET8Vt4q1hC1rBYE",
+        "season": "Season 2"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADixMAAo1OUET7IjBfoAwoiBYE",
+        "season": "Season 3"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADjRMAAo1OUERGB_tkaAX62xYE",
+        "season": "Season 4"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADjxMAAo1OUESQIHO3oPUuThYE",
+        "season": "Season 5"
+      },
+      {
+        "url": "https://t.me/FilmHouseFile2bot?start=BQADAQADkRMAAo1OUEQh3P-3R5JcUhYE",
+        "season": "Season 6"
+      }
+    ]
+  },
+  {
     "csv_id": "66558-voltron-legendary-defender",
     "tmdb_id": 66558,
     "imdb_id": "",
@@ -63,7 +116,8 @@
         "url": "https://t.me/filmHouseFile1bot?start=BQADAQADhBIAAo1OUEQoUs2Sr73tyhYE",
         "season": "Season 8"
       }
-    ]
+    ],
+    "current_season": 1
   },
   {
     "csv_id": "1595124-steps",
