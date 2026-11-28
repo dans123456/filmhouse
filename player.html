@@ -2221,7 +2221,7 @@
           ${isActive ? '<span style="font-size:10.5px;font-weight:800;color:#ffbc00;background:rgba(255,188,0,0.2);padding:2px 8px;border-radius:12px;">Active</span>' : ''}
         `;
         item.onclick = () => {
-          window.postMessage({ action: 'switchAudioTrack', index: track.index, reloadWithTrack: true }, '*');
+          window.postMessage({ action: 'selectAudioTrack', index: track.index, reloadWithTrack: true }, '*');
           window._selectedAudioTrackIndex = track.index;
           tracks.forEach(t => t.enabled = (t.index === track.index));
           renderInPlayerAudioTracks();
@@ -3191,6 +3191,18 @@
             enabled: a.enabled
           });
         }
+      } else if (Array.isArray(window._probedAudioTracks) && window._probedAudioTracks.length > 0) {
+        const selIdx = typeof window._selectedAudioTrackIndex === 'number' ? window._selectedAudioTrackIndex : 0;
+        window._probedAudioTracks.forEach((pt, idx) => {
+          const rawLang = pt.language || pt.lang || '';
+          const rawTitle = pt.title || pt.name || pt.label || rawLang || `Audio ${idx + 1}`;
+          audioTracks.push({
+            index: idx,
+            label: rawTitle,
+            lang: rawLang,
+            enabled: (idx === selIdx)
+          });
+        });
       }
 
       // Universal Fallback for mobile WebViews / Plyr where videoEl.audioTracks is not exposed
@@ -3622,7 +3634,7 @@
                 }, '*');
               }
             } catch (_) { }
-          } else if (ev.data.action === 'selectAudioTrack') {
+          } else if (ev.data.action === 'selectAudioTrack' || ev.data.action === 'switchAudioTrack') {
             const targetIndex = parseInt(ev.data.index, 10);
             window._selectedAudioTrackIndex = targetIndex;
             let switchedClientSide = false;
@@ -4017,13 +4029,18 @@
               const token = m[1];
               const probeUrl = `${u.origin}/api/probe/${encodeURIComponent(token)}`;
               const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-              const timer = ctrl ? setTimeout(() => ctrl.abort(), 5000) : null;
+              const timer = ctrl ? setTimeout(() => ctrl.abort(), 15000) : null;
 
               fetch(probeUrl, ctrl ? { signal: ctrl.signal } : {})
                 .then(r => (r.ok ? r.json() : null))
                 .then(data => {
                   if (timer) clearTimeout(timer);
-                  if (!data || !data.ok || !data.hls_path) return;
+                  if (!data || !data.ok) return;
+                  if (Array.isArray(data.audio_tracks) && data.audio_tracks.length > 0) {
+                    window._probedAudioTracks = data.audio_tracks;
+                    if (typeof detectAndBroadcastTracks === 'function') detectAndBroadcastTracks();
+                  }
+                  if (!data.hls_path) return;
                   const shouldUseHls = !!(data.needs_hls || (Array.isArray(data.audio_tracks) && data.audio_tracks.length > 1) || audioParam);
                   if (!shouldUseHls) return;
 
